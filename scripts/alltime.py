@@ -149,13 +149,14 @@ def team_lists(rows, keys=('r', 'o', 'd')):
 
 
 # ---------------------------------------------------------------- players
-def player_lists(seasons, key_v, minv=None, per=None):
-    """seasons: dicts id, n, y, v (value, era-adjusted already), (+ tm, pos). -> peak (best season) and career (sum)"""
+def player_lists(seasons, key_v, minv=None, per=None, every=False):
+    """seasons: dicts id, n, y, v (value, era-adjusted already), (+ tm, pos). -> peak and career (sum).
+    every: the peak list ranks every player-season (a player can appear more than once); else his best season only"""
     peak = sorted([s for s in seasons if s['v'] is not None], key=lambda s: -s['v'])
     best = {}
     for s in peak:
         if s['id'] not in best: best[s['id']] = s
-    P = list(best.values())
+    P = peak if every else list(best.values())
     car = defaultdict(lambda: dict(v=0.0, n=0))
     for s in seasons:
         if s['v'] is None: continue
@@ -170,7 +171,7 @@ def player_lists(seasons, key_v, minv=None, per=None):
     C = sorted(car.items(), key=lambda kv: -kv[1]['v'])
     def prow(s):
         return dict(n=s['n'], y=s['y'], tm=s.get('tm'), pos=s.get('pos'), v=round(s['v'], 2), raw=s.get('raw'), est=s.get('est') or None,
-                    ph=s.get('ph'), ox=s.get('ox'), dx=s.get('dx'))
+                    ph=s.get('ph'), ox=s.get('ox'), dx=s.get('dx'), u=None if s.get('v0') is None else round(s['v0'], 2))
     def crow(pid, c):
         return dict(n=c['nm'], y0=c['y0'], y1=c['y1'], tm=c['tms'].most_common(1)[0][0], pos=c['pos'], v=round(c['v'], 1), s=c['n'],
                     pk=round(c['bestv'], 2), est=c['est'] or None, ph=c.get('ph'),
@@ -767,6 +768,105 @@ def player_era(S, ref=(2012, 2026)):
     return dict(mu=round(m0, 3), sd=round(s0, 3))
 
 
+def era_scale(S, rate, vol, value, reg, grp=lambda s: '', ref=10, vq=.9):
+    """Era adjustment, every sport (Noah Nov 20): a season's rate against that season's league, its volume against
+    that season's volume, both put in the units of the last `ref` seasons, then the sport's own value formula.
+      rate'  = mu_ref + sd_ref x (rate - season mean) / season SD   (regulars; SD pooled over the season +- WIN)
+      vol'   = vol x q_ref / season q                                (q = the vq quantile of the regulars' volume)
+      v      = value(rate', vol')
+    grp splits the pool (NHL skaters / goalies). vol None: rate only. Keeps v0 (as played).
+    -> {group: dict(mu, sd, q)} for the reference seasons and the per-season terms"""
+    out = {}
+    for g in sorted({grp(x) for x in S}):
+        G = [x for x in S if grp(x) == g]
+        R = defaultdict(list); V = defaultdict(list)
+        for x in G:
+            if reg(x) and rate(x) is not None:
+                R[x['y']].append(rate(x))
+                if vol: V[x['y']].append(vol(x))
+        mu = {y: float(np.mean(L)) for y, L in R.items() if len(L) >= 5}
+        sd = {}
+        for y in mu:
+            pool = [v - mu[t] for t in range(y - WIN, y + WIN + 1) if t in mu for v in R[t]]
+            sd[y] = float(np.sqrt(np.mean(np.square(pool)))) or 1.0
+        q = {y: float(np.quantile(V[y], vq)) for y in mu} if vol else {}
+        ys = sorted(mu)[-ref:]
+        m0 = float(np.mean([mu[y] for y in ys])); s0 = float(np.mean([sd[y] for y in ys]))
+        q0 = float(np.mean([q[y] for y in ys])) if vol else None
+        for x in G:
+            x.setdefault('v0', x['v'])
+            r = rate(x)
+            if x['y'] not in mu or r is None: x['v'] = None; continue
+            r2 = m0 + s0 * (r - mu[x['y']]) / sd[x['y']]
+            x['v'] = value(r2, vol(x) * q0 / q[x['y']]) if vol else r2
+        out[g or 'all'] = dict(mu=round(m0, 3), sd=round(s0, 3), q=None if q0 is None else round(q0, 1), ref=[ys[0], ys[-1]],
+                               by={y: [round(mu[y], 3), round(sd[y], 3), round(q[y], 1) if vol else None] for y in sorted(mu)})
+    return out
+
+
+def era_drift(rows, n=25):
+    """top-n seasons as played (v0) vs era-adjusted (v): who left, who came in, mean season, decade counts"""
+    a = sorted([r for r in rows if r.get('v0') is not None], key=lambda r: -r['v0'])[:n]
+    b = sorted([r for r in rows if r.get('v') is not None], key=lambda r: -r['v'])[:n]
+    k = lambda r: (r['id'], r['y'])
+    ka, kb = {k(r) for r in a}, {k(r) for r in b}
+    dec = lambda L: dict(sorted(Counter(r['y'] // 10 * 10 for r in L).items()))
+    return dict(out=[(fixenc(r['n']), r['y']) for r in a if k(r) not in kb], inn=[(fixenc(r['n']), r['y']) for r in b if k(r) not in ka],
+                y_raw=round(float(np.mean([r['y'] for r in a])), 1), y_adj=round(float(np.mean([r['y'] for r in b])), 1),
+                dec_raw=dec(a), dec_adj=dec(b), kept=len(ka & kb))
+
+
+def cs2_players():
+    """CS2 player-seasons (calendar years, bo3.gg per-map lines 2024-, scripts/cs2_players.py): that year's RWA (round win %
+    added per round, opponents credited at their year-end ratings, the board's S/A-tier lift) over the year's replacement
+    level (median of players with 1,000+ rounds), and rounds played. Built from the repo's per-map files, not the snapshot"""
+    import datetime as dt, cs2_players as CP, cs2_bo3
+    fitj = json.loads(CP.FIT.read_text()); p = fitj['params']; a = p['a']
+    M = CP.Maps()
+    c = CP.contributions(M, np.array([fitj['beta'][k] for k in CP.STATS]), np.array(fitj['mline']), p.get('pm', 0.0))
+    bo3 = cs2_bo3.Bo3(); tname = {}
+    for r in sorted(bo3.mt.values(), key=lambda r: r[1]): tname[r[2]], tname[r[3]] = r[4], r[5]
+    pdir = CP.load_pdir(); today = dt.date.today().toordinal() + 1; out = []
+    y0, y1 = dt.date.fromordinal(int(M.d.min())).year, dt.date.fromordinal(int(M.d.max())).year
+    for y in range(y0, y1 + 1):
+        T0, T1 = dt.date(y, 1, 1).toordinal(), min(dt.date(y + 1, 1, 1).toordinal(), today)
+        th, _ = CP.ratings(M, c, T1, p)
+        lift = p.get('ssg', 0.0) * CP.sa_share(M, T1) if p.get('ssg') else 0.0
+        rt, rd = CP.window_stats(M, c, th, T0, T1, p)
+        rt = rt + lift
+        act = rd >= 1000
+        if act.sum() < 20: continue
+        repl = float(np.median(rt[act]))
+        m = (M.d >= T0) & (M.d < T1); tm = defaultdict(Counter)
+        for i in np.where(m)[0]: tm[M.p[i]][int(M.team[i])] += M.R[i]
+        for i in np.where(rd >= 200)[0]:
+            pid = int(M.pids[i]); d = pdir.get(str(pid)) or [None] * 6
+            t = tname.get(tm[i].most_common(1)[0][0], '') if tm[i] else ''
+            out.append(dict(id=pid, n=M.nick.get(pid) or d[1] or str(pid), y=y, tm=t, pos=None, rate=float(a / 2 * (rt[i] - repl)), w=float(rd[i]),
+                            v=float(a / 2 * (rt[i] - repl) * rd[i] / 100), raw=round(float(a / 2 * (rt[i] - repl)), 2), reg=bool(act[i]), ph=d[5],
+                            ytd=T1 < dt.date(y + 1, 1, 1).toordinal()))
+    return out
+
+
+def hockey_prospect_seasons():
+    """Drafted skaters' pre-NHL seasons (NHL draft classes 2008-, scripts/data/hockey_rows.json.gz): draft year -1, draft
+    year and each later season outside the NHL, at 20+ games. NHLe = points per 82 NHL games at the league's fitted
+    factor (scripts/hockey_nhle.py), on a log scale (log(NHLe + 5): junior scoring is right-skewed). Age = on Dec 31 of the season"""
+    import datetime as dt
+    R = json.load(gzip.open(os.path.join(HERE, 'data', 'hockey_rows.json.gz'))); out = []
+    for r in R:
+        if r.get('G') or not r.get('birth'): continue
+        b = dt.date.fromisoformat(r['birth']); pos = 'D' if r.get('D') else 'F'
+        L = [(r['year'] - 1, r.get('dm1')), (r['year'], r.get('d0'))] + [(r['year'] + int(k), q) for k, q in (r.get('post') or {}).items()]
+        for y, q in L:
+            if not q or q.get('lg') == 'NHL' or not q.get('gp') or q['gp'] < 20 or q.get('nhle') is None: continue
+            age = int((dt.date(y - 1, 12, 31) - b).days / 365.25)
+            if age > 21: continue
+            out.append(dict(id=r['id'], n=r['name'], y=y, tm=q['lg'], pos=pos, age=max(age, 16), rate=math.log(max(q['nhle'], 0) + 5), w=q['gp'], v=q['nhle'],
+                            raw=round(q['nhle'], 1), reg=True, pick=r.get('pick'), dy=r['year']))
+    return out
+
+
 def fixenc(x):
     try: return x.encode('latin-1').decode('utf-8')
     except (UnicodeEncodeError, UnicodeDecodeError): return x
@@ -863,6 +963,7 @@ def face(sp, ph):
         if ph.startswith('e'): ph = ph[1:]
         return f'https://a.espncdn.com/combiner/i?img=/i/headshots/nhl/players/full/{ph}.png&w=96&h=70&scale=crop' if ph.isdigit() else None
     if sp == 'soccer': return f'https://img.a.transfermarkt.technology/portrait/medium/{ph}'
+    if sp == 'cs2': return ph if str(ph).startswith('https://') else None
     return None
 
 
@@ -876,8 +977,8 @@ def teams_out(sp, rows, keys=('r', 'o', 'd')):
     return T
 
 
-def players_out(seasons, pk, car, src, pos=True, tm=True, est=None, career=None, abouts=('', '')):
-    P = player_lists(seasons, 'v')
+def players_out(seasons, pk, car, src, pos=True, tm=True, est=None, career=None, abouts=('', ''), every=False):
+    P = player_lists(seasons, 'v', every=every)
     if career is not None: P['career'] = career
     for L in (P['peak'], P['career']):
         for r in L: r['n'] = fixenc(r['n'])
@@ -919,7 +1020,30 @@ def main():
     # CS2: each snapshot's top 50 are the pool
     res['cs2'] = {'teams': teams_out('cs2', src['cs2T'], keys=('r',))}
     nf = src['nbafit']
-    for k in ('nbaS', 'nhlS'): player_era(src[k])
+    # era adjustment (era_scale): NBA XPM vs the season's regulars + minutes per 82 vs the season's 90th pct load;
+    # NHL WAR per 82 vs the season, skaters and goalies apart (no minutes before 2008-09); CBB BPM + minutes; soccer GAR/90 + minutes
+    import nba_xpm
+    gsn = defaultdict(int)
+    for r in src['nbaT']: gsn[r['y']] = max(gsn[r['y']], sum(r['wl'][:2]))
+    for x in src['nbaS']: x['m82'] = x['mp'] * 82 / gsn[x['y']] if gsn.get(x['y']) else None
+    ERA = {}
+    ERA['nba'] = era_scale([x for x in src['nbaS'] if x['m82']], lambda x: x['raw'], lambda x: x['m82'],
+                           lambda r, m: nba_xpm.VORX_K * (r - nba_xpm.VORX_REP) * m / 48, reg=lambda x: x.get('reg'))
+    ERA['nhl'] = era_scale(src['nhlS'], lambda x: x['v'], None, None, reg=lambda x: x.get('reg'), grp=lambda x: 'G' if x.get('pos') == 'G' else 'S')
+    wpp = json.load(gzip.open(os.path.join(HERE, 'data', 'cbb_tabs_2026.json.gz')))['wfit']['wpp']
+    ERA['cbb'] = era_scale(src['cbbS'], lambda x: x['raw'], lambda x: x['w'], lambda r, m: (r + 2.0) * m / 40 * .68 * wpp, reg=lambda x: x['w'] >= 400)
+    ERA['soccer'] = era_scale(src['soccerS'], lambda x: x['v'] / x['raw'] * 90 if x.get('raw') else None, lambda x: x['raw'] or 0,
+                              lambda r, m: r * m / 90, reg=lambda x: (x.get('raw') or 0) >= 900)
+    cs = cs2_players()
+    ERA['cs2'] = era_scale(cs, lambda x: x['rate'], lambda x: x['w'], lambda r, m: r * m / 100, reg=lambda x: x['reg'])
+    hk = hockey_prospect_seasons()
+    ERA['hkp'] = era_scale(hk, lambda x: x['rate'], None, None, reg=lambda x: x['reg'], grp=lambda x: f"{x['pos']}{x['age']}")
+    for x in hk:   # NHLe+ = 100 + 25 SD against prospects of his age and position that season; adj NHLe kept for the column
+        if x['v'] is None: continue
+        e = ERA['hkp'][f"{x['pos']}{x['age']}"]; mu, sd = e['by'][x['y']][:2]
+        x['adj'] = round(math.exp(x['v']) - 5, 1); x['v'] = 100 + 25 * (x['rate'] - mu) / sd
+    nba_nom = [x for x in src['nbaS'] if not x['m82']]
+    for x in nba_nom: x['v'] = None
     hf = src['nhlfit']
     res['nba']['players'] = players_out(src['nbaS'], dict(l='VORX', t='wins over replacement on XPM: .030 x (XPM + 1.4) x MP / 48, per 82 games, in today\'s units', f='%.1f', rl='XPM', rt='XPM (DPM + BPM blend from 2009-10; BPM alone before)', rf='%.1f'),
                                         dict(l='VORX', t='career VORX, each season per 82 games in today\'s units', f='%.0f', s=1, pl='Peak', pt='best season VORX per 82'),
@@ -964,20 +1088,50 @@ def main():
     res['soccer']['players'] = players_out(src['soccerS'], dict(l='GAR', t='goals above replacement (soccer GAR), big-five leagues', f='%.1f', rl='Min', rt='minutes', rf='%.0f'),
                                            dict(l='GAR', t='career GAR, big-five seasons 2014-15 on', f='%.0f', s=1, pl='Peak', pt='best season GAR'), 'ESPN + FotMob',
                                            abouts=('Big-five league seasons 2014-15 on.', ''))
+    for sp_, k_ in (('nba', 'nbaS'), ('nhl', 'nhlS'), ('cbb', 'cbbS'), ('soccer', 'soccerS')):
+        old_ = res[sp_]['players']
+        P_ = players_out(src[k_], old_['pk'], old_['car'], old_['src'], pos=old_['pos'], est=old_['estT'], abouts=(old_['peak_about'], old_['career_about']), every=True)
+        for kk in old_:
+            if kk not in P_: P_[kk] = old_[kk]
+        P_['era'] = ERA[sp_]; P_['drift'] = era_drift(src[k_]); P_['u'] = True
+        res[sp_]['players'] = P_
+    res['cs2']['players'] = players_out(cs, dict(l='RAR', t="rounds won over a replacement player: RWA over replacement x rounds / 100, in today's units (RWA vs that year's players, rounds vs that year's load)", f='%.1f', rl='RWA', rt="round win % added per round over that year's replacement level", rf='%+.2f'),
+                                        dict(l='RAR', t='career RAR, each year in today\'s units', f='%.0f', s=1, pl='Peak', pt='best year RAR'),
+                                        'bo3.gg', pos=False, abouts=('Calendar years, 2024 on; current year to date.', ''), every=True)
+    res['cs2']['players'].update(era=ERA['cs2'], drift=era_drift(cs), u=True)
+    res['hkp'] = {'players': players_out([x for x in hk if x['v'] is not None], dict(l='NHLe+', t="NHLe against drafted prospects of his age and position that season: 100 = average, +25 = one SD", f='%.0f', rl='NHLe', rt='points per 82 NHL games at the league factor, as played', rf='%.1f'),
+                                         dict(l='NHLe+', t='sum of seasons over 100, in SDs', f='%.0f', s=1, pl='Peak', pt='best season NHLe+'),
+                                         'NHL + HockeyTech + Elite leagues', abouts=('Drafted skaters (2008 on), seasons outside the NHL at 20+ games, ages 16-21 (on Dec 31).', ''), every=True)}
+    for r in res['hkp']['players']['peak']:
+        q = next((x for x in hk if x['n'] == r['n'] and x['y'] == r['y'] and x['tm'] == r['tm']), None)
+        if q: r['u'] = q['adj']; r['age'] = q['age']
+    res['hkp']['players'].update(era=ERA['hkp'], u=True, ul='Adj', ut="NHLe in today's units for his age and position (season mean and SD set to the last 10 seasons')")
+    res['hkp']['players'].update(tmL='Lg', age=True, career=[])
+    def _e(sp, k='all'):
+        e = ERA[sp][k]; return f"{e['ref'][0]}-{e['ref'][1]}"
+    ET = {'nba': f"Era: XPM against that season's regulars (mean, SD), minutes per 82 against that season's 90th pct load, both in {_e('nba')} units; BPM is per 100 possessions, so pace is already out.",
+          'nhl': f"Era: WAR per 82 against that season's regulars (mean, SD), skaters and goalies apart, in {_e('nhl', 'S')} units.",
+          'cbb': f"Era: BPM against that season's regulars (400+ min), minutes against that season's 90th pct, in {_e('cbb')} units.",
+          'soccer': f"Era: GAR per 90 against that season's regulars (900+ min), minutes against that season's 90th pct, in {_e('soccer')} units.",
+          'cs2': f"Era: RWA against that year's regulars (1,000+ rounds), rounds against that year's 90th pct, in {_e('cs2')} units.",
+          'hkp': 'Era: log NHLe against drafted skaters of the same age and position that season (SD pooled +- 2 seasons).'}
+    for sp_, t_ in ET.items(): res[sp_]['players']['eraT'] = t_
     for t in ('atp', 'wta'):
         S = src[t]
         pk = players_out([dict(s, v=100 + 25 * s['v']) for s in S if s['v'] is not None],
                          dict(l='Elo+', t="peak Elo that year against the year's #20 (100) in SDs of the year's top 100 (x25)", f='%.0f', rl='Elo', rt='peak Elo that year', rf='%.0f'),
-                         {}, 'Sackmann archive', pos=False, tm=False)
+                         {}, 'Sackmann archive', pos=False, tm=False, every=True)
+        drift = era_drift([dict(s, v=s['v'], v0=s['raw']) for s in S if s['v'] is not None])
         cr = players_out([dict(s, v=s['cv']) for s in S], {}, dict(l='Career', t="sum of year-end Elo over the year's #20, in SDs of the year's top 100", f='%.1f', s=1, pl='', pt=''),
                          'Sackmann archive', pos=False, tm=False)
         pk['career'] = cr['career']; pk['car'] = cr['car']
         pk['peak_about'] = 'Tour-level singles; peak counts after 40 matches.'; pk['career_about'] = 'Years with 20+ tour-level matches.'
+        pk['drift'] = drift; pk['eraT'] = "Era: Elo against that year's #20, in SDs of that year's top 100."
         res[t] = {'players': pk}
     snm = {}
     import names as NM
     for r in src['soccerT']: snm[NM.team_key(fixenc(r['t']))] = r.get('c')
-    for sp, g in (('nba', 'players'), ('nhl', 'players'), ('cbb', 'players'), ('nfl', 'players'), ('nfl', 'qbs'), ('soccer', 'players')):
+    for sp, g in (('nba', 'players'), ('nhl', 'players'), ('cbb', 'players'), ('nfl', 'players'), ('nfl', 'qbs'), ('soccer', 'players'), ('cs2', 'players')):
         P = res[sp].get(g)
         if not P: continue
         for L in (P['peak'], P['career']):

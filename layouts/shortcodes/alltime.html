@@ -1,12 +1,12 @@
-{{- /* All-time team-seasons and players (scripts/alltime.py, data/alltime.json). sport="cfb|cbb|nfl|nba|nhl|soccer|cs2|atp|wta"
+{{- /* All-time team-seasons and players (scripts/alltime.py, data/alltime.json). sport="cfb|cbb|nfl|nba|nhl|hkp|soccer|cs2|atp|wta"
        list="teams|offense|defense" (team-seasons, era-adjusted: 100 + 25 SD over that season's league) or "peak|career" (players);
        group="qbs" (NFL, CFB: the QB lists, with QB columns; NFL's default players lists then hold everyone else).
        Method on Process (Glossary/Methodology). Mobile: the cfbp cards (name + key number, season under it, the rest labelled). */ -}}
 {{- $sp := $.Get "sport" -}}{{- $L := $.Get "list" | default "teams" -}}
 {{- $D := index site.Data.alltime $sp -}}
 {{- $asof := lower ((time site.Data.alltime.asof).Format "Jan 2, 2006") -}}
-{{- $icon := index (dict "cfb" "football" "nfl" "football" "cbb" "basketball" "nba" "basketball" "nhl" "hockey" "soccer" "soccer" "cs2" "cs" "atp" "tennis" "wta" "tennis") $sp -}}
-{{- $split := in (slice "cbb" "nba" "nhl" "soccer") $sp -}}
+{{- $icon := index (dict "cfb" "football" "nfl" "football" "cbb" "basketball" "nba" "basketball" "nhl" "hockey" "hkp" "hockey" "soccer" "soccer" "cs2" "cs" "atp" "tennis" "wta" "tennis") $sp -}}
+{{- $split := in (slice "cbb" "nba" "nhl" "soccer" "hkp") $sp -}}
 {{- $lgN := dict "eng.1" "EPL" "esp.1" "LaLiga" "ger.1" "BL" "ita.1" "Serie A" "fra.1" "L1" "AFL" "AFL" "AAFC" "AAFC" -}}
 {{- if and $D (in (slice "teams" "offense" "defense") $L) -}}{{- with $D.teams -}}
 {{- $T := . -}}{{- $rows := index . $L -}}
@@ -48,12 +48,13 @@
 {{- $M := cond $peak .pk .car -}}
 {{- $od := and .od true -}}
 {{- $qb := and .qb true -}}{{- $sk := and .skill true -}}{{- $posOn := and .pos (not $qb) -}}
-{{- $gfx := printf "RK,Player,%s,%s%s%s%s" (cond $peak "Season" "Years") (cond .tm "Team," "") $M.l (cond $od ",O-XPM,D-XPM" "") (cond $qb (cond (eq $sp "cfb") ",QBR,ANY/A" (cond $peak ",EPA/db,ANY/A" ",Yds,TD")) (cond $sk ",Pos,Scrim" "")) -}}
+{{- $gfx := printf "RK,Player,%s,%s%s%s%s" (cond $peak "Season" "Years") (cond .tm (printf "%s," (.tmL | default "Team")) "") $M.l (cond $od ",O-XPM,D-XPM" "") (cond $qb (cond (eq $sp "cfb") ",QBR,ANY/A" (cond $peak ",EPA/db,ANY/A" ",Yds,TD")) (cond $sk ",Pos,Scrim" "")) -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (cond $peak "all-time peak seasons" "all-time careers")) "filter" (cond $posOn "Era,Pos" "Era") "rerank" true "tab" ($.Get "tab") "icon" $icon "gfxCols" $gfx "gfxDate" $asof "gfxMax" "25") -}}
 <table class="cfb__table cfbp alltime">
   <thead><tr><th>RK</th><th>Player</th><th>{{ if $peak }}Season{{ else }}Years{{ end }}</th>
-    {{- if .tm }}<th>Team</th>{{ end }}{{ if $posOn }}<th>Pos</th>{{ end }}
+    {{- if .tm }}<th>{{ .tmL | default "Team" }}</th>{{ end }}{{ if $posOn }}<th>Pos</th>{{ end }}{{ if and $peak .age }}<th title="age on Dec 31 of the season">Age</th>{{ end }}
     <th class="cfb__g" title="{{ $M.t }}">{{ $M.l }}</th>
+    {{- if and $peak .u }}<th title="{{ .ut | default "as played, before the era adjustment" }}">{{ .ul | default "Unadj" }}</th>{{ end }}
     {{- if $od }}<th title="{{ if $peak }}offensive XPM that season{{ else }}career offensive XPM, minutes-weighted{{ end }} (.5 ODPM + .5 OBPM from 2009-10, OBPM before; - before 1973-74)">O-XPM</th><th title="{{ if $peak }}defensive XPM that season{{ else }}career defensive XPM, minutes-weighted{{ end }} (.5 DDPM + .5 DBPM from 2009-10, DBPM before; - before 1973-74)">D-XPM</th>{{ end }}
     {{- if $peak }}{{ with .pk.rl }}<th title="{{ $P.pk.rt }}">{{ . }}</th>{{ end }}
     {{- else }}{{ if .car.s }}<th title="seasons">Seasons</th>{{ end }}{{ with .car.pl }}<th title="{{ $P.car.pt }}">{{ . }}</th>{{ end }}{{ end }}
@@ -74,8 +75,9 @@
     <td class="cfbp__role">{{ if $split }}{{ sub .y0 1 }}{{ else }}{{ .y0 }}{{ end }}-{{ if $split }}{{ substr (string .y1) 2 2 }}{{ else }}{{ .y1 }}{{ end }}</td>
     {{- end }}
     {{- if $P.tm }}<td class="cfb__team">{{ with .lo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span>{{ .tm }}</span></td>{{ end }}
-    {{- if $posOn }}<td class="cfbp__conf">{{ .pos | default "-" }}</td>{{ end }}
+    {{- if $posOn }}<td class="cfbp__conf">{{ .pos | default "-" }}</td>{{ end }}{{ if and $peak $P.age }}<td class="cfb__num" data-l="Age" data-v="{{ .age }}">{{ .age | default "-" }}</td>{{ end }}
     <td class="cfb__num cfb__g cfbp__surplus is-key" data-l="{{ $M.l }}" data-v="{{ .v }}"><b>{{ partial "num.html" (slice $M.f .v) }}</b></td>
+    {{- if and $peak $P.u }}<td class="cfb__num{{ if eq .u nil }} at-na{{ end }}" data-l="{{ $P.ul | default "Unadj" }}" data-v="{{ .u }}">{{ with .u }}{{ partial "num.html" (slice $P.pk.f .) }}{{ else }}-{{ end }}</td>{{ end }}
     {{- if $od }}
     <td class="cfb__num{{ if eq .ox nil }} at-na{{ end }}" data-l="O-XPM" data-v="{{ .ox }}">{{ with .ox }}{{ if ge . 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.1f" .) }}{{ else }}-{{ end }}</td>
     <td class="cfb__num{{ if eq .dx nil }} at-na{{ end }}" data-l="D-XPM" data-v="{{ .dx }}">{{ with .dx }}{{ if ge . 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.1f" .) }}{{ else }}-{{ end }}</td>
@@ -132,6 +134,6 @@
   {{- end }}
   </tbody>
 </table>
-{{- $about := printf "%s player-seasons %v-%v. %s" (string .n) .from .to (index . (printf "%s_about" $L) | default "") -}}
+{{- $about := printf "%s player-seasons %v-%v. %s%s" (string .n) .from .to (index . (printf "%s_about" $L) | default "") (cond (and $peak (isset . "eraT")) (printf " %s" (.eraT | default "")) "") -}}
 {{- partial "wintable-close.html" (dict "rows" (len $rows) "note" (printf "%s · updated %s" .src $asof) "about" $about) -}}
 {{- end -}}{{- end -}}

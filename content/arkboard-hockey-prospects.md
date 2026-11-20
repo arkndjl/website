@@ -11,11 +11,14 @@ cover = "/og/hockey-prospects.png"
 
 {{< winpane title="hockey_prospects.exe :: 2027 draft" icon="hockey" sprite="px/hero-hockey" status="NHL API · Tankathon · Central Scouting · HockeyTech · MoneyPuck" class="winpane--art" />}}
 
-{{< wintabs groups="players:draft board,drafted prospects,first-year,ARKLIST|draft:mock draft|model:fv model,past boards,all-time FV" side="true" label="Hockey prospects views" >}}
+{{< wintabs groups="players:draft board,drafted prospects,first-year,peak seasons,ARKLIST|draft:mock draft|model:fv model,past boards,all-time FV" side="true" label="Hockey prospects views" >}}
 {{< hockeyboard view="board" tab="draft board" >}}
 {{< hockeyboard view="pipe" tab="drafted prospects" >}}
 {{< rookies sport="hockey" icon="hockey" title="first-year" tab="first-year" >}}
 {{< arklist sport="hockey-prospects" title="ARKLIST" tab="ARKLIST" >}}
+{{< lazytab tab="peak seasons" >}}
+{{< alltime sport="hkp" list="peak" title="peak seasons" tab="peak seasons" >}}
+{{< /lazytab >}}
 {{< hockeyboard view="past" tab="past boards" >}}
 {{< desk tab="fv model" >}}
 {{< deskcol >}}
