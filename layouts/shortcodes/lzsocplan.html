@@ -1,5 +1,5 @@
 {{- /* LAURSEN_111 social tab windows from data/laursen_socials.json .plan (scripts/laursen_social_plan.mjs).
-       {{< lzsocplan part="plan|youtube|twitch|tiktok" class="desk__wide" >}}
+       {{< lzsocplan part="plan|youtube|twitch|tiktok|instagram" class="desk__wide" >}}
        Another account: src = data file, name = GFX title (about/contact: src="arkndjl_socials" name="ARKNDJL", parts x / youtube / plan,
        scripts/arkndjl_socials.mjs). */ -}}
 {{- $src := .Get "src" | default "laursen_socials" }}{{ $s := index site.Data $src }}{{ $who := .Get "name" | default "LAURSEN_111" -}}{{- $p := $s.plan | default dict -}}{{- $part := .Get "part" | default "plan" -}}
@@ -7,8 +7,9 @@
 {{- $days := slice "Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" }}{{ $blocks := slice "12a" "4a" "8a" "12p" "4p" "8p" -}}
 {{- $fmt := "Jan 2" -}}
 {{- $ytl := "Shorts" }}{{ with $p.roll }}{{ with .ytl }}{{ $ytl = . }}{{ end }}{{ end -}}
-{{- $names := dict "x" (slice "x.exe" "icon-twitter") "plan" (slice "insights.exe" (cond (eq $src "laursen_socials") "icon-twitch" "icon-twitter")) "youtube" (slice "youtube.exe" "icon-youtube") "twitch" (slice "twitch.exe" "icon-twitch") "tiktok" (slice "tiktok_stats.exe" "icon-tiktok") -}}
+{{- $names := dict "x" (slice "x.exe" "icon-twitter") "plan" (slice "insights.exe" (cond (eq $src "laursen_socials") "icon-twitch" "icon-twitter")) "youtube" (slice "youtube.exe" "icon-youtube") "twitch" (slice "twitch.exe" "icon-twitch") "tiktok" (slice "tiktok_stats.exe" "icon-tiktok") "instagram" (slice "instagram.exe" "icon-instagram") -}}
 {{- $nm := index $names $part -}}
+{{- if or (ne $part "instagram") $p.ig }}
 <div class="win lzf lzp{{ with .Get "class" }} {{ . }}{{ end }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#{{ index $nm 1 }}"/></svg>{{ index $nm 0 }}<span class="win__cursor" aria-hidden="true">_</span></span>
@@ -232,8 +233,40 @@
     </div>
     {{- end }}
   {{- else }}<p class="esea__empty-line">no TikTok data yet.</p>{{ end }}
+{{- else if eq $part "instagram" }}
+  {{- with $p.ig }}{{ $y := . }}
+    <ul class="esea__tiles lzf__tiles">
+      <li><span class="esea__v">{{ with .likes }}{{ lang.FormatNumber 0 (float .) }}{{ else }}—{{ end }}</span><span class="esea__k" title="likes summed over every post">likes</span></li>
+      <li><span class="esea__v">{{ .lpp }}</span><span class="esea__k" title="likes per post">likes/post</span></li>
+      <li><span class="esea__v">{{ .posts }}</span><span class="esea__k">posts</span></li>
+      <li><span class="esea__v">{{ with .views }}{{ lang.FormatNumber 0 (float .) }}{{ else }}—{{ end }}</span><span class="esea__k" title="views summed over every post (Instagram insights)">views</span></li>
+      <li><span class="esea__v">{{ lang.FormatNumber 0 (float .l10.avg) }}</span><span class="esea__k" title="mean views, last {{ .l10.n }} posts · median {{ lang.FormatNumber 0 (float .l10.med) }}">L10 avg</span></li>
+      <li><span class="esea__v">{{ with .er }}{{ . }}%{{ else }}—{{ end }}</span><span class="esea__k" title="(likes + comments) per post over followers, last {{ .l10.n }} posts">ER</span></li>
+    </ul>
+    {{- with .vids }}{{ $n := len . }}{{ $max := 1.0 }}{{ range . }}{{ if gt (float .views) $max }}{{ $max = float .views }}{{ end }}{{ end }}
+    {{- $h := 90.0 }}{{ $w := 10 }}
+    <svg class="lzf__chart" viewBox="0 0 {{ mul $n $w }} {{ $h }}" preserveAspectRatio="none" shape-rendering="crispEdges" role="img" aria-label="views per Instagram post, oldest to newest">
+      {{- range $i, $u := . }}{{ $bh := math.Max (div (mul (float $u.views) (sub $h 2)) $max) 0.6 }}
+      <rect x="{{ add (mul $i $w) 1 }}" y="{{ sub $h $bh }}" width="{{ sub $w 2 }}" height="{{ $bh }}" class="{{ if eq $u.type "reel" }}is-short{{ else }}is-long{{ end }}"><title>{{ (time.In "America/New_York" (time (int (div $u.pub 1000)))).Format "Jan 2 3:04 PM" }} · {{ $u.cap }} · {{ lang.FormatNumber 0 (float $u.views) }} views · {{ $u.l }} likes</title></rect>
+      {{- end }}
+      {{- range $i, $u := . }}{{ with $u.r5 }}<rect x="{{ mul $i $w }}" y="{{ math.Max (sub (sub $h (div (mul (float .) (sub $h 2)) $max)) 1) 0 }}" width="{{ $w }}" height="2" class="lzf__roll"><title>trailing 5 {{ lang.FormatNumber 0 (float .) }}</title></rect>{{ end }}{{ end }}
+    </svg>
+    <p class="esea-fc__axis lzf__axis"><span>older</span><span>views · <i class="lzp__key is-short"></i> reel <i class="lzp__key is-long"></i> post <i class="lzf__key"></i> 5-post</span><span>latest</span></p>
+    <div class="wintable__scroll lzp__ups">
+    <table class="esea-box">
+      <thead><tr><th>Posted</th><th>Post</th><th>Views</th><th>Likes</th><th title="comments">Cmt</th></tr></thead>
+      <tbody>{{ range collections.Reverse . }}<tr>
+        <td class="cfb__dim">{{ (time.In "America/New_York" (time (int (div .pub 1000)))).Format "Jan 2 3PM" }}</td>
+        <td class="lzp__t"><a href="{{ .url }}" rel="noopener" target="_blank">{{ .cap | default .type }}</a></td>
+        <td><b>{{ lang.FormatNumber 0 (float .views) }}</b></td><td>{{ .l }}</td><td>{{ .c }}</td>
+      </tr>{{ end }}</tbody>
+    </table>
+    </div>
+    {{- end }}
+  {{- else }}<p class="esea__empty-line">no Instagram data yet.</p>{{ end }}
 {{- end }}
   </div>
-  <div class="win__status"><span title="{{ if eq $part "x" }}X via api.fxtwitter.com: his latest ~20 posts each run, kept once seen; views are the last reading{{ else if eq $part "youtube" }}YouTube {{ if eq $p.src.yt "api" }}Data API{{ else }}channel feed{{ end }}; timing splits use uploads 3+ days old; xViews = exp of mean log views shrunk toward the channel's with 3 uploads of weight{{ else if eq $part "tiktok" }}TikTok public profile (likes, videos) and creator embed (views on the latest videos){{ else if eq $part "twitch" }}Twitch {{ if eq $p.src.tw "helix" }}Helix API (streams + VOD archive){{ else }}live viewer count via decapi.me, sampled about every 30 minutes{{ end }}; follows per hour split by whether he was live between follower readings{{ else if ne $src "laursen_socials" }}calls from x.exe, youtube.exe and social_data.exe; each unlocks once its sample is big enough; n = sample size{{ else }}calls from youtube.exe, twitch.exe, tiktok_stats.exe and social_data.exe; each unlocks once its sample is big enough; n = sample size{{ end }}">{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span title="{{ if eq $part "x" }}X via api.fxtwitter.com: his latest ~20 posts each run, kept once seen; views are the last reading{{ else if eq $part "youtube" }}YouTube {{ if eq $p.src.yt "api" }}Data API{{ else }}channel feed{{ end }}; timing splits use uploads 3+ days old; xViews = exp of mean log views shrunk toward the channel's with 3 uploads of weight{{ else if eq $part "instagram" }}Instagram API (Instagram Login): followers, likes and comments on every post, views from post insights{{ else if eq $part "tiktok" }}TikTok public profile (likes, videos) and creator embed (views on the latest videos){{ else if eq $part "twitch" }}Twitch {{ if eq $p.src.tw "helix" }}Helix API (streams + VOD archive){{ else }}live viewer count via decapi.me, sampled about every 30 minutes{{ end }}; follows per hour split by whether he was live between follower readings{{ else if ne $src "laursen_socials" }}calls from x.exe, youtube.exe and social_data.exe; each unlocks once its sample is big enough; n = sample size{{ else }}calls from youtube.exe, twitch.exe, tiktok_stats.exe and social_data.exe; each unlocks once its sample is big enough; n = sample size{{ end }}">{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{ partial "gfx.html" . }}
+{{- end }}

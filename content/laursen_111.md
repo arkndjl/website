@@ -19,6 +19,7 @@ draft = false
 {{< lzsocplan part="twitch" class="desk__wide" >}}
 {{< lzsocplan part="youtube" class="desk__wide" >}}
 {{< lzsocplan part="tiktok" class="desk__wide" >}}
+{{< lzsocplan part="instagram" class="desk__wide" >}}
 {{< lzsocplan part="plan" class="desk__wide" >}}
 {{< /desk >}}
 {{< desk tab="clips" >}}
