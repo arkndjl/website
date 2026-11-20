@@ -21,7 +21,10 @@ cover = "/og/nfl.png"
 {{< rookies sport="nfl" src="data/next-up/nfl-tab.json" icon="football" title="next up" tab="next up" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
-{{< awards sport="nfl" tab="awards" >}}
+{{< wintabs tab="awards" tabs="predictive awards,conviction awards" sub="true" label="awards views" >}}
+{{< awards sport="nfl" tab="predictive awards" >}}
+{{< awards sport="nfl" tab="conviction awards" view="conv" >}}
+{{< /wintabs >}}
 {{< arklist sport="nfl" title="ARKLIST" tab="ARKLIST" >}}
 {{< nflgames title="games" tab="games" >}}
 {{< nflgametable title="game table" tab="game table" >}}

@@ -19,7 +19,10 @@ cover = "/og/soccer.png"
 {{< lazytab tab="next up" >}}
 {{< rookies sport="soccer" src="data/next-up/soccer-tab.json" icon="soccer" title="next up" tab="next up" >}}
 {{< /lazytab >}}
-{{< lazytab tab="awards" >}}{{< awards sport="soccer" tab="awards" >}}{{< /lazytab >}}
+{{< wintabs tab="awards" tabs="predictive awards,conviction awards" sub="true" label="awards views" >}}
+{{< lazytab tab="predictive awards" >}}{{< awards sport="soccer" tab="predictive awards" >}}{{< /lazytab >}}
+{{< lazytab tab="conviction awards" >}}{{< awards sport="soccer" tab="conviction awards" view="conv" >}}{{< /lazytab >}}
+{{< /wintabs >}}
 {{< arklist sport="soccer" title="ARKLIST" tab="ARKLIST" >}}
 {{< soccerlineups title="lineups" tab="lineups" >}}
 {{< lazytab tab="transactions" >}}

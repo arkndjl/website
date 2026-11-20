@@ -25,7 +25,10 @@ cover = "/og/nba.png"
 {{< rookies sport="nba" src="data/next-up/nba-tab.json" icon="basketball" title="next up" tab="next up" >}}
 {{< /lazytab >}}
 {{< gleague title="G League" tab="G League" >}}
-{{< awards sport="nba" tab="awards" >}}
+{{< wintabs tab="awards" tabs="predictive awards,conviction awards" sub="true" label="awards views" >}}
+{{< awards sport="nba" tab="predictive awards" >}}
+{{< awards sport="nba" tab="conviction awards" view="conv" >}}
+{{< /wintabs >}}
 {{< arklist sport="nba" title="ARKLIST" tab="ARKLIST" >}}
 {{< nbagames title="games" tab="games" >}}
 {{< nbagametable title="game table" tab="game table" >}}

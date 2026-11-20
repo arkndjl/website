@@ -14,7 +14,12 @@ A candidate's P(win) is the voter model's softmax averaged over the simulations.
 market for the award the shown P(win) is the log-linear blend model^(1 - w) x market^w, w = MKT_W (Noah, Nov 19 2026:
 on the 2025-26 races the model's winner log loss was 2.32 against the market's 1.12, the blend 1.13 at w .95, t -2.26
 by race; scripts/research/sweep_nov19/markets/a1_award_market.py). The model's own number stays on the row (pm) and
-the market's (mkt, no vig) beside it. Stdlib only."""
+the market's (mkt, no vig) beside it.
+
+Two views a sport (Noah, Nov 20 2026): "races" = predictive (who the voters will pick, above); "conv" = conviction (who
+leads the award's pool on our own value metric: P(lead) from the same simulations, no voter model and no market; lead()).
+Football's conviction pools are the boards' WAR lines by position (war_lead), so they cover awards whose voter model
+failed too. Stdlib only."""
 import datetime as dt, json, math, os, random, re, sys, urllib.request
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import awards_engine as E
@@ -140,6 +145,54 @@ def prune(cands, spec, draw, rng, keep=45):
     p = race(cands, spec, draw, rng, sims=60)
     order = sorted(range(len(cands)), key=lambda i: -p[i])
     return [cands[i] for i in order[:keep] if p[i] > 1e-5 or i == order[0]]
+
+
+CONV = None             # main sets {}: each race function then records its conviction race here (award -> Rows)
+
+
+def lead(aw, pool, draw, metric, show, rng, k=1, sims=SIMS, keep=60, top=SHOW):
+    """the conviction race: P(lead) = the share of simulations in which the candidate leads the award's eligible pool
+    (is in its top k) on our own value metric, from the same simulated finishes as the voter race. No voter model, no
+    market. The pool is cut to the `keep` best by mean metric at a few draws first. Recorded in CONV[aw]."""
+    if CONV is None or not pool: return
+    acc = {}
+    for _ in range(40):
+        td = draw.teams(rng)
+        for i, c in enumerate(pool):
+            f = draw(c, td, rng)
+            if f is not None: acc.setdefault(i, []).append(f[metric])
+    order = sorted(acc, key=lambda i: -sum(acc[i]) / len(acc[i]))[:max(keep, 4 * k)]
+    cands = [pool[i] for i in order]
+    win = [0] * len(cands)
+    tot = [[0.0] * len(show) for _ in cands]
+    cnt = [0] * len(cands)
+    for _ in range(sims):
+        td = draw.teams(rng)
+        z = []
+        for i, c in enumerate(cands):
+            f = draw(c, td, rng)
+            if f is None: continue
+            z.append((f[metric], i))
+            cnt[i] += 1
+            for j, (x, _, _) in enumerate(show): tot[i][j] += f[x]
+        z.sort(reverse=True)
+        for _, i in z[:k]: win[i] += 1
+    out = []
+    for i, c in enumerate(cands):
+        r = bare(c, win[i] / sims)
+        if cnt[i]: r['x'] = {x: round(tot[i][j] / cnt[i], 3) for j, (x, _, _) in enumerate(show)}
+        out.append(r)
+    out.sort(key=lambda r: (-r['p'], -(r['x'].get(metric) or -1e9)))
+    rows = Rows(out[:top if k == 1 else max(top, 2 * k)])
+    rows.rest = out[len(rows):]
+    rows.show, rows.metric = show, metric
+    if k > 1: rows.k = k
+    CONV[aw] = rows
+
+
+def first(show, metric):
+    """the shown stats with the conviction metric first"""
+    return [t for t in show if t[0] == metric] + [t for t in show if t[0] != metric]
 
 
 class Rows(list):
@@ -386,6 +439,7 @@ def nba_races(fit, rng, cands, teams, conf, G=82, min_g=65, sims=SIMS):
         pool = [c for c in cands if pool_f(c)]
         dr = lambda c, td, rng, e=elig: draw(c, td, rng, e)
         dr.teams = teams_draw
+        lead(aw, pool, dr, spec['null'][0], first(show, spec['null'][0]), rng)
         pool = prune(pool, spec, dr, rng)
         p = race(pool, spec, dr, rng, sims)
         dm = lambda c, td, rng: draw(c, td, rng, False)
@@ -395,11 +449,12 @@ def nba_races(fit, rng, cands, teams, conf, G=82, min_g=65, sims=SIMS):
     if spec and spec['test'].get('pass'):
         dr = lambda c, td, rng: draw(c, td, rng, True)
         dr.teams = teams_draw
+        show = [('vorx', 'VORX', '%.1f'), ('ppg', 'PPG', '%.1f'), ('wp', 'W%', 'pct'), ('gfrac', 'G', 'g82')]
+        lead('allnba', [c for c in cands if c['mpg'] >= 20], dr, spec['null'][0], show, rng, k=spec.get('k', 15))
         pool = prune([c for c in cands if c['mpg'] >= 20], spec, dr, rng, keep=60)
         dm = lambda c, td, rng: draw(c, td, rng, False)
         dm.teams = teams_draw
-        yield 'allnba', pool, race_k(pool, spec, dr, rng, spec.get('k', 15), sims), dm, [
-            ('vorx', 'VORX', '%.1f'), ('ppg', 'PPG', '%.1f'), ('wp', 'W%', 'pct'), ('gfrac', 'G', 'g82')]
+        yield 'allnba', pool, race_k(pool, spec, dr, rng, spec.get('k', 15), sims), dm, show
 
 
 # ---------------------------------------------------------------- NHL
@@ -490,6 +545,7 @@ def nhl_races(fit, rng, cands, teams, G=82, sims=SIMS):
             ('calder', lambda c: c['rookie'] and c['gp'] >= 3, [('war', 'WAR', '%.1f'), ('pts', 'PTS', '%.0f'), ('g', 'G', '%.0f'), ('tpct', 'PTS%', 'pct')])):
         spec = fit.get(aw)
         if not spec or not spec['test'].get('pass'): continue
+        lead(aw, [c for c in cands if pool_f(c)], draw, spec['null'][0], first(show, spec['null'][0]), rng)
         pool = prune([c for c in cands if pool_f(c)], spec, draw, rng)
         p = race(pool, spec, draw, rng, sims)
         yield aw, pool, p, draw, show
@@ -553,6 +609,7 @@ def cbb(fit, rng):
     if not spec or not spec['test'].get('pass'): return None
     show = [('bpm', 'BPM', '%+.1f'), ('ppg', 'PPG', '%.1f'), ('wp', 'W%', 'pct')]
     pool = [c for c in cands if c['mpg'] >= 20]
+    lead('wooden', pool, draw, spec['null'][0], first(show, spec['null'][0]), rng)
     pool = prune(pool, spec, draw, rng, keep=60)
     p = race(pool, spec, draw, rng)
     return {'season': G.get('season', ''), 'races': [('wooden', rows_out(pool, p, draw, show, rng), show)], 'logo': 'cbb'}
@@ -594,7 +651,7 @@ def football_draw(teams, per_left, sport):
             rate = c['f'][k] / gn
             mu = rate * gr
             sdv = math.sqrt(max(mu, 0)) if kind == 'count' else .3 * mu
-            f[k] = c['f'][k] + max(gauss(rng, mu, sdv), 0)
+            f[k] = c['f'][k] + (gauss(rng, mu, abs(sdv)) if k == 'war' else max(gauss(rng, mu, sdv), 0))
         if 'rush_y' in f and 'rush_y' in dict(per_left): f['scrim'] = f['rush_y'] + f['rec_y']
         if 'ptd' in f and 'ptd' in dict(per_left):
             f['td'] = c['f']['td'] + sum(f[k] - c['f'][k] for k in ('ptd', 'rtd', 'ctd'))
@@ -651,6 +708,8 @@ def cfb(fit, rng):
         w, g, _, _, G = teams[c['tid']]
         k = G / max(g, 1)
         c['pf'] = dict(c['f'], **{x: c['f'][x] * k for x, _ in CFB_LEFT}, yds=c['f']['yds'] * k)
+    war_lead.logos = {k: (v[1], v[0]) for k, v in logos.items()}
+    war_lead('cfb', teams, rng)
     draw = football_draw(teams, CFB_LEFT, 'cfb')
     big = lambda f: f['yds'] >= 300 or f['tackles'] >= 25 or f['sacks'] >= 4 or f['dint'] >= 3
     races = []
@@ -700,6 +759,8 @@ def nfl(fit, rng):
         cands.append({'id': v['id'], 'n': v['n'], 'tid': f['tid'], 'tm': tmap[f['tid']], 'pos': f['pos'], 'ph': v['id'],
                       'war': wr.get('war'), 'f': f})
     ROSTER['nfl'] = cands
+    war_lead.tmap = tmap
+    war_lead('nfl', teams, rng)
     out = []
     T = season_T('nfl', sum(v[1] for v in teams.values()) / max(17 * len(teams), 1))
     for aw, pl, p, draw, show in nfl_races(fit, rng, cands, teams): out.append((aw, rows_out(pl, temper(p, T), draw, show, rng), show))
@@ -712,6 +773,47 @@ def nfl(fit, rng):
 
 
 NFLV_TEAM = {'LA': 'LAR', 'WAS': 'WSH'}
+OFF, DEF = ('QB', 'RB', 'WR', 'TE', 'OL'), ('EDGE', 'DL', 'LB', 'CB', 'S')
+WAR_SHOW = [('war', 'WAR', '%.2f'), ('wp', 'W%', 'pct')]
+# football's conviction pools: the board's WAR lines by the award's position rule (every award, voter model or not)
+NFL_CONV = [('mvp', lambda c: True), ('opoy', lambda c: c['pos'] in OFF), ('dpoy', lambda c: c['pos'] in DEF),
+            ('oroy', lambda c: c['rookie'] and c['pos'] in OFF), ('droy', lambda c: c['rookie'] and c['pos'] in DEF)]
+CFB_CONV = [('heisman', lambda c: True), ('obrien', lambda c: c['pos'] == 'QB'), ('doak', lambda c: c['pos'] == 'RB'),
+            ('bilet', lambda c: c['pos'] == 'WR'), ('mackey', lambda c: c['pos'] == 'TE'),
+            ('bednarik', lambda c: c['pos'] in DEF), ('butkus', lambda c: c['pos'] == 'LB'),
+            ('thorpe', lambda c: c['pos'] in ('CB', 'S')), ('groza', lambda c: c['pos'] == 'K'), ('guy', lambda c: c['pos'] == 'P')]
+
+
+def war_lead(sport, teams, rng):
+    """football's conviction races: the board's WAR to date run out over the team's games left at its pace so far
+    (the box stats' own draw: spread 30% of the rest), P(lead) by pool. teams: {tid: (wins, games, mean final wins,
+    sd, G)}; the candidates come from the WAR boards, not the stat leaders, so linemen and defenders are in."""
+    if CONV is None: return
+    cands = []
+    if sport == 'nfl':
+        tid = {v: k for k, v in war_lead.tmap.items()}
+        for r in (jload(os.path.join(ROOT, 'static', 'data', 'nfl-war.json'), {}) or {}).get('players', []):
+            ab = (r.get('tm') or '').split('/')[-1]
+            ab = NFLV_TEAM.get(ab, ab)
+            if r.get('war') is None or ab not in tid: continue
+            cands.append({'id': r['id'], 'n': r['n'], 'tid': tid[ab], 'tm': ab, 'pos': r.get('pos'), 'rookie': bool(r.get('rook')),
+                          'phu': 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + r['ph'] if r.get('ph') else None,
+                          'f': {'war': r['war']}})
+    else:
+        d = jload(os.path.join(ROOT, 'static', 'data', 'cfb-all.json'), {}) or {}
+        ix = {c: i for i, c in enumerate(d.get('cols', []))}
+        tid = {v[1]: k for k, v in war_lead.logos.items()}
+        for i, r in enumerate(d.get('rows', [])):
+            if r[ix['war']] is None or r[ix['div']] != 'FBS' or r[ix['team']] not in tid: continue
+            m = re.search(r'/id/(\d+)', r[ix['espnl']] or '')
+            cands.append({'id': i, 'n': r[ix['name']], 'tid': tid[r[ix['team']]], 'tm': r[ix['team']], 'logo': r[ix['logo']],
+                          'pos': r[ix['pos']], 'ph': m.group(1) if m else None, 'f': {'war': r[ix['war']]}})
+    draw = football_draw(teams, [('war', 'yds')], sport)
+    for aw, ok in (NFL_CONV if sport == 'nfl' else CFB_CONV):
+        lead(aw, [c for c in cands if ok(c)], draw, 'war', WAR_SHOW, rng)
+
+
+war_lead.tmap, war_lead.logos = {}, {}
 DROY_LEFT = [('sacks', 'count'), ('dint', 'count'), ('tfl', 'count'), ('pd', 'count'), ('ff', 'count'), ('tackles', 'yds'),
              ('dtd', 'count')]
 
@@ -816,6 +918,7 @@ def soccer(fit, rng):
 
     draw.teams = teams_draw
     show = [('gar', 'GAR', '%.1f'), ('ga', 'G+A', '%.0f'), ('lgw', 'LG', 'pct'), ('uclw', 'UCL', 'pct')]
+    lead('ballon', cands, draw, spec['null'][0], first(show, spec['null'][0]), rng)
     pool = prune(cands, spec, draw, rng)
     p = race(pool, spec, draw, rng)
     return {'season': f'{S - 1}-{str(S)[2:]}', 'races': [('ballon', rows_out(pool, p, draw, show, rng), show)], 'logo': 'soccer'}
@@ -835,8 +938,10 @@ def main(argv):
     cur = jload(OUT, {}) or {}
     want = [a for a in argv if a in BUILD] or list(BUILD)
     rng = random.Random(20261114)
+    global CONV
     for sp in want:
         if sp not in fit: continue
+        CONV = {}
         try:
             res = BUILD[sp](fit[sp], rng)
         except Exception as e:
@@ -858,8 +963,24 @@ def main(argv):
             if bl: races[-1]['blend'] = MKT_W
             top = rows[0] if rows else {}
             print(sp, spec['label'], 'top:', ', '.join(f"{r['n']} {r['p']:.0%}" + (f" (mkt {r['mkt']:.0%}, model {r['pm']:.0%})" if r.get('pm') is not None and 'mkt' in r else '') for r in rows[:5]))
+        # conviction: P(lead) on our own metric; each side's rows carry the other's number (pc / pp) where he is on both
+        conv = []
+        pred = {r['key']: {NM.key(x['n']): x['p'] for x in r['rows']} for r in races}
+        for aw, rows in CONV.items():
+            allp = {NM.key(x['n']): x['p'] for x in list(rows) + list(rows.rest)}
+            for r in races:
+                if r['key'] == aw:
+                    for x in r['rows']:
+                        if NM.key(x['n']) in allp: x['pc'] = allp[NM.key(x['n'])]
+            for x in rows:
+                if NM.key(x['n']) in pred.get(aw, {}): x['pp'] = pred[aw][NM.key(x['n'])]
+            conv.append({'key': aw, 'label': fit[sp][aw]['label'], 'rows': list(rows), 'pred': aw in pred,
+                         'metric': NULL_LABEL.get(rows.metric, rows.metric),
+                         'show': [{'k': k, 'l': l, 'f': f} for k, l, f in rows.show]})
+            if getattr(rows, 'k', None): conv[-1]['k'] = rows.k
+            print(sp, fit[sp][aw]['label'], 'conviction:', ', '.join(f"{r['n']} {r['p']:.0%}" for r in rows[:5]))
         cur[sp] = {'season': res['season'], 'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
-                   'sims': SIMS, 'logo': res['logo'], 'races': races}
+                   'sims': SIMS, 'logo': res['logo'], 'races': races, 'conv': conv}
         if abs(res.get('T', 1) - 1) > 1e-9: cur[sp]['temp'] = round(res['T'], 3)
     json.dump(cur, open(OUT, 'w'), indent=1, sort_keys=True)
     print('wrote', OUT)

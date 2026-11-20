@@ -30,7 +30,10 @@ cover = "/og/college-basketball.png"
 {{< lazytab tab="draft board" >}}
 {{< rookies sport="cbb" src="data/cbb/draft.json" icon="basketball" title="draft board" tab="draft board" >}}
 {{< /lazytab >}}
-{{< awards sport="cbb" tab="awards" >}}
+{{< wintabs tab="awards" tabs="predictive awards,conviction awards" sub="true" label="awards views" >}}
+{{< awards sport="cbb" tab="predictive awards" >}}
+{{< awards sport="cbb" tab="conviction awards" view="conv" >}}
+{{< /wintabs >}}
 {{< arklist sport="college-basketball" title="ARKLIST" tab="ARKLIST" >}}
 {{< cbbgames title="games" tab="games" >}}
 {{< cbbgametable title="game table" tab="game table" >}}

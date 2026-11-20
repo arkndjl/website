@@ -21,7 +21,10 @@ cover = "/og/nhl.png"
 {{< lazytab tab="next up" >}}
 {{< rookies sport="nhl" src="data/next-up/nhl-tab.json" icon="hockey" title="next up" tab="next up" >}}
 {{< /lazytab >}}
-{{< awards sport="nhl" tab="awards" >}}
+{{< wintabs tab="awards" tabs="predictive awards,conviction awards" sub="true" label="awards views" >}}
+{{< awards sport="nhl" tab="predictive awards" >}}
+{{< awards sport="nhl" tab="conviction awards" view="conv" >}}
+{{< /wintabs >}}
 {{< arklist sport="nhl" title="ARKLIST" tab="ARKLIST" >}}
 {{< nhllines title="lines" tab="lines" >}}
 {{< lazytab tab="transactions" >}}
