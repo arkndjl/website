@@ -1,0 +1,47 @@
+{{- /* followers_chart.exe: LAURSEN_111 total followers (sum of every tracked network) + one line per network, same axis.
+       Reads data/laursen_socials.json "series" (scripts/laursen_socials.mjs). Instagram is not tracked yet: shown dim in the legend.
+       {{< lzsocchart class="desk__wide" >}} */ -}}
+{{- $s := site.Data.laursen_socials -}}
+{{- $nets := slice (dict "k" "twitch" "n" "Twitch" "c" "#b57bff") (dict "k" "youtube" "n" "YouTube" "c" "#ffb86b") (dict "k" "tiktok" "n" "TikTok" "c" "#ff8fd0") (dict "k" "x" "n" "X" "c" "#7fffd4") -}}
+<div class="win lzf lzsc{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-twitch"/></svg>followers_chart.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  {{- with $s.series }}{{ $tr := . }}{{ $n := len $tr }}
+  {{- $t0 := float (index $tr 0).t }}{{ $t1 := float (index $tr (sub $n 1)).t }}{{ $dt := math.Max (sub $t1 $t0) 1.0 }}
+  {{- /* carry values forward so every row has every network */ -}}
+  {{- $last := dict "twitch" 0.0 "youtube" 0.0 "tiktok" 0.0 "x" 0.0 }}
+  {{- $rows := slice }}{{ $mx := 0.0 }}
+  {{- range $tr }}{{ $r := . }}
+    {{- range $nt := $nets }}{{ with index $r $nt.k }}{{ $last = merge $last (dict $nt.k (float .)) }}{{ end }}{{ end }}
+    {{- $tot := add (add (index $last "twitch") (index $last "youtube")) (add (index $last "tiktok") (index $last "x")) }}
+    {{- if gt $tot $mx }}{{ $mx = $tot }}{{ end }}
+    {{- $rows = $rows | append (dict "t" (float $r.t) "twitch" (index $last "twitch") "youtube" (index $last "youtube") "tiktok" (index $last "tiktok") "x" (index $last "x") "tot" $tot) }}
+  {{- end }}
+  {{- $top := mul (math.Ceil (div $mx 100.0)) 100.0 }}{{ $W := 600.0 }}{{ $H := 200.0 }}
+  {{- $cur := index $rows (sub $n 1) }}
+  <div class="lzf__body lzsc__body">
+    <ul class="lzsc__key">
+      <li style="--c:#c8c7ff"><i></i>Total <b>{{ lang.FormatNumber 0 $cur.tot }}</b></li>
+      {{- range $nets }}{{ $k := .k }}<li style="--c:{{ .c }}"><i></i>{{ .n }} <b>{{ lang.FormatNumber 0 (index $cur $k) }}</b></li>{{ end }}
+      <li class="lzsc__off" title="Instagram is not tracked yet"><i></i>Instagram <b>n/a</b></li>
+    </ul>
+    <div class="lzsc__plot">
+      <p class="lzsc__y"><span>{{ lang.FormatNumber 0 $top }}</span><span>{{ lang.FormatNumber 0 (div $top 2) }}</span><span>0</span></p>
+      <svg viewBox="0 0 {{ $W }} {{ $H }}" preserveAspectRatio="none" shape-rendering="crispEdges" role="img" aria-label="LAURSEN_111 total followers and followers by network over time">
+        <line x1="0" x2="{{ $W }}" y1="1" y2="1" class="lzsc__g"/><line x1="0" x2="{{ $W }}" y1="{{ div $H 2 }}" y2="{{ div $H 2 }}" class="lzsc__g"/><line x1="0" x2="{{ $W }}" y1="{{ sub $H 1 }}" y2="{{ sub $H 1 }}" class="lzsc__g"/>
+        {{- range $nt := slice (dict "k" "tot" "c" "#c8c7ff" "w" 4) (dict "k" "twitch" "c" "#b57bff" "w" 2) (dict "k" "youtube" "c" "#ffb86b" "w" 2) (dict "k" "tiktok" "c" "#ff8fd0" "w" 2) (dict "k" "x" "c" "#7fffd4" "w" 2) }}
+          {{- $k := $nt.k }}{{ $d := "" }}{{ $py := 0.0 }}
+          {{- range $i, $r := $rows }}{{ $x := mul (div (sub $r.t $t0) $dt) $W }}{{ $y := sub $H (mul (div (index $r $k) $top) $H) }}
+            {{- if eq $i 0 }}{{ $d = printf "M%.1f %.1f" $x $y }}{{ else }}{{ $d = printf "%sH%.1fV%.1f" $d $x $y }}{{ end }}{{ $py = $y }}
+          {{- end }}
+          <path d="{{ $d }}H{{ $W }}" fill="none" stroke="{{ $nt.c }}" stroke-width="{{ $nt.w }}" vector-effect="non-scaling-stroke"/>
+        {{- end }}
+      </svg>
+    </div>
+    <p class="esea-fc__axis lzf__axis lzsc__x"><span>{{ (time.In "America/New_York" (time (int (div $t0 1000)))).Format "Jan 2" }}</span><span>{{ (time.In "America/New_York" (time (int (div $t1 1000)))).Format "Jan 2" }}</span></p>
+  </div>
+  {{- else }}<p class="esea__empty-line">no social data yet.</p>{{ end }}
+  <div class="win__status"><span title="Sum of Twitch, YouTube, TikTok and X followers, one line per network on the same axis. Instagram has no tracker yet.">{{ with $s.asof }}synced {{ (time.In "America/New_York" (time .)).Format "Jan 2 · 3:04 PM ET" }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
