@@ -3,8 +3,8 @@
        Another account: src = data file, nets = which networks in order, name = GFX title, icon = title icon
        (about/contact: {{< lzsocial src="arkndjl_socials" nets="x,youtube" name="ARKNDJL" icon="icon-twitter" >}}, scripts/arkndjl_socials.mjs). */ -}}
 {{- $src := .Get "src" | default "laursen_socials" }}{{ $s := index site.Data $src -}}
-{{- $want := split (.Get "nets" | default "twitch,youtube,tiktok,x,tth") "," }}{{ $who := .Get "name" | default "LAURSEN_111" -}}
-{{- $spec := dict "twitch" (slice "twitch" "Twitch" "icon-twitch") "youtube" (slice "youtube" "YouTube" "icon-youtube") "tiktok" (slice "tiktok" "TikTok" "icon-tiktok") "x" (slice "x" "X" "icon-twitter") "tth" (slice "tth" "TikTok likes" "icon-tiktok") -}}
+{{- $want := split (.Get "nets" | default "twitch,youtube,tiktok,x,ig,tth,igl,igv") "," }}{{ $who := .Get "name" | default "LAURSEN_111" -}}
+{{- $spec := dict "twitch" (slice "twitch" "Twitch" "icon-twitch") "youtube" (slice "youtube" "YouTube" "icon-youtube") "tiktok" (slice "tiktok" "TikTok" "icon-tiktok") "x" (slice "x" "X" "icon-twitter") "tth" (slice "tth" "TikTok likes" "icon-tiktok") "ig" (slice "ig" "Instagram" "icon-instagram") "igl" (slice "igl" "Instagram likes" "icon-instagram") "igv" (slice "igv" "Instagram views" "icon-instagram") -}}
 {{- $syncd := "" }}{{ with $s }}{{ with .asof }}{{ $syncd = (time.In "America/New_York" (time .)).Format "Jan 2 · 3:04 PM ET" }}{{ end }}{{ end -}}
 <div class="win lzf lzsoc{{ with .Get "class" }} {{ . }}{{ end }}">
   <div class="win__title">
@@ -42,13 +42,13 @@
       </div>
     {{- end }}{{ end }}
     </div>
-    {{- $rows := slice }}{{ $nets := dict "twitch" "Twitch" "youtube" "YouTube" "tiktok" "TikTok" "x" "X" }}
+    {{- $rows := slice }}{{ $nets := dict "twitch" "Twitch" "youtube" "YouTube" "tiktok" "TikTok" "x" "X" "ig" "Instagram" }}
     {{- range $k, $h := $s.hist | default dict }}
       {{- range $h.ms }}{{ if .hit }}{{ $rows = $rows | append (dict "net" (index $nets $k) "goal" .goal "kind" "milestone" "t" .hit "est" .est "target" .eta0 "ahead" .ahead "hit" true) }}{{ end }}{{ end }}
       {{- range $h.dated }}{{ if .done }}{{ $rows = $rows | append (dict "net" (index $nets $k) "goal" .goal "kind" (printf "%dd" .T) "t" (.hit | default .due) "due" .due "ahead" .ahead "hit" (ne .hit nil) "final" .final) }}{{ end }}{{ end }}
     {{- end }}
     {{- $gx := slice }}
-    {{- range $w := $want }}{{ if ne $w "tth" }}{{ $sp := index $spec $w }}{{ $k := index $sp 0 }}
+    {{- range $w := $want }}{{ if not (in (slice "tth" "igl" "igv") $w) }}{{ $sp := index $spec $w }}{{ $k := index $sp 0 }}
       {{- $cv := 0.0 }}{{ range $s.series }}{{ with index . $k }}{{ $cv = float . }}{{ end }}{{ end }}
       {{- with index ($s.goals | default dict) $k }}{{ $g := . }}{{ $gl := slice }}
         {{- range $T := slice 30 90 }}{{ with index $g (printf "d%d" $T) }}{{ $gl = $gl | append (dict "l" (cond (ne .due nil) ((time.In "America/New_York" (time (int (div (.due | default 0) 1000)))).Format "Jan 2") (printf "%dd" $T)) "v" (lang.FormatNumber 0 (float .goal)) "p" (printf "%v%%" .p) "f" (.f | default 0) "m" (.m | default -1)) }}{{ end }}{{ end }}
@@ -76,6 +76,6 @@
   {{- else }}
   <p class="esea__empty-line">no social data yet.</p>
   {{- end }}
-  <div class="win__status"><span title="{{ if eq $src "laursen_socials" }}Twitch via decapi.me; YouTube and TikTok from the public profile pages; X via api.fxtwitter.com{{ else }}X via api.fxtwitter.com; YouTube from the channel page{{ end }}. Goals: daily gain ~ Gamma (prior = lifetime pace worth 30 days, updated by tracked gains), gain over t days negative binomial; dated goals = median count, % = chance of reaching it">{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span title="{{ if eq $src "laursen_socials" }}Twitch via decapi.me; YouTube and TikTok from the public profile pages; X via api.fxtwitter.com; Instagram via the Instagram API{{ else }}X via api.fxtwitter.com; YouTube from the channel page{{ end }}. Goals: daily gain ~ Gamma (prior = lifetime pace worth 30 days, updated by tracked gains), gain over t days negative binomial; dated goals = median count, % = chance of reaching it">{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{ partial "gfx.html" . }}

@@ -41,7 +41,7 @@ jobs:
         env:
           FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
           ESEA_DEMO_PROBE: ${{ inputs.probe && '1' || '' }}
-      # LAURSEN_111 follower counts (Twitch, YouTube, TikTok) over time: data/laursen_socials.json
+      # LAURSEN_111 follower counts (Twitch, YouTube, TikTok, X, Instagram) over time: data/laursen_socials.json
       - name: Socials
         continue-on-error: true
         run: node scripts/laursen_socials.mjs
@@ -49,6 +49,8 @@ jobs:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
           TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          IG_SECRETS_PAT: ${{ secrets.IG_SECRETS_PAT }}
       # @ARKNDJL X + YouTube (about/contact social section): data/arkndjl_socials.json
       - name: ARKNDJL socials
         continue-on-error: true
