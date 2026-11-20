@@ -101,6 +101,34 @@ def write(sport, out):
     print('wrote', fn, ' '.join(f"{s['l']}:{len(s['rows'])}" for s in out['seasons']))
 
 
+def season_pts(fn, groups):
+    """(name, team) -> this season's SV over replacement (data/nfl_qb.json spts, data/nfl_season_value.json pts,
+    data/cfb_season_value.json pts); id -> SV where the file carries ids."""
+    try:
+        d = J('data', fn)
+    except (OSError, ValueError):
+        return [], {}
+    out, ids = [], {}
+    for g, k in groups:
+        for r in d.get(g) or []:
+            v = r.get(k)
+            if v is None:
+                continue
+            out.append((r['n'], r.get('t') or '', v))
+            if r.get('id'):
+                ids[str(r['id'])] = v
+    return out, ids
+
+
+def pts_of(L, n, t):
+    m = [v for nn, tt, v in L if NM.same(nn, n) and (not t or not tt or tt == t)]
+    return m[0] if len(m) == 1 else None
+
+
+SPTS_T = ('SV (season value): this season\'s points over replacement a game, opponent-adjusted EPA (QBs: dropbacks + runs; skill: runs + '
+          'targets; defenders: credited EPA on negative plays), as on the QBs / skill players / defenders tabs')
+
+
 # ---------------------------------------------------------------- NFL
 def nfl():
     import nfl_war as N
@@ -122,6 +150,7 @@ def nfl():
         s = json.load(gzip.open(os.path.join(ld, snaps[-1])))
         prow = [dict(zip(s['cols'], r)) for r in s['rows']]
     M = NM.Matcher(prow, pos=None)
+    SP = season_pts('nfl_qb.json', [('rows', 'spts')])[0] + season_pts('nfl_season_value.json', [('skill', 'pts'), ('defense', 'pts')])[0]
     rows = []
     for p in b['players']:
         if not p.get('rook'):
@@ -131,7 +160,7 @@ def nfl():
         pre = int(d['pick']) if d and d['pick'] else None
         rows.append({'n': p['n'], 'tm': p['tm'], 'pos': p['pos'], 'age': p.get('ax', p.get('age')), 'waa': p.get('waa'), 'waaP': p.get('waaP'), 'war': p['war'], 'xv': p.get('xv'),
                      'pxp': p.get('pxp'), 'xp': p.get('xp') if (p.get('sn') or 0) >= 100 else None,
-                     'wav': p.get('wav'), 'pace': p.get('pace'), 'g': p['g'], 'sn': p.get('sn'),
+                     'wav': p.get('wav'), 'pace': p.get('pace'), 'g': p['g'], 'sn': p.get('sn'), 'spts': pts_of(SP, p['n'], p['tm']),
                      'pre': pre, 'preL': f"R{d['round']} #{d['pick']}" if pre else 'UDFA', 'pfv': m['fv'] if m else None,
                      'sub': p.get('col') or '', 'line': p.get('line') or '',
                      'ph': NFL_FACE.format(p['ph']) if p.get('ph') else None, 'lo': logo(f"/img/nfl/{p['tm'].lower()}.png")})
@@ -141,11 +170,12 @@ def nfl():
         'views': [['waa', 'WAA', 'WAA this season: wins over an average regular at the sub-position, same snaps'],
                   ['war', 'WAR', 'WAR this season: .6 x AV WAR + .4 x XV'],
                   ['pxp', 'pXP/60', 'pXP/60: predictive points over an average regular per 60 snaps (a rookie has no past seasons, so this season alone, shrunk by K snaps to the sub-position mean moved by his draft slot)'], ['xv', 'XV', 'XV: WAR on the stat-line parts that track team margin'],
-                  ['pace', 'WAR/17', 'WAR on a 17-game pace'], ['waaP', 'WAA/17', 'WAA on a 17-game pace']],
+                  ['pace', 'WAR/17', 'WAR on a 17-game pace'], ['waaP', 'WAA/17', 'WAA on a 17-game pace'], ['spts', 'SV', SPTS_T]],
         'cols': [col('waa', 'WAA', 'wins over an average regular at the sub-position, same snaps', 's2'), col('war', 'WAR', 'wins above replacement this season', '2'),
                  col('pxp', 'pXP/60', 'predictive points over an average regular at the sub-position per 60 snaps: this season shrunk by K snaps (QB 900, RB 450, WR 900, TE 300, DL 900, LB 1300, OL 2600, DB 3600) to the sub-position mean moved by his draft slot', 's2'),
                  col('xp', 'rXP/60', 'points over an average regular at the sub-position per 60 snaps, this season (100+ snaps)', 's2', 1), col('xv', 'XV', 'expected value: WAR from the stat line', '2'),
                  col('wav', 'AV WAR', 'WAR from approximate value', '2', 1), col('pace', 'WAR/17', 'WAR on a 17-game pace', '2', 1), col('waaP', 'WAA/17', 'WAA on a 17-game pace', 's2', 1),
+                 col('spts', 'SV', SPTS_T + ' (QB, RB, WR, TE, DL, LB, DB)', 's1', 1),
                  col('g', 'G', 'games', 'i', 1), col('sn', 'Snaps', 'snaps', 'i', 1), col('line', 'Line', 'season line', 's', 1, 0)],
         'pre': {'l': 'Pick', 't': 'overall pick in the draft (UDFA: undrafted)'}, 'pfv': {'l': 'Pre FV', 't': 'CFB board FV on the eve of the draft (draft ledger, 2027 class on), mean outcome'},
         'pos': ['QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'EDGE', 'LB', 'CB', 'S', 'K', 'P'], 'posGroup': 1,
@@ -389,8 +419,13 @@ def cfb():
     # this one. Snap share of the team's snaps at or above the position bar, or snaps at or above it where the share is
     # missing; neither on file: PFN's own qualifier (a Stat+); K/P (no snap counts): a WAR this season (kicks or punts on file).
     fr = [r for r in keep if qualifies(r)]
+    SP, SPI = season_pts('cfb_season_value.json', [('qbs', 'pts'), ('skill', 'pts')])
+
+    def cpts(r):
+        m = re.search(r'/id/(\d+)', r.get('espnl') or '')
+        return SPI.get(m.group(1)) if m and SPI else pts_of(SP, r['name'], r.get('team'))
     rows = [{'n': r['name'], 'tm': r['team'], 'pos': 'DT' if r['pos'] == 'DL' else r['pos'], 'age': r.get('age') or r.get('ageEst'), 'fv': r['fv'], 'war': r.get('war'),
-             'xv': r.get('xv'), 'pfn': r.get('pfn'), 'sn': r.get('snaps'), 'xnil': r['xnil'] / 1e6 if r.get('xnil') else None,
+             'xv': r.get('xv'), 'pfn': r.get('pfn'), 'sn': r.get('snaps'), 'spts': cpts(r), 'xnil': r['xnil'] / 1e6 if r.get('xnil') else None,
              'pre': r.get('_rk'), 'preL': f"#{r['_rk']}" if r.get('_rk') else '', 'pfv': None,
              'sub': (r.get('pfnLabel') or '') + (f" · {r['div']}" if r.get('div') == 'FCS' else ''), 'div': r.get('div'),
              'ph': cfb_face(r), 'lo': r.get('logo')}
@@ -401,9 +436,11 @@ def cfb():
                '20%+ of team snaps (130+ snaps if no share) at QB/RB/TE/DT/EDGE/LB, 25%+ (160+) at WR/OL/CB/S, K/P with kicks or punts on file; '
                'the rest stay graded on the main board. Rec = 247 composite national rank.',
         'views': [['fv', 'FV', 'FV: mean outcome grade'], ['war', 'WAR', 'college WAR this season'], ['pfn', 'Stat+', 'Stat+: position all-in-one, 100 = average'],
-                  ['xnil', 'xNIL', 'expected NIL market worth, $M']],
+                  ['xnil', 'xNIL', 'expected NIL market worth, $M'],
+                  ['spts', 'SV', 'SV (season value): this season\'s points over replacement a game from EPA a play (QBs: dropbacks + runs, opponent-adjusted; skill: runs + targets, RB opponent-adjusted), FBS games, as on the QB SV / skill players tabs']],
         'cols': [col('fv', 'FV', 'FV, mean outcome', 'i'), col('war', 'WAR', 'college WAR this season', '2'),
                  col('pfn', 'Stat+', 'position Stat+, 100 average, 25 per SD', 'i', 1), col('xv', 'XV', 'WAR from the stat line', '2', 1),
+                 col('spts', 'SV', 'this season\'s points over replacement a game (QB, RB, WR, TE; FBS games)', 's1', 1),
                  col('sn', 'Snaps', 'snaps', 'i', 1), col('xnil', 'xNIL', 'expected NIL worth, $M', 'm', 1)],
         'pre': {'l': 'Rec', 't': '247 composite national rank in the high school class'},
         'gfx': ['pfn', 'xnil'],      # GFX columns after the view (Noah, Nov 18): Stat+ and xNIL in place of Rec and its Δ

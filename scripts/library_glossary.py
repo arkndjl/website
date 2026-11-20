@@ -305,27 +305,27 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
     E('SPW+ / RPW+ / xHold / xBreak', 'Serve and return points won over the average top-100 player, opponent-adjusted.',
       ['Percentage points, hard court. xHold / xBreak = games held or broken vs an average top-100 opponent via the game chain.'],
       'Tennis serve + return tabs', ['Tennis']),
-    E('QB value (NFL)', 'Pts/G = this season\'s points a game over a replacement QB (-0.12 EPA a play), opponent-adjusted. Proj = the game model\'s QB term.',
-      ['Pts/G: each dropback and QB run less the defense\'s EPA allowed a play over the league\'s (its other games, shrunk with 300 plays); '
+    E('SV (NFL QBs)', 'SV (season value) = this season\'s points a game over a replacement QB (-0.12 EPA a play), opponent-adjusted. Proj = the game model\'s QB term.',
+      ['SV: each dropback and QB run less the defense\'s EPA allowed a play over the league\'s (its other games, shrunk with 300 plays); '
        'sum(aEPA + 0.12) / games with 10+ plays. Split-half r .512 raw, .528 adjusted (QB-seasons 250+ plays, 2021-26); wind, cold and rain added nothing.',
        'Proj: weighted career EPA/play shrunk toward replacement with %d pseudo-plays (fit), x the game model\'s QB coefficient. '
-       'This season\'s Pts/G in the game model, as a swap or an extra term, failed held-out 2021-25 (margin MAE 10.010 -> 10.034 / 10.027).'
+       'SV in the game model, as a swap or an extra term, failed held-out 2021-25 (margin MAE 10.010 -> 10.034 / 10.027).'
        % round(json.load(open(os.path.join(ROOT, 'data', 'nfl_games_fit.json')))['params']['qb_n0'])],
       'NFL QBs tab', ['NFL']),
-    E('Season value (NFL skill players, defenders)', 'Pts/G = this season\'s points a game over replacement. Skill: EPA a run / target. Defenders: credited EPA on plays with negative EPA.',
+    E('SV (NFL skill players, defenders)', 'SV (season value) = this season\'s points a game over replacement. Skill: EPA a run / target. Defenders: credited EPA on plays with negative EPA.',
       ['Skill (RB, WR, TE): EPA less the defense\'s EPA allowed on that play type over the league\'s (other games, shrunk 300 plays) for RB and WR, less the play\'s weather for RB; '
        'replacement = the level of players past the starters (RB 48, WR 96, TE 48 by volume, 2016-25).',
        'Defenders (DL, LB, DB): sack, INT, pass defensed, forced fumble, TFL, QB hit or a tackle on a failed play split -(EPA less the offense\'s rate over the league\'s; DL, DB); replacement = credit a snap past the starters (DL 128, LB 80, DB 160) x snaps.',
        'Kept only where split-half r rose (P >= .9): opponent RB .199 -> .217, WR .172 -> .190, DL .308 -> .315, DB .147 -> .149; TE and LB stay raw. Weather only for RB (.217 -> .220).',
        'In the game model\'s injury term in place of WAR a game it failed held out 2021-25 (MAE 10.010 -> 10.070, 0/5 seasons); WAR stays.'],
       'NFL skill players + defenders tabs', ['NFL']),
-    E('Season value (CFB QBs, skill players)', 'Pts/G = this season\'s points a game over replacement from EPA a play (QB: dropbacks + runs; skill: runs + targets), FBS games.',
+    E('SV (CFB QBs, skill players)', 'SV (season value) = this season\'s points a game over replacement from EPA a play (QB: dropbacks + runs; skill: runs + targets), FBS games.',
       ['Opponent-adjusted for QB and RB (the defense\'s EPA allowed on that play type over the league\'s, other games, shrunk 300 plays): split-half r QB .360 -> .403, RB .179 -> .199; '
        'WR and TE stay raw (P .84 / .88 on 2025-26, when target ids are complete). Weather (Open-Meteo at the stadium) added nothing.',
        'Replacement = players past the starters by volume in 2025 (QB 134, RB 268, WR 402, TE 134).',
        'Defenders left out: public plays carry no tackles or snaps; splash credits had no split-half reliability.',
        'Game model: the starter\'s adjusted season value scored the same as raw season EPA (t +0.5); the QB charge stays.'],
-      'CFB QB EPA + skill players tabs', ['CFB']),
+      'CFB QB SV + skill players tabs', ['CFB']),
     E('Yds+ / YOE (returners)', 'Kick and punt return yards over expected, shrunk.',
       ['YOE = return yards minus the mean return from the same spot (5-yard bins, this season). Yards, not EPA (EPA does not repeat).'],
       'special teams tab on NFL and CFB pages', ['NFL', 'CFB']),

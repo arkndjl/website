@@ -1,5 +1,5 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""CFB season value (layouts/shortcodes/cfbseason.html: leaders > QB EPA, skill players) -> data/cfb_season_value.json.
+"""CFB season value (layouts/shortcodes/cfbseason.html: leaders > QB SV, skill players) -> data/cfb_season_value.json.
 Descriptive, this season only; nothing here feeds a model. No CFBD call.
 
     python3 scripts/cfb_season_value.py [--force]     # skips when the release's ETag is the one on file
@@ -10,7 +10,7 @@ postseason, ESPN athlete ids. Dropbacks go to the passer (completion / incomplet
 passes to the receiver or target.
   aEPA   EPA a play less the defense's EPA allowed a play of that kind (run / pass) over the league's, from its other
          games, shrunk with K_DEF = 300 plays (QB, RB); WR and TE stay raw
-  Pts/G  sum(aEPA - replacement) / games with a play (QB: 10+); replacement = the mean a play (QB) or a run / target
+  SV  sum(aEPA - replacement) / games with a play (QB: 10+); replacement = the mean a play (QB) or a run / target
          (skill) of the players past the starters by volume in 2025 (QB 134, RB 268, WR 402, TE 134), REPL below
 Kept only where split-half reliability rose (alternate games, P >= .9 of 1,000 boots; 2021-26 player-seasons: QB 250+
 plays, RB 100+, WR 60+, TE 40+; target ids are complete only from 2025, so receiving was rechecked on 2025-26):
@@ -177,7 +177,7 @@ def main():
             continue
         b = board.get(i, {})
         gp = sum(1 for v in GP[i].values() if v >= (10 if g == 'QB' else 1)) or 1
-        base = {'n': b.get('name') or n, 't': t, 'lo': b.get('logo') or (f'/img/cfb/logos/{tid[t]}.png' if tid.get(t) else None),
+        base = {'id': i, 'n': b.get('name') or n, 't': t, 'lo': b.get('logo') or (f'/img/cfb/logos/{tid[t]}.png' if tid.get(t) else None),
                 'conf': b.get('conf'), 'cls': b.get('cls'), 'war': b.get('war'), 'waa': b.get('waa'),
                 'ph': f'https://a.espncdn.com/combiner/i?img=/i/headshots/college-football/players/full/{i}.png&w=96&h=70&scale=crop&cquality=60' if b.get('photo') else None,
                 'pts': r1(X['par'] / gp), 'tot': r1(X['par']), 'aepa': r1(X['a'] / X['n'], 3), 'g': gp, 'plays': int(X['n'])}
