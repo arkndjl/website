@@ -52,6 +52,7 @@ SPL = ['interception_player_id', 'pass_defense_1_player_id', 'pass_defense_2_pla
        'forced_fumble_player_2_player_id', 'tackle_for_loss_1_player_id', 'tackle_for_loss_2_player_id', 'qb_hit_1_player_id',
        'qb_hit_2_player_id']
 MIN_SKILL, MIN_SNAPS = 30, 150
+PTS_PER_WIN = 36.0      # season points a win (nfl_games.PTS_PER_WIN): SVAR = SV points over replacement / 36
 tm = lambda x: FR.get(x, x)  # noqa: E731
 
 
@@ -181,7 +182,7 @@ def main():
             if X.get('n', 0) < MIN_SKILL:
                 continue
             gp = len(osn.get(pid, ())) or 1
-            skill.append({'n': n, 't': t, 'pos': g, 'ph': ph or None, 'pts': r1(X['par'] / gp), 'tot': r1(X['par']),
+            skill.append({'n': n, 't': t, 'pos': g, 'ph': ph or None, 'pts': r1(X['par'] / gp), 'tot': r1(X['par']), 'svar': r1(X['par'] / PTS_PER_WIN, 2),
                           'aepa': r1(X['a'] / X['n'], 3), 'g': gp, 'opp': int(X['n']),
                           'ra': r1(X['a0'] / X['n0'], 3) if X.get('n0') else None,
                           'ta': r1(X['a1'] / X['n1'], 3) if X.get('n1') else None,
@@ -193,7 +194,7 @@ def main():
             if sn < MIN_SNAPS:
                 continue
             par = X.get('cr', 0.0) - REPL[g] * sn
-            dfn.append({'n': n, 't': t, 'pos': g, 'ph': ph or None, 'pts': r1(par / max(len(gs), 1)), 'tot': r1(par),
+            dfn.append({'n': n, 't': t, 'pos': g, 'ph': ph or None, 'pts': r1(par / max(len(gs), 1)), 'tot': r1(par), 'svar': r1(par / PTS_PER_WIN, 2),
                         'p100': r1(100 * par / sn, 2), 'cr': r1(X.get('cr', 0.0)), 'g': len(gs), 'sn': sn,
                         'sk': r1(S.get('def_sacks', 0.0)), 'int': int(S.get('def_interceptions', 0)), 'pd': int(S.get('def_pass_defended', 0)),
                         'tfl': r1(S.get('def_tackles_for_loss', 0.0)), 'ff': int(S.get('def_fumbles_forced', 0)),

@@ -23,6 +23,7 @@
     <th title="EPA a run">EPA/run</th><th title="EPA a target">EPA/tgt</th>
     <th title="games with a run or target">G</th><th title="runs + targets">Plays</th><th title="runs">Car</th><th title="targets">Tgt</th>
   {{- end }}
+    <th title="SVAR = SV over replacement, season total, in wins: points / 53 a win (FBS: win % rises .0189 a point of margin a game, 12 games). FBS games, this season only">SVAR</th>
     <th title="WAR, season to date (board)">WAR</th>
   </tr></thead>
   <tbody>
@@ -40,6 +41,7 @@
     <td class="cfb__num">{{ with .ta }}{{ partial "num.html" (slice "%+.3f" (float .)) }}{{ end }}</td>
     <td class="cfb__num">{{ .g }}</td><td class="cfb__num">{{ .plays }}</td><td class="cfb__num">{{ .car }}</td><td class="cfb__num">{{ .tgt }}</td>
   {{- end }}
+    <td class="cfb__num">{{ with .svar }}{{ partial "num.html" (slice "%+.2f" (float .)) }}{{ end }}</td>
     <td class="cfb__num">{{ with .war }}{{ printf "%.2f" (float .) }}{{ end }}</td>
   </tr>
   {{- end }}

@@ -29,6 +29,7 @@
     <th title="sacks">Sk</th><th title="QB hits">QBH</th><th title="tackles for loss">TFL</th><th title="interceptions">INT</th>
     <th title="passes defensed">PD</th><th title="forced fumbles">FF</th><th title="tackles (solo + assists)">Tk</th>
   {{- end }}
+    <th title="SVAR = SV over replacement, season total, in wins: points / 36 a win (the game model's points a win). this season only">SVAR</th>
     <th title="WAR = .6 x AV WAR + .4 x XV, season to date (WAR leaders board)">WAR</th>
   </tr></thead>
   <tbody>
@@ -52,6 +53,7 @@
     <td class="cfb__num">{{ .sk }}</td><td class="cfb__num">{{ .qbh }}</td><td class="cfb__num">{{ .tfl }}</td><td class="cfb__num">{{ .int }}</td>
     <td class="cfb__num">{{ .pd }}</td><td class="cfb__num">{{ .ff }}</td><td class="cfb__num">{{ .tk }}</td>
   {{- end }}
+    <td class="cfb__num">{{ with .svar }}{{ partial "num.html" (slice "%+.2f" (float .)) }}{{ end }}</td>
     <td class="cfb__num">{{ with .war }}{{ printf "%.2f" (float .) }}{{ end }}</td>
   </tr>
   {{- end }}
