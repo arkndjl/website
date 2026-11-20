@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-20T23:15:33Z",
+ "asof": "2026-11-20T23:35:02Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -52,7 +52,7 @@
  },
  "model": {
   "asof": "2026-11-20T19:16:53Z",
-  "ageH": 4.0,
+  "ageH": 4.3,
   "stale": false
  },
  "picks": [],
@@ -100,7 +100,7 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -119.0,
+   "price": -117.0,
    "edge": 3.6,
    "x": null,
    "why": "total market off",
@@ -257,7 +257,7 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -119.0,
+   "price": -117.0,
    "edge": 3.6,
    "ev": null,
    "units": 0.0,
@@ -450,15 +450,15 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 5507,
+  "snapshots": 5512,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 2315,
-    "clvRet": -0.033,
-    "clvT": -19.31,
+    "clvN": 2318,
+    "clvRet": -0.0331,
+    "clvT": -19.36,
     "clv": 0.3,
-    "beat": 0.272,
+    "beat": 0.271,
     "still": 0.657
    },
    {
@@ -2866,9 +2866,14 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-20T23:15:33Z",
+ "checked": "2026-11-20T23:35:02Z",
  "nightCap": {
   "cap": 40.0,
-  "nights": {}
+  "nights": {
+   "2026-11-21": {
+    "raw": 0.25,
+    "scale": 1.0
+   }
+  }
  }
 }
