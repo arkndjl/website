@@ -120,6 +120,26 @@
 .esea-pv__prob i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--foreground); }
 .esea-pv__prob span { position: relative; padding: 0 8px; }
 .esea-pv__sub { font-size: .8em; }
+.esea-vl { display: flex; flex-direction: column; gap: 8px; }
+.esea-vl__bar { display: flex; flex-wrap: wrap; gap: 6px; }
+.esea-vl__seg { display: inline-flex; gap: 0; }
+.esea-vl__seg button, .esea-vl__map { font: inherit; color: var(--foreground); background: var(--win-well); border: 0; box-shadow: inset -2px -2px 0 var(--win-dark), inset 2px 2px 0 var(--win-light); cursor: pointer; }
+.esea-vl__seg button { padding: 6px 10px; min-height: 36px; font-size: .85em; }
+.esea-vl__seg button.is-on { background: var(--accent); color: var(--win-dark); box-shadow: inset 2px 2px 0 var(--win-dark); }
+.esea-vl__turn { font-size: .95em; } .esea-vl__turn .is-us { color: var(--foreground); } .esea-vl__turn .is-them { color: #ff9ec7; }
+.esea-vl__step { opacity: .7; } .esea-vl__rec { color: var(--accent); }
+.esea-vl__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px; }
+.esea-vl__map { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px; min-height: 64px; text-align: left; }
+.esea-vl__map b { font-size: 1.15em; } .esea-vl__opp { color: #ff9ec7; } .esea-vl__map small { font-size: .7em; opacity: .8; }
+.esea-vl__map.is-rec { box-shadow: inset 0 0 0 3px var(--accent); }
+.esea-vl__map.is-likely { box-shadow: inset 0 0 0 3px #ff9ec7; } .esea-vl__map.is-maybe { box-shadow: inset 0 0 0 2px rgba(255,158,199,.5); }
+.esea-vl__map.is-ban { opacity: .38; text-decoration: line-through; cursor: default; }
+.esea-vl__map.is-ban.by-them small, .esea-vl__map.is-pick.by-them small { color: #ff9ec7; }
+.esea-vl__map.is-pick { background: color-mix(in srgb, var(--accent) 28%, var(--win-well)); cursor: default; }
+.esea-vl__map.is-dec { background: var(--accent); color: var(--win-dark); }
+.esea-vl__log { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: .75em; }
+.esea-vl__log li::before { content: none !important; } .esea-vl__log li.is-them { color: #ff9ec7; }
+@media (max-width: 684px) { .esea-vl__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .esea-pv__vetoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .esea-pv__seq { margin: 4px 0 0; padding: 0 0 0 1.8em; font-size: .9em; } .esea-pv__seq li::before { content: none !important; }
 .esea-pv__seq li > span:first-child { display: inline-block; min-width: 10ch; color: #ff9ec7; } .esea-pv__seq li.is-us > span:first-child { color: var(--foreground); }
@@ -663,6 +683,105 @@
     {{- with $pv.plan }}
     <details class="esea-pv__more esea-pv__plan"><summary><b>game plan</b> <span class="cfb__dim esea-pv__more-hint">· {{ len . }} notes</span></summary><ul>{{ range . }}<li>{{ . }}</li>{{ end }}</ul></details>
     {{- end }}
+    {{- /* live veto: tap maps in ESEA veto order; 1NT's best move (expectimax) and the opponent's likely move
+           (HABIT/EDGE mix, as teamGFX) recompute after each step */}}
+    {{- $vp := dict }}{{ range $pv.maps }}{{ $vp = merge $vp (dict .map .p) }}{{ end }}
+    {{- $vh := dict }}{{ with $pv.habit }}{{ $vh = . }}{{ else }}{{ range $pv.oppMaps }}{{ $vh = merge $vh (dict .map (add .w .l)) }}{{ end }}{{ end }}
+    {{- $vr := dict }}{{ range $pv.oppMaps }}{{ $vr = merge $vr (dict .map (printf "%v-%v" .w .l)) }}{{ end }}
+    <div class="esea-vl" data-vl="{{ dict "p" $vp "pool" $pv.pool "bo" ($pv.bestOf | default 1) "n" $vh "hw" ($pv.habitW | default 0.9) "r" $vr "opp" $o.name | jsonify }}">
+      <div class="esea-vl__bar">
+        <span class="esea-vl__seg" role="group" aria-label="format"><button type="button" data-vl-bo="1">Bo1</button><button type="button" data-vl-bo="3">Bo3</button></span>
+        <span class="esea-vl__seg" role="group" aria-label="first ban"><button type="button" data-vl-first="us">1NT 1st</button><button type="button" data-vl-first="them">OPP 1st</button></span>
+        <span class="esea-vl__seg"><button type="button" data-vl-undo aria-label="undo">◄</button><button type="button" data-vl-reset aria-label="reset">↺</button></span>
+      </div>
+      <p class="esea-vl__turn" aria-live="polite"></p>
+      <div class="esea-vl__grid"></div>
+      <ol class="esea-vl__log"></ol>
+    </div>
+    <script>document.querySelectorAll('.esea-vl').forEach(function (el) {
+      var D; try { D = JSON.parse(el.getAttribute('data-vl')); } catch (e) { return; }
+      var P = {}; Object.keys(D.p || {}).forEach(function (m) { P[m] = D.p[m] / 100; });
+      var R = D.r || {}, pool = (D.pool || []).filter(function (m) { return m in P; }), N = D.n || {}, HW = +D.hw || 0.9;
+      if (pool.length < 3) { el.hidden = true; return; }
+      var st = { bo: +D.bo === 3 ? 3 : 1, first: 'us', log: [] };
+      var grid = el.querySelector('.esea-vl__grid'), turn = el.querySelector('.esea-vl__turn'), logEl = el.querySelector('.esea-vl__log');
+      function seq() {
+        var A = st.first, B = A === 'us' ? 'them' : 'us';
+        var S = st.bo === 3 ? [[A, 'ban'], [B, 'ban'], [A, 'pick'], [B, 'pick'], [A, 'ban'], [B, 'ban']] : [[A, 'ban'], [B, 'ban'], [A, 'ban'], [B, 'ban'], [A, 'ban'], [B, 'ban']];
+        return S.slice(0, pool.length - 1);
+      }
+      function val(pk, dec) {
+        if (st.bo !== 3) return P[dec];
+        var a = P[pk[0]], b = P[pk[1]], c = P[dec];
+        return a * b + a * (1 - b) * c + (1 - a) * b * c;
+      }
+      var S, memo, mmo;
+      function nxt(left, pk, t, m) { return [left.filter(function (x) { return x !== m; }), S[t][1] === 'pick' ? pk.concat(m) : pk]; }
+      function mm(left, pk, t) {   // minimax: the opponent playing purely on the edge
+        if (t === S.length) return val(pk, left[0]);
+        var k = left.join() + '|' + pk.join() + '|' + t; if (k in mmo) return mmo[k];
+        var us = S[t][0] === 'us', best = null;
+        left.forEach(function (m) { var n = nxt(left, pk, t, m), v = mm(n[0], n[1], t + 1); if (best == null || (us ? v > best : v < best)) best = v; });
+        return (mmo[k] = best);
+      }
+      function oppMoves(left, pk, t) {   // HABIT (ban least played / pick most played) with weight HW, else the EDGE minimax move
+        var act = S[t][1], h = left.slice().sort(function (a, b) { return act === 'ban' ? ((N[a] || 0) - (N[b] || 0) || P[b] - P[a]) : ((N[b] || 0) - (N[a] || 0) || P[a] - P[b]); })[0];
+        var em = null, ev = null;
+        left.forEach(function (m) { var n = nxt(left, pk, t, m), v = mm(n[0], n[1], t + 1); if (ev == null || v < ev) { ev = v; em = m; } });
+        return h === em ? [[h, 1]] : [[h, HW], [em, 1 - HW]];
+      }
+      function ex(left, pk, t) {
+        if (t === S.length) return val(pk, left[0]);
+        var k = left.join() + '|' + pk.join() + '|' + t; if (k in memo) return memo[k];
+        var v;
+        if (S[t][0] === 'us') v = Math.max.apply(null, left.map(function (m) { var n = nxt(left, pk, t, m); return ex(n[0], n[1], t + 1); }));
+        else v = oppMoves(left, pk, t).reduce(function (a, o) { var n = nxt(left, pk, t, o[0]); return a + o[1] * ex(n[0], n[1], t + 1); }, 0);
+        return (memo[k] = v);
+      }
+      function pct(x) { return Math.round(x * 100) + '%'; }
+      function render() {
+        S = seq(); memo = {}; mmo = {};
+        var t = st.log.length, used = {}, pk = [];
+        st.log.forEach(function (x) { used[x.map] = x; if (x.act === 'pick') pk.push(x.map); });
+        var left = pool.filter(function (m) { return !used[m]; }), done = t >= S.length;
+        el.querySelectorAll('[data-vl-bo]').forEach(function (b) { b.classList.toggle('is-on', +b.getAttribute('data-vl-bo') === st.bo); });
+        el.querySelectorAll('[data-vl-first]').forEach(function (b) { b.classList.toggle('is-on', b.getAttribute('data-vl-first') === st.first); });
+        var vals = {}, rec = null, opp = {};
+        if (!done) {
+          if (S[t][0] === 'us') left.forEach(function (m) { var n = nxt(left, pk, t, m); vals[m] = ex(n[0], n[1], t + 1); if (rec == null || vals[m] > vals[rec] + 1e-12) rec = m; });
+          else oppMoves(left, pk, t).forEach(function (o) { opp[o[0]] = o[1]; });
+        }
+        var ev = done ? val(pk, left[0]) : ex(left, pk, t);
+        var who = done ? '' : (S[t][0] === 'us' ? '1NT' : 'OPP') + ' ' + S[t][1].toUpperCase();
+        turn.innerHTML = done ? '<b>' + (st.bo === 3 ? 'SERIES ' : 'MAP ') + pct(ev) + '</b> · ' + (st.bo === 3 ? pk.concat(left[0]).join(' / ') : left[0])
+          : '<span class="esea-vl__step">' + (t + 1) + '/' + S.length + '</span> <b class="' + (S[t][0] === 'us' ? 'is-us' : 'is-them') + '">' + who + '</b>' + (rec ? ' · <span class="esea-vl__rec">' + rec + '</span>' : '') + ' <span class="cfb__dim">exp. ' + pct(ev) + '</span>';
+        grid.innerHTML = '';
+        pool.forEach(function (m) {
+          var b = document.createElement('button'), u = used[m];
+          b.type = 'button'; b.className = 'esea-vl__map'; b.setAttribute('data-map', m);
+          if (u) b.classList.add(u.act === 'pick' ? 'is-pick' : 'is-ban', u.by === 'us' ? 'by-us' : 'by-them');
+          else if (done) b.classList.add('is-dec');
+          if (m === rec) b.classList.add('is-rec');
+          if (opp[m] != null) b.classList.add(opp[m] >= 0.5 ? 'is-likely' : 'is-maybe');
+          var tag = u ? (u.by === 'us' ? '1NT ' : 'OPP ') + u.act.toUpperCase() : done ? 'DECIDER' : vals[m] != null ? 'exp ' + pct(vals[m]) : opp[m] != null ? Math.round(opp[m] * 100) + '% likely' : '';
+          b.innerHTML = '<span class="esea-map" data-map="' + m + '">' + m + '</span><b>' + pct(P[m]) + '</b><small>' + tag + '</small>' + (R[m] ? '<small class="esea-vl__opp" title="' + D.opp + ' official maps, 90 days">' + R[m] + '</small>' : '');
+          b.disabled = !!u || done;
+          b.addEventListener('click', function () { if (used[m] || done) return; st.log.push({ by: S[t][0], act: S[t][1], map: m }); render(); });
+          grid.appendChild(b);
+        });
+        logEl.innerHTML = st.log.map(function (x) { return '<li class="' + (x.by === 'us' ? 'is-us' : 'is-them') + '">' + (x.by === 'us' ? '1NT' : D.opp) + ' ' + x.act + ' ' + x.map + '</li>'; }).join('');
+      }
+      el.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b || !el.contains(b)) return;
+        if (b.hasAttribute('data-vl-bo')) { st.bo = +b.getAttribute('data-vl-bo'); st.log = []; }
+        else if (b.hasAttribute('data-vl-first')) { st.first = b.getAttribute('data-vl-first'); st.log = []; }
+        else if (b.hasAttribute('data-vl-undo')) st.log.pop();
+        else if (b.hasAttribute('data-vl-reset')) st.log = [];
+        else return;
+        render();
+      });
+      render();
+    });</script>
     <details class="esea-pv__more">
       <summary class="esea-pv__call">{{ $ourB := slice }}{{ range $v1.bans }}{{ if eq .by "us" }}{{ $ourB = $ourB | append .map }}{{ end }}{{ end }}<b>Bo{{ $pv.bestOf | default 1 }} veto call:</b> ban <b>{{ delimit $ourB ", " }}</b> · expect <span class="esea-map" data-map="{{ $v1.decider }}">{{ $v1.decider }}</span>{{ if ne $v1.decider $v2.decider }} (or <span class="esea-map" data-map="{{ $v2.decider }}">{{ $v2.decider }}</span> if {{ $o.name }} bans first){{ end }} <span class="cfb__dim esea-pv__more-hint">· map edges, both ban orders</span></summary>
     <div class="wintable__scroll">
