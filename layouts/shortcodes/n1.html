@@ -330,6 +330,7 @@
     {{- with .twitch }}<li><a href="https://www.twitch.tv/{{ . }}" rel="noopener"><svg aria-hidden="true" viewBox="0 0 16 16"><use href="#icon-twitch"/></svg>{{ with index $flags $n }}{{ partial "px/flag.html" (lower .) }}{{ end }}<b>{{ $n }}</b><span class="n1-dim">twitch.tv/{{ . }}</span></a></li>{{ end }}
     {{- with .youtube }}<li><a href="https://www.youtube.com/{{ . }}" rel="noopener"><svg aria-hidden="true" viewBox="0 0 16 16"><use href="#icon-youtube"/></svg>{{ with index $flags $n }}{{ partial "px/flag.html" (lower .) }}{{ end }}<b>{{ $n }}</b><span class="n1-dim">youtube.com/{{ . }}</span></a></li>{{ end }}
     {{- end }}{{ end }}
+    {{- range $c.casters }}<li><a href="https://www.twitch.tv/{{ . }}" rel="noopener"><svg aria-hidden="true" viewBox="0 0 16 16"><use href="#icon-twitch"/></svg><b>caster</b><span class="n1-dim">twitch.tv/{{ . }}</span></a></li>{{ end }}
     <li><a href="https://www.faceit.com/en/teams/a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a" rel="noopener"><svg aria-hidden="true" viewBox="0 0 16 16"><use href="#px-faceit10"/></svg><b>1NT</b><span class="n1-dim">FACEIT</span></a></li>
   </ul>
   <div class="win__status"><span>FACEIT · Twitch · YouTube</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
