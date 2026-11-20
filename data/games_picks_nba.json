@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-20T15:34:16Z",
+ "asof": "2026-11-20T16:33:48Z",
  "recenter": {
-  "2026-11-20": 1.58
+  "2026-11-20": 1.55
  },
  "monitor": {
   "clocks": {
@@ -328,7 +328,7 @@
  },
  "model": {
   "asof": "2026-11-20T08:35:35Z",
-  "ageH": 7.0,
+  "ageH": 8.0,
   "stale": false
  },
  "picks": [],
@@ -344,7 +344,7 @@
    "mk": "total",
    "side": "over",
    "line": 237.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 4.5,
    "x": 6.0,
    "why": "edge under 6 (total: high)",
@@ -368,22 +368,6 @@
    "tm": 220.4
   },
   {
-   "id": "401909308",
-   "sport": "nba",
-   "kick": "2026-11-21T00:30:00Z",
-   "home": "DET",
-   "away": "TOR",
-   "mk": "spread",
-   "side": "home",
-   "line": 6.5,
-   "price": -119.0,
-   "edge": 1.5,
-   "x": 5.0,
-   "why": "edge under 5 (venue: home)",
-   "m": 8.0,
-   "tm": 214.9
-  },
-  {
    "id": "401909312",
    "sport": "nba",
    "kick": "2026-11-21T03:00:00Z",
@@ -392,7 +376,7 @@
    "mk": "spread",
    "side": "home",
    "line": 1.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 1.1,
    "x": 4.0,
    "why": "edge under 4 (line: <4)",
@@ -405,15 +389,31 @@
    "kick": "2026-11-21T00:30:00Z",
    "home": "CLE",
    "away": "IND",
-   "mk": "spread",
-   "side": "away",
-   "line": 6.5,
-   "price": -124.0,
-   "edge": 1.0,
-   "x": 5.0,
-   "why": "edge under 5 (role: dog)",
+   "mk": "total",
+   "side": "under",
+   "line": 233.5,
+   "price": -106.0,
+   "edge": 1.5,
+   "x": 6.0,
+   "why": "edge under 6 (total: high)",
    "m": 5.5,
    "tm": 232.0
+  },
+  {
+   "id": "401909308",
+   "sport": "nba",
+   "kick": "2026-11-21T00:30:00Z",
+   "home": "DET",
+   "away": "TOR",
+   "mk": "total",
+   "side": "under",
+   "line": 216.5,
+   "price": -114.0,
+   "edge": 1.6,
+   "x": 6.5,
+   "why": "edge under 6.5 (total: mid)",
+   "m": 8.0,
+   "tm": 214.9
   },
   {
    "id": "401909310",
@@ -432,22 +432,6 @@
    "tm": 227.3
   },
   {
-   "id": "401909311",
-   "sport": "nba",
-   "kick": "2026-11-21T02:30:00Z",
-   "home": "UTAH",
-   "away": "PHX",
-   "mk": "total",
-   "side": "over",
-   "line": 224.5,
-   "price": -119.0,
-   "edge": 1.0,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: over)",
-   "m": -3.8,
-   "tm": 225.5
-  },
-  {
    "id": "401909305",
    "sport": "nba",
    "kick": "2026-11-21T00:00:00Z",
@@ -464,6 +448,22 @@
    "tm": 219.1
   },
   {
+   "id": "401909311",
+   "sport": "nba",
+   "kick": "2026-11-21T02:30:00Z",
+   "home": "UTAH",
+   "away": "PHX",
+   "mk": "spread",
+   "side": "home",
+   "line": -4.5,
+   "price": -114.0,
+   "edge": 0.7,
+   "x": 5.0,
+   "why": "edge under 5 (role: dog)",
+   "m": -3.8,
+   "tm": 225.5
+  },
+  {
    "id": "401909313",
    "sport": "nba",
    "kick": "2026-11-21T03:00:00Z",
@@ -472,7 +472,7 @@
    "mk": "spread",
    "side": "home",
    "line": 14.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 0.2,
    "x": 5.0,
    "why": "edge under 5 (venue: home)",
@@ -506,11 +506,11 @@
    "state": "under"
   },
   "401909307": {
-   "mk": "spread",
-   "side": "away",
-   "line": 6.5,
-   "price": -124.0,
-   "edge": 1.0,
+   "mk": "total",
+   "side": "under",
+   "line": 233.5,
+   "price": -106.0,
+   "edge": 1.5,
    "ev": null,
    "units": 0.0,
    "home": "CLE",
@@ -518,11 +518,11 @@
    "state": "under"
   },
   "401909308": {
-   "mk": "spread",
-   "side": "home",
-   "line": 6.5,
-   "price": -119.0,
-   "edge": 1.5,
+   "mk": "total",
+   "side": "under",
+   "line": 216.5,
+   "price": -114.0,
+   "edge": 1.6,
    "ev": null,
    "units": 0.0,
    "home": "DET",
@@ -533,7 +533,7 @@
    "mk": "total",
    "side": "over",
    "line": 237.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 4.5,
    "ev": null,
    "units": 0.0,
@@ -554,11 +554,11 @@
    "state": "under"
   },
   "401909311": {
-   "mk": "total",
-   "side": "over",
-   "line": 224.5,
-   "price": -119.0,
-   "edge": 1.0,
+   "mk": "spread",
+   "side": "home",
+   "line": -4.5,
+   "price": -114.0,
+   "edge": 0.7,
    "ev": null,
    "units": 0.0,
    "home": "UTAH",
@@ -569,7 +569,7 @@
    "mk": "spread",
    "side": "home",
    "line": 1.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 1.1,
    "ev": null,
    "units": 0.0,
@@ -581,7 +581,7 @@
    "mk": "spread",
    "side": "home",
    "line": 14.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 0.2,
    "ev": null,
    "units": 0.0,
@@ -642,7 +642,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 5060,
+  "snapshots": 5066,
   "buckets": [
    {
     "when": "24h+",
@@ -7317,7 +7317,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-20T15:34:16Z",
+ "checked": "2026-11-20T16:33:48Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
