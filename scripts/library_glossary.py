@@ -319,6 +319,13 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
        'Kept only where split-half r rose (P >= .9): opponent RB .199 -> .217, WR .172 -> .190, DL .308 -> .315, DB .147 -> .149; TE and LB stay raw. Weather only for RB (.217 -> .220).',
        'In the game model\'s injury term in place of WAR a game it failed held out 2021-25 (MAE 10.010 -> 10.070, 0/5 seasons); WAR stays.'],
       'NFL skill players + defenders tabs', ['NFL']),
+    E('Season value (CFB QBs, skill players)', 'Pts/G = this season\'s points a game over replacement from EPA a play (QB: dropbacks + runs; skill: runs + targets), FBS games.',
+      ['Opponent-adjusted for QB and RB (the defense\'s EPA allowed on that play type over the league\'s, other games, shrunk 300 plays): split-half r QB .360 -> .403, RB .179 -> .199; '
+       'WR and TE stay raw (P .84 / .88 on 2025-26, when target ids are complete). Weather (Open-Meteo at the stadium) added nothing.',
+       'Replacement = players past the starters by volume in 2025 (QB 134, RB 268, WR 402, TE 134).',
+       'Defenders left out: public plays carry no tackles or snaps; splash credits had no split-half reliability.',
+       'Game model: the starter\'s adjusted season value scored the same as raw season EPA (t +0.5); the QB charge stays.'],
+      'CFB QB EPA + skill players tabs', ['CFB']),
     E('Yds+ / YOE (returners)', 'Kick and punt return yards over expected, shrunk.',
       ['YOE = return yards minus the mean return from the same spot (5-yard bins, this season). Yards, not EPA (EPA does not repeat).'],
       'special teams tab on NFL and CFB pages', ['NFL', 'CFB']),

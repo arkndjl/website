@@ -1,0 +1,49 @@
+{{- /* CFB season value (data/cfb_season_value.json, scripts/cfb_season_value.py): group="qbs" or group="skill" (RB, WR,
+       TE), ranked by this season's points over replacement a game. FBS games, cfbfastR plays. */ -}}
+{{- $qb := eq ($.Get "group") "qbs" -}}
+{{- with site.Data.cfb_season_value -}}
+{{- $rows := cond $qb .qbs .skill -}}
+{{- $gfx := cond $qb "RK,QB,Team,Pts/G,aEPA,EPA/play,Plays" "RK,Player,Team,Pos,Pts/G,aEPA,Plays" -}}
+{{- $o := dict "title" ($.Get "title" | default (cond $qb "QB EPA" "skill players")) "rerank" true "tab" ($.Get "tab") "gfxCols" $gfx "gfxDate" (printf "%v · %s" .season (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32" -}}
+{{- if not $qb }}{{ $o = merge $o (dict "filter" "Pos") }}{{ end -}}
+{{- partial "wintable-open.html" $o -}}
+<table class="cfb__table">
+  <thead><tr>
+    <th title="rank by Pts/G within the filter">RK</th><th>{{ cond $qb "QB" "Player" }}</th><th>Team</th>{{ if not $qb }}<th title="position group">Pos</th>{{ end }}
+  {{- if $qb }}
+    <th title="Pts/G = this season's points over replacement a game with 10+ plays: every dropback and QB run, EPA less the defense's EPA allowed a play of that kind over the league's (its other games, shrunk 300 plays), minus replacement (-0.074 a play: QBs past the 134 starters by volume, 2025). FBS games, this season only">Pts/G</th>
+    <th title="opponent-adjusted EPA a play, dropbacks + QB runs">aEPA</th>
+    <th title="this season's points over replacement, total">Pts</th>
+    <th title="EPA a play before the opponent adjustment">EPA/play</th>
+    <th title="games with 10+ plays">G</th><th title="dropbacks + QB runs">Plays</th><th title="dropbacks: passes, sacks">DB</th><th title="QB runs (designed + scrambles)">Runs</th>
+  {{- else }}
+    <th title="Pts/G = this season's points over replacement a game with a play: every run and target, EPA less the defense's EPA allowed a run / pass over the league's (RB; its other games, shrunk 300 plays), minus replacement (players past the starters by volume, 2025: RB 268, WR 402, TE 134). FBS games, this season only">Pts/G</th>
+    <th title="EPA a play (runs + targets), opponent-adjusted for RB">aEPA</th>
+    <th title="this season's points over replacement, total">Pts</th>
+    <th title="EPA a run">EPA/run</th><th title="EPA a target">EPA/tgt</th>
+    <th title="games with a run or target">G</th><th title="runs + targets">Plays</th><th title="runs">Car</th><th title="targets">Tgt</th>
+  {{- end }}
+    <th title="WAR, season to date (board)">WAR</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $r := $rows }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td><td class="cfb__name">{{ partial "face.html" (dict "u" (.ph | default "")) }}<b>{{ .n }}</b></td><td style="white-space: nowrap">{{ with .lo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}{{ .t }}</td>{{ if not $qb }}<td>{{ .pos }}</td>{{ end }}
+    <td class="cfb__num nflwar__war is-key">{{ partial "num.html" (slice "%+.1f" (float .pts)) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%+.3f" (float .aepa)) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float .tot)) }}</td>
+  {{- if $qb }}
+    <td class="cfb__num">{{ partial "num.html" (slice "%+.3f" (float .epa)) }}</td>
+    <td class="cfb__num">{{ .g }}</td><td class="cfb__num">{{ .plays }}</td><td class="cfb__num">{{ .db }}</td><td class="cfb__num">{{ .runs }}</td>
+  {{- else }}
+    <td class="cfb__num">{{ with .ra }}{{ partial "num.html" (slice "%+.3f" (float .)) }}{{ end }}</td>
+    <td class="cfb__num">{{ with .ta }}{{ partial "num.html" (slice "%+.3f" (float .)) }}{{ end }}</td>
+    <td class="cfb__num">{{ .g }}</td><td class="cfb__num">{{ .plays }}</td><td class="cfb__num">{{ .car }}</td><td class="cfb__num">{{ .tgt }}</td>
+  {{- end }}
+    <td class="cfb__num">{{ with .war }}{{ printf "%.2f" (float .) }}{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "fresh" "cfb_season_value" "rows" (len $rows) "note" "cfbfastR play-by-play (sportsdataverse)") -}}
+{{- end -}}
