@@ -1,10 +1,10 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-20T03:55:27Z",
+ "asof": "2026-11-20T03:58:54Z",
  "recenter": {
   "2026-11-19": 1.77,
-  "2026-11-20": 1.47
+  "2026-11-20": 1.45
  },
  "monitor": {
   "clocks": {
@@ -1831,7 +1831,7 @@
  },
  "model": {
   "asof": "2026-11-20T03:19:49Z",
-  "ageH": 0.6,
+  "ageH": 0.7,
   "stale": false
  },
  "picks": [],
@@ -1967,13 +1967,13 @@
    "kick": "2026-11-20T22:30:00Z",
    "home": "Canisius",
    "away": "Mercyhurst",
-   "mk": "spread",
-   "side": "home",
-   "line": -18.5,
-   "price": -5413.0,
-   "edge": 15.3,
-   "x": 5.0,
-   "why": "gap too big: a bad line",
+   "mk": "total",
+   "side": "under",
+   "line": 149.5,
+   "price": -678.0,
+   "edge": 13.7,
+   "x": 6.5,
+   "why": "no edge at -678",
    "m": -3.2,
    "tm": 135.8
   },
@@ -2040,22 +2040,6 @@
    "why": "edge under 5 (line: 4-9)",
    "m": 9.3,
    "tm": 138.2
-  },
-  {
-   "id": "401909709",
-   "sport": "cbb",
-   "kick": "2026-11-21T00:00:00Z",
-   "home": "Pittsburgh",
-   "away": "Central Michigan",
-   "mk": "total",
-   "side": "under",
-   "line": 145.5,
-   "price": -124.0,
-   "edge": 5.6,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": 22.6,
-   "tm": 139.9
   },
   {
    "id": "401928795",
@@ -2138,6 +2122,22 @@
    "tm": 150.1
   },
   {
+   "id": "401909709",
+   "sport": "cbb",
+   "kick": "2026-11-21T00:00:00Z",
+   "home": "Pittsburgh",
+   "away": "Central Michigan",
+   "mk": "total",
+   "side": "under",
+   "line": 144.5,
+   "price": -110.0,
+   "edge": 4.6,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": 22.6,
+   "tm": 139.9
+  },
+  {
    "id": "401920357",
    "sport": "cbb",
    "kick": "2026-11-21T00:00:00Z",
@@ -2146,7 +2146,7 @@
    "mk": "spread",
    "side": "home",
    "line": -12.5,
-   "price": -133.0,
+   "price": -125.0,
    "edge": 3.1,
    "x": 4.5,
    "why": "edge under 4.5 (line: 9-15)",
@@ -2226,7 +2226,7 @@
    "mk": "spread",
    "side": "away",
    "line": -8.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 2.5,
    "x": 4.0,
    "why": "edge under 4 (tier: power)",
@@ -2368,11 +2368,11 @@
    "state": "under"
   },
   "401921418": {
-   "mk": "total",
-   "side": "over",
-   "line": 148.5,
+   "mk": "spread",
+   "side": "away",
+   "line": -1.5,
    "price": -110.0,
-   "edge": 1.7,
+   "edge": 0.5,
    "ev": null,
    "units": 0.0,
    "home": "Minnesota",
@@ -2443,7 +2443,7 @@
    "mk": "spread",
    "side": "away",
    "line": -8.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 2.5,
    "ev": null,
    "units": 0.0,
@@ -2479,7 +2479,7 @@
    "mk": "total",
    "side": "under",
    "line": 156.5,
-   "price": -129.0,
+   "price": -124.0,
    "edge": 2.2,
    "ev": null,
    "units": 0.0,
@@ -2611,7 +2611,7 @@
    "mk": "spread",
    "side": "away",
    "line": 1.5,
-   "price": -146.0,
+   "price": -140.0,
    "edge": 1.2,
    "ev": null,
    "units": 0.0,
@@ -2634,9 +2634,9 @@
   "401909709": {
    "mk": "total",
    "side": "under",
-   "line": 145.5,
-   "price": -124.0,
-   "edge": 5.6,
+   "line": 144.5,
+   "price": -110.0,
+   "edge": 4.6,
    "ev": null,
    "units": 0.0,
    "home": "Pittsburgh",
@@ -2707,7 +2707,7 @@
    "mk": "total",
    "side": "over",
    "line": 139.5,
-   "price": -140.0,
+   "price": -129.0,
    "edge": 1.6,
    "ev": null,
    "units": 0.0,
@@ -2767,7 +2767,7 @@
    "mk": "spread",
    "side": "home",
    "line": -5.5,
-   "price": -110.0,
+   "price": -106.0,
    "edge": 0.6,
    "ev": null,
    "units": 0.0,
@@ -2815,7 +2815,7 @@
    "mk": "spread",
    "side": "home",
    "line": -12.5,
-   "price": -133.0,
+   "price": -125.0,
    "edge": 3.1,
    "ev": null,
    "units": 0.0,
@@ -2824,11 +2824,11 @@
    "state": "under"
   },
   "401919827": {
-   "mk": "spread",
-   "side": "home",
-   "line": -18.5,
-   "price": -5413.0,
-   "edge": 15.3,
+   "mk": "total",
+   "side": "under",
+   "line": 149.5,
+   "price": -678.0,
+   "edge": 13.7,
    "ev": null,
    "units": 0.0,
    "home": "Canisius",
@@ -2836,11 +2836,11 @@
    "state": "under"
   },
   "401924844": {
-   "mk": "spread",
-   "side": "away",
-   "line": 2.5,
-   "price": -120.0,
-   "edge": 1.4,
+   "mk": "total",
+   "side": "under",
+   "line": 136.5,
+   "price": -115.0,
+   "edge": 0.7,
    "ev": null,
    "units": 0.0,
    "home": "Delaware State",
@@ -2912,7 +2912,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 20625,
+  "snapshots": 20647,
   "buckets": [
    {
     "when": "24h+",
@@ -2925,9 +2925,9 @@
    },
    {
     "when": "6-24h",
-    "clvN": 4237,
-    "clvRet": -0.0094,
-    "clvT": -5.06,
+    "clvN": 4241,
+    "clvRet": -0.0091,
+    "clvT": -4.87,
     "clv": 0.54,
     "beat": 0.399,
     "still": 0.407
@@ -20652,7 +20652,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-20T03:55:27Z",
+ "checked": "2026-11-20T03:58:54Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
