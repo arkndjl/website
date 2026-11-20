@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-02T22:37:47Z",
+ "asof": "2026-11-20T02:37:01Z",
  "params": {
   "k": 0.02592,
   "kl": 0.00346,
@@ -27,7 +27,10 @@
   "carn": 1.0,
   "wn": 1.0,
   "av": 0.35,
-  "r45": -0.02
+  "r45": -0.02,
+  "trel": 0.77,
+  "tkt": 0.03,
+  "tkb": 0.06
  },
  "tune": [
   2013,
@@ -37,195 +40,195 @@
  "tests": [
   {
    "name": "goals ratings only",
-   "tune": 0.97633,
-   "hold": 0.97562,
+   "tune": 0.97732,
+   "hold": 0.97661,
    "tuneBy": {
-    "euro": 0.95581,
-    "dom": 0.98331
+    "euro": 0.95996,
+    "dom": 0.98333
    },
    "holdBy": {
     "dom": 0.98593,
-    "euro": 0.93565
+    "euro": 0.94145
    },
    "kept": false,
    "note": "every club: attack and defence on goals"
   },
   {
    "name": "+ Understat xG ratings",
-   "tune": 0.97527,
-   "hold": 0.97408,
+   "tune": 0.97626,
+   "hold": 0.97502,
    "tuneBy": {
-    "euro": 0.95572,
-    "dom": 0.98193
+    "euro": 0.95984,
+    "dom": 0.98195
    },
    "holdBy": {
     "dom": 0.98411,
-    "euro": 0.93516
+    "euro": 0.94073
    },
    "kept": false,
    "note": "big five: xG a match, blended into attack and defence"
   },
   {
    "name": "+ market ratings",
-   "tune": 0.96564,
-   "hold": 0.96329,
+   "tune": 0.96673,
+   "hold": 0.96414,
    "tuneBy": {
-    "euro": 0.95341,
-    "dom": 0.9698
+    "euro": 0.95775,
+    "dom": 0.96984
    },
    "holdBy": {
     "dom": 0.97158,
-    "euro": 0.93111
+    "euro": 0.93608
    },
    "kept": false,
    "note": "earlier matches' closing 1X2 prices as goals; never the match's own"
   },
   {
    "name": "+ squad market value",
-   "tune": 0.96518,
-   "hold": 0.96226,
+   "tune": 0.96634,
+   "hold": 0.9631,
    "tuneBy": {
-    "euro": 0.95199,
-    "dom": 0.96966
+    "euro": 0.95663,
+    "dom": 0.9697
    },
    "holdBy": {
     "dom": 0.97092,
-    "euro": 0.92867
+    "euro": 0.93359
    },
    "kept": false,
    "note": "Transfermarkt top-18 squad value, home minus away (log): Oct 24 2026 source sweep, held out t 3.9, 4 of 4 seasons; the top 18's mean age beside it (value-weighted or plain) adds nothing, Oct 30 2026"
   },
   {
    "name": "+ injuries and suspensions (final model)",
-   "tune": 0.96518,
-   "hold": 0.96226,
+   "tune": 0.96634,
+   "hold": 0.9631,
    "tuneBy": {
-    "euro": 0.95199,
-    "dom": 0.96966
+    "euro": 0.95663,
+    "dom": 0.9697
    },
    "holdBy": {
     "dom": 0.97092,
-    "euro": 0.92867
+    "euro": 0.93359
    },
    "kept": true,
    "note": "Transfermarkt spells begun in the last 3 weeks, each missing player's prior-season GAR a 90 x usual league minutes (Oct 28 2026: tune t -2.1, held out big five t -1.7; every spell of any age, sat out last match and red cards from line-ups alone all failed)"
   },
   {
    "name": "+ rest days",
-   "tune": 0.96529,
-   "hold": 0.96252,
+   "tune": 0.96645,
+   "hold": 0.96338,
    "tuneBy": {
-    "euro": 0.95189,
-    "dom": 0.96985
+    "euro": 0.95653,
+    "dom": 0.96989
    },
    "holdBy": {
     "dom": 0.97103,
-    "euro": 0.92951
+    "euro": 0.93452
    },
    "kept": false,
    "note": "days since the last match, 2 to 7, home minus away"
   },
   {
    "name": "+ rest days (other sign)",
-   "tune": 0.96553,
-   "hold": 0.96256,
+   "tune": 0.9667,
+   "hold": 0.96337,
    "tuneBy": {
-    "euro": 0.95259,
-    "dom": 0.96994
+    "euro": 0.95722,
+    "dom": 0.96998
    },
    "holdBy": {
     "dom": 0.97134,
-    "euro": 0.92846
+    "euro": 0.93329
    },
    "kept": false,
    "note": ""
   },
   {
    "name": "no 4-5 day rest band",
-   "tune": 0.96537,
-   "hold": 0.96253,
+   "tune": 0.96653,
+   "hold": 0.96335,
    "tuneBy": {
-    "euro": 0.95218,
-    "dom": 0.96985
+    "euro": 0.95682,
+    "dom": 0.96989
    },
    "holdBy": {
     "dom": 0.97127,
-    "euro": 0.92863
+    "euro": 0.93346
    },
    "kept": false,
    "note": "r45: 4-5 days off its last match, home minus away (kept: rest_research.py)"
   },
   {
    "name": "+ <= 3 day rest band",
-   "tune": 0.96523,
-   "hold": 0.96244,
+   "tune": 0.96639,
+   "hold": 0.96327,
    "tuneBy": {
-    "euro": 0.95186,
-    "dom": 0.96978
+    "euro": 0.9565,
+    "dom": 0.96982
    },
    "holdBy": {
     "dom": 0.97109,
-    "euro": 0.92888
+    "euro": 0.93378
    },
    "kept": false,
    "note": "r3: 3 or fewer days off, home minus away"
   },
   {
    "name": "+ shots on target",
-   "tune": 0.96513,
-   "hold": 0.96235,
+   "tune": 0.96629,
+   "hold": 0.96319,
    "tuneBy": {
-    "euro": 0.95205,
-    "dom": 0.96958
+    "euro": 0.95667,
+    "dom": 0.96962
    },
    "holdBy": {
     "dom": 0.97105,
-    "euro": 0.92859
+    "euro": 0.93351
    },
    "kept": false,
    "note": "football-data's shots on target as goals (30% conversion)"
   },
   {
    "name": "no early-season boost",
-   "tune": 0.96654,
-   "hold": 0.9624,
+   "tune": 0.96763,
+   "hold": 0.96312,
    "tuneBy": {
-    "euro": 0.95608,
-    "dom": 0.9701
+    "euro": 0.9604,
+    "dom": 0.97014
    },
    "holdBy": {
     "dom": 0.97133,
-    "euro": 0.92774
+    "euro": 0.93214
    },
    "kept": false,
    "note": "learning rate x (1 + boost) in a season's first matches"
   },
   {
    "name": "summer regression 0.85",
-   "tune": 0.96595,
-   "hold": 0.96246,
+   "tune": 0.96705,
+   "hold": 0.96324,
    "tuneBy": {
-    "euro": 0.95545,
-    "dom": 0.96952
+    "euro": 0.95979,
+    "dom": 0.96957
    },
    "holdBy": {
     "dom": 0.97113,
-    "euro": 0.92882
+    "euro": 0.93345
    },
    "kept": false,
    "note": "pull 15% back to the league mean each summer"
   },
   {
    "name": "spread x1.05",
-   "tune": 0.9658,
-   "hold": 0.96205,
+   "tune": 0.967,
+   "hold": 0.9629,
    "tuneBy": {
-    "euro": 0.95292,
-    "dom": 0.97018
+    "euro": 0.95773,
+    "dom": 0.97022
    },
    "holdBy": {
     "dom": 0.97064,
-    "euro": 0.92869
+    "euro": 0.93371
    },
    "kept": false,
    "note": "the gap between the sides' expected goals stretched 5% (held out better, tuning worse)"
@@ -425,38 +428,38 @@
   "0.5": 0.299,
   "0.75": 0.381
  },
- "n": {
-  "matches": 182980,
-  "scored": 33248
- },
  "totals": {
   "tune": {
    "n": 11380,
-   "level": 0.68014,
-   "ratings": 0.67474,
+   "level": 0.68037,
+   "ratings": 0.67481,
    "close": 0.67175,
-   "t": -5.43
+   "t": -5.54
   },
   "hold": {
    "n": 21763,
-   "level": 0.6827,
+   "level": 0.68272,
    "ratings": 0.67531,
    "close": 0.67168,
-   "t": -8.96
+   "t": -8.98
   },
   "holdBig5": {
    "n": 7076,
-   "level": 0.67362,
+   "level": 0.67369,
    "ratings": 0.67147,
    "close": 0.66759,
-   "t": -2.66
+   "t": -2.7
   },
   "holdOther": {
    "n": 14687,
    "level": 0.68707,
    "ratings": 0.67716,
    "close": 0.67366,
-   "t": -8.66
+   "t": -8.67
   }
+ },
+ "n": {
+  "matches": 182980,
+  "scored": 33248
  }
 }
