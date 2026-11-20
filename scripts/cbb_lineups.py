@@ -511,6 +511,54 @@ def pull(season, upto=None, workers=3, log=True, budget=None, retry=False):
 
 
 # ---------------------------------------------------------------- tables
+OPP_K = 350.0     # possessions of shrink on a team's offence / defence rating (about five games)
+
+
+def team_ratings(games, upto=None, K=OPP_K, iters=40):
+    """{(team, game id): [defence, offence, home]} for adjusting what a lineup did AGAINST that team in that game:
+    points per possession the team allows / scores over the league's rate with its schedule counted (offence, defence
+    and a home term solved together over the season's games, each shrunk toward 0 by poss / (poss + K)), the game
+    itself taken back out; home = the per-possession home edge of the side facing it (+ at home, - away).
+
+        adjusted points for     = points for     - poss x (defence + home / 2)
+        adjusted points against = points against - poss x (offence - home / 2)
+
+    Nov 20 2026 (scripts/research/oppwx_nov20/cbb_lineups_test.py, odd vs even games of 2025-26)."""
+    G = []                                                # (gid, home, away, poss, home pts, away pts)
+    for gid, g in games.items():
+        if 'stints' not in g or (upto and g['date'] >= upto):
+            continue
+        secs = g['secs'] or 1
+        poss = g.get('poss') or 68.0 * secs / 2400
+        hp = sum(s[3] for s in g['stints']); ap = sum(s[4] for s in g['stints'])
+        if poss > 20:
+            G.append((gid, g['home'], g['away'], poss, hp, ap))
+    if not G:
+        return {}
+    P = defaultdict(float)
+    for gid, h, a, ps, hp, ap in G:
+        P[h] += ps; P[a] += ps
+    m = sum(x[4] + x[5] for x in G) / (2 * sum(x[3] for x in G))
+    off = defaultdict(float); dfn = defaultdict(float); hm = 0.0
+    for _ in range(iters):
+        no = defaultdict(float); nd = defaultdict(float); hs = hw = 0.0
+        for gid, h, a, ps, hp, ap in G:
+            no[h] += hp - ps * (m + dfn[a] + hm / 2); no[a] += ap - ps * (m + dfn[h] - hm / 2)
+            nd[h] += ap - ps * (m + off[a] - hm / 2); nd[a] += hp - ps * (m + off[h] + hm / 2)
+            hs += (hp - ap) - ps * ((off[h] + dfn[a]) - (off[a] + dfn[h])); hw += ps
+        off = defaultdict(float, {t: v / (P[t] + K) for t, v in no.items()})
+        dfn = defaultdict(float, {t: v / (P[t] + K) for t, v in nd.items()})
+        hm = hs / hw
+    out = {}
+    for gid, h, a, ps, hp, ap in G:
+        for t, o, pf, pa, sg in ((h, a, hp, ap, 1), (a, h, ap, hp, -1)):
+            den = P[t] + K - ps
+            d = (dfn[t] * (P[t] + K) - (pa - ps * (m + off[o] - sg * hm / 2))) / den
+            f = (off[t] * (P[t] + K) - (pf - ps * (m + dfn[o] + sg * hm / 2))) / den
+            out[(t, gid)] = [d, f, -sg * hm]
+    return out
+
+
 def season_tables(games, upto=None, k_lineup=150.0, k_onoff=600.0):
     """per team: 5-man units and player on/off over the season's games (before `upto` when given).
     Net shrunk to the team's own net by k possessions (units) / to 0 by k possessions (on-off)."""
