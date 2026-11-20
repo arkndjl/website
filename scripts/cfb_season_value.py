@@ -139,6 +139,12 @@ def main():
     except (OSError, ValueError):
         old = {}
     if old.get('season') == y and old.get('etag') == h.get('etag') and '--force' not in sys.argv:
+        import datetime as dt
+        import checked                 # weekly release: a quiet week keeps the file fresh-stamped, asof stays the release
+        w = checked.stamp(old, old, dt.datetime.now(dt.timezone.utc))
+        if w is not None:
+            with open(OUT, 'w') as fh:
+                json.dump(w, fh, separators=(',', ':'), allow_nan=False)
         print(f'cfb_season_value: release unchanged ({h.get("modified")}), kept')
         return
     pq_path = os.path.join(CACHE, f'cfbfastr_pbp_{y}.parquet')
