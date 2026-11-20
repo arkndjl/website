@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-20T04:40:56Z",
+ "asof": "2026-11-20T04:44:35Z",
  "recenter": {
   "week": 0.54
  },
@@ -549,22 +549,6 @@
    "tm": 57.0
   },
   {
-   "id": "401856752",
-   "sport": "cfb",
-   "kick": "2026-11-21T20:45:00.000Z",
-   "home": "Oklahoma",
-   "away": "Texas A&M",
-   "mk": "total",
-   "side": "over",
-   "line": 37.5,
-   "price": -114.0,
-   "edge": 1.0,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": 8.1,
-   "tm": 38.5
-  },
-  {
    "id": "401866468",
    "sport": "cfb",
    "kick": "2026-11-21T00:30:00.000Z",
@@ -675,6 +659,22 @@
    "why": "spread market off",
    "m": -13.4,
    "tm": 54.3
+  },
+  {
+   "id": "401858532",
+   "sport": "cfb",
+   "kick": "2026-11-21T20:30:00.000Z",
+   "home": "Penn State",
+   "away": "Rutgers",
+   "mk": "spread",
+   "side": "away",
+   "line": 27.5,
+   "price": -132.0,
+   "edge": 6.1,
+   "x": null,
+   "why": "spread market off",
+   "m": 21.4,
+   "tm": 53.8
   }
  ],
  "games": {
@@ -787,16 +787,16 @@
    "state": "under"
   },
   "401856752": {
-   "mk": "total",
-   "side": "over",
-   "line": 37.5,
-   "price": -114.0,
-   "edge": 1.0,
+   "mk": "spread",
+   "side": "home",
+   "line": 6.5,
+   "price": -117.0,
+   "edge": 1.6,
    "ev": null,
    "units": 0.0,
    "home": "Oklahoma",
    "away": "Texas A&M",
-   "state": "under"
+   "state": "off"
   },
   "401856751": {
    "mk": "total",
@@ -910,7 +910,7 @@
    "mk": "spread",
    "side": "home",
    "line": -2.5,
-   "price": -112.0,
+   "price": -114.0,
    "edge": 5.4,
    "ev": null,
    "units": 0.0,
@@ -1423,11 +1423,11 @@
    "state": "off"
   },
   "401869929": {
-   "mk": "total",
-   "side": "under",
-   "line": 50.5,
-   "price": -119.0,
-   "edge": 1.0,
+   "mk": "spread",
+   "side": "away",
+   "line": 13.5,
+   "price": -106.0,
+   "edge": 0.2,
    "ev": null,
    "units": 0.0,
    "home": "App State",
@@ -1487,16 +1487,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 24589,
+  "snapshots": 24594,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 5124,
+    "clvN": 5126,
     "clvRet": -0.0414,
-    "clvT": -33.02,
+    "clvT": -33.1,
     "clv": 0.35,
-    "beat": 0.378,
-    "still": 0.343
+    "beat": 0.377,
+    "still": 0.344
    },
    {
     "when": "6-24h",
@@ -6270,7 +6270,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-20T04:40:56Z",
+ "checked": "2026-11-20T04:44:35Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
