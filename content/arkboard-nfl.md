@@ -30,9 +30,11 @@ cover = "/og/nfl.png"
 {{< lazytab tab="transactions" >}}
 {{< transactions sport="nfl" title="transactions" tab="transactions" >}}
 {{< /lazytab >}}
-{{< wintabs tab="leaders" tabs="WAR leaders,QBs,specialists" sub="true" label="leaders views" >}}
+{{< wintabs tab="leaders" tabs="WAR leaders,QBs,skill players,defenders,specialists" sub="true" label="leaders views" >}}
 {{< nflwar title="WAR leaders" tab="WAR leaders" >}}
 {{< nflqb title="QBs" tab="QBs" >}}
+{{< nflseason group="skill" title="skill players" tab="skill players" >}}
+{{< nflseason group="defense" title="defenders" tab="defenders" >}}
 {{< streturners sport="nfl" title="specialists" tab="specialists" >}}
 {{< /wintabs >}}
 {{< wintabs tab="depth chart" tabs="depth chart,backup watch" sub="true" label="depth chart views" >}}
