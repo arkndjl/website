@@ -1,149 +1,149 @@
 {
- "n": 5974,
+ "n": 24926,
  "seasons": [
   2013,
-  2016
+  2026
  ],
  "share": {
-  "wind>10 /mph": 0.33,
-  "gust>20 /mph": 0.087,
-  "cold<40 /F": 0.11,
-  "heat>80 /F": 0.02,
-  "wet": 0.201,
-  "snow": 0.012
+  "wind>10 /mph": 0.337,
+  "gust>20 /mph": 0.082,
+  "cold<40 /F": 0.098,
+  "heat>80 /F": 0.035,
+  "wet": 0.204,
+  "snow": 0.008
  },
  "all six": {
   "coef (log goals)": {
-   "wind>10 /mph": 0.0012,
-   "gust>20 /mph": -0.0049,
-   "cold<40 /F": -0.0077,
-   "heat>80 /F": 0.0058,
-   "wet": 0.0542,
-   "snow": -0.0332
+   "wind>10 /mph": -0.0021,
+   "gust>20 /mph": -0.0019,
+   "cold<40 /F": -0.0073,
+   "heat>80 /F": -0.0031,
+   "wet": 0.0238,
+   "snow": -0.0249
   },
   "ols t": {
-   "wind>10 /mph": 0.4,
-   "gust>20 /mph": -1.81,
-   "cold<40 /F": -1.79,
-   "heat>80 /F": 0.62,
-   "wet": 2.75,
-   "snow": -0.44
+   "wind>10 /mph": -1.38,
+   "gust>20 /mph": -1.46,
+   "cold<40 /F": -3.24,
+   "heat>80 /F": -0.89,
+   "wet": 2.59,
+   "snow": -0.56
   },
   "total (Poisson deviance)": {
-   "d": NaN,
-   "t": NaN,
-   "seasonsBetter": "0/0"
+   "d": -0.0002,
+   "t": -0.37,
+   "seasonsBetter": "4/9"
   },
   "xg total (sq err)": {
-   "d": NaN,
-   "t": NaN,
-   "seasonsBetter": "0/0",
-   "n": 0
+   "d": 0.00286,
+   "t": 6.21,
+   "seasonsBetter": "2/9",
+   "n": 15626
   },
   "margin toward level (sq err)": {
-   "d": NaN,
-   "t": NaN,
-   "seasonsBetter": "0/0"
+   "d": 0.00067,
+   "t": 0.67,
+   "seasonsBetter": "3/9"
   }
  },
  "wind + wet": {
   "coef (log goals)": {
-   "wind>10 /mph": -0.0024,
-   "wet": 0.0467
+   "wind>10 /mph": -0.0033,
+   "wet": 0.0219
   },
   "ols t": {
-   "wind>10 /mph": -0.98,
+   "wind>10 /mph": -2.9,
    "wet": 2.46
   },
   "total (Poisson deviance)": {
-   "d": NaN,
-   "t": NaN,
-   "seasonsBetter": "0/0"
+   "d": -0.00027,
+   "t": -0.99,
+   "seasonsBetter": "7/9"
   },
   "xg total (sq err)": {
-   "d": NaN,
-   "t": NaN,
-   "seasonsBetter": "0/0",
-   "n": 0
+   "d": 0.00131,
+   "t": 8.36,
+   "seasonsBetter": "1/9",
+   "n": 15626
   },
   "margin toward level (sq err)": {
-   "d": NaN,
-   "t": NaN,
-   "seasonsBetter": "0/0"
+   "d": 8e-05,
+   "t": 0.18,
+   "seasonsBetter": "4/9"
   }
  },
  "wind": {
   "coef (log goals)": {
-   "wind>10 /mph": -0.0016
+   "wind>10 /mph": -0.0029
   },
   "ols t": {
-   "wind>10 /mph": -0.65
+   "wind>10 /mph": -2.54
   },
   "total (Poisson deviance)": {
-   "d": NaN,
-   "t": NaN,
-   "seasonsBetter": "0/0"
+   "d": -0.00029,
+   "t": -1.46,
+   "seasonsBetter": "6/9"
   },
   "xg total (sq err)": {
-   "d": NaN,
-   "t": NaN,
-   "seasonsBetter": "0/0",
-   "n": 0
+   "d": 0.00068,
+   "t": 5.18,
+   "seasonsBetter": "3/9",
+   "n": 15626
   },
   "margin toward level (sq err)": {
-   "d": NaN,
-   "t": NaN,
-   "seasonsBetter": "0/0"
+   "d": -0.00028,
+   "t": -0.87,
+   "seasonsBetter": "6/9"
   }
  },
  "wet": {
   "coef (log goals)": {
-   "wet": 0.0439
+   "wet": 0.0175
   },
   "ols t": {
-   "wet": 2.35
+   "wet": 2.02
   },
   "total (Poisson deviance)": {
-   "d": NaN,
-   "t": NaN,
-   "seasonsBetter": "0/0"
+   "d": 3e-05,
+   "t": 0.14,
+   "seasonsBetter": "6/9"
   },
   "xg total (sq err)": {
-   "d": NaN,
-   "t": NaN,
-   "seasonsBetter": "0/0",
-   "n": 0
+   "d": 0.00082,
+   "t": 8.56,
+   "seasonsBetter": "2/9",
+   "n": 15626
   },
   "margin toward level (sq err)": {
-   "d": NaN,
-   "t": NaN,
-   "seasonsBetter": "0/0"
+   "d": 0.0003,
+   "t": 0.78,
+   "seasonsBetter": "3/9"
   }
  },
  "cold + heat": {
   "coef (log goals)": {
-   "cold<40 /F": -0.0076,
-   "heat>80 /F": 0.0045
+   "cold<40 /F": -0.0073,
+   "heat>80 /F": -0.0034
   },
   "ols t": {
-   "cold<40 /F": -1.93,
-   "heat>80 /F": 0.5
+   "cold<40 /F": -3.41,
+   "heat>80 /F": -0.98
   },
   "total (Poisson deviance)": {
-   "d": NaN,
-   "t": NaN,
-   "seasonsBetter": "0/0"
+   "d": -0.00019,
+   "t": -0.47,
+   "seasonsBetter": "3/9"
   },
   "xg total (sq err)": {
-   "d": NaN,
-   "t": NaN,
-   "seasonsBetter": "0/0",
-   "n": 0
+   "d": 0.00159,
+   "t": 4.57,
+   "seasonsBetter": "2/9",
+   "n": 15626
   },
   "margin toward level (sq err)": {
-   "d": NaN,
-   "t": NaN,
-   "seasonsBetter": "0/0"
+   "d": -0.00027,
+   "t": -0.4,
+   "seasonsBetter": "5/9"
   }
  }
 }
