@@ -142,24 +142,73 @@ def prune(cands, spec, draw, rng, keep=45):
     return [cands[i] for i in order[:keep] if p[i] > 1e-5 or i == order[0]]
 
 
+class Rows(list):
+    """the shown rows; rest = the pool's other candidates as full rows, for a market name below the cut"""
+    rest = ()
+
+
+ROSTER = {}              # sport -> every candidate line of the build (name, team, position, photo), for market names
+
+
+def bare(c, p=0.0):
+    r = {'n': c['n'], 'tm': c['tm'], 'p': round(p, 4), 'x': {}}
+    for k in ('ph', 'phu', 'logo', 'cls', 'pos', 'war'):
+        if c.get(k) is not None: r[k] = c[k]
+    return r
+
+
+def board(sport):
+    """the site's own board lines for the sport as candidate lines (name, team, position, photo): where a market name
+    that the award's stat pool does not hold is looked up"""
+    if sport in board.c: return board.c[sport]
+    import glob
+    out = []
+    try:
+        if sport == 'nfl':
+            for r in jload(os.path.join(ROOT, 'static', 'data', 'nfl-war.json'), {}).get('players', []):
+                out.append({'n': r['n'], 'tm': NFLV_TEAM.get(r['tm'], r['tm']), 'pos': r.get('pos'),
+                            'phu': 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + r['ph'] if r.get('ph') else None})
+        elif sport == 'nhl':
+            fs = sorted(glob.glob(os.path.join(ROOT, 'static', 'data', 'nhl-war', '*.json')))
+            for r in (jload(fs[-1], {}) if fs else {}).get('players', []):
+                out.append({'n': r['n'], 'tm': r['tm'].split('/')[-1], 'pos': r.get('pos'), 'ph': r.get('ph')})
+            H = jload(os.path.join(ROOT, 'data', 'hockey.json'), {})
+            for r in H.get('pipe', []) + H.get('board', []):
+                if r.get('name') and r.get('team'): out.append({'n': r['name'], 'tm': r['team'], 'pos': r.get('pos')})
+        elif sport == 'cfb':
+            d = jload(os.path.join(ROOT, 'static', 'data', 'cfb-all.json'), {})
+            ix = {c: i for i, c in enumerate(d.get('cols', []))}
+            for r in d.get('rows', []):
+                m = re.search(r'/id/(\d+)', r[ix['espnl']] or '')
+                out.append({'n': r[ix['name']], 'tm': r[ix['team']], 'logo': r[ix['logo']], 'pos': r[ix['pos']],
+                            'ph': m.group(1) if m else None})
+    except Exception as e:
+        print('board lines', sport, e)
+    board.c[sport] = [r for r in out if r.get('n') and r.get('tm')]
+    return board.c[sport]
+
+
+board.c = {}
+
+
 def rows_out(pool, p, draw, show, rng, n=200, top=SHOW):
     """the top candidates with their mean projected finish on the shown stats"""
-    top = sorted(zip(pool, p), key=lambda t: -t[1])[:top]
+    order = sorted(zip(pool, p), key=lambda t: -t[1])
     acc = {}
     for _ in range(n):
         td = draw.teams(rng)
-        for c, _ in top:
+        for c, _ in order:
             f = draw(c, td, rng)
             if f is None: continue
             for k, _, _ in show: acc.setdefault((c['id'], k), []).append(f[k])
     out = []
-    for c, pi in top:
-        x = {k: round(sum(acc[(c['id'], k)]) / len(acc[(c['id'], k)]), 3) for k, _, _ in show if acc.get((c['id'], k))}
-        r = {'n': c['n'], 'tm': c['tm'], 'p': round(pi, 4), 'x': x}
-        for k in ('ph', 'phu', 'logo', 'cls', 'pos', 'war'):
-            if c.get(k) is not None: r[k] = c[k]
+    for c, pi in order:
+        r = bare(c, pi)
+        r['x'] = {k: round(sum(acc[(c['id'], k)]) / len(acc[(c['id'], k)]), 3) for k, _, _ in show if acc.get((c['id'], k))}
         out.append(r)
-    return out
+    rows = Rows(out[:top])
+    rows.rest = out[top:]
+    return rows
 
 
 # ---------------------------------------------------------------- markets
@@ -190,16 +239,33 @@ def poly(slug):
         return {}
 
 
-def blend(rows, m, w=None):
+def find(name, rows):
+    """the row of rows that is this market name (shared matcher), or None"""
+    k = NM.key(name)
+    return next((r for r in rows if NM.key(r['n']) == k), None) or next((r for r in rows if NM.same(name, r['n'])), None)
+
+
+def blend(rows, m, w=None, sport=None):
     """the shown P(win): model^(1 - w) x market^w over the union of candidates, renormalised (the tested form, B1).
-    A model row with no market price takes the smallest listed price split across such rows; a market name outside the
-    rows joins as a bare row at model 1e-3. Rows are re-sorted; each keeps its model number as pm."""
+    A model row with no market price takes the smallest listed price split across such rows. A market name outside
+    the shown rows joins as the pool's own row for him (below the cut), else as his line from the build's candidates
+    or the site's board at model 1e-3 (mo); a name the build has no player for is left out. Rows are re-sorted; each keeps its model
+    number as pm."""
     w = MKT_W if w is None else w
     lo = min(m.values())
     un = sum(1 for r in rows if 'mkt' not in r)
     used = {r['_mk'] for r in rows if '_mk' in r}
+    rest, have = list(getattr(rows, 'rest', ())), {NM.key(r['n']) for r in rows}
     for n, v in m.items():
-        if n not in used: rows.append({'n': n, 'tm': '', 'p': 1e-3, 'mkt': round(v, 4), 'x': {}, 'mo': True})
+        if n in used: continue
+        r = find(n, rest)
+        if r is None:
+            c = find(n, ROSTER.get(sport, [])) or find(n, board(sport))
+            if c is None: print('  market name with no player on the build, left out:', n, round(v, 4)); continue
+            r = dict(bare(c, 1e-3), mo=True)
+        if NM.key(r['n']) in have: continue
+        have.add(NM.key(r['n']))
+        rows.append(dict(r, mkt=round(v, 4)))
     z = [max(r['p'], 1e-6) ** (1 - w) * max(r.get('mkt') or lo / max(un, 1), 1e-6) ** w for r in rows]
     t = sum(z)
     for r, v in zip(rows, z):
@@ -214,15 +280,12 @@ def attach_market(rows, sport, award):
     poly.raw = (0, 0.0, 0.0)
     m = poly(POLY.get((sport, award)))
     if not m: return False, False
-    keys = [(n, NM.key(n)) for n in m]
-    for r in rows:
-        k = NM.key(r['n'])
-        hit = next((n for n, kk in keys if kk == k), None)
-        if hit is None: hit = next((n for n, kk in keys if NM.same(n, r['n'])), None)
-        if hit is not None: r['mkt'] = round(m[hit], 4); r['_mk'] = hit
+    for n in m:
+        r = find(n, [r for r in rows if '_mk' not in r])
+        if r is not None: r['mkt'] = round(m[n], 4); r['_mk'] = n
     n, t, vol = poly.raw
     liquid = n >= MKT_MIN and MKT_SUM[0] <= t <= MKT_SUM[1] and vol >= MKT_VOL
-    if liquid: blend(rows, m)
+    if liquid: blend(rows, m, sport=sport)
     for r in rows: r.pop('_mk', None)
     return True, liquid
 
@@ -262,6 +325,7 @@ def nba(fit, rng):
                       'apg': p['ast_per_g'], 'apg0': q.get('ast_per_g'), 'st': p['stl_per_g'] + p['blk_per_g'],
                       'st0': (q.get('stl_per_g', 0) + q.get('blk_per_g', 0)) if q else None,
                       'mpg': p['mp_per_g'], 'pos': r.get('pos', ''), 'rookie': pid not in seen})
+    ROSTER['nba'] = cands
     out = []
     T = season_T('nba', sum(v[1] for v in teams.values()) / max(82 * len(teams), 1))
     for aw, pool, p, dm, show in nba_races(fit, rng, cands, teams, conf):
@@ -373,6 +437,7 @@ def nhl(fit, rng):
                       'gsx0': (q.get('gsax') or 0) / max(q.get('toi') or 1, 1) * 60 if q.get('gp') else None,
                       'rookie': rookie, 'key': k})
 
+    ROSTER['nhl'] = cands
     out = []
     T = season_T('nhl', sum(TG.values()) / max(82 * len(TG), 1))
     for aw, pool, p, draw, show in nhl_races(fit, rng, cands, teams): out.append((aw, rows_out(pool, temper(p, T), draw, show, rng), show))
@@ -581,6 +646,7 @@ def cfb(fit, rng):
         f['prev_top5'] = 1.0 if NM.key(f['n']) in top5 else 0.0
         nm, logo = logos[f['tid']]
         cands.append({'id': v['id'], 'n': v['n'], 'tid': f['tid'], 'tm': nm, 'logo': logo, 'pos': f['pos'], 'ph': v['id'], 'f': f})
+    ROSTER['cfb'] = cands
     for c in cands:                      # the pool rules use season-end thresholds: test them on full-season pace
         w, g, _, _, G = teams[c['tid']]
         k = G / max(g, 1)
@@ -633,6 +699,7 @@ def nfl(fit, rng):
         wr = war.get(NM.key(f['n']), {})
         cands.append({'id': v['id'], 'n': v['n'], 'tid': f['tid'], 'tm': tmap[f['tid']], 'pos': f['pos'], 'ph': v['id'],
                       'war': wr.get('war'), 'f': f})
+    ROSTER['nfl'] = cands
     out = []
     T = season_T('nfl', sum(v[1] for v in teams.values()) / max(17 * len(teams), 1))
     for aw, pl, p, draw, show in nfl_races(fit, rng, cands, teams): out.append((aw, rows_out(pl, temper(p, T), draw, show, rng), show))

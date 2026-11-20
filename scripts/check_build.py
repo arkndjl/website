@@ -13,6 +13,8 @@
   calibMean: both come from scripts/fv_dist.py past_at_mean, which cbb_fit.py runs after it rewrites the past boards
 - data/fv_scale.json K and T match a refit from the boards' tables (scripts/fv_scale.py compute) within 0.25; hockey's
   gap is a warning until its scale is refit (`python3 scripts/fv_scale.py --fit`)
+- every row of data/awards.json names a player and his team: a market name the build could not place on a roster must
+  be left out by scripts/awards.py blend, never written as a bare row (no photo, team or position; Nov 19)
 - with --hugo: data/team_alias.json (the browser's team short forms, layouts/partials/namekey.html) matches
   scripts/names.py TEAM_ALIAS; `python3 scripts/names.py --teams` rewrites it
 Local hook: git config core.hooksPath .githooks (runs the fast checks on each commit). Stdlib only."""
@@ -103,6 +105,13 @@ def check_fv_scale(tol=0.25, warn_only=('hockey', 'soccer')):   # soccer: stretc
     return errs, warns
 
 
+def check_awards():
+    try: d = json.load(open(os.path.join(ROOT, 'data', 'awards.json')))
+    except Exception: return []
+    return [f'data/awards.json {sp} {r.get("key")}: row "{x.get("n")}" has no team (unmatched market name; scripts/awards.py blend)'
+            for sp, v in d.items() for r in v.get('races', []) for x in r.get('rows', []) if not (x.get('n') and x.get('tm'))]
+
+
 def check_hugo():
     hugo = shutil.which('hugo') or os.environ.get('HUGO')
     if not hugo: return ['hugo not found (set HUGO or put it on PATH)']
@@ -116,7 +125,7 @@ def check_hugo():
 
 if __name__ == '__main__':
     errs, n = check_json()
-    e2, warns = check_sizes(); errs += e2 + check_pairs() + check_cbb_mean()
+    e2, warns = check_sizes(); errs += e2 + check_pairs() + check_cbb_mean() + check_awards()
     e3, w3 = check_fv_scale(); errs += e3; warns += w3
     if '--hugo' in sys.argv[1:]: errs += check_teams()
     if '--hugo' in sys.argv[1:] and not errs: errs += check_hugo()
