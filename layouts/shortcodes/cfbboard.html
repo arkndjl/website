@@ -5,7 +5,7 @@
        {{< cfbboard title="..." tab="all FCS" preset="fcs" >}}       FCS players only (move-up odds column)
        {{< cfbboard title="..." tab="draft board" preset="d27" >}}    only players eligible for the next draft
        {{< cfbboard title="..." tab="ARKLIST" preset="star" >}}       only starred players (cfb_manual.json stars)
-       {{< cfbboard title="..." tab="WAR leaders" preset="war" >}}   everyone, ranked by WAA (RK and position rank by WAA; WAR column beside it)
+       {{< cfbboard title="..." tab="WAR leaders" preset="war" >}}   everyone but QBs (QBs tab), ranked by WAA (RK and position rank by WAA; WAR column beside it)
        {{< cfbboard title="..." tab="NIL" preset="nil" >}}       everyone, ranked by xNIL (RK and position rank by xNIL)
        Filters (year, position, team, class, age, FV, conference; year: a past season's grades from
        static/data/cfb-past.json, ranked within that season, on the all / FBS / FCS boards), click-to-sort headers, a scouting report
@@ -19,6 +19,7 @@
 {{- if $fcsOn }}{{ with $d.fcs }}{{ range .teams }}{{ $teams = $teams | append . }}{{ end }}{{ range .confs }}{{ $confs = $confs | append . }}{{ end }}{{ end }}{{ end -}}
 {{- $confs = $confs | uniq | sort }}{{ $teams = $teams | uniq | sort -}}
 {{- $pos := slice "QB" "RB" "WR" "TE" "OT" "G" "C" "EDGE" "DT" "LB" "CB" "S" "K" "P" -}}
+{{- if eq (.Get "preset") "war" }}{{ $pos = after 1 $pos }}{{ end -}}{{- /* WAR leaders: everyone but QBs (QBs tab, cfbqb.html) */ -}}
 {{- $groups := slice (slice "OL" "offensive line: OT, G and C") (slice "DL" "defensive line: EDGE and DT") (slice "OFF" "offense: QB, RB, WR, TE, OL") (slice "DEF" "defense: EDGE, DT, LB, CB, S") (slice "DB" "defensive backs: CB and S") (slice "K/P" "specialists: kickers and punters") -}}
 {{- $upCol := eq $preset "fcs" }}{{ $draftCol := eq $preset "d27" }}{{ $yrOn := in (slice "" "fbs" "fcs") $preset -}}
 {{- $s := 2026 }}{{ with $d }}{{ $s = int .season }}{{ end -}}

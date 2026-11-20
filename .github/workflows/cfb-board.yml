@@ -234,6 +234,11 @@ jobs:
       - name: Board moves
         continue-on-error: true
         run: python3 scripts/board_moves.py r-cfb
+      # QBs tab: the board's QBs with ESPN's season line (scripts/cfb_qb.py -> data/cfb_qb.json, ~400 calls), display only
+      - name: QBs tab
+        continue-on-error: true
+        timeout-minutes: 5
+        run: python3 scripts/cfb_qb.py
       # each game model's season so far against its own walk-forward record, and the model ledger's one-year re-tests
       # (scripts/model_monitor.py -> data/model_monitor/<sport>.json, on the Predictions page's game models tab)
       - name: Model monitor

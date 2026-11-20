@@ -30,9 +30,9 @@ cover = "/og/nfl.png"
 {{< lazytab tab="transactions" >}}
 {{< transactions sport="nfl" title="transactions" tab="transactions" >}}
 {{< /lazytab >}}
-{{< wintabs tab="leaders" tabs="WAR leaders,QB value,specialists" sub="true" label="leaders views" >}}
+{{< wintabs tab="leaders" tabs="WAR leaders,QBs,specialists" sub="true" label="leaders views" >}}
 {{< nflwar title="WAR leaders" tab="WAR leaders" >}}
-{{< nflqb title="QB value" tab="QB value" >}}
+{{< nflqb title="QBs" tab="QBs" >}}
 {{< streturners sport="nfl" title="specialists" tab="specialists" >}}
 {{< /wintabs >}}
 {{< wintabs tab="depth chart" tabs="depth chart,backup watch" sub="true" label="depth chart views" >}}
@@ -72,12 +72,18 @@ cover = "/og/nfl.png"
 {{< coachalltime sport="nfl" title="all-time coaches" tab="all-time coaches" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
-{{< wintabs tab="all-time players" tabs="peak seasons,careers" sub="true" label="all-time players views" >}}
+{{< wintabs tab="all-time players" tabs="peak seasons,careers,QB peak seasons,QB careers" sub="true" label="all-time players views" >}}
 {{< lazytab tab="peak seasons" >}}
 {{< alltime sport="nfl" list="peak" title="peak seasons" tab="peak seasons" >}}
 {{< /lazytab >}}
 {{< lazytab tab="careers" >}}
 {{< alltime sport="nfl" list="career" title="careers" tab="careers" >}}
+{{< /lazytab >}}
+{{< lazytab tab="QB peak seasons" >}}
+{{< alltime sport="nfl" list="peak" group="qbs" title="QB peak seasons" tab="QB peak seasons" >}}
+{{< /lazytab >}}
+{{< lazytab tab="QB careers" >}}
+{{< alltime sport="nfl" list="career" group="qbs" title="QB careers" tab="QB careers" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
 {{< /wintabs >}}
