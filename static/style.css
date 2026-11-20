@@ -5042,8 +5042,9 @@ a.tick__g--nw:hover .tick__me { color: #fff; }
 .sst__axis { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; font-size: .75em; opacity: .8; margin: 4px 0 0; } .sst__axis > span:nth-child(2) { white-space: nowrap; }
 @media (max-width: 640px) { .sst__axis > span:nth-child(2) { order: 3; flex-basis: 100%; } }
 
-/* Tip menu entry (/tip/): teal pixel cup with a soft steady glow, no motion */
-.menu-tip > a { color: #5fd4c4; }
+/* Tip menu entry (/tip/): teal pixel heart in a teal box with a soft steady glow, no motion */
+.menu-tip > a { color: #5fd4c4; border: 2px solid #5fd4c4; padding: 2px 6px; box-shadow: 2px 2px 0 rgba(95, 212, 196, 0.35); }
+.menu-tip > a:hover { background: rgba(95, 212, 196, 0.12); }
 .menu-tip .menu__icon { filter: drop-shadow(0 0 2px rgba(95, 212, 196, 0.75)); }
 .menu-tip > a:hover .menu__icon { filter: drop-shadow(0 0 3px rgba(200, 199, 255, 0.9)); }
 
