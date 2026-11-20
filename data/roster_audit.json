@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-20T08:27Z",
+ "asof": "2026-11-20T08:29Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -4717,8 +4717,8 @@
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 1,
-     "rows": 638
+     "flags": 0,
+     "rows": 637
     },
     "static/data/lines/nhl.json": {
      "flags": 0,
@@ -4726,11 +4726,11 @@
     },
     "static/data/nhl-war/2027.json": {
      "flags": 3,
-     "rows": 858
+     "rows": 859
     },
     "static/data/pctl-nhl.json": {
-     "flags": 1,
-     "rows": 353
+     "flags": 2,
+     "rows": 357
     },
     "static/data/xaav-nhl.json": {
      "flags": 12,
@@ -4738,24 +4738,6 @@
     }
    },
    "flags": [
-    {
-     "d": "2026-11-19",
-     "field": "depth",
-     "file": "static/data/depth/nhl.json",
-     "flag": "released",
-     "head": "Departs Thursday's game",
-     "kind": "exit",
-     "move": {
-      "d": "2026-11-19",
-      "head": "Departs Thursday's game",
-      "kind": "exit"
-     },
-     "pid": "4150",
-     "player": "Ryan Pulock",
-     "pos": "RD",
-     "rotowire": "NYI",
-     "site": "NYI"
-    },
     {
      "d": "2026-11-13",
      "field": "tm",
@@ -5027,6 +5009,24 @@
      "site": "FA"
     },
     {
+     "d": "2026-11-13",
+     "field": "tm",
+     "file": "static/data/pctl-nhl.json",
+     "flag": "released",
+     "head": "Two-point effort in Finland",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-13",
+      "head": "Two-point effort in Finland",
+      "kind": "exit"
+     },
+     "pid": "5744",
+     "player": "K'Andre Miller",
+     "pos": "D",
+     "rotowire": "CAR",
+     "site": "CAR"
+    },
+    {
      "d": "2026-11-19",
      "field": "tm",
      "file": "static/data/pctl-nhl.json",
@@ -5047,7 +5047,7 @@
    ],
    "joined": 0,
    "players": 1422,
-   "rows": 2731
+   "rows": 2735
   }
  }
 }
