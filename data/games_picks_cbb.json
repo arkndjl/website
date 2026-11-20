@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-20T16:57:26Z",
+ "asof": "2026-11-20T17:00:33Z",
  "recenter": {
-  "2026-11-20": 1.62
+  "2026-11-20": 1.6
  },
  "monitor": {
   "clocks": {
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-20T16:27:10Z",
-  "ageH": 0.5,
+  "ageH": 0.6,
   "stale": false
  },
  "picks": [],
@@ -1936,22 +1936,6 @@
  ],
  "withdrawn": [],
  "board": [
-  {
-   "id": "401927396",
-   "sport": "cbb",
-   "kick": "2026-11-21T00:00:00Z",
-   "home": "Western Kentucky",
-   "away": "Richmond",
-   "mk": "spread",
-   "side": "away",
-   "line": 1.5,
-   "price": -129.0,
-   "edge": 6.0,
-   "x": 4.0,
-   "why": "no edge at -129",
-   "m": -4.5,
-   "tm": 147.2
-  },
   {
    "id": "401925828",
    "sport": "cbb",
@@ -2065,6 +2049,22 @@
    "tm": 155.8
   },
   {
+   "id": "401927396",
+   "sport": "cbb",
+   "kick": "2026-11-21T00:00:00Z",
+   "home": "Western Kentucky",
+   "away": "Richmond",
+   "mk": "spread",
+   "side": "away",
+   "line": -1.5,
+   "price": -101.0,
+   "edge": 3.0,
+   "x": 4.0,
+   "why": "edge under 4 (venue: neutral)",
+   "m": -4.5,
+   "tm": 147.2
+  },
+  {
    "id": "401925865",
    "sport": "cbb",
    "kick": "2026-11-21T00:30:00Z",
@@ -2137,7 +2137,7 @@
    "mk": "total",
    "side": "under",
    "line": 152.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 4.3,
    "x": 6.5,
    "why": "edge under 6.5 (side: under)",
@@ -2191,22 +2191,6 @@
    "why": "edge under 4 (tier: power)",
    "m": -11.0,
    "tm": 165.5
-  },
-  {
-   "id": "401909698",
-   "sport": "cbb",
-   "kick": "2026-11-20T17:00:00Z",
-   "home": "Florida State",
-   "away": "Green Bay",
-   "mk": "total",
-   "side": "under",
-   "line": 156.5,
-   "price": -114.0,
-   "edge": 4.0,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": 21.7,
-   "tm": 152.5
   },
   {
    "id": "401920298",
@@ -2335,6 +2319,22 @@
    "why": "edge under 5 (total: low)",
    "m": 1.1,
    "tm": 135.7
+  },
+  {
+   "id": "401926782",
+   "sport": "cbb",
+   "kick": "2026-11-21T00:00:00Z",
+   "home": "Jacksonville State",
+   "away": "Georgia State",
+   "mk": "total",
+   "side": "over",
+   "line": 137.5,
+   "price": -114.0,
+   "edge": 3.0,
+   "x": 7.0,
+   "why": "edge under 7",
+   "m": 4.3,
+   "tm": 140.5
   }
  ],
  "games": {
@@ -2521,9 +2521,9 @@
   "401927396": {
    "mk": "spread",
    "side": "away",
-   "line": 1.5,
-   "price": -129.0,
-   "edge": 6.0,
+   "line": -1.5,
+   "price": -101.0,
+   "edge": 3.0,
    "ev": null,
    "units": 0.0,
    "home": "Western Kentucky",
@@ -2565,18 +2565,6 @@
    "units": 0.0,
    "home": "Purdue",
    "away": "Oakland",
-   "state": "under"
-  },
-  "401909698": {
-   "mk": "total",
-   "side": "under",
-   "line": 156.5,
-   "price": -114.0,
-   "edge": 4.0,
-   "ev": null,
-   "units": 0.0,
-   "home": "Florida State",
-   "away": "Green Bay",
    "state": "under"
   },
   "401909799": {
@@ -2751,7 +2739,7 @@
    "mk": "total",
    "side": "under",
    "line": 152.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 4.3,
    "ev": null,
    "units": 0.0,
@@ -2847,7 +2835,7 @@
    "mk": "total",
    "side": "under",
    "line": 145.5,
-   "price": -110.0,
+   "price": -114.0,
    "edge": 2.3,
    "ev": null,
    "units": 0.0,
@@ -3004,7 +2992,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 21190,
+  "snapshots": 21196,
   "buckets": [
    {
     "when": "24h+",
@@ -3017,9 +3005,9 @@
    },
    {
     "when": "6-24h",
-    "clvN": 4326,
-    "clvRet": -0.0071,
-    "clvT": -3.66,
+    "clvN": 4327,
+    "clvRet": -0.007,
+    "clvT": -3.62,
     "clv": 0.59,
     "beat": 0.398,
     "still": 0.411
@@ -20823,7 +20811,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-20T16:57:26Z",
+ "checked": "2026-11-20T17:00:33Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
