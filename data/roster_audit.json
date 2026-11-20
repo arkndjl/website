@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-20T02:45Z",
+ "asof": "2026-11-20T03:03Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -4765,13 +4765,13 @@
     }
    ],
    "joined": 0,
-   "players": 2291,
+   "players": 2292,
    "rows": 8078
   },
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 0,
+     "flags": 1,
      "rows": 638
     },
     "static/data/lines/nhl.json": {
@@ -4779,19 +4779,37 @@
      "rows": 32
     },
     "static/data/nhl-war/2027.json": {
-     "flags": 2,
+     "flags": 3,
      "rows": 858
     },
     "static/data/pctl-nhl.json": {
-     "flags": 0,
+     "flags": 1,
      "rows": 353
     },
     "static/data/xaav-nhl.json": {
-     "flags": 11,
+     "flags": 12,
      "rows": 850
     }
    },
    "flags": [
+    {
+     "d": "2026-11-19",
+     "field": "depth",
+     "file": "static/data/depth/nhl.json",
+     "flag": "released",
+     "head": "Departs Thursday's game",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-19",
+      "head": "Departs Thursday's game",
+      "kind": "exit"
+     },
+     "pid": "4150",
+     "player": "Ryan Pulock",
+     "pos": "RD",
+     "rotowire": "NYI",
+     "site": "NYI"
+    },
     {
      "d": "2026-11-13",
      "field": "tm",
@@ -4829,6 +4847,24 @@
      "site": "NYR"
     },
     {
+     "d": "2026-11-19",
+     "field": "tm",
+     "file": "static/data/nhl-war/2027.json",
+     "flag": "released",
+     "head": "Departs Thursday's game",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-19",
+      "head": "Departs Thursday's game",
+      "kind": "exit"
+     },
+     "pid": "4150",
+     "player": "Ryan Pulock",
+     "pos": "D",
+     "rotowire": "NYI",
+     "site": "NYI"
+    },
+    {
      "d": "2026-11-13",
      "field": "tm",
      "file": "static/data/xaav-nhl.json",
@@ -4845,6 +4881,24 @@
      "pos": "D",
      "rotowire": "CAR",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-19",
+     "field": "tm",
+     "file": "static/data/xaav-nhl.json",
+     "flag": "released",
+     "head": "Departs Thursday's game",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-19",
+      "head": "Departs Thursday's game",
+      "kind": "exit"
+     },
+     "pid": "4150",
+     "player": "Ryan Pulock",
+     "pos": "D",
+     "rotowire": "NYI",
+     "site": "NYI"
     },
     {
      "d": "2026-09-11",
@@ -5025,6 +5079,24 @@
      "pos": "C",
      "rotowire": "FA",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-19",
+     "field": "tm",
+     "file": "static/data/pctl-nhl.json",
+     "flag": "released",
+     "head": "Departs Thursday's game",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-19",
+      "head": "Departs Thursday's game",
+      "kind": "exit"
+     },
+     "pid": "4150",
+     "player": "Ryan Pulock",
+     "pos": "D",
+     "rotowire": "NYI",
+     "site": "NYI"
     }
    ],
    "joined": 0,
