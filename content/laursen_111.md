@@ -14,6 +14,7 @@ draft = false
 {{< lzlog class="desk__wide" >}}
 {{< /desk >}}
 {{< desk tab="social" >}}
+{{< lzsocchart class="desk__wide" >}}
 {{< lzsocial class="desk__wide" >}}
 {{< lzsocplan part="twitch" class="desk__wide" >}}
 {{< lzsocplan part="youtube" class="desk__wide" >}}
