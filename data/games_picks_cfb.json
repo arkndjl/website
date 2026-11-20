@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-20T04:44:35Z",
+ "asof": "2026-11-20T06:55:53Z",
  "recenter": {
-  "week": 0.54
+  "week": 0.52
  },
  "monitor": {
   "clocks": {
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-20",
-  "ageH": -19.3,
+  "ageH": -17.1,
   "stale": false
  },
  "picks": [],
@@ -533,20 +533,20 @@
    "tm": 48.1
   },
   {
-   "id": "401858307",
+   "id": "401856752",
    "sport": "cfb",
-   "kick": "2026-11-22T00:30:00.000Z",
-   "home": "Notre Dame",
-   "away": "SMU",
+   "kick": "2026-11-21T20:45:00.000Z",
+   "home": "Oklahoma",
+   "away": "Texas A&M",
    "mk": "total",
    "side": "over",
-   "line": 55.5,
-   "price": -119.0,
-   "edge": 1.5,
+   "line": 37.5,
+   "price": -114.0,
+   "edge": 1.0,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
-   "m": 20.6,
-   "tm": 57.0
+   "m": 8.1,
+   "tm": 38.5
   },
   {
    "id": "401866468",
@@ -581,6 +581,22 @@
    "tm": 49.2
   },
   {
+   "id": "401858307",
+   "sport": "cfb",
+   "kick": "2026-11-22T00:30:00.000Z",
+   "home": "Notre Dame",
+   "away": "SMU",
+   "mk": "total",
+   "side": "over",
+   "line": 56.5,
+   "price": -110.0,
+   "edge": 0.5,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": 20.6,
+   "tm": 57.0
+  },
+  {
    "id": "401856750",
    "sport": "cfb",
    "kick": "2026-11-21T18:00:00.000Z",
@@ -589,7 +605,7 @@
    "mk": "spread",
    "side": "away",
    "line": 34.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 11.6,
    "x": null,
    "why": "spread market off",
@@ -659,22 +675,6 @@
    "why": "spread market off",
    "m": -13.4,
    "tm": 54.3
-  },
-  {
-   "id": "401858532",
-   "sport": "cfb",
-   "kick": "2026-11-21T20:30:00.000Z",
-   "home": "Penn State",
-   "away": "Rutgers",
-   "mk": "spread",
-   "side": "away",
-   "line": 27.5,
-   "price": -132.0,
-   "edge": 6.1,
-   "x": null,
-   "why": "spread market off",
-   "m": 21.4,
-   "tm": 53.8
   }
  ],
  "games": {
@@ -753,9 +753,9 @@
   "401858307": {
    "mk": "total",
    "side": "over",
-   "line": 55.5,
-   "price": -119.0,
-   "edge": 1.5,
+   "line": 56.5,
+   "price": -110.0,
+   "edge": 0.5,
    "ev": null,
    "units": 0.0,
    "home": "Notre Dame",
@@ -787,16 +787,16 @@
    "state": "under"
   },
   "401856752": {
-   "mk": "spread",
-   "side": "home",
-   "line": 6.5,
-   "price": -117.0,
-   "edge": 1.6,
+   "mk": "total",
+   "side": "over",
+   "line": 37.5,
+   "price": -114.0,
+   "edge": 1.0,
    "ev": null,
    "units": 0.0,
    "home": "Oklahoma",
    "away": "Texas A&M",
-   "state": "off"
+   "state": "under"
   },
   "401856751": {
    "mk": "total",
@@ -934,7 +934,7 @@
    "mk": "spread",
    "side": "away",
    "line": -7.5,
-   "price": 104.0,
+   "price": 102.0,
    "edge": 2.9,
    "ev": null,
    "units": 0.0,
@@ -946,7 +946,7 @@
    "mk": "spread",
    "side": "away",
    "line": -2.5,
-   "price": -122.0,
+   "price": -119.0,
    "edge": 1.8,
    "ev": null,
    "units": 0.0,
@@ -1186,7 +1186,7 @@
    "mk": "spread",
    "side": "home",
    "line": 48.5,
-   "price": 101.0,
+   "price": -101.0,
    "edge": 5.2,
    "ev": null,
    "units": 0.0,
@@ -1234,7 +1234,7 @@
    "mk": "spread",
    "side": "away",
    "line": 8.5,
-   "price": -112.0,
+   "price": -110.0,
    "edge": 3.2,
    "ev": null,
    "units": 0.0,
@@ -1282,7 +1282,7 @@
    "mk": "spread",
    "side": "away",
    "line": 34.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 11.6,
    "ev": null,
    "units": 0.0,
@@ -1294,7 +1294,7 @@
    "mk": "spread",
    "side": "home",
    "line": 3.5,
-   "price": -101.0,
+   "price": 101.0,
    "edge": 0.3,
    "ev": null,
    "units": 0.0,
@@ -1353,9 +1353,9 @@
   "401871077": {
    "mk": "total",
    "side": "under",
-   "line": 53.5,
-   "price": -106.0,
-   "edge": 3.3,
+   "line": 54.5,
+   "price": -119.0,
+   "edge": 4.3,
    "ev": null,
    "units": 0.0,
    "home": "New Mexico State",
@@ -1402,7 +1402,7 @@
    "mk": "spread",
    "side": "home",
    "line": 25.5,
-   "price": -110.0,
+   "price": -112.0,
    "edge": 1.7,
    "ev": null,
    "units": 0.0,
@@ -1487,16 +1487,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 24594,
+  "snapshots": 24627,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 5126,
+    "clvN": 5133,
     "clvRet": -0.0414,
-    "clvT": -33.1,
+    "clvT": -33.09,
     "clv": 0.35,
     "beat": 0.377,
-    "still": 0.344
+    "still": 0.345
    },
    {
     "when": "6-24h",
@@ -6270,7 +6270,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-20T04:44:35Z",
+ "checked": "2026-11-20T06:55:53Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
