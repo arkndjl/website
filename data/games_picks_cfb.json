@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-20T03:58:41Z",
+ "asof": "2026-11-20T04:27:47Z",
  "recenter": {
-  "week": 0.55
+  "week": 0.54
  },
  "monitor": {
   "clocks": {
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-20",
-  "ageH": -20.0,
+  "ageH": -19.5,
   "stale": false
  },
  "picks": [],
@@ -349,7 +349,7 @@
    "mk": "total",
    "side": "over",
    "line": 43.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 4.5,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
@@ -499,22 +499,6 @@
    "why": "edge under 7.5 (side: over)",
    "m": -4.5,
    "tm": 49.6
-  },
-  {
-   "id": "401856869",
-   "sport": "cfb",
-   "kick": "2026-11-20T23:00:00.000Z",
-   "home": "UCF",
-   "away": "Iowa State",
-   "mk": "total",
-   "side": "over",
-   "line": 47.5,
-   "price": -124.0,
-   "edge": 2.0,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": 0.1,
-   "tm": 49.5
   },
   {
    "id": "401862831",
@@ -675,6 +659,22 @@
    "why": "total market off",
    "m": 16.9,
    "tm": 58.4
+  },
+  {
+   "id": "401858310",
+   "sport": "cfb",
+   "kick": "2026-11-21T17:00:00.000Z",
+   "home": "Georgia Tech",
+   "away": "Wake Forest",
+   "mk": "spread",
+   "side": "home",
+   "line": -19.5,
+   "price": -108.0,
+   "edge": 6.1,
+   "x": null,
+   "why": "spread market off",
+   "m": -13.4,
+   "tm": 54.3
   }
  ],
  "games": {
@@ -682,7 +682,7 @@
    "mk": "total",
    "side": "over",
    "line": 43.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 4.5,
    "ev": null,
    "units": 0.0,
@@ -766,7 +766,7 @@
    "mk": "spread",
    "side": "away",
    "line": -8.5,
-   "price": -114.0,
+   "price": -112.0,
    "edge": 2.8,
    "ev": null,
    "units": 0.0,
@@ -991,16 +991,16 @@
    "state": "off"
   },
   "401856869": {
-   "mk": "total",
-   "side": "over",
-   "line": 47.5,
-   "price": -124.0,
-   "edge": 2.0,
+   "mk": "spread",
+   "side": "away",
+   "line": 1.5,
+   "price": -114.0,
+   "edge": 1.4,
    "ev": null,
    "units": 0.0,
    "home": "UCF",
    "away": "Iowa State",
-   "state": "under"
+   "state": "off"
   },
   "401856868": {
    "mk": "total",
@@ -1030,7 +1030,7 @@
    "mk": "spread",
    "side": "home",
    "line": 48.5,
-   "price": -124.0,
+   "price": -108.0,
    "edge": 3.7,
    "ev": null,
    "units": 0.0,
@@ -1186,7 +1186,7 @@
    "mk": "spread",
    "side": "home",
    "line": 48.5,
-   "price": -101.0,
+   "price": 101.0,
    "edge": 5.2,
    "ev": null,
    "units": 0.0,
@@ -1487,16 +1487,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 24561,
+  "snapshots": 24578,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 5115,
+    "clvN": 5120,
     "clvRet": -0.0413,
-    "clvT": -32.92,
+    "clvT": -32.98,
     "clv": 0.35,
     "beat": 0.378,
-    "still": 0.342
+    "still": 0.343
    },
    {
     "when": "6-24h",
@@ -6270,7 +6270,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-20T03:58:41Z",
+ "checked": "2026-11-20T04:27:47Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
