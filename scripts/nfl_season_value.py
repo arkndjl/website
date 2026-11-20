@@ -7,12 +7,12 @@ Skill (RB, WR, TE): every designed run (rusher) and target (receiver, sacks out)
   aEPA   EPA a play less the defense's EPA allowed a play of that kind (run / pass) over the league's, from its other
          games, shrunk with K_DEF = 300 plays (RB and WR; TE left raw). RBs also less the play's weather (WX, fit 2016-25 on
          every run and dropback: wind over 10 mph, cold under 40 F, rain / snow, outdoor games)
-  Pts/G  sum(aEPA - replacement) / games with an offensive snap; replacement = the mean aEPA a run / a target of the
+  SV  sum(aEPA - replacement) / games with an offensive snap; replacement = the mean aEPA a run / a target of the
          players past the starters by volume (RB 48, WR 96, TE 48 a season), 2016-25 (REPL)
 Defense (DL, LB, DB): credited EPA. On each play with a negative EPA the defenders credited with a sack (half sacks .5), INT,
 pass defensed, forced fumble, TFL, QB hit, or (failed run / completion) a tackle split -(EPA - offense adjustment); the
 offense adjustment = the offense's EPA a play over the league's, other games, shrunk 300 plays (DL and DB; LB left raw).
-  Pts/G  sum(credit - replacement a snap x defensive snaps) / games with a defensive snap; replacement = the credit a
+  SV  sum(credit - replacement a snap x defensive snaps) / games with a defensive snap; replacement = the credit a
          snap of the players past the starters by snaps (DL 128, LB 80, DB 160), 2016-25
 Adjustments kept only where the split-half reliability (alternate games, 2016-26 player-seasons: skill 100+ plays,
 defense 300+ snaps; 1,000 boots) went up with P >= .9:

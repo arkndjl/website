@@ -1,12 +1,12 @@
 {{- /* NFL QB leaderboard (data/nfl_qb.json, scripts/nfl_qb.py): the game model's QB list (60+ plays this season or a
-       listed start), ranked by this season's points over a replacement QB a game (spts), with the game model's QB term (Proj), WAR from the WAR board and this season's play-by-play line. The WAR leaders tab
+       listed start), ranked by SV, this season's points over a replacement QB a game (spts), with the game model's QB term (Proj), WAR from the WAR board and this season's play-by-play line. The WAR leaders tab
        holds everyone else. */ -}}
 {{- with site.Data.nfl_qb -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "QBs") "filter" "Role" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,QB,Team,Pts/G,aEPA,Proj,EPA/db,CPOE,ANY/A" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "QBs") "filter" "Role" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,QB,Team,SV,aEPA,Proj,EPA/db,CPOE,ANY/A" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
 <table class="cfb__table">
   <thead><tr>
-    <th title="rank by Pts/G within the filter">RK</th><th>QB</th><th>Team</th>
-    <th title="Pts/G = this season's points over a replacement QB a game played: every dropback and QB run, EPA less the defense's EPA allowed a play over the league's (its other games, shrunk 300 plays), minus replacement (-0.12 a play), over games with 10+ plays. this season only">Pts/G</th>
+    <th title="rank by SV within the filter">RK</th><th>QB</th><th>Team</th>
+    <th title="SV (season value) = this season's points over a replacement QB a game played: every dropback and QB run, EPA less the defense's EPA allowed a play over the league's (its other games, shrunk 300 plays), minus replacement (-0.12 a play), over games with 10+ plays. this season only">SV</th>
     <th title="opponent-adjusted EPA a play, dropbacks + QB runs, this season">aEPA</th>
     <th title="Proj = the game model's QB term: b_qb x (rating - replacement) x 38 plays; rating = EPA/play (passing + rushing), career-weighted (each past season x .7), shrunk toward replacement (-0.12) with 100 plays. a projection, not this season alone">Proj</th>
     <th title="WAR = .6 x AV WAR + .4 x XV, season to date (WAR leaders board)">WAR</th>

@@ -158,7 +158,7 @@ jobs:
       # skill players + defenders tabs: this season's opponent-adjusted value (scripts/nfl_season_value.py), display only
       - name: Season value tabs
         continue-on-error: true
-        run: python3 scripts/nfl_season_value.py
+        run: python3 scripts/nfl_season_value.py && python3 scripts/rookies.py nfl   # rookies' SV sort reads it
       - name: Predictions picks, NFL
         run: python3 scripts/games_picks.py nfl || echo "nfl picks not updated"
       # the live rule monitor (every sport's rules against the close; stdlib, reads the committed ledgers)

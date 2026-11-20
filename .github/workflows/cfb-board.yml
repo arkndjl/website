@@ -239,7 +239,7 @@ jobs:
         continue-on-error: true
         timeout-minutes: 5
         run: python3 scripts/cfb_qb.py
-      # QB EPA + skill players tabs: this season's value from the cfbfastR release (no CFBD call; skipped when the release is
+      # QB SV + skill players tabs: this season's value from the cfbfastR release (no CFBD call; skipped when the release is
       # unchanged), scripts/cfb_season_value.py -> data/cfb_season_value.json, display only
       - name: Season value tabs
         continue-on-error: true
@@ -247,6 +247,7 @@ jobs:
         run: |
           python3 -m venv /tmp/sv && /tmp/sv/bin/pip install -q pyarrow
           /tmp/sv/bin/python scripts/cfb_season_value.py
+          python3 scripts/rookies.py cfb   # the true freshmen tab's SV sort reads it
       # each game model's season so far against its own walk-forward record, and the model ledger's one-year re-tests
       # (scripts/model_monitor.py -> data/model_monitor/<sport>.json, on the Predictions page's game models tab)
       - name: Model monitor

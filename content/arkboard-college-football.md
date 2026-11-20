@@ -103,13 +103,13 @@ cover = "/og/college-football.png"
 {{< cfbboard title="CFB 2026-27 :: every graded FBS player" tab="all FBS" preset="fbs" >}}
 {{< cfbboard title="CFB 2026-27 :: every graded FCS player" tab="all FCS" preset="fcs" >}}
 {{< /wintabs >}}
-{{< wintabs tab="leaders" tabs="WAR leaders,QBs,QB EPA,skill players,specialists" sub="true" label="leaders views" >}}
+{{< wintabs tab="leaders" tabs="WAR leaders,QBs,QB SV,skill players,specialists" sub="true" label="leaders views" >}}
 {{< cfbboard title="WAR leaders" tab="WAR leaders" preset="war" >}}
 {{< lazytab tab="QBs" >}}
 {{< cfbqb title="QBs" tab="QBs" >}}
 {{< /lazytab >}}
-{{< lazytab tab="QB EPA" >}}
-{{< cfbseason group="qbs" title="QB EPA" tab="QB EPA" >}}
+{{< lazytab tab="QB SV" >}}
+{{< cfbseason group="qbs" title="QB SV" tab="QB SV" >}}
 {{< /lazytab >}}
 {{< lazytab tab="skill players" >}}
 {{< cfbseason group="skill" title="skill players" tab="skill players" >}}

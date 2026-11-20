@@ -20,7 +20,7 @@ and this season's play-by-play line (nflverse pbp, regular season + playoffs, tw
         (its other games, shrunk with K_DEF = 300 plays). Split-half reliability 2021-26 (QB-seasons 250+ plays, alternate
         games): r .512 raw -> .528 adjusted (P better .91 of 1,000 boots); wind / cold / rain adjustments added nothing
         (.528 -> .529, P .57-.67) and are left out (/mnt/project-files/qb-season-metric/)
-  spts  this season's points over a replacement QB (-0.12 EPA a play) a game played (10+ plays): sum(aepa - REPL) / games.
+  spts  SV (season value): this season's points over a replacement QB (-0.12 EPA a play) a game played (10+ plays): sum(aepa - REPL) / games.
         Descriptive, this season only; pts (proj) is the game model's career-weighted term
 Join: pbp by gsis id -> name + team (stats_player_week) -> scripts/names.py matcher against the QB list and the WAR board."""
 import csv

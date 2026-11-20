@@ -3,21 +3,21 @@
 {{- $qb := eq ($.Get "group") "qbs" -}}
 {{- with site.Data.cfb_season_value -}}
 {{- $rows := cond $qb .qbs .skill -}}
-{{- $gfx := cond $qb "RK,QB,Team,Pts/G,aEPA,EPA/play,Plays" "RK,Player,Team,Pos,Pts/G,aEPA,Plays" -}}
-{{- $o := dict "title" ($.Get "title" | default (cond $qb "QB EPA" "skill players")) "rerank" true "tab" ($.Get "tab") "gfxCols" $gfx "gfxDate" (printf "%v · %s" .season (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32" -}}
+{{- $gfx := cond $qb "RK,QB,Team,SV,aEPA,EPA/play,Plays" "RK,Player,Team,Pos,SV,aEPA,Plays" -}}
+{{- $o := dict "title" ($.Get "title" | default (cond $qb "QB SV" "skill players")) "rerank" true "tab" ($.Get "tab") "gfxCols" $gfx "gfxDate" (printf "%v · %s" .season (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32" -}}
 {{- if not $qb }}{{ $o = merge $o (dict "filter" "Pos") }}{{ end -}}
 {{- partial "wintable-open.html" $o -}}
 <table class="cfb__table">
   <thead><tr>
-    <th title="rank by Pts/G within the filter">RK</th><th>{{ cond $qb "QB" "Player" }}</th><th>Team</th>{{ if not $qb }}<th title="position group">Pos</th>{{ end }}
+    <th title="rank by SV within the filter">RK</th><th>{{ cond $qb "QB" "Player" }}</th><th>Team</th>{{ if not $qb }}<th title="position group">Pos</th>{{ end }}
   {{- if $qb }}
-    <th title="Pts/G = this season's points over replacement a game with 10+ plays: every dropback and QB run, EPA less the defense's EPA allowed a play of that kind over the league's (its other games, shrunk 300 plays), minus replacement (-0.074 a play: QBs past the 134 starters by volume, 2025). FBS games, this season only">Pts/G</th>
+    <th title="SV (season value) = this season's points over replacement a game with 10+ plays: every dropback and QB run, EPA less the defense's EPA allowed a play of that kind over the league's (its other games, shrunk 300 plays), minus replacement (-0.074 a play: QBs past the 134 starters by volume, 2025). FBS games, this season only">SV</th>
     <th title="opponent-adjusted EPA a play, dropbacks + QB runs">aEPA</th>
     <th title="this season's points over replacement, total">Pts</th>
     <th title="EPA a play before the opponent adjustment">EPA/play</th>
     <th title="games with 10+ plays">G</th><th title="dropbacks + QB runs">Plays</th><th title="dropbacks: passes, sacks">DB</th><th title="QB runs (designed + scrambles)">Runs</th>
   {{- else }}
-    <th title="Pts/G = this season's points over replacement a game with a play: every run and target, EPA less the defense's EPA allowed a run / pass over the league's (RB; its other games, shrunk 300 plays), minus replacement (players past the starters by volume, 2025: RB 268, WR 402, TE 134). FBS games, this season only">Pts/G</th>
+    <th title="SV (season value) = this season's points over replacement a game with a play: every run and target, EPA less the defense's EPA allowed a run / pass over the league's (RB; its other games, shrunk 300 plays), minus replacement (players past the starters by volume, 2025: RB 268, WR 402, TE 134). FBS games, this season only">SV</th>
     <th title="EPA a play (runs + targets), opponent-adjusted for RB">aEPA</th>
     <th title="this season's points over replacement, total">Pts</th>
     <th title="EPA a run">EPA/run</th><th title="EPA a target">EPA/tgt</th>
