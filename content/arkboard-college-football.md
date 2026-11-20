@@ -195,7 +195,13 @@ cover = "/og/college-football.png"
 {{< cfbudfa src="cfb_mock_pred" title="udfa signings" tab="udfa signings" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
-{{< wintabs tab="all-time players" tabs="QB peak seasons,QB careers" sub="true" label="all-time players views" >}}
+{{< wintabs tab="all-time players" tabs="peak seasons,careers,QB peak seasons,QB careers" sub="true" label="all-time players views" >}}
+{{< lazytab tab="peak seasons" >}}
+{{< alltime sport="cfb" list="peak" title="peak seasons" tab="peak seasons" >}}
+{{< /lazytab >}}
+{{< lazytab tab="careers" >}}
+{{< alltime sport="cfb" list="career" title="careers" tab="careers" >}}
+{{< /lazytab >}}
 {{< lazytab tab="QB peak seasons" >}}
 {{< alltime sport="cfb" list="peak" group="qbs" title="QB peak seasons" tab="QB peak seasons" >}}
 {{< /lazytab >}}

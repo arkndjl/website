@@ -318,6 +318,11 @@ def nfl_qb_attach(P, Q):
     import names as NM
     by_y = defaultdict(list)
     for s in Q['seasons']: by_y[s[1]].append(s)
+    # ANY/A+ = 100 + 25 z against that season's QBs with 200+ attempts (ANY/A has climbed with the passing game)
+    lg = {}
+    for y, L in by_y.items():
+        a = [(s[5] + 20 * s[6] - 45 * s[7] - s[9]) / (s[3] + s[8]) for s in L if s[3] >= 200]
+        if len(a) > 5: m = sum(a) / len(a); lg[y] = (m, (sum((x - m) ** 2 for x in a) / len(a)) ** .5)
     for r in P['peak']:
         c = [s for s in by_y[r['y']] if NM.same(s[0], r['n'])]
         c.sort(key=lambda s: (s[2] != (r.get('tm') or '').split('/')[-1], -s[3]))
@@ -326,6 +331,7 @@ def nfl_qb_attach(P, Q):
         db = att + sk
         r['q'] = dict(epa=round(pe / db, 3), cpoe=round(cpoe, 1), anya=round((yd + 20 * td - 45 * it - sky) / db, 2), sk=round(100 * sk / db, 1),
                       adot=round(ay / att, 1), int=round(100 * it / att, 1), rush=round(re_, 1), db=int(db))
+        if r['y'] in lg: r['q']['anyx'] = round(100 + 25 * (r['q']['anya'] - lg[r['y']][0]) / lg[r['y']][1])
     for r in P['career']:
         if r['y0'] >= 1999:
             c = [s for s in Q['seasons'] if r['y0'] <= s[1] <= r['y1'] and NM.same(s[0], r['n'])]
@@ -388,7 +394,7 @@ def cfb_qb_lists(rows, minq=150):
     att (college counts sacks as runs, sack yards in rushing). TAY/P = (pass yds + 20 pass TD - 45 INT + rush yds + 20 rush
     TD) / plays. Yds+ = (TAY/P - that season's average TAY/P over QBs with minq+ attempts, play-weighted) x plays: adjusted
     yards over an average FBS QB, no opponent adjustment. TAY/P+ = 100 + 25 z within the season (QBs with minq+ attempts).
-    peak = best season by Yds+; career = Yds+ summed over the seasons in the pool (top 150 passers a season)."""
+    peak = every season on its own by Yds+; career = Yds+ summed over the seasons in the pool (top 150 passers a season)."""
     import names as NM
     S = []
     for r in rows:
@@ -404,6 +410,8 @@ def cfb_qb_lists(rows, minq=150):
         m = sum(q['tay'] * q['pl'] for q in Q) / w
         sd = (sum((q['tay'] - m) ** 2 for q in Q) / len(Q)) ** .5
         s['v'] = (s['tay'] - m) * s['pl']; s['ix'] = 100 + 25 * (s['tay'] - m) / sd
+    # era (Nov 20 2026): plays per qualified QB run flat 2004-25 (355-422 a season, no upward trend), so volume is not
+    # rescaled; scaling to it mostly inflated 2020's short schedules. The rate is already measured against each season.
     lo = lambda tid: f'/img/cfb/logos/{tid}.png' if tid and os.path.exists(os.path.join(IMG, 'cfb', 'logos', f'{tid}.png')) else (f'https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/{tid}.png&w=40&h=40' if tid else None)
     def q_of(L):
         att = sum(s['att'] for s in L); sk = sum(s['sk'] for s in L); yd = sum(s['yd'] for s in L); td = sum(s['td'] for s in L); it = sum(s['it'] for s in L)
@@ -416,12 +424,7 @@ def cfb_qb_lists(rows, minq=150):
         if s['att'] < minq: continue
         peak.append(dict(id=s['id'], n=s['n'], y=s['y'], tm=s['tm'], lo=lo(s['tid']), pos='QB', v=round(s['v']), raw=round(s['tay'], 2),
                          q=dict(q_of([s]), ix=round(s['ix'])), est=None, ph=None))
-    peak.sort(key=lambda r: -r['v'])
-    best, P = set(), []
-    for r in peak:
-        if r['id'] in best: continue
-        best.add(r['id']); P.append(r)
-    pk = pick([dict(r) for r in P], 'v')
+    pk = pick([dict(r) for r in peak], 'v')      # every player-season on its own
     for r in pk: r.pop('id', None)
     C = defaultdict(list)
     for s in S: C[s['id']].append(s)
@@ -436,8 +439,103 @@ def cfb_qb_lists(rows, minq=150):
                 pk=dict(l='Yds+', t='adjusted yards over an average FBS QB that season: (TAY/P - season average) x plays; TAY/P = (pass yds + 20 x pass TD - 45 x INT + rush yds + 20 x rush TD) / (attempts + rushes), sacks count as rushes. no opponent adjustment', f='%+.0f', rl='TAY/P', rt='total adjusted yards a play', rf='%.2f'),
                 car=dict(l='Yds+', t='career Yds+: each season\'s adjusted yards over an average FBS QB, summed (seasons among the top 150 passers)', f='%+.0f', s=1, pl='Peak', pt='best season Yds+', pf='%+.0f'),
                 src='ESPN', pos=True, tm=True, estT='', qb=True, ph=False,
-                peak_about=f'FBS regular seasons {min(s["y"] for s in S)}-{max(s["y"] for s in S)}, QBs with {minq}+ attempts; the season average and SD over the same QBs.',
+                peak_about=f'FBS regular seasons {min(s["y"] for s in S)}-{max(s["y"] for s in S)}, QBs with {minq}+ attempts; the season average and SD over the same QBs; every player-season ranks on its own.',
                 career_about='FBS regular seasons from 2004 (careers that started earlier count from 2004), 300+ attempts.')
+
+
+
+SKILL_POS = {'RB': 'RB', 'FB': 'RB', 'WR': 'WR', 'TE': 'TE'}
+SKILL_K = {'RB': 100, 'WR': 200, 'TE': 40}       # the season's average starter: mean of the top K at the position
+
+
+def cfb_skill_pull(y0=2004, y1=2025, rush=150, rec=450, workers=12):
+    """CFB RB / WR / TE seasons for the all-time players lists: each FBS regular season's top `rush` rushers and top `rec`
+    receivers by yards (ESPN byathlete, pages of 150), then each one's season line (ESPN core statistics; cached in
+    CACHE/cfb_qb, shared with cfb_qb_pull). Position from ESPN (FB counts as RB); a player ESPN lists without one is an RB
+    when he ran more than he caught, else a WR. QBs and defenders are left out.
+    -> [espn id, name, y, team id, school, pos, games, carries, rush yds, rush TD, rec, rec yds, rec TD, fumbles lost]"""
+    import urllib.request, time
+    from concurrent.futures import ThreadPoolExecutor
+    D = os.path.join(CACHE, 'cfb_qb'); os.makedirs(D, exist_ok=True)
+    def get(u, fn):
+        p = os.path.join(D, fn)
+        if os.path.exists(p): return json.load(open(p))
+        for k in range(4):
+            try:
+                with urllib.request.urlopen(urllib.request.Request(u, headers={'User-Agent': 'Mozilla/5.0'}), timeout=30) as r: d = json.load(r)
+                json.dump(d, open(p, 'w')); return d
+            except Exception as e:  # noqa: BLE001
+                if getattr(e, 'code', None) == 404: return {}
+                time.sleep(2 * (k + 1))
+        return {}
+    who = {}
+    for y in range(y0, y1 + 1):
+        for sort, n in (('rushing.rushingYards', rush), ('receiving.receivingYards', rec)):
+            for pg in range(1, (n + 149) // 150 + 1):
+                d = get('https://site.web.api.espn.com/apis/common/v3/sports/football/college-football/statistics/byathlete?region=us&lang=en'
+                        f'&contentorigin=espn&isqualified=false&page={pg}&limit=150&season={y}&seasontype=2&category=offense&sort={sort}:desc',
+                        f'lead_{y}_{sort.split(".")[0]}_{pg}.json')
+                for a in d.get('athletes', []):
+                    x = a['athlete']; t = (x.get('teams') or [{}])[0]
+                    who.setdefault((x['id'], y), (x['id'], x['displayName'], y, x.get('teamId') or t.get('id'),
+                                                  t.get('shortDisplayName') or x.get('teamShortName'), (x.get('position') or {}).get('abbreviation') or '-'))
+    def line(w):
+        aid, n, y, tid, sch, pos = w
+        d = get(f'https://sports.core.api.espn.com/v2/sports/football/leagues/college-football/seasons/{y}/types/2/athletes/{aid}/statistics', f'{y}_{aid}.json')
+        S = {}
+        for c in (d.get('splits') or {}).get('categories', []):
+            for st in c.get('stats', []): S[c['name'] + '.' + st['name']] = st.get('value')
+        g = lambda k: float(S.get(k) or 0.0)  # noqa: E731
+        ra, rc = g('rushing.rushingAttempts'), g('receiving.receptions')
+        if pos == '-': pos = 'RB' if ra > rc else 'WR'
+        pos = SKILL_POS.get(pos)
+        if not pos or ra + rc < 1: return None
+        return [aid, n, y, tid, sch, pos, int(g('general.gamesPlayed')), ra, g('rushing.rushingYards'), g('rushing.rushingTouchdowns'),
+                rc, g('receiving.receivingYards'), g('receiving.receivingTouchdowns'), g('general.fumblesLost')]
+    with ThreadPoolExecutor(workers) as ex:
+        return [r for r in ex.map(line, list(who.values())) if r]
+
+
+def cfb_skill_lists(rows, qbrows=()):
+    """CFB all-time RB / WR / TE lists, FBS regular seasons from 2004. AY = rush yds + rec yds + 20 x (rush TD + rec TD)
+    - 45 x fumbles lost. Yds+ = AY - the season's average starter at the position (mean AY of the top SKILL_K by AY: RB 100,
+    WR 200, TE 40). No targets in ESPN's college history, so receivers are measured on volume, not per target.
+    AY+ = 100 + 25 z against the same starters. peak = best season by Yds+; career = Yds+ summed over the seasons in the pool."""
+    qb = {(r[0], r[2]) for r in qbrows if r[6] >= 50}      # a season with 50+ passes is a QB season (ESPN lists many QBs with no position)
+    S = [dict(id=r[0], n=r[1], y=r[2], tid=r[3], tm=r[4], pos=r[5], g=r[6], ra=r[7], ry=r[8], rtd=r[9], rc=r[10], cy=r[11], ctd=r[12], fl=r[13]) for r in rows if (r[0], r[2]) not in qb]
+    for s in S: s['ay'] = s['ry'] + s['cy'] + 20 * (s['rtd'] + s['ctd']) - 45 * s['fl']
+    base = {}
+    by = defaultdict(list)
+    for s in S: by[(s['y'], s['pos'])].append(s['ay'])
+    for k, v in by.items():
+        v = sorted(v, reverse=True)[:SKILL_K[k[1]]]; m = sum(v) / len(v)
+        base[k] = (m, (sum((x - m) ** 2 for x in v) / len(v)) ** .5 or 1.0)
+    for s in S:
+        m, sd = base[(s['y'], s['pos'])]; s['v'] = s['ay'] - m; s['ix'] = 100 + 25 * (s['ay'] - m) / sd
+    lo = lambda tid: f'/img/cfb/logos/{tid}.png' if tid and os.path.exists(os.path.join(IMG, 'cfb', 'logos', f'{tid}.png')) else (f'https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/{tid}.png&w=40&h=40' if tid else None)
+    def q_of(L):
+        ra, ry, rc, cy = (sum(s[k] for s in L) for k in ('ra', 'ry', 'rc', 'cy'))
+        return dict(ra=int(ra), ry=int(ry), ypc=round(ry / ra, 1) if ra >= 20 else None, rtd=int(sum(s['rtd'] for s in L)),
+                    rc=int(rc), cy=int(cy), ypr=round(cy / rc, 1) if rc >= 10 else None, ctd=int(sum(s['ctd'] for s in L)), scr=int(ry + cy))
+    P = []
+    for s in S:    # every player-season on its own
+        P.append(dict(n=s['n'], y=s['y'], tm=s['tm'], lo=lo(s['tid']), pos=s['pos'], v=round(s['v']), raw=round(s['ay']), est=None, ph=None, q=dict(q_of([s]), ix=round(s['ix']))))
+    pk = pick([dict(r) for r in P], 'v')
+    C = defaultdict(list)
+    for s in S: C[s['id']].append(s)
+    car = []
+    for i, L in C.items():
+        tms = Counter(s['tm'] for s in L for _ in range(int(s['ra'] + s['rc']) or 1)); tm = tms.most_common(1)[0][0]
+        pos = Counter(s['pos'] for s in L for _ in range(int(s['ra'] + s['rc']) or 1)).most_common(1)[0][0]
+        car.append(dict(n=L[0]['n'], y0=min(s['y'] for s in L), y1=max(s['y'] for s in L), tm=tm, lo=lo(next(s['tid'] for s in L if s['tm'] == tm)),
+                        pos=pos, v=round(sum(s['v'] for s in L)), s=len(L), pk=round(max(s['v'] for s in L)), est=None, ph=None, q=q_of(L)))
+    car.sort(key=lambda r: -r['v'])
+    return dict(peak=pk, career=car[:TOP], n=len(S), **{'from': min(s['y'] for s in S)}, to=max(s['y'] for s in S),
+                pk=dict(l='Yds+', t='adjusted scrimmage yards over the season\'s average starter at the position: AY = rush + rec yds + 20 x TD - 45 x fumbles lost, minus the mean AY of that season\'s top RB 100 / WR 200 / TE 40. volume, not per target (no targets in the college history)', f='%+.0f', rl='AY', rt='adjusted scrimmage yards', rf='%.0f'),
+                car=dict(l='Yds+', t='career Yds+: each season\'s adjusted yards over the average starter at his position, summed (seasons among the top 150 rushers / 450 receivers)', f='%+.0f', s=1, pl='Peak', pt='best season Yds+', pf='%+.0f'),
+                src='ESPN', pos=True, tm=True, estT='', skill=True, ph=False,
+                peak_about='FBS regular seasons 2004-25: RB, WR, TE (ESPN position; FB as RB); every player-season ranks on its own. QBs on their own lists; defense, OL and specialists left out (no usable per-player history).',
+                career_about='FBS regular seasons from 2004 (careers that started earlier count from 2004).')
 
 
 def soccer_teams():
@@ -797,12 +895,13 @@ def main():
         if '--qb' in sys.argv:   # add the all-time QB lines to the snapshot (no other pull needed)
             src['nflqb'] = nfl_qb_pull(max(s['y'] for s in src['nflpk']))
             src['cfbqb'] = cfb_qb_pull()
+            src['cfbsk'] = cfb_skill_pull()
             json.dump(src, gzip.open(SNAP, 'wt'), separators=(',', ':'))
     else:
         nT, nS, nfit = nba(); hT, hS = nhl()
         nflpk, nflcar = nfl_players()
         src = dict(nhlfit=NHL_FIT, nflwav=nfl_wav(), cfb=cfb_rows(), nfl=nfl_rows(), nflch=nfl_champs(), cbb=cbb_teams(), nbaT=nT, nbaS=nS, nbafit=nfit, nhlT=hT, nhlS=hS,
-                   soccerT=soccer_teams(), cs2T=cs2_teams(), cbbS=cbb_players(), nflpk=nflpk, nflcar=nflcar, soccerS=soccer_players(), nflqb=nfl_qb_pull(max(s['y'] for s in nflpk)), cfbqb=cfb_qb_pull(),
+                   soccerT=soccer_teams(), cs2T=cs2_teams(), cbbS=cbb_players(), nflpk=nflpk, nflcar=nflcar, soccerS=soccer_players(), nflqb=nfl_qb_pull(max(s['y'] for s in nflpk)), cfbqb=cfb_qb_pull(), cfbsk=cfb_skill_pull(),
                    atp=tennis_players('atp'), wta=tennis_players('wta'))
         rnd = lambda x: round(x, 3) if isinstance(x, float) else [rnd(v) for v in x] if isinstance(x, list) else {k: rnd(v) for k, v in x.items()} if isinstance(x, dict) else x
         json.dump(rnd(src), gzip.open(SNAP, 'wt'), separators=(',', ':'))
@@ -811,6 +910,7 @@ def main():
     for r in src['nbaT'] + src['nhlT']: r['nt'] = 0
     res['cfb'] = {'teams': teams_out('cfb', src['cfb'])}
     if src.get('cfbqb'): res['cfb']['qbs'] = cfb_qb_lists(src['cfbqb'])
+    if src.get('cfbsk'): res['cfb']['players'] = cfb_skill_lists(src['cfbsk'], src.get('cfbqb') or ())
     res['nfl'] = {'teams': teams_out('nfl', src['nfl'])}
     res['cbb'] = {'teams': teams_out('cbb', src['cbb'])}
     res['nba'] = {'teams': teams_out('nba', src['nbaT'])}
@@ -840,13 +940,23 @@ def main():
                                         'nflverse + Pro Football Reference', career=car, est=f"seasons before 2012: weighted career AV x pre-2012 share of his seasons x {nfit['b']:.3f} (fit on 2003-11 draftees' 2012-on WAR, r {nfit['r']:.2f})",
                                         abouts=('Seasons 2012 on.', 'NFL WAR 2012 on; earlier careers est from weighted career AV (drafted players 1980 on).'))
     res['nfl']['players']['fit'] = nfit
-    # QBs and everyone else, each its own all-time list (QB lists add the QB columns: nfl_qb_attach)
+    # QBs and everyone else, each its own all-time list (QB lists add the QB columns: nfl_qb_attach). Era: WAR is measured
+    # against each season's own replacement lines and a team's WAR sums to its wins - 3, so the league total is fixed by the
+    # schedule, not by pass volume; seasons are put on 17 games (2012-20 played 16: x 17 / 16). Peak lists rank every
+    # player-season on its own (a player can appear more than once).
+    for s_ in src['nflpk']: s_['v17'] = s_['v'] * 17 / (16 if s_['y'] <= 2020 else 17)
     if src.get('nflqb'):
-        allc, _ = nfl_career(src['nflpk'], src['nflwav'], top=None)
+        pk17 = [dict(s_, v=s_['v17']) for s_ in src['nflpk']]
+        allc, nfit = nfl_career(pk17, src['nflwav'], top=None)
         base = res['nfl']['players']
+        pkm = dict(base['pk'], t='NFL WAR (AV WAR, no special teams), 2012 on (snap counts), on 17 games (2012-20 x 17 / 16)')
         for g, keep in (('qbs', lambda p: p == 'QB'), ('players', lambda p: p != 'QB')):
-            P = players_out([s for s in src['nflpk'] if keep(s.get('pos'))], base['pk'], base['car'], base['src'],
-                            career=[r for r in allc if keep(r.get('pos'))][:TOP], est=base['estT'], abouts=(base['peak_about'], base['career_about']))
+            S_ = [s_ for s_ in pk17 if keep(s_.get('pos'))]
+            P = players_out(S_, pkm, base['car'], base['src'],
+                            career=[r for r in allc if keep(r.get('pos'))][:TOP], est=base['estT'],
+                            abouts=('Seasons 2012 on, on 17 games; every player-season ranks on its own.', base['career_about']))
+            P['peak'] = [dict(n=fixenc(x['n']), y=x['y'], tm=x.get('tm'), pos=x.get('pos'), v=round(x['v'], 2), raw=x.get('raw'), est=None, ph=None, ox=None, dx=None)
+                         for x in pick([dict(x) for x in S_], 'v')]
             P['fit'] = nfit
             res['nfl'][g] = P
         nfl_qb_attach(res['nfl']['qbs'], src['nflqb'])
