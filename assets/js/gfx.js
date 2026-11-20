@@ -2619,7 +2619,9 @@
     for (var k = 0; k < 2; k++) {
       var L = k ? d.theirFive : d.five, label = (k ? d.opp : '1NT').toUpperCase() + ' · PROJECTED FIVE';
       g.font = '48px ' + FONT; g.fillStyle = k ? C.down : C.teal; g.fillText(label, bx, ly);
-      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText('ROLE', bx + 12 + (bw - 24) * 0.5, ly); g.fillText(L.some(function (q) { return q.rwa != null; }) ? 'TALENT · RWA · ARK' : 'TALENT · FORM ARK', bx + 12 + (bw - 24) * 0.74, ly);
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText('ROLE', bx + 12 + (bw - 24) * 0.5, ly); var hd = L.some(function (q) { return q.rwa != null; }) ? 'TALENT · CAREER RWA · ARK' : 'TALENT · FORM ARK', hf = 32;   // preview RWA = career league maps
+      while (hf > 20 && g.measureText(hd).width > (bw - 24) * 0.26) { hf--; g.font = hf + 'px ' + FONT; }
+      g.fillText(hd, bx + 12 + (bw - 24) * 0.74, ly);
       ly += 90;
       for (var i = 0; i < L.length; i++) { if (i % 2) { g.fillStyle = 'rgba(36,26,58,0.35)'; g.fillRect(bx, ly - RH / 2 + 2, bw, RH - 4); } await teamRow(g, bx + 12, ly, bw - 24, L[i], RS); ly += RH; }
       if (!k && d.lineupNote) { g.font = '34px ' + FONT; g.fillStyle = '#ffd166'; g.fillText(fit(g, 'SUB · ' + d.lineupNote, bw - 24), bx + 12, ly - 14); ly += 30; }

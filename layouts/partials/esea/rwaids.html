@@ -1,0 +1,6 @@
+{{- /* name -> FACEIT id (every rated player, current 1NT nicknames win) and id -> current 1NT nickname, for
+       esea/rwa.html. Call through partialCached. */ -}}
+{{- $ids := dict }}{{ $nicks := dict }}
+{{- with site.Data.esea_rwa }}{{ range $id, $n := .names }}{{ $ids = merge $ids (dict $n $id) }}{{ end }}{{ end }}
+{{- with site.Data.esea }}{{ range .members }}{{ $ids = merge $ids (dict .nick .id) }}{{ $nicks = merge $nicks (dict .id .nick) }}{{ end }}{{ end }}
+{{- return (dict "ids" $ids "nicks" $nicks) -}}

@@ -1,0 +1,20 @@
+{{- /* the one RWA lookup for every 1NT surface (data/esea_rwa.json, scripts/esea_rwa.py). Both windows are the same
+       formula (ARK 2 line + team-result credit + opposing five's mean RWA, rounds-weighted, shrunk 15 rounds toward
+       the division prior, 0 = average recent Main player); only the maps differ:
+         win "career" (default): every ESEA league map since S53, no decay = .p, the rating the preview, team RWA and
+                                 map opponent credit use
+         win "59" (a season):    that season's league maps only = .seasons (1NT players)
+       In: id (FACEIT id, preferred) and/or name. Out: dict ok (bool), v (RWA), n (rounds), ark (season ARK Rating; season window only), win, label ("RWA S59" /
+       "RWA career"). */ -}}
+{{- $win := string (.win | default "career") }}{{ $ok := false }}{{ $v := 0.0 }}{{ $n := 0 }}{{ $ark := false }}
+{{- with site.Data.esea_rwa }}{{ $rw := . }}
+  {{- $L := partialCached "esea/rwaids.html" "rwa" }}
+  {{- $id := $.id | default "" }}{{ if not $id }}{{ $id = index $L.ids ($.name | default "-") | default "" }}{{ end }}
+  {{- if eq $win "career" }}
+    {{- with index $rw.p ($id | default "-") }}{{ $ok = true }}{{ $v = float (index . 0) }}{{ $n = int (index . 1) }}{{ end }}
+  {{- else }}
+    {{- $nick := $.name | default "" }}{{ with $id }}{{ with index $L.nicks . }}{{ $nick = . }}{{ end }}{{ end }}
+    {{- with index ($rw.seasons | default dict) ($nick | default "-") }}{{ with index . $win }}{{ $ok = true }}{{ $v = float (index . 0) }}{{ $n = int (index . 2) }}{{ $ark = float (index . 1) }}{{ end }}{{ end }}
+  {{- end }}
+{{- end }}
+{{- return (dict "ok" $ok "v" $v "n" $n "ark" $ark "win" $win "label" (cond (eq $win "career") "RWA career" (printf "RWA S%s" $win))) -}}
