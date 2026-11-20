@@ -17,9 +17,11 @@ by race; scripts/research/sweep_nov19/markets/a1_award_market.py). The model's o
 the market's (mkt, no vig) beside it.
 
 Two views a sport (Noah, Nov 20 2026): "races" = predictive (who the voters will pick, above); "conv" = conviction (who
-leads the award's pool on our own value metric: P(lead) from the same simulations, no voter model and no market; lead()).
-Football's conviction pools are the boards' WAR lines by position (war_lead), so they cover awards whose voter model
-failed too. Stdlib only."""
+leads the award's pool on this season's value alone: P(lead), no voter model and no market; lead()). Noah, Nov 20:
+conviction rests on SV / SVAR, nothing that leans on other seasons. So its draws run the games left at this season's
+own rates (SEASON_ONLY: no last-season blend, no shrunk or predictive rate), and football's pools are the SV boards
+(war_lead: SVAR by position; covers awards whose voter model failed, leaves out positions with no SV). Soccer's GAR
+is the exception: its plus-minus term is a three-season ridge and there is no season-only soccer value yet. Stdlib only."""
 import datetime as dt, json, math, os, random, re, sys, urllib.request
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import awards_engine as E
@@ -148,6 +150,8 @@ def prune(cands, spec, draw, rng, keep=45):
 
 
 CONV = None             # main sets {}: each race function then records its conviction race here (award -> Rows)
+SEASON_ONLY = False     # on inside lead(): the draws run the games left at this season's own rates (no last season,
+                        # no predictive or shrunk rate), so conviction rests on this season's value alone
 
 
 def lead(aw, pool, draw, metric, show, rng, k=1, sims=SIMS, keep=60, top=SHOW):
@@ -155,6 +159,13 @@ def lead(aw, pool, draw, metric, show, rng, k=1, sims=SIMS, keep=60, top=SHOW):
     (is in its top k) on our own value metric, from the same simulated finishes as the voter race. No voter model, no
     market. The pool is cut to the `keep` best by mean metric at a few draws first. Recorded in CONV[aw]."""
     if CONV is None or not pool: return
+    global SEASON_ONLY
+    SEASON_ONLY = True
+    try: _lead(aw, pool, draw, metric, show, rng, k, sims, keep, top)
+    finally: SEASON_ONLY = False
+
+
+def _lead(aw, pool, draw, metric, show, rng, k, sims, keep, top):
     acc = {}
     for _ in range(40):
         td = draw.teams(rng)
@@ -403,6 +414,7 @@ def nba_races(fit, rng, cands, teams, conf, G=82, min_g=65, sims=SIMS):
         return td
 
     def blend(now, g, prior, g0=15):
+        if SEASON_ONLY: return now
         return (now * g + (.85 * now if prior is None else prior) * g0) / (g + g0)   # no last season: toward 85%
 
     def draw(c, td, rng, elig65=False):
@@ -415,8 +427,8 @@ def nba_races(fit, rng, cands, teams, conf, G=82, min_g=65, sims=SIMS):
         mr = gr * c['mpg']
         mp = c['mp'] + mr
         if mp <= 0: return None
-        x_rest = gauss(rng, c['sx'], TAU * math.sqrt(K / (c['mp'] + K)) + (TAU * math.sqrt(K / mr) if mr > 0 else 0))
-        d_rest = gauss(rng, c['sdx'], TAUD * math.sqrt(K / (c['mp'] + K)) + (TAUD * math.sqrt(K / mr) if mr > 0 else 0))
+        x_rest = gauss(rng, c['xpm'] if SEASON_ONLY else c['sx'], TAU * math.sqrt(K / (c['mp'] + K)) + (TAU * math.sqrt(K / mr) if mr > 0 else 0))
+        d_rest = gauss(rng, c['dxpm'] if SEASON_ONLY else c['sdx'], TAUD * math.sqrt(K / (c['mp'] + K)) + (TAUD * math.sqrt(K / mr) if mr > 0 else 0))
         xpm = (c['xpm'] * c['mp'] + x_rest * mr) / mp
         dx = (c['dxpm'] * c['mp'] + d_rest * mr) / mp
         pp_r = gauss(rng, blend(c['ppg'], c['g'], c['ppg0']), 2.5 * math.sqrt(15 / (c['g'] + 15)))
@@ -514,17 +526,17 @@ def nhl_races(fit, rng, cands, teams, G=82, sims=SIMS):
         gp = c['gp'] + gr
         tpg = c['toi'] / max(c['gp'], 1)
         tr = gr * tpg
-        rate = c['pwar'] / max(c['toi'], 1)                         # predictive WAR a minute
+        rate = (c['war'] if SEASON_ONLY else c['pwar']) / max(c['toi'], 1)   # predictive WAR a minute (conviction: this season's)
         war_r = gauss(rng, rate * tr, abs(rate) * tr * .35 + .25 * math.sqrt(tr / 60) * (.6 if c['grp'] != 'G' else 1.5))
         war = c['war'] + war_r
         # rates toward last season (no season: 80% of the pace so far), points by 40 games, goals 50, GSAx 40 starts
-        bl = lambda now, prior, g0: (now * c['gp'] + (.8 * now if prior is None else prior) * g0) / (c['gp'] + g0)
+        bl = lambda now, prior, g0: now if SEASON_ONLY else (now * c['gp'] + (.8 * now if prior is None else prior) * g0) / (c['gp'] + g0)
         ppg = max(gauss(rng, bl(c['pts'] / max(c['gp'], 1), c['ppg0'], 40), .12), 0)     # talent sd .12 a game
         gpg = max(gauss(rng, bl(c['g'] / max(c['gp'], 1), c['gpg0'], 50), .06), 0)
         pts = c['pts'] + max(gauss(rng, ppg * gr, math.sqrt(max(ppg * gr, 0) * 1.3)), 0)
         g = c['g'] + max(gauss(rng, gpg * gr, math.sqrt(max(gpg * gr, 0) * 1.1)), 0)
         gs_rate = c['gsax'] / max(c['toi'], 1) * 60
-        gs_rate = bl(gs_rate, c['gsx0'], 40) if c['gsx0'] is not None else gs_rate * c['gp'] / (c['gp'] + 40)
+        if not SEASON_ONLY: gs_rate = bl(gs_rate, c['gsx0'], 40) if c['gsx0'] is not None else gs_rate * c['gp'] / (c['gp'] + 40)
         gsax = c['gsax'] + gauss(rng, gs_rate * tr / 60, 1.4 * math.sqrt(max(tr / 60, 0)))   # 1.4 goals a game
         return {'war': war, 'pts': pts, 'g': g, 'gsax': gsax, 'gp': gp, 'gfrac': gp / G, 'toipg': tpg,
                 'tpct': td[c['tm']], 'goalie': 1.0 if c['grp'] == 'G' else 0.0, 'gd': c['gd'] * gp / max(c['gp'], 1),
@@ -595,11 +607,11 @@ def cbb(fit, rng):
         gr = games_left(rng, left, av, 'cbb')
         gp = c['gp'] + gr
         m0, mr = c['gp'] * c['mpg'], gr * c['mpg']
-        mean = (c['bpm'] * m0 + c['prior'] * K) / (m0 + K)
+        mean = c['bpm'] if SEASON_ONLY else (c['bpm'] * m0 + c['prior'] * K) / (m0 + K)
         b_rest = gauss(rng, mean, TAU * math.sqrt(K / (m0 + K)) + (TAU * math.sqrt(K / mr) if mr > 0 else 0))
         bpm = (c['bpm'] * m0 + b_rest * mr) / max(m0 + mr, 1)
         pp0 = c['pp0'] if c['pp0'] is not None else .6 * c['ppg'] + 4
-        p_rest = gauss(rng, (c['ppg'] * c['gp'] + pp0 * 10) / (c['gp'] + 10), 3.0 * math.sqrt(10 / (c['gp'] + 10)))
+        p_rest = gauss(rng, c['ppg'] if SEASON_ONLY else (c['ppg'] * c['gp'] + pp0 * 10) / (c['gp'] + 10), 3.0 * math.sqrt(10 / (c['gp'] + 10)))
         ppg = (c['ppg'] * c['gp'] + p_rest * gr) / max(gp, 1)
         return {'bpm': bpm, 'ppg': ppg, 'wp': td[c['tm']], 'barthag': td['_b' + c['tm']], 'mpg': c['mpg'],
                 'p5': 1.0 if tinfo[c['tm']][2] in P5 else 0.0}
@@ -651,7 +663,7 @@ def football_draw(teams, per_left, sport):
             rate = c['f'][k] / gn
             mu = rate * gr
             sdv = math.sqrt(max(mu, 0)) if kind == 'count' else .3 * mu
-            f[k] = c['f'][k] + (gauss(rng, mu, abs(sdv)) if k == 'war' else max(gauss(rng, mu, sdv), 0))
+            f[k] = c['f'][k] + (gauss(rng, mu, abs(sdv)) if k == 'svar' else max(gauss(rng, mu, sdv), 0))
         if 'rush_y' in f and 'rush_y' in dict(per_left): f['scrim'] = f['rush_y'] + f['rec_y']
         if 'ptd' in f and 'ptd' in dict(per_left):
             f['td'] = c['f']['td'] + sum(f[k] - c['f'][k] for k in ('ptd', 'rtd', 'ctd'))
@@ -773,44 +785,42 @@ def nfl(fit, rng):
 
 
 NFLV_TEAM = {'LA': 'LAR', 'WAS': 'WSH'}
-OFF, DEF = ('QB', 'RB', 'WR', 'TE', 'OL'), ('EDGE', 'DL', 'LB', 'CB', 'S')
-WAR_SHOW = [('war', 'WAR', '%.2f'), ('wp', 'W%', 'pct')]
-# football's conviction pools: the board's WAR lines by the award's position rule (every award, voter model or not)
+OFF, DEF = ('QB', 'RB', 'WR', 'TE'), ('DL', 'LB', 'DB')
+SV_SHOW = [('svar', 'SVAR', '%.2f'), ('sv', 'SV', '%.1f')]
+# football's conviction pools: the season value boards (SV / SVAR: this season only) by the award's position rule,
+# every award a position with SV can win, voter model or not. No SV: OL, K, P (NFL); OL, defence, K, P (CFB).
 NFL_CONV = [('mvp', lambda c: True), ('opoy', lambda c: c['pos'] in OFF), ('dpoy', lambda c: c['pos'] in DEF),
             ('oroy', lambda c: c['rookie'] and c['pos'] in OFF), ('droy', lambda c: c['rookie'] and c['pos'] in DEF)]
 CFB_CONV = [('heisman', lambda c: True), ('obrien', lambda c: c['pos'] == 'QB'), ('doak', lambda c: c['pos'] == 'RB'),
-            ('bilet', lambda c: c['pos'] == 'WR'), ('mackey', lambda c: c['pos'] == 'TE'),
-            ('bednarik', lambda c: c['pos'] in DEF), ('butkus', lambda c: c['pos'] == 'LB'),
-            ('thorpe', lambda c: c['pos'] in ('CB', 'S')), ('groza', lambda c: c['pos'] == 'K'), ('guy', lambda c: c['pos'] == 'P')]
+            ('bilet', lambda c: c['pos'] == 'WR'), ('mackey', lambda c: c['pos'] == 'TE')]
 
 
 def war_lead(sport, teams, rng):
-    """football's conviction races: the board's WAR to date run out over the team's games left at its pace so far
-    (the box stats' own draw: spread 30% of the rest), P(lead) by pool. teams: {tid: (wins, games, mean final wins,
-    sd, G)}; the candidates come from the WAR boards, not the stat leaders, so linemen and defenders are in."""
+    """football's conviction races: SVAR to date (scripts/nfl_qb.py, nfl_season_value.py, cfb_season_value.py) run
+    out over the team's games left at its pace so far (the box stats' own draw: spread 30% of the rest), P(lead) by
+    pool. teams: {tid: (wins, games, mean final wins, sd, G)}."""
     if CONV is None: return
     cands = []
+    V = jload(os.path.join(ROOT, 'data', f'{sport}_season_value.json'), {}) or {}
     if sport == 'nfl':
         tid = {v: k for k, v in war_lead.tmap.items()}
-        for r in (jload(os.path.join(ROOT, 'static', 'data', 'nfl-war.json'), {}) or {}).get('players', []):
-            ab = (r.get('tm') or '').split('/')[-1]
+        rook = {NM.key(r['n']) for r in (jload(os.path.join(ROOT, 'static', 'data', 'nfl-war.json'), {}) or {}).get('players', []) if r.get('rook')}
+        Q = [dict(r, pos='QB', pts=r.get('spts'), ph=r.get('photo')) for r in (jload(os.path.join(ROOT, 'data', 'nfl_qb.json'), {}) or {}).get('rows', [])]
+        for r in Q + V.get('skill', []) + V.get('defense', []):
+            ab = (r.get('t') or '').split('/')[-1]
             ab = NFLV_TEAM.get(ab, ab)
-            if r.get('war') is None or ab not in tid: continue
-            cands.append({'id': r['id'], 'n': r['n'], 'tid': tid[ab], 'tm': ab, 'pos': r.get('pos'), 'rookie': bool(r.get('rook')),
-                          'phu': 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + r['ph'] if r.get('ph') else None,
-                          'f': {'war': r['war']}})
+            if r.get('svar') is None or ab not in tid: continue
+            cands.append({'id': len(cands), 'n': r['n'], 'tid': tid[ab], 'tm': ab, 'pos': r.get('pos'), 'phu': r.get('ph') or None,
+                          'rookie': NM.key(r['n']) in rook, 'f': {'svar': r['svar'], 'sv': r.get('pts') or 0}})
     else:
-        d = jload(os.path.join(ROOT, 'static', 'data', 'cfb-all.json'), {}) or {}
-        ix = {c: i for i, c in enumerate(d.get('cols', []))}
         tid = {v[1]: k for k, v in war_lead.logos.items()}
-        for i, r in enumerate(d.get('rows', [])):
-            if r[ix['war']] is None or r[ix['div']] != 'FBS' or r[ix['team']] not in tid: continue
-            m = re.search(r'/id/(\d+)', r[ix['espnl']] or '')
-            cands.append({'id': i, 'n': r[ix['name']], 'tid': tid[r[ix['team']]], 'tm': r[ix['team']], 'logo': r[ix['logo']],
-                          'pos': r[ix['pos']], 'ph': m.group(1) if m else None, 'f': {'war': r[ix['war']]}})
-    draw = football_draw(teams, [('war', 'yds')], sport)
+        for r in [dict(r, pos='QB') for r in V.get('qbs', [])] + V.get('skill', []):
+            if r.get('svar') is None or r.get('t') not in tid: continue
+            cands.append({'id': len(cands), 'n': r['n'], 'tid': tid[r['t']], 'tm': r['t'], 'logo': r.get('lo'), 'pos': r.get('pos'),
+                          'ph': r.get('id'), 'f': {'svar': r['svar'], 'sv': r.get('pts') or 0}})
+    draw = football_draw(teams, [('svar', 'yds')], sport)
     for aw, ok in (NFL_CONV if sport == 'nfl' else CFB_CONV):
-        lead(aw, [c for c in cands if ok(c)], draw, 'war', WAR_SHOW, rng)
+        lead(aw, [c for c in cands if ok(c)], draw, 'svar', SV_SHOW, rng)
 
 
 war_lead.tmap, war_lead.logos = {}, {}
@@ -926,7 +936,7 @@ def soccer(fit, rng):
 
 # ---------------------------------------------------------------- output
 
-NULL_LABEL = {'vorx': 'VORX', 'dxpm': 'D-XPM', 'war': 'WAR', 'gsax': 'GSAx', 'bpm': 'BPM', 'yds': 'yards',
+NULL_LABEL = {'svar': 'SVAR', 'vorx': 'VORX', 'dxpm': 'D-XPM', 'war': 'WAR', 'gsax': 'GSAx', 'bpm': 'BPM', 'yds': 'yards',
               'td': 'TDs', 'sacks': 'sacks', 'dint': 'INTs', 'pass_y': 'pass yards', 'ptd': 'pass TDs', 'gross': 'gross average',
               'rush_y': 'rush yards', 'rtd': 'rush TDs', 'rec_y': 'receiving yards', 'ctd': 'receiving TDs', 'tackles': 'tackles',
               'fgm': 'FGs', 'fgpct': 'FG%', 'pd': 'PDs', 'gar': 'GAR'}

@@ -268,8 +268,10 @@
      "Blend: model^.05 x market^.95, renormalised. 7 held 2025-26 races, winner log loss: model 2.32, market 1.12, blend 1.13 (t -2.3).",
      "Blended only when the event has 3+ two-sided quotes, prices summing within 25% of 1 and $50,000 traded. Otherwise model only.",
      "The cell hover keeps the model number; the weekly ledger scores the model alone against the market.",
-     "Conviction view: P(lead) = share of the same simulations in which he leads the award's pool on our value metric",
-     "(NBA VORX, D-XPM for DPOY; NHL WAR, GSAx for Vezina; NFL and CFB WAR by position; CBB BPM; soccer GAR). No voter model, no market."
+     "Conviction view: P(lead) = share of simulations in which he leads the award's pool on this season's value alone.",
+     "Games left run at this season's own rate: no last season, no shrunk or predictive rate, no voter model, no market.",
+     "NFL and CFB: SVAR by position (no SV: OL, K, P; CFB defence). NBA VORX, D-XPM for DPOY; NHL WAR, GSAx for Vezina; CBB BPM.",
+     "Soccer: GAR, whose plus-minus term is a three-season ridge (no season-only soccer value yet)."
     ],
     "where": "Awards tabs (predictive awards, conviction awards): NBA, NFL, NHL, CFB, CBB, soccer",
     "sports": [
