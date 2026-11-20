@@ -307,7 +307,7 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
       'Tennis serve + return tabs', ['Tennis']),
     E('QB value (NFL)', 'Points a game over a replacement QB from the game model\'s QB term.',
       ['Rating = weighted career EPA/play shrunk toward replacement (-0.12) with 250 pseudo-plays.'],
-      'NFL QB value tab', ['NFL']),
+      'NFL QBs tab', ['NFL']),
     E('Yds+ / YOE (returners)', 'Kick and punt return yards over expected, shrunk.',
       ['YOE = return yards minus the mean return from the same spot (5-yard bins, this season). Yards, not EPA (EPA does not repeat).'],
       'special teams tab on NFL and CFB pages', ['NFL', 'CFB']),

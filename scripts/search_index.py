@@ -143,6 +143,10 @@ def pro(ix):
         if d:
             items = [(p['n'], sub(p.get('pos'), p.get(tk)), f'/img/{sp}/{str(p.get(tk) or "").lower()}.png', p.get(met), None)
                      for p in d.get('players') or []]
+            if sp == 'nfl':   # QBs have their own board (QBs tab, layouts/shortcodes/nflqb.html)
+                qb = [it for it, p in zip(items, d.get('players') or []) if p.get('pos') == 'QB']
+                items = [it for it, p in zip(items, d.get('players') or []) if p.get('pos') != 'QB']
+                print(sp, 'qbs', ix.add(page, 'QBs', qb))
             print(sp, 'players', ix.add(page, tab, items))
         g = load(f'data/{sp}_games.json')
         if g:

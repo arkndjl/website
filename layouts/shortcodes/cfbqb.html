@@ -1,0 +1,47 @@
+{{- /* CFB QB leaderboard (data/cfb_qb.json, scripts/cfb_qb.py): the board's QBs with 50+ pass attempts this season,
+       ranked by WAA, with ESPN's season line. The WAR leaders tab holds everyone else. */ -}}
+{{- with site.Data.cfb_qb -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "QBs") "filter" "Div,Conf,Class" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,QB,School,WAA,WAR,FV,ANY/A,Eff" "gfxDate" (printf "updated %s" (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "25") -}}
+<table class="cfb__table">
+  <thead><tr>
+    <th title="rank by WAA within the filters">RK</th><th>QB</th><th>School</th>
+    <th title="WAA = wins over an average starting QB, same snaps (WAR leaders board)">WAA</th>
+    <th title="college WAR = wins a 12-game season over a replacement starter (WAR leaders board)">WAR</th>
+    <th title="FV, the board's future value grade">FV</th>
+    <th title="completion %">Cmp%</th>
+    <th title="pass yards / attempt">Y/A</th>
+    <th title="ANY/A = (pass yds + 20 x TD - 45 x INT - sack yds) / (attempts + sacks)">ANY/A</th>
+    <th title="TD passes / attempts">TD%</th>
+    <th title="interceptions / attempts">INT%</th>
+    <th title="sacks / (attempts + sacks)">Sack%</th>
+    <th title="NCAA passer efficiency">Eff</th>
+    <th title="rushing yards, as listed (college counts sacks as runs)">Rush</th>
+    <th title="rushing TD">RTD</th>
+    <th title="pass attempts">Att</th>
+    <th>Div</th><th>Conf</th><th>Class</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $q := .rows }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td><td class="cfb__name">{{ partial "face.html" (dict "u" (.ph | default "")) }}<b>{{ .n }}</b></td>
+    <td style="white-space: nowrap">{{ with .lo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}{{ .t }}</td>
+    <td class="cfb__num nflwar__war is-key">{{ with .waa }}{{ partial "num.html" (slice "%+.2f" (float .)) }}{{ end }}</td>
+    <td class="cfb__num">{{ with .war }}{{ printf "%.2f" (float .) }}{{ end }}</td>
+    <td class="cfb__num">{{ .fv }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .cmp) }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .ya) }}</td>
+    <td class="cfb__num">{{ printf "%.2f" (float .anya) }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .td) }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .int) }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .sk) }}</td>
+    <td class="cfb__num">{{ printf "%.1f" (float .eff) }}</td>
+    <td class="cfb__num">{{ .ry }}</td>
+    <td class="cfb__num">{{ .rtd }}</td>
+    <td class="cfb__num">{{ .att }}</td>
+    <td>{{ .div }}</td><td class="cfb__dim">{{ .conf }}</td><td>{{ .cls }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "fresh" "cfb_qb" "rows" (len .rows) "note" "ESPN · board WAR") -}}
+{{- end -}}

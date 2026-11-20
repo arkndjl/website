@@ -261,7 +261,7 @@ def nfl_wav():
     return out
 
 
-def nfl_career(pk, wav):
+def nfl_career(pk, wav, top=TOP):
     """career = the site's AV WAR summed over 2012 on, plus for seasons before 2012 c x weighted career AV x the share of
     his seasons played before 2012. c fit (through 0) on players drafted 2003-11 still playing after 2012: their 2012-on
     WAR against weighted career AV x the share of seasons from 2012 on"""
@@ -282,7 +282,64 @@ def nfl_career(pk, wav):
         if i not in tot and w[2] < 2012:
             rows.append(dict(n=w[0], y0=w[1], y1=w[2], tm=w[4], pos=w[3], v=round(c * w[5], 1), s=w[2] - w[1] + 1, est=True, hof=w[6] or None))
     rows.sort(key=lambda r: -r['v'])
-    return rows[:TOP], dict(b=round(c, 4), r=round(r, 3), n=len(a))
+    return rows[:top], dict(b=round(c, 4), r=round(r, 3), n=len(a))
+
+
+NFL_REL = 'https://github.com/nflverse/nflverse-data/releases/download'
+
+
+def nfl_qb_pull(last):
+    """QB lines for the all-time QB lists: every QB regular season 1999-last (nflverse stats_player_reg) and drafted QBs'
+    career passing (nflverse draft_picks, PFR totals). seasons: [name, y, team, att, cmp, yds, td, int, sk, sk yds, air
+    yds, pass EPA, CPOE, rush EPA, carries, rush yds]; dp: [name, drafted, last season, att, cmp, yds, td, int, rush yds]"""
+    from nfl_pbp import download
+    D = os.path.join(CACHE, 'nfl'); os.makedirs(D, exist_ok=True)
+    f = lambda x: float(x) if x not in (None, '', 'NA') else 0.0  # noqa: E731
+    seasons = []
+    for y in range(1999, last + 1):
+        p = os.path.join(D, f'stats_player_reg_{y}.csv')
+        if not os.path.exists(p): download(f'{NFL_REL}/stats_player/stats_player_reg_{y}.csv', p)
+        for r in csv.DictReader(open(p, encoding='utf-8')):
+            if f(r['attempts']) < 1: continue   # any listed position: Taysom Hill is a TE in nflverse
+            seasons.append([r['player_display_name'], y, r['recent_team']] + [f(r[k]) for k in (
+                'attempts', 'completions', 'passing_yards', 'passing_tds', 'passing_interceptions', 'sacks_suffered', 'sack_yards_lost',
+                'passing_air_yards', 'passing_epa', 'passing_cpoe', 'rushing_epa', 'carries', 'rushing_yards')])
+    p = os.path.join(D, 'draft_picks.csv')
+    if not os.path.exists(p): download(f'{NFL_REL}/draft_picks/draft_picks.csv', p)
+    dp = [[r['pfr_player_name'], int(r['season']), int(r['to'] or r['season'])] + [f(r[k]) for k in ('pass_attempts', 'pass_completions', 'pass_yards', 'pass_tds', 'pass_ints', 'rush_yards')]
+          for r in csv.DictReader(open(p, encoding='utf-8')) if f(r['pass_attempts']) > 0]
+    return dict(seasons=seasons, dp=dp)
+
+
+def nfl_qb_attach(P, Q):
+    """QB columns on the all-time QB lists. peak: that season's line (EPA a dropback = pass EPA / (att + sacks), CPOE,
+    ANY/A, sack %, aDOT, INT %, rush EPA, dropbacks). career: Cmp %, yards, TD, INT, AY/A, rush yards, from the nflverse
+    seasons when the career starts 1999 or later, else PFR's career totals (draft_picks)"""
+    import names as NM
+    by_y = defaultdict(list)
+    for s in Q['seasons']: by_y[s[1]].append(s)
+    for r in P['peak']:
+        c = [s for s in by_y[r['y']] if NM.same(s[0], r['n'])]
+        c.sort(key=lambda s: (s[2] != (r.get('tm') or '').split('/')[-1], -s[3]))
+        if not c: continue
+        _, _, _, att, cm, yd, td, it, sk, sky, ay, pe, cpoe, re_, car, ry = c[0]
+        db = att + sk
+        r['q'] = dict(epa=round(pe / db, 3), cpoe=round(cpoe, 1), anya=round((yd + 20 * td - 45 * it - sky) / db, 2), sk=round(100 * sk / db, 1),
+                      adot=round(ay / att, 1), int=round(100 * it / att, 1), rush=round(re_, 1), db=int(db))
+    for r in P['career']:
+        if r['y0'] >= 1999:
+            c = [s for s in Q['seasons'] if r['y0'] <= s[1] <= r['y1'] and NM.same(s[0], r['n'])]
+            if not c: continue
+            att, cm, yd, td, it, ry = (sum(s[k] for s in c) for k in (3, 4, 5, 6, 7, 15))
+        else:
+            c = [d for d in Q['dp'] if NM.same(d[0], r['n']) and abs(d[1] - r['y0']) <= 1]
+            if not c: continue
+            _, _, _, att, cm, yd, td, it, ry = c[0]
+        r['q'] = dict(cmp=round(100 * cm / att, 1), yds=int(yd), td=int(td), int=int(it), aya=round((yd + 20 * td - 45 * it) / att, 2), ry=int(ry))
+    miss = [r['n'] for r in P['peak'] + P['career'] if 'q' not in r]
+    if miss: print('nfl QB lines missing (left off the QB lists)', miss)
+    P['peak'] = [r for r in P['peak'] if 'q' in r]; P['career'] = [r for r in P['career'] if 'q' in r]
+
 
 def soccer_teams():
     d = json.load(gzip.open(os.path.join(HERE, 'data', 'soccer_team_ratings.json.gz')))['seasons']
@@ -638,11 +695,14 @@ def main():
     res = {'asof': dt.date.today().isoformat(), 'top': TOP, 'perDec': PER_DEC}
     if snap:
         src = json.load(gzip.open(SNAP))
+        if '--qb' in sys.argv:   # add the all-time QB lines to the snapshot (no other pull needed)
+            src['nflqb'] = nfl_qb_pull(max(s['y'] for s in src['nflpk']))
+            json.dump(src, gzip.open(SNAP, 'wt'), separators=(',', ':'))
     else:
         nT, nS, nfit = nba(); hT, hS = nhl()
         nflpk, nflcar = nfl_players()
         src = dict(nhlfit=NHL_FIT, nflwav=nfl_wav(), cfb=cfb_rows(), nfl=nfl_rows(), nflch=nfl_champs(), cbb=cbb_teams(), nbaT=nT, nbaS=nS, nbafit=nfit, nhlT=hT, nhlS=hS,
-                   soccerT=soccer_teams(), cs2T=cs2_teams(), cbbS=cbb_players(), nflpk=nflpk, nflcar=nflcar, soccerS=soccer_players(),
+                   soccerT=soccer_teams(), cs2T=cs2_teams(), cbbS=cbb_players(), nflpk=nflpk, nflcar=nflcar, soccerS=soccer_players(), nflqb=nfl_qb_pull(max(s['y'] for s in nflpk)),
                    atp=tennis_players('atp'), wta=tennis_players('wta'))
         rnd = lambda x: round(x, 3) if isinstance(x, float) else [rnd(v) for v in x] if isinstance(x, list) else {k: rnd(v) for k, v in x.items()} if isinstance(x, dict) else x
         json.dump(rnd(src), gzip.open(SNAP, 'wt'), separators=(',', ':'))
@@ -679,6 +739,17 @@ def main():
                                         'nflverse + Pro Football Reference', career=car, est=f"seasons before 2012: weighted career AV x pre-2012 share of his seasons x {nfit['b']:.3f} (fit on 2003-11 draftees' 2012-on WAR, r {nfit['r']:.2f})",
                                         abouts=('Seasons 2012 on.', 'NFL WAR 2012 on; earlier careers est from weighted career AV (drafted players 1980 on).'))
     res['nfl']['players']['fit'] = nfit
+    # QBs and everyone else, each its own all-time list (QB lists add the QB columns: nfl_qb_attach)
+    if src.get('nflqb'):
+        allc, _ = nfl_career(src['nflpk'], src['nflwav'], top=None)
+        base = res['nfl']['players']
+        for g, keep in (('qbs', lambda p: p == 'QB'), ('players', lambda p: p != 'QB')):
+            P = players_out([s for s in src['nflpk'] if keep(s.get('pos'))], base['pk'], base['car'], base['src'],
+                            career=[r for r in allc if keep(r.get('pos'))][:TOP], est=base['estT'], abouts=(base['peak_about'], base['career_about']))
+            P['fit'] = nfit
+            res['nfl'][g] = P
+        nfl_qb_attach(res['nfl']['qbs'], src['nflqb'])
+        res['nfl']['qbs']['qb'] = True
     res['soccer']['players'] = players_out(src['soccerS'], dict(l='GAR', t='goals above replacement (soccer GAR), big-five leagues', f='%.1f', rl='Min', rt='minutes', rf='%.0f'),
                                            dict(l='GAR', t='career GAR, big-five seasons 2014-15 on', f='%.0f', s=1, pl='Peak', pt='best season GAR'), 'ESPN + FotMob',
                                            abouts=('Big-five league seasons 2014-15 on.', ''))
@@ -695,8 +766,9 @@ def main():
     snm = {}
     import names as NM
     for r in src['soccerT']: snm[NM.team_key(fixenc(r['t']))] = r.get('c')
-    for sp in ('nba', 'nhl', 'cbb', 'nfl', 'soccer'):
-        P = res[sp]['players']
+    for sp, g in (('nba', 'players'), ('nhl', 'players'), ('cbb', 'players'), ('nfl', 'players'), ('nfl', 'qbs'), ('soccer', 'players')):
+        P = res[sp].get(g)
+        if not P: continue
         for L in (P['peak'], P['career']):
             for r in L:
                 tm = (r.get('tm') or '').split('/')[-1]
