@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-20T19:54:12Z",
+ "asof": "2026-11-20T19:57:53Z",
  "recenter": {
   "2026-11-20": 1.57
  },
@@ -1936,6 +1936,38 @@
  "withdrawn": [],
  "board": [
   {
+   "id": "401919826",
+   "sport": "cbb",
+   "kick": "2026-11-20T20:00:00Z",
+   "home": "UAlbany",
+   "away": "Western Illinois",
+   "mk": "spread",
+   "side": "home",
+   "line": -6.5,
+   "price": -119.0,
+   "edge": 10.4,
+   "x": 4.0,
+   "why": "no edge at -119",
+   "m": 3.9,
+   "tm": 140.1
+  },
+  {
+   "id": "401927396",
+   "sport": "cbb",
+   "kick": "2026-11-21T00:00:00Z",
+   "home": "Western Kentucky",
+   "away": "Richmond",
+   "mk": "spread",
+   "side": "away",
+   "line": 1.5,
+   "price": -129.0,
+   "edge": 6.0,
+   "x": 4.0,
+   "why": "no edge at -129",
+   "m": -4.5,
+   "tm": 147.2
+  },
+  {
    "id": "401925664",
    "sport": "cbb",
    "kick": "2026-11-21T03:00:00Z",
@@ -2032,22 +2064,6 @@
    "tm": 155.8
   },
   {
-   "id": "401927396",
-   "sport": "cbb",
-   "kick": "2026-11-21T00:00:00Z",
-   "home": "Western Kentucky",
-   "away": "Richmond",
-   "mk": "spread",
-   "side": "away",
-   "line": -1.5,
-   "price": -101.0,
-   "edge": 3.0,
-   "x": 4.0,
-   "why": "edge under 4 (venue: neutral)",
-   "m": -4.5,
-   "tm": 147.2
-  },
-  {
    "id": "401925865",
    "sport": "cbb",
    "kick": "2026-11-21T00:30:00Z",
@@ -2112,22 +2128,6 @@
    "tm": 148.2
   },
   {
-   "id": "401919826",
-   "sport": "cbb",
-   "kick": "2026-11-20T20:00:00Z",
-   "home": "UAlbany",
-   "away": "Western Illinois",
-   "mk": "spread",
-   "side": "away",
-   "line": 6.5,
-   "price": -119.0,
-   "edge": 2.6,
-   "x": 4.0,
-   "why": "edge under 4 (venue: neutral)",
-   "m": 3.9,
-   "tm": 140.1
-  },
-  {
    "id": "401921107",
    "sport": "cbb",
    "kick": "2026-11-21T00:00:00Z",
@@ -2152,7 +2152,7 @@
    "mk": "spread",
    "side": "away",
    "line": -8.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 2.5,
    "x": 4.0,
    "why": "edge under 4 (tier: power)",
@@ -2328,7 +2328,7 @@
    "mk": "spread",
    "side": "away",
    "line": 4.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 1.6,
    "x": 4.0,
    "why": "edge under 4 (venue: neutral)",
@@ -2401,7 +2401,7 @@
    "mk": "total",
    "side": "over",
    "line": 161.5,
-   "price": -106.0,
+   "price": -101.0,
    "edge": 0.9,
    "ev": null,
    "units": 0.0,
@@ -2425,7 +2425,7 @@
    "mk": "spread",
    "side": "home",
    "line": 11.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 0.4,
    "ev": null,
    "units": 0.0,
@@ -2437,7 +2437,7 @@
    "mk": "spread",
    "side": "away",
    "line": -8.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 2.5,
    "ev": null,
    "units": 0.0,
@@ -2508,9 +2508,9 @@
   "401927396": {
    "mk": "spread",
    "side": "away",
-   "line": -1.5,
-   "price": -101.0,
-   "edge": 3.0,
+   "line": 1.5,
+   "price": -129.0,
+   "edge": 6.0,
    "ev": null,
    "units": 0.0,
    "home": "Western Kentucky",
@@ -2570,7 +2570,7 @@
    "mk": "spread",
    "side": "away",
    "line": 4.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 1.6,
    "ev": null,
    "units": 0.0,
@@ -2870,7 +2870,7 @@
    "mk": "total",
    "side": "under",
    "line": 136.5,
-   "price": -106.0,
+   "price": -124.0,
    "edge": 0.8,
    "ev": null,
    "units": 0.0,
@@ -2892,10 +2892,10 @@
   },
   "401919826": {
    "mk": "spread",
-   "side": "away",
-   "line": 6.5,
+   "side": "home",
+   "line": -6.5,
    "price": -119.0,
-   "edge": 2.6,
+   "edge": 10.4,
    "ev": null,
    "units": 0.0,
    "home": "UAlbany",
@@ -2955,7 +2955,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 21280,
+  "snapshots": 21288,
   "buckets": [
    {
     "when": "24h+",
@@ -2969,19 +2969,19 @@
    {
     "when": "6-24h",
     "clvN": 4338,
-    "clvRet": -0.0064,
-    "clvT": -3.29,
+    "clvRet": -0.0059,
+    "clvT": -3.04,
     "clv": 0.6,
     "beat": 0.407,
     "still": 0.404
    },
    {
     "when": "1-6h",
-    "clvN": 2062,
-    "clvRet": -0.0404,
-    "clvT": -35.68,
+    "clvN": 2065,
+    "clvRet": -0.0408,
+    "clvT": -36.05,
     "clv": 0.07,
-    "beat": 0.161,
+    "beat": 0.16,
     "still": 0.711
    },
    {
@@ -20773,7 +20773,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-20T19:54:12Z",
+ "checked": "2026-11-20T19:57:53Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
