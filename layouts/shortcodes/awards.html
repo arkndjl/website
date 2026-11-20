@@ -4,7 +4,7 @@
        a two-sided market is open. Stat columns are the projected finish (mean of the simulations). A race with k
        (All-NBA: 15 named) shows P(team), the share of simulations in which the player is named.
        view="conv" is the conviction view (the sport's .conv races: P(lead) = the share of simulations in which the
-       player leads the award's pool on our own value metric; no voter model, no market). Each view's rows carry the
+       player leads the award's pool on this season's value alone, SVAR in football; no voter model, no market). Each view's rows carry the
        other's number (Conv / Pred column) where the player is on both. */ -}}
 {{- $sport := .Get "sport" -}}
 {{- $conv := eq (.Get "view") "conv" -}}
@@ -58,7 +58,7 @@
 </table>
 {{- $about := "" }}
 {{- if $conv }}
-{{- $about = printf "P(lead): the share of %v simulated rests of the season in which he leads the award's pool on %s. No voter model, no market." $d.sims .metric }}
+{{- $about = printf "P(lead): the share of %v simulated rests of the season in which he leads the award's pool on %s, the games left at this season's own rate. No voter model, no market." $d.sims .metric }}
 {{- with .k }}{{ $about = printf "P(team): the share of %v simulated rests of the season in which he is in the pool's top %v on %s. No voter model, no market." $d.sims . $r.metric }}{{ end }}
 {{- else }}
 {{- $about = printf "Voter model fit on %v-%v; held out a season at a time it gave the winner %.0f%% on average and picked him %v of %v times (%s alone: %v). P(win) averages it over %v simulated rests of the season." $t.from $t.to (mul $t.pw 100) $t.hit $t.n (delimit $t.null " + ") $t.hit0 $d.sims }}
