@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-16T15:33:29Z",
+ "asof": "2026-11-20T02:39:54Z",
  "jobs": {
   "close_model": {
    "last": "2026-11-02T22:35:03Z",
@@ -201,16 +201,16 @@
    "sport": "predictions"
   },
   "soccer_games": {
-   "last": "2026-11-02T22:35:03Z",
+   "last": "2026-11-20T02:34:19Z",
    "status": "ok",
-   "secs": 164,
+   "secs": 167,
    "note": "",
    "changed": [
     "data/soccer_games_fit.json",
     "scripts/data/games_wf/soccer.json.gz",
     "scripts/data/soccer_team_ratings.json.gz"
    ],
-   "lastOk": "2026-11-02T22:35:03Z",
+   "lastOk": "2026-11-20T02:34:19Z",
    "cmd": "python3 scripts/soccer_games.py --fit",
    "months": [
     10,
@@ -238,7 +238,7 @@
    "local": true
   },
   "tennis_model": {
-   "cmd": "python3 scripts/tennis_data.py --offline && python3 scripts/tennis_model.py --fit",
+   "cmd": "python3 scripts/tennis_data.py --offline && python3 scripts/tennis_model.py --fit && python3 scripts/tennis_proj_research.py --refresh",
    "months": [
     2,
     4,
