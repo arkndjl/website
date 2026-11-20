@@ -1,15 +1,14 @@
 {
- "asof": "2026-11-20T19:54:32Z",
+ "asof": "2026-11-20T23:15:53Z",
  "registered": "2026-10-28T15:35:00Z",
  "source": "picks",
  "bankroll": {
   "start": 100,
-  "now": 85.04,
+  "now": 85.14,
   "peak": 117.38,
-  "drawdown": 0.2755,
-  "open": 0.25,
+  "drawdown": 0.2747,
+  "open": 0,
   "path": [
-   117.38,
    111.97,
    109.69,
    106.56,
@@ -408,7 +407,8 @@
    84.95,
    85.13,
    85.9,
-   85.04
+   85.04,
+   85.14
   ]
  },
  "record": {
@@ -418,15 +418,15 @@
   "clvT": -1.85,
   "clv": 0.07,
   "beat": 0.33,
-  "settled": 438,
-  "w": 219,
+  "settled": 439,
+  "w": 220,
   "l": 219,
   "p": 0,
-  "roi": -0.0119,
-  "roiT": -0.25,
-  "profit": -13.14,
-  "risked": 409.25,
-  "yield": -0.0321
+  "roi": -0.0108,
+  "roiT": -0.22,
+  "profit": -13.03,
+  "risked": 409.5,
+  "yield": -0.0318
  },
  "tEff": -1.42,
  "corr": {
@@ -459,7 +459,7 @@
   },
   {
    "gate": "results within 2 SE of the close",
-   "value": "ROI -1.2% vs -0.9% (SE 4.8)",
+   "value": "ROI -1.1% vs -0.9% (SE 4.8)",
    "pass": true
   }
  ],
@@ -686,15 +686,15 @@
    "clvT": -4.23,
    "clv": -0.05,
    "beat": 0.242,
-   "settled": 65,
-   "w": 35,
+   "settled": 66,
+   "w": 36,
    "l": 30,
    "p": 0,
-   "roi": 0.1214,
-   "roiT": 0.85,
-   "profit": 3.71,
-   "risked": 57.5,
-   "yield": 0.0645
+   "roi": 0.1265,
+   "roiT": 0.9,
+   "profit": 3.83,
+   "risked": 57.75,
+   "yield": 0.0662
   },
   {
    "id": "nflprops-prop",
@@ -718,7 +718,8 @@
    "yield": 0.3882
   }
  ],
- "open": [
+ "open": [],
+ "recent": [
   {
    "rule": "tennis-ml",
    "sport": "tennis",
@@ -741,10 +742,12 @@
    "clvRet": 0.0415,
    "clv": 4.0,
    "beat": 1,
-   "close": 0.715
-  }
- ],
- "recent": [
+   "close": 0.715,
+   "score": "3-6 4-6",
+   "res": "w",
+   "ret": 0.4566,
+   "profit": 0.1142
+  },
   {
    "rule": "nflprops-prop",
    "sport": "nflprops",
@@ -2488,37 +2491,6 @@
    "res": "w",
    "ret": 0.9434,
    "profit": 0.2359
-  },
-  {
-   "rule": "nfl-total",
-   "sport": "nfl",
-   "id": "2026_09_TB_CHI",
-   "k": "2026-11-09T01:20:00Z",
-   "slate": "nfl:2026-11-08",
-   "h": "CHI",
-   "a": "TB",
-   "mk": "total",
-   "side": "under",
-   "line": 47.5,
-   "price": -104.0,
-   "bet": "under 47.5 -104",
-   "placed": "2026-11-04T01:21:44Z",
-   "stake": 0.25,
-   "edge": 2.5,
-   "ev": 0.0029,
-   "event": null,
-   "pass": false,
-   "clvRet": -0.0194,
-   "clv": 0.0,
-   "beat": 0,
-   "close": 47.5,
-   "score": [
-    24.0,
-    27.0
-   ],
-   "res": "l",
-   "ret": -1.0,
-   "profit": -0.25
   }
  ],
  "ledger": [
@@ -17688,8 +17660,12 @@
    "clvRet": 0.0415,
    "clv": 4.0,
    "beat": 1,
-   "close": 0.715
+   "close": 0.715,
+   "score": "3-6 4-6",
+   "res": "w",
+   "ret": 0.4566,
+   "profit": 0.1142
   }
  ],
- "checked": "2026-11-20T19:54:32Z"
+ "checked": "2026-11-20T23:15:53Z"
 }
