@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-20T17:09:13Z",
+ "asof": "2026-11-20T18:01:08Z",
  "recenter": {
-  "week": 0.47
+  "week": 0.46
  },
  "monitor": {
   "clocks": {
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-20",
-  "ageH": -6.8,
+  "ageH": -6.0,
   "stale": false
  },
  "picks": [],
@@ -389,22 +389,6 @@
    "tm": 48.0
   },
   {
-   "id": "401856749",
-   "sport": "cfb",
-   "kick": "2026-11-21T17:00:00.000Z",
-   "home": "Ole Miss",
-   "away": "Wofford",
-   "mk": "total",
-   "side": "over",
-   "line": 59.5,
-   "price": -114.0,
-   "edge": 3.3,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": 50.1,
-   "tm": 62.8
-  },
-  {
    "id": "401862836",
    "sport": "cfb",
    "kick": "2026-11-22T01:00:00.000Z",
@@ -477,7 +461,7 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 2.6,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
@@ -499,6 +483,22 @@
    "why": "edge under 7.5 (side: over)",
    "m": 5.2,
    "tm": 50.9
+  },
+  {
+   "id": "401856749",
+   "sport": "cfb",
+   "kick": "2026-11-21T17:00:00.000Z",
+   "home": "Ole Miss",
+   "away": "Wofford",
+   "mk": "total",
+   "side": "over",
+   "line": 60.5,
+   "price": -114.0,
+   "edge": 2.3,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": 50.1,
+   "tm": 62.8
   },
   {
    "id": "401858305",
@@ -621,7 +621,7 @@
    "mk": "total",
    "side": "under",
    "line": 67.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 11.5,
    "x": null,
    "why": "total market off",
@@ -652,9 +652,9 @@
    "away": "Colorado State",
    "mk": "total",
    "side": "under",
-   "line": 65.5,
+   "line": 66.5,
    "price": -106.0,
-   "edge": 7.1,
+   "edge": 8.1,
    "x": null,
    "why": "total market off",
    "m": 16.9,
@@ -766,7 +766,7 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 2.6,
    "ev": null,
    "units": 0.0,
@@ -934,7 +934,7 @@
    "mk": "spread",
    "side": "away",
    "line": -7.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 2.9,
    "ev": null,
    "units": 0.0,
@@ -946,7 +946,7 @@
    "mk": "spread",
    "side": "away",
    "line": -2.5,
-   "price": -122.0,
+   "price": -117.0,
    "edge": 1.8,
    "ev": null,
    "units": 0.0,
@@ -982,7 +982,7 @@
    "mk": "total",
    "side": "under",
    "line": 67.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 11.5,
    "ev": null,
    "units": 0.0,
@@ -994,7 +994,7 @@
    "mk": "total",
    "side": "under",
    "line": 48.5,
-   "price": -110.0,
+   "price": -106.0,
    "edge": 4.3,
    "ev": null,
    "units": 0.0,
@@ -1101,9 +1101,9 @@
   "401856749": {
    "mk": "total",
    "side": "over",
-   "line": 59.5,
+   "line": 60.5,
    "price": -114.0,
-   "edge": 3.3,
+   "edge": 2.3,
    "ev": null,
    "units": 0.0,
    "home": "Ole Miss",
@@ -1377,9 +1377,9 @@
   "401860918": {
    "mk": "total",
    "side": "under",
-   "line": 65.5,
+   "line": 66.5,
    "price": -106.0,
-   "edge": 7.1,
+   "edge": 8.1,
    "ev": null,
    "units": 0.0,
    "home": "Fresno State",
@@ -1402,7 +1402,7 @@
    "mk": "spread",
    "side": "home",
    "line": 25.5,
-   "price": -112.0,
+   "price": -110.0,
    "edge": 1.7,
    "ev": null,
    "units": 0.0,
@@ -1487,16 +1487,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 24893,
+  "snapshots": 24920,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 5173,
+    "clvN": 5178,
     "clvRet": -0.038,
-    "clvT": -30.49,
+    "clvT": -30.52,
     "clv": 0.41,
     "beat": 0.402,
-    "still": 0.325
+    "still": 0.326
    },
    {
     "when": "6-24h",
@@ -6270,7 +6270,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-20T17:09:13Z",
+ "checked": "2026-11-20T18:01:08Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
