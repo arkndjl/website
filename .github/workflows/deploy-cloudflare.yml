@@ -10,6 +10,53 @@ name: deploy cloudflare
 on:
   push:
     branches: [main]
+  # bot data pushes use GITHUB_TOKEN, which fires no push event, so each data workflow's completion triggers a deploy
+  # (the batch wait and the live check below debounce it). The schedule is the backup.
+  workflow_run:
+    workflows:
+      - "1nt live"
+      - "awards"
+      - "cbb board"
+      - "cbb boards"
+      - "cbb bracket matrix"
+      - "cbb recruits"
+      - "cfb board"
+      - "cfb game research"
+      - "cfb mirror parity"
+      - "cfb recruits"
+      - "cfb recruits cfbd"
+      - "cs2"
+      - "cs2 market log"
+      - "darko log"
+      - "data health"
+      - "dratings log"
+      - "esea 1nt history"
+      - "esea econ"
+      - "esea probe"
+      - "esea research"
+      - "esea season"
+      - "fiba youth check"
+      - "model refits"
+      - "nba xpm"
+      - "nfl"
+      - "nhl"
+      - "nhl goalies"
+      - "nhl lineups log"
+      - "odds snap"
+      - "picks refresh"
+      - "process refresh"
+      - "recruit leans"
+      - "recruit news"
+      - "rotowire history"
+      - "search index"
+      - "site stats"
+      - "soccer"
+      - "soccer extra"
+      - "soccer intl"
+      - "soccer prospects"
+      - "tennis"
+      - "tennis prospects"
+    types: [completed]
   schedule:
     - cron: "5,35 * * * *"
   workflow_dispatch:
@@ -25,6 +72,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # a data workflow that failed pushed nothing: only deploy after a success
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       # the account id is an identifier, not a credential (it is in every dashboard URL); a secret overrides it
@@ -37,7 +86,7 @@ jobs:
           echo "Add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repo secrets (README, Deploying)"
           [ "${{ github.event_name }}" = "workflow_dispatch" ] && exit 1 || exit 0
       - name: Batch commits
-        if: steps.sec.outputs.ok && github.event_name == 'push'
+        if: steps.sec.outputs.ok && (github.event_name == 'push' || github.event_name == 'workflow_run')
         run: sleep 600
       - uses: actions/checkout@v4
         if: steps.sec.outputs.ok
