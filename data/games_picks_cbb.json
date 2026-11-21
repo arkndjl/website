@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-21T16:25:59Z",
+ "asof": "2026-11-21T16:28:49Z",
  "recenter": {
   "2026-11-21": 1.92
  },
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-21T15:41:07Z",
-  "ageH": 0.7,
+  "ageH": 0.8,
   "stale": false
  },
  "picks": [],
@@ -1905,7 +1905,7 @@
     "side": "over",
     "line": 149.5,
     "price": -114.0,
-    "ev": 0.1,
+    "ev": 0.101,
     "units": 1.0
    }
   },
@@ -2109,6 +2109,22 @@
    "tm": 151.8
   },
   {
+   "id": "401924882",
+   "sport": "cbb",
+   "kick": "2026-11-21T19:00:00Z",
+   "home": "Saint Peter's",
+   "away": "Stony Brook",
+   "mk": "total",
+   "side": "under",
+   "line": 126.5,
+   "price": -119.0,
+   "edge": 3.4,
+   "x": 5.0,
+   "why": "edge under 5 (total: low)",
+   "m": -5.1,
+   "tm": 123.1
+  },
+  {
    "id": "401924722",
    "sport": "cbb",
    "kick": "2026-11-21T19:00:00Z",
@@ -2155,22 +2171,6 @@
    "why": "edge under 5 (line: 4-9)",
    "m": 7.6,
    "tm": 135.1
-  },
-  {
-   "id": "401911199",
-   "sport": "cbb",
-   "kick": "2026-11-21T19:00:00Z",
-   "home": "Portland",
-   "away": "Fordham",
-   "mk": "total",
-   "side": "over",
-   "line": 150.5,
-   "price": -124.0,
-   "edge": 4.3,
-   "x": 7.0,
-   "why": "edge under 7",
-   "m": -3.7,
-   "tm": 154.8
   },
   {
    "id": "401920570",
@@ -2365,20 +2365,20 @@
    "tm": 142.1
   },
   {
-   "id": "401924882",
+   "id": "401911199",
    "sport": "cbb",
    "kick": "2026-11-21T19:00:00Z",
-   "home": "Saint Peter's",
-   "away": "Stony Brook",
+   "home": "Portland",
+   "away": "Fordham",
    "mk": "total",
-   "side": "under",
-   "line": 125.5,
+   "side": "over",
+   "line": 151.5,
    "price": -106.0,
-   "edge": 2.4,
-   "x": 5.0,
-   "why": "edge under 5 (total: low)",
-   "m": -5.1,
-   "tm": 123.1
+   "edge": 3.3,
+   "x": 7.0,
+   "why": "edge under 7",
+   "m": -3.7,
+   "tm": 154.8
   }
  ],
  "games": {
@@ -2423,7 +2423,7 @@
    "side": "over",
    "line": 149.5,
    "price": -114.0,
-   "ev": 0.1,
+   "ev": 0.101,
    "edge": 7.8,
    "units": 1.0,
    "bk": "poly",
@@ -2444,11 +2444,11 @@
    "state": "under"
   },
   "401921811": {
-   "mk": "spread",
-   "side": "away",
-   "line": 26.5,
+   "mk": "total",
+   "side": "under",
+   "line": 172.5,
    "price": -110.0,
-   "edge": 2.0,
+   "edge": 1.4,
    "ev": null,
    "units": 0.0,
    "home": "LSU",
@@ -2458,9 +2458,9 @@
   "401911199": {
    "mk": "total",
    "side": "over",
-   "line": 150.5,
-   "price": -124.0,
-   "edge": 4.3,
+   "line": 151.5,
+   "price": -106.0,
+   "edge": 3.3,
    "ev": null,
    "units": 0.0,
    "home": "Portland",
@@ -2760,9 +2760,9 @@
   "401924882": {
    "mk": "total",
    "side": "under",
-   "line": 125.5,
-   "price": -106.0,
-   "edge": 2.4,
+   "line": 126.5,
+   "price": -119.0,
+   "edge": 3.4,
    "ev": null,
    "units": 0.0,
    "home": "Saint Peter's",
@@ -2950,11 +2950,11 @@
    "state": "under"
   },
   "401923322": {
-   "mk": "total",
-   "side": "under",
-   "line": 142.5,
-   "price": -114.0,
-   "edge": 2.4,
+   "mk": "spread",
+   "side": "home",
+   "line": -1.5,
+   "price": -101.0,
+   "edge": 2.2,
    "ev": null,
    "units": 0.0,
    "home": "Canisius",
@@ -3026,7 +3026,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 22270,
+  "snapshots": 22275,
   "buckets": [
    {
     "when": "24h+",
@@ -3040,17 +3040,17 @@
    {
     "when": "6-24h",
     "clvN": 4441,
-    "clvRet": -0.0005,
-    "clvT": -0.24,
+    "clvRet": -0.0004,
+    "clvT": -0.22,
     "clv": 0.7,
     "beat": 0.419,
     "still": 0.398
    },
    {
     "when": "1-6h",
-    "clvN": 2097,
+    "clvN": 2098,
     "clvRet": -0.0393,
-    "clvT": -33.81,
+    "clvT": -33.83,
     "clv": 0.09,
     "beat": 0.168,
     "still": 0.706
@@ -20994,7 +20994,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-21T16:25:59Z",
+ "checked": "2026-11-21T16:28:49Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
