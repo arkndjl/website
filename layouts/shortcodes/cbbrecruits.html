@@ -120,7 +120,7 @@
 {{- end -}}
 
 {{- else if eq $view "teams" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "class rankings") "icon" "basketball" "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Pts,Commits,NBA%,Class xNIL" "gfxDate" $date "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "class rankings") "icon" "basketball" "filter" "Conf" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Pts,Commits,NBA%,Class xNIL" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cbbrc-teams">
   <thead><tr>
     <th>RK</th><th>Team</th>
@@ -134,8 +134,11 @@
     <th title="best consensus rank in the class">Best</th><th>Top commits</th><th title="conference">Conf</th>
   </tr></thead>
   <tbody>
-  {{- range .teams }}
-  <tr>
+  {{- /* every class with commits (teamsBy, scripts/cbb_recruit_fit.py class_ranks); the year chips (tablefilter.js,
+         rows' data-yr) show one class at a time, RK counted within the class and filters */}}
+  {{- $by := .teamsBy | default (dict (string (index .classes 0).year) .teams) }}{{ $n := 0 }}
+  {{- range $c := .classes }}{{ range index $by (string $c.year) }}{{ $n = add $n 1 }}
+  <tr data-yr="{{ $c.year }}">
     <td class="cfb__rk">{{ .rk }}</td>
     <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
     <td class="cfb__num cfb__g" data-v="{{ .ets }}">{{ partial "num.html" (slice "%.1f" .ets) }}</td>
@@ -149,10 +152,10 @@
     <td class="cfb__dim">{{ range $j, $x := .top }}{{ if $j }} · {{ end }}{{ index $x 0 }} ({{ index $x 1 }}, {{ index $x 2 }}){{ end }}</td>
     <td>{{ .conf }}</td>
   </tr>
-  {{- end }}
+  {{- end }}{{ end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .teams) "fresh" "cbb_recruits" "note" (printf "%d class · updated %s" (int (index .classes 0).year) $date) "about" "Schools ranked by their committed class's FV points: each commit's FV above the 20 floor, summed. Two top-10 commits outweigh four recruits ranked 50-100. Y1 columns: what the class adds next season in college.") -}}
+{{- partial "wintable-close.html" (dict "rows" $n "fresh" "cbb_recruits" "note" (printf "updated %s" $date) "about" "Schools ranked by their committed class's FV points: each commit's FV above the 20 floor, summed. Two top-10 commits outweigh four recruits ranked 50-100. Y1 columns: what the class adds next season in college.") -}}
 
 {{- else if eq $view "model" -}}{{ $m := .model }}
 <div class="win cfbm">

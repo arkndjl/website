@@ -91,11 +91,26 @@
         });
         bar.parentNode.insertBefore(grp, bar);
       }
+      // class-year chips: rows with data-yr (class rankings by recruiting class); one year at a time, the first by default
+      var yset = {}, yrs, yr = '', ychips = [];
+      rows.forEach(function (r) { if (r.dataset.yr) yset[r.dataset.yr] = 1; });
+      yrs = Object.keys(yset).sort();
+      if (yrs.length > 1) {
+        yr = yrs[0];
+        var ygrp = document.createElement('p'); ygrp.className = 'tf__days tf__yrs'; ygrp.setAttribute('role', 'group'); ygrp.setAttribute('aria-label', 'class');
+        yrs.forEach(function (y, i) {
+          var b = document.createElement('button');
+          b.type = 'button'; b.className = 'cfb__btn' + (i ? '' : ' is-on'); b.dataset.yr = y; b.textContent = y;
+          b.addEventListener('click', function () { yr = y; ychips.forEach(function (c) { c.classList.toggle('is-on', c === b); }); apply(); openPk = ''; writeHash(); });
+          ychips.push(b); ygrp.appendChild(b);
+        });
+        bar.parentNode.insertBefore(ygrp, bar);
+      }
       // FV dropdown means "at least": 50 keeps 50, 50+, 55…
       function apply() {
         var q = fold(bar.elements.q.value.trim()), n = 0, amax = ageSel ? parseFloat(ageSel.value) : NaN;
         rows.forEach(function (r) {
-          var ok = !day || r.dataset.day === day;
+          var ok = (!day || r.dataset.day === day) && (!yr || r.dataset.yr === yr);
           sels.forEach(function (s) {
             if (!ok || !s.el.value) return;
             var v = s.attr ? r.getAttribute(s.attr) || '' : txt(r.cells[s.c]);
@@ -107,7 +122,8 @@
         });
         renum();
         shown = WIN; paint();
-        if (count) count.textContent = (n === total ? total : n + ' of ' + total) + ' ' + (count.dataset.noun || 'rows');
+        var tot = yr ? rows.filter(function (r) { return r.dataset.yr === yr; }).length : total;
+        if (count) count.textContent = (n === tot ? tot : n + ' of ' + tot) + ' ' + (count.dataset.noun || 'rows');
       }
       function renum() {
         if (rc < 0) return;
@@ -118,9 +134,9 @@
         on.forEach(function (r) { r.cells[rc].textContent = r.__rk; });
       }
       bar.addEventListener('input', function () { apply(); writeHash(); }); bar.addEventListener('change', function () { apply(); writeHash(); });
-      bar.addEventListener('reset', function () { day = ''; chips.forEach(function (c, i) { c.classList.toggle('is-on', !i); }); setTimeout(function () { apply(); writeHash(); }); });
+      bar.addEventListener('reset', function () { day = ''; chips.forEach(function (c, i) { c.classList.toggle('is-on', !i); }); if (ychips.length) ychips[0].click(); setTimeout(function () { apply(); writeHash(); }); });
       sels.forEach(function (s) { if (s.fv) s.el.previousElementSibling.textContent = 'FV ≥'; });
-      paint();
+      if (yr) apply(); else paint();
       bar.hidden = false;
       var ths = [].slice.call(table.tHead.rows[0].cells), cur = -1, dir = 1;
       ths.forEach(function (th, c) {
@@ -161,6 +177,7 @@
         sels.forEach(function (x) { if (x.el.value) s.push((x.key || slug(heads[x.c])) + '=' + encodeURIComponent(x.el.value)); });
         if (ageSel && ageSel.value) s.push('age=' + ageSel.value);
         if (day) s.push('day=' + day);
+        if (yr && yr !== yrs[0]) s.push('yr=' + yr);
         if (openPk) s.push('p=' + encodeURIComponent(openPk));
         var h = s.length ? '#' + id + ':' + s.join('&') : '#' + id, at = location.hash.split(':')[0] === '#' + id;
         if (s.length || at) { if (h !== location.hash) history.replaceState(null, '', location.pathname + location.search + h); }
@@ -177,6 +194,7 @@
         sels.forEach(function (x) { var v = want[(x.key || slug(heads[x.c]))]; if (v != null && [].some.call(x.el.options, function (o) { return o.value === v; })) x.el.value = v; });
         if (ageSel && want.age) ageSel.value = want.age;
         if (want.day) chips.forEach(function (c) { if (c.dataset.day === want.day) c.click(); });
+        if (want.yr) ychips.forEach(function (c) { if (c.dataset.yr === want.yr) c.click(); });
         var sc = heads.map(slug).indexOf(want.s);
         if (sc >= 0) { ths[sc].__go(); if (+want.d !== dir) ths[sc].__go(); }
         apply();

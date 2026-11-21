@@ -656,11 +656,26 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   // class rank: expected FV points over the floor, summed (FBS programs)
   roster.sort((a, b) => b.classXfv - a.classXfv).forEach((t, i) => { t.classRk = i + 1; });
   roster.slice().sort((a, b) => b.av27 - a.av27).forEach((t, i) => { t.rk27 = i + 1; });
+  // later classes ranked the same way, commits so far (the class-rankings year filter)
+  for (const f of future) f.teams = classRanks(f.list, fit.floor);
   const q = f => boardFv[Math.floor(f * (boardFv.length - 1))];
   const boardRef = { p50: q(0.5), p75: q(0.75), p90: q(0.9), p99: q(0.99) };
   return { asof, season, next, floor: fit.floor, blendGames: BLEND_GAMES, boardRef, class: klass, future, redshirts, young, teams: roster,
     counts: { class: klass.length, committed: cls.length, redshirts: redshirts.length, young: young.length, future: future.map(f => f.n) },
     ...(Object.keys(cfbdCover).length ? { cfbd: Object.values(cfbdCover) } : {}) };
+}
+// class rankings for one class: each school's commits, expected FV points over the floor summed (as classXfv above)
+export function classRanks(list, floor) {
+  const by = {};
+  for (const x of list) if (x.tid) (by[x.tid] ||= []).push(x);
+  const out = Object.values(by).map(xs => {
+    xs = xs.slice().sort((a, b) => b.xfv - a.xfv);
+    return { tid: xs[0].tid, team: xs[0].team, logo: xs[0].logo, conf: xs[0].conf, classN: xs.length,
+      classXfv: r1(xs.reduce((s, x) => s + (x.xfv - floor), 0)), classAv: r1(xs.reduce((s, x) => s + x.pOn * avOf(x.fvOn), 0)),
+      classXnil: xs.reduce((s, x) => s + (x.xnil || 0), 0), top: xs.slice(0, 3).map(x => ({ name: x.name, pos: x.pos, xfv: x.xfv })) };
+  });
+  out.sort((a, b) => b.classXfv - a.classXfv || b.classN - a.classN).forEach((t, i) => { t.classRk = i + 1; });
+  return out;
 }
 // expected FV at each starting slot (as the team builder's slots()): each player there with his chance
 function slotsAv(players, n, repl, rand) {
