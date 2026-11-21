@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-21T01:00:14Z",
+ "asof": "2026-11-21T01:03:49Z",
  "recenter": {
   "week": 0.41
  },
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-20",
-  "ageH": 1.0,
+  "ageH": 1.1,
   "stale": false
  },
  "picks": [],
@@ -421,22 +421,6 @@
    "tm": 43.6
   },
   {
-   "id": "401858527",
-   "sport": "cfb",
-   "kick": "2026-11-21T19:30:00.000Z",
-   "home": "Illinois",
-   "away": "Iowa",
-   "mk": "total",
-   "side": "over",
-   "line": 40.5,
-   "price": -110.0,
-   "edge": 2.7,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": -11.3,
-   "tm": 43.2
-  },
-  {
    "id": "401856751",
    "sport": "cfb",
    "kick": "2026-11-22T00:30:00.000Z",
@@ -477,7 +461,7 @@
    "mk": "total",
    "side": "over",
    "line": 47.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 1.8,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
@@ -605,7 +589,7 @@
    "mk": "spread",
    "side": "away",
    "line": 27.5,
-   "price": -129.0,
+   "price": -127.0,
    "edge": 6.1,
    "x": null,
    "why": "spread market off",
@@ -653,7 +637,7 @@
    "mk": "spread",
    "side": "away",
    "line": -2.5,
-   "price": -117.0,
+   "price": -119.0,
    "edge": 4.4,
    "x": null,
    "why": "spread market off",
@@ -675,6 +659,22 @@
    "why": "total market off",
    "m": -5.5,
    "tm": 61.2
+  },
+  {
+   "id": "401860925",
+   "sport": "cfb",
+   "kick": "2026-11-22T02:30:00.000Z",
+   "home": "Boise State",
+   "away": "San Diego State",
+   "mk": "total",
+   "side": "under",
+   "line": 60.5,
+   "price": -106.0,
+   "edge": 4.2,
+   "x": null,
+   "why": "total market off",
+   "m": 19.4,
+   "tm": 56.3
   }
  ],
  "games": {
@@ -718,7 +718,7 @@
    "mk": "total",
    "side": "under",
    "line": 51.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 2.8,
    "ev": null,
    "units": 0.0,
@@ -763,16 +763,16 @@
    "state": "under"
   },
   "401858527": {
-   "mk": "total",
-   "side": "over",
-   "line": 40.5,
-   "price": -110.0,
-   "edge": 2.7,
+   "mk": "spread",
+   "side": "away",
+   "line": -8.5,
+   "price": -112.0,
+   "edge": 2.8,
    "ev": null,
    "units": 0.0,
    "home": "Illinois",
    "away": "Iowa",
-   "state": "under"
+   "state": "off"
   },
   "401858528": {
    "mk": "total",
@@ -934,7 +934,7 @@
    "mk": "spread",
    "side": "away",
    "line": -2.5,
-   "price": -117.0,
+   "price": -119.0,
    "edge": 4.4,
    "ev": null,
    "units": 0.0,
@@ -1078,7 +1078,7 @@
    "mk": "spread",
    "side": "away",
    "line": 27.5,
-   "price": -129.0,
+   "price": -127.0,
    "edge": 6.1,
    "ev": null,
    "units": 0.0,
@@ -1342,7 +1342,7 @@
    "mk": "total",
    "side": "over",
    "line": 47.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 1.8,
    "ev": null,
    "units": 0.0,
@@ -1439,25 +1439,25 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 25134,
+  "snapshots": 25150,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 5199,
+    "clvN": 5200,
     "clvRet": -0.0353,
     "clvT": -27.72,
     "clv": 0.47,
     "beat": 0.409,
-    "still": 0.321
+    "still": 0.322
    },
    {
     "when": "6-24h",
-    "clvN": 612,
-    "clvRet": -0.0635,
-    "clvT": -24.78,
+    "clvN": 614,
+    "clvRet": -0.0636,
+    "clvT": -24.89,
     "clv": 0.0,
-    "beat": 0.172,
-    "still": 0.609
+    "beat": 0.171,
+    "still": 0.611
    },
    {
     "when": "1-6h",
@@ -6222,7 +6222,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-21T01:00:14Z",
+ "checked": "2026-11-21T01:03:49Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {

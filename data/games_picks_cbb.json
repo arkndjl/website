@@ -1,10 +1,10 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-21T01:00:26Z",
+ "asof": "2026-11-21T01:04:03Z",
  "recenter": {
-  "2026-11-20": 1.97,
-  "2026-11-21": 1.82
+  "2026-11-20": 1.98,
+  "2026-11-21": 1.78
  },
  "monitor": {
   "clocks": {
@@ -1995,22 +1995,6 @@
    "tm": 150.9
   },
   {
-   "id": "401921222",
-   "sport": "cbb",
-   "kick": "2026-11-21T19:00:00Z",
-   "home": "Rider",
-   "away": "Navy",
-   "mk": "total",
-   "side": "over",
-   "line": 128.5,
-   "price": -441.0,
-   "edge": 7.3,
-   "x": 5.0,
-   "why": "no edge at -441",
-   "m": -2.5,
-   "tm": 135.8
-  },
-  {
    "id": "401924884",
    "sport": "cbb",
    "kick": "2026-11-21T16:00:00Z",
@@ -2019,10 +2003,10 @@
    "mk": "spread",
    "side": "away",
    "line": 1.5,
-   "price": -331.0,
+   "price": -369.0,
    "edge": 5.7,
    "x": 5.0,
-   "why": "no edge at -331",
+   "why": "no edge at -369",
    "m": -4.2,
    "tm": 157.6
   },
@@ -2176,13 +2160,13 @@
    "kick": "2026-11-21T02:00:00Z",
    "home": "North Carolina",
    "away": "Marshall",
-   "mk": "total",
-   "side": "under",
-   "line": 157.5,
+   "mk": "spread",
+   "side": "home",
+   "line": 18.5,
    "price": -114.0,
-   "edge": 3.4,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
+   "edge": 2.7,
+   "x": 5.0,
+   "why": "edge under 5 (tier: mixed)",
    "m": 21.2,
    "tm": 154.1
   },
@@ -2233,6 +2217,22 @@
    "why": "edge under 5 (line: <4)",
    "m": -6.0,
    "tm": 142.2
+  },
+  {
+   "id": "401921222",
+   "sport": "cbb",
+   "kick": "2026-11-21T19:00:00Z",
+   "home": "Rider",
+   "away": "Navy",
+   "mk": "total",
+   "side": "over",
+   "line": 133.5,
+   "price": -178.0,
+   "edge": 2.3,
+   "x": 5.0,
+   "why": "edge under 5 (total: low)",
+   "m": -2.5,
+   "tm": 135.8
   },
   {
    "id": "401909719",
@@ -2369,11 +2369,11 @@
    "state": "under"
   },
   "401912710": {
-   "mk": "total",
-   "side": "under",
-   "line": 157.5,
+   "mk": "spread",
+   "side": "home",
+   "line": 18.5,
    "price": -114.0,
-   "edge": 3.4,
+   "edge": 2.7,
    "ev": null,
    "units": 0.0,
    "home": "North Carolina",
@@ -2504,7 +2504,7 @@
    "mk": "total",
    "side": "over",
    "line": 141.5,
-   "price": -152.0,
+   "price": -146.0,
    "edge": 1.2,
    "ev": null,
    "units": 0.0,
@@ -2600,7 +2600,7 @@
    "mk": "spread",
    "side": "home",
    "line": 7.5,
-   "price": -129.0,
+   "price": -124.0,
    "edge": 1.2,
    "ev": null,
    "units": 0.0,
@@ -2708,7 +2708,7 @@
    "mk": "spread",
    "side": "away",
    "line": 1.5,
-   "price": -331.0,
+   "price": -369.0,
    "edge": 5.7,
    "ev": null,
    "units": 0.0,
@@ -2743,9 +2743,9 @@
   "401921222": {
    "mk": "total",
    "side": "over",
-   "line": 128.5,
-   "price": -441.0,
-   "edge": 7.3,
+   "line": 133.5,
+   "price": -178.0,
+   "edge": 2.3,
    "ev": null,
    "units": 0.0,
    "home": "Rider",
@@ -2805,7 +2805,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 21518,
+  "snapshots": 21527,
   "buckets": [
    {
     "when": "24h+",
@@ -2818,12 +2818,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 4345,
+    "clvN": 4346,
     "clvRet": -0.0049,
-    "clvT": -2.49,
+    "clvT": -2.5,
     "clv": 0.61,
     "beat": 0.412,
-    "still": 0.4
+    "still": 0.401
    },
    {
     "when": "1-6h",
@@ -20624,7 +20624,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-21T01:00:26Z",
+ "checked": "2026-11-21T01:04:03Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
