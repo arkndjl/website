@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-21T18:23Z",
+ "asof": "2026-11-21T20:03Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -296,15 +296,15 @@
      "rows": 2144
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 15,
+     "flags": 16,
      "rows": 636
     },
     "static/data/nfl-war.json": {
-     "flags": 82,
+     "flags": 81,
      "rows": 1826
     },
     "static/data/pctl-nfl.json": {
-     "flags": 80,
+     "flags": 79,
      "rows": 1755
     },
     "static/data/personnel/nfl.json": {
@@ -312,7 +312,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 56,
+     "flags": 55,
      "rows": 1650
     }
    },
@@ -1668,24 +1668,6 @@
      "site": "DAL"
     },
     {
-     "d": "2026-10-05",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "practice",
-     "head": "Back to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-10-05",
-      "head": "Back to practice squad",
-      "kind": "practice"
-     },
-     "pid": "10988",
-     "player": "Sterling Shepard",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "NYJ"
-    },
-    {
      "d": "2026-10-16",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -2080,24 +2062,6 @@
      "pos": "QB",
      "rotowire": "FA",
      "site": "TB"
-    },
-    {
-     "d": "2026-10-05",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "practice",
-     "head": "Back to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-10-05",
-      "head": "Back to practice squad",
-      "kind": "practice"
-     },
-     "pid": "10988",
-     "player": "Sterling Shepard",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "NYJ"
     },
     {
      "d": "2026-11-17",
@@ -4170,24 +4134,6 @@
      "site": "DAL"
     },
     {
-     "d": "2026-10-05",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "practice",
-     "head": "Back to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-10-05",
-      "head": "Back to practice squad",
-      "kind": "practice"
-     },
-     "pid": "10988",
-     "player": "Sterling Shepard",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "NYJ"
-    },
-    {
      "d": "2026-10-16",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -4476,6 +4422,20 @@
      "site": "MIA"
     },
     {
+     "d": "2026-11-21",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "moved",
+     "head": "Elevated for Week 11",
+     "kind": null,
+     "move": null,
+     "pid": "12842",
+     "player": "Daniel Carlson",
+     "pos": "K",
+     "rotowire": "MIA",
+     "site": "NO"
+    },
+    {
      "d": "2026-11-16",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -4689,7 +4649,7 @@
      "rows": 32
     },
     "static/data/nhl-war/2027.json": {
-     "flags": 2,
+     "flags": 3,
      "rows": 861
     },
     "static/data/pctl-nhl.json": {
@@ -4719,6 +4679,24 @@
      "pos": "D",
      "rotowire": "CAR",
      "site": "CAR"
+    },
+    {
+     "d": "2026-11-21",
+     "field": "tm",
+     "file": "static/data/nhl-war/2027.json",
+     "flag": "moved",
+     "head": "Claimed off waivers",
+     "kind": "claim",
+     "move": {
+      "d": "2026-11-21",
+      "head": "Claimed off waivers",
+      "kind": "claim"
+     },
+     "pid": "6625",
+     "player": "Clay Stevenson",
+     "pos": "G",
+     "rotowire": "WSH",
+     "site": "WPG"
     },
     {
      "d": "2026-11-07",
