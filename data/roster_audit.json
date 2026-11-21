@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-21T21:47Z",
+ "asof": "2026-11-21T21:52Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -292,11 +292,11 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 9,
-     "rows": 2144
+     "flags": 10,
+     "rows": 2158
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 16,
+     "flags": 15,
      "rows": 636
     },
     "static/data/nfl-war.json": {
@@ -442,6 +442,24 @@
      "pos": "RT",
      "rotowire": "FA",
      "site": "PHI"
+    },
+    {
+     "d": "2026-09-19",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "practice",
+     "head": "Placed on practice squad injured reserve",
+     "kind": "practice",
+     "move": {
+      "d": "2026-09-19",
+      "head": "Placed on practice squad injured reserve",
+      "kind": "practice"
+     },
+     "pid": "19120",
+     "player": "Max Hurleman",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "PIT"
     },
     {
      "d": "2026-10-06",
@@ -4422,20 +4440,6 @@
      "site": "MIA"
     },
     {
-     "d": "2026-11-21",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "moved",
-     "head": "Elevated for Week 11",
-     "kind": null,
-     "move": null,
-     "pid": "12842",
-     "player": "Daniel Carlson",
-     "pos": "K",
-     "rotowire": "MIA",
-     "site": "NO"
-    },
-    {
      "d": "2026-11-16",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -4636,7 +4640,7 @@
    ],
    "joined": 0,
    "players": 2295,
-   "rows": 8075
+   "rows": 8089
   },
   "nhl": {
    "by_file": {
