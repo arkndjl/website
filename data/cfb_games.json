@@ -1,7 +1,7 @@
 {
- "asof": "2026-11-20",
+ "asof": "2026-11-21",
  "week": 12,
- "injuriesAsof": "2026-11-20",
+ "injuriesAsof": "2026-11-21",
  "games": [
   {
    "id": "401858535",
@@ -501,8 +501,8 @@
      "inj": 0.7
     },
     "wx": {
-     "t": 47.9,
-     "w": 4,
+     "t": 50.8,
+     "w": 1.3,
      "p": 0,
      "f": 1
     },
@@ -593,7 +593,7 @@
      }
     ]
    },
-   "score": 3.27
+   "score": 3.29
   },
   {
    "id": "401856754",
@@ -1131,17 +1131,17 @@
      "inj": 0.3
     },
     "wx": {
-     "t": 68.4,
-     "w": 2.1,
+     "t": 68.7,
+     "w": 1.5,
      "p": 0,
      "f": 1
     },
     "sim": {
-     "m10": -22,
+     "m10": -21,
      "m90": 17,
      "t10": 34,
      "t90": 72,
-     "pRaw": 0.53
+     "pRaw": 0.529
     },
     "over": 0.56
    },
@@ -1226,6 +1226,607 @@
    "score": 2.75
   },
   {
+   "id": "401856753",
+   "date": "2026-11-22T00:30:00.000Z",
+   "venue": "Williams-Brice Stadium",
+   "tv": "ABC",
+   "neutral": false,
+   "line": "UGA -14.5",
+   "total": 51.5,
+   "market": 14.5,
+   "edge": {
+    "pts": 0.4,
+    "side": "away",
+    "cover": 0.5
+   },
+   "ml": {
+    "home": "+560",
+    "away": "-707"
+   },
+   "spreadOdds": {
+    "home": "-106",
+    "away": "-117"
+   },
+   "home": {
+    "id": "2579",
+    "name": "South Carolina",
+    "logo": "/img/cfb/logos/2579.png",
+    "color": "#73000a",
+    "rank": 21,
+    "elo": 1634,
+    "rec": "6-4",
+    "talentRk": 17,
+    "style": {
+     "run": 0.47,
+     "osr": 0.43,
+     "oepa": 0.15,
+     "dsr": 0.41,
+     "depa": 0.12,
+     "xpl": 1.33,
+     "havoc": 0.13
+    },
+    "off": [
+     {
+      "name": "Darius Gray",
+      "pos": "OL",
+      "fv": 48,
+      "plus": false,
+      "star": true,
+      "riser": null,
+      "logo": "/img/cfb/logos/2579.png",
+      "cls": "Fr",
+      "inj": null,
+      "fvx": 48
+     },
+     {
+      "name": "LaNorris Sellers",
+      "pos": "QB",
+      "fv": 48,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/2579.png",
+      "cls": "Sr",
+      "inj": null,
+      "fvx": 48
+     },
+     {
+      "name": "Jabree Coleman",
+      "pos": "RB",
+      "fv": 36,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/2579.png",
+      "cls": "Fr",
+      "inj": null,
+      "fvx": 36
+     },
+     {
+      "name": "Jacarrius Peak",
+      "pos": "OL",
+      "fv": 36,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/2579.png",
+      "cls": "RS-Sr",
+      "inj": null,
+      "fvx": 36
+     },
+     {
+      "name": "Mazeo Bennett Jr.",
+      "pos": "WR",
+      "fv": 27,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/2579.png",
+      "cls": "Jr",
+      "inj": "Doubtful",
+      "fvx": 27
+     }
+    ],
+    "def": [
+     {
+      "name": "Dylan Stewart",
+      "pos": "EDGE",
+      "fv": 59,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/2579.png",
+      "cls": "Jr",
+      "inj": "Questionable",
+      "fvx": 59
+     },
+     {
+      "name": "Vicari Swain",
+      "pos": "CB",
+      "fv": 33,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/2579.png",
+      "cls": "RS-Jr",
+      "inj": null,
+      "fvx": 33
+     },
+     {
+      "name": "Tomiwa Durojaiye",
+      "pos": "DL",
+      "fv": 32,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/2579.png",
+      "cls": "RS-Sr",
+      "inj": null,
+      "fvx": 32
+     },
+     {
+      "name": "Anthony Addison",
+      "pos": "EDGE",
+      "fv": 31,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/2579.png",
+      "cls": "So",
+      "inj": "Doubtful",
+      "fvx": 31
+     },
+     {
+      "name": "Noah Clark",
+      "pos": "DL",
+      "fv": 30,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/2579.png",
+      "cls": "Fr",
+      "inj": null,
+      "fvx": 30
+     }
+    ],
+    "injAdj": -20,
+    "injPts": -1.1,
+    "qbOut": null,
+    "kOut": null,
+    "out": [
+     {
+      "name": "Mazeo Bennett Jr.",
+      "pos": "WR",
+      "fv": 27,
+      "status": "Doubtful",
+      "miss": 1,
+      "fvx": 27
+     },
+     {
+      "name": "Dylan Stewart",
+      "pos": "EDGE",
+      "fv": 59,
+      "status": "Questionable",
+      "miss": 0.68,
+      "fvx": 59
+     },
+     {
+      "name": "Anthony Addison",
+      "pos": "EDGE",
+      "fv": 31,
+      "status": "Doubtful",
+      "miss": 1,
+      "fvx": 31
+     }
+    ],
+    "seasonOut": [],
+    "talentAdj": 99,
+    "stars": {
+     "off": [
+      {
+       "name": "LaNorris Sellers",
+       "pos": "QB",
+       "fv": 48,
+       "play": 0.66,
+       "st": null,
+       "more": 1,
+       "miss": 1,
+       "pts": 14.6,
+       "line": "135 pass yds · 1.1 pass TD · 35 yds · 0.4 TD",
+       "fvx": 48
+      },
+      {
+       "name": "Jabree Coleman",
+       "pos": "RB",
+       "fv": 36,
+       "play": 0.92,
+       "st": null,
+       "more": 1.39,
+       "miss": 0,
+       "pts": 9.5,
+       "line": "49 yds · 1.7 rec · 0.5 TD",
+       "fvx": 36
+      },
+      {
+       "name": "DJ Black",
+       "pos": "WR",
+       "fv": 20,
+       "play": 0.8,
+       "st": null,
+       "more": 1.27,
+       "miss": 0,
+       "pts": 7.6,
+       "line": "41 yds · 2.1 rec · 0.2 TD",
+       "fvx": 20
+      }
+     ],
+     "def": [
+      {
+       "name": "Fred \"JayR\" Johnson",
+       "pos": "LB",
+       "fv": 29,
+       "pts": 10.5,
+       "line": "8.3 tkl · 0.5 TFL · 0.2 sk",
+       "fvx": 29
+      },
+      {
+       "name": "Justin Okoronkwo",
+       "pos": "LB",
+       "fv": 27,
+       "pts": 9,
+       "line": "7.3 tkl · 0.4 TFL",
+       "fvx": 27
+      },
+      {
+       "name": "Peyton Williams",
+       "pos": "S",
+       "fv": 24,
+       "pts": 7,
+       "line": "5.7 tkl",
+       "fvx": 24
+      }
+     ]
+    }
+   },
+   "away": {
+    "id": "61",
+    "name": "Georgia",
+    "logo": "/img/cfb/logos/61.png",
+    "color": "#ba0c2f",
+    "rank": 1,
+    "elo": 1928,
+    "rec": "9-1",
+    "talentRk": 2,
+    "style": {
+     "run": 0.52,
+     "osr": 0.52,
+     "oepa": 0.31,
+     "dsr": 0.35,
+     "depa": -0.02,
+     "xpl": 1.18,
+     "havoc": 0.19
+    },
+    "off": [
+     {
+      "name": "Zykie Helton",
+      "pos": "OL",
+      "fv": 56,
+      "plus": false,
+      "star": true,
+      "riser": null,
+      "logo": "/img/cfb/logos/61.png",
+      "cls": "Fr",
+      "inj": null,
+      "fvx": 56
+     },
+     {
+      "name": "Dontrell Glover",
+      "pos": "OL",
+      "fv": 50,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/61.png",
+      "cls": "So",
+      "inj": null,
+      "fvx": 50
+     },
+     {
+      "name": "Talyn Taylor",
+      "pos": "WR",
+      "fv": 49,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/61.png",
+      "cls": "RS-Fr",
+      "inj": null,
+      "fvx": 49
+     },
+     {
+      "name": "Nate Frazier",
+      "pos": "RB",
+      "fv": 47,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/61.png",
+      "cls": "Jr",
+      "inj": null,
+      "fvx": 47
+     },
+     {
+      "name": "Dwight Phillips Jr.",
+      "pos": "RB",
+      "fv": 47,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/61.png",
+      "cls": "Jr",
+      "inj": null,
+      "fvx": 47
+     }
+    ],
+    "def": [
+     {
+      "name": "Chris Cole",
+      "pos": "LB",
+      "fv": 56,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/61.png",
+      "cls": "Jr",
+      "inj": null,
+      "fvx": 56
+     },
+     {
+      "name": "KJ Bolden",
+      "pos": "S",
+      "fv": 51,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/61.png",
+      "cls": "Jr",
+      "inj": null,
+      "fvx": 51
+     },
+     {
+      "name": "Ellis Robinson IV",
+      "pos": "CB",
+      "fv": 50,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/61.png",
+      "cls": "RS-So",
+      "inj": null,
+      "fvx": 50
+     },
+     {
+      "name": "Raylen Wilson",
+      "pos": "LB",
+      "fv": 42,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/61.png",
+      "cls": "Sr",
+      "inj": null,
+      "fvx": 42
+     },
+     {
+      "name": "Elijah Griffin",
+      "pos": "DL",
+      "fv": 37,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/61.png",
+      "cls": "So",
+      "inj": null,
+      "fvx": 37
+     }
+    ],
+    "injAdj": 0,
+    "injPts": 0,
+    "qbOut": null,
+    "kOut": null,
+    "out": [],
+    "seasonOut": [],
+    "talentAdj": 261,
+    "stars": {
+     "off": [
+      {
+       "name": "Gunner Stockton",
+       "pos": "QB",
+       "fv": 41,
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 20.7,
+       "line": "223 pass yds · 2.2 pass TD · 20 yds · 0.3 TD",
+       "fvx": 41
+      },
+      {
+       "name": "Talyn Taylor",
+       "pos": "WR",
+       "fv": 49,
+       "play": 0.88,
+       "st": null,
+       "more": 1.01,
+       "miss": 0,
+       "pts": 12.8,
+       "line": "57 yds · 3.1 rec · 0.7 TD",
+       "fvx": 49
+      },
+      {
+       "name": "Nate Frazier",
+       "pos": "RB",
+       "fv": 47,
+       "play": 0.85,
+       "st": null,
+       "more": 1.01,
+       "miss": 0,
+       "pts": 10.8,
+       "line": "50 yds · 0.8 TD",
+       "fvx": 47
+      }
+     ],
+     "def": [
+      {
+       "name": "Chris Cole",
+       "pos": "LB",
+       "fv": 56,
+       "pts": 12.1,
+       "line": "6.4 tkl · 1.1 TFL · 0.5 sk",
+       "fvx": 56
+      },
+      {
+       "name": "Raylen Wilson",
+       "pos": "LB",
+       "fv": 42,
+       "pts": 9,
+       "line": "5.9 tkl · 0.7 TFL · 0.4 sk",
+       "fvx": 42
+      },
+      {
+       "name": "Justin Williams",
+       "pos": "LB",
+       "fv": 32,
+       "pts": 5.9,
+       "line": "4.2 tkl · 0.5 TFL",
+       "fvx": 32
+      }
+     ]
+    }
+   },
+   "pHome": 0.15,
+   "spread": 15,
+   "proj": {
+    "margin": -14.9,
+    "total": 53.7,
+    "home": 19,
+    "away": 34,
+    "parts": {
+     "elo": -4.7,
+     "net": -1.9,
+     "home": 0.9,
+     "rest": 0,
+     "tz": 0,
+     "dist": 0.1,
+     "alt": 0,
+     "fcs": 0,
+     "st": 0,
+     "p4": 0,
+     "aggr": 0.3,
+     "ret": 0,
+     "gc": -2.3,
+     "fcsm": 0,
+     "fpi": -8.3,
+     "ld": 1.3,
+     "mkt": 1,
+     "inj": -1.1
+    },
+    "wx": {
+     "t": 61.1,
+     "w": 12.7,
+     "p": 0,
+     "f": 1
+    },
+    "sim": {
+     "m10": -36,
+     "m90": 6,
+     "t10": 33,
+     "t90": 75,
+     "pRaw": 0.228
+    },
+    "over": 0.52
+   },
+   "stars": {
+    "off": [
+     {
+      "name": "Gunner Stockton",
+      "pos": "QB",
+      "fv": 41,
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 20.7,
+      "line": "223 pass yds · 2.2 pass TD · 20 yds · 0.3 TD",
+      "team": "UGA",
+      "logo": "/img/cfb/logos/61.png",
+      "fvx": 41
+     },
+     {
+      "name": "LaNorris Sellers",
+      "pos": "QB",
+      "fv": 48,
+      "play": 0.66,
+      "st": null,
+      "more": 1,
+      "miss": 1,
+      "pts": 14.6,
+      "line": "135 pass yds · 1.1 pass TD · 35 yds · 0.4 TD",
+      "team": "SC",
+      "logo": "/img/cfb/logos/2579.png",
+      "fvx": 48
+     },
+     {
+      "name": "Talyn Taylor",
+      "pos": "WR",
+      "fv": 49,
+      "play": 0.88,
+      "st": null,
+      "more": 1.01,
+      "miss": 0,
+      "pts": 12.8,
+      "line": "57 yds · 3.1 rec · 0.7 TD",
+      "team": "UGA",
+      "logo": "/img/cfb/logos/61.png",
+      "fvx": 49
+     }
+    ],
+    "def": [
+     {
+      "name": "Chris Cole",
+      "pos": "LB",
+      "fv": 56,
+      "pts": 12.1,
+      "line": "6.4 tkl · 1.1 TFL · 0.5 sk",
+      "team": "UGA",
+      "logo": "/img/cfb/logos/61.png",
+      "fvx": 56
+     },
+     {
+      "name": "Fred \"JayR\" Johnson",
+      "pos": "LB",
+      "fv": 29,
+      "pts": 10.5,
+      "line": "8.3 tkl · 0.5 TFL · 0.2 sk",
+      "team": "SC",
+      "logo": "/img/cfb/logos/2579.png",
+      "fvx": 29
+     },
+     {
+      "name": "Raylen Wilson",
+      "pos": "LB",
+      "fv": 42,
+      "pts": 9,
+      "line": "5.9 tkl · 0.7 TFL · 0.4 sk",
+      "team": "UGA",
+      "logo": "/img/cfb/logos/61.png",
+      "fvx": 42
+     }
+    ]
+   },
+   "score": 2.27
+  },
+  {
    "id": "401858531",
    "date": "2026-11-21T17:00:00.000Z",
    "venue": "Memorial Stadium (Lincoln, NE)",
@@ -1244,8 +1845,8 @@
     "away": "-176"
    },
    "spreadOdds": {
-    "home": "-112",
-    "away": "-110"
+    "home": "-110",
+    "away": "-112"
    },
    "home": {
     "id": "158",
@@ -1713,8 +2314,8 @@
      "inj": 0
     },
     "wx": {
-     "t": 53,
-     "w": 11.1,
+     "t": 52.6,
+     "w": 11.2,
      "p": 0,
      "f": 1
     },
@@ -1808,607 +2409,6 @@
    "score": 2.26
   },
   {
-   "id": "401856753",
-   "date": "2026-11-22T00:30:00.000Z",
-   "venue": "Williams-Brice Stadium",
-   "tv": "ABC",
-   "neutral": false,
-   "line": "UGA -14.5",
-   "total": 51.5,
-   "market": 14.5,
-   "edge": {
-    "pts": 0.4,
-    "side": "away",
-    "cover": 0.5
-   },
-   "ml": {
-    "home": "+538",
-    "away": "-678"
-   },
-   "spreadOdds": {
-    "home": "-106",
-    "away": "-119"
-   },
-   "home": {
-    "id": "2579",
-    "name": "South Carolina",
-    "logo": "/img/cfb/logos/2579.png",
-    "color": "#73000a",
-    "rank": 21,
-    "elo": 1634,
-    "rec": "6-4",
-    "talentRk": 17,
-    "style": {
-     "run": 0.47,
-     "osr": 0.43,
-     "oepa": 0.15,
-     "dsr": 0.41,
-     "depa": 0.12,
-     "xpl": 1.33,
-     "havoc": 0.13
-    },
-    "off": [
-     {
-      "name": "Darius Gray",
-      "pos": "OL",
-      "fv": 48,
-      "plus": false,
-      "star": true,
-      "riser": null,
-      "logo": "/img/cfb/logos/2579.png",
-      "cls": "Fr",
-      "inj": null,
-      "fvx": 48
-     },
-     {
-      "name": "LaNorris Sellers",
-      "pos": "QB",
-      "fv": 48,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2579.png",
-      "cls": "Sr",
-      "inj": null,
-      "fvx": 48
-     },
-     {
-      "name": "Jabree Coleman",
-      "pos": "RB",
-      "fv": 36,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2579.png",
-      "cls": "Fr",
-      "inj": null,
-      "fvx": 36
-     },
-     {
-      "name": "Jacarrius Peak",
-      "pos": "OL",
-      "fv": 36,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2579.png",
-      "cls": "RS-Sr",
-      "inj": null,
-      "fvx": 36
-     },
-     {
-      "name": "Mazeo Bennett Jr.",
-      "pos": "WR",
-      "fv": 27,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2579.png",
-      "cls": "Jr",
-      "inj": "Doubtful",
-      "fvx": 27
-     }
-    ],
-    "def": [
-     {
-      "name": "Dylan Stewart",
-      "pos": "EDGE",
-      "fv": 59,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2579.png",
-      "cls": "Jr",
-      "inj": "Questionable",
-      "fvx": 59
-     },
-     {
-      "name": "Vicari Swain",
-      "pos": "CB",
-      "fv": 33,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2579.png",
-      "cls": "RS-Jr",
-      "inj": null,
-      "fvx": 33
-     },
-     {
-      "name": "Tomiwa Durojaiye",
-      "pos": "DL",
-      "fv": 32,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2579.png",
-      "cls": "RS-Sr",
-      "inj": null,
-      "fvx": 32
-     },
-     {
-      "name": "Anthony Addison",
-      "pos": "EDGE",
-      "fv": 31,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2579.png",
-      "cls": "So",
-      "inj": "Doubtful",
-      "fvx": 31
-     },
-     {
-      "name": "Noah Clark",
-      "pos": "DL",
-      "fv": 30,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2579.png",
-      "cls": "Fr",
-      "inj": null,
-      "fvx": 30
-     }
-    ],
-    "injAdj": -20,
-    "injPts": -1.1,
-    "qbOut": null,
-    "kOut": null,
-    "out": [
-     {
-      "name": "Mazeo Bennett Jr.",
-      "pos": "WR",
-      "fv": 27,
-      "status": "Doubtful",
-      "miss": 1,
-      "fvx": 27
-     },
-     {
-      "name": "Dylan Stewart",
-      "pos": "EDGE",
-      "fv": 59,
-      "status": "Questionable",
-      "miss": 0.68,
-      "fvx": 59
-     },
-     {
-      "name": "Anthony Addison",
-      "pos": "EDGE",
-      "fv": 31,
-      "status": "Doubtful",
-      "miss": 1,
-      "fvx": 31
-     }
-    ],
-    "seasonOut": [],
-    "talentAdj": 99,
-    "stars": {
-     "off": [
-      {
-       "name": "LaNorris Sellers",
-       "pos": "QB",
-       "fv": 48,
-       "play": 0.66,
-       "st": null,
-       "more": 1,
-       "miss": 1,
-       "pts": 14.6,
-       "line": "135 pass yds · 1.1 pass TD · 35 yds · 0.4 TD",
-       "fvx": 48
-      },
-      {
-       "name": "Jabree Coleman",
-       "pos": "RB",
-       "fv": 36,
-       "play": 0.92,
-       "st": null,
-       "more": 1.39,
-       "miss": 0,
-       "pts": 9.5,
-       "line": "49 yds · 1.7 rec · 0.5 TD",
-       "fvx": 36
-      },
-      {
-       "name": "DJ Black",
-       "pos": "WR",
-       "fv": 20,
-       "play": 0.8,
-       "st": null,
-       "more": 1.27,
-       "miss": 0,
-       "pts": 7.6,
-       "line": "41 yds · 2.1 rec · 0.2 TD",
-       "fvx": 20
-      }
-     ],
-     "def": [
-      {
-       "name": "Fred \"JayR\" Johnson",
-       "pos": "LB",
-       "fv": 29,
-       "pts": 10.5,
-       "line": "8.3 tkl · 0.5 TFL · 0.2 sk",
-       "fvx": 29
-      },
-      {
-       "name": "Justin Okoronkwo",
-       "pos": "LB",
-       "fv": 27,
-       "pts": 9,
-       "line": "7.3 tkl · 0.4 TFL",
-       "fvx": 27
-      },
-      {
-       "name": "Peyton Williams",
-       "pos": "S",
-       "fv": 24,
-       "pts": 7,
-       "line": "5.7 tkl",
-       "fvx": 24
-      }
-     ]
-    }
-   },
-   "away": {
-    "id": "61",
-    "name": "Georgia",
-    "logo": "/img/cfb/logos/61.png",
-    "color": "#ba0c2f",
-    "rank": 1,
-    "elo": 1928,
-    "rec": "9-1",
-    "talentRk": 2,
-    "style": {
-     "run": 0.52,
-     "osr": 0.52,
-     "oepa": 0.31,
-     "dsr": 0.35,
-     "depa": -0.02,
-     "xpl": 1.18,
-     "havoc": 0.19
-    },
-    "off": [
-     {
-      "name": "Zykie Helton",
-      "pos": "OL",
-      "fv": 56,
-      "plus": false,
-      "star": true,
-      "riser": null,
-      "logo": "/img/cfb/logos/61.png",
-      "cls": "Fr",
-      "inj": null,
-      "fvx": 56
-     },
-     {
-      "name": "Dontrell Glover",
-      "pos": "OL",
-      "fv": 50,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/61.png",
-      "cls": "So",
-      "inj": null,
-      "fvx": 50
-     },
-     {
-      "name": "Talyn Taylor",
-      "pos": "WR",
-      "fv": 49,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/61.png",
-      "cls": "RS-Fr",
-      "inj": null,
-      "fvx": 49
-     },
-     {
-      "name": "Nate Frazier",
-      "pos": "RB",
-      "fv": 47,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/61.png",
-      "cls": "Jr",
-      "inj": null,
-      "fvx": 47
-     },
-     {
-      "name": "Dwight Phillips Jr.",
-      "pos": "RB",
-      "fv": 47,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/61.png",
-      "cls": "Jr",
-      "inj": null,
-      "fvx": 47
-     }
-    ],
-    "def": [
-     {
-      "name": "Chris Cole",
-      "pos": "LB",
-      "fv": 56,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/61.png",
-      "cls": "Jr",
-      "inj": null,
-      "fvx": 56
-     },
-     {
-      "name": "KJ Bolden",
-      "pos": "S",
-      "fv": 51,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/61.png",
-      "cls": "Jr",
-      "inj": null,
-      "fvx": 51
-     },
-     {
-      "name": "Ellis Robinson IV",
-      "pos": "CB",
-      "fv": 50,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/61.png",
-      "cls": "RS-So",
-      "inj": null,
-      "fvx": 50
-     },
-     {
-      "name": "Raylen Wilson",
-      "pos": "LB",
-      "fv": 42,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/61.png",
-      "cls": "Sr",
-      "inj": null,
-      "fvx": 42
-     },
-     {
-      "name": "Elijah Griffin",
-      "pos": "DL",
-      "fv": 37,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/61.png",
-      "cls": "So",
-      "inj": null,
-      "fvx": 37
-     }
-    ],
-    "injAdj": 0,
-    "injPts": 0,
-    "qbOut": null,
-    "kOut": null,
-    "out": [],
-    "seasonOut": [],
-    "talentAdj": 261,
-    "stars": {
-     "off": [
-      {
-       "name": "Gunner Stockton",
-       "pos": "QB",
-       "fv": 41,
-       "play": 0.95,
-       "st": null,
-       "more": 1,
-       "miss": 0,
-       "pts": 20.7,
-       "line": "223 pass yds · 2.2 pass TD · 20 yds · 0.3 TD",
-       "fvx": 41
-      },
-      {
-       "name": "Talyn Taylor",
-       "pos": "WR",
-       "fv": 49,
-       "play": 0.88,
-       "st": null,
-       "more": 1.01,
-       "miss": 0,
-       "pts": 12.8,
-       "line": "57 yds · 3.1 rec · 0.7 TD",
-       "fvx": 49
-      },
-      {
-       "name": "Nate Frazier",
-       "pos": "RB",
-       "fv": 47,
-       "play": 0.85,
-       "st": null,
-       "more": 1.01,
-       "miss": 0,
-       "pts": 10.8,
-       "line": "50 yds · 0.8 TD",
-       "fvx": 47
-      }
-     ],
-     "def": [
-      {
-       "name": "Chris Cole",
-       "pos": "LB",
-       "fv": 56,
-       "pts": 12.1,
-       "line": "6.4 tkl · 1.1 TFL · 0.5 sk",
-       "fvx": 56
-      },
-      {
-       "name": "Raylen Wilson",
-       "pos": "LB",
-       "fv": 42,
-       "pts": 9,
-       "line": "5.9 tkl · 0.7 TFL · 0.4 sk",
-       "fvx": 42
-      },
-      {
-       "name": "Justin Williams",
-       "pos": "LB",
-       "fv": 32,
-       "pts": 5.9,
-       "line": "4.2 tkl · 0.5 TFL",
-       "fvx": 32
-      }
-     ]
-    }
-   },
-   "pHome": 0.15,
-   "spread": 15,
-   "proj": {
-    "margin": -14.9,
-    "total": 49.1,
-    "home": 17,
-    "away": 32,
-    "parts": {
-     "elo": -4.7,
-     "net": -1.9,
-     "home": 0.9,
-     "rest": 0,
-     "tz": 0,
-     "dist": 0.1,
-     "alt": 0,
-     "fcs": 0,
-     "st": 0,
-     "p4": 0,
-     "aggr": 0.3,
-     "ret": 0,
-     "gc": -2.3,
-     "fcsm": 0,
-     "fpi": -8.3,
-     "ld": 1.3,
-     "mkt": 1,
-     "inj": -1.1
-    },
-    "wx": {
-     "t": 56.3,
-     "w": 15.8,
-     "p": 12.4,
-     "f": 1
-    },
-    "sim": {
-     "m10": -35,
-     "m90": 7,
-     "t10": 28,
-     "t90": 70,
-     "pRaw": 0.225
-    },
-    "over": 0.48
-   },
-   "stars": {
-    "off": [
-     {
-      "name": "Gunner Stockton",
-      "pos": "QB",
-      "fv": 41,
-      "play": 0.95,
-      "st": null,
-      "more": 1,
-      "miss": 0,
-      "pts": 20.7,
-      "line": "223 pass yds · 2.2 pass TD · 20 yds · 0.3 TD",
-      "team": "UGA",
-      "logo": "/img/cfb/logos/61.png",
-      "fvx": 41
-     },
-     {
-      "name": "LaNorris Sellers",
-      "pos": "QB",
-      "fv": 48,
-      "play": 0.66,
-      "st": null,
-      "more": 1,
-      "miss": 1,
-      "pts": 14.6,
-      "line": "135 pass yds · 1.1 pass TD · 35 yds · 0.4 TD",
-      "team": "SC",
-      "logo": "/img/cfb/logos/2579.png",
-      "fvx": 48
-     },
-     {
-      "name": "Talyn Taylor",
-      "pos": "WR",
-      "fv": 49,
-      "play": 0.88,
-      "st": null,
-      "more": 1.01,
-      "miss": 0,
-      "pts": 12.8,
-      "line": "57 yds · 3.1 rec · 0.7 TD",
-      "team": "UGA",
-      "logo": "/img/cfb/logos/61.png",
-      "fvx": 49
-     }
-    ],
-    "def": [
-     {
-      "name": "Chris Cole",
-      "pos": "LB",
-      "fv": 56,
-      "pts": 12.1,
-      "line": "6.4 tkl · 1.1 TFL · 0.5 sk",
-      "team": "UGA",
-      "logo": "/img/cfb/logos/61.png",
-      "fvx": 56
-     },
-     {
-      "name": "Fred \"JayR\" Johnson",
-      "pos": "LB",
-      "fv": 29,
-      "pts": 10.5,
-      "line": "8.3 tkl · 0.5 TFL · 0.2 sk",
-      "team": "SC",
-      "logo": "/img/cfb/logos/2579.png",
-      "fvx": 29
-     },
-     {
-      "name": "Raylen Wilson",
-      "pos": "LB",
-      "fv": 42,
-      "pts": 9,
-      "line": "5.9 tkl · 0.7 TFL · 0.4 sk",
-      "team": "UGA",
-      "logo": "/img/cfb/logos/61.png",
-      "fvx": 42
-     }
-    ]
-   },
-   "score": 2.26
-  },
-  {
    "id": "401856871",
    "date": "2026-11-21T20:30:00.000Z",
    "venue": "McLane Stadium",
@@ -2418,7 +2418,7 @@
    "total": 56.5,
    "market": 4.5,
    "edge": {
-    "pts": 1.9,
+    "pts": 1.8,
     "side": "home",
     "cover": 0.5
    },
@@ -2427,8 +2427,8 @@
     "away": "-214"
    },
    "spreadOdds": {
-    "home": "-108",
-    "away": "-114"
+    "home": "-106",
+    "away": "-117"
    },
    "home": {
     "id": "239",
@@ -2789,7 +2789,7 @@
      }
     ],
     "injAdj": -3,
-    "injPts": -0.2,
+    "injPts": -0.1,
     "qbOut": null,
     "kOut": null,
     "out": [
@@ -2800,14 +2800,6 @@
       "status": "Questionable",
       "miss": 0.79,
       "fvx": 24
-     },
-     {
-      "name": "Coy Eakin",
-      "pos": "WR",
-      "fv": 23,
-      "status": "Questionable",
-      "miss": 0.25,
-      "fvx": 23
      }
     ],
     "seasonOut": [],
@@ -2822,8 +2814,8 @@
        "st": null,
        "more": 1.05,
        "miss": 0,
-       "pts": 18.4,
-       "line": "115 yds · 2.6 rec · 0.7 TD",
+       "pts": 18.3,
+       "line": "114 yds · 2.6 rec · 0.7 TD",
        "fvx": 48
       },
       {
@@ -2879,13 +2871,13 @@
      ]
     }
    },
-   "pHome": 0.43,
+   "pHome": 0.42,
    "spread": 2.5,
    "proj": {
-    "margin": -2.6,
-    "total": 56.6,
+    "margin": -2.7,
+    "total": 56.2,
     "home": 27,
-    "away": 30,
+    "away": 29,
     "parts": {
      "elo": -3.6,
      "net": 0.2,
@@ -2904,20 +2896,20 @@
      "fpi": -1.8,
      "ld": 1.3,
      "mkt": 0.2,
-     "inj": 0.2
+     "inj": 0.1
     },
     "wx": {
-     "t": 72.4,
-     "w": 9.7,
+     "t": 72.3,
+     "w": 10.8,
      "p": 0,
      "f": 1
     },
     "sim": {
      "m10": -23,
-     "m90": 18,
+     "m90": 17,
      "t10": 37,
      "t90": 77,
-     "pRaw": 0.493
+     "pRaw": 0.486
     },
     "over": 0.5
    },
@@ -2931,8 +2923,8 @@
       "st": null,
       "more": 1.05,
       "miss": 0,
-      "pts": 18.4,
-      "line": "115 yds · 2.6 rec · 0.7 TD",
+      "pts": 18.3,
+      "line": "114 yds · 2.6 rec · 0.7 TD",
       "team": "TTU",
       "logo": "/img/cfb/logos/2641.png",
       "fvx": 48
@@ -3000,582 +2992,6 @@
     ]
    },
    "score": 2.23
-  },
-  {
-   "id": "401856872",
-   "date": "2026-11-22T02:00:00.000Z",
-   "venue": "Amon G. Carter Stadium",
-   "tv": "Fox",
-   "neutral": false,
-   "line": "UTAH -7.5",
-   "total": 46.5,
-   "market": 7.5,
-   "edge": {
-    "pts": 2.6,
-    "side": "home",
-    "cover": 0.51
-   },
-   "ml": {
-    "home": "+234",
-    "away": "-291"
-   },
-   "spreadOdds": {
-    "home": "-124",
-    "away": "-101"
-   },
-   "home": {
-    "id": "2628",
-    "name": "TCU",
-    "logo": "/img/cfb/logos/2628.png",
-    "color": "#4d1979",
-    "rank": null,
-    "elo": 1593,
-    "rec": "5-5",
-    "talentRk": 55,
-    "style": {
-     "run": 0.43,
-     "osr": 0.41,
-     "oepa": 0.08,
-     "dsr": 0.35,
-     "depa": -0.03,
-     "xpl": 1.27,
-     "havoc": 0.16
-    },
-    "off": [
-     {
-      "name": "Ed Small",
-      "pos": "WR",
-      "fv": 30,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2628.png",
-      "cls": "So",
-      "inj": null,
-      "fvx": 30
-     },
-     {
-      "name": "Jeremy Payne",
-      "pos": "RB",
-      "fv": 30,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2628.png",
-      "cls": "Jr",
-      "inj": null,
-      "fvx": 30
-     },
-     {
-      "name": "Kari Ashley",
-      "pos": "TE",
-      "fv": 25,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2628.png",
-      "cls": "Sr",
-      "inj": null,
-      "fvx": 25
-     },
-     {
-      "name": "Kilian Registe",
-      "pos": "OL",
-      "fv": 25,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2628.png",
-      "cls": "So",
-      "inj": null,
-      "fvx": 25
-     },
-     {
-      "name": "Witten Van Hoy",
-      "pos": "OL",
-      "fv": 23,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2628.png",
-      "cls": "So",
-      "inj": null,
-      "fvx": 23
-     }
-    ],
-    "def": [
-     {
-      "name": "Hudson Hooper",
-      "pos": "LB",
-      "fv": 46,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2628.png",
-      "cls": "RS-Jr",
-      "inj": null,
-      "fvx": 46
-     },
-     {
-      "name": "Ansel Din-Mbuh",
-      "pos": "DL",
-      "fv": 28,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2628.png",
-      "cls": "Sr",
-      "inj": null,
-      "fvx": 28
-     },
-     {
-      "name": "Koron Hayward",
-      "pos": "EDGE",
-      "fv": 26,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2628.png",
-      "cls": "Sr",
-      "inj": null,
-      "fvx": 26
-     },
-     {
-      "name": "Gil Jackson",
-      "pos": "CB",
-      "fv": 24,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2628.png",
-      "cls": "So",
-      "inj": null,
-      "fvx": 24
-     },
-     {
-      "name": "John Schobel",
-      "pos": "EDGE",
-      "fv": 24,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2628.png",
-      "cls": "So",
-      "inj": null,
-      "fvx": 24
-     }
-    ],
-    "injAdj": 0,
-    "injPts": 0,
-    "qbOut": null,
-    "kOut": null,
-    "out": [],
-    "seasonOut": [],
-    "talentAdj": -7,
-    "stars": {
-     "off": [
-      {
-       "name": "Jaden Craig",
-       "pos": "QB",
-       "fv": 22,
-       "play": 0.95,
-       "st": null,
-       "more": 1,
-       "miss": 0,
-       "pts": 15.1,
-       "line": "225 pass yds · 1.1 pass TD",
-       "fvx": 22
-      },
-      {
-       "name": "Kari Ashley",
-       "pos": "TE",
-       "fv": 25,
-       "play": 0.94,
-       "st": null,
-       "more": 1,
-       "miss": 0,
-       "pts": 13.6,
-       "line": "61 yds · 4.8 rec · 0.4 TD",
-       "fvx": 25
-      },
-      {
-       "name": "Jordan Dwyer",
-       "pos": "WR",
-       "fv": 22,
-       "play": 0.8,
-       "st": null,
-       "more": 1,
-       "miss": 0,
-       "pts": 12.3,
-       "line": "68 yds · 4.8 rec · 0.1 TD",
-       "fvx": 22
-      }
-     ],
-     "def": [
-      {
-       "name": "Hudson Hooper",
-       "pos": "LB",
-       "fv": 46,
-       "pts": 10.2,
-       "line": "7 tkl · 0.5 TFL · 0.3 PD",
-       "fvx": 46
-      },
-      {
-       "name": "Jamel Johnson",
-       "pos": "S",
-       "fv": 21,
-       "pts": 8.3,
-       "line": "5.9 tkl · 0.6 TFL",
-       "fvx": 21
-      },
-      {
-       "name": "Max Carroll",
-       "pos": "LB",
-       "fv": 20,
-       "pts": 7.1,
-       "line": "4.3 tkl · 0.3 TFL",
-       "fvx": 20
-      }
-     ]
-    }
-   },
-   "away": {
-    "id": "254",
-    "name": "Utah",
-    "logo": "/img/cfb/logos/254.png",
-    "color": "#be0000",
-    "rank": 2,
-    "elo": 1877,
-    "rec": "10-0",
-    "talentRk": 40,
-    "style": {
-     "run": 0.51,
-     "osr": 0.5,
-     "oepa": 0.29,
-     "dsr": 0.38,
-     "depa": 0.04,
-     "xpl": 1.31,
-     "havoc": 0.17
-    },
-    "off": [
-     {
-      "name": "Zereoue Williams",
-      "pos": "OL",
-      "fv": 47,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/254.png",
-      "cls": "RS-Gr",
-      "inj": null,
-      "fvx": 47
-     },
-     {
-      "name": "Wayshawn Parker",
-      "pos": "RB",
-      "fv": 47,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/254.png",
-      "cls": "Jr",
-      "inj": null,
-      "fvx": 47
-     },
-     {
-      "name": "Devon Dampier",
-      "pos": "QB",
-      "fv": 35,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/254.png",
-      "cls": "Sr",
-      "inj": null,
-      "fvx": 35
-     },
-     {
-      "name": "Kelvin Obot",
-      "pos": "OL",
-      "fv": 30,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/254.png",
-      "cls": "Fr",
-      "inj": null,
-      "fvx": 30
-     },
-     {
-      "name": "Noah Bennee",
-      "pos": "TE",
-      "fv": 26,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/254.png",
-      "cls": "Gr",
-      "inj": null,
-      "fvx": 26
-     }
-    ],
-    "def": [
-     {
-      "name": "Jackson Bennee",
-      "pos": "CB",
-      "fv": 34,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/254.png",
-      "cls": "Jr",
-      "inj": null,
-      "fvx": 34
-     },
-     {
-      "name": "Rabbit Evans",
-      "pos": "S",
-      "fv": 32,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/254.png",
-      "cls": "Gr",
-      "inj": null,
-      "fvx": 32
-     },
-     {
-      "name": "Jireh Moe",
-      "pos": "DL",
-      "fv": 28,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/254.png",
-      "cls": "So",
-      "inj": null,
-      "fvx": 28
-     },
-     {
-      "name": "Cyrus Polu",
-      "pos": "LB",
-      "fv": 27,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/254.png",
-      "cls": "So",
-      "inj": null,
-      "fvx": 27
-     },
-     {
-      "name": "Karson Kaufusi",
-      "pos": "DL",
-      "fv": 26,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/254.png",
-      "cls": "So",
-      "inj": null,
-      "fvx": 26
-     }
-    ],
-    "injAdj": 0,
-    "injPts": 0,
-    "qbOut": null,
-    "kOut": null,
-    "out": [],
-    "seasonOut": [],
-    "talentAdj": 30,
-    "stars": {
-     "off": [
-      {
-       "name": "Devon Dampier",
-       "pos": "QB",
-       "fv": 35,
-       "play": 0.96,
-       "st": null,
-       "more": 1,
-       "miss": 0,
-       "pts": 22.7,
-       "line": "195 pass yds · 1.9 pass TD · 47 yds · 0.7 TD",
-       "fvx": 35
-      },
-      {
-       "name": "Wayshawn Parker",
-       "pos": "RB",
-       "fv": 47,
-       "play": 0.95,
-       "st": null,
-       "more": 1,
-       "miss": 0,
-       "pts": 16.7,
-       "line": "81 yds · 2.5 rec · 1 TD",
-       "fvx": 47
-      },
-      {
-       "name": "Braden Pegan",
-       "pos": "WR",
-       "fv": 21,
-       "play": 0.95,
-       "st": null,
-       "more": 1,
-       "miss": 0,
-       "pts": 14.1,
-       "line": "56 yds · 4 rec · 0.8 TD",
-       "fvx": 21
-      }
-     ],
-     "def": [
-      {
-       "name": "Trey Reynolds",
-       "pos": "LB",
-       "fv": 20,
-       "pts": 8.4,
-       "line": "6 tkl · 0.5 TFL",
-       "fvx": 20
-      },
-      {
-       "name": "Rabbit Evans",
-       "pos": "S",
-       "fv": 32,
-       "pts": 8.2,
-       "line": "4.7 tkl · 0.3 TFL · 0.4 PD",
-       "fvx": 32
-      },
-      {
-       "name": "Jackson Bennee",
-       "pos": "CB",
-       "fv": 34,
-       "pts": 7.5,
-       "line": "4.2 tkl · 0.8 PD",
-       "fvx": 34
-      }
-     ]
-    }
-   },
-   "pHome": 0.36,
-   "spread": 5,
-   "proj": {
-    "margin": -4.9,
-    "total": 48.8,
-    "home": 22,
-    "away": 27,
-    "parts": {
-     "elo": -4,
-     "net": -1.4,
-     "home": 0.9,
-     "rest": 0,
-     "tz": 0,
-     "dist": 0.4,
-     "alt": 0,
-     "fcs": 0,
-     "st": 0,
-     "p4": 0,
-     "aggr": 0,
-     "ret": 0,
-     "gc": -1.7,
-     "fcsm": 0,
-     "fpi": -4.8,
-     "ld": 1.3,
-     "mkt": 4.3,
-     "inj": 0
-    },
-    "wx": {
-     "t": 67.1,
-     "w": 10.2,
-     "p": 0.4,
-     "f": 1
-    },
-    "sim": {
-     "m10": -23,
-     "m90": 15,
-     "t10": 31,
-     "t90": 67,
-     "pRaw": 0.354
-    },
-    "over": 0.52
-   },
-   "stars": {
-    "off": [
-     {
-      "name": "Devon Dampier",
-      "pos": "QB",
-      "fv": 35,
-      "play": 0.96,
-      "st": null,
-      "more": 1,
-      "miss": 0,
-      "pts": 22.7,
-      "line": "195 pass yds · 1.9 pass TD · 47 yds · 0.7 TD",
-      "team": "UTAH",
-      "logo": "/img/cfb/logos/254.png",
-      "fvx": 35
-     },
-     {
-      "name": "Wayshawn Parker",
-      "pos": "RB",
-      "fv": 47,
-      "play": 0.95,
-      "st": null,
-      "more": 1,
-      "miss": 0,
-      "pts": 16.7,
-      "line": "81 yds · 2.5 rec · 1 TD",
-      "team": "UTAH",
-      "logo": "/img/cfb/logos/254.png",
-      "fvx": 47
-     },
-     {
-      "name": "Jaden Craig",
-      "pos": "QB",
-      "fv": 22,
-      "play": 0.95,
-      "st": null,
-      "more": 1,
-      "miss": 0,
-      "pts": 15.1,
-      "line": "225 pass yds · 1.1 pass TD",
-      "team": "TCU",
-      "logo": "/img/cfb/logos/2628.png",
-      "fvx": 22
-     }
-    ],
-    "def": [
-     {
-      "name": "Hudson Hooper",
-      "pos": "LB",
-      "fv": 46,
-      "pts": 10.2,
-      "line": "7 tkl · 0.5 TFL · 0.3 PD",
-      "team": "TCU",
-      "logo": "/img/cfb/logos/2628.png",
-      "fvx": 46
-     },
-     {
-      "name": "Trey Reynolds",
-      "pos": "LB",
-      "fv": 20,
-      "pts": 8.4,
-      "line": "6 tkl · 0.5 TFL",
-      "team": "UTAH",
-      "logo": "/img/cfb/logos/254.png",
-      "fvx": 20
-     },
-     {
-      "name": "Jamel Johnson",
-      "pos": "S",
-      "fv": 21,
-      "pts": 8.3,
-      "line": "5.9 tkl · 0.6 TFL",
-      "team": "TCU",
-      "logo": "/img/cfb/logos/2628.png",
-      "fvx": 21
-     }
-    ]
-   },
-   "score": 2.19
   },
   {
    "id": "401858307",
@@ -4007,7 +3423,7 @@
        "st": null,
        "more": 1,
        "miss": 0,
-       "pts": 13.5,
+       "pts": 13.4,
        "line": "57 yds · 4.7 rec · 0.5 TD",
        "fvx": 20
       }
@@ -4067,17 +3483,17 @@
      "inj": -0.1
     },
     "wx": {
-     "t": 52.9,
-     "w": 8.2,
+     "t": 50.8,
+     "w": 6.1,
      "p": 0,
      "f": 1
     },
     "sim": {
-     "m10": 1,
+     "m10": 2,
      "m90": 40,
      "t10": 38,
      "t90": 77,
-     "pRaw": 0.912
+     "pRaw": 0.913
     },
     "over": 0.51
    },
@@ -4159,7 +3575,597 @@
      }
     ]
    },
-   "score": 2.18
+   "score": 2.19
+  },
+  {
+   "id": "401856872",
+   "date": "2026-11-22T02:00:00.000Z",
+   "venue": "Amon G. Carter Stadium",
+   "tv": "Fox",
+   "neutral": false,
+   "line": "UTAH -7.5",
+   "total": 46.5,
+   "market": 7.5,
+   "edge": {
+    "pts": 2.7,
+    "side": "away",
+    "cover": 0.51
+   },
+   "ml": {
+    "home": "+253",
+    "away": "-314"
+   },
+   "spreadOdds": {
+    "home": "-106",
+    "away": "-117"
+   },
+   "home": {
+    "id": "2628",
+    "name": "TCU",
+    "logo": "/img/cfb/logos/2628.png",
+    "color": "#4d1979",
+    "rank": null,
+    "elo": 1593,
+    "rec": "5-5",
+    "talentRk": 55,
+    "style": {
+     "run": 0.43,
+     "osr": 0.41,
+     "oepa": 0.08,
+     "dsr": 0.35,
+     "depa": -0.03,
+     "xpl": 1.27,
+     "havoc": 0.16
+    },
+    "off": [
+     {
+      "name": "Ed Small",
+      "pos": "WR",
+      "fv": 30,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/2628.png",
+      "cls": "So",
+      "inj": null,
+      "fvx": 30
+     },
+     {
+      "name": "Jeremy Payne",
+      "pos": "RB",
+      "fv": 30,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/2628.png",
+      "cls": "Jr",
+      "inj": null,
+      "fvx": 30
+     },
+     {
+      "name": "Kari Ashley",
+      "pos": "TE",
+      "fv": 25,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/2628.png",
+      "cls": "Sr",
+      "inj": null,
+      "fvx": 25
+     },
+     {
+      "name": "Kilian Registe",
+      "pos": "OL",
+      "fv": 25,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/2628.png",
+      "cls": "So",
+      "inj": null,
+      "fvx": 25
+     },
+     {
+      "name": "Witten Van Hoy",
+      "pos": "OL",
+      "fv": 23,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/2628.png",
+      "cls": "So",
+      "inj": null,
+      "fvx": 23
+     }
+    ],
+    "def": [
+     {
+      "name": "Hudson Hooper",
+      "pos": "LB",
+      "fv": 46,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/2628.png",
+      "cls": "RS-Jr",
+      "inj": null,
+      "fvx": 46
+     },
+     {
+      "name": "Ansel Din-Mbuh",
+      "pos": "DL",
+      "fv": 28,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/2628.png",
+      "cls": "Sr",
+      "inj": null,
+      "fvx": 28
+     },
+     {
+      "name": "Koron Hayward",
+      "pos": "EDGE",
+      "fv": 26,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/2628.png",
+      "cls": "Sr",
+      "inj": null,
+      "fvx": 26
+     },
+     {
+      "name": "Gil Jackson",
+      "pos": "CB",
+      "fv": 24,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/2628.png",
+      "cls": "So",
+      "inj": null,
+      "fvx": 24
+     },
+     {
+      "name": "John Schobel",
+      "pos": "EDGE",
+      "fv": 24,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/2628.png",
+      "cls": "So",
+      "inj": null,
+      "fvx": 24
+     }
+    ],
+    "injAdj": -39,
+    "injPts": -5.3,
+    "qbOut": {
+     "name": "Jaden Craig",
+     "backup": null,
+     "status": "Doubtful",
+     "pts": -5.3
+    },
+    "kOut": null,
+    "out": [
+     {
+      "name": "Jaden Craig",
+      "pos": "QB",
+      "fv": 22,
+      "status": "Doubtful",
+      "miss": 1,
+      "fvx": 22
+     }
+    ],
+    "seasonOut": [],
+    "talentAdj": -7,
+    "stars": {
+     "off": [
+      {
+       "name": "Kari Ashley",
+       "pos": "TE",
+       "fv": 25,
+       "play": 0.94,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 13.4,
+       "line": "61 yds · 4.8 rec · 0.4 TD",
+       "fvx": 25
+      },
+      {
+       "name": "Jordan Dwyer",
+       "pos": "WR",
+       "fv": 22,
+       "play": 0.8,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 12.2,
+       "line": "68 yds · 4.8 rec · 0.1 TD",
+       "fvx": 22
+      },
+      {
+       "name": "Ed Small",
+       "pos": "WR",
+       "fv": 30,
+       "play": 0.93,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 10,
+       "line": "53 yds · 3.7 rec · 0.2 TD",
+       "fvx": 30
+      }
+     ],
+     "def": [
+      {
+       "name": "Hudson Hooper",
+       "pos": "LB",
+       "fv": 46,
+       "pts": 10.2,
+       "line": "7 tkl · 0.5 TFL · 0.3 PD",
+       "fvx": 46
+      },
+      {
+       "name": "Jamel Johnson",
+       "pos": "S",
+       "fv": 21,
+       "pts": 8.3,
+       "line": "5.9 tkl · 0.6 TFL",
+       "fvx": 21
+      },
+      {
+       "name": "Max Carroll",
+       "pos": "LB",
+       "fv": 20,
+       "pts": 7.1,
+       "line": "4.3 tkl · 0.3 TFL",
+       "fvx": 20
+      }
+     ]
+    }
+   },
+   "away": {
+    "id": "254",
+    "name": "Utah",
+    "logo": "/img/cfb/logos/254.png",
+    "color": "#be0000",
+    "rank": 2,
+    "elo": 1877,
+    "rec": "10-0",
+    "talentRk": 40,
+    "style": {
+     "run": 0.51,
+     "osr": 0.5,
+     "oepa": 0.29,
+     "dsr": 0.38,
+     "depa": 0.04,
+     "xpl": 1.31,
+     "havoc": 0.17
+    },
+    "off": [
+     {
+      "name": "Zereoue Williams",
+      "pos": "OL",
+      "fv": 47,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/254.png",
+      "cls": "RS-Gr",
+      "inj": null,
+      "fvx": 47
+     },
+     {
+      "name": "Wayshawn Parker",
+      "pos": "RB",
+      "fv": 47,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/254.png",
+      "cls": "Jr",
+      "inj": null,
+      "fvx": 47
+     },
+     {
+      "name": "Devon Dampier",
+      "pos": "QB",
+      "fv": 35,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/254.png",
+      "cls": "Sr",
+      "inj": null,
+      "fvx": 35
+     },
+     {
+      "name": "Kelvin Obot",
+      "pos": "OL",
+      "fv": 30,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/254.png",
+      "cls": "Fr",
+      "inj": null,
+      "fvx": 30
+     },
+     {
+      "name": "Noah Bennee",
+      "pos": "TE",
+      "fv": 26,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/254.png",
+      "cls": "Gr",
+      "inj": null,
+      "fvx": 26
+     }
+    ],
+    "def": [
+     {
+      "name": "Jackson Bennee",
+      "pos": "CB",
+      "fv": 34,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/254.png",
+      "cls": "Jr",
+      "inj": null,
+      "fvx": 34
+     },
+     {
+      "name": "Rabbit Evans",
+      "pos": "S",
+      "fv": 32,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/254.png",
+      "cls": "Gr",
+      "inj": null,
+      "fvx": 32
+     },
+     {
+      "name": "Jireh Moe",
+      "pos": "DL",
+      "fv": 28,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/254.png",
+      "cls": "So",
+      "inj": null,
+      "fvx": 28
+     },
+     {
+      "name": "Cyrus Polu",
+      "pos": "LB",
+      "fv": 27,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/254.png",
+      "cls": "So",
+      "inj": null,
+      "fvx": 27
+     },
+     {
+      "name": "Karson Kaufusi",
+      "pos": "DL",
+      "fv": 26,
+      "plus": false,
+      "star": null,
+      "riser": null,
+      "logo": "/img/cfb/logos/254.png",
+      "cls": "So",
+      "inj": null,
+      "fvx": 26
+     }
+    ],
+    "injAdj": 0,
+    "injPts": 0,
+    "qbOut": null,
+    "kOut": null,
+    "out": [],
+    "seasonOut": [],
+    "talentAdj": 30,
+    "stars": {
+     "off": [
+      {
+       "name": "Devon Dampier",
+       "pos": "QB",
+       "fv": 35,
+       "play": 0.96,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 22.7,
+       "line": "195 pass yds · 1.9 pass TD · 47 yds · 0.7 TD",
+       "fvx": 35
+      },
+      {
+       "name": "Wayshawn Parker",
+       "pos": "RB",
+       "fv": 47,
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 16.7,
+       "line": "81 yds · 2.5 rec · 1 TD",
+       "fvx": 47
+      },
+      {
+       "name": "Braden Pegan",
+       "pos": "WR",
+       "fv": 21,
+       "play": 0.95,
+       "st": null,
+       "more": 1,
+       "miss": 0,
+       "pts": 14.1,
+       "line": "56 yds · 4 rec · 0.8 TD",
+       "fvx": 21
+      }
+     ],
+     "def": [
+      {
+       "name": "Trey Reynolds",
+       "pos": "LB",
+       "fv": 20,
+       "pts": 8.4,
+       "line": "6 tkl · 0.5 TFL",
+       "fvx": 20
+      },
+      {
+       "name": "Rabbit Evans",
+       "pos": "S",
+       "fv": 32,
+       "pts": 8.2,
+       "line": "4.7 tkl · 0.3 TFL · 0.4 PD",
+       "fvx": 32
+      },
+      {
+       "name": "Jackson Bennee",
+       "pos": "CB",
+       "fv": 34,
+       "pts": 7.5,
+       "line": "4.2 tkl · 0.8 PD",
+       "fvx": 34
+      }
+     ]
+    }
+   },
+   "pHome": 0.24,
+   "spread": 10,
+   "proj": {
+    "margin": -10.2,
+    "total": 48.9,
+    "home": 19,
+    "away": 30,
+    "parts": {
+     "elo": -4,
+     "net": -1.3,
+     "home": 0.9,
+     "rest": 0,
+     "tz": 0,
+     "dist": 0.4,
+     "alt": 0,
+     "fcs": 0,
+     "st": 0,
+     "p4": 0,
+     "aggr": 0,
+     "ret": 0,
+     "gc": -1.7,
+     "fcsm": 0,
+     "fpi": -4.8,
+     "ld": 1.3,
+     "mkt": 4.3,
+     "inj": -5.3
+    },
+    "wx": {
+     "t": 67.6,
+     "w": 7.9,
+     "p": 0,
+     "f": 1
+    },
+    "sim": {
+     "m10": -24,
+     "m90": 14,
+     "t10": 32,
+     "t90": 67,
+     "pRaw": 0.359
+    },
+    "over": 0.52
+   },
+   "stars": {
+    "off": [
+     {
+      "name": "Devon Dampier",
+      "pos": "QB",
+      "fv": 35,
+      "play": 0.96,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 22.7,
+      "line": "195 pass yds · 1.9 pass TD · 47 yds · 0.7 TD",
+      "team": "UTAH",
+      "logo": "/img/cfb/logos/254.png",
+      "fvx": 35
+     },
+     {
+      "name": "Wayshawn Parker",
+      "pos": "RB",
+      "fv": 47,
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 16.7,
+      "line": "81 yds · 2.5 rec · 1 TD",
+      "team": "UTAH",
+      "logo": "/img/cfb/logos/254.png",
+      "fvx": 47
+     },
+     {
+      "name": "Braden Pegan",
+      "pos": "WR",
+      "fv": 21,
+      "play": 0.95,
+      "st": null,
+      "more": 1,
+      "miss": 0,
+      "pts": 14.1,
+      "line": "56 yds · 4 rec · 0.8 TD",
+      "team": "UTAH",
+      "logo": "/img/cfb/logos/254.png",
+      "fvx": 21
+     }
+    ],
+    "def": [
+     {
+      "name": "Hudson Hooper",
+      "pos": "LB",
+      "fv": 46,
+      "pts": 10.2,
+      "line": "7 tkl · 0.5 TFL · 0.3 PD",
+      "team": "TCU",
+      "logo": "/img/cfb/logos/2628.png",
+      "fvx": 46
+     },
+     {
+      "name": "Trey Reynolds",
+      "pos": "LB",
+      "fv": 20,
+      "pts": 8.4,
+      "line": "6 tkl · 0.5 TFL",
+      "team": "UTAH",
+      "logo": "/img/cfb/logos/254.png",
+      "fvx": 20
+     },
+     {
+      "name": "Jamel Johnson",
+      "pos": "S",
+      "fv": 21,
+      "pts": 8.3,
+      "line": "5.9 tkl · 0.6 TFL",
+      "team": "TCU",
+      "logo": "/img/cfb/logos/2628.png",
+      "fvx": 21
+     }
+    ]
+   },
+   "score": 1.93
   },
   {
    "id": "401858527",
@@ -4168,20 +4174,20 @@
    "tv": "BTN",
    "neutral": false,
    "line": "IOWA -9.5",
-   "total": 40.5,
+   "total": 41.5,
    "market": 9.5,
    "edge": {
-    "pts": 1.8,
+    "pts": 0.3,
     "side": "away",
     "cover": 0.5
    },
    "ml": {
-    "home": "+281",
-    "away": "-349"
+    "home": "+273",
+    "away": "-340"
    },
    "spreadOdds": {
-    "home": "-108",
-    "away": "-114"
+    "home": "-110",
+    "away": "-112"
    },
    "home": {
     "id": "356",
@@ -4325,13 +4331,13 @@
       "fvx": 21
      }
     ],
-    "injAdj": -68,
-    "injPts": -6,
+    "injAdj": -48,
+    "injPts": -4,
     "qbOut": {
      "name": "Katin Houser",
      "backup": "Carson Boyd",
-     "status": "Doubtful",
-     "pts": -5.4
+     "status": "Questionable",
+     "pts": -3.4
     },
     "kOut": null,
     "out": [
@@ -4339,8 +4345,8 @@
       "name": "Katin Houser",
       "pos": "QB",
       "fv": 21,
-      "status": "Doubtful",
-      "miss": 1,
+      "status": "Questionable",
+      "miss": 0.64,
       "fvx": 21
      },
      {
@@ -4369,6 +4375,18 @@
        "fvx": 39
       },
       {
+       "name": "Katin Houser",
+       "pos": "QB",
+       "fv": 21,
+       "play": 0.33,
+       "st": "Questionable",
+       "more": 2.19,
+       "miss": 0,
+       "pts": 12.5,
+       "line": "177 pass yds · 1.5 pass TD",
+       "fvx": 21
+      },
+      {
        "name": "Aidan Laughery",
        "pos": "RB",
        "fv": 20,
@@ -4378,18 +4396,6 @@
        "miss": 0,
        "pts": 8.8,
        "line": "59 yds · 1.4 rec · 0.3 TD",
-       "fvx": 20
-      },
-      {
-       "name": "Ty Robinson",
-       "pos": "WR",
-       "fv": 20,
-       "play": 0.77,
-       "st": null,
-       "more": 1.2,
-       "miss": 0,
-       "pts": 5.8,
-       "line": "20 yds · 1.6 rec · 0.4 TD",
        "fvx": 20
       }
      ],
@@ -4535,7 +4541,7 @@
       "riser": null,
       "logo": "/img/cfb/logos/2294.png",
       "cls": "RS-Jr",
-      "inj": "Questionable",
+      "inj": null,
       "fvx": 42
      },
      {
@@ -4563,20 +4569,11 @@
       "fvx": 26
      }
     ],
-    "injAdj": -9,
-    "injPts": -0.5,
+    "injAdj": 0,
+    "injPts": 0,
     "qbOut": null,
     "kOut": null,
-    "out": [
-     {
-      "name": "Zach Lutmer",
-      "pos": "S",
-      "fv": 42,
-      "status": "Questionable",
-      "miss": 0.68,
-      "fvx": 42
-     }
-    ],
+    "out": [],
     "seasonOut": [
      {
       "name": "Kamari Moulton",
@@ -4638,7 +4635,6 @@
        "name": "Zach Lutmer",
        "pos": "S",
        "fv": 42,
-       "st": "Questionable",
        "pts": 7.8,
        "line": "6.2 tkl · 0.4 PD",
        "fvx": 42
@@ -4654,16 +4650,16 @@
      ]
     }
    },
-   "pHome": 0.21,
-   "spread": 11.5,
+   "pHome": 0.25,
+   "spread": 10,
    "proj": {
-    "margin": -11.3,
-    "total": 43.6,
-    "home": 16,
+    "margin": -9.8,
+    "total": 44,
+    "home": 17,
     "away": 27,
     "parts": {
      "elo": -1.9,
-     "net": -0.8,
+     "net": -0.7,
      "home": 0.9,
      "rest": 0.1,
      "tz": 0,
@@ -4678,22 +4674,22 @@
      "fcsm": 0,
      "fpi": -2.6,
      "mkt": -1.1,
-     "inj": -5.5
+     "inj": -4
     },
     "wx": {
-     "t": 69.8,
-     "w": 11.3,
+     "t": 69.7,
+     "w": 10.5,
      "p": 0,
      "f": 1
     },
     "sim": {
-     "m10": -23,
-     "m90": 11,
-     "t10": 26,
+     "m10": -24,
+     "m90": 12,
+     "t10": 27,
      "t90": 61,
-     "pRaw": 0.451
+     "pRaw": 0.458
     },
-    "over": 0.53
+    "over": 0.52
    },
    "stars": {
     "off": [
@@ -4773,7 +4769,7 @@
      }
     ]
    },
-   "score": 1.61
+   "score": 1.68
   },
   {
    "id": "401858528",
@@ -4785,13 +4781,13 @@
    "total": 36.5,
    "market": 3.5,
    "edge": {
-    "pts": 1.4,
+    "pts": 1.7,
     "side": "home",
     "cover": 0.5
    },
    "ml": {
-    "home": "+149",
-    "away": "-183"
+    "home": "+145",
+    "away": "-180"
    },
    "spreadOdds": {
     "home": "-112",
@@ -4911,7 +4907,7 @@
       "riser": null,
       "logo": "/img/cfb/logos/130.png",
       "cls": "Jr",
-      "inj": "Questionable",
+      "inj": null,
       "fvx": 36
      },
      {
@@ -4939,8 +4935,8 @@
       "fvx": 30
      }
     ],
-    "injAdj": -32,
-    "injPts": -1.7,
+    "injAdj": -27,
+    "injPts": -1.4,
     "qbOut": null,
     "kOut": null,
     "out": [
@@ -4959,14 +4955,6 @@
       "status": "Questionable",
       "miss": 0.68,
       "fvx": 42
-     },
-     {
-      "name": "Dominic Nichols",
-      "pos": "EDGE",
-      "fv": 36,
-      "status": "Questionable",
-      "miss": 0.68,
-      "fvx": 36
      }
     ],
     "seasonOut": [],
@@ -5275,10 +5263,10 @@
      ]
     }
    },
-   "pHome": 0.44,
+   "pHome": 0.45,
    "spread": 2,
    "proj": {
-    "margin": -2.1,
+    "margin": -1.8,
     "total": 42.4,
     "home": 20,
     "away": 22,
@@ -5299,11 +5287,11 @@
      "fcsm": 0,
      "fpi": -1.1,
      "mkt": 1.6,
-     "inj": 0
+     "inj": 0.3
     },
     "wx": {
-     "t": 61.2,
-     "w": 7.3,
+     "t": 61,
+     "w": 7,
      "p": 0,
      "f": 1
     },
@@ -5312,7 +5300,7 @@
      "m90": 15,
      "t10": 26,
      "t90": 61,
-     "pRaw": 0.262
+     "pRaw": 0.264
     },
     "over": 0.55
    },
@@ -5394,7 +5382,7 @@
      }
     ]
    },
-   "score": 1.41
+   "score": 1.43
   },
   {
    "id": "401856751",
@@ -5415,7 +5403,7 @@
     "away": "+162"
    },
    "spreadOdds": {
-    "home": "-108",
+    "home": "-106",
     "away": "-117"
    },
    "home": {
@@ -5862,7 +5850,7 @@
    "spread": -5,
    "proj": {
     "margin": 5.2,
-    "total": 51.4,
+    "total": 51.1,
     "home": 28,
     "away": 23,
     "parts": {
@@ -5885,16 +5873,16 @@
      "inj": -0.5
     },
     "wx": {
-     "t": 62.5,
-     "w": 8.7,
+     "t": 66.3,
+     "w": 10.7,
      "p": 0,
      "f": 1
     },
     "sim": {
      "m10": -14,
      "m90": 24,
-     "t10": 33,
-     "t90": 71,
+     "t10": 32,
+     "t90": 70,
      "pRaw": 0.655
     },
     "over": 0.52
@@ -5985,21 +5973,21 @@
    "venue": "Memorial Stadium (Norman, OK)",
    "tv": "ESPN2",
    "neutral": false,
-   "line": "OU -7.5",
+   "line": "OU -6.5",
    "total": 37.5,
-   "market": -7.5,
+   "market": -6.5,
    "edge": {
-    "pts": 1.5,
+    "pts": 2.5,
     "side": "home",
-    "cover": 0.5
+    "cover": 0.51
    },
    "ml": {
     "home": "-276",
     "away": "+223"
    },
    "spreadOdds": {
-    "home": "+101",
-    "away": "-124"
+    "home": "-129",
+    "away": "+105"
    },
    "home": {
     "id": "201",
@@ -6469,7 +6457,7 @@
    "spread": -9,
    "proj": {
     "margin": 9,
-    "total": 38.9,
+    "total": 39.9,
     "home": 24,
     "away": 15,
     "parts": {
@@ -6493,8 +6481,8 @@
      "inj": 1
     },
     "wx": {
-     "t": 65.8,
-     "w": 15.5,
+     "t": 66.6,
+     "w": 13.8,
      "p": 0,
      "f": 1
     },
@@ -6502,10 +6490,10 @@
      "m10": -8,
      "m90": 25,
      "t10": 24,
-     "t90": 56,
+     "t90": 57,
      "pRaw": 0.579
     },
-    "over": 0.51
+    "over": 0.52
    },
    "stars": {
     "off": [
@@ -6585,7 +6573,7 @@
      }
     ]
    },
-   "score": 1.33
+   "score": 1.34
   },
   {
    "id": "401856755",
@@ -6602,8 +6590,8 @@
     "cover": 0.5
    },
    "ml": {
-    "home": "-1188",
-    "away": "+923"
+    "home": "-1270",
+    "away": "+982"
    },
    "spreadOdds": {
     "home": "-108",
@@ -7099,8 +7087,8 @@
      "inj": -2
     },
     "wx": {
-     "t": 72.6,
-     "w": 7.2,
+     "t": 72.8,
+     "w": 8.5,
      "p": 0,
      "f": 1
     },
@@ -7200,21 +7188,21 @@
    "venue": "David Booth Kansas Memorial Stadium",
    "tv": "ABC",
    "neutral": false,
-   "line": "BYU -5.5",
+   "line": "BYU -4.5",
    "total": 47.5,
-   "market": 5.5,
+   "market": 4.5,
    "edge": {
-    "pts": 1.1,
+    "pts": 2.1,
     "side": "away",
     "cover": 0.5
    },
    "ml": {
-    "home": "+189",
-    "away": "-234"
+    "home": "+173",
+    "away": "-214"
    },
    "spreadOdds": {
-    "home": "-106",
-    "away": "-117"
+    "home": "-108",
+    "away": "-114"
    },
    "home": {
     "id": "2305",
@@ -7652,7 +7640,7 @@
    "spread": 6.5,
    "proj": {
     "margin": -6.6,
-    "total": 46,
+    "total": 46.1,
     "home": 20,
     "away": 26,
     "parts": {
@@ -7675,8 +7663,8 @@
      "inj": 0
     },
     "wx": {
-     "t": 65.8,
-     "w": 15.8,
+     "t": 67.7,
+     "w": 15.9,
      "p": 0,
      "f": 1
     },
@@ -7685,7 +7673,7 @@
      "m90": 12,
      "t10": 27,
      "t90": 65,
-     "pRaw": 0.447
+     "pRaw": 0.457
     },
     "over": 0.49
    },
@@ -7788,7 +7776,7 @@
     "away": "+982"
    },
    "spreadOdds": {
-    "home": "-117",
+    "home": "-119",
     "away": "-106"
    },
    "home": {
@@ -8292,16 +8280,16 @@
      "inj": -1.3
     },
     "wx": {
-     "t": 78.3,
-     "w": 8.3,
+     "t": 71.3,
+     "w": 5.5,
      "p": 0,
      "f": 1
     },
     "sim": {
      "m10": 2,
-     "m90": 42,
+     "m90": 43,
      "t10": 41,
-     "t90": 80,
+     "t90": 81,
      "pRaw": 0.96
     },
     "over": 0.49
@@ -8392,22 +8380,12 @@
    "venue": "Wallace Wade Stadium",
    "tv": "ESPN",
    "neutral": false,
-   "line": "DUKE -10.5",
-   "total": 41.5,
-   "market": -10.5,
-   "edge": {
-    "pts": 1,
-    "side": "home",
-    "cover": 0.5
-   },
-   "ml": {
-    "home": "-470",
-    "away": "+376"
-   },
-   "spreadOdds": {
-    "home": "-122",
-    "away": "-101"
-   },
+   "line": null,
+   "total": null,
+   "market": null,
+   "edge": null,
+   "ml": null,
+   "spreadOdds": null,
    "home": {
     "id": "150",
     "name": "Duke",
@@ -8927,19 +8905,18 @@
      "inj": 2.9
     },
     "wx": {
-     "t": 51.2,
-     "w": 5.5,
+     "t": 49.6,
+     "w": 4.4,
      "p": 0,
      "f": 1
     },
     "sim": {
-     "m10": -6,
-     "m90": 25,
+     "m10": -7,
+     "m90": 24,
      "t10": 30,
      "t90": 61,
-     "pRaw": 0.904
-    },
-    "over": 0.53
+     "pRaw": 0.905
+    }
    },
    "stars": {
     "off": [
@@ -9031,13 +9008,13 @@
    "total": 50.5,
    "market": -13.5,
    "edge": {
-    "pts": 0.6,
+    "pts": 0.5,
     "side": "home",
     "cover": 0.5
    },
    "ml": {
-    "home": "-539",
-    "away": "+430"
+    "home": "-520",
+    "away": "+415"
    },
    "spreadOdds": {
     "home": "-117",
@@ -9500,7 +9477,7 @@
    "pHome": 0.84,
    "spread": -14,
    "proj": {
-    "margin": 14.1,
+    "margin": 14,
     "total": 54.7,
     "home": 34,
     "away": 20,
@@ -9524,8 +9501,8 @@
      "inj": 0
     },
     "wx": {
-     "t": 58.3,
-     "w": 3.6,
+     "t": 55.8,
+     "w": 5.4,
      "p": 0,
      "f": 1
     },
@@ -9534,7 +9511,7 @@
      "m90": 33,
      "t10": 36,
      "t90": 75,
-     "pRaw": 0.721
+     "pRaw": 0.718
     },
     "over": 0.53
    },
@@ -9624,22 +9601,12 @@
    "venue": "Spartan Stadium",
    "tv": "Fox",
    "neutral": false,
-   "line": "ORE -17.5",
-   "total": 41.5,
-   "market": 17.5,
-   "edge": {
-    "pts": 1.3,
-    "side": "away",
-    "cover": 0.5
-   },
-   "ml": {
-    "home": "+738",
-    "away": "-941"
-   },
-   "spreadOdds": {
-    "home": "-108",
-    "away": "-114"
-   },
+   "line": null,
+   "total": null,
+   "market": null,
+   "edge": null,
+   "ml": null,
+   "spreadOdds": null,
    "home": {
     "id": "127",
     "name": "Michigan State",
@@ -9847,10 +9814,10 @@
        "fv": 22,
        "play": 0.91,
        "st": null,
-       "more": 1.28,
+       "more": 1.25,
        "miss": 0,
-       "pts": 6.9,
-       "line": "31 yds · 2.6 rec · 0.2 TD",
+       "pts": 6.7,
+       "line": "30 yds · 2.5 rec · 0.2 TD",
        "fvx": 22
       },
       {
@@ -9859,9 +9826,9 @@
        "fv": 23,
        "play": 0.64,
        "st": null,
-       "more": 1.28,
+       "more": 1.25,
        "miss": 0,
-       "pts": 5.1,
+       "pts": 5,
        "line": "23 yds · 1.1 rec · 0.3 TD",
        "fvx": 23
       }
@@ -10154,8 +10121,8 @@
      "inj": -3.1
     },
     "wx": {
-     "t": 51.5,
-     "w": 8.2,
+     "t": 51.6,
+     "w": 6.6,
      "p": 0,
      "f": 1
     },
@@ -10164,9 +10131,8 @@
      "m90": 2,
      "t10": 30,
      "t90": 68,
-     "pRaw": 0.217
-    },
-    "over": 0.55
+     "pRaw": 0.218
+    }
    },
    "stars": {
     "off": [
@@ -10744,7 +10710,7 @@
     "away": 22,
     "parts": {
      "elo": 2.3,
-     "net": 0.7,
+     "net": 0.8,
      "home": 0.9,
      "rest": 0,
      "tz": 0,
@@ -10763,17 +10729,17 @@
      "inj": -2.1
     },
     "wx": {
-     "t": 67.6,
-     "w": 9.6,
+     "t": 71.2,
+     "w": 8.8,
      "p": 0,
      "f": 1
     },
     "sim": {
-     "m10": -8,
+     "m10": -7,
      "m90": 28,
      "t10": 35,
      "t90": 71,
-     "pRaw": 0.854
+     "pRaw": 0.857
     },
     "over": 0.56
    },
@@ -10863,21 +10829,21 @@
    "venue": "Bobby Dodd Stadium",
    "tv": "ESPN",
    "neutral": false,
-   "line": "WAKE -19.5",
+   "line": "WAKE -20.5",
    "total": 55.5,
-   "market": 19.5,
+   "market": 20.5,
    "edge": {
-    "pts": 1.9,
+    "pts": 2.9,
     "side": "home",
-    "cover": 0.5
+    "cover": 0.51
    },
    "ml": {
     "home": "+923",
     "away": "-1188"
    },
    "spreadOdds": {
-    "home": "-106",
-    "away": "-117"
+    "home": "-108",
+    "away": "-114"
    },
    "home": {
     "id": "59",
@@ -11340,8 +11306,8 @@
    "spread": 17.5,
    "proj": {
     "margin": -17.6,
-    "total": 54.8,
-    "home": 19,
+    "total": 54.3,
+    "home": 18,
     "away": 36,
     "parts": {
      "elo": -4,
@@ -11364,17 +11330,17 @@
      "inj": -0.3
     },
     "wx": {
-     "t": 68.7,
-     "w": 11.2,
+     "t": 61.8,
+     "w": 12.3,
      "p": 0,
      "f": 1
     },
     "sim": {
-     "m10": -36,
+     "m10": -37,
      "m90": 1,
-     "t10": 37,
-     "t90": 73,
-     "pRaw": 0.042
+     "t10": 36,
+     "t90": 72,
+     "pRaw": 0.043
     },
     "over": 0.49
    },
@@ -11477,8 +11443,8 @@
     "away": "-132"
    },
    "spreadOdds": {
-    "home": "-112",
-    "away": "-110"
+    "home": "-114",
+    "away": "-108"
    },
    "home": {
     "id": "135",
@@ -11929,7 +11895,7 @@
    "spread": -3,
    "proj": {
     "margin": 2.9,
-    "total": 45.7,
+    "total": 45.5,
     "home": 24,
     "away": 21,
     "parts": {
@@ -11952,19 +11918,19 @@
      "inj": 7.9
     },
     "wx": {
-     "t": 48.7,
-     "w": 10,
+     "t": 50.3,
+     "w": 10.3,
      "p": 0,
      "f": 1
     },
     "sim": {
-     "m10": -23,
-     "m90": 14,
-     "t10": 29,
-     "t90": 64,
-     "pRaw": 0.303
+     "m10": -24,
+     "m90": 13,
+     "t10": 28,
+     "t90": 63,
+     "pRaw": 0.304
     },
-    "over": 0.53
+    "over": 0.52
    },
    "stars": {
     "off": [
@@ -12053,7 +12019,7 @@
    "tv": "CW",
    "neutral": false,
    "line": "UVA -1.5",
-   "total": 41.5,
+   "total": 42.5,
    "market": -1.5,
    "edge": {
     "pts": 0.8,
@@ -12061,8 +12027,8 @@
     "cover": 0.5
    },
    "ml": {
-    "home": "-122",
-    "away": "-101"
+    "home": "-119",
+    "away": "-104"
    },
    "spreadOdds": {
     "home": "-110",
@@ -12556,8 +12522,8 @@
      "inj": 2.5
     },
     "wx": {
-     "t": 64.8,
-     "w": 4.8,
+     "t": 63.9,
+     "w": 4.1,
      "p": 0,
      "f": 1
     },
@@ -12566,9 +12532,9 @@
      "m90": 18,
      "t10": 28,
      "t90": 63,
-     "pRaw": 0.509
+     "pRaw": 0.508
     },
-    "over": 0.53
+    "over": 0.52
    },
    "stars": {
     "off": [
@@ -13066,8 +13032,8 @@
        "st": null,
        "more": 1.03,
        "miss": 0,
-       "pts": 20.4,
-       "line": "95 yds · 5.1 rec · 1 TD",
+       "pts": 20.3,
+       "line": "94 yds · 5.1 rec · 1 TD",
        "fvx": 51
       },
       {
@@ -13078,7 +13044,7 @@
        "st": null,
        "more": 1.03,
        "miss": 0,
-       "pts": 13.8,
+       "pts": 13.7,
        "line": "75 yds · 5.4 rec · 0.1 TD",
        "fvx": 28
       }
@@ -13114,8 +13080,8 @@
    "spread": 10.5,
    "proj": {
     "margin": -10.4,
-    "total": 51.4,
-    "home": 20,
+    "total": 51.6,
+    "home": 21,
     "away": 31,
     "parts": {
      "elo": -3.3,
@@ -13137,17 +13103,17 @@
      "inj": 0
     },
     "wx": {
-     "t": 58.7,
-     "w": 6.2,
-     "p": 6.1,
+     "t": 57.1,
+     "w": 9.1,
+     "p": 7.2,
      "f": 1
     },
     "sim": {
      "m10": -31,
      "m90": 11,
      "t10": 33,
-     "t90": 72,
-     "pRaw": 0.385
+     "t90": 71,
+     "pRaw": 0.394
     },
     "over": 0.49
    },
@@ -13175,8 +13141,8 @@
       "st": null,
       "more": 1.03,
       "miss": 0,
-      "pts": 20.4,
-      "line": "95 yds · 5.1 rec · 1 TD",
+      "pts": 20.3,
+      "line": "94 yds · 5.1 rec · 1 TD",
       "team": "ARIZ",
       "logo": "/img/cfb/logos/12.png",
       "fvx": 51
@@ -13189,7 +13155,7 @@
       "st": null,
       "more": 1.03,
       "miss": 0,
-      "pts": 13.8,
+      "pts": 13.7,
       "line": "75 yds · 5.4 rec · 0.1 TD",
       "team": "ARIZ",
       "logo": "/img/cfb/logos/12.png",
@@ -13240,17 +13206,17 @@
    "total": 56.5,
    "market": 6.5,
    "edge": {
-    "pts": 3.6,
+    "pts": 3.7,
     "side": "home",
     "cover": 0.51
    },
    "ml": {
     "home": "+213",
-    "away": "-270"
+    "away": "-263"
    },
    "spreadOdds": {
-    "home": "-101",
-    "away": "-124"
+    "home": "-104",
+    "away": "-119"
    },
    "home": {
     "id": "2655",
@@ -13724,7 +13690,7 @@
    "pHome": 0.42,
    "spread": 3,
    "proj": {
-    "margin": -2.9,
+    "margin": -2.8,
     "total": 60.4,
     "home": 29,
     "away": 32,
@@ -13749,17 +13715,17 @@
      "inj": 9.1
     },
     "wx": {
-     "t": 68,
-     "w": 9.2,
+     "t": 71.2,
+     "w": 7.8,
      "p": 0,
      "f": 1
     },
     "sim": {
      "m10": -33,
      "m90": 8,
-     "t10": 41,
+     "t10": 40,
      "t90": 81,
-     "pRaw": 0.283
+     "pRaw": 0.284
     },
     "over": 0.53
    },
@@ -13853,7 +13819,7 @@
    "total": 59.5,
    "market": 2.5,
    "edge": {
-    "pts": 4.4,
+    "pts": 4.3,
     "side": "away",
     "cover": 0.51
    },
@@ -13862,8 +13828,8 @@
     "away": "-146"
    },
    "spreadOdds": {
-    "home": "-106",
-    "away": "-117"
+    "home": "-108",
+    "away": "-114"
    },
    "home": {
     "id": "9",
@@ -14313,10 +14279,10 @@
      ]
     }
    },
-   "pHome": 0.31,
+   "pHome": 0.32,
    "spread": 7,
    "proj": {
-    "margin": -6.9,
+    "margin": -6.8,
     "total": 60.6,
     "home": 27,
     "away": 34,
@@ -14341,8 +14307,8 @@
      "inj": 0
     },
     "wx": {
-     "t": 64.3,
-     "w": 0.5,
+     "t": 52.5,
+     "w": 4.6,
      "p": 0,
      "f": 1
     },
@@ -14351,7 +14317,7 @@
      "m90": 14,
      "t10": 40,
      "t90": 82,
-     "pRaw": 0.36
+     "pRaw": 0.367
     },
     "over": 0.51
    },
@@ -14454,8 +14420,8 @@
     "away": "+702"
    },
    "spreadOdds": {
-    "home": "-117",
-    "away": "-106"
+    "home": "-119",
+    "away": "-104"
    },
    "home": {
     "id": "30",
@@ -14924,15 +14890,15 @@
      "inj": 0
     },
     "wx": {
-     "t": 66.2,
-     "w": 7.3,
+     "t": 67,
+     "w": 4.4,
      "p": 0,
      "f": 1
     },
     "sim": {
-     "m10": 0,
+     "m10": -1,
      "m90": 39,
-     "t10": 39,
+     "t10": 40,
      "t90": 79,
      "pRaw": 0.782
     },
@@ -15037,8 +15003,8 @@
     "away": "-146"
    },
    "spreadOdds": {
-    "home": "-106",
-    "away": "-119"
+    "home": "-108",
+    "away": "-114"
    },
    "home": {
     "id": "2426",
@@ -15498,17 +15464,17 @@
      "inj": 0
     },
     "wx": {
-     "t": 62.6,
-     "w": 3.2,
+     "t": 62.2,
+     "w": 3.1,
      "p": 0,
      "f": 1
     },
     "sim": {
      "m10": -24,
-     "m90": 18,
+     "m90": 17,
      "t10": 36,
      "t90": 78,
-     "pRaw": 0.377
+     "pRaw": 0.378
     },
     "over": 0.41
    },
@@ -15593,586 +15559,6 @@
    "score": 0.11
   },
   {
-   "id": "401856869",
-   "date": "2026-11-20T23:00:00.000Z",
-   "venue": "Acrisure Bounce House",
-   "tv": "FS1",
-   "neutral": false,
-   "line": null,
-   "total": null,
-   "market": null,
-   "edge": null,
-   "ml": null,
-   "spreadOdds": null,
-   "home": {
-    "id": "2116",
-    "name": "UCF",
-    "logo": "/img/cfb/logos/2116.png",
-    "color": "#000000",
-    "rank": null,
-    "elo": 1465,
-    "rec": "5-5",
-    "talentRk": 62,
-    "style": {
-     "run": 0.45,
-     "osr": 0.42,
-     "oepa": 0.06,
-     "dsr": 0.43,
-     "depa": 0.08,
-     "xpl": 1.17,
-     "havoc": 0.14
-    },
-    "off": [
-     {
-      "name": "Tyren Hornes",
-      "pos": "WR",
-      "fv": 37,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2116.png",
-      "cls": "Fr",
-      "inj": null,
-      "fvx": 37
-     },
-     {
-      "name": "Caden Piening",
-      "pos": "TE",
-      "fv": 35,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2116.png",
-      "cls": "RS-Fr",
-      "inj": null,
-      "fvx": 35
-     },
-     {
-      "name": "Duke Watson",
-      "pos": "RB",
-      "fv": 28,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2116.png",
-      "cls": "Jr",
-      "inj": null,
-      "fvx": 28
-     },
-     {
-      "name": "Jacob Maiava",
-      "pos": "OL",
-      "fv": 23,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2116.png",
-      "cls": "Fr",
-      "inj": null,
-      "fvx": 23
-     },
-     {
-      "name": "Waden Charles",
-      "pos": "WR",
-      "fv": 23,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2116.png",
-      "cls": "So",
-      "inj": null,
-      "fvx": 23
-     }
-    ],
-    "def": [
-     {
-      "name": "Jayden Bellamy",
-      "pos": "CB",
-      "fv": 29,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2116.png",
-      "cls": "RS-Sr",
-      "inj": null,
-      "fvx": 29
-     },
-     {
-      "name": "Jeffson Lafontant",
-      "pos": "DL",
-      "fv": 28,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2116.png",
-      "cls": "Sr",
-      "inj": null,
-      "fvx": 28
-     },
-     {
-      "name": "Horace Lockett",
-      "pos": "DL",
-      "fv": 26,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2116.png",
-      "cls": "RS-Sr",
-      "inj": null,
-      "fvx": 26
-     },
-     {
-      "name": "Sincere Edwards",
-      "pos": "EDGE",
-      "fv": 24,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2116.png",
-      "cls": "Jr",
-      "inj": null,
-      "fvx": 24
-     },
-     {
-      "name": "Rukeem Stroud",
-      "pos": "CB",
-      "fv": 23,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/2116.png",
-      "cls": "Fr",
-      "inj": null,
-      "fvx": 23
-     }
-    ],
-    "injAdj": 0,
-    "injPts": 0,
-    "qbOut": null,
-    "kOut": null,
-    "out": [],
-    "seasonOut": [],
-    "talentAdj": -19,
-    "stars": {
-     "off": [
-      {
-       "name": "Josh Derry",
-       "pos": "WR",
-       "fv": 20,
-       "play": 0.94,
-       "st": null,
-       "more": 1,
-       "miss": 0,
-       "pts": 14.3,
-       "line": "69 yds · 5 rec · 0.4 TD",
-       "fvx": 20
-      },
-      {
-       "name": "Alonza Barnett III",
-       "pos": "QB",
-       "fv": 20,
-       "play": 0.72,
-       "st": null,
-       "more": 1,
-       "miss": 0,
-       "pts": 9.1,
-       "line": "142 pass yds · 0.7 pass TD",
-       "fvx": 20
-      },
-      {
-       "name": "Tyren Hornes",
-       "pos": "WR",
-       "fv": 37,
-       "play": 0.86,
-       "st": null,
-       "more": 1,
-       "miss": 0,
-       "pts": 7.8,
-       "line": "37 yds · 2.9 rec · 0.2 TD",
-       "fvx": 37
-      }
-     ],
-     "def": [
-      {
-       "name": "Tackett Curtis",
-       "pos": "LB",
-       "fv": 20,
-       "pts": 9.7,
-       "line": "6.7 tkl · 0.4 TFL · 0.2 sk",
-       "fvx": 20
-      },
-      {
-       "name": "Jayden Williams",
-       "pos": "S",
-       "fv": 20,
-       "pts": 7.2,
-       "line": "5.3 tkl · 0.2 TFL",
-       "fvx": 20
-      },
-      {
-       "name": "Antione Jackson",
-       "pos": "CB",
-       "fv": 20,
-       "pts": 6.2,
-       "line": "3.6 tkl · 0.9 PD",
-       "fvx": 20
-      }
-     ]
-    }
-   },
-   "away": {
-    "id": "66",
-    "name": "Iowa State",
-    "logo": "/img/cfb/logos/66.png",
-    "color": "#ae192d",
-    "rank": null,
-    "elo": 1585,
-    "rec": "5-5",
-    "talentRk": 61,
-    "style": {
-     "run": 0.54,
-     "osr": 0.41,
-     "oepa": 0.17,
-     "dsr": 0.45,
-     "depa": 0.16,
-     "xpl": 1.38,
-     "havoc": 0.15
-    },
-    "off": [
-     {
-      "name": "Aiden Flora",
-      "pos": "RB",
-      "fv": 53,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/66.png",
-      "cls": "RS-So",
-      "inj": null,
-      "fvx": 53
-     },
-     {
-      "name": "Jamal Polite",
-      "pos": "WR",
-      "fv": 27,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/66.png",
-      "cls": "Fr",
-      "inj": null,
-      "fvx": 27
-     },
-     {
-      "name": "Vince Benetti",
-      "pos": "TE",
-      "fv": 26,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/66.png",
-      "cls": "Jr",
-      "inj": null,
-      "fvx": 26
-     },
-     {
-      "name": "Braden Smith",
-      "pos": "OL",
-      "fv": 24,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/66.png",
-      "cls": "So",
-      "inj": null,
-      "fvx": 24
-     },
-     {
-      "name": "DeAndre Carter",
-      "pos": "OL",
-      "fv": 23,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/66.png",
-      "cls": "So",
-      "inj": null,
-      "fvx": 23
-     }
-    ],
-    "def": [
-     {
-      "name": "Sullivan Schlimgen",
-      "pos": "LB",
-      "fv": 42,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/66.png",
-      "cls": "So",
-      "inj": null,
-      "fvx": 42
-     },
-     {
-      "name": "Jace Gilbert",
-      "pos": "DL",
-      "fv": 26,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/66.png",
-      "cls": "RS-So",
-      "inj": null,
-      "fvx": 26
-     },
-     {
-      "name": "Tyrone Cotton",
-      "pos": "CB",
-      "fv": 24,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/66.png",
-      "cls": "Fr",
-      "inj": null,
-      "fvx": 24
-     },
-     {
-      "name": "Donovan Fitzmaurice",
-      "pos": "DL",
-      "fv": 23,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/66.png",
-      "cls": "So",
-      "inj": null,
-      "fvx": 23
-     },
-     {
-      "name": "Blake Hawkins",
-      "pos": "EDGE",
-      "fv": 23,
-      "plus": false,
-      "star": null,
-      "riser": null,
-      "logo": "/img/cfb/logos/66.png",
-      "cls": "So",
-      "inj": null,
-      "fvx": 23
-     }
-    ],
-    "injAdj": -5,
-    "injPts": -0.3,
-    "qbOut": null,
-    "kOut": null,
-    "out": [
-     {
-      "name": "Cody Jackson",
-      "pos": "WR",
-      "fv": 20,
-      "status": "Out (season)",
-      "miss": 1,
-      "fvx": 20
-     }
-    ],
-    "seasonOut": [
-     {
-      "name": "Dominic Overby",
-      "pos": "WR",
-      "fv": 25,
-      "fvx": 25
-     }
-    ],
-    "talentAdj": -18,
-    "stars": {
-     "off": [
-      {
-       "name": "Aiden Flora",
-       "pos": "RB",
-       "fv": 53,
-       "play": 0.96,
-       "st": null,
-       "more": 1.03,
-       "miss": 0,
-       "pts": 23.1,
-       "line": "133 yds · 2.3 rec · 1.1 TD",
-       "fvx": 53
-      },
-      {
-       "name": "Jaylen Raynor",
-       "pos": "QB",
-       "fv": 20,
-       "play": 0.95,
-       "st": null,
-       "more": 1,
-       "miss": 0,
-       "pts": 16,
-       "line": "184 pass yds · 1.3 pass TD",
-       "fvx": 20
-      },
-      {
-       "name": "Jamal Polite",
-       "pos": "WR",
-       "fv": 27,
-       "play": 0.85,
-       "st": null,
-       "more": 1.1,
-       "miss": 0,
-       "pts": 7.5,
-       "line": "41 yds · 2.1 rec · 0.2 TD",
-       "fvx": 27
-      }
-     ],
-     "def": [
-      {
-       "name": "Sullivan Schlimgen",
-       "pos": "LB",
-       "fv": 42,
-       "pts": 12.3,
-       "line": "9.3 tkl · 0.7 TFL · 0.2 sk · 0.5 PD",
-       "fvx": 42
-      },
-      {
-       "name": "Carson Willich",
-       "pos": "LB",
-       "fv": 20,
-       "pts": 7.5,
-       "line": "5.4 tkl · 0.8 TFL",
-       "fvx": 20
-      },
-      {
-       "name": "Beau Goodwin",
-       "pos": "LB",
-       "fv": 22,
-       "pts": 4.9,
-       "line": "3.6 tkl",
-       "fvx": 22
-      }
-     ]
-    }
-   },
-   "pHome": 0.5,
-   "spread": 0,
-   "proj": {
-    "margin": 0.1,
-    "total": 44.6,
-    "home": 22,
-    "away": 22,
-    "parts": {
-     "elo": -1.5,
-     "net": -0.3,
-     "home": 0.9,
-     "rest": 0,
-     "tz": 0,
-     "dist": 0.4,
-     "alt": 0,
-     "fcs": 0,
-     "st": 0,
-     "p4": 0,
-     "aggr": 0,
-     "ret": 0,
-     "gc": -0.3,
-     "fcsm": 0,
-     "fpi": 0.2,
-     "mkt": 0.5,
-     "inj": 0.3
-    },
-    "wx": {
-     "t": 69.7,
-     "w": 15,
-     "p": 4.3,
-     "f": 1
-    },
-    "sim": {
-     "m10": -21,
-     "m90": 19,
-     "t10": 25,
-     "t90": 64,
-     "pRaw": 0.617
-    }
-   },
-   "stars": {
-    "off": [
-     {
-      "name": "Aiden Flora",
-      "pos": "RB",
-      "fv": 53,
-      "play": 0.96,
-      "st": null,
-      "more": 1.03,
-      "miss": 0,
-      "pts": 23.1,
-      "line": "133 yds · 2.3 rec · 1.1 TD",
-      "team": "ISU",
-      "logo": "/img/cfb/logos/66.png",
-      "fvx": 53
-     },
-     {
-      "name": "Jaylen Raynor",
-      "pos": "QB",
-      "fv": 20,
-      "play": 0.95,
-      "st": null,
-      "more": 1,
-      "miss": 0,
-      "pts": 16,
-      "line": "184 pass yds · 1.3 pass TD",
-      "team": "ISU",
-      "logo": "/img/cfb/logos/66.png",
-      "fvx": 20
-     },
-     {
-      "name": "Josh Derry",
-      "pos": "WR",
-      "fv": 20,
-      "play": 0.94,
-      "st": null,
-      "more": 1,
-      "miss": 0,
-      "pts": 14.3,
-      "line": "69 yds · 5 rec · 0.4 TD",
-      "team": "UCF",
-      "logo": "/img/cfb/logos/2116.png",
-      "fvx": 20
-     }
-    ],
-    "def": [
-     {
-      "name": "Sullivan Schlimgen",
-      "pos": "LB",
-      "fv": 42,
-      "pts": 12.3,
-      "line": "9.3 tkl · 0.7 TFL · 0.2 sk · 0.5 PD",
-      "team": "ISU",
-      "logo": "/img/cfb/logos/66.png",
-      "fvx": 42
-     },
-     {
-      "name": "Tackett Curtis",
-      "pos": "LB",
-      "fv": 20,
-      "pts": 9.7,
-      "line": "6.7 tkl · 0.4 TFL · 0.2 sk",
-      "team": "UCF",
-      "logo": "/img/cfb/logos/2116.png",
-      "fvx": 20
-     },
-     {
-      "name": "Carson Willich",
-      "pos": "LB",
-      "fv": 20,
-      "pts": 7.5,
-      "line": "5.4 tkl · 0.8 TFL",
-      "team": "ISU",
-      "logo": "/img/cfb/logos/66.png",
-      "fvx": 20
-     }
-    ]
-   },
-   "score": 0.09
-  },
-  {
    "id": "401856868",
    "date": "2026-11-21T18:00:00.000Z",
    "venue": "Milan Puskar Stadium",
@@ -16182,17 +15568,17 @@
    "total": 71.5,
    "market": 7.5,
    "edge": {
-    "pts": 0.5,
+    "pts": 3.9,
     "side": "home",
-    "cover": 0.5
+    "cover": 0.51
    },
    "ml": {
-    "home": "+240",
-    "away": "-298"
+    "home": "+229",
+    "away": "-283"
    },
    "spreadOdds": {
-    "home": "-117",
-    "away": "-106"
+    "home": "-127",
+    "away": "+103"
    },
    "home": {
     "id": "277",
@@ -16474,7 +15860,7 @@
       "riser": null,
       "logo": "/img/cfb/logos/248.png",
       "cls": "RS-Sr",
-      "inj": null,
+      "inj": "Questionable",
       "fvx": 34
      },
      {
@@ -16552,11 +15938,25 @@
       "fvx": 20
      }
     ],
-    "injAdj": 0,
-    "injPts": 0,
-    "qbOut": null,
+    "injAdj": -54,
+    "injPts": -3.5,
+    "qbOut": {
+     "name": "Conner Weigman",
+     "backup": "Keisean Henderson",
+     "status": "Questionable",
+     "pts": -3.5
+    },
     "kOut": null,
-    "out": [],
+    "out": [
+     {
+      "name": "Conner Weigman",
+      "pos": "QB",
+      "fv": 34,
+      "status": "Questionable",
+      "miss": 0.4,
+      "fvx": 34
+     }
+    ],
     "seasonOut": [],
     "talentAdj": 28,
     "stars": {
@@ -16565,12 +15965,12 @@
        "name": "Conner Weigman",
        "pos": "QB",
        "fv": 34,
-       "play": 0.96,
-       "st": null,
-       "more": 1,
+       "play": 0.59,
+       "st": "Questionable",
+       "more": 1.45,
        "miss": 0,
-       "pts": 32.9,
-       "line": "330 pass yds · 3.2 pass TD · 30 yds · 0.7 TD",
+       "pts": 27.1,
+       "line": "292 pass yds · 2.9 pass TD",
        "fvx": 34
       },
       {
@@ -16626,13 +16026,13 @@
      ]
     }
    },
-   "pHome": 0.31,
-   "spread": 7,
+   "pHome": 0.4,
+   "spread": 3.5,
    "proj": {
-    "margin": -7,
+    "margin": -3.6,
     "total": 62.5,
-    "home": 28,
-    "away": 35,
+    "home": 29,
+    "away": 33,
     "parts": {
      "elo": -2.8,
      "net": -1.1,
@@ -16646,15 +16046,15 @@
      "p4": 0,
      "aggr": 0.1,
      "ret": -0.1,
-     "gc": -1.2,
+     "gc": -1.3,
      "fcsm": 0,
      "fpi": -4.6,
      "mkt": 1.6,
-     "inj": 0
+     "inj": 3.5
     },
     "wx": {
-     "t": 68.4,
-     "w": 5,
+     "t": 68.8,
+     "w": 5.1,
      "p": 0,
      "f": 1
     },
@@ -16687,12 +16087,12 @@
       "name": "Conner Weigman",
       "pos": "QB",
       "fv": 34,
-      "play": 0.96,
-      "st": null,
-      "more": 1,
+      "play": 0.59,
+      "st": "Questionable",
+      "more": 1.45,
       "miss": 0,
-      "pts": 32.9,
-      "line": "330 pass yds · 3.2 pass TD · 30 yds · 0.7 TD",
+      "pts": 27.1,
+      "line": "292 pass yds · 2.9 pass TD",
       "team": "HOU",
       "logo": "/img/cfb/logos/248.png",
       "fvx": 34
@@ -16745,7 +16145,7 @@
      }
     ]
    },
-   "score": -0.17
+   "score": 0.01
   },
   {
    "id": "401858304",
@@ -17279,9 +16679,9 @@
      "inj": -1.6
     },
     "wx": {
-     "t": 66.7,
-     "w": 7.1,
-     "p": 0,
+     "t": 64.8,
+     "w": 7.4,
+     "p": 0.4,
      "f": 1
     },
     "sim": {
@@ -17289,7 +16689,7 @@
      "m90": 30,
      "t10": 38,
      "t90": 78,
-     "pRaw": 0.698
+     "pRaw": 0.7
     },
     "over": 0.51
    },
@@ -17680,7 +17080,7 @@
      "tz": 0,
      "dist": 0,
      "alt": 0,
-     "fcs": 2.6,
+     "fcs": 2.7,
      "st": 0.1,
      "p4": 5.1,
      "aggr": -0.1,
@@ -17691,8 +17091,8 @@
      "inj": 0
     },
     "wx": {
-     "t": 76.4,
-     "w": 5.6,
+     "t": 75,
+     "w": 9.5,
      "p": 0,
      "f": 1
     },
@@ -17798,8 +17198,8 @@
     "cover": 0.51
    },
    "ml": {
-    "home": "-104",
-    "away": "-119"
+    "home": "-106",
+    "away": "-117"
    },
    "spreadOdds": {
     "home": "-110",
@@ -18286,17 +17686,17 @@
      "inj": -0.3
     },
     "wx": {
-     "t": 77,
-     "w": 7.7,
+     "t": 77.2,
+     "w": 7.2,
      "p": 0,
      "f": 1
     },
     "sim": {
      "m10": -20,
      "m90": 22,
-     "t10": 43,
-     "t90": 82,
-     "pRaw": 0.519
+     "t10": 42,
+     "t90": 83,
+     "pRaw": 0.518
     },
     "over": 0.49
    },
@@ -18399,8 +17799,8 @@
     "away": "+669"
    },
    "spreadOdds": {
-    "home": "-108",
-    "away": "-114"
+    "home": "-110",
+    "away": "-112"
    },
    "home": {
     "id": "68",
@@ -18466,7 +17866,7 @@
       "riser": null,
       "logo": "/img/cfb/logos/68.png",
       "cls": "So",
-      "inj": "Questionable",
+      "inj": null,
       "fvx": 34
      },
      {
@@ -18573,10 +17973,10 @@
        "fv": 48,
        "play": 0.96,
        "st": null,
-       "more": 1.04,
+       "more": 1,
        "miss": 0,
-       "pts": 24.8,
-       "line": "151 yds · 2 rec · 1.3 TD",
+       "pts": 23.8,
+       "line": "145 yds · 1.9 rec · 1.2 TD",
        "fvx": 48
       },
       {
@@ -18585,23 +17985,23 @@
        "fv": 52,
        "play": 0.92,
        "st": null,
-       "more": 1.05,
+       "more": 1,
        "miss": 0,
-       "pts": 21.3,
-       "line": "99 yds · 5.6 rec · 1 TD",
+       "pts": 20.1,
+       "line": "93 yds · 5.4 rec · 0.9 TD",
        "fvx": 52
       },
       {
-       "name": "Maddux Madsen",
-       "pos": "QB",
-       "fv": 20,
-       "play": 0.36,
-       "st": "Questionable",
-       "more": 1.76,
+       "name": "Sire Gaines",
+       "pos": "RB",
+       "fv": 34,
+       "play": 0.8,
+       "st": null,
+       "more": 1,
        "miss": 0,
-       "pts": 12.1,
-       "line": "141 pass yds · 1.3 pass TD",
-       "fvx": 20
+       "pts": 13.3,
+       "line": "74 yds · 1.3 rec · 0.8 TD",
+       "fvx": 34
       }
      ],
      "def": [
@@ -18890,8 +18290,8 @@
      "inj": -4.5
     },
     "wx": {
-     "t": 42.5,
-     "w": 5.2,
+     "t": 39.1,
+     "w": 9.5,
      "p": 0,
      "f": 1
     },
@@ -18912,10 +18312,10 @@
       "fv": 48,
       "play": 0.96,
       "st": null,
-      "more": 1.04,
+      "more": 1,
       "miss": 0,
-      "pts": 24.8,
-      "line": "151 yds · 2 rec · 1.3 TD",
+      "pts": 23.8,
+      "line": "145 yds · 1.9 rec · 1.2 TD",
       "team": "BOIS",
       "logo": "/img/cfb/logos/68.png",
       "fvx": 48
@@ -18926,27 +18326,27 @@
       "fv": 52,
       "play": 0.92,
       "st": null,
-      "more": 1.05,
+      "more": 1,
       "miss": 0,
-      "pts": 21.3,
-      "line": "99 yds · 5.6 rec · 1 TD",
+      "pts": 20.1,
+      "line": "93 yds · 5.4 rec · 0.9 TD",
       "team": "BOIS",
       "logo": "/img/cfb/logos/68.png",
       "fvx": 52
      },
      {
-      "name": "Javion Kinnard",
+      "name": "Sire Gaines",
       "pos": "RB",
-      "fv": 33,
-      "play": 0.89,
+      "fv": 34,
+      "play": 0.8,
       "st": null,
-      "more": 1.02,
+      "more": 1,
       "miss": 0,
-      "pts": 13.2,
-      "line": "89 yds · 1.2 rec · 0.5 TD",
-      "team": "SDSU",
-      "logo": "/img/cfb/logos/21.png",
-      "fvx": 33
+      "pts": 13.3,
+      "line": "74 yds · 1.3 rec · 0.8 TD",
+      "team": "BOIS",
+      "logo": "/img/cfb/logos/68.png",
+      "fvx": 34
      }
     ],
     "def": [
@@ -18990,11 +18390,11 @@
    "venue": "Nippert Stadium",
    "tv": "ESPN+",
    "neutral": false,
-   "line": "CIN -3.5",
+   "line": "CIN -2.5",
    "total": 56.5,
-   "market": -3.5,
+   "market": -2.5,
    "edge": {
-    "pts": 2,
+    "pts": 1,
     "side": "away",
     "cover": 0.5
    },
@@ -19003,8 +18403,8 @@
     "away": "+128"
    },
    "spreadOdds": {
-    "home": "+103",
-    "away": "-127"
+    "home": "-129",
+    "away": "+105"
    },
    "home": {
     "id": "2132",
@@ -19175,7 +18575,7 @@
        "more": 1,
        "miss": 0,
        "pts": 22.6,
-       "line": "217 pass yds · 1.7 pass TD · 30 yds · 0.8 TD",
+       "line": "217 pass yds · 1.7 pass TD · 31 yds · 0.8 TD",
        "fvx": 20
       },
       {
@@ -19184,10 +18584,10 @@
        "fv": 48,
        "play": 0.56,
        "st": "Questionable",
-       "more": 1.2,
+       "more": 1.79,
        "miss": 0,
-       "pts": 14.1,
-       "line": "73 yds · 1.8 rec · 0.8 TD",
+       "pts": 18.8,
+       "line": "102 yds · 1.9 rec · 1.1 TD",
        "fvx": 48
       },
       {
@@ -19196,10 +18596,10 @@
        "fv": 21,
        "play": 0.56,
        "st": null,
-       "more": 1.06,
+       "more": 1.09,
        "miss": 1,
-       "pts": 9.2,
-       "line": "41 yds · 3.1 rec · 0.3 TD",
+       "pts": 9.5,
+       "line": "43 yds · 3.2 rec · 0.3 TD",
        "fvx": 21
       }
      ],
@@ -19475,17 +18875,17 @@
      "inj": -0.8
     },
     "wx": {
-     "t": 68.5,
-     "w": 5.6,
+     "t": 69.3,
+     "w": 5.1,
      "p": 0,
      "f": 1
     },
     "sim": {
      "m10": -17,
      "m90": 22,
-     "t10": 36,
+     "t10": 35,
      "t90": 74,
-     "pRaw": 0.706
+     "pRaw": 0.701
     },
     "over": 0.48
    },
@@ -19500,7 +18900,7 @@
       "more": 1,
       "miss": 0,
       "pts": 22.6,
-      "line": "217 pass yds · 1.7 pass TD · 30 yds · 0.8 TD",
+      "line": "217 pass yds · 1.7 pass TD · 31 yds · 0.8 TD",
       "team": "CIN",
       "logo": "/img/cfb/logos/2132.png",
       "fvx": 20
@@ -19525,10 +18925,10 @@
       "fv": 48,
       "play": 0.56,
       "st": "Questionable",
-      "more": 1.2,
+      "more": 1.79,
       "miss": 0,
-      "pts": 14.1,
-      "line": "73 yds · 1.8 rec · 0.8 TD",
+      "pts": 18.8,
+      "line": "102 yds · 1.9 rec · 1.1 TD",
       "team": "CIN",
       "logo": "/img/cfb/logos/2132.png",
       "fvx": 48
@@ -20074,7 +19474,7 @@
      "inj": 0.3
     },
     "wx": {
-     "t": 60.1,
+     "t": 61.8,
      "w": 5.8,
      "p": 0,
      "f": 1
@@ -20184,7 +19584,7 @@
    },
    "ml": {
     "home": "+181",
-    "away": "-229"
+    "away": "-224"
    },
    "spreadOdds": {
     "home": "-104",
@@ -20659,7 +20059,7 @@
     },
     "wx": {
      "t": 62.5,
-     "w": 6.5,
+     "w": 2.2,
      "p": 0,
      "f": 1
     },
@@ -20668,7 +20068,7 @@
      "m90": 14,
      "t10": 36,
      "t90": 73,
-     "pRaw": 0.425
+     "pRaw": 0.431
     },
     "over": 0.53
    },
@@ -20771,8 +20171,8 @@
     "away": "OFF"
    },
    "spreadOdds": {
-    "home": "+101",
-    "away": "-127"
+    "home": "-101",
+    "away": "-124"
    },
    "home": {
     "id": "145",
@@ -21060,13 +20460,13 @@
     "away": 7,
     "parts": {
      "elo": 23,
-     "net": 9.4,
+     "net": 9.3,
      "home": 1.9,
      "rest": -0.1,
      "tz": 0,
      "dist": 0,
      "alt": 0,
-     "fcs": 2.6,
+     "fcs": 2.7,
      "st": 0.1,
      "p4": 5.1,
      "aggr": -0.1,
@@ -21077,8 +20477,8 @@
      "inj": 0
     },
     "wx": {
-     "t": 71.1,
-     "w": 6.2,
+     "t": 71.2,
+     "w": 6.3,
      "p": 0,
      "f": 1
     },
@@ -21179,7 +20579,7 @@
    "total": 49.5,
    "market": -27.5,
    "edge": {
-    "pts": 6.1,
+    "pts": 4.5,
     "side": "away",
     "cover": 0.51
    },
@@ -21189,7 +20589,7 @@
    },
    "spreadOdds": {
     "home": "+103",
-    "away": "-129"
+    "away": "-127"
    },
    "home": {
     "id": "213",
@@ -21333,8 +20733,8 @@
       "fvx": 25
      }
     ],
-    "injAdj": -4,
-    "injPts": -0.2,
+    "injAdj": -8,
+    "injPts": -0.4,
     "qbOut": null,
     "kOut": null,
     "out": [
@@ -21342,8 +20742,8 @@
       "name": "Carson Hansen",
       "pos": "RB",
       "fv": 25,
-      "status": "Questionable",
-      "miss": 0.55,
+      "status": "Doubtful",
+      "miss": 1,
       "fvx": 25
      }
     ],
@@ -21369,10 +20769,10 @@
        "fv": null,
        "play": 0.78,
        "st": null,
-       "more": 1.26,
+       "more": 1.57,
        "miss": 0,
-       "pts": 12.1,
-       "line": "67 yds · 0.8 TD"
+       "pts": 14.7,
+       "line": "82 yds · 0.9 TD"
       },
       {
        "name": "Chase Sowell",
@@ -21380,10 +20780,10 @@
        "fv": 21,
        "play": 0.56,
        "st": null,
-       "more": 1.02,
+       "more": 1.04,
        "miss": 1,
-       "pts": 11.2,
-       "line": "57 yds · 3.4 rec · 0.4 TD",
+       "pts": 11.4,
+       "line": "58 yds · 3.4 rec · 0.4 TD",
        "fvx": 21
       }
      ],
@@ -21558,19 +20958,15 @@
      }
     ],
     "injAdj": 0,
-    "injPts": 0,
-    "qbOut": null,
+    "injPts": -1.8,
+    "qbOut": {
+     "name": "Dylan Lonergan",
+     "backup": "AJ Surace",
+     "status": "Questionable",
+     "pts": -1.8
+    },
     "kOut": null,
-    "out": [
-     {
-      "name": "AJ Surace",
-      "pos": "QB",
-      "fv": 21,
-      "status": "Questionable",
-      "miss": 0.84,
-      "fvx": 21
-     }
-    ],
+    "out": [],
     "seasonOut": [
      {
       "name": "KJ Duff",
@@ -21653,12 +21049,12 @@
      ]
     }
    },
-   "pHome": 0.93,
-   "spread": -21.5,
+   "pHome": 0.95,
+   "spread": -23,
    "proj": {
-    "margin": 21.4,
+    "margin": 23,
     "total": 54.2,
-    "home": 38,
+    "home": 39,
     "away": 16,
     "parts": {
      "elo": 4.5,
@@ -21677,11 +21073,11 @@
      "fcsm": 0,
      "fpi": 13,
      "mkt": -1,
-     "inj": -0.2
+     "inj": 1.4
     },
     "wx": {
-     "t": 57.4,
-     "w": 5.7,
+     "t": 57.7,
+     "w": 5.9,
      "p": 0,
      "f": 1
     },
@@ -21690,7 +21086,7 @@
      "m90": 41,
      "t10": 34,
      "t90": 73,
-     "pRaw": 0.924
+     "pRaw": 0.923
     },
     "over": 0.54
    },
@@ -21730,10 +21126,10 @@
       "fv": null,
       "play": 0.78,
       "st": null,
-      "more": 1.26,
+      "more": 1.57,
       "miss": 0,
-      "pts": 12.1,
-      "line": "67 yds · 0.8 TD",
+      "pts": 14.7,
+      "line": "82 yds · 0.9 TD",
       "team": "PSU",
       "logo": "/img/cfb/logos/213.png"
      }
@@ -21771,7 +21167,7 @@
      }
     ]
    },
-   "score": -0.66
+   "score": -0.69
   },
   {
    "id": "401858533",
@@ -21792,8 +21188,8 @@
     "away": "-234"
    },
    "spreadOdds": {
-    "home": "-101",
-    "away": "-122"
+    "home": "-104",
+    "away": "-119"
    },
    "home": {
     "id": "2509",
@@ -21976,10 +21372,10 @@
        "fv": 24,
        "play": 0.94,
        "st": null,
-       "more": 1.04,
+       "more": 1.05,
        "miss": 0,
-       "pts": 11.1,
-       "line": "66 yds · 4 rec · 0.1 TD",
+       "pts": 11.2,
+       "line": "66 yds · 4.1 rec · 0.1 TD",
        "fvx": 24
       }
      ],
@@ -22267,8 +21663,8 @@
      "inj": 0
     },
     "wx": {
-     "t": 65.1,
-     "w": 9.3,
+     "t": 64.9,
+     "w": 9.1,
      "p": 0,
      "f": 1
     },
@@ -22367,22 +21763,12 @@
    "venue": "War Memorial Stadium",
    "tv": "FS1",
    "neutral": false,
-   "line": "UNM -9.5",
-   "total": 37.5,
-   "market": 9.5,
-   "edge": {
-    "pts": 3.9,
-    "side": "away",
-    "cover": 0.51
-   },
-   "ml": {
-    "home": "+305",
-    "away": "-380"
-   },
-   "spreadOdds": {
-    "home": "-104",
-    "away": "-119"
-   },
+   "line": null,
+   "total": null,
+   "market": null,
+   "edge": null,
+   "ml": null,
+   "spreadOdds": null,
    "home": {
     "id": "2751",
     "name": "Wyoming",
@@ -22841,9 +22227,9 @@
    "spread": 13.5,
    "proj": {
     "margin": -13.4,
-    "total": 41.4,
+    "total": 41.7,
     "home": 14,
-    "away": 27,
+    "away": 28,
     "parts": {
      "elo": -1.1,
      "net": -1.1,
@@ -22864,8 +22250,8 @@
      "inj": -3.5
     },
     "wx": {
-     "t": 23.5,
-     "w": 11.4,
+     "t": 27.5,
+     "w": 10.6,
      "p": 0,
      "f": 1
     },
@@ -22874,9 +22260,8 @@
      "m90": 8,
      "t10": 25,
      "t90": 59,
-     "pRaw": 0.178
-    },
-    "over": 0.53
+     "pRaw": 0.177
+    }
    },
    "stars": {
     "off": [
@@ -22974,7 +22359,7 @@
    },
    "ml": {
     "home": "+116",
-    "away": "-143"
+    "away": "-146"
    },
    "spreadOdds": {
     "home": "-108",
@@ -23467,9 +22852,9 @@
      "inj": -0.3
     },
     "wx": {
-     "t": 53.4,
-     "w": 4.4,
-     "p": 0.6,
+     "t": 52.4,
+     "w": 5.4,
+     "p": 0.4,
      "f": 1
     },
     "sim": {
@@ -23477,7 +22862,7 @@
      "m90": 21,
      "t10": 34,
      "t90": 73,
-     "pRaw": 0.581
+     "pRaw": 0.58
     },
     "over": 0.48
    },
@@ -24041,8 +23426,8 @@
      "inj": 0
     },
     "wx": {
-     "t": 69.2,
-     "w": 5.8,
+     "t": 69,
+     "w": 4.6,
      "p": 0,
      "f": 1
     },
@@ -24051,7 +23436,7 @@
      "m90": 37,
      "t10": 40,
      "t90": 79,
-     "pRaw": 0.728
+     "pRaw": 0.729
     },
     "over": 0.47
    },
@@ -24578,10 +23963,10 @@
        "fv": 22,
        "play": 0.96,
        "st": null,
-       "more": 1.04,
+       "more": 1.05,
        "miss": 0,
-       "pts": 22.1,
-       "line": "108 yds · 6.5 rec · 0.8 TD",
+       "pts": 22.4,
+       "line": "109 yds · 6.6 rec · 0.8 TD",
        "fvx": 22
       },
       {
@@ -24590,10 +23975,10 @@
        "fv": 35,
        "play": 0.8,
        "st": null,
-       "more": 1.04,
+       "more": 1.05,
        "miss": 0,
-       "pts": 14.1,
-       "line": "61 yds · 5.6 rec · 0.4 TD",
+       "pts": 14.2,
+       "line": "62 yds · 5.6 rec · 0.4 TD",
        "fvx": 35
       },
       {
@@ -24664,8 +24049,8 @@
      "inj": -0.5
     },
     "wx": {
-     "t": 60.2,
-     "w": 3.9,
+     "t": 62.8,
+     "w": 5.2,
      "p": 0,
      "f": 1
     },
@@ -24686,10 +24071,10 @@
       "fv": 22,
       "play": 0.96,
       "st": null,
-      "more": 1.04,
+      "more": 1.05,
       "miss": 0,
-      "pts": 22.1,
-      "line": "108 yds · 6.5 rec · 0.8 TD",
+      "pts": 22.4,
+      "line": "109 yds · 6.6 rec · 0.8 TD",
       "team": "SYR",
       "logo": "/img/cfb/logos/183.png",
       "fvx": 22
@@ -24714,10 +24099,10 @@
       "fv": 35,
       "play": 0.8,
       "st": null,
-      "more": 1.04,
+      "more": 1.05,
       "miss": 0,
-      "pts": 14.1,
-      "line": "61 yds · 5.6 rec · 0.4 TD",
+      "pts": 14.2,
+      "line": "62 yds · 5.6 rec · 0.4 TD",
       "team": "SYR",
       "logo": "/img/cfb/logos/183.png",
       "fvx": 35
@@ -25052,18 +24437,18 @@
    "spread": -53.5,
    "proj": {
     "margin": 53.7,
-    "total": 58.6,
-    "home": 56,
+    "total": 57.3,
+    "home": 55,
     "away": 2,
     "parts": {
      "elo": 25.8,
-     "net": 8.2,
+     "net": 8.1,
      "home": 1.9,
      "rest": 0,
      "tz": 0,
      "dist": 0,
      "alt": 0,
-     "fcs": 2.6,
+     "fcs": 2.7,
      "st": 0,
      "p4": 5.1,
      "aggr": 0.3,
@@ -25074,19 +24459,19 @@
      "inj": 0
     },
     "wx": {
-     "t": 71.6,
-     "w": 9.3,
+     "t": 62.9,
+     "w": 12.9,
      "p": 0,
      "f": 1
     },
     "sim": {
      "m10": 38,
      "m90": 70,
-     "t10": 43,
-     "t90": 75,
+     "t10": 42,
+     "t90": 74,
      "pRaw": 0.999
     },
-    "over": 0.49
+    "over": 0.48
    },
    "stars": {
     "off": [
@@ -25173,7 +24558,7 @@
    "tv": "CBSSN",
    "neutral": false,
    "line": "CONN -13.5",
-   "total": 46.5,
+   "total": 47.5,
    "market": -13.5,
    "edge": {
     "pts": 1.5,
@@ -25186,7 +24571,7 @@
    },
    "spreadOdds": {
     "home": "-119",
-    "away": "-106"
+    "away": "-108"
    },
    "home": {
     "id": "41",
@@ -25662,8 +25047,8 @@
      "inj": 0.4
     },
     "wx": {
-     "t": 57.5,
-     "w": 4.8,
+     "t": 58.8,
+     "w": 5.7,
      "p": 0,
      "f": 1
     },
@@ -25674,7 +25059,7 @@
      "t90": 67,
      "pRaw": 0.868
     },
-    "over": 0.52
+    "over": 0.51
    },
    "stars": {
     "off": [
@@ -26238,17 +25623,17 @@
      "inj": 0
     },
     "wx": {
-     "t": 55.6,
-     "w": 4.7,
+     "t": 51.6,
+     "w": 5.2,
      "p": 0,
      "f": 1
     },
     "sim": {
      "m10": -22,
-     "m90": 15,
+     "m90": 14,
      "t10": 34,
      "t90": 69,
-     "pRaw": 0.415
+     "pRaw": 0.416
     },
     "over": 0.51
    },
@@ -26813,8 +26198,8 @@
      "inj": 0
     },
     "wx": {
-     "t": 66.3,
-     "w": 5.7,
+     "t": 67.6,
+     "w": 6.2,
      "p": 0,
      "f": 1
     },
@@ -26823,7 +26208,7 @@
      "m90": 36,
      "t10": 36,
      "t90": 75,
-     "pRaw": 0.809
+     "pRaw": 0.81
     },
     "over": 0.5
    },
@@ -26913,21 +26298,21 @@
    "venue": "Reser Stadium",
    "tv": "CBSSN",
    "neutral": false,
-   "line": "ORST -8.5",
+   "line": "ORST -7.5",
    "total": 50.5,
-   "market": -8.5,
+   "market": -7.5,
    "edge": {
-    "pts": 3.2,
+    "pts": 2.2,
     "side": "away",
-    "cover": 0.51
+    "cover": 0.5
    },
    "ml": {
-    "home": "-314",
+    "home": "-306",
     "away": "+246"
    },
    "spreadOdds": {
-    "home": "-110",
-    "away": "-112"
+    "home": "-114",
+    "away": "-110"
    },
    "home": {
     "id": "204",
@@ -27131,10 +26516,10 @@
        "fv": 22,
        "play": 0.94,
        "st": null,
-       "more": 1.01,
+       "more": 1.06,
        "miss": 0,
-       "pts": 12.5,
-       "line": "71 yds · 2.5 rec · 0.4 TD",
+       "pts": 12.9,
+       "line": "74 yds · 2.5 rec · 0.4 TD",
        "fvx": 22
       }
      ],
@@ -27403,9 +26788,9 @@
    "spread": -5.5,
    "proj": {
     "margin": 5.3,
-    "total": 48.5,
-    "home": 27,
-    "away": 22,
+    "total": 51.5,
+    "home": 28,
+    "away": 23,
     "parts": {
      "elo": 0.6,
      "net": 1,
@@ -27426,19 +26811,19 @@
      "inj": -3.7
     },
     "wx": {
-     "t": 43.1,
-     "w": 4.6,
-     "p": 2.9,
+     "t": 40.6,
+     "w": 3.9,
+     "p": 0,
      "f": 1
     },
     "sim": {
      "m10": -10,
      "m90": 28,
-     "t10": 31,
-     "t90": 67,
-     "pRaw": 0.852
+     "t10": 34,
+     "t90": 70,
+     "pRaw": 0.851
     },
-    "over": 0.48
+    "over": 0.51
    },
    "stars": {
     "off": [
@@ -27475,10 +26860,10 @@
       "fv": 22,
       "play": 0.94,
       "st": null,
-      "more": 1.01,
+      "more": 1.06,
       "miss": 0,
-      "pts": 12.5,
-      "line": "71 yds · 2.5 rec · 0.4 TD",
+      "pts": 12.9,
+      "line": "74 yds · 2.5 rec · 0.4 TD",
       "team": "ORST",
       "logo": "/img/cfb/logos/204.png",
       "fvx": 22
@@ -27535,7 +26920,7 @@
    },
    "ml": {
     "home": "-893",
-    "away": "+702"
+    "away": "+669"
    },
    "spreadOdds": {
     "home": "-104",
@@ -28001,8 +27386,8 @@
      "inj": 0
     },
     "wx": {
-     "t": 63.4,
-     "w": 9,
+     "t": 62.4,
+     "w": 6.6,
      "p": 0,
      "f": 1
     },
@@ -28011,7 +27396,7 @@
      "m90": 39,
      "t10": 34,
      "t90": 72,
-     "pRaw": 0.903
+     "pRaw": 0.902
     },
     "over": 0.51
    },
@@ -28583,8 +27968,8 @@
      "inj": 0
     },
     "wx": {
-     "t": 68.6,
-     "w": 8.1,
+     "t": 60.5,
+     "w": 8.3,
      "p": 0,
      "f": 1
     },
@@ -28683,22 +28068,12 @@
    "venue": "Glass Bowl",
    "tv": "ESPN2",
    "neutral": false,
-   "line": "TOL -16.5",
-   "total": 45.5,
-   "market": -16.5,
-   "edge": {
-    "pts": 1.8,
-    "side": "home",
-    "cover": 0.5
-   },
-   "ml": {
-    "home": "-739",
-    "away": "+584"
-   },
-   "spreadOdds": {
-    "home": "-119",
-    "away": "-104"
-   },
+   "line": null,
+   "total": null,
+   "market": null,
+   "edge": null,
+   "ml": null,
+   "spreadOdds": null,
    "home": {
     "id": "2649",
     "name": "Toledo",
@@ -28851,6 +28226,30 @@
     "stars": {
      "off": [
       {
+       "name": "Adjatay Dabbs",
+       "pos": "WR",
+       "fv": 24,
+       "play": 0.91,
+       "st": null,
+       "more": 1.06,
+       "miss": 0,
+       "pts": 17.3,
+       "line": "78 yds · 5 rec · 0.7 TD",
+       "fvx": 24
+      },
+      {
+       "name": "Connor Walendzak",
+       "pos": "RB",
+       "fv": 20,
+       "play": 0.87,
+       "st": null,
+       "more": 1.01,
+       "miss": 0,
+       "pts": 16.9,
+       "line": "76 yds · 1.7 rec · 1.3 TD",
+       "fvx": 20
+      },
+      {
        "name": "John Alan Richter",
        "pos": "QB",
        "fv": 20,
@@ -28861,30 +28260,6 @@
        "pts": 16.8,
        "line": "238 pass yds · 1.8 pass TD",
        "fvx": 20
-      },
-      {
-       "name": "Connor Walendzak",
-       "pos": "RB",
-       "fv": 20,
-       "play": 0.87,
-       "st": null,
-       "more": 1.01,
-       "miss": 0,
-       "pts": 16.7,
-       "line": "75 yds · 1.6 rec · 1.3 TD",
-       "fvx": 20
-      },
-      {
-       "name": "Adjatay Dabbs",
-       "pos": "WR",
-       "fv": 24,
-       "play": 0.91,
-       "st": null,
-       "more": 1,
-       "miss": 0,
-       "pts": 16.4,
-       "line": "74 yds · 4.7 rec · 0.7 TD",
-       "fvx": 24
       }
      ],
      "def": [
@@ -29161,7 +28536,7 @@
     "away": 15,
     "parts": {
      "elo": 3.5,
-     "net": 1.6,
+     "net": 1.7,
      "home": 0.9,
      "rest": -0.1,
      "tz": 0,
@@ -29179,22 +28554,49 @@
      "inj": 2.4
     },
     "wx": {
-     "t": 50,
-     "w": 5.5,
+     "t": 49.7,
+     "w": 3.5,
      "p": 0,
      "f": 1
     },
     "sim": {
-     "m10": -2,
-     "m90": 36,
+     "m10": -3,
+     "m90": 35,
      "t10": 30,
      "t90": 68,
-     "pRaw": 0.89
-    },
-    "over": 0.53
+     "pRaw": 0.897
+    }
    },
    "stars": {
     "off": [
+     {
+      "name": "Adjatay Dabbs",
+      "pos": "WR",
+      "fv": 24,
+      "play": 0.91,
+      "st": null,
+      "more": 1.06,
+      "miss": 0,
+      "pts": 17.3,
+      "line": "78 yds · 5 rec · 0.7 TD",
+      "team": "TOL",
+      "logo": "/img/cfb/logos/2649.png",
+      "fvx": 24
+     },
+     {
+      "name": "Connor Walendzak",
+      "pos": "RB",
+      "fv": 20,
+      "play": 0.87,
+      "st": null,
+      "more": 1.01,
+      "miss": 0,
+      "pts": 16.9,
+      "line": "76 yds · 1.7 rec · 1.3 TD",
+      "team": "TOL",
+      "logo": "/img/cfb/logos/2649.png",
+      "fvx": 20
+     },
      {
       "name": "John Alan Richter",
       "pos": "QB",
@@ -29208,34 +28610,6 @@
       "team": "TOL",
       "logo": "/img/cfb/logos/2649.png",
       "fvx": 20
-     },
-     {
-      "name": "Connor Walendzak",
-      "pos": "RB",
-      "fv": 20,
-      "play": 0.87,
-      "st": null,
-      "more": 1.01,
-      "miss": 0,
-      "pts": 16.7,
-      "line": "75 yds · 1.6 rec · 1.3 TD",
-      "team": "TOL",
-      "logo": "/img/cfb/logos/2649.png",
-      "fvx": 20
-     },
-     {
-      "name": "Adjatay Dabbs",
-      "pos": "WR",
-      "fv": 24,
-      "play": 0.91,
-      "st": null,
-      "more": 1,
-      "miss": 0,
-      "pts": 16.4,
-      "line": "74 yds · 4.7 rec · 0.7 TD",
-      "team": "TOL",
-      "logo": "/img/cfb/logos/2649.png",
-      "fvx": 24
      }
     ],
     "def": [
@@ -29283,17 +28657,17 @@
    "total": 59.5,
    "market": -33.5,
    "edge": {
-    "pts": 10.6,
+    "pts": 10.7,
     "side": "away",
     "cover": 0.52
    },
    "ml": {
-    "home": "-2098",
-    "away": "+1568"
+    "home": "-1898",
+    "away": "+1430"
    },
    "spreadOdds": {
-    "home": "+109",
-    "away": "-134"
+    "home": "+105",
+    "away": "-129"
    },
    "home": {
     "id": "344",
@@ -29596,7 +28970,7 @@
    "pHome": 0.95,
    "spread": -23,
    "proj": {
-    "margin": 22.9,
+    "margin": 22.8,
     "total": 60.7,
     "home": 42,
     "away": 19,
@@ -29608,7 +28982,7 @@
      "tz": 0,
      "dist": 0,
      "alt": 0,
-     "fcs": 2.6,
+     "fcs": 2.7,
      "st": 0,
      "p4": 5.1,
      "aggr": 0.5,
@@ -29619,8 +28993,8 @@
      "inj": -5.1
     },
     "wx": {
-     "t": 73,
-     "w": 7.2,
+     "t": 72.8,
+     "w": 5,
      "p": 0,
      "f": 1
     },
@@ -29628,7 +29002,7 @@
      "m10": 10,
      "m90": 46,
      "t10": 43,
-     "t90": 78,
+     "t90": 77,
      "pRaw": 0.991
     },
     "over": 0.51
@@ -29731,8 +29105,8 @@
     "away": "+111"
    },
    "spreadOdds": {
-    "home": "-117",
-    "away": "-106"
+    "home": "-114",
+    "away": "-108"
    },
    "home": {
     "id": "338",
@@ -30184,9 +29558,9 @@
    "spread": -4,
    "proj": {
     "margin": 3.8,
-    "total": 45.1,
+    "total": 44,
     "home": 24,
-    "away": 21,
+    "away": 20,
     "parts": {
      "elo": -0.2,
      "net": 0,
@@ -30207,17 +29581,17 @@
      "inj": -0.6
     },
     "wx": {
-     "t": 68.8,
-     "w": 9.5,
+     "t": 63.9,
+     "w": 12.5,
      "p": 0,
      "f": 1
     },
     "sim": {
      "m10": -11,
      "m90": 20,
-     "t10": 30,
-     "t90": 61,
-     "pRaw": 0.686
+     "t10": 29,
+     "t90": 60,
+     "pRaw": 0.689
     },
     "over": 0.5
    },
@@ -30321,7 +29695,7 @@
    },
    "spreadOdds": {
     "home": "-104",
-    "away": "-119"
+    "away": "-122"
    },
    "home": {
     "id": "309",
@@ -30791,8 +30165,8 @@
      "inj": 0.1
     },
     "wx": {
-     "t": 77.3,
-     "w": 6.8,
+     "t": 78.8,
+     "w": 3.3,
      "p": 0,
      "f": 1
     },
@@ -30801,7 +30175,7 @@
      "m90": 28,
      "t10": 30,
      "t90": 68,
-     "pRaw": 0.746
+     "pRaw": 0.742
     },
     "over": 0.5
    },
@@ -31352,7 +30726,7 @@
    "spread": -13,
    "proj": {
     "margin": 13.1,
-    "total": 51.6,
+    "total": 51.1,
     "home": 32,
     "away": 19,
     "parts": {
@@ -31375,17 +30749,17 @@
      "inj": -0.2
     },
     "wx": {
-     "t": 72.6,
-     "w": 6.6,
+     "t": 69.3,
+     "w": 11.2,
      "p": 0,
      "f": 1
     },
     "sim": {
      "m10": -6,
      "m90": 32,
-     "t10": 35,
-     "t90": 70,
-     "pRaw": 0.82
+     "t10": 34,
+     "t90": 69,
+     "pRaw": 0.823
     },
     "over": 0.49
    },
@@ -31475,12 +30849,12 @@
    "venue": "Mackay Stadium",
    "tv": "FS1",
    "neutral": false,
-   "line": "NEV -5.5",
+   "line": "NEV -6.5",
    "total": 40.5,
-   "market": -5.5,
+   "market": -6.5,
    "edge": {
-    "pts": 0.6,
-    "side": "home",
+    "pts": 0.4,
+    "side": "away",
     "cover": 0.5
    },
    "ml": {
@@ -31488,8 +30862,8 @@
     "away": "+189"
    },
    "spreadOdds": {
-    "home": "-114",
-    "away": "-108"
+    "home": "-108",
+    "away": "-114"
    },
    "home": {
     "id": "2440",
@@ -31960,7 +31334,7 @@
    "spread": -6,
    "proj": {
     "margin": 6.1,
-    "total": 44,
+    "total": 43.9,
     "home": 25,
     "away": 19,
     "parts": {
@@ -31983,16 +31357,16 @@
      "inj": 0
     },
     "wx": {
-     "t": 32.4,
-     "w": 4.9,
+     "t": 35,
+     "w": 6.9,
      "p": 0,
      "f": 1
     },
     "sim": {
      "m10": -12,
      "m90": 23,
-     "t10": 28,
-     "t90": 62,
+     "t10": 27,
+     "t90": 61,
      "pRaw": 0.646
     },
     "over": 0.53
@@ -32566,17 +31940,17 @@
      "inj": 0
     },
     "wx": {
-     "t": 71.1,
-     "w": 5.7,
+     "t": 74.7,
+     "w": 6.4,
      "p": 0,
      "f": 1
     },
     "sim": {
-     "m10": -28,
-     "m90": 17,
-     "t10": 39,
+     "m10": -29,
+     "m90": 16,
+     "t10": 40,
      "t90": 83,
-     "pRaw": 0.416
+     "pRaw": 0.419
     },
     "over": 0.47
    },
@@ -32665,11 +32039,11 @@
    "venue": "Aggie Memorial Stadium",
    "tv": "ESPN+",
    "neutral": false,
-   "line": "DEL -3.5",
+   "line": "DEL -2.5",
    "total": 53.5,
-   "market": 3.5,
+   "market": 2.5,
    "edge": {
-    "pts": 1.1,
+    "pts": 0.1,
     "side": "home",
     "cover": 0.5
    },
@@ -32678,8 +32052,8 @@
     "away": "-155"
    },
    "spreadOdds": {
-    "home": "-132",
-    "away": "+103"
+    "home": "+103",
+    "away": "-127"
    },
    "home": {
     "id": "166",
@@ -33122,7 +32496,7 @@
    "spread": 2.5,
    "proj": {
     "margin": -2.4,
-    "total": 50.6,
+    "total": 50.9,
     "home": 24,
     "away": 27,
     "parts": {
@@ -33145,17 +32519,17 @@
      "inj": 0
     },
     "wx": {
-     "t": 61.1,
-     "w": 15.3,
+     "t": 59.9,
+     "w": 15.1,
      "p": 0,
      "f": 1
     },
     "sim": {
      "m10": -24,
      "m90": 18,
-     "t10": 30,
-     "t90": 71,
-     "pRaw": 0.442
+     "t10": 31,
+     "t90": 72,
+     "pRaw": 0.444
     },
     "over": 0.48
    },
@@ -33253,7 +32627,7 @@
     "cover": 0.51
    },
    "ml": {
-    "home": "-143",
+    "home": "-146",
     "away": "+116"
    },
    "spreadOdds": {
@@ -33725,24 +33099,24 @@
      "p4": 0,
      "aggr": -0.1,
      "ret": 0,
-     "gc": -0.1,
+     "gc": -0.2,
      "fcsm": 0,
      "fpi": -2.4,
      "mkt": 3,
      "inj": 5.4
     },
     "wx": {
-     "t": 63.9,
-     "w": 4.9,
+     "t": 64.9,
+     "w": 5,
      "p": 0,
      "f": 1
     },
     "sim": {
-     "m10": -19,
-     "m90": 20,
+     "m10": -18,
+     "m90": 21,
      "t10": 39,
-     "t90": 77,
-     "pRaw": 0.313
+     "t90": 78,
+     "pRaw": 0.294
     },
     "over": 0.52
    },
@@ -33845,8 +33219,8 @@
     "away": "+869"
    },
    "spreadOdds": {
-    "home": "-106",
-    "away": "-117"
+    "home": "-108",
+    "away": "-114"
    },
    "home": {
     "id": "278",
@@ -34325,8 +33699,8 @@
      "inj": 0
     },
     "wx": {
-     "t": 56.9,
-     "w": 2.2,
+     "t": 53.6,
+     "w": 2.9,
      "p": 0,
      "f": 1
     },
@@ -34334,8 +33708,8 @@
      "m10": -3,
      "m90": 37,
      "t10": 39,
-     "t90": 78,
-     "pRaw": 0.912
+     "t90": 79,
+     "pRaw": 0.913
     },
     "over": 0.44
    },
@@ -34438,8 +33812,8 @@
     "away": "-234"
    },
    "spreadOdds": {
-    "home": "-114",
-    "away": "-108"
+    "home": "-119",
+    "away": "-106"
    },
    "home": {
     "id": "2534",
@@ -34751,8 +34125,8 @@
      "inj": 0
     },
     "wx": {
-     "t": 75.9,
-     "w": 8.2,
+     "t": 74.3,
+     "w": 8.8,
      "p": 0,
      "f": 1
     },
@@ -34761,7 +34135,7 @@
      "m90": 14,
      "t10": 31,
      "t90": 70,
-     "pRaw": 0.532
+     "pRaw": 0.533
     },
     "over": 0.52
    },
@@ -34837,7 +34211,7 @@
      }
     ]
    },
-   "score": -2.49
+   "score": -2.5
   },
   {
    "id": "401864543",
@@ -34858,8 +34232,8 @@
     "away": "+1734"
    },
    "spreadOdds": {
-    "home": "-108",
-    "away": "-114"
+    "home": "-106",
+    "away": "-117"
    },
    "home": {
     "id": "2449",
@@ -35323,7 +34697,7 @@
    "spread": -27,
    "proj": {
     "margin": 27.2,
-    "total": 45.7,
+    "total": 45.8,
     "home": 36,
     "away": 9,
     "parts": {
@@ -35443,18 +34817,12 @@
    "venue": "Falcon Stadium",
    "tv": "CW",
    "neutral": false,
-   "line": "AFA -21.5",
-   "total": 48.5,
+   "line": null,
+   "total": null,
    "market": null,
    "edge": null,
-   "ml": {
-    "home": "-1730",
-    "away": "+1313"
-   },
-   "spreadOdds": {
-    "home": "-110",
-    "away": "-112"
-   },
+   "ml": null,
+   "spreadOdds": null,
    "home": {
     "id": "2005",
     "name": "Air Force",
@@ -35597,8 +34965,8 @@
       "fvx": 22
      }
     ],
-    "injAdj": -19,
-    "injPts": 0,
+    "injAdj": -27,
+    "injPts": -0.4,
     "qbOut": null,
     "kOut": null,
     "out": [
@@ -35609,6 +34977,14 @@
       "status": "Questionable",
       "miss": 0.73,
       "fvx": 21
+     },
+     {
+      "name": "Kemper Hodges",
+      "pos": "RB",
+      "fv": 20,
+      "status": "Out",
+      "miss": 1,
+      "fvx": 20
      }
     ],
     "seasonOut": [],
@@ -35616,16 +34992,15 @@
     "stars": {
      "off": [
       {
-       "name": "Kemper Hodges",
+       "name": "Rocco Conti",
        "pos": "RB",
-       "fv": 20,
-       "play": 0.88,
+       "fv": null,
+       "play": 0.9,
        "st": null,
-       "more": 1.13,
+       "more": 1.58,
        "miss": 0,
-       "pts": 13,
-       "line": "70 yds · 1 TD",
-       "fvx": 20
+       "pts": 8.4,
+       "line": "63 yds · 0.3 TD"
       },
       {
        "name": "Owen Allen",
@@ -35640,15 +35015,16 @@
        "fvx": 20
       },
       {
-       "name": "Rocco Conti",
-       "pos": "RB",
-       "fv": null,
-       "play": 0.9,
-       "st": null,
-       "more": 1.18,
+       "name": "Evan Medders",
+       "pos": "QB",
+       "fv": 21,
+       "play": 0.24,
+       "st": "Questionable",
+       "more": 1.58,
        "miss": 0,
-       "pts": 6.4,
-       "line": "48 yds · 0.2 TD"
+       "pts": 6.2,
+       "line": "33 yds · 0.4 TD",
+       "fvx": 21
       }
      ],
      "def": [
@@ -35912,7 +35288,7 @@
    "pHome": 0.96,
    "spread": -25,
    "proj": {
-    "margin": 25.2,
+    "margin": 24.8,
     "total": 50.8,
     "home": 38,
     "away": 13,
@@ -35933,11 +35309,11 @@
      "fcsm": 0,
      "fpi": 14.8,
      "mkt": -1.5,
-     "inj": 0.8
+     "inj": 0.4
     },
     "wx": {
-     "t": 41.4,
-     "w": 8.1,
+     "t": 44.2,
+     "w": 6.1,
      "p": 0,
      "f": 1
     },
@@ -35947,25 +35323,10 @@
      "t10": 32,
      "t90": 69,
      "pRaw": 0.926
-    },
-    "over": 0.52
+    }
    },
    "stars": {
     "off": [
-     {
-      "name": "Kemper Hodges",
-      "pos": "RB",
-      "fv": 20,
-      "play": 0.88,
-      "st": null,
-      "more": 1.13,
-      "miss": 0,
-      "pts": 13,
-      "line": "70 yds · 1 TD",
-      "team": "AF",
-      "logo": "/img/cfb/logos/2005.png",
-      "fvx": 20
-     },
      {
       "name": "Raymond Moore III",
       "pos": "QB",
@@ -35979,6 +35340,19 @@
       "team": "UTEP",
       "logo": "/img/cfb/logos/2638.png",
       "fvx": 22
+     },
+     {
+      "name": "Rocco Conti",
+      "pos": "RB",
+      "fv": null,
+      "play": 0.9,
+      "st": null,
+      "more": 1.58,
+      "miss": 0,
+      "pts": 8.4,
+      "line": "63 yds · 0.3 TD",
+      "team": "AF",
+      "logo": "/img/cfb/logos/2005.png"
      },
      {
       "name": "Owen Allen",
@@ -36487,8 +35861,8 @@
    "spread": -22.5,
    "proj": {
     "margin": 22.5,
-    "total": 48.5,
-    "home": 35,
+    "total": 48.6,
+    "home": 36,
     "away": 13,
     "parts": {
      "elo": 5,
@@ -36510,17 +35884,17 @@
      "inj": 0
     },
     "wx": {
-     "t": 68.1,
-     "w": 15.5,
+     "t": 70.2,
+     "w": 15.7,
      "p": 0,
      "f": 1
     },
     "sim": {
      "m10": 5,
      "m90": 41,
-     "t10": 30,
-     "t90": 67,
-     "pRaw": 0.969
+     "t10": 31,
+     "t90": 68,
+     "pRaw": 0.971
     },
     "over": 0.48
    },
@@ -36602,7 +35976,7 @@
      }
     ]
    },
-   "score": -3.2
+   "score": -3.21
   },
   {
    "id": "401869929",
@@ -37062,7 +36436,7 @@
    "spread": -13.5,
    "proj": {
     "margin": 13.3,
-    "total": 50,
+    "total": 50.1,
     "home": 32,
     "away": 18,
     "parts": {
@@ -37085,17 +36459,17 @@
      "inj": 0
     },
     "wx": {
-     "t": 54,
-     "w": 10.1,
+     "t": 50.2,
+     "w": 8.4,
      "p": 0,
      "f": 1
     },
     "sim": {
      "m10": -5,
      "m90": 32,
-     "t10": 32,
-     "t90": 67,
-     "pRaw": 0.869
+     "t10": 33,
+     "t90": 69,
+     "pRaw": 0.872
     },
     "over": 0.5
    },
