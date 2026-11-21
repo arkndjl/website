@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-21T12:43:35Z",
+ "asof": "2026-11-21T12:57:01Z",
  "recenter": {
-  "2026-11-21": 1.47
+  "2026-11-21": 1.48
  },
  "monitor": {
   "clocks": {
@@ -328,13 +328,29 @@
  },
  "model": {
   "asof": "2026-11-21T08:19:40Z",
-  "ageH": 4.4,
+  "ageH": 4.6,
   "stale": false
  },
  "picks": [],
  "paperPicks": [],
  "withdrawn": [],
  "board": [
+  {
+   "id": "401910023",
+   "sport": "nba",
+   "kick": "2026-11-21T18:00:00Z",
+   "home": "PHI",
+   "away": "MIL",
+   "mk": "total",
+   "side": "over",
+   "line": 228.5,
+   "price": -119.0,
+   "edge": 3.5,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: over)",
+   "m": 13.4,
+   "tm": 232.0
+  },
   {
    "id": "401910024",
    "sport": "nba",
@@ -350,22 +366,6 @@
    "why": "edge under 6.5 (side: over)",
    "m": 5.4,
    "tm": 219.1
-  },
-  {
-   "id": "401910023",
-   "sport": "nba",
-   "kick": "2026-11-21T18:00:00Z",
-   "home": "PHI",
-   "away": "MIL",
-   "mk": "total",
-   "side": "over",
-   "line": 229.5,
-   "price": -101.0,
-   "edge": 2.5,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: over)",
-   "m": 13.4,
-   "tm": 232.0
   },
   {
    "id": "401910025",
@@ -392,7 +392,7 @@
    "mk": "total",
    "side": "under",
    "line": 228.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 2.0,
    "x": 6.5,
    "why": "edge under 6.5 (total: mid)",
@@ -436,9 +436,9 @@
   "401910023": {
    "mk": "total",
    "side": "over",
-   "line": 229.5,
-   "price": -101.0,
-   "edge": 2.5,
+   "line": 228.5,
+   "price": -119.0,
+   "edge": 3.5,
    "ev": null,
    "units": 0.0,
    "home": "PHI",
@@ -473,7 +473,7 @@
    "mk": "total",
    "side": "under",
    "line": 228.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 2.0,
    "ev": null,
    "units": 0.0,
@@ -558,7 +558,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 5177,
+  "snapshots": 5178,
   "buckets": [
    {
     "when": "24h+",
@@ -7233,7 +7233,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-21T12:43:35Z",
+ "checked": "2026-11-21T12:57:01Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
