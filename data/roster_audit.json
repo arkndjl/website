@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-21T16:55Z",
+ "asof": "2026-11-21T18:11Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -59,7 +59,7 @@
     }
    ],
    "joined": 0,
-   "players": 2604,
+   "players": 2605,
    "rows": 16744
   },
   "nba": {
@@ -292,8 +292,8 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 8,
-     "rows": 2143
+     "flags": 9,
+     "rows": 2144
     },
     "static/data/nfl-fantasy.json": {
      "flags": 15,
@@ -442,6 +442,24 @@
      "pos": "RT",
      "rotowire": "FA",
      "site": "PHI"
+    },
+    {
+     "d": "2026-10-06",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "practice",
+     "head": "Catches on with Pittsburgh on PS",
+     "kind": "practice",
+     "move": {
+      "d": "2026-10-06",
+      "head": "Catches on with Pittsburgh on PS",
+      "kind": "practice"
+     },
+     "pid": "16833",
+     "player": "KJ Henry",
+     "pos": "WLB",
+     "rotowire": "FA",
+     "site": "PIT"
     },
     {
      "d": "2026-08-31",
@@ -4658,7 +4676,7 @@
    ],
    "joined": 0,
    "players": 2295,
-   "rows": 8074
+   "rows": 8075
   },
   "nhl": {
    "by_file": {
@@ -4671,11 +4689,11 @@
      "rows": 32
     },
     "static/data/nhl-war/2027.json": {
-     "flags": 3,
+     "flags": 2,
      "rows": 861
     },
     "static/data/pctl-nhl.json": {
-     "flags": 1,
+     "flags": 0,
      "rows": 354
     },
     "static/data/xaav-nhl.json": {
@@ -4721,24 +4739,6 @@
      "site": "NYR"
     },
     {
-     "d": "2026-11-19",
-     "field": "tm",
-     "file": "static/data/nhl-war/2027.json",
-     "flag": "released",
-     "head": "Departs Thursday's game",
-     "kind": "exit",
-     "move": {
-      "d": "2026-11-19",
-      "head": "Departs Thursday's game",
-      "kind": "exit"
-     },
-     "pid": "4150",
-     "player": "Ryan Pulock",
-     "pos": "D",
-     "rotowire": "NYI",
-     "site": "NYI"
-    },
-    {
      "d": "2026-11-13",
      "field": "tm",
      "file": "static/data/xaav-nhl.json",
@@ -4757,12 +4757,12 @@
      "site": "FA"
     },
     {
-     "d": "2026-11-19",
+     "d": "2026-11-21",
      "field": "tm",
      "file": "static/data/xaav-nhl.json",
-     "flag": "released",
-     "head": "Departs Thursday's game",
-     "kind": "exit",
+     "flag": "moved",
+     "head": "Missing Saturday's clash",
+     "kind": null,
      "move": {
       "d": "2026-11-19",
       "head": "Departs Thursday's game",
@@ -4953,28 +4953,10 @@
      "pos": "C",
      "rotowire": "FA",
      "site": "FA"
-    },
-    {
-     "d": "2026-11-19",
-     "field": "tm",
-     "file": "static/data/pctl-nhl.json",
-     "flag": "released",
-     "head": "Departs Thursday's game",
-     "kind": "exit",
-     "move": {
-      "d": "2026-11-19",
-      "head": "Departs Thursday's game",
-      "kind": "exit"
-     },
-     "pid": "4150",
-     "player": "Ryan Pulock",
-     "pos": "D",
-     "rotowire": "NYI",
-     "site": "NYI"
     }
    ],
    "joined": 0,
-   "players": 1424,
+   "players": 1425,
    "rows": 2734
   }
  }
