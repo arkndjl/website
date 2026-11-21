@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-21T04:22:26Z",
+ "asof": "2026-11-21T06:41:09Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -3260,19 +3260,19 @@
    "status": "on",
    "stopped": null,
    "n": 3,
-   "clvN": 1,
-   "clvRet": -0.0348,
-   "clvT": null,
-   "days": 1,
-   "beat": 1.0,
-   "settled": 1,
-   "w": 1,
+   "clvN": 2,
+   "clvRet": -0.0736,
+   "clvT": -1.9,
+   "days": 2,
+   "beat": 0.5,
+   "settled": 2,
+   "w": 2,
    "l": 0,
-   "roi": 0.84,
+   "roi": 0.8075,
    "week": {
-    "n": 1,
-    "clvRet": -0.0348,
-    "clvT": null
+    "n": 2,
+    "clvRet": -0.0736,
+    "clvT": -1.9
    },
    "exp": {
     "clvRet": 0.0994,
@@ -3281,9 +3281,9 @@
     "n": 38
    },
    "vsExp": {
-    "gap": -0.1342,
-    "z": -0.85,
-    "read": "in line"
+    "gap": -0.173,
+    "z": -4.46,
+    "read": "below the backtest"
    },
    "check": {
     "n": 1,
@@ -3322,23 +3322,28 @@
    },
    "drift": {
     "mu1": 0.0229,
-    "n": 1,
+    "n": 2,
     "sd": 0.1575,
     "rho": 0.306,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": -0.017,
-    "info": 0.02,
-    "real": -0.317,
-    "realSe": 6.874,
+    "llr": -0.077,
+    "info": 0.04,
+    "real": -1.328,
+    "realSe": 4.861,
     "need": 278,
     "path": [
      [
       "2026-11-19",
       1,
       -0.017
+     ],
+     [
+      "2026-11-20",
+      2,
+      -0.077
      ]
     ]
    }
@@ -4017,7 +4022,8 @@
  "stopped": [],
  "flags": [
   "pick:cbb:spread | line: 9-15",
-  "pick:cbb:total | side: under"
+  "pick:cbb:total | side: under",
+  "pick:cbb:total | tier: mixed"
  ],
  "drift": {
   "watching": [
