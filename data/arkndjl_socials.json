@@ -1,23 +1,23 @@
 {
- "asof": "2026-11-21T20:05:27.194Z",
+ "asof": "2026-11-21T21:45:59.632Z",
  "status": {
-  "x": false,
+  "x": true,
   "youtube": true
  },
  "goals": {
   "x": {
-   "rate": 92.3,
+   "rate": 90.8,
    "prior": 88.5,
-   "tracked": 3,
+   "tracked": 3.2,
    "d30": {
     "goal": 2508,
     "base": 2420,
     "set": 1795021245501,
     "due": 1797613245501,
     "p0": 51,
-    "p": 75,
-    "f": 0.148,
-    "m": 0.099
+    "p": 67,
+    "f": 0.136,
+    "m": 0.107
    },
    "d90": {
     "goal": 2684,
@@ -25,27 +25,27 @@
     "set": 1795021245501,
     "due": 1802797245501,
     "p0": 51,
-    "p": 70,
-    "f": 0.049,
-    "m": 0.033
+    "p": 63,
+    "f": 0.045,
+    "m": 0.036
    },
    "next": {
     "goal": 2500,
-    "eta": "2026-12-13",
+    "eta": "2026-12-14",
     "p90": 100,
     "from": 2000,
     "base": 2420,
     "set": 1795021245501,
     "eta0": "2026-12-16",
-    "f": 0.866,
-    "m": 0.857
+    "f": 0.864,
+    "m": 0.859
    },
    "opened": "2024-08-20"
   },
   "youtube": {
    "rate": 0.7,
    "prior": 0.8,
-   "tracked": 3,
+   "tracked": 3.2,
    "d30": {
     "goal": 18,
     "base": 17,
@@ -54,7 +54,7 @@
     "p0": 43,
     "p": 38,
     "f": 0,
-    "m": 0.099
+    "m": 0.107
    },
    "d90": {
     "goal": 18,
@@ -62,13 +62,13 @@
     "set": 1795021245501,
     "due": 1802797245501,
     "p0": 67,
-    "p": 65,
+    "p": 64,
     "f": 0,
-    "m": 0.033
+    "m": 0.036
    },
    "next": {
     "goal": 25,
-    "eta": "2028-04-06",
+    "eta": "2028-04-09",
     "p90": 6,
     "from": 0,
     "base": 17,
@@ -424,6 +424,12 @@
    "x": 2433,
    "youtube": 17,
    "xn": 14628
+  },
+  {
+   "t": 1795297559632,
+   "x": 2432,
+   "youtube": 17,
+   "xn": 14629
   }
  ],
  "xp": {
@@ -476,6 +482,10 @@
     [
      1795291527194,
      681
+    ],
+    [
+     1795297559632,
+     704
     ]
    ]
   },
@@ -524,6 +534,10 @@
     [
      1795291527194,
      402
+    ],
+    [
+     1795297559632,
+     417
     ]
    ]
   },
@@ -632,6 +646,10 @@
     [
      1795291527194,
      549
+    ],
+    [
+     1795297559632,
+     550
     ]
    ]
   },
@@ -740,6 +758,10 @@
     [
      1795291527194,
      338
+    ],
+    [
+     1795297559632,
+     339
     ]
    ]
   },
@@ -800,6 +822,10 @@
     [
      1795291527194,
      103
+    ],
+    [
+     1795297559632,
+     104
     ]
    ]
   },
@@ -876,6 +902,10 @@
     [
      1795291527194,
      456
+    ],
+    [
+     1795297559632,
+     459
     ]
    ]
   },
@@ -984,6 +1014,10 @@
     [
      1795291527194,
      775
+    ],
+    [
+     1795297559632,
+     776
     ]
    ]
   },
@@ -1164,6 +1198,10 @@
     [
      1795291527194,
      1035
+    ],
+    [
+     1795297559632,
+     1037
     ]
    ]
   },
@@ -1300,6 +1338,10 @@
     [
      1795222428174,
      212
+    ],
+    [
+     1795297559632,
+     213
     ]
    ]
   },
@@ -1408,6 +1450,10 @@
     [
      1795291527194,
      945
+    ],
+    [
+     1795297559632,
+     949
     ]
    ]
   },
@@ -3201,7 +3247,7 @@
    {
     "k": "X post type",
     "v": "text",
-    "d": "text 4,659 · quote 818 · photo 775",
+    "d": "text 4,659 · quote 818 · photo 776",
     "n": 28
    },
    {
@@ -3212,16 +3258,21 @@
    },
    {
     "k": "X posting",
-    "v": "7.4 / day",
+    "v": "7.2 / day",
     "d": "30 in 30 days",
     "n": 30
    },
    {
     "k": "X follows / 1k views",
-    "v": null,
-    "d": "at 3 days of X view history",
-    "n": null,
-    "wait": true
+    "v": "0.3",
+    "d": "12,666 views / day on tracked posts",
+    "n": 46
+   },
+   {
+    "k": "X 2,500",
+    "v": "229,532 views",
+    "d": "0.3 follows / 1k views",
+    "n": 46
    },
    {
     "k": "YouTube post day",
@@ -3230,16 +3281,9 @@
     "n": 2
    },
    {
-    "k": "Subs / 1k views",
-    "v": null,
-    "d": "at 3 days of YouTube view history",
-    "n": null,
-    "wait": true
-   },
-   {
     "k": "X L10 trend",
     "v": "-75%",
-    "d": "544 vs 2,178 avg, prior 10",
+    "d": "549 vs 2,178 avg, prior 10",
     "n": 20
    },
    {
@@ -3252,14 +3296,14 @@
    {
     "k": "X pace",
     "v": null,
-    "d": "at 14 days tracked (3)",
+    "d": "at 14 days tracked (3.2)",
     "n": null,
     "wait": true
    },
    {
     "k": "YouTube pace",
     "v": null,
-    "d": "at 14 days tracked (3)",
+    "d": "at 14 days tracked (3.2)",
     "n": null,
     "wait": true
    },
@@ -3284,11 +3328,11 @@
    "nOld": 28,
    "median": 928,
    "er": 2.25,
-   "perDay": 7.4,
+   "perDay": 7.2,
    "last30": 30,
    "gap": 0.2,
-   "vpd": 13111.2,
-   "fpk": null,
+   "vpd": 12665.6,
+   "fpk": 0.3,
    "base": 844,
    "kinds": {
     "text": {
@@ -3297,7 +3341,7 @@
     },
     "photo": {
      "n": 13,
-     "med": 775
+     "med": 776
     },
     "video": {
      "n": 0,
@@ -3432,17 +3476,17 @@
      },
      {
       "n": 4,
-      "med": 546.5
+      "med": 548.5
      },
      {
       "n": 2,
-      "med": 905
+      "med": 906.5
      }
     ],
     [
      {
       "n": 1,
-      "med": 456
+      "med": 459
      },
      {
       "n": 0,
@@ -3454,7 +3498,7 @@
      },
      {
       "n": 2,
-      "med": 443.5
+      "med": 444.5
      },
      {
       "n": 0,
@@ -3520,14 +3564,14 @@
     {
      "d": "Thu",
      "n": 9,
-     "med": 775,
+     "med": 776,
      "x": 502
     },
     {
      "d": "Fri",
      "n": 3,
-     "med": 456,
-     "x": 609
+     "med": 459,
+     "x": 610
     },
     {
      "d": "Sat",
@@ -3818,19 +3862,19 @@
      "text": "im now accepting donations for @eephus_io + my personal website. all donations will go towards NYU tuition & keeping my websites free w/ no ",
      "pub": 1795129454000,
      "kind": "text",
-     "views": 945,
+     "views": 949,
      "likes": 23,
      "reposts": 4,
      "replies": 2,
      "er": 3.1,
-     "r5": 844
+     "r5": 845
     },
     {
      "id": "2123553230059688190",
      "text": "this is completely optional, i just wanted to set it up b/c i had people reach out about tipping/donating and i want to keep the sites/my re",
      "pub": 1795129518000,
      "kind": "reply",
-     "views": 212,
+     "views": 213,
      "likes": 9,
      "reposts": 0,
      "replies": 0,
@@ -3847,7 +3891,7 @@
      "reposts": 0,
      "replies": 0,
      "er": 1.9,
-     "r5": 777
+     "r5": 778
     },
     {
      "id": "2123572492216471880",
@@ -3859,7 +3903,7 @@
      "reposts": 0,
      "replies": 1,
      "er": 4.1,
-     "r5": 565
+     "r5": 566
     },
     {
      "id": "2123572536311222360",
@@ -3890,12 +3934,12 @@
      "text": "NFL Quarterback SV (Season Value) Leaderboard through Week 11 (11/19/26). SV is a new metric that evaluates QBs solely off of their rate-bas",
      "pub": 1795144893000,
      "kind": "photo",
-     "views": 1035,
+     "views": 1037,
      "likes": 18,
      "reposts": 0,
      "replies": 1,
      "er": 1.8,
-     "r5": 764
+     "r5": 765
     },
     {
      "id": "2123617820160180478",
@@ -3914,31 +3958,31 @@
      "text": "Best NFL Quarterback seasons in history by SVAR (Season Value Above Replacement) since 1999, era-adjusted. Some standouts for me: -Daunte Cu",
      "pub": 1795145363000,
      "kind": "photo",
-     "views": 775,
+     "views": 776,
      "likes": 9,
      "reposts": 0,
      "replies": 1,
      "er": 1.4,
-     "r5": 602
+     "r5": 604
     },
     {
      "id": "2123686660273799579",
      "text": "International Soccer GAR (Goals Above Replacement) Leaders through Week 15 (11/20/26)",
      "pub": 1795161330000,
      "kind": "photo",
-     "views": 456,
+     "views": 459,
      "likes": 4,
      "reposts": 0,
      "replies": 1,
      "er": 1.3,
-     "r5": 504
+     "r5": 506
     },
     {
      "id": "2123686678426714594",
      "text": "https://arkndjl.net/arkboard/soccer/",
      "pub": 1795161334000,
      "kind": "reply",
-     "views": 103,
+     "views": 104,
      "likes": 1,
      "reposts": 0,
      "replies": 0,
@@ -3950,12 +3994,12 @@
      "text": "International Soccer ARKRANKING through Week 15 (11/20/26)",
      "pub": 1795194455000,
      "kind": "photo",
-     "views": 338,
+     "views": 339,
      "likes": 4,
      "reposts": 0,
      "replies": 1,
      "er": 1.8,
-     "r5": 550
+     "r5": 552
     },
     {
      "id": "2123825669410783432",
@@ -3974,12 +4018,12 @@
      "text": "International Soccer \"next up\" ranking based on my breakout% metric through Week 15 (11/20/26)",
      "pub": 1795194747000,
      "kind": "photo",
-     "views": 549,
+     "views": 550,
      "likes": 10,
      "reposts": 0,
      "replies": 2,
      "er": 2.4,
-     "r5": 631
+     "r5": 632
     },
     {
      "id": "2123826890607882598",
@@ -3998,24 +4042,24 @@
      "text": "thats my rb1",
      "pub": 1795230971000,
      "kind": "quote",
-     "views": 402,
+     "views": 417,
      "likes": 1,
      "reposts": 0,
      "replies": 0,
      "er": 0.5,
-     "r5": 504
+     "r5": 508
     },
     {
      "id": "2123980777763344722",
      "text": "good lord",
      "pub": 1795231453000,
      "kind": "quote",
-     "views": 681,
+     "views": 704,
      "likes": 6,
      "reposts": 0,
      "replies": 0,
      "er": 0.9,
-     "r5": 485
+     "r5": 494
     }
    ]
   },
@@ -4034,7 +4078,7 @@
    "last30": 0,
    "gap": 4.6,
    "vpd": 0.9,
-   "subsPerK": null,
+   "subsPerK": 0,
    "likeRate": 4.14,
    "grid": [
     [
@@ -4274,7 +4318,7 @@
      "views": 57,
      "likes": 3,
      "comments": null,
-     "age": 270,
+     "age": 270.1,
      "et": {
       "d": 2,
       "h": 15,
@@ -4290,7 +4334,7 @@
      "views": 30,
      "likes": 3,
      "comments": null,
-     "age": 268.9,
+     "age": 269,
      "et": {
       "d": 3,
       "h": 17,
@@ -4322,7 +4366,7 @@
      "views": 113,
      "likes": 5,
      "comments": null,
-     "age": 204.9,
+     "age": 205,
      "et": {
       "d": 4,
       "h": 18,
@@ -4354,7 +4398,7 @@
      "views": 9,
      "likes": 1,
      "comments": null,
-     "age": 69.5,
+     "age": 69.6,
      "et": {
       "d": 0,
       "h": 3,
@@ -4370,7 +4414,7 @@
      "views": 358,
      "likes": 2,
      "comments": null,
-     "age": 57.1,
+     "age": 57.2,
      "et": {
       "d": 5,
       "h": 13,
@@ -4402,7 +4446,7 @@
      "views": 184,
      "likes": 14,
      "comments": null,
-     "age": 54.9,
+     "age": 55,
      "et": {
       "d": 0,
       "h": 18,
@@ -4416,9 +4460,9 @@
    "x": 10,
    "xp": {
     "n": 10,
-    "sum": 5437,
-    "avg": 544,
-    "med": 502.5
+    "sum": 5487,
+    "avg": 549,
+    "med": 504.5
    },
    "yt": {
     "n": 9,
@@ -4698,6 +4742,11 @@
     1795291527194,
     870,
     5437
+   ],
+   [
+    1795297559632,
+    870,
+    5487
    ]
   ]
  }
