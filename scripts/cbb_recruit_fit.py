@@ -1040,6 +1040,25 @@ def dob_old(dob, c):
     return 1.0 if (ref.year - b.year - ((ref.month, ref.day) < (b.month, b.day))) >= 18 else 0.0
 
 
+def class_ranks(lst, bt):
+    """One class's rankings: committed schools by summed E[share] (FV points), with the class's year-1 college value."""
+    by = defaultdict(list)
+    for x in lst:
+        if x['team']: by[x['team']].append(x)
+    trows = []
+    for t, xs in by.items():
+        e = sum(x['ets'] for x in xs)
+        trows.append({'team': t, 'logo': bt[t]['logo'], 'conf': bt[t]['conf'], 'n': len(xs), 'ets': round(e, 4),
+                      'fvSum': round(fv_of(e), 1), 'pNba': round(1 - float(np.prod([1 - x['p'] for x in xs])), 3),
+                      'top': [[x['name'], x['pos'], x['fv']] for x in xs[:3]], 'best': min(x['rk'] or 999 for x in xs),
+                      'xnil': sum(x['xnil'] for x in xs), 'v1': round(sum(x['path'][0]['v'] for x in xs), 2),
+                      'min1': round(sum(x['path'][0]['on'] * x['path'][0]['min'] for x in xs), 1),
+                      'ark5': sum(1 for x in xs if x['ark'] >= 5), 'ark4': sum(1 for x in xs if 4 <= x['ark'] < 5)})
+    trows.sort(key=lambda x: -x['ets'])
+    for i, x in enumerate(trows): x['rk'] = i + 1
+    return trows
+
+
 def board_teams():
     d = json.load(open(os.path.join(ROOT, 'static', 'data', 'cbb-all.json')))
     i = {c: k for k, c in enumerate(d['cols'])}
@@ -1251,22 +1270,10 @@ def write():
         for i, x in enumerate(recs): x['ovr'] = i + 1
         out_classes.append({'year': c, 'n': len(recs), 'committed': sum(1 for x in recs if x['team'] or x['school']),
                             'reliability': rel[c], 'list': recs})
-    # class rankings: expected NBA value the class brings (sum of E[share]) per committed school, next class
-    nxt = next(x for x in out_classes if x['year'] == LIVE[0])
-    by = defaultdict(list)
-    for x in nxt['list']:
-        if x['team']: by[x['team']].append(x)
-    trows = []
-    for t, xs in by.items():
-        e = sum(x['ets'] for x in xs)
-        trows.append({'team': t, 'logo': bt[t]['logo'], 'conf': bt[t]['conf'], 'n': len(xs), 'ets': round(e, 4),
-                      'fvSum': round(fv_of(e), 1), 'pNba': round(1 - float(np.prod([1 - x['p'] for x in xs])), 3),
-                      'top': [[x['name'], x['pos'], x['fv']] for x in xs[:3]], 'best': min(x['rk'] or 999 for x in xs),
-                      'xnil': sum(x['xnil'] for x in xs), 'v1': round(sum(x['path'][0]['v'] for x in xs), 2),
-                      'min1': round(sum(x['path'][0]['on'] * x['path'][0]['min'] for x in xs), 1),
-                      'ark5': sum(1 for x in xs if x['ark'] >= 5), 'ark4': sum(1 for x in xs if 4 <= x['ark'] < 5)})
-    trows.sort(key=lambda x: -x['ets'])
-    for i, x in enumerate(trows): x['rk'] = i + 1
+    # class rankings: expected NBA value the class brings (sum of E[share]) per committed school, each class
+    # (teams = the next class; teamsBy = every class, for the class-rankings year filter)
+    teamsBy = {str(c['year']): class_ranks(c['list'], bt) for c in out_classes}
+    trows = teamsBy[str(LIVE[0])]
     res = {
         'asof': __import__('datetime').date.today().isoformat(),
         'scale': {'c': C_TS, 'ages': list(AGES), 'vorx': [VORX_K, VORX_REP]},
@@ -1282,7 +1289,7 @@ def write():
                   'xnil': {'budget': {k: XNIL[k] for k in ('HM', 'MM', 'LM')}, 'tilt': XNIL['tilt'], 'rep': REP_BPM, 'ref': {k: v for k, v in H['nilRef'].items() if k != 'conf'},
                            'levels': {k: sorted(v) for k, v in LEVELS.items()}},
                   'research': RESEARCH},
-        'classes': out_classes, 'teams': trows,
+        'classes': out_classes, 'teams': trows, 'teamsBy': teamsBy,
         'intl': sorted(intl, key=lambda x: (-x['fv'], -x['s'])),
     }
     json.dump(res, open(OUT, 'w'), separators=(',', ':'), allow_nan=False)
