@@ -32,7 +32,32 @@ function looksLikeBot(ua) {
   return !ua || /bot|crawl|spider|slurp|headless|curl|wget|python|httpclient|preview/i.test(ua);
 }
 
+// Cloudflare's own clock (wrangler.toml [triggers]) starts the feed workflows that GitHub's cron skips. Each one is
+// a workflow_dispatch of an existing workflow, so its concurrency group still queues or merges overlapping runs.
+// Needs the GITHUB_TOKEN secret: a fine-grained token on arkndjl/website with Actions: read and write.
+const DISPATCH = ["odds-snap.yml", "esea.yml", "picks-refresh.yml"];
+
+async function dispatchFeeds(env) {
+  if (!env.GITHUB_TOKEN) return console.log("feed dispatch: GITHUB_TOKEN not set");
+  for (const wf of DISPATCH) {
+    const r = await fetch(`https://api.github.com/repos/arkndjl/website/actions/workflows/${wf}/dispatches`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.GITHUB_TOKEN}`,
+        Accept: "application/vnd.github+json",
+        "User-Agent": "arkndjl-site-cron",
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+      body: JSON.stringify({ ref: "main" }),
+    });
+    console.log(`feed dispatch ${wf}: ${r.status}`);
+  }
+}
+
 export default {
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(dispatchFeeds(env));
+  },
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname.replace(/\/+$/, "") === "/api/kofi") return kofi(request, env);

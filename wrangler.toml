@@ -27,3 +27,7 @@ class_name = "Supporters"
 [[migrations]]
 tag = "v2-supporters"
 new_sqlite_classes = ["Supporters"]
+
+# Every 30 minutes, dispatch the feed workflows (worker/site.js scheduled); GitHub's own cron skips runs under load.
+[triggers]
+crons = ["*/30 * * * *"]
