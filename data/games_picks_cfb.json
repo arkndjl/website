@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-21T21:53:21Z",
+ "asof": "2026-11-21T22:23:01Z",
  "recenter": {
   "week": 0.48
  },
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-21",
-  "ageH": -2.1,
+  "ageH": -1.6,
   "stale": false
  },
  "picks": [],
@@ -445,7 +445,7 @@
    "mk": "total",
    "side": "under",
    "line": 53.5,
-   "price": 106.0,
+   "price": -100.0,
    "edge": 3.8,
    "x": null,
    "why": "total market off",
@@ -477,7 +477,7 @@
    "mk": "spread",
    "side": "home",
    "line": -2.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 2.6,
    "x": null,
    "why": "spread market off",
@@ -499,22 +499,6 @@
    "why": "total market off",
    "m": 20.6,
    "tm": 59.3
-  },
-  {
-   "id": "401858534",
-   "sport": "cfb",
-   "kick": "2026-11-21T23:15:00.000Z",
-   "home": "USC",
-   "away": "Maryland",
-   "mk": "spread",
-   "side": "home",
-   "line": 17.5,
-   "price": -119.0,
-   "edge": 2.2,
-   "x": null,
-   "why": "spread market off",
-   "m": 19.7,
-   "tm": 57.7
   },
   {
    "id": "401856870",
@@ -563,6 +547,22 @@
    "why": "spread market off",
    "m": 5.2,
    "tm": 51.0
+  },
+  {
+   "id": "401858534",
+   "sport": "cfb",
+   "kick": "2026-11-21T23:15:00.000Z",
+   "home": "USC",
+   "away": "Maryland",
+   "mk": "spread",
+   "side": "home",
+   "line": 19.5,
+   "price": -101.0,
+   "edge": 0.2,
+   "x": null,
+   "why": "spread market off",
+   "m": 19.7,
+   "tm": 57.7
   }
  ],
  "games": {
@@ -642,7 +642,7 @@
    "mk": "total",
    "side": "under",
    "line": 53.5,
-   "price": 106.0,
+   "price": -100.0,
    "edge": 3.8,
    "ev": null,
    "units": 0.0,
@@ -665,9 +665,9 @@
   "401858534": {
    "mk": "spread",
    "side": "home",
-   "line": 17.5,
-   "price": -119.0,
-   "edge": 2.2,
+   "line": 19.5,
+   "price": -101.0,
+   "edge": 0.2,
    "ev": null,
    "units": 0.0,
    "home": "USC",
@@ -702,7 +702,7 @@
    "mk": "spread",
    "side": "home",
    "line": -2.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 2.6,
    "ev": null,
    "units": 0.0,
@@ -835,16 +835,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 25672,
+  "snapshots": 25680,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 5206,
-    "clvRet": -0.0326,
-    "clvT": -23.15,
-    "clv": 0.53,
-    "beat": 0.415,
-    "still": 0.285
+    "clvRet": -0.0314,
+    "clvT": -22.06,
+    "clv": 0.55,
+    "beat": 0.419,
+    "still": 0.281
    },
    {
     "when": "6-24h",
@@ -5618,7 +5618,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-21T21:53:21Z",
+ "checked": "2026-11-21T22:23:01Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
