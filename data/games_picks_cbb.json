@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-22T16:01:29Z",
+ "asof": "2026-11-22T16:13:36Z",
  "recenter": {
   "2026-11-22": 1.86
  },
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-22T15:45:34Z",
-  "ageH": 0.3,
+  "ageH": 0.5,
   "stale": false
  },
  "picks": [],
@@ -1896,9 +1896,9 @@
     "mk": "total",
     "side": "under",
     "line": 156.5,
-    "price": -114.0,
-    "ev": 0.156,
-    "units": 0.75
+    "price": -119.0,
+    "ev": 0.136,
+    "units": 0.5
    }
   },
   {
@@ -1933,9 +1933,9 @@
     "mk": "total",
     "side": "under",
     "line": 145.5,
-    "price": -114.0,
-    "ev": 0.103,
-    "units": 0.5
+    "price": -119.0,
+    "ev": 0.086,
+    "units": 0.25
    }
   }
  ],
@@ -2116,6 +2116,22 @@
    "why": "edge under 5 (line: <4)",
    "m": 1.2,
    "tm": 160.9
+  },
+  {
+   "id": "401921420",
+   "sport": "cbb",
+   "kick": "2026-11-22T23:00:00Z",
+   "home": "Minnesota",
+   "away": "Utah",
+   "mk": "spread",
+   "side": "home",
+   "line": 8.5,
+   "price": -124.0,
+   "edge": 2.9,
+   "x": 4.0,
+   "why": "edge under 4 (tier: power)",
+   "m": 11.4,
+   "tm": 130.5
   },
   {
    "id": "401911200",
@@ -2324,22 +2340,6 @@
    "why": "edge under 7",
    "m": 2.8,
    "tm": 155.9
-  },
-  {
-   "id": "401917541",
-   "sport": "cbb",
-   "kick": "2026-11-23T00:00:00Z",
-   "home": "Portland",
-   "away": "California Baptist",
-   "mk": "total",
-   "side": "over",
-   "line": 146.5,
-   "price": -119.0,
-   "edge": 3.4,
-   "x": 7.0,
-   "why": "edge under 7",
-   "m": 9.2,
-   "tm": 149.9
   }
  ],
  "games": {
@@ -2359,21 +2359,21 @@
    "mk": "total",
    "side": "under",
    "line": 156.5,
-   "price": -114.0,
-   "ev": 0.156,
+   "price": -119.0,
+   "ev": 0.136,
    "edge": 6.7,
-   "units": 0.75,
+   "units": 0.5,
    "bk": "poly",
    "home": "Butler",
    "away": "Nebraska",
    "state": "paper"
   },
   "401921420": {
-   "mk": "total",
-   "side": "under",
-   "line": 131.5,
-   "price": -110.0,
-   "edge": 1.0,
+   "mk": "spread",
+   "side": "home",
+   "line": 8.5,
+   "price": -124.0,
+   "edge": 2.9,
    "ev": null,
    "units": 0.0,
    "home": "Minnesota",
@@ -2636,9 +2636,9 @@
   "401925013": {
    "mk": "total",
    "side": "under",
-   "line": 165.5,
-   "price": -119.0,
-   "edge": 2.0,
+   "line": 164.5,
+   "price": -110.0,
+   "edge": 1.0,
    "ev": null,
    "units": 0.0,
    "home": "Lamar",
@@ -2709,7 +2709,7 @@
    "mk": "total",
    "side": "under",
    "line": 155.5,
-   "price": -104.0,
+   "price": -106.0,
    "edge": 2.7,
    "ev": null,
    "units": 0.0,
@@ -2766,11 +2766,11 @@
    "state": "under"
   },
   "401923323": {
-   "mk": "spread",
-   "side": "away",
-   "line": -1.5,
-   "price": -114.0,
-   "edge": 1.1,
+   "mk": "total",
+   "side": "under",
+   "line": 132.5,
+   "price": -124.0,
+   "edge": 2.4,
    "ev": null,
    "units": 0.0,
    "home": "UAlbany",
@@ -2792,9 +2792,9 @@
   "401929023": {
    "mk": "total",
    "side": "over",
-   "line": 140.5,
-   "price": -106.0,
-   "edge": 2.2,
+   "line": 139.5,
+   "price": -110.0,
+   "edge": 3.2,
    "ev": null,
    "units": 0.0,
    "home": "Canisius",
@@ -2854,7 +2854,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 23006,
+  "snapshots": 23019,
   "buckets": [
    {
     "when": "24h+",
@@ -2867,18 +2867,18 @@
    },
    {
     "when": "6-24h",
-    "clvN": 4578,
+    "clvN": 4579,
     "clvRet": 0.0004,
-    "clvT": 0.2,
+    "clvT": 0.19,
     "clv": 0.72,
     "beat": 0.421,
     "still": 0.397
    },
    {
     "when": "1-6h",
-    "clvN": 2136,
+    "clvN": 2137,
     "clvRet": -0.0393,
-    "clvT": -33.76,
+    "clvT": -33.78,
     "clv": 0.09,
     "beat": 0.168,
     "still": 0.705
@@ -20981,7 +20981,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-22T16:01:29Z",
+ "checked": "2026-11-22T16:13:36Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
