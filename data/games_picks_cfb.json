@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-22T18:45:04Z",
+ "asof": "2026-11-22T18:50:03Z",
  "recenter": {
   "week": 0.4
  },
@@ -300,13 +300,29 @@
    "away": "Sacramento State",
    "mk": "total",
    "side": "over",
-   "line": 41.5,
-   "price": -115.0,
-   "edge": 5.5,
+   "line": 40.5,
+   "price": -110.0,
+   "edge": 6.5,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
    "m": 18.4,
    "tm": 47.0
+  },
+  {
+   "id": "401856765",
+   "sport": "cfb",
+   "kick": "2026-11-29T00:00:00.000Z",
+   "home": "Vanderbilt",
+   "away": "Tennessee",
+   "mk": "total",
+   "side": "over",
+   "line": 43.5,
+   "price": -114.0,
+   "edge": 5.1,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": -12.4,
+   "tm": 48.6
   },
   {
    "id": "401864546",
@@ -556,45 +572,29 @@
    "away": "Purdue",
    "mk": "spread",
    "side": "home",
-   "line": -2.5,
+   "line": -1.5,
    "price": -7255.0,
-   "edge": 27.2,
+   "edge": 26.2,
    "x": null,
    "why": "spread market off",
    "m": 24.7,
    "tm": 52.5
   },
   {
-   "id": "401858314",
+   "id": "401862838",
    "sport": "cfb",
-   "kick": "2026-11-28T17:00:00.000Z",
-   "home": "Syracuse",
-   "away": "Notre Dame",
+   "kick": "2026-11-27T20:30:00.000Z",
+   "home": "Memphis",
+   "away": "Temple",
    "mk": "spread",
-   "side": "away",
-   "line": 1.5,
+   "side": "home",
+   "line": -2.5,
    "price": -7255.0,
-   "edge": 25.0,
+   "edge": 21.8,
    "x": null,
    "why": "spread market off",
-   "m": -23.5,
-   "tm": 53.3
-  },
-  {
-   "id": "401856765",
-   "sport": "cfb",
-   "kick": "2026-11-29T00:00:00.000Z",
-   "home": "Vanderbilt",
-   "away": "Tennessee",
-   "mk": "spread",
-   "side": "away",
-   "line": 9.5,
-   "price": -5413.0,
-   "edge": 21.9,
-   "x": null,
-   "why": "spread market off",
-   "m": -12.4,
-   "tm": 48.6
+   "m": 19.3,
+   "tm": 58.5
   },
   {
    "id": "401858316",
@@ -611,22 +611,6 @@
    "why": "spread market off",
    "m": -7.8,
    "tm": 56.2
-  },
-  {
-   "id": "401862838",
-   "sport": "cfb",
-   "kick": "2026-11-27T20:30:00.000Z",
-   "home": "Memphis",
-   "away": "Temple",
-   "mk": "spread",
-   "side": "home",
-   "line": -1.5,
-   "price": -7255.0,
-   "edge": 20.8,
-   "x": null,
-   "why": "spread market off",
-   "m": 19.3,
-   "tm": 58.5
   },
   {
    "id": "401864549",
@@ -675,6 +659,22 @@
    "why": "spread market off",
    "m": 8.4,
    "tm": 52.8
+  },
+  {
+   "id": "401860926",
+   "sport": "cfb",
+   "kick": "2026-11-28T23:00:00.000Z",
+   "home": "Colorado State",
+   "away": "Boise State",
+   "mk": "total",
+   "side": "under",
+   "line": 74.5,
+   "price": -100.0,
+   "edge": 8.1,
+   "x": null,
+   "why": "total market off",
+   "m": -23.8,
+   "tm": 66.4
   }
  ],
  "games": {
@@ -694,7 +694,7 @@
    "mk": "spread",
    "side": "home",
    "line": 13.5,
-   "price": -149.0,
+   "price": -146.0,
    "edge": 2.1,
    "ev": null,
    "units": 0.0,
@@ -787,16 +787,16 @@
    "state": "off"
   },
   "401856765": {
-   "mk": "spread",
-   "side": "away",
-   "line": 9.5,
-   "price": -5413.0,
-   "edge": 21.9,
+   "mk": "total",
+   "side": "over",
+   "line": 43.5,
+   "price": -114.0,
+   "edge": 5.1,
    "ev": null,
    "units": 0.0,
    "home": "Vanderbilt",
    "away": "Tennessee",
-   "state": "off"
+   "state": "under"
   },
   "401856761": {
    "mk": "total",
@@ -873,9 +873,9 @@
   "401858538": {
    "mk": "spread",
    "side": "home",
-   "line": -2.5,
+   "line": -1.5,
    "price": -7255.0,
-   "edge": 27.2,
+   "edge": 26.2,
    "ev": null,
    "units": 0.0,
    "home": "Indiana",
@@ -921,9 +921,9 @@
   "401858314": {
    "mk": "spread",
    "side": "away",
-   "line": 1.5,
-   "price": -7255.0,
-   "edge": 25.0,
+   "line": -20.5,
+   "price": -245.0,
+   "edge": 3.0,
    "ev": null,
    "units": 0.0,
    "home": "Syracuse",
@@ -1234,7 +1234,7 @@
    "mk": "spread",
    "side": "home",
    "line": -2.5,
-   "price": -117.0,
+   "price": -119.0,
    "edge": 1.4,
    "ev": null,
    "units": 0.0,
@@ -1269,9 +1269,9 @@
   "401862838": {
    "mk": "spread",
    "side": "home",
-   "line": -1.5,
+   "line": -2.5,
    "price": -7255.0,
-   "edge": 20.8,
+   "edge": 21.8,
    "ev": null,
    "units": 0.0,
    "home": "Memphis",
@@ -1413,9 +1413,9 @@
   "401864547": {
    "mk": "total",
    "side": "over",
-   "line": 41.5,
-   "price": -115.0,
-   "edge": 5.5,
+   "line": 40.5,
+   "price": -110.0,
+   "edge": 6.5,
    "ev": null,
    "units": 0.0,
    "home": "Hawai'i",
@@ -1511,15 +1511,15 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 26067,
+  "snapshots": 26095,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 5314,
-    "clvRet": -0.0309,
-    "clvT": -21.49,
-    "clv": 0.56,
-    "beat": 0.418,
+    "clvN": 5324,
+    "clvRet": -0.0281,
+    "clvT": -18.14,
+    "clv": 0.64,
+    "beat": 0.42,
     "still": 0.287
    },
    {
@@ -6294,7 +6294,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-22T18:45:04Z",
+ "checked": "2026-11-22T18:50:03Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
