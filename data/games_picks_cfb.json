@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-22T02:16:41Z",
+ "asof": "2026-11-22T02:43:43Z",
  "recenter": {
-  "week": 0.35
+  "week": 0.37
  },
  "monitor": {
   "clocks": {
@@ -268,8 +268,8 @@
   }
  },
  "model": {
-  "asof": "2026-11-21",
-  "ageH": 2.3,
+  "asof": "2026-11-22",
+  "ageH": -21.3,
   "stale": false
  },
  "picks": [],
@@ -286,27 +286,27 @@
    "side": "over",
    "line": 40.5,
    "price": -114.0,
-   "edge": 2.9,
+   "edge": 2.6,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
-   "m": 6.2,
-   "tm": 43.4
+   "m": 6.3,
+   "tm": 43.1
   },
   {
-   "id": "401860925",
+   "id": "401860919",
    "sport": "cfb",
-   "kick": "2026-11-22T02:30:00.000Z",
-   "home": "Boise State",
-   "away": "San Diego State",
+   "kick": "2026-11-22T03:30:00.000Z",
+   "home": "Oregon State",
+   "away": "Utah State",
    "mk": "total",
    "side": "under",
-   "line": 60.5,
-   "price": -106.0,
-   "edge": 4.1,
+   "line": 51.5,
+   "price": -114.0,
+   "edge": 3.3,
    "x": null,
    "why": "total market off",
-   "m": 22,
-   "tm": 56.4
+   "m": 5.2,
+   "tm": 48.2
   },
   {
    "id": "401856870",
@@ -316,62 +316,34 @@
    "away": "Oklahoma State",
    "mk": "spread",
    "side": "away",
-   "line": -2.5,
-   "price": -119.0,
-   "edge": 1.7,
+   "line": -3.5,
+   "price": 105.0,
+   "edge": 0.7,
    "x": null,
    "why": "spread market off",
    "m": -4.2,
    "tm": 60.2
-  },
-  {
-   "id": "401860919",
-   "sport": "cfb",
-   "kick": "2026-11-22T03:30:00.000Z",
-   "home": "Oregon State",
-   "away": "Utah State",
-   "mk": "spread",
-   "side": "away",
-   "line": 6.5,
-   "price": -101.0,
-   "edge": 1.3,
-   "x": null,
-   "why": "spread market off",
-   "m": 5.2,
-   "tm": 51.1
   }
  ],
  "games": {
   "401856870": {
    "mk": "spread",
    "side": "away",
-   "line": -2.5,
-   "price": -119.0,
-   "edge": 1.7,
+   "line": -3.5,
+   "price": 105.0,
+   "edge": 0.7,
    "ev": null,
    "units": 0.0,
    "home": "Arizona State",
    "away": "Oklahoma State",
    "state": "off"
   },
-  "401860925": {
+  "401860919": {
    "mk": "total",
    "side": "under",
-   "line": 60.5,
-   "price": -106.0,
-   "edge": 4.1,
-   "ev": null,
-   "units": 0.0,
-   "home": "Boise State",
-   "away": "San Diego State",
-   "state": "off"
-  },
-  "401860919": {
-   "mk": "spread",
-   "side": "away",
-   "line": 6.5,
-   "price": -101.0,
-   "edge": 1.3,
+   "line": 51.5,
+   "price": -114.0,
+   "edge": 3.3,
    "ev": null,
    "units": 0.0,
    "home": "Oregon State",
@@ -383,7 +355,7 @@
    "side": "over",
    "line": 40.5,
    "price": -114.0,
-   "edge": 2.9,
+   "edge": 2.6,
    "ev": null,
    "units": 0.0,
    "home": "Nevada",
@@ -443,25 +415,25 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 25700,
+  "snapshots": 25704,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 5206,
-    "clvRet": -0.0314,
-    "clvT": -22.06,
-    "clv": 0.55,
-    "beat": 0.419,
-    "still": 0.281
+    "clvRet": -0.0311,
+    "clvT": -21.89,
+    "clv": 0.56,
+    "beat": 0.421,
+    "still": 0.283
    },
    {
     "when": "6-24h",
     "clvN": 692,
-    "clvRet": -0.0586,
-    "clvT": -22.91,
-    "clv": 0.09,
-    "beat": 0.198,
-    "still": 0.595
+    "clvRet": -0.0581,
+    "clvT": -22.54,
+    "clv": 0.1,
+    "beat": 0.208,
+    "still": 0.585
    },
    {
     "when": "1-6h",
@@ -5226,7 +5198,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-22T02:16:41Z",
+ "checked": "2026-11-22T02:43:43Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
