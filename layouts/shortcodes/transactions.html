@@ -1,4 +1,5 @@
 {{- /* Transactions: every move this season, newest first, from data/transactions/<sport>.json (scripts/transactions.py:
+       player values from data/transactions/values.json (scripts/transaction_values.py);
        RotoWire's news-feed moves for nfl/nba/nhl/cfb/cbb, Transfermarkt transfers for soccer). Trades carry the draft
        picks in the deal: each club and the picks it gets ("PHI '27 R1, '29 R2"; * conditional). */ -}}
 {{- $sport := .Get "sport" | default "nfl" -}}
@@ -7,13 +8,21 @@
 {{- $college := in (slice "cfb" "cbb") $sport -}}
 {{- $soccer := eq $sport "soccer" -}}
 {{- $pro := in (slice "nfl" "nba" "nhl") $sport -}}
+{{- $V := index (site.Data.transactions.values | default dict) $sport | default dict -}}
+{{- /* value columns (data/transactions/values.json, scripts/transaction_values.py): [label, hover, format] */ -}}
+{{- $vc := dict "cfb" (slice (slice "FV" "FV, the board's headline grade (mean outcome)" "%d")) "cbb" (slice (slice "FV" "FV, the board's headline grade (mean outcome)" "%d"))
+    "nfl" (slice (slice "WAR" "WAR this season" "%+.2f") (slice "SVAR" "SVAR = SV over replacement this season, in wins (QBs, skill players, defense)" "%+.2f"))
+    "nba" (slice (slice "XPM" "XPM this season: points per 100 possessions over an average player" "%+.1f") (slice "VORX" "VORX this season: wins over a replacement player" "%+.2f"))
+    "nhl" (slice (slice "WAR" "WAR this season" "%+.2f")) "soccer" (slice (slice "GAR" "GAR this season: goals above replacement" "%+.2f")) -}}
+{{- $cols := index $vc $sport | default slice -}}
+{{- $vn := slice }}{{ range $cols }}{{ $vn = $vn | append (index . 0) }}{{ end -}}
 {{- $icon := cond (in (slice "cbb" "nba") $sport) "basketball" (cond (eq $sport "nhl") "hockey" (cond $soccer "soccer" "football")) -}}
 {{- $filter := cond $soccer "Move,Lg,From,To" (cond $college "Move,Pos,Team" "Move,Pos,From,To") -}}
 {{- $kt := dict "trade" "traded" "claim" "claimed off waivers" "release" "waived, released or cut" "sign" "signed (contract, extension, active roster)" "practice" "practice squad" "up" "called up / promoted" "down" "sent down / assigned" "exit" (cond $college "left the program (portal, dismissed, retired)" "retired, overseas or parted ways") "transfer" "transfer or loan" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "transactions") "icon" $icon "filter" $filter "tab" ($.Get "tab") "gfxCols" (cond $soccer "Date,Player,From,To,Fee" "Date,Player,Pos,Move,From,To,Picks") "gfxDate" (lower ((time .asof).Format "Jan 2")) "gfxMax" "30") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "transactions") "icon" $icon "filter" $filter "tab" ($.Get "tab") "gfxCols" (cond $soccer (printf "Date,Player,%s,From,To,Fee" (delimit $vn ",")) (printf "Date,Player,Pos,%s,Move,From,To%s" (delimit $vn ",") (cond $pro ",Picks" ""))) "gfxDate" (lower ((time .asof).Format "Jan 2")) "gfxMax" "30") -}}
 <table class="cfb__table tx">
   <thead><tr>
-    <th>Date</th><th>Player</th>{{ if not $soccer }}<th>Pos</th>{{ end }}<th>Move</th>
+    <th>Date</th><th>Player</th>{{ if not $soccer }}<th>Pos</th>{{ end }}{{ range $cols }}<th title="{{ index . 1 }}">{{ index . 0 }}</th>{{ end }}<th>Move</th>
     {{- if $soccer }}<th title="league of the club he joined (else the one he left)">Lg</th>{{ end }}
     {{- if $college }}<th>Team</th>{{ else }}<th>From</th><th>To</th>{{ end }}
     {{- if $soccer }}<th title="transfer fee, EUR (Transfermarkt)">Fee</th><th class="tx__x" title="market value, EUR (Transfermarkt)">MV</th>{{ end }}
@@ -25,6 +34,8 @@
     <td class="cfb__num" data-v="{{ .d }}">{{ lower ((time .d).Format "Jan 2") }}</td>
     <td class="cfb__name"{{ with .h }} title="{{ . }}"{{ end }}><b>{{ .n }}</b></td>
     {{- if not $soccer }}<td>{{ .pos }}</td>{{ end }}
+    {{- $v := index $V (printf "%s|%s|%s" .d .n .k) | default slice }}
+    {{- range $i, $c := $cols }}{{ $x := cond (lt $i (len $v)) (index $v $i) nil }}<td class="cfb__num" data-v="{{ if ne $x nil }}{{ $x }}{{ end }}">{{ if ne $x nil }}{{ if eq (index $c 2) "%d" }}{{ printf "%d" (int $x) }}{{ else }}{{ partial "num.html" (slice (index $c 2) (float $x)) }}{{ end }}{{ end }}</td>{{ end }}
     <td title="{{ index $kt .k }}"><span class="tx__k tx__k--{{ .k }}">{{ .k }}</span></td>
     {{- if $soccer }}<td>{{ .lg }}</td>{{ end }}
     {{- if $college }}

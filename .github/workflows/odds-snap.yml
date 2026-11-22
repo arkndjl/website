@@ -49,7 +49,7 @@ jobs:
       # since the last poll (scripts/rotowire_moves.py -> scripts/data/rotowire_moves/), then every board's roster
       # checked against it (scripts/roster_audit.py -> data/roster_audit.json). The sport builds retag clubs from it.
       # Then each sport's transactions tab (scripts/transactions.py -> data/transactions/; soccer's Transfermarkt pull
-      # once a day).
+      # once a day), and each row's player value (scripts/transaction_values.py -> data/transactions/values.json).
       - name: RotoWire roster moves
         continue-on-error: true
         timeout-minutes: 5
@@ -57,6 +57,7 @@ jobs:
           python3 scripts/rotowire_moves.py --calls 20
           python3 scripts/roster_audit.py
           python3 scripts/transactions.py
+          python3 scripts/transaction_values.py   # each row's FV / WAR / XPM / GAR, recruit ARK stars
       # NBA and NFL player props (Novig, DraftKings through ESPN), NFL first-half lines and team totals, and the paper
       # books (scripts/props_snap.py, scripts/props_paper.py, scripts/nfl_props_paper.py)
       - name: Props snapshot and paper book
