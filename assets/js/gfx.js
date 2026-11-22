@@ -3612,6 +3612,59 @@
     return F.canvas;
   }
 
+  // ---- games to watch (Standings, layouts/shortcodes/watch.html): the week's top games across sports, one row each:
+  // rank, sport tag, start (ET), both sides with full-colour logos, W with its five parts as pixel bars ----
+  async function buildWatch(win, btn) {
+    var D; try { D = JSON.parse(btn.getAttribute('data-gfx-watch')); } catch (e) { return null; }
+    var G = (D.games || []).slice(0, 15); if (!G.length) return null;
+    var F = await frame(2160, 2700, 'GAMES TO WATCH :: ' + D.span, '', 'arkndjl.net/arkboard/standings#games-to-watch');
+    var g = F.g, n = G.length, gap = 12, rh = Math.min(240, Math.floor((F.h - gap * (n - 1)) / n));
+    var imgs = await Promise.all(G.map(function (r) { return Promise.all([r.a.l ? loadImg(r.a.l) : null, r.h.l ? loadImg(r.h.l) : null]); }));
+    var big = rh >= 190, ns = big ? 64 : rh >= 160 ? 54 : 44, ss = Math.round(ns * 0.62), ls = Math.round(ns * 1.25);
+    var PARTS = [['q', 'Q'], ['c', 'C'], ['s', 'S'], ['l', 'L'], ['t', 'T']];
+    G.forEach(function (r, k) {
+      var y = F.y + k * (rh + gap), cy = y + rh / 2;
+      g.fillStyle = k === 0 ? C.well : C.face; g.fillRect(F.x, y, F.w, rh); bevel(g, F.x, y, F.w, rh, k !== 0, 3);
+      // rank
+      var rw = Math.round(ns * 1.9);
+      g.fillStyle = C.dark; g.fillRect(F.x + 14, y + 14, rw, rh - 28); bevel(g, F.x + 14, y + 14, rw, rh - 28, false, 3);
+      g.font = Math.round(ns * 1.1) + 'px ' + FONT; g.fillStyle = k < 3 ? C.teal : C.lilac; g.textAlign = 'center';
+      g.fillText(String(r.rk), F.x + 14 + rw / 2, cy + 2); g.textAlign = 'left';
+      // W and its parts on the right
+      var bw = Math.round(ss * 1.3), bgap = Math.round(ss * 0.35), partsW = PARTS.length * bw + (PARTS.length - 1) * bgap;
+      var right = F.x + F.w - 28, px0 = right - partsW, bh = rh - 28 - ss * 1.6;
+      PARTS.forEach(function (pp, i) {
+        var v = Math.max(0, Math.min(100, +((r.p || {})[pp[0]] || 0))), bx = px0 + i * (bw + bgap), by = y + 16;
+        g.fillStyle = C.dark; g.fillRect(bx, by, bw, bh);
+        var fh = Math.round(bh * v / 100 / 6) * 6;   // 6px steps: pixel bars
+        g.fillStyle = v >= 75 ? C.teal : C.lilac; g.fillRect(bx, by + bh - fh, bw, fh);
+        g.font = ss + 'px ' + FONT; g.fillStyle = C.lilac; g.textAlign = 'center'; g.fillText(pp[1], bx + bw / 2, y + rh - 14 - ss * 0.5); g.textAlign = 'left';
+      });
+      var ws = Math.round(ns * 1.45), wt = String(Math.round(r.w));
+      g.font = ws + 'px ' + FONT; var wW = g.measureText('100').width, wx = px0 - 36 - wW;
+      g.fillStyle = C.teal; g.textAlign = 'right'; g.fillText(wt, px0 - 36, cy + 2); g.textAlign = 'left';
+      // sport tag + start on the top line, the matchup below
+      var x = F.x + 14 + rw + 28, room = wx - 24 - x, l1 = y + 14 + ss * 0.9, l2 = y + rh - 18 - ls / 2;
+      var tgw = nwTag(g, r.lab, x, l1, ss);
+      g.font = ss + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, r.et + ' ET', room - tgw - 20), x + tgw + 20, l1 + 1);
+      var sides = [r.a, r.h], sep = r.at === false ? 'v' : '@';
+      var label = function (t, short) { return (t.r ? '#' + t.r + ' ' : '') + (short && t.ab ? t.ab : t.n); };
+      g.font = ns + 'px ' + FONT; g.fillStyle = C.white;
+      var short = false, sepW = g.measureText(' ' + sep + ' ').width + 24, logoW = ls + 14;
+      var need = function (sh) { return sides.reduce(function (a, t, i) { return a + (imgs[k][i] ? logoW : 0) + g.measureText(label(t, sh)).width; }, 0) + sepW; };
+      if (need(false) > room) short = true;
+      var each = (room - sepW) / 2, mx = x;
+      sides.forEach(function (t, i) {
+        if (i) { g.font = ns + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText(' ' + sep + ' ', mx + 6, l2); mx += sepW; }
+        var im = imgs[k][i]; if (im) { drawLogo(g, im, mx, l2 - ls / 2, ls, ls); mx += logoW; }
+        g.font = ns + 'px ' + FONT; g.fillStyle = C.white;
+        var txt0 = fit(g, label(t, short), short ? each - (im ? logoW : 0) : room);
+        g.fillText(txt0, mx, l2); mx += g.measureText(txt0).width;
+      });
+    });
+    return F.canvas;
+  }
+
   document.addEventListener('click', async function (e) {
     var btn = e.target.closest('[data-gfx]'); if (!btn) return;
     var win = btn.closest('.win'); if (!win) return;
@@ -3619,6 +3672,7 @@
     try {
       var mode = btn.getAttribute('data-gfx-mode');
       if (mode === 'news') { var nc = await buildNews(win, btn); if (nc) preview(nc, 'arkndjl-news-' + btn.getAttribute('data-gfx-day')); return; }
+      if (mode === 'watch') { var wc = await buildWatch(win, btn); if (wc) preview(wc, 'arkboard-games-to-watch'); return; }
       var canvas = mode === 'term' ? await buildTerm(win, btn) : mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn) : mode === 'bracket' ? await buildBracket(win, btn) : mode === 'pickem' ? await buildPickem(win, btn) : mode === 'perf' ? await buildPerf(win, btn) : mode === 'depth' ? await buildDepth(win, btn)
         : mode === 'lz-social' ? await buildSocial(win, btn) : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
         : mode === 'esea-summary' ? await buildEseaSummary(win, btn)

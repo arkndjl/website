@@ -316,6 +316,38 @@
      "Tennis"
     ]
    }
+  },
+  {
+   "section": "games",
+   "after": "Game projection",
+   "entry": {
+    "term": "Games to watch (W)",
+    "short": "The next seven days' best games across every sport, 0-100.",
+    "body": [
+     "W = 100 x (.30 Q + .20 C + .20 S + .20 L + .10 T) + bonus, cap 100. Display only, no backtest.",
+     "Q quality: each side 1 - (rank - .5) / min(N, 60) in the sport's rating order, 0 past 60; mean of the two.",
+     "C closeness: 1 - (P home - P away)^2, percentile among the sport's games. T total: projected points or goals, percentile.",
+     "S stars: each side's top three players by the sport's value (NFL WAR, NBA VORX, NHL WAR, soccer GAR, college FV - 20)",
+     "x chance to play (injury tags: out / IR 0, doubtful .25, questionable / day-to-day .6; the game model's play chances first),",
+     "weighted 1 / .7 / .5, scored by rank in the sport's teams like Q.",
+     "L leverage: a target's swing from one result, dP = phi(Phi^-1(p)) / sqrt(n / 4 + 1 / 2), p = the season sims' odds,",
+     "n = games left; playoff 1, division / bye / top four .5, soccer title and relegation 1; side L = min(1, sum / .35);",
+     "game L = .6 x higher side + .4 x lower; postseason games 1. Tennis and CS2: round and format levels.",
+     "Bonus: named rivalry 6, division or conference game 2, both ranked 4, one ranked 1. Top 15, at most 4 a sport.",
+     "Source: scripts/watch_games.py -> data/watch.json, every half hour."
+    ],
+    "where": "Standings: games to watch",
+    "sports": [
+     "NFL",
+     "CFB",
+     "NBA",
+     "CBB",
+     "NHL",
+     "Soccer",
+     "Tennis",
+     "CS2"
+    ]
+   }
   }
  ],
  "append": [

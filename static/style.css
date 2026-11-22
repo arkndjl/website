@@ -5079,3 +5079,20 @@ a.tick__g--nw:hover .tick__me { color: #fff; }
 .tip-top h2 { font-size: 1em; color: #5fd4c4; }
 .tip-top__list { padding-left: 1.6em; }
 .tip-top__list li:nth-child(-n+3) { color: #c8c7ff; }
+
+/* Games to watch (layouts/shortcodes/watch.html, Standings) */
+.wt-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.wt-lg { white-space: nowrap; } .wt-lg .win__icon { width: 14px; height: 14px; vertical-align: -2px; margin-right: 4px; }
+.wt-ab { display: none; }
+.wt-at { padding-left: 2px; padding-right: 2px; text-align: center; }
+.wt-et { white-space: nowrap; }
+.wt-w { position: relative; min-width: 56px; }
+.wt-w b { position: relative; z-index: 1; color: var(--accent); }
+.wt-bar__fill { position: absolute; left: 4px; bottom: 3px; height: 3px; width: calc((100% - 8px) * var(--w) / 100); background: #7fffd4; opacity: .6; }
+.wt-table tbody tr { cursor: help; }
+@media (max-width: 684px) {
+  .wt-n { display: none; } .wt-ab { display: inline; }
+  .wt-lg span { display: none; } .wt-lg .win__icon { margin-right: 0; }
+  .wt-table .st-team .cfb__dim { display: none; }
+  .wt-table td, .wt-table th { padding-left: 4px; padding-right: 4px; }
+}

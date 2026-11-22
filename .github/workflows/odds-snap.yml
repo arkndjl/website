@@ -146,6 +146,11 @@ jobs:
       - name: Injury tags
         continue-on-error: true
         run: python3 scripts/injury_tags.py
+      # Games to watch (Standings): the week's best games across sports from the game files, sims and injury tags
+      # (scripts/watch_games.py -> data/watch.json; after the injury tags so the stars reflect the newest statuses)
+      - name: Games to watch
+        continue-on-error: true
+        run: python3 scripts/watch_games.py
       # The college basketball slate is re-priced on the newest injury report inside the picks refresh, so its games and
       # injury files ride along (rebuilt on a newer main like the picks: the re-price reruns on the build's snapshot).
       # Only the paper books, the picks, the ticker, the standings and those CBB files are on the site (--site): a snapshot-only commit
@@ -155,10 +160,10 @@ jobs:
       - name: Commit if it changed
         run: |
           python3 scripts/data_push.py -m "Odds snapshot, paper book and picks ($(date -u +%Y-%m-%dT%H:%MZ))" \
-            --site static/data/arklist-perf.json static/data/injuries.json data/transactions data/ticker.json data/news.json data/standings.json data/paper_book.json data/picks_oos.json data/props_paper.json data/props_paper_nfl.json data/novig_paper.json 'data/games_picks_*.json' data/cbb_games.json data/cbb_injuries.json \
+            --site static/data/arklist-perf.json static/data/injuries.json data/watch.json data/transactions data/ticker.json data/news.json data/standings.json data/paper_book.json data/picks_oos.json data/props_paper.json data/props_paper_nfl.json data/novig_paper.json 'data/games_picks_*.json' data/cbb_games.json data/cbb_injuries.json \
             --rebuild data/games_picks_cfb.json data/games_picks_nfl.json data/games_picks_cbb.json data/games_picks_nba.json data/games_picks_tennis.json data/paper_book.json data/picks_oos.json data/cbb_games.json data/cbb_injuries.json \
             --regen "GITHUB_TOKEN= python3 scripts/picks_refresh.py; python3 scripts/paper_book.py; python3 scripts/picks_oos.py" \
-            -- scripts/data/odds_dense scripts/data/rotowire_news.json scripts/data/rotowire_moves data/roster_audit.json data/transactions data/paper_book.json data/picks_oos.json data/ticker.json data/news.json scripts/data/news_state.json data/standings.json static/data/arklist-perf.json static/data/injuries.json \
+            -- scripts/data/odds_dense scripts/data/rotowire_news.json scripts/data/rotowire_moves data/roster_audit.json data/transactions data/paper_book.json data/picks_oos.json data/ticker.json data/news.json scripts/data/news_state.json data/standings.json static/data/arklist-perf.json static/data/injuries.json data/watch.json \
                scripts/data/odds_novig scripts/data/odds_novig_ladder scripts/data/odds_pm_ladder scripts/data/odds_tp data/novig_ladder_test.json data/novig_paper.json \
                scripts/data/props scripts/data/ledger/derivs_b2_result.json data/props_paper.json data/props_paper_nfl.json data/props_paper_nhl.json data/games_picks_nflprops.json scripts/data/refs \
                data/games_picks_cfb.json data/games_picks_nfl.json data/games_picks_cbb.json data/games_picks_nba.json data/games_picks_tennis.json scripts/data/odds \
