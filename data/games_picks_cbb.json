@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-22T17:13:30Z",
+ "asof": "2026-11-22T17:16:58Z",
  "recenter": {
   "2026-11-22": 1.87
  },
@@ -1934,8 +1934,8 @@
     "side": "under",
     "line": 145.5,
     "price": -119.0,
-    "ev": 0.089,
-    "units": 0.5
+    "ev": 0.086,
+    "units": 0.25
    }
   }
  ],
@@ -2150,6 +2150,22 @@
    "tm": 147.6
   },
   {
+   "id": "401912212",
+   "sport": "cbb",
+   "kick": "2026-11-22T18:00:00Z",
+   "home": "American University",
+   "away": "Towson",
+   "mk": "total",
+   "side": "under",
+   "line": 132.5,
+   "price": -119.0,
+   "edge": 3.2,
+   "x": 5.0,
+   "why": "edge under 5 (total: low)",
+   "m": 2.8,
+   "tm": 129.3
+  },
+  {
    "id": "401920736",
    "sport": "cbb",
    "kick": "2026-11-22T18:00:00Z",
@@ -2190,7 +2206,7 @@
    "mk": "total",
    "side": "under",
    "line": 144.5,
-   "price": -110.0,
+   "price": -106.0,
    "edge": 3.8,
    "x": 6.5,
    "why": "edge under 6.5 (side: under)",
@@ -2238,7 +2254,7 @@
    "mk": "spread",
    "side": "home",
    "line": 23.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 2.6,
    "x": 5.0,
    "why": "edge under 5 (tier: mixed)",
@@ -2324,22 +2340,6 @@
    "why": "edge under 4 (venue: neutral)",
    "m": -3.6,
    "tm": 136.6
-  },
-  {
-   "id": "401929023",
-   "sport": "cbb",
-   "kick": "2026-11-22T18:00:00Z",
-   "home": "Canisius",
-   "away": "Western Illinois",
-   "mk": "total",
-   "side": "over",
-   "line": 139.5,
-   "price": -110.0,
-   "edge": 3.2,
-   "x": 7.0,
-   "why": "edge under 7",
-   "m": 4.6,
-   "tm": 142.7
   }
  ],
  "games": {
@@ -2420,7 +2420,7 @@
    "mk": "total",
    "side": "under",
    "line": 144.5,
-   "price": -110.0,
+   "price": -106.0,
    "edge": 3.8,
    "ev": null,
    "units": 0.0,
@@ -2588,9 +2588,9 @@
   "401912212": {
    "mk": "total",
    "side": "under",
-   "line": 131.5,
-   "price": -106.0,
-   "edge": 2.2,
+   "line": 132.5,
+   "price": -119.0,
+   "edge": 3.2,
    "ev": null,
    "units": 0.0,
    "home": "American University",
@@ -2613,7 +2613,7 @@
    "mk": "spread",
    "side": "away",
    "line": 2.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 0.3,
    "ev": null,
    "units": 0.0,
@@ -2661,7 +2661,7 @@
    "mk": "spread",
    "side": "home",
    "line": 23.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 2.6,
    "ev": null,
    "units": 0.0,
@@ -2830,7 +2830,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 23058,
+  "snapshots": 23067,
   "buckets": [
    {
     "when": "24h+",
@@ -2843,18 +2843,18 @@
    },
    {
     "when": "6-24h",
-    "clvN": 4583,
+    "clvN": 4585,
     "clvRet": 0.001,
-    "clvT": 0.49,
+    "clvT": 0.47,
     "clv": 0.73,
     "beat": 0.424,
-    "still": 0.394
+    "still": 0.395
    },
    {
     "when": "1-6h",
-    "clvN": 2141,
+    "clvN": 2142,
     "clvRet": -0.0391,
-    "clvT": -33.67,
+    "clvT": -33.69,
     "clv": 0.09,
     "beat": 0.17,
     "still": 0.703
@@ -20957,7 +20957,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-22T17:13:30Z",
+ "checked": "2026-11-22T17:16:58Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
