@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-22T01:14Z",
+ "asof": "2026-11-22T01:49Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -10,7 +10,7 @@
    },
    "flags": [],
    "joined": 0,
-   "players": 959,
+   "players": 960,
    "rows": 5293
   },
   "cfb": {
@@ -59,7 +59,7 @@
     }
    ],
    "joined": 0,
-   "players": 2606,
+   "players": 2607,
    "rows": 16744
   },
   "nba": {
@@ -78,7 +78,7 @@
     },
     "static/data/pctl-nba.json": {
      "flags": 3,
-     "rows": 473
+     "rows": 474
     },
     "static/data/xaav-nba.json": {
      "flags": 0,
@@ -287,13 +287,13 @@
    ],
    "joined": 0,
    "players": 603,
-   "rows": 2049
+   "rows": 2050
   },
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 9,
-     "rows": 2158
+     "flags": 10,
+     "rows": 2162
     },
     "static/data/nfl-fantasy.json": {
      "flags": 11,
@@ -317,6 +317,24 @@
     }
    },
    "flags": [
+    {
+     "d": "2026-11-16",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "practice",
+     "head": "Back to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Back to practice squad",
+      "kind": "practice"
+     },
+     "pid": "11751",
+     "player": "Zay Jones",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "ARI"
+    },
     {
      "d": "2026-08-29",
      "field": "depth",
@@ -4424,7 +4442,7 @@
    ],
    "joined": 0,
    "players": 2296,
-   "rows": 8089
+   "rows": 8093
   },
   "nhl": {
    "by_file": {
@@ -4704,7 +4722,7 @@
     }
    ],
    "joined": 0,
-   "players": 1425,
+   "players": 1426,
    "rows": 2736
   }
  }
