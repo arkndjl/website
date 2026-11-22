@@ -1,0 +1,87 @@
+{{- /* One WAVE panel (content/arkndjl-wave.md, inside {{< arkndjlwave >}}'s tabs), from data/wave.json:
+       {{< wavepanel p="drops|merch|shows|promos|tickets|collabs|brands|collections" tab="<tab name>" >}}.
+       Rows carry data-who so the frequency wall can filter them. Table notes live in th titles / the status bar hover. */ -}}
+{{- $lg := printf "/img/px/wave-logos.svg?v=%s#px-wv-" (substr (readFile "static/img/px/wave-logos.svg" | md5) 0 8) -}}
+{{- $w := site.Data.wave | default dict -}}
+{{- $p := .Get "p" -}}
+{{- $tab := .Get "tab" | default $p -}}
+{{- if in (slice "drops" "merch") $p }}
+{{- $items := cond (eq $p "drops") ($w.drops | default slice) ($w.merch | default slice) -}}
+{{- $feed := cond (eq $p "drops") ($w.news | default slice) ($w.bandnews | default slice) -}}
+<div class="win" data-tab="{{ $tab }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ cond (eq $p "drops") "entity" "note" }}"/></svg>{{ $p }}.exe<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="wv-body">
+    {{ partial "wave/drops.html" (dict "items" $items) }}
+    {{ partial "wave/feed.html" (dict "items" (first 25 $feed)) }}
+  </div>
+  <div class="win__status" title="{{ $w.about }}"><span>{{ len $items }} {{ $p }}</span><span>{{ len $feed }} headlines</span>{{ partial "fresh.html" (dict "feed" "wave") }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- else if eq $p "shows" }}
+{{- $rows := $w.shows | default slice -}}
+{{ partial "wintable-open.html" (dict "title" "nyc_live.exe" "icon" "events" "tab" $tab "class" "wv-t") }}
+<table>
+<thead><tr><th title="ET">date</th><th></th><th>artist</th><th>venue</th><th>with</th><th title="where the date was found">src</th></tr></thead>
+<tbody>
+{{- range $rows }}
+<tr data-who="{{ .who }}"><td>{{ (time .d).Format "Mon Jan 2" }}</td><td class="lgc"><svg class="lg lg--xs" aria-hidden="true"><use href="{{ $lg }}{{ .who }}"/></svg></td><td><a href="{{ .u }}" target="_blank" rel="noopener" title="{{ .t }}">{{ .name }}</a></td><td>{{ .venue }}</td><td class="wrap">{{ .with }}</td><td>{{ .src }}</td></tr>
+{{- else }}<tr><td>--</td><td></td><td>--</td><td></td><td></td><td></td></tr>{{ end }}
+</tbody></table>
+{{ partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "wave" "about" "NYC shows for the ARKLIBRARY artists: Mercury Lounge, Bowery Ballroom, Irving Plaza and Brooklyn Paramount calendars, plus Ticketmaster when TICKETMASTER_API_KEY is set") }}
+{{- else if eq $p "promos" }}
+{{- $all := $w.mets.promos | default slice -}}
+{{- $up := slice }}{{ $past := slice }}{{ range $all }}{{ if .past }}{{ $past = $past | append . }}{{ else }}{{ $up = $up | append . }}{{ end }}{{ end -}}
+<div class="win" data-tab="{{ $tab }}" data-who="mets">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-baseball"/></svg>citi_field.exe<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="wv-body">
+    <div class="wv-promos">
+    {{- range $up }}
+      <a class="wv-pm" href="{{ .u }}" target="_blank" rel="noopener" title="{{ .t }}{{ with .s }} · {{ . }}{{ end }}{{ with .by }} · {{ . }}{{ end }}">{{ with .img }}<img src="{{ . }}" alt="" loading="lazy" decoding="async" width="150" height="150">{{ end }}<div><b>{{ .type }}</b><span>{{ .t }}</span><span class="wv-more">{{ (time .d).Format "Mon Jan 2" }} · {{ .opp }}</span></div></a>
+    {{- else }}<p class="wv-empty">{{ add now.Year 1 }} --</p>{{ end }}
+    </div>
+    {{- with $past }}
+    <ol class="wv-feed wv-past">
+    {{- range sort . "at" "desc" }}{{ if in (slice "Giveaway" "Ticket Offer" "Theme Days") .type }}
+      <li data-who="mets"><time>{{ substr .d 5 }}</time><svg class="lg lg--xs" aria-hidden="true"><use href="{{ $lg }}mets"/></svg><a href="{{ .u }}" target="_blank" rel="noopener">{{ .t }}</a><span class="src">{{ lower .type }}</span></li>
+    {{- end }}{{ end }}
+    </ol>
+    {{- end }}
+  </div>
+  <div class="win__status" title="MLB Stats API promotions for Mets home games (giveaways, theme nights, ticket offers, game-day highlights)"><span>{{ len $up }} upcoming</span><span>{{ len $past }} past</span>{{ partial "fresh.html" (dict "feed" "wave") }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- else if eq $p "tickets" }}
+{{- $rows := $w.deals | default slice -}}
+{{ partial "wintable-open.html" (dict "title" "tickets.exe" "icon" "coin" "tab" $tab "class" "wv-t" "filter" "team,opp") }}
+<table>
+<thead><tr><th title="ET">date</th><th></th><th>team</th><th>opp</th><th title="lowest listed price (ESPN / Vivid Seats)">get-in</th><th title="expected get-in: exp(mean log price + weekday + month + opponent effects), each shrunk n/(n+4)">exp</th><th title="100 x exp / get-in. 120+ = deal">VAL</th><th title="change since the first price WAVE saw for the game">chg</th><th title="Mets promotion that night">promo</th></tr></thead>
+<tbody>
+{{- range $rows }}
+<tr data-who="{{ .team }}"><td data-sort="{{ .at }}">{{ (time .d).Format "Mon Jan 2" }}</td><td class="lgc"><svg class="lg lg--xs" aria-hidden="true"><use href="{{ $lg }}{{ .team }}"/></svg></td><td>{{ upper .team }}</td><td>{{ .oppa }}</td><td data-sort="{{ .price | default 0 }}">{{ with .u }}<a href="{{ . }}" target="_blank" rel="noopener">{{ end }}{{ with .price }}${{ . | int }}{{ else }}--{{ end }}{{ with .u }}</a>{{ end }}</td><td>{{ with .exp }}${{ . }}{{ end }}</td><td>{{ with .val }}{{ if ge . 120 }}<span class="wv-deal">{{ . }}</span>{{ else }}{{ . }}{{ end }}{{ end }}</td><td>{{ with .dp }}{{ if lt . 0 }}<span class="wv-dn">{{ . }}%</span>{{ else if gt . 0 }}<span class="wv-up">+{{ . }}%</span>{{ end }}{{ end }}</td><td>{{ delimit (.promo | default slice) " · " }}</td></tr>
+{{- else }}<tr><td>--</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>{{ end }}
+</tbody></table>
+{{ partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "wave" "about" "Home games, lowest listed price from ESPN's ticket feed. VAL = 100 x expected / listed; expected from a weekday + month + opponent model fit on every listed home game") }}
+{{- else if eq $p "collabs" }}
+{{- $rows := $w.collabs | default slice -}}
+<div class="win" data-tab="{{ $tab }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>collabs.exe<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="wv-body">{{ partial "wave/feed.html" (dict "items" $rows) }}</div>
+  <div class="win__status" title="fashion headlines naming the Mets or Knicks with a collab word, and new '47 Mets / Knicks pieces"><span>{{ len $rows }} items</span>{{ partial "fresh.html" (dict "feed" "wave") }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- else if eq $p "brands" }}
+{{- $rows := $w.suggested | default slice -}}
+{{ partial "wintable-open.html" (dict "title" "suggested.exe" "icon" "entity" "tab" $tab "class" "wv-t") }}
+<table>
+<thead><tr><th>RK</th><th></th><th>brand</th><th title="streetwear · gothic · oversized top · slim bottom">tags</th><th title="15 per taste tag matched (max 60)">TAG</th><th title="12.5 per tie on record to a tracked brand, band or team (max 25)">LINK</th><th title="15 if based in New York">NYC</th><th title="TAG + LINK + NYC">WAVE</th><th>ties</th><th title="headlines naming the brand, last 45 days">news</th></tr></thead>
+<tbody>
+{{- range $i, $r := $rows }}
+<tr data-who="{{ .id }}"><td>{{ add $i 1 }}</td><td class="lgc"><svg class="lg lg--xs" aria-hidden="true"><use href="{{ $lg }}{{ .id }}"/></svg></td><td><a href="{{ .u }}" target="_blank" rel="noopener">{{ .name }}</a></td><td>{{ range .tags }}<span class="wv-tag on">{{ . }}</span>{{ end }}</td><td>{{ .tag }}</td><td>{{ .link }}</td><td>{{ .nyc }}</td><td><b>{{ .total }}</b></td><td>{{ delimit (.ties | default slice) " · " }}</td><td>{{ .n }}</td></tr>
+{{- end }}
+</tbody></table>
+{{ partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "wave" "about" "WAVE = TAG (15 per taste tag: streetwear, gothic, oversized top, slim bottom) + LINK (12.5 per tie on record to a tracked brand, band or team, max 25) + NYC (15)") }}
+{{- else if eq $p "collections" }}
+{{- $rows := $w.collections | default slice -}}
+<div class="win" data-tab="{{ $tab }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-brush"/></svg>collections.exe<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="wv-body">{{ partial "wave/feed.html" (dict "items" $rows) }}</div>
+  <div class="win__status" title="headlines naming a suggested brand, ranked WAVE score x recency (half-life ~10 days) x taste words in the title"><span>{{ len $rows }} items</span>{{ partial "fresh.html" (dict "feed" "wave") }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end }}

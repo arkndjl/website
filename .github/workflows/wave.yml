@@ -1,0 +1,47 @@
+# ST. CLAIRE WAVE (/stclaire/wave/): scripts/wave.py -> data/wave.json (state scripts/data/wave_state.json).
+# Free public sources only (Shopify stores, RSS, NYC venue pages, MLB Stats API, ESPN); robots.txt checked per request.
+# Optional secret TICKETMASTER_API_KEY (free, developer.ticketmaster.com) adds every NYC Ticketmaster show for the bands.
+# Every 3 hours; data-health.yml watches the run and the file's checked stamp (data/freshness.json "wave").
+name: wave
+
+on:
+  schedule:
+    - cron: "41 */3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wave
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Self-check
+        run: python3 scripts/wave.py --test
+      - name: Fetch
+        env:
+          TICKETMASTER_API_KEY: ${{ secrets.TICKETMASTER_API_KEY }}
+        run: python3 scripts/wave.py
+      - name: Logos (a band new to ARKLIBRARY gets its tile)
+        run: python3 scripts/wave_logos.py
+      - name: Commit if anything changed
+        run: |
+          git add data/wave.json scripts/data/wave_state.json static/img/px/wave-logos.svg
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes
+          git commit -m "Update WAVE ($(date -u +%Y-%m-%dT%H:%MZ))"
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            sleep $((i * 5))
+            git pull --rebase -X theirs origin main || exit 1
+          done
+          exit 1
