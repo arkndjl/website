@@ -1,0 +1,38 @@
+{{- /* Games to watch: the next seven days' best games across every sport, data/watch.json (scripts/watch_games.py,
+       rerun by the odds-snap workflow). {{< watch tab="games to watch" >}} on the Standings page. Score parts live
+       only in hover (row title, th titles); the GFX card is assets/js/gfx.js buildWatch (rows on the button). */ -}}
+{{- with site.Data.watch }}{{ with .games -}}
+{{- $D := site.Data.watch -}}
+{{- $W := $D.weights -}}
+{{- $about := printf "W = 100 x (%.2f Q + %.2f C + %.2f S + %.2f L + %.2f T) + rivalry %v / division or conference %v / both ranked %v / one ranked %v, cap 100. Q, S, L on one scale across sports; C, T percentiles within each sport; top 15, at most 4 a sport. Method on Process." $W.q $W.c $W.s $W.l $W.t $D.bonus.rival $D.bonus.div $D.bonus.ranked2 $D.bonus.ranked1 -}}
+{{- $gfx := slice -}}
+{{- range . }}{{ $gfx = $gfx | append (dict "rk" .rk "lab" .lab "et" .et "w" .w "at" .at "a" (dict "n" .a.n "ab" (.a.ab | default "") "l" (.a.logo | default "") "r" (.a.rk | default "")) "h" (dict "n" .h.n "ab" (.h.ab | default "") "l" (.h.logo | default "") "r" (.h.rk | default "")) "p" .parts "tags" .tags "stars" .stars) }}{{ end -}}
+<div class="win wintable wt-win" data-tab="{{ $.Get "tab" }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-tv"/></svg>games to watch<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="cfb__bar wt-bar">
+    <span class="cfb__dim">{{ $D.span }}</span>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="watch" data-gfx-name="games-to-watch" data-gfx-watch="{{ dict "span" $D.span "games" $gfx | jsonify }}" title="games to watch card (4:5)">GFX</button>
+  </div>
+  <div class="wintable__scroll">
+<table class="cfb__table st-table wt-table">
+  <thead><tr><th title="rank by W">RK</th><th title="sport">Lg</th><th>Away</th><th></th><th>Home</th><th title="start, ET">ET</th><th title="watchability, 0-100: hover a row for its parts">W</th></tr></thead>
+  <tbody>
+  {{- range . }}{{ $g := . }}{{ $p := .parts }}
+    <tr title="Q quality {{ $p.q }} · C closeness {{ $p.c }} · S stars {{ $p.s }} · L leverage {{ $p.l }} · T total {{ $p.t }}{{ with $p.b }} · +{{ . }}{{ end }}{{ with .tags }} {{ delimit . ", " }}{{ end }}{{ with .stars }} · {{ delimit . ", " }}{{ end }}">
+      <td class="cfb__rk">{{ .rk }}</td>
+      <td class="wt-lg"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ .icon }}"/></svg><span>{{ .lab }}</span></td>
+      {{- range $i, $t := slice .a .h }}
+      {{- if $i }}<td class="cfb__dim wt-at">{{ cond (eq $g.at false) "v" "@" }}</td>{{ end }}
+      <td class="st-team">{{ with $t.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.style.display='none'"> {{ end }}{{ with $t.rk }}<span class="cfb__dim">{{ . }}</span> {{ end }}<span class="wt-n">{{ $t.n }}</span>{{ with $t.ab }}<span class="wt-ab">{{ . }}</span>{{ end }}</td>
+      {{- end }}
+      <td class="cfb__dim wt-et"><span class="wt-n">{{ .et }}</span><span class="wt-ab">{{ .ets | default .et }}</span></td>
+      <td class="cfb__num wt-w"><b>{{ printf "%.0f" .w }}</b><i class="wt-bar__fill" style="--w:{{ .w }}%"></i></td>
+    </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .) "about" $about "fresh" "watch") -}}
+{{- end }}{{ end -}}

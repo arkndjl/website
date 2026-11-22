@@ -2,7 +2,7 @@
 title = "Standings :: ARKBOARD"
 url = "/arkboard/standings/"
 description = "Standings: what has happened, every sport, no model numbers. NFL, NBA and NHL standings and the playoff picture as it stands; college football and college basketball conference standings with the AP, Coaches and CFP polls; official stat leaders; scores and schedules; 18 soccer league tables, MLS and the UEFA league phases with goals and assists leaders; the ATP and WTA rankings; Valve's CS2 ranking."
-keywords = ["arkboard", "standings", "nfl standings", "nba standings", "nhl standings", "college football standings", "college basketball standings", "playoff picture", "stat leaders", "ap poll", "coaches poll", "cfp rankings", "premier league table", "champions league table", "atp rankings", "wta rankings", "valve regional standings", "scores"]
+keywords = ["arkboard", "standings", "games to watch", "best games this week", "nfl standings", "nba standings", "nhl standings", "college football standings", "college basketball standings", "playoff picture", "stat leaders", "ap poll", "coaches poll", "cfp rankings", "premier league table", "champions league table", "atp rankings", "wta rankings", "valve regional standings", "scores"]
 draft = false
 +++
 
@@ -10,7 +10,8 @@ draft = false
 
 {{< winpane title="standings.exe" icon="standings" sprite="px/hero-standings" status="" class="winpane--art" />}}
 
-{{< wintabs groups="football:NFL,CFB|basketball:NBA,CBB|hockey:NHL|soccer:big five,more leagues,MLS,UEFA cups|tennis:ATP ranking,WTA ranking|esports:CS2 ranking" side="true" label="Standings views" >}}
+{{< wintabs groups="scores:games to watch|football:NFL,CFB|basketball:NBA,CBB|hockey:NHL|soccer:big five,more leagues,MLS,UEFA cups|tennis:ATP ranking,WTA ranking|esports:CS2 ranking" side="true" label="Standings views" >}}
+{{< lazytab tab="games to watch" >}}{{< watch tab="games to watch" >}}{{< /lazytab >}}
 {{< lazytab tab="ATP ranking" >}}{{< standings part="rank" k="atp" title="ATP ranking" tab="ATP ranking" icon="tennis" >}}{{< /lazytab >}}
 {{< lazytab tab="WTA ranking" >}}{{< standings part="rank" k="wta" title="WTA ranking" tab="WTA ranking" icon="tennis" >}}{{< /lazytab >}}
 {{< lazytab tab="CS2 ranking" >}}{{< standings part="vrs" title="Counter-Strike" tab="CS2 ranking" >}}{{< /lazytab >}}
