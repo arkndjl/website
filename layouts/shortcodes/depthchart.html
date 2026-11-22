@@ -33,14 +33,14 @@
   var FVT = [[0, '#1e1733', '#a89fd8'], [25, '#3a2c6c', '#ffffff'], [30, '#5a23a6', '#ffffff'], [35, '#8a52ea', '#ffffff'], [40, '#c0b0ff', '#241a3a'],
              [45, '#24877f', '#ffffff'], [50, '#4fd8bc', '#241a3a'], [55, '#b8ffe8', '#241a3a'], [60, '#ffffff', '#241a3a'], [70, '#ffd34d', '#241a3a']];
   var PCT = [0, 10, 25, 40, 55, 70, 82, 92, 97, 99];
-  var INJ = { out: 'O', doubtful: 'D', questionable: 'Q', probable: 'P', 'injured reserve': 'IR', suspension: 'SUSP', 'day-to-day': 'DTD' };
-  var INJT = { O: 'out', D: 'doubtful', Q: 'questionable', P: 'probable', IR: 'injured reserve', SUSP: 'suspended', DTD: 'day-to-day', PUP: 'physically unable to perform', NFI: 'non-football injury' };
+  var INJ = { dd: 'DTD', 'out (season)': 'OFS', out: 'O', doubtful: 'D', questionable: 'Q', probable: 'P', 'injured reserve': 'IR', suspension: 'SUSP', 'day-to-day': 'DTD' };
+  var INJT = { OFS: 'out for season', O: 'out', D: 'doubtful', Q: 'questionable', P: 'probable', IR: 'injured reserve', SUSP: 'suspended', DTD: 'day-to-day', PUP: 'physically unable to perform', NFI: 'non-football injury' };
   var USE = { nfl: 'snaps', nba: 'min, 3 seasons', nhl: 'min TOI, 3 seasons', soccer: 'min', cbb: 'mpg' };
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function step(v, cuts) { var i = 0; cuts.forEach(function (c, k) { if (v >= c) i = k; }); return i; }
   function tier(D, p) { return D.grade === 'FV' ? (p[1] == null ? -1 : step(p[1], FVT.map(function (t) { return t[0]; }))) : (p[5] == null ? -1 : step(p[5], PCT)); }
   function num(D, g) { if (g == null) return '—'; if (!D.fmt) return String(Math.round(g)); return (g > 0 ? '+' : g < 0 ? '−' : '') + Math.abs(g).toFixed(D.fmt); }
-  function inj(s) { if (!s) return ''; var a = INJ[String(s).toLowerCase()] || String(s).toUpperCase(); return ' <span class="dc__inj" title="' + esc(INJT[a] || s) + '">' + esc(a) + '</span>'; }
+  function inj(s) { if (!s) return ''; var a = INJ[String(s).toLowerCase()] || String(s).toUpperCase(); return ' <span class="dc__inj injtag--' + ({ IR: 1, SUSP: 1, PUP: 1, NFI: 1, OFS: 1 }[a] ? 'long' : { Q: 1, D: 1, DTD: 1, P: 1 }[a] ? 'mid' : 'out') + '" title="' + esc(INJT[a] || s) + '">' + esc(a) + '</span>'; }
   function use(D, sport, p) {
     if (p[2] == null) return sport === 'cfb' ? 'no snaps yet' : '';
     return typeof p[2] === 'string' ? p[2] : (sport === 'cbb' ? p[2].toFixed(1) : Math.round(p[2]).toLocaleString('en-US')) + ' ' + (USE[sport] || '');

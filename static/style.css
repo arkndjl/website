@@ -3431,7 +3431,12 @@ table.trophycase__hist td.trophycase__post {
 .cfb__star { display: inline-block; width: 11px; height: 11px; margin-left: 4px; vertical-align: -1px; overflow: hidden; font-size: 0; line-height: 0; color: var(--accent); background: currentColor; -webkit-mask: var(--px-glyph) no-repeat 0 0 / 11px 11px; mask: var(--px-glyph) no-repeat 0 0 / 11px 11px; }
 .cfb__carried { margin-left: 4px; padding: 0 3px; border: 1px dashed currentColor; color: var(--muted, #a9a3d6); font-size: 0.75em; white-space: nowrap; }
 .cfb__riser { color: #7dffb0; margin-left: 4px; font-weight: bold; }
-.cfb__injchip { display: inline-block; margin-left: 4px; padding: 0 3px; font-size: 0.75em; line-height: 1.3; color: var(--win-dark); background: #ff9ec7; vertical-align: 1px; }
+/* Injury tags (layouts/partials/injtags.html): a 1px pixel frame, the palette by length: teal = may play (Q, D, DTD),
+   lilac = out this game, purple = out long (OFS, IR, PUP, NFI, SUSP) */
+.injtag, .cfb__injchip, .dc__inj { display: inline-block; margin-left: 4px; padding: 0 3px; font-size: .75em; font-weight: normal; line-height: 1.3; vertical-align: 1px;
+  white-space: nowrap; color: var(--win-dark); background: var(--accent); box-shadow: inset -1px -1px 0 rgba(36, 26, 58, .45), inset 1px 1px 0 rgba(255, 255, 255, .5); cursor: help; }
+.injtag--mid { background: var(--foreground, #7fffd4); }
+.injtag--long { color: var(--accent); background: #57068c; box-shadow: inset -1px -1px 0 #241a3a, inset 1px 1px 0 #8a3fc4; }
 .cfb__upchip, .cfb__movechip, .cfb__valuechip, .cfb__reachchip { display: inline-block; margin-left: 4px; padding: 0 3px; font-size: 0.72em; line-height: 1.3; vertical-align: 1px; white-space: nowrap; }
 .cfb__upchip { color: var(--win-dark); background: #7dffb0; }
 .cfb__movechip { color: var(--accent); border: 1px solid var(--accent); padding: 0 2px; }
@@ -4218,7 +4223,7 @@ img.flag { display: inline-block; width: 16px; height: 11px; margin: 0 4px 0 0; 
 .dc__n { overflow-wrap: anywhere; }
 .dc__st .dc__n { color: #fff; font-weight: bold; }
 .dc__u { font-size: .78em; color: #a89fd8; }
-.dc__inj { padding: 0 3px; font-size: .75em; font-weight: normal; color: #241a3a; background: #ff9ec7; }
+
 .dc__key { display: flex; flex-wrap: wrap; gap: 2px; align-items: center; margin-top: 10px; font-size: .8em; }
 .dc__key span { margin-right: 6px; color: #a89fd8; }
 .dc__key i { font-style: normal; padding: 1px 5px; color: var(--k); background: var(--t); }
