@@ -29,7 +29,7 @@ import gzip
 import json
 import math
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 import numpy as np
@@ -700,6 +700,16 @@ def fee_fit(M, c, p, pdir, ag, scale_a, bo3):
     return v
 
 
+def team_flag(nats):
+    """Team flag from the latest five's nationalities: the code 3+ of them share, else "eu" (a mixed roster, any
+    region); None when fewer than 3 nationalities are known."""
+    c = Counter((n or "").lower() for n in nats if n)
+    if sum(c.values()) < 3:
+        return None
+    code, k = c.most_common(1)[0]
+    return code if k >= 3 else "eu"
+
+
 def fv_of(x, mu, sd):
     return int(min(80, max(20, round(50 + 10 * (x - mu) / sd))))
 
@@ -748,6 +758,7 @@ def build():
         ix = [nkt.get((names.key(q), t["k"]), nk.get(names.key(q))) for q in t.get("ros") or []]
         tv = [th[i] for i in ix if i is not None]
         t["rwa"] = round(float(a / 2 * 5 * (np.mean(tv) - mu1)), 1) if len(tv) >= 3 else None
+        t["fl"] = team_flag([(pdir.get(str(int(M.pids[i]))) or [None] * 4)[3] for i in ix if i is not None])
     by_rwa = sorted((t for t in cs["teams"] if t["rwa"] is not None), key=lambda t: -t["rwa"])
     for j, t in enumerate(by_rwa):
         t["rwaRk"] = j + 1

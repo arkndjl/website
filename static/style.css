@@ -3256,6 +3256,7 @@ table.trophycase__hist td.trophycase__post {
   /* the pinned player cell wraps inside 40vw (photo floated beside the name) so the stats keep most of the screen;
      hockey prospects and breakouts set their own widths further down */
   .cfb__table td.cfb__name { white-space: normal; min-width: 40vw; width: 40vw; max-width: 40vw; }
+  .cs__table td.cfb__name { white-space: normal !important; }   /* Counter-Strike team cells (flag + logo + name) wrap inside the 40vw too */
   .cfb__table td.cfb__name .pxframe--row { float: left; margin: 1px 6px 0 0; }
   .cfb__table td.cfb__name .cfb__who { white-space: normal; max-width: calc(100% - 32px); }
   .cfb__table td.cfb__name .cfb__dim { white-space: nowrap; }
