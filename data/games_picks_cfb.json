@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-22T18:53:58Z",
+ "asof": "2026-11-22T18:57:00Z",
  "recenter": {
   "week": 0.4
  },
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-22",
-  "ageH": -5.1,
+  "ageH": -5.0,
   "stale": false
  },
  "picks": [],
@@ -645,6 +645,22 @@
    "tm": 53.0
   },
   {
+   "id": "401856879",
+   "sport": "cfb",
+   "kick": "2026-11-27T01:00:00.000Z",
+   "home": "Texas Tech",
+   "away": "TCU",
+   "mk": "spread",
+   "side": "home",
+   "line": 10.5,
+   "price": -146.0,
+   "edge": 8.2,
+   "x": null,
+   "why": "spread market off",
+   "m": 18.7,
+   "tm": 49.1
+  },
+  {
    "id": "401856757",
    "sport": "cfb",
    "kick": "2026-11-29T00:30:00.000Z",
@@ -659,22 +675,6 @@
    "why": "spread market off",
    "m": 8.4,
    "tm": 52.8
-  },
-  {
-   "id": "401860926",
-   "sport": "cfb",
-   "kick": "2026-11-28T23:00:00.000Z",
-   "home": "Colorado State",
-   "away": "Boise State",
-   "mk": "total",
-   "side": "under",
-   "line": 74.5,
-   "price": -100.0,
-   "edge": 8.1,
-   "x": null,
-   "why": "total market off",
-   "m": -23.8,
-   "tm": 66.4
   }
  ],
  "games": {
@@ -742,7 +742,7 @@
    "mk": "spread",
    "side": "home",
    "line": 9.5,
-   "price": -127.0,
+   "price": -122.0,
    "edge": 7.2,
    "ev": null,
    "units": 0.0,
@@ -777,9 +777,9 @@
   "401856879": {
    "mk": "spread",
    "side": "home",
-   "line": 13.5,
-   "price": 103.0,
-   "edge": 5.2,
+   "line": 10.5,
+   "price": -146.0,
+   "edge": 8.2,
    "ev": null,
    "units": 0.0,
    "home": "Texas Tech",
@@ -1511,16 +1511,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 26125,
+  "snapshots": 26152,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 5333,
-    "clvRet": -0.0282,
-    "clvT": -18.38,
-    "clv": 0.63,
-    "beat": 0.42,
-    "still": 0.288
+    "clvN": 5342,
+    "clvRet": -0.0287,
+    "clvT": -18.73,
+    "clv": 0.62,
+    "beat": 0.418,
+    "still": 0.289
    },
    {
     "when": "6-24h",
@@ -6294,7 +6294,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-22T18:53:58Z",
+ "checked": "2026-11-22T18:57:00Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}

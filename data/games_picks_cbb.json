@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-22T18:54:10Z",
+ "asof": "2026-11-22T18:57:08Z",
  "recenter": {
   "2026-11-22": 1.83
  },
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-22T15:45:34Z",
-  "ageH": 3.1,
+  "ageH": 3.2,
   "stale": false
  },
  "picks": [],
@@ -1866,9 +1866,9 @@
     "mk": "total",
     "side": "over",
     "line": 141.5,
-    "price": -119.0,
-    "ev": 0.088,
-    "units": 0.75
+    "price": -114.0,
+    "ev": 0.105,
+    "units": 1.0
    }
   },
   {
@@ -1958,6 +1958,22 @@
    "tm": 157.1
   },
   {
+   "id": "401911200",
+   "sport": "cbb",
+   "kick": "2026-11-22T19:00:00Z",
+   "home": "Fordham",
+   "away": "San Diego",
+   "mk": "spread",
+   "side": "home",
+   "line": -1.5,
+   "price": -114.0,
+   "edge": 6.8,
+   "x": 4.0,
+   "why": "no edge at -114",
+   "m": 5.3,
+   "tm": 142.4
+  },
+  {
    "id": "401920159",
    "sport": "cbb",
    "kick": "2026-11-22T22:00:00Z",
@@ -1988,22 +2004,6 @@
    "why": "no edge at -119",
    "m": -3.8,
    "tm": 137.7
-  },
-  {
-   "id": "401911200",
-   "sport": "cbb",
-   "kick": "2026-11-22T19:00:00Z",
-   "home": "Fordham",
-   "away": "San Diego",
-   "mk": "spread",
-   "side": "home",
-   "line": 1.5,
-   "price": -119.0,
-   "edge": 3.8,
-   "x": 4.0,
-   "why": "edge under 4 (venue: neutral)",
-   "m": 5.3,
-   "tm": 142.4
   },
   {
    "id": "401906868",
@@ -2479,9 +2479,9 @@
   "401911200": {
    "mk": "spread",
    "side": "home",
-   "line": 1.5,
-   "price": -119.0,
-   "edge": 3.8,
+   "line": -1.5,
+   "price": -114.0,
+   "edge": 6.8,
    "ev": null,
    "units": 0.0,
    "home": "Fordham",
@@ -2541,7 +2541,7 @@
    "side": "under",
    "line": 142.5,
    "price": 121,
-   "ev": 0.038,
+   "ev": 0.037,
    "edge": 6.5,
    "units": 0.75,
    "bk": "poly",
@@ -2770,7 +2770,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 23122,
+  "snapshots": 23128,
   "buckets": [
    {
     "when": "24h+",
@@ -2793,20 +2793,20 @@
    {
     "when": "1-6h",
     "clvN": 2152,
-    "clvRet": -0.0396,
-    "clvT": -33.96,
-    "clv": 0.09,
+    "clvRet": -0.0397,
+    "clvT": -33.76,
+    "clv": 0.08,
     "beat": 0.169,
     "still": 0.701
    },
    {
     "when": "<1h",
-    "clvN": 371,
-    "clvRet": -0.0465,
-    "clvT": -27.9,
-    "clv": -0.02,
-    "beat": 0.073,
-    "still": 0.836
+    "clvN": 373,
+    "clvRet": -0.0476,
+    "clvT": -26.47,
+    "clv": -0.03,
+    "beat": 0.072,
+    "still": 0.831
    }
   ]
  },
@@ -20897,7 +20897,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-22T18:54:10Z",
+ "checked": "2026-11-22T18:57:08Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
