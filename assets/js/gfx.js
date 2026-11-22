@@ -14,7 +14,9 @@
   function tabLink(win) { var t = win && win.closest('[data-tab]'); t = t && t.getAttribute('data-tab'); return SITE + (t && !/(1nt|laursen_111)$/.test(SITE) ? '#' + String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : ''); }
   function txt(el) { return (el && el.textContent || '').replace(/\s+/g, ' ').trim(); }
   // a photo from another site (ESPN, Wikimedia) loads with CORS so the canvas can still be saved
+  // On3 recruit photos come through the site's own /api/photo (worker/site.js): On3's CDN sends CORS headers unreliably
   function loadPhoto(src) {
+    if (src) src = src.replace(/^https:\/\/on3static\.com\/(?=cdn-cgi\/image\/)/, '/api/photo/');
     return new Promise(function (res) { if (!src) return res(null); var i = new Image(); i.crossOrigin = 'anonymous'; i.onload = function () { res(i); }; i.onerror = function () { res(null); }; i.src = src; });
   }
   // an on-theme picture frame: raised bevel, a dark inner line, the photo cover-cropped from the top
@@ -1168,6 +1170,7 @@
   // a bigger copy of a row thumbnail: ESPN combiner, NFL Cloudinary, Transfermarkt, Wikimedia
   function pcBig(src) {
     if (!src || /\/img\/face\.svg/.test(src)) return null;
+    if (/on3static\.com\/cdn-cgi\/image\//.test(src)) return src.replace(/\/cdn-cgi\/image\/[^/]+\//, '/cdn-cgi/image/height=640,width=560,quality=85,fit=cover,gravity=top,format=auto/');   // On3 recruit photos: portrait crop at card size
     return src.replace(/([?&])w=\d+&h=\d+/, '$1w=700&h=509').replace(/\/w_\d+\//, '/w_600/').replace(/\/portrait\/(medium|small)\//, '/portrait/big/').replace(/([?&])width=\d+/, '$1width=600');
   }
   function pcBadges(els) {

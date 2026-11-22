@@ -1,4 +1,4 @@
-// Site worker: static assets (public/) plus /api/plays, the ST. CLAIRE song play counter.
+// Site worker: static assets (public/) plus /api/plays, the ST. CLAIRE song play counter, and /api/photo (On3 recruit photos).
 // Only /api/* runs this code (run_worker_first in wrangler.toml); every other path is served straight from assets.
 //   GET  /api/plays          -> {"ambro_sia": 12, "PHOENiX": 9}
 //   POST /api/plays/<slug>   -> {"slug": "...", "plays": 13, "counted": true}
@@ -54,6 +54,24 @@ async function dispatchFeeds(env) {
   }
 }
 
+// /api/photo/<path>: an On3 recruit photo (on3static.com/<path>) served from this site, so the GFX cards can draw it on a
+// canvas and still save it (On3's CDN sends CORS headers only on some cached copies). Only On3's resized upload paths.
+const ON3_PHOTO = /^cdn-cgi\/image\/[a-z0-9=,.]{1,120}\/uploads\/assets\/\d{1,6}\/\d{1,6}\/\d{1,9}\.(png|jpe?g|webp)$/i;
+
+async function photo(url, request) {
+  const path = url.pathname.slice("/api/photo/".length);
+  if (request.method !== "GET" || !ON3_PHOTO.test(path)) return new Response("not found", { status: 404 });
+  const r = await fetch(`https://on3static.com/${path}`, {
+    headers: { Accept: request.headers.get("accept") || "image/*" },
+    cf: { cacheEverything: true, cacheTtl: 7 * 86400 },
+  });
+  const type = r.headers.get("content-type") || "";
+  if (!r.ok || !type.startsWith("image/")) return new Response("not found", { status: 404 });
+  return new Response(r.body, {
+    headers: { "content-type": type, "cache-control": "public, max-age=604800", "access-control-allow-origin": "*", vary: "Accept" },
+  });
+}
+
 export default {
   async scheduled(event, env, ctx) {
     ctx.waitUntil(dispatchFeeds(env));
@@ -65,6 +83,7 @@ export default {
       const list = await env.SUPPORTERS.get(env.SUPPORTERS.idFromName("kofi")).top(25);
       return json(list, 200, { "cache-control": "public, max-age=60" });
     }
+    if (url.pathname.startsWith("/api/photo/")) return photo(url, request);
     if (!url.pathname.startsWith("/api/plays")) return env.ASSETS.fetch(request);
     const stub = env.PLAYS.get(env.PLAYS.idFromName("stclaire"));
     const rest = url.pathname.slice("/api/plays".length).replace(/^\/+|\/+$/g, "");
