@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-22T18:56Z",
+ "asof": "2026-11-22T20:18Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -59,7 +59,7 @@
     }
    ],
    "joined": 0,
-   "players": 2608,
+   "players": 2609,
    "rows": 16746
   },
   "nba": {
@@ -286,7 +286,7 @@
     }
    ],
    "joined": 0,
-   "players": 603,
+   "players": 605,
    "rows": 2051
   },
   "nfl": {
@@ -4387,13 +4387,13 @@
     }
    ],
    "joined": 0,
-   "players": 2300,
+   "players": 2302,
    "rows": 8098
   },
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 1,
+     "flags": 2,
      "rows": 637
     },
     "static/data/lines/nhl.json": {
@@ -4401,7 +4401,7 @@
      "rows": 32
     },
     "static/data/nhl-war/2027.json": {
-     "flags": 2,
+     "flags": 3,
      "rows": 863
     },
     "static/data/pctl-nhl.json": {
@@ -4409,11 +4409,29 @@
      "rows": 358
     },
     "static/data/xaav-nhl.json": {
-     "flags": 11,
+     "flags": 12,
      "rows": 850
     }
    },
    "flags": [
+    {
+     "d": "2026-11-22",
+     "field": "depth",
+     "file": "static/data/depth/nhl.json",
+     "flag": "minors",
+     "head": "Assigned to AHL",
+     "kind": "down",
+     "move": {
+      "d": "2026-11-22",
+      "head": "Assigned to AHL",
+      "kind": "down"
+     },
+     "pid": "7799",
+     "player": "Dillon Boucher",
+     "pos": "RW",
+     "rotowire": "CHI",
+     "site": "CHI"
+    },
     {
      "d": "2026-11-22",
      "field": "depth",
@@ -4449,6 +4467,24 @@
      "pos": "D",
      "rotowire": "CAR",
      "site": "CAR"
+    },
+    {
+     "d": "2026-11-22",
+     "field": "tm",
+     "file": "static/data/nhl-war/2027.json",
+     "flag": "moved",
+     "head": "Claimed off waivers",
+     "kind": "claim",
+     "move": {
+      "d": "2026-11-22",
+      "head": "Claimed off waivers",
+      "kind": "claim"
+     },
+     "pid": "4268",
+     "player": "Luke Glendening",
+     "pos": "C",
+     "rotowire": "CHI",
+     "site": "NYR"
     },
     {
      "d": "2026-11-07",
@@ -4665,10 +4701,28 @@
      "pos": "C",
      "rotowire": "FA",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-22",
+     "field": "tm",
+     "file": "static/data/xaav-nhl.json",
+     "flag": "moved",
+     "head": "Claimed off waivers",
+     "kind": "claim",
+     "move": {
+      "d": "2026-11-22",
+      "head": "Claimed off waivers",
+      "kind": "claim"
+     },
+     "pid": "4268",
+     "player": "Luke Glendening",
+     "pos": "C",
+     "rotowire": "CHI",
+     "site": "NYR"
     }
    ],
    "joined": 0,
-   "players": 1428,
+   "players": 1429,
    "rows": 2740
   }
  }
