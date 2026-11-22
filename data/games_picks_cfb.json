@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-22T13:40:38Z",
+ "asof": "2026-11-22T13:44:07Z",
  "recenter": {
   "week": 0.51
  },
@@ -293,6 +293,22 @@
    "tm": 48.5
   },
   {
+   "id": "401856764",
+   "sport": "cfb",
+   "kick": "2026-11-28T20:00:00.000Z",
+   "home": "Clemson",
+   "away": "South Carolina",
+   "mk": "total",
+   "side": "over",
+   "line": 42.5,
+   "price": -100.0,
+   "edge": 4.0,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": -4.8,
+   "tm": 46.5
+  },
+  {
    "id": "401858315",
    "sport": "cfb",
    "kick": "2026-11-29T00:30:00.000Z",
@@ -389,22 +405,6 @@
    "tm": 51.2
   },
   {
-   "id": "401856764",
-   "sport": "cfb",
-   "kick": "2026-11-28T20:00:00.000Z",
-   "home": "Clemson",
-   "away": "South Carolina",
-   "mk": "spread",
-   "side": "away",
-   "line": 20.5,
-   "price": -7255.0,
-   "edge": 25.3,
-   "x": null,
-   "why": "spread market off",
-   "m": -4.8,
-   "tm": 46.5
-  },
-  {
    "id": "401858314",
    "sport": "cfb",
    "kick": "2026-11-28T17:00:00.000Z",
@@ -477,12 +477,28 @@
    "mk": "total",
    "side": "under",
    "line": 69.5,
-   "price": -124.0,
+   "price": -134.0,
    "edge": 6.8,
    "x": null,
    "why": "total market off",
    "m": 22.9,
    "tm": 62.7
+  },
+  {
+   "id": "401858544",
+   "sport": "cfb",
+   "kick": "2026-11-28T00:30:00.000Z",
+   "home": "Wisconsin",
+   "away": "Minnesota",
+   "mk": "spread",
+   "side": "home",
+   "line": 5.5,
+   "price": -117.0,
+   "edge": 6.4,
+   "x": null,
+   "why": "spread market off",
+   "m": 11.9,
+   "tm": 37.9
   },
   {
    "id": "401856757",
@@ -501,22 +517,6 @@
    "tm": 52.7
   },
   {
-   "id": "401858544",
-   "sport": "cfb",
-   "kick": "2026-11-28T00:30:00.000Z",
-   "home": "Wisconsin",
-   "away": "Minnesota",
-   "mk": "spread",
-   "side": "home",
-   "line": 6.5,
-   "price": -117.0,
-   "edge": 5.4,
-   "x": null,
-   "why": "spread market off",
-   "m": 11.9,
-   "tm": 37.9
-  },
-  {
    "id": "401856879",
    "sport": "cfb",
    "kick": "2026-11-27T01:00:00.000Z",
@@ -525,7 +525,7 @@
    "mk": "spread",
    "side": "home",
    "line": 13.5,
-   "price": -127.0,
+   "price": -132.0,
    "edge": 5.2,
    "x": null,
    "why": "spread market off",
@@ -730,7 +730,7 @@
    "mk": "spread",
    "side": "home",
    "line": 5.5,
-   "price": -137.0,
+   "price": -129.0,
    "edge": 1.4,
    "ev": null,
    "units": 0.0,
@@ -766,7 +766,7 @@
    "mk": "spread",
    "side": "home",
    "line": 13.5,
-   "price": -127.0,
+   "price": -132.0,
    "edge": 5.2,
    "ev": null,
    "units": 0.0,
@@ -811,16 +811,16 @@
    "state": "off"
   },
   "401856764": {
-   "mk": "spread",
-   "side": "away",
-   "line": 20.5,
-   "price": -7255.0,
-   "edge": 25.3,
+   "mk": "total",
+   "side": "over",
+   "line": 42.5,
+   "price": -100.0,
+   "edge": 4.0,
    "ev": null,
    "units": 0.0,
    "home": "Clemson",
    "away": "South Carolina",
-   "state": "off"
+   "state": "under"
   },
   "401858537": {
    "mk": "spread",
@@ -898,7 +898,7 @@
    "mk": "total",
    "side": "under",
    "line": 69.5,
-   "price": -124.0,
+   "price": -134.0,
    "edge": 6.8,
    "ev": null,
    "units": 0.0,
@@ -957,9 +957,9 @@
   "401858544": {
    "mk": "spread",
    "side": "home",
-   "line": 6.5,
+   "line": 5.5,
    "price": -117.0,
-   "edge": 5.4,
+   "edge": 6.4,
    "ev": null,
    "units": 0.0,
    "home": "Wisconsin",
@@ -1115,16 +1115,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 25802,
+  "snapshots": 25811,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 5225,
-    "clvRet": -0.031,
-    "clvT": -21.88,
+    "clvN": 5230,
+    "clvRet": -0.0309,
+    "clvT": -21.67,
     "clv": 0.56,
     "beat": 0.421,
-    "still": 0.283
+    "still": 0.284
    },
    {
     "when": "6-24h",
@@ -5898,7 +5898,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-22T13:40:38Z",
+ "checked": "2026-11-22T13:44:07Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
