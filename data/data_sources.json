@@ -141,6 +141,14 @@
     ]},
     { "name": "site", "sources": [
       { "n": "Cloudflare Analytics", "u": "https://developers.cloudflare.com/analytics/graphql-api/", "w": "site visitors, requests, page views, cache, countries (/site/)" }
+    ]},
+    { "name": "ST. CLAIRE WAVE", "sources": [
+      { "n": "Shopify storefronts", "u": "https://www.47brand.com/products.json", "w": "new products (drops and band merch): '47, Nubian (STUDIO SEVEN), The Strokes, Charli XCX, Playboi Carti, FKA twigs, Geese, Sacred Bones (Sextile), Cult Records (The Voidz, Julian Casablancas), Fleetwood Mac, Nas, Lauryn Hill, Warner Music (PinkPantheress), Rough Trade (Ethel Cain)" },
+      { "n": "Fashion and music RSS", "u": "https://www.highsnobiety.com/feeds/rss", "w": "brand, band, Mets/Knicks collab and suggested-brand headlines: Highsnobiety, WWD, Fashionista, Sneaker Files, FASHIONSNAP, Pitchfork, Stereogum, NME" },
+      { "n": "NYC venue calendars", "u": "https://www.mercuryloungenyc.com/", "w": "NYC shows for ARKLIBRARY artists: Mercury Lounge, Bowery Ballroom, Irving Plaza, Brooklyn Paramount" },
+      { "n": "MLB Stats API", "u": "https://statsapi.mlb.com/", "w": "Mets home-game promotions: giveaways, theme nights, ticket offers" },
+      { "n": "ESPN", "u": "https://www.espn.com/", "w": "Mets and Knicks home schedules with the lowest listed ticket price (Vivid Seats), for the ticket VAL model" },
+      { "n": "Ticketmaster Discovery API", "u": "https://developer.ticketmaster.com/", "w": "every NYC Ticketmaster show for the ARKLIBRARY artists (only when the free TICKETMASTER_API_KEY secret is set)" }
     ]}
   ]
 }

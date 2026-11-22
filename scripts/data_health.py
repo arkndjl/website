@@ -468,7 +468,7 @@ def cmd_injury_report():
 # the workflows data-health.yml listens to (its workflow_run list; `test` fails when the two differ)
 WATCH = ['cbb board', 'cbb boards', 'cbb recruits', 'cfb board', 'cs2', 'esea season', 'nba xpm', 'nfl', 'nhl',
          'nhl goalies', 'odds snap', 'picks refresh', 'soccer', 'soccer prospects', 'tennis', 'tennis prospects',
-         'model refits', 'build gate']
+         'model refits', 'build gate', 'wave']
 RED = ('failure', 'timed_out', 'startup_failure')
 RED_WORD = {'failure': 'failed', 'timed_out': 'timed out', 'startup_failure': 'failed to start',
             'cancelled': 'was cancelled by a job time limit'}

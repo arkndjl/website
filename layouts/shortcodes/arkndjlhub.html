@@ -10,7 +10,8 @@
 {{- $look := dict
   "arkndjl-music" (dict "img" "" "sub" (printf "%d tracks" $nTracks))
   "arkndjl-art" (dict "img" "img/px/rose-window.png" "sub" (cond (gt $nPieces 0) (printf "%d pieces" $nPieces) ""))
-  "arkndjl-style" (dict "img" "" "sub" "") -}}
+  "arkndjl-style" (dict "img" "" "sub" "")
+  "arkndjl-wave" (dict "img" "img/px/wave-portal.svg" "sub" (printf "%d drops · %d NYC shows · %d games" (add (len (site.Data.wave.drops | default slice)) (len (site.Data.wave.merch | default slice))) (len (site.Data.wave.shows | default slice)) (len (site.Data.wave.deals | default slice)))) -}}
 {{- $sc := site.Params.stclaire | default dict -}}
 <style>
 .post:has(.ah)>.post-title{display:none}
@@ -61,11 +62,14 @@
 .ah-p--style .ah-p__art img{width:38%;height:auto;object-fit:contain;image-rendering:auto}
 .ah-p--art .ah-p__art{background:#131316}
 .ah-p--art .ah-p__art img{object-fit:contain;clip-path:polygon(0 100%,0 38%,8% 18%,22% 6%,50% 0,78% 6%,92% 18%,100% 38%,100% 100%)}
+.ah-p--wave{grid-column:span 6}
+.ah-p--wave .ah-p__art{aspect-ratio:auto;height:160px;background:#0e0b16}
+.ah-p--wave .ah-p__art img{object-fit:cover;image-rendering:pixelated}
 .ah-low{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:1rem;align-items:start;max-width:40rem}
 .ah-low .winlist{margin:0;max-width:none;--win-dark:#0e0e12;--win-face:#131316;--win-well:#0e0e12;--win-title:#2e2e35;--background:#131316}
 @media (prefers-reduced-motion:reduce){.ah-p{transition:none}}
-@media (max-width:900px){.ah-portals{grid-template-columns:repeat(2,minmax(0,1fr))}.ah-p{grid-column:span 1}.ah-p--style{grid-column:span 2}.ah-hero{grid-template-columns:minmax(0,1fr);justify-items:center;gap:1.25rem}.ah-head{width:100%}}
-@media (max-width:684px){.ah-portals{grid-template-columns:minmax(0,1fr)}.ah-p,.ah-p--music,.ah-p--art{grid-column:auto}.ah-hero{padding:1rem}.ah-rel{width:256px;height:256px}.ah-rel .ah-mono{width:128px;height:128px;margin:-64px 0 0 -64px}.ah-title{font-size:48px;letter-spacing:.08em}.ah-soc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.ah-soc a{font-size:.72rem;padding-right:6px}.ah-soc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+@media (max-width:900px){.ah-portals{grid-template-columns:repeat(2,minmax(0,1fr))}.ah-p{grid-column:span 1}.ah-p--style,.ah-p--wave{grid-column:span 2}.ah-hero{grid-template-columns:minmax(0,1fr);justify-items:center;gap:1.25rem}.ah-head{width:100%}}
+@media (max-width:684px){.ah-portals{grid-template-columns:minmax(0,1fr)}.ah-p,.ah-p--music,.ah-p--art,.ah-p--style,.ah-p--wave{grid-column:auto}.ah-hero{padding:1rem}.ah-rel{width:256px;height:256px}.ah-rel .ah-mono{width:128px;height:128px;margin:-64px 0 0 -64px}.ah-title{font-size:48px;letter-spacing:.08em}.ah-soc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.ah-soc a{font-size:.72rem;padding-right:6px}.ah-soc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
 .ah-hero{padding-left:76px;padding-right:76px;border:2px solid;border-color:#60606c #000 #000 #60606c;image-rendering:pixelated}
 @media (max-width:684px){.ah-hero{padding-left:1rem;padding-right:1rem;background:var(--ah-ink) url({{ "img/px/stclaire-stone.png" | relURL }}) 0 0/512px 512px}}
 </style>

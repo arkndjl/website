@@ -1,0 +1,16 @@
+{{- /* WAVE drop cards: dict "items" (wave.json drops / merch). Product images load small (Shopify width=96) and draw
+       pixelated; hover shows them smooth. Used by layouts/shortcodes/wavepanel.html. */ -}}
+{{- $lg := printf "/img/px/wave-logos.svg?v=%s#px-wv-" (substr (readFile "static/img/px/wave-logos.svg" | md5) 0 8) -}}
+<div class="wv-drops">
+{{- range .items }}
+<article class="wv-drop" data-who="{{ .who }}">
+  <div class="wv-drop__h"><svg class="lg lg--s" aria-hidden="true"><use href="{{ $lg }}{{ .who }}"/></svg><span><b>{{ .name }}</b><br><i>{{ (time .d).Format "Mon Jan 2" }}</i></span><span class="wv-drop__n">{{ .n }} new</span></div>
+  <div class="wv-strip">
+  {{- range first 8 .items }}
+    <a class="wv-pr" href="{{ .u }}" target="_blank" rel="noopener" title="{{ .t }}{{ with .price }} · ${{ . }}{{ end }}">{{ with .img }}<img src="{{ . }}{{ if in . "?" }}&{{ else }}?{{ end }}width=96" width="96" height="96" alt="" loading="lazy" decoding="async">{{ end }}{{ with .price }}<em>${{ . | float | int }}</em>{{ end }}<span>{{ .t }}</span></a>
+  {{- end }}
+  </div>
+  {{- if gt .n 8 }}<span class="wv-more">+{{ sub .n 8 }}</span>{{ end }}
+</article>
+{{- else }}<p class="wv-empty">--</p>{{ end }}
+</div>

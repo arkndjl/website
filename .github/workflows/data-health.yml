@@ -15,7 +15,8 @@ name: data health
 on:
   workflow_run:
     workflows: [cbb board, cbb boards, cbb recruits, cfb board, cs2, esea season, nba xpm, nfl, nhl, nhl goalies,
-                odds snap, picks refresh, soccer, soccer prospects, tennis, tennis prospects, model refits, build gate]
+                odds snap, picks refresh, soccer, soccer prospects, tennis, tennis prospects, model refits, build gate,
+                wave]
     types: [completed]
   schedule:
     - cron: "13 */3 * * *"

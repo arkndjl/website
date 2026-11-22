@@ -1,0 +1,7 @@
+{{- /* WAVE headline list: dict "items" (wave.json news-like rows: t u at src who). Used by layouts/shortcodes/wavepanel.html. */ -}}
+{{- $lg := printf "/img/px/wave-logos.svg?v=%s#px-wv-" (substr (readFile "static/img/px/wave-logos.svg" | md5) 0 8) -}}
+<ol class="wv-feed">
+{{- range .items }}
+<li data-who="{{ delimit .who " " }}"><time>{{ with .at }}{{ substr . 5 5 }}{{ end }}</time><svg class="lg lg--xs" aria-hidden="true"><use href="{{ $lg }}{{ index .who 0 }}"/></svg><a href="{{ .u }}" target="_blank" rel="noopener" title="{{ .t }}">{{ .t }}</a><span class="src">{{ .src }}</span></li>
+{{- else }}<li class="wv-empty">--</li>{{ end }}
+</ol>

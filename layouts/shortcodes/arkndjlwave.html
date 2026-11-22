@@ -1,0 +1,184 @@
+{{- /* ST. CLAIRE WAVE (content/arkndjl-wave.md): drops, band merch, NYC shows, Mets promos, Mets/Knicks tickets and collabs,
+       suggested brands, all from data/wave.json (scripts/wave.py, every 3 hours). A pixel tide over the hero, a "frequency"
+       wall of every tracked logo (signal bars = how recently it moved; a tile filters every list to that name), then the
+       tabs. Logos are scripts/wave_logos.py sprites (#px-wv-<id>). Styles are scoped under .wv. Usage: {{< arkndjlwave >}} */ -}}
+{{- $lg := printf "/img/px/wave-logos.svg?v=%s#px-wv-" (substr (readFile "static/img/px/wave-logos.svg" | md5) 0 8) -}}
+{{- $w := site.Data.wave | default dict -}}
+{{- $now := now.UTC -}}
+{{- $today := now.Format "2006-01-02" -}}
+{{- $names := dict -}}{{ range $w.wall }}{{ $names = merge $names (dict .id .name) }}{{ end -}}
+{{- range $w.suggested }}{{ $names = merge $names (dict .id .name) }}{{ end -}}
+<style>
+.post:has(.wv)>.post-title{display:none}
+.wv{--wv-k:#0e0b16;--wv-d:#241a3a;--wv-m:#3a2d56;--wv-m2:#4a3b6b;--wv-p:#57068c;--wv-l:#c8c7ff;--wv-a:#7fffd4;--wv-w:#f4f2ff;--wv-g:#8d86a8;display:grid;grid-template-columns:minmax(0,1fr);gap:1.25rem;margin:0 0 2rem;color:var(--wv-l);min-width:0}
+.wv *{box-sizing:border-box}
+.wv>*{min-width:0}
+.wv img{border:0;margin:0;border-radius:0;max-width:none}
+.wv ul,.wv ol{margin:0;padding:0;list-style:none}
+.wv li::before{content:none!important}
+.wv a{color:inherit}
+.wv svg.lg{display:block;width:48px;height:48px;shape-rendering:crispEdges;flex:none}
+.wv svg.lg--s{width:32px;height:32px}
+.wv svg.lg--xs{width:24px;height:24px}
+/* hero: the tide */
+.wv-hero{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:1.25rem;align-items:end;min-height:300px;padding:1.5rem;background:var(--wv-k);border:2px solid;border-color:var(--wv-l) var(--wv-d) var(--wv-d) var(--wv-l);overflow:hidden}
+.wv-hero canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;pointer-events:none}
+.wv-hero::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(14,11,22,.35) 3px 4px);pointer-events:none}
+.wv-ttl{position:relative;z-index:1;margin:0;font-size:96px;line-height:.85;letter-spacing:.06em;font-weight:normal;color:var(--wv-w);text-shadow:4px 0 0 var(--wv-a),-4px 0 0 var(--wv-p),0 6px 0 var(--wv-d)}
+.wv-ttl::before,.wv-ttl::after{content:none}
+.wv-next{position:relative;z-index:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem}
+.wv-nx{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.15rem .6rem;align-items:center;padding:.5rem .6rem;background:color-mix(in srgb,var(--wv-d) 88%,transparent);border:1px solid var(--wv-m2);text-decoration:none;color:var(--wv-l);min-width:0}
+.wv-nx:hover,.wv-nx:focus-visible{border-color:var(--wv-a);color:var(--wv-w)}
+.wv-nx svg{grid-row:span 3}
+.wv-nx b{font-weight:normal;color:var(--wv-a);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase}
+.wv-nx span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.85rem}
+.wv-nx i{font-style:normal;color:var(--wv-g);font-size:.75rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* the frequency wall */
+.wv-wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px}
+.wv-f{position:relative;display:grid;justify-items:center;gap:4px;padding:8px 4px 6px;background:var(--wv-d);border:2px solid;border-color:var(--wv-m2) var(--wv-k) var(--wv-k) var(--wv-m2);color:var(--wv-l);cursor:pointer;font:inherit;font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;min-width:0}
+.wv-f:hover,.wv-f:focus-visible{border-color:var(--wv-a) var(--wv-k) var(--wv-k) var(--wv-a);outline:0}
+.wv-f[aria-pressed="true"]{background:var(--wv-p);border-color:var(--wv-k) var(--wv-a) var(--wv-a) var(--wv-k)}
+.wv-f svg.lg{width:64px;height:64px}
+.wv-f .nm{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wv-f .k{position:absolute;top:3px;left:4px;color:var(--wv-g);font-size:.55rem}
+.wv-f .c{position:absolute;top:3px;right:4px;color:var(--wv-a);font-size:.6rem}
+.wv-sig{display:flex;gap:2px;align-items:flex-end;height:10px}
+.wv-sig i{display:block;width:4px;background:var(--wv-m)}
+.wv-sig i:nth-child(1){height:2px}.wv-sig i:nth-child(2){height:4px}.wv-sig i:nth-child(3){height:6px}.wv-sig i:nth-child(4){height:8px}.wv-sig i:nth-child(5){height:10px}
+.wv-sig i.on{background:var(--wv-a)}
+.wv-f--brand .wv-sig i.on{background:var(--wv-l)}
+.wv-flt{display:none;align-items:center;gap:.5rem;font-size:.8rem}
+.wv[data-f] .wv-flt{display:flex}
+.wv-flt button{font:inherit;background:var(--wv-p);color:var(--wv-w);border:1px solid var(--wv-a);padding:2px 8px;cursor:pointer}
+.wv [data-who].is-out{display:none!important}
+/* windows */
+.wv .win{--win-dark:#0e0b16;margin:0;max-width:none;width:100%}
+.wv .wintabs{max-width:none;width:100%}
+.wv .win__status{gap:1rem}
+.wv-keys{display:flex;flex-wrap:wrap;gap:.4rem 1rem;margin:0}
+.wv-body{padding:.75rem;display:grid;gap:.75rem;min-width:0}
+.wv-empty{color:var(--wv-g);padding:.5rem 0}
+.wv-drops{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:.75rem}
+.wv-drop{display:grid;gap:.5rem;padding:.6rem;background:var(--wv-k);border:1px solid var(--wv-m);min-width:0}
+.wv-drop__h{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:.6rem;align-items:center}
+.wv-drop__h b{font-weight:normal;color:var(--wv-w)}
+.wv-drop__h i{font-style:normal;color:var(--wv-g);font-size:.75rem}
+.wv-drop__n{color:var(--wv-a);font-size:.8rem;white-space:nowrap}
+.wv-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.wv-pr{position:relative;display:block;aspect-ratio:1;background:var(--wv-d);overflow:hidden;text-decoration:none}
+.wv-pr img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
+.wv-pr span{position:absolute;left:0;right:0;bottom:0;padding:2px 3px;background:rgba(14,11,22,.82);color:var(--wv-l);font-size:.6rem;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wv-pr:hover img,.wv-pr:focus-visible img{image-rendering:auto}
+.wv-pr em{position:absolute;top:2px;right:2px;font-style:normal;font-size:.55rem;padding:0 3px;background:var(--wv-p);color:var(--wv-w)}
+.wv-more{color:var(--wv-g);font-size:.75rem}
+.wv-feed li{display:grid;grid-template-columns:3.2rem 24px minmax(0,1fr) auto;gap:.6rem;align-items:center;padding:.35rem 0;border-bottom:1px solid var(--wv-m)}
+.wv-feed time,.wv-feed .src{color:var(--wv-g);font-size:.72rem;white-space:nowrap}
+.wv-feed a{text-decoration:none;overflow:hidden;text-overflow:ellipsis}
+.wv-feed a:hover{color:var(--wv-a)}
+.wv-promos{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:.6rem}
+.wv-pm{display:grid;grid-template-rows:auto 1fr;background:var(--wv-k);border:1px solid var(--wv-m);text-decoration:none;min-width:0}
+.wv-pm img{width:100%;aspect-ratio:1;object-fit:cover;image-rendering:pixelated;background:var(--wv-d)}
+.wv-pm div{display:grid;gap:2px;padding:.4rem;font-size:.75rem}
+.wv-pm b{font-weight:normal;color:var(--wv-a);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.wv-pm:hover{border-color:var(--wv-a)}
+.wv-past{opacity:.55}
+.wv-tag{display:inline-block;padding:0 4px;margin:1px 2px 1px 0;border:1px solid var(--wv-m2);font-size:.65rem;white-space:nowrap}
+.wv-tag.on{border-color:var(--wv-a);color:var(--wv-a)}
+.wv-deal{color:var(--wv-k);background:var(--wv-a);padding:0 4px}
+.wv-up{color:#ff8fa3}.wv-dn{color:var(--wv-a)}
+.wv td.lgc{width:36px;padding-top:2px;padding-bottom:2px}
+.wv .wintable td,.wv .wintable th{white-space:nowrap}
+.wv .wintable td.wrap{white-space:normal;min-width:12rem}
+.wv-keys{color:var(--wv-g)}
+@media (max-width:900px){.wv-hero{grid-template-columns:minmax(0,1fr);min-height:0}.wv-ttl{font-size:72px}}
+@media (max-width:560px){.wv-hero{padding:1rem}.wv-ttl{font-size:56px}.wv-next{grid-template-columns:minmax(0,1fr)}.wv-wall{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.wv-f{padding:6px 2px 4px}.wv-f svg.lg{width:48px;height:48px}.wv-f .nm{font-size:.55rem}.wv-strip{grid-template-columns:repeat(4,minmax(0,1fr))}.wv-feed li{grid-template-columns:2.8rem 24px minmax(0,1fr)}.wv-feed .src{display:none}}
+@media (prefers-reduced-motion:reduce){.wv-hero canvas{display:none}}
+</style>
+
+{{- /* the four "next" tiles */ -}}
+{{- $drop := index ($w.drops | default slice) 0 -}}
+{{- $merch := index ($w.merch | default slice) 0 -}}
+{{- $show := index ($w.shows | default slice) 0 -}}
+{{- $up := slice }}{{ range ($w.mets.promos | default slice) }}{{ if not .past }}{{ $up = $up | append . }}{{ end }}{{ end -}}
+{{- $best := dict }}{{ range ($w.deals | default slice) }}{{ if and .val (ge .val (or $best.val 0)) }}{{ $best = . }}{{ end }}{{ end -}}
+<div class="wv" data-wave>
+<section class="wv-hero" aria-label="WAVE">
+  <canvas width="160" height="80" data-wv-tide aria-hidden="true"></canvas>
+  <h1 class="wv-ttl">WAVE</h1>
+  <div class="wv-next">
+    {{- with $drop }}<a class="wv-nx" href="#drops"><svg class="lg lg--s" aria-hidden="true"><use href="{{ $lg }}{{ .who }}"/></svg><b>drop</b><span>{{ .name }}</span><i>{{ substr .d 5 }} · {{ .n }} new</i></a>{{ end }}
+    {{- with $merch }}<a class="wv-nx" href="#merch"><svg class="lg lg--s" aria-hidden="true"><use href="{{ $lg }}{{ .who }}"/></svg><b>merch</b><span>{{ .name }}</span><i>{{ substr .d 5 }} · {{ .n }} new</i></a>{{ end }}
+    {{- with $show }}<a class="wv-nx" href="#shows"><svg class="lg lg--s" aria-hidden="true"><use href="{{ $lg }}{{ .who }}"/></svg><b>nyc live</b><span>{{ .name }}</span><i>{{ (time .d).Format "Mon Jan 2" }} · {{ .venue }}</i></a>
+    {{- else }}<a class="wv-nx" href="#shows"><svg class="lg lg--s" aria-hidden="true"><use href="{{ $lg }}thestrokes"/></svg><b>nyc live</b><span>--</span><i>{{ len ($w.wall | default slice) }} names watched</i></a>{{ end }}
+    {{- with index $up 0 }}<a class="wv-nx" href="#promos"><svg class="lg lg--s" aria-hidden="true"><use href="{{ $lg }}mets"/></svg><b>mets {{ lower (.type | default "promo") }}</b><span>{{ .t }}</span><i>{{ (time .d).Format "Mon Jan 2" }} · {{ .opp }}</i></a>
+    {{- else }}<a class="wv-nx" href="#promos"><svg class="lg lg--s" aria-hidden="true"><use href="{{ $lg }}mets"/></svg><b>mets promos</b><span>{{ add now.Year 1 }} TBA</span><i>{{ len ($w.mets.promos | default slice) }} in {{ now.Year }}</i></a>{{ end }}
+    {{- with $best.id }}<a class="wv-nx" href="#tickets"><svg class="lg lg--s" aria-hidden="true"><use href="{{ $lg }}{{ $best.team }}"/></svg><b>best ticket · VAL {{ $best.val }}</b><span>{{ $best.oppa }} · ${{ $best.price | int }}</span><i>{{ (time $best.d).Format "Mon Jan 2" }} · exp ${{ $best.exp }}</i></a>{{ end }}
+    {{- with index ($w.suggested | default slice) 0 }}<a class="wv-nx" href="#brands"><svg class="lg lg--s" aria-hidden="true"><use href="{{ $lg }}{{ .id }}"/></svg><b>suggested · {{ .total }}</b><span>{{ .name }}</span><i>{{ delimit .tags " · " }}</i></a>{{ end }}
+  </div>
+</section>
+
+<section aria-label="frequencies">
+  <div class="wv-wall" role="group" aria-label="filter by name">
+  {{- range $w.wall }}
+  {{- $bars := 0 }}{{ with .last }}{{ $age := sub $now.Unix ((time (replace . "Z" ":00Z")).Unix) }}{{ $bars = cond (lt $age 86400) 5 (cond (lt $age 259200) 4 (cond (lt $age 604800) 3 (cond (lt $age 1814400) 2 1))) }}{{ end }}
+  {{- $n := add .items .news .shows .promos }}
+  <button type="button" class="wv-f wv-f--{{ .kind }}" data-f="{{ .id }}" aria-pressed="false" title="{{ .name }}{{ with .last }} · last {{ substr . 0 10 }}{{ end }} · {{ .items }} new items · {{ .news }} headlines · {{ .shows }} NYC shows{{ if .promos }} · {{ .promos }} promos{{ end }}">
+    <span class="k">{{ .kind }}</span>{{ if $n }}<span class="c">{{ $n }}</span>{{ end }}
+    <svg class="lg" aria-hidden="true"><use href="{{ $lg }}{{ .id }}"/></svg>
+    <span class="wv-sig" aria-hidden="true">{{ range seq 5 }}<i{{ if le . $bars }} class="on"{{ end }}></i>{{ end }}</span>
+    <span class="nm">{{ .name }}</span>
+  </button>
+  {{- end }}
+  </div>
+  <div class="wv-flt"><span data-wv-fname></span><button type="button" data-wv-clear>× all</button></div>
+</section>
+
+{{ .Inner }}
+<p class="wv-keys win__status" title="{{ $w.about }}">{{ $ok := 0 }}{{ range $w.sources }}{{ if .ok }}{{ $ok = add $ok 1 }}{{ end }}{{ end }}<span>{{ $ok }}/{{ len ($w.sources | default slice) }} sources</span>{{ range $w.keys }}<span title="{{ .w }}">key: {{ .k }}</span>{{ end }}{{ partial "fresh.html" (dict "feed" "wave") }}</p>
+</div>
+<script>
+(function () {
+  var root = document.querySelector('[data-wave]'); if (!root) return;
+  // the tide: three pixel sine bands on a 160 x 80 canvas, ~12 fps; reduced motion draws one frame
+  var c = root.querySelector('[data-wv-tide]'), x = c && c.getContext('2d');
+  if (x) {
+    var cols = ['#241a3a', '#57068c', '#4a3b6b', '#7fffd4', '#c8c7ff'], t = 0;
+    var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var draw = function () {
+      x.clearRect(0, 0, 160, 80);
+      for (var b = 0; b < 5; b++) {
+        x.fillStyle = cols[b];
+        for (var i = 0; i < 160; i++) {
+          var y = Math.round(30 + b * 9 + (6 - b) * Math.sin(i / (11 + b * 2) + t * (0.9 + b * 0.25) + b * 1.7));
+          x.fillRect(i, y, 1, b > 2 ? 1 : 80 - y);
+        }
+      }
+      for (var k = 0; k < 14; k++) {   // foam
+        var fx = (k * 37 + Math.floor(t * 20)) % 160;
+        x.fillStyle = '#f4f2ff'; x.fillRect(fx, Math.round(28 + 3 * Math.sin(fx / 9 + t)), 1, 1);
+      }
+      t += 0.08;
+    };
+    draw();
+    if (!still) { var on = true; setInterval(function () { if (on && !document.hidden) draw(); }, 83);
+      if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { on = e[0].isIntersecting; }).observe(c); }
+  }
+  // frequency wall: a tile filters every list to that name; again (or "x all") clears
+  var label = root.querySelector('[data-wv-fname]');
+  function set(id, name) {
+    root.querySelectorAll('.wv-f').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.f === id ? 'true' : 'false'); });
+    if (id) root.setAttribute('data-f', id); else root.removeAttribute('data-f');
+    root.querySelectorAll('[data-who]').forEach(function (el) {
+      el.classList.toggle('is-out', !!id && (' ' + el.dataset.who + ' ').indexOf(' ' + id + ' ') < 0);
+    });
+    if (label) label.textContent = name || '';
+  }
+  root.querySelectorAll('.wv-f').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var on = b.getAttribute('aria-pressed') === 'true';
+      set(on ? '' : b.dataset.f, on ? '' : b.querySelector('.nm').textContent);
+    });
+  });
+  var clr = root.querySelector('[data-wv-clear]'); if (clr) clr.addEventListener('click', function () { set(''); });
+})();
+</script>
