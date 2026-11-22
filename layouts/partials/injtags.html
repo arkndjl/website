@@ -1,0 +1,58 @@
+{{- /* Injury tags on every player board of a sport page: static/data/injuries.json (scripts/injury_tags.py, rerun every
+       half hour by odds-snap.yml) maps name keys (scripts/names.mjs rules, window.arkName.key) to [tag, hover, team logo,
+       team name]. Each player-name cell gets a pixel tag after the name, also in tabs rendered later (a MutationObserver).
+       A name two clubs share is tagged only where its row shows the club (logo or name). Cells that already carry a tag
+       (the CFB board's own chip, depth charts) are left alone. Display only. */ -}}
+{{- $sports := dict "arkboard-nfl" "nfl" "arkboard-nba" "nba" "arkboard-nhl" "nhl" "arkboard-college-football" "cfb" "arkboard-college-basketball" "cbb" "arkboard-soccer" "soccer" -}}
+{{- with .File }}{{ with index $sports .ContentBaseName -}}
+{{- partial "namekey.html" $ -}}
+<script>
+(function () {
+  var S = '{{ . }}', SEL = '.cfb__name, .arkl__name, .cfbp__name, .cfbst__name, .nflrk__name, .tb__name, .athletes__name, .nbaln__who, .nhll__who, .lld__who, .cfbg__who';
+  var NB = 'td > .pxframe--row + b, li > .pxframe--row + b';
+  var SKIP = '.cfb__injchip, .dc__inj, .injtag', LONG = { OFS: 1, IR: 1, PUP: 1, NFI: 1, SUSP: 1 }, MID = { Q: 1, D: 1, DTD: 1 };
+  var D = null, AMB = {}, pend = [], raf = 0;
+  function own(el) { var t = ''; el.childNodes.forEach(function (n) { if (n.nodeType === 3) t += n.textContent; }); return t.trim(); }
+  function pick(el) {
+    var b = el.querySelector(':scope > b, :scope > a, :scope > .cfb__who > b, :scope > .cfb__who, :scope > .hk__nm > b');
+    var name = b ? b.textContent.trim() : own(el);
+    return name && name.length < 48 ? [b, name] : null;
+  }
+  function tag(el) {
+    if (el.__inj) return; el.__inj = 1;
+    if (el.querySelector(SKIP)) return;
+    var p = pick(el); if (!p) return;
+    var k = window.arkName.key(p[1]), es = D[k]; if (!es) return;
+    var e = null;
+    if (AMB[k] || es.length > 1) {
+      var row = el.closest('tr, li, .tb__row') || el.parentElement, h = row ? row.innerHTML : '', tx = row ? row.textContent : '';
+      for (var i = 0; i < es.length && !e; i++) if ((es[i][2] && h.indexOf(es[i][2]) >= 0) || (es[i][3] && tx.indexOf(es[i][3]) >= 0)) e = es[i];
+    } else e = es[0];
+    if (!e) return;
+    var s = document.createElement('span');
+    s.className = 'injtag injtag--' + (LONG[e[0]] ? 'long' : MID[e[0]] ? 'mid' : 'out');
+    s.title = e[1]; s.textContent = e[0];
+    if (p[0]) p[0].insertAdjacentElement('afterend', s); else el.appendChild(s);
+  }
+  function scan(root) {
+    if (root.nodeType !== 1) return;
+    if (root.matches && root.matches(SEL)) tag(root);
+    if (root.matches && root.matches(NB)) tag(root.parentElement);
+    root.querySelectorAll(SEL).forEach(tag);
+    root.querySelectorAll(NB).forEach(function (b) { tag(b.parentElement); });   // JS boards: face frame, then the name in <b>
+  }
+  function flush() { raf = 0; var q = pend; pend = []; q.forEach(scan); }
+  function start(J) {
+    D = J[S] || {}; (J[S + '_amb'] || []).forEach(function (k) { AMB[k] = 1; });
+    if (!Object.keys(D).length) return;
+    scan(document.body);
+    new MutationObserver(function (ms) {
+      ms.forEach(function (m) { m.addedNodes.forEach(function (n) { if (n.nodeType === 1 && !(n.classList && n.classList.contains('injtag'))) pend.push(n); }); });
+      if (pend.length && !raf) raf = requestAnimationFrame(flush);
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+  function go() { fetch('/data/injuries.json?v=' + Math.floor(Date.now() / 6e5)).then(function (r) { return r.ok ? r.json() : {}; }).then(start).catch(function () {}); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
+})();
+</script>
+{{- end }}{{ end -}}
