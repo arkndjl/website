@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-21T22:25Z",
+ "asof": "2026-11-22T00:18Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -286,25 +286,25 @@
     }
    ],
    "joined": 0,
-   "players": 602,
+   "players": 603,
    "rows": 2049
   },
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 10,
+     "flags": 9,
      "rows": 2158
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 15,
+     "flags": 12,
      "rows": 636
     },
     "static/data/nfl-war.json": {
-     "flags": 81,
+     "flags": 78,
      "rows": 1826
     },
     "static/data/pctl-nfl.json": {
-     "flags": 79,
+     "flags": 76,
      "rows": 1755
     },
     "static/data/personnel/nfl.json": {
@@ -312,7 +312,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 55,
+     "flags": 54,
      "rows": 1650
     }
    },
@@ -442,24 +442,6 @@
      "pos": "RT",
      "rotowire": "FA",
      "site": "PHI"
-    },
-    {
-     "d": "2026-09-19",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "practice",
-     "head": "Placed on practice squad injured reserve",
-     "kind": "practice",
-     "move": {
-      "d": "2026-09-19",
-      "head": "Placed on practice squad injured reserve",
-      "kind": "practice"
-     },
-     "pid": "19120",
-     "player": "Max Hurleman",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "PIT"
     },
     {
      "d": "2026-10-06",
@@ -1452,24 +1434,6 @@
      "site": "WAS"
     },
     {
-     "d": "2026-11-09",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "practice",
-     "head": "Reverts to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Reverts to practice squad",
-      "kind": "practice"
-     },
-     "pid": "14453",
-     "player": "Salvon Ahmed",
-     "pos": "RB",
-     "rotowire": "FA",
-     "site": "CHI"
-    },
-    {
      "d": "2026-11-16",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1558,24 +1522,6 @@
      "pos": "OL",
      "rotowire": "FA",
      "site": "NE"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "practice",
-     "head": "Reverts to Vegas' practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Reverts to Vegas' practice squad",
-      "kind": "practice"
-     },
-     "pid": "18863",
-     "player": "Carter Runyon",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "LV"
     },
     {
      "d": "2026-11-03",
@@ -1869,24 +1815,6 @@
      "d": "2026-11-17",
      "field": "t",
      "file": "static/data/nfl-war.json",
-     "flag": "practice",
-     "head": "Returns to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-17",
-      "head": "Returns to practice squad",
-      "kind": "practice"
-     },
-     "pid": "10949",
-     "player": "Nick Vannett",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "BAL"
-    },
-    {
-     "d": "2026-11-17",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
      "flag": "released",
      "head": "Cut by Baltimore",
      "kind": "waived",
@@ -1920,12 +1848,12 @@
      "site": "DAL"
     },
     {
-     "d": "2026-11-19",
+     "d": "2026-11-21",
      "field": "t",
      "file": "static/data/nfl-war.json",
      "flag": "released",
-     "head": "Gets waived by Packers",
-     "kind": "waived",
+     "head": "Back with Green Bay",
+     "kind": null,
      "move": {
       "d": "2026-11-19",
       "head": "Gets waived by Packers",
@@ -2836,24 +2764,6 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "BUF"
-    },
-    {
-     "d": "2026-11-17",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
-     "flag": "practice",
-     "head": "Returns to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-17",
-      "head": "Returns to practice squad",
-      "kind": "practice"
-     },
-     "pid": "10949",
-     "player": "Nick Vannett",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "BAL"
     },
     {
      "d": "2026-11-11",
@@ -3936,24 +3846,6 @@
      "site": "WAS"
     },
     {
-     "d": "2026-11-09",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "practice",
-     "head": "Reverts to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Reverts to practice squad",
-      "kind": "practice"
-     },
-     "pid": "14453",
-     "player": "Salvon Ahmed",
-     "pos": "RB",
-     "rotowire": "FA",
-     "site": "CHI"
-    },
-    {
      "d": "2026-11-16",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -4042,24 +3934,6 @@
      "pos": "OL",
      "rotowire": "FA",
      "site": "NE"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "practice",
-     "head": "Reverts to Vegas' practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Reverts to Vegas' practice squad",
-      "kind": "practice"
-     },
-     "pid": "18863",
-     "player": "Carter Runyon",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "LV"
     },
     {
      "d": "2026-11-03",
@@ -4296,24 +4170,6 @@
      "site": "PIT"
     },
     {
-     "d": "2026-11-17",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "practice",
-     "head": "Returns to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-17",
-      "head": "Returns to practice squad",
-      "kind": "practice"
-     },
-     "pid": "10949",
-     "player": "Nick Vannett",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "BAL"
-    },
-    {
      "d": "2026-11-10",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -4332,12 +4188,12 @@
      "site": "DAL"
     },
     {
-     "d": "2026-11-19",
+     "d": "2026-11-21",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
      "flag": "released",
-     "head": "Gets waived by Packers",
-     "kind": "waived",
+     "head": "Back with Green Bay",
+     "kind": null,
      "move": {
       "d": "2026-11-19",
       "head": "Gets waived by Packers",
@@ -4366,24 +4222,6 @@
      "pos": "RB",
      "rotowire": "FA",
      "site": "PHI"
-    },
-    {
-     "d": "2026-11-09",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
-     "head": "Reverts to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Reverts to practice squad",
-      "kind": "practice"
-     },
-     "pid": "14453",
-     "player": "Salvon Ahmed",
-     "pos": "RB",
-     "rotowire": "FA",
-     "site": "CHI"
     },
     {
      "d": "2026-11-16",
@@ -4548,24 +4386,6 @@
      "site": "GB"
     },
     {
-     "d": "2026-11-17",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
-     "head": "Returns to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-17",
-      "head": "Returns to practice squad",
-      "kind": "practice"
-     },
-     "pid": "10949",
-     "player": "Nick Vannett",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "BAL"
-    },
-    {
      "d": "2026-11-16",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -4618,24 +4438,6 @@
      "pos": "TE",
      "rotowire": "FA",
      "site": "CLE"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
-     "head": "Reverts to Vegas' practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Reverts to Vegas' practice squad",
-      "kind": "practice"
-     },
-     "pid": "18863",
-     "player": "Carter Runyon",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "LV"
     }
    ],
    "joined": 0,
