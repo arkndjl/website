@@ -300,7 +300,7 @@ function attachOn3(cl, y, asOf) {
   for (const o of o3) { (by[norm(o[0]) + '|' + o[1]] ||= []).push(o); if (n[norm(o[0])] === 1) (by[norm(o[0]) + '|'] ||= []).push(o); }
   for (const r of cl) {
     const m = by[norm(r.name) + '|' + r.state] || by[norm(r.name) + '|'] || [], o = m.length === 1 ? m[0] : [];
-    r.ind = o[2] ?? null; r.indRank = o[3] ?? null; r.g247 = o[5] ?? null; r.gEspn = o[6] ?? null; r.commit = o[7] ?? null; r.rRiv = o[8] ?? null; r.sRiv = o[9] ?? null; r.asOf = asOf; r.byRank = byRank(y);
+    r.ind = o[2] ?? null; r.indRank = o[3] ?? null; r.g247 = o[5] ?? null; r.gEspn = o[6] ?? null; r.commit = o[7] ?? null; r.rRiv = o[8] ?? null; r.sRiv = o[9] ?? null; r.img = o[10] ?? null; r.asOf = asOf; r.byRank = byRank(y);
     if (o[4] && !r.r247) r.r247 = o[4];
   }
   return cl;
@@ -504,7 +504,7 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
     whyQueue.push([null, r, false]);
     klass.push({ name: c.name, pos: c.pos, g: r.g, ht: c.ht, wt: c.wt, grade: c.grade || null, rank: c.rank, posRank: c.posRank, home: c.city && c.state ? `${c.city}, ${c.state}` : c.state,
       status: c.status === 'Verbal' ? 'committed' : c.status === 'Signed' ? 'signed' : String(c.status || '').toLowerCase(), team: P.team, tid: c.tid, logo: P.logo, conf: P.conf, level: P.level,
-      pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), pct: pct(p.fvOn), range: range(p, 1, 0, r), path: pathOf(r), xnil: xnil(P.level, p), comp: c.comp, rRiv: c.rRiv ?? null, sRiv: c.sRiv ?? null, ark: 0, stars: c.grade >= 90 ? 5 : c.grade >= 80 ? 4 : c.grade >= 70 ? 3 : c.grade >= 60 ? 2 : null });
+      pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), pct: pct(p.fvOn), range: range(p, 1, 0, r), path: pathOf(r), xnil: xnil(P.level, p), comp: c.comp, rRiv: c.rRiv ?? null, sRiv: c.sRiv ?? null, img: c.img ?? null, ark: 0, stars: c.grade >= 90 ? 5 : c.grade >= 80 ? 4 : c.grade >= 70 ? 3 : c.grade >= 60 ? 2 : null });
     { const x = klass[klass.length - 1]; x.ark = starsOf(r); whyQueue[whyQueue.length - 1][0] = x; }
   }
   // default order (and RK): ARK stars, then xFV, then ESPN grade
@@ -589,7 +589,7 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
       list.push({ name: c.name, pos: c.pos, g, ht: c.ht, wt: c.wt, grade: r1(c.grade), src: c.src, rank: c.rank, home: c.city && c.state ? `${c.city}, ${c.state}` : c.state,
         status: committed ? 'committed' : 'uncommitted', team: committed ? P.team : null, tid: committed ? c.tid : null, logo: committed ? P.logo : null, conf: committed ? P.conf : null,
         pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), pct: pct(p.fvOn), range: range(p, 1, c.gsd || 0, r), path: pathOf(r), xnil: xnil(P.level, p),
-        rRiv: c.rRiv ?? null, sRiv: c.sRiv ?? null, stars: c.src === 'espn' ? band(c.grade) || 2 : null });
+        rRiv: c.rRiv ?? null, sRiv: c.sRiv ?? null, img: c.img ?? null, stars: c.src === 'espn' ? band(c.grade) || 2 : null });
       list[list.length - 1].ark = starsOf(r);
       whyQueue[whyQueue.length - 1][0] = list[list.length - 1];
     }
