@@ -4455,6 +4455,7 @@ html.menu-locked, html.menu-locked body { overflow: hidden; overscroll-behavior:
   background: var(--win-well);
 }
 .tick__pin[hidden] { display: none; }
+@media (max-width: 640px) { .tick__pin { max-width: 72%; overflow-x: auto; scrollbar-width: none; } }
 .tick__g--lz .tick__me { color: #7fffd4; }
 .tick__pin .tick__g--nt .tick__ha::before { content: "1NT "; color: #7fffd4; letter-spacing: 0.05em; }
 .tick__track {

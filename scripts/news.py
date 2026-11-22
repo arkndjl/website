@@ -50,7 +50,10 @@ STATE = os.path.join(ROOT, 'scripts', 'data', 'news_state.json')
 ET = ZoneInfo('America/New_York')
 KEEP_DAYS = 30
 MAJOR = 60
-TICKER_N = 24
+TICKER_N = 24     # cells on the strip
+TICKER_DAYS = 7
+NEWS_FLOOR = 40   # impact = w - NEWS_FLOOR (40 = the "not news" line in the rules above)
+HALF_LIFE_H = 24  # impact halves every 24 h
 FV_FLOOR = 40     # an FV move is major only for a player at 40+ (before or after)
 PLAYS = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000]
 OUT_RE = re.compile(r"ruled out|won't play|will not play|not playing|out for (the )?season|season[- ]ending|lands on (ir|injured reserve)|"
@@ -542,10 +545,30 @@ def build(state, plays='fetch'):
         days[-1]['n'] += 1; days[-1]['major'] += i['w'] >= MAJOR
     for dy in days:
         dy['top'] = roundup([i for i in items if i['d'] == dy['d']])
-    # the header strip: each day's roundup order, majors only, newest day first
-    by = {i['id']: i for i in items}
-    strip = [x for dy in days for x in dy['top'] if by[x]['w'] >= MAJOR][:TICKER_N]
+    strip = ticker_pool(items, dt.datetime.now(dt.timezone.utc).timestamp() * 1000)
     return {'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'major': MAJOR, 'ticker': strip, 'days': days, 'items': items}
+
+
+def blend(i, now_ms):
+    """Strip order: impact over the news floor times a 24 h half-life, (w - 40) * 2^(-age / 24 h). A 92 (52 over the
+    floor) outranks a fresh 60 (20) until it is about 33 h old. One half-life for every item, so the ratio of two items'
+    scores never changes with the clock: the order is fixed when the feed is built (no reshuffle between builds)."""
+    age_h = max(0.0, (now_ms - i['at']) / 3.6e6)
+    return (i['w'] - NEWS_FLOOR) * 2 ** (-age_h / HALF_LIFE_H)
+
+
+def ticker_pool(items, now_ms):
+    """The header strip: majors from the last TICKER_DAYS days, best blend first. A headline reported on several days (an FV
+    move that repeats against each day's first build) is one cell, the newest id, aged from its first report."""
+    since = (dt.datetime.fromtimestamp(now_ms / 1000, ET).date() - dt.timedelta(days=TICKER_DAYS - 1)).isoformat()
+    first, show = {}, {}
+    for i in items:
+        if i['w'] < MAJOR: continue
+        k = (i.get('cat'), i['t'])
+        first[k] = min(first.get(k, i['at']), i['at'])
+        if i['d'] >= since and (k not in show or i['at'] > show[k]['at']): show[k] = i
+    rank = sorted(show.items(), key=lambda kv: -blend(dict(kv[1], at=first[kv[0]]), now_ms))
+    return [i['id'] for _, i in rank][:TICKER_N]
 
 
 def _test():
@@ -554,6 +577,11 @@ def _test():
     assert tier('nfl', 95) == 2 and tier('nba', 80) == 1 and tier('cfb', 50) == 2 and tier('cbb', 44) == 0 and tier('nhl', None) == 0
     assert clip('a' * 100, 10).endswith('…') and len(clip('a' * 100, 10)) == 10
     assert num(3.0) == '3' and num(2.5) == '2.5'
+    H = 3.6e6
+    assert abs(blend({'w': 92, 'at': 0}, 24 * H) - 26) < 1e-9 and blend({'w': 70, 'at': 5 * H}, 0) == 30
+    tp = ticker_pool([{'id': 'a', 'w': 92, 'at': 0, 'd': '1970-01-01', 't': 'x'}, {'id': 'b', 'w': 92, 'at': H, 'd': '1970-01-01', 't': 'x'},
+                      {'id': 'c', 'w': 62, 'at': 31 * H, 'd': '1970-01-02', 't': 'y'}, {'id': 'd', 'w': 59, 'at': 30 * H, 'd': '1970-01-02', 't': 'z'}], 31 * H)
+    assert tp == ['c', 'b'], tp   # b is shown, aged from a (its first report)
     st = {}
     a = fv_moves(st, '2026-01-01', 0)
     assert st['fv']['d'] == '2026-01-01' and all(abs(float(i['s'].split()[1].replace('−', '-').replace('+', ''))) >= 2 for i in a)
