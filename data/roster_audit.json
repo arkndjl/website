@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-22T16:32Z",
+ "asof": "2026-11-22T17:03Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -10,7 +10,7 @@
    },
    "flags": [],
    "joined": 0,
-   "players": 964,
+   "players": 965,
    "rows": 5293
   },
   "cfb": {
@@ -4387,13 +4387,13 @@
     }
    ],
    "joined": 0,
-   "players": 2296,
+   "players": 2297,
    "rows": 8090
   },
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 1,
+     "flags": 2,
      "rows": 637
     },
     "static/data/lines/nhl.json": {
@@ -4414,6 +4414,24 @@
     }
    },
    "flags": [
+    {
+     "d": "2026-11-22",
+     "field": "depth",
+     "file": "static/data/depth/nhl.json",
+     "flag": "minors",
+     "head": "Dropped to AHL",
+     "kind": "down",
+     "move": {
+      "d": "2026-11-22",
+      "head": "Dropped to AHL",
+      "kind": "down"
+     },
+     "pid": "6309",
+     "player": "Brett Berard",
+     "pos": "LW",
+     "rotowire": "MTL",
+     "site": "MTL"
+    },
     {
      "d": "2026-11-22",
      "field": "depth",
