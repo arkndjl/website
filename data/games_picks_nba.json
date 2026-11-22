@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-22T22:29:05Z",
+ "asof": "2026-11-22T22:32:05Z",
  "recenter": {
   "2026-11-22": 1.52
  },
@@ -368,6 +368,22 @@
    "tm": 217.3
   },
   {
+   "id": "401910035",
+   "sport": "nba",
+   "kick": "2026-11-23T01:30:00Z",
+   "home": "GS",
+   "away": "BOS",
+   "mk": "spread",
+   "side": "home",
+   "line": -8.5,
+   "price": -119.0,
+   "edge": 2.7,
+   "x": 5.0,
+   "why": "edge under 5 (role: dog)",
+   "m": -5.8,
+   "tm": 209.3
+  },
+  {
    "id": "401910031",
    "sport": "nba",
    "kick": "2026-11-23T00:00:00Z",
@@ -398,22 +414,6 @@
    "why": "edge under 6 (total: high)",
    "m": -9.8,
    "tm": 240.1
-  },
-  {
-   "id": "401910035",
-   "sport": "nba",
-   "kick": "2026-11-23T01:30:00Z",
-   "home": "GS",
-   "away": "BOS",
-   "mk": "spread",
-   "side": "home",
-   "line": -7.5,
-   "price": -101.0,
-   "edge": 1.7,
-   "x": 5.0,
-   "why": "edge under 5 (role: dog)",
-   "m": -5.8,
-   "tm": 209.3
   },
   {
    "id": "401910033",
@@ -496,9 +496,9 @@
   "401910035": {
    "mk": "spread",
    "side": "home",
-   "line": -7.5,
-   "price": -101.0,
-   "edge": 1.7,
+   "line": -8.5,
+   "price": -119.0,
+   "edge": 2.7,
    "ev": null,
    "units": 0.0,
    "home": "GS",
@@ -558,7 +558,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 5334,
+  "snapshots": 5336,
   "buckets": [
    {
     "when": "24h+",
@@ -572,11 +572,11 @@
    {
     "when": "6-24h",
     "clvN": 1172,
-    "clvRet": -0.018,
-    "clvT": -4.89,
-    "clv": 0.45,
-    "beat": 0.453,
-    "still": 0.375
+    "clvRet": -0.0191,
+    "clvT": -5.21,
+    "clv": 0.43,
+    "beat": 0.447,
+    "still": 0.381
    },
    {
     "when": "1-6h",
@@ -589,12 +589,12 @@
    },
    {
     "when": "<1h",
-    "clvN": 66,
+    "clvN": 67,
     "clvRet": -0.0443,
-    "clvT": -9.08,
+    "clvT": -9.22,
     "clv": 0.06,
-    "beat": 0.106,
-    "still": 0.803
+    "beat": 0.104,
+    "still": 0.806
    }
   ]
  },
@@ -7233,7 +7233,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-22T22:29:05Z",
+ "checked": "2026-11-22T22:32:05Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
