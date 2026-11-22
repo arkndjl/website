@@ -1098,6 +1098,10 @@ def counterstrike():
     F("ro", vs(["#002b7f", "#fcd116", "#ce1126"]))
     F("bg", hs(["#ffffff", "#00966e", "#d62612"], [0, 4, 7, 11]))
     F("rs", hs(["#c6363c", "#0c4076", "#ffffff"], [0, 4, 7, 11])).rect(2, 3, 3, 4, "#c6363c")
+    # EU: the CS2 ARK Ranking's flag for a team with no 3-of-5 nationality; twelve gold stars in a ring
+    g = F("eu", vs(["#003399"]))
+    for x, y in ((7, 1), (8, 1), (5, 2), (10, 2), (4, 4), (11, 4), (4, 6), (11, 6), (5, 8), (10, 8), (7, 9), (8, 9)):
+        g.set(x, y, "#ffcc00")
     g = F("gr", hs(["#0d5eaf", "#ffffff", "#0d5eaf", "#ffffff", "#0d5eaf", "#ffffff", "#0d5eaf", "#ffffff", "#0d5eaf"], [0, 1, 2, 3, 4, 5, 6, 7, 8, 11]))
     g.rect(0, 0, 6, 5, "#0d5eaf"); g.rect(2, 0, 2, 5, "#ffffff"); g.rect(0, 2, 6, 1, "#ffffff")
     g = F("il", hs(["#ffffff"])); g.rect(0, 1, 16, 1, "#0038b8"); g.rect(0, 9, 16, 1, "#0038b8")
