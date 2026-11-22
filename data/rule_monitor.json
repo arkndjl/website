@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-22T15:57:42Z",
+ "asof": "2026-11-22T21:55:32Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -3168,19 +3168,19 @@
    "status": "on",
    "stopped": null,
    "n": 4,
-   "clvN": 3,
-   "clvRet": 0.0403,
-   "clvT": 0.72,
-   "days": 3,
-   "beat": 0.667,
-   "settled": 3,
-   "w": 1,
+   "clvN": 4,
+   "clvRet": 0.0169,
+   "clvT": 0.37,
+   "days": 4,
+   "beat": 0.5,
+   "settled": 4,
+   "w": 2,
    "l": 2,
-   "roi": -0.398,
+   "roi": -0.0752,
    "week": {
-    "n": 3,
-    "clvRet": 0.0403,
-    "clvT": 0.72
+    "n": 4,
+    "clvRet": 0.0169,
+    "clvT": 0.37
    },
    "exp": {
     "clvRet": 0.1467,
@@ -3189,9 +3189,9 @@
     "n": 82
    },
    "vsExp": {
-    "gap": -0.1064,
-    "z": -1.91,
-    "read": "in line"
+    "gap": -0.1298,
+    "z": -2.83,
+    "read": "below the backtest"
    },
    "check": {
     "n": 3,
@@ -3230,17 +3230,17 @@
    },
    "drift": {
     "mu1": 0.0466,
-    "n": 3,
+    "n": 4,
     "sd": 0.1176,
     "rho": 0.175,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": 0.15,
-    "info": 0.47,
-    "real": 0.819,
-    "realSe": 1.458,
+    "llr": -0.109,
+    "info": 0.63,
+    "real": 0.327,
+    "realSe": 1.262,
     "need": 38,
     "path": [
      [
@@ -3257,6 +3257,11 @@
       "2026-11-18",
       3,
       0.15
+     ],
+     [
+      "2026-11-22",
+      4,
+      -0.109
      ]
     ]
    }
@@ -4003,13 +4008,13 @@
    "sport": "cbb",
    "mk": "total",
    "label": "CBB total",
-   "n": 194,
-   "du": 122.75,
-   "clvRet": -0.0132,
-   "clvT": -1.26,
-   "flat": -0.0058,
-   "adds": -0.0074,
-   "expEdge": 0.0173,
+   "n": 195,
+   "du": 123.75,
+   "clvRet": -0.0136,
+   "clvT": -1.31,
+   "flat": -0.0061,
+   "adds": -0.0075,
+   "expEdge": 0.0174,
    "basis": "backtest + live picks"
   },
   {
@@ -4044,6 +4049,7 @@
   "pick:cbb:total",
   "pick:cbb:spread | line: 9-15",
   "pick:cbb:total | side: under",
+  "pick:cbb:total | tier: power",
   "pick:cbb:total | tier: mixed"
  ],
  "drift": {
