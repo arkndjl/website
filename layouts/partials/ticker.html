@@ -25,6 +25,8 @@
       <span class="tick__l2"><span class="tick__live">live</span><span class="tick__when">twitch</span></span>
     </a>
     {{- if and (not $home) $nt }}{{ with $nt.games }}{{ partial "inline/tick-nt.html" $nt }}{{ end }}{{ end }}
+    {{- if not $home }}{{ range where ((site.Data.ticker | default dict).teams | default slice) "key" "knicks" }}{{ $t := . }}{{ range $i, $g := .games }}
+    {{- partial "inline/tick-team.html" (dict "t" $t "g" $g "i" 1 "href" (index $links $t.key)) }}{{ end }}{{ end }}{{ end }}
   </div>
   <div class="tick__track">
     <div class="tick__run">
@@ -42,22 +44,7 @@
       {{- $t := . }}
       <div class="tick__team" data-team="{{ .key }}">
         {{- range $i, $g := .games }}
-        {{- $href := index $links $t.key }}
-        <a class="tick__g"{{ with $href }} href="{{ . }}"{{ end }} data-at="{{ $g.at }}" data-h="{{ $t.hours }}" data-id="{{ $g.id }}" data-sport="{{ $t.sport }}" data-path="{{ $t.path }}"{{ with $g.lg }} data-lg="{{ . }}"{{ end }} data-home="{{ if $g.home }}1{{ else }}0{{ end }}"{{ with $g.live }} data-live="{{ jsonify . }}"{{ end }}{{ if $i }} hidden{{ end }}>
-          <span class="tick__l1">
-            {{- with $t.logo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
-            <span class="tick__me">{{ $t.label }}</span>
-            <span class="tick__ha">{{ if $g.neutral }}vs{{ else if $g.home }}vs{{ else }}@{{ end }}</span>
-            {{- with $g.oppLogo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
-            <span class="tick__opp">{{ $g.opp }}</span>
-          </span>
-          <span class="tick__l2">
-            <span class="tick__when">{{ $g.day }}{{ with $g.time }} {{ . }} ET{{ end }}</span>
-            <span class="tick__score" hidden></span>
-            {{- with $g.note }}<span class="tick__note">{{ . }}</span>{{ end -}}
-            <span class="tick__p"{{ with $g.p }} data-pre="{{ . }}"{{ else }} hidden{{ end }}>{{ with $g.p }}win {{ . }}%{{ end }}</span>
-          </span>
-        </a>
+        {{- partial "inline/tick-team.html" (dict "t" $t "g" $g "i" $i "href" (index $links $t.key)) }}
         {{- end }}
         {{- if not .games }}
         <span class="tick__g tick__g--off">
@@ -108,23 +95,33 @@
     gs.forEach(function (a) { a.hidden = true; if (!shown && !done(a)) shown = a; });
     if (shown) { shown.hidden = false; mark(shown); t.dataset.at = shown.dataset.at; } else t.hidden = true;
   });
-  // 1NT first; then the teams, soonest game first; teams with nothing scheduled go last
+  // 1NT first; then the Knicks; then the other teams, soonest game first; teams with nothing scheduled go last
   var run0 = box.querySelector('.tick__run'), teams = [].slice.call(box.querySelectorAll('.tick__team'));
-  teams.sort(function (a, b) { return (Date.parse(a.dataset.at) || 9e15) - (Date.parse(b.dataset.at) || 9e15); });
+  var FIRST = 'knicks';   // Knicks lead the teams whatever the date
+  teams.sort(function (a, b) { return (b.dataset.team === FIRST) - (a.dataset.team === FIRST) || (Date.parse(a.dataset.at) || 9e15) - (Date.parse(b.dataset.at) || 9e15); });
   var nwTag = run0.querySelector('.tick__tag--news');   // the news cells stay after the games
   teams.forEach(function (t) { run0.insertBefore(t, nwTag); });
   box.querySelectorAll('a.tick__g--nt').forEach(function (a) { if (done(a)) a.hidden = true; else mark(a); });
 
-  // pinned slot (left, never scrolls): a 1NT match from 10 min before start to the end, and LAURSEN_111 when live on Twitch
+  // pinned slot (left, never scrolls): LAURSEN_111 when live on Twitch, then a 1NT match and a Knicks game from 10 min
+  // before start to the end
   var pin = box.querySelector('.tick__pin'), home = !box.classList.contains('tick--news');
   function pinNow(a) { var t = Date.parse(a.dataset.at); return Date.now() >= t - 10 * 60e3 && !done(a); }
+  // pinned order, left to right: LAURSEN_111 live, 1NT, Knicks
   function repin() {
-    [].slice.call(box.querySelectorAll('a.tick__g--nt')).forEach(function (a) {
+    var lz0 = pin.querySelector('a.tick__g--lz');
+    [].slice.call(box.querySelectorAll('a.tick__g--nt, a.tick__g[data-key="' + FIRST + '"]')).forEach(function (a) {
       if (a.closest('[aria-hidden]')) return;
-      if (pinNow(a)) { if (a.parentNode !== pin) pin.appendChild(a); a.hidden = false; mark(a); }
-      else if (a.parentNode === pin) { if (home && !done(a)) box.querySelector('.tick__run').insertBefore(a, box.querySelector('.tick__tag--next')); else a.hidden = true; }
+      var isNt = a.classList.contains('tick__g--nt');
+      if (pinNow(a)) { if (a.parentNode !== pin) { if (!isNt) a._team = a.parentNode; pin.appendChild(a); } a.hidden = false; mark(a); }
+      else if (a.parentNode === pin) {
+        if (home && !done(a)) { if (isNt) box.querySelector('.tick__run').insertBefore(a, box.querySelector('.tick__tag--next')); else a._team.prepend(a); }
+        else a.hidden = true;
+      }
       else if (!home) a.hidden = true;
     });
+    if (lz0) pin.prepend(lz0);
+    pin.querySelectorAll('a.tick__g[data-key]').forEach(function (a) { pin.appendChild(a); });   // Knicks after 1NT
     pin.hidden = ![].some.call(pin.children, function (c) { return !c.hidden; });
   }
   repin(); setInterval(repin, 60000);
@@ -301,4 +298,22 @@
         </span>
       </a>
       {{- end }}
+{{- end }}
+
+{{- define "partials/inline/tick-team.html" }}
+        <a class="tick__g" data-key="{{ $.t.key }}"{{ with .href }} href="{{ . }}"{{ end }} data-at="{{ $.g.at }}" data-h="{{ $.t.hours }}" data-id="{{ $.g.id }}" data-sport="{{ $.t.sport }}" data-path="{{ $.t.path }}"{{ with $.g.lg }} data-lg="{{ . }}"{{ end }} data-home="{{ if $.g.home }}1{{ else }}0{{ end }}"{{ with $.g.live }} data-live="{{ jsonify . }}"{{ end }}{{ if $.i }} hidden{{ end }}>
+          <span class="tick__l1">
+            {{- with $.t.logo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
+            <span class="tick__me">{{ $.t.label }}</span>
+            <span class="tick__ha">{{ if $.g.neutral }}vs{{ else if $.g.home }}vs{{ else }}@{{ end }}</span>
+            {{- with $.g.oppLogo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
+            <span class="tick__opp">{{ $.g.opp }}</span>
+          </span>
+          <span class="tick__l2">
+            <span class="tick__when">{{ $.g.day }}{{ with $.g.time }} {{ . }} ET{{ end }}</span>
+            <span class="tick__score" hidden></span>
+            {{- with $.g.note }}<span class="tick__note">{{ . }}</span>{{ end -}}
+            <span class="tick__p"{{ with $.g.p }} data-pre="{{ . }}"{{ else }} hidden{{ end }}>{{ with $.g.p }}win {{ . }}%{{ end }}</span>
+          </span>
+        </a>
 {{- end }}
