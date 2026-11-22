@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-22T02:41:08Z",
+ "asof": "2026-11-22T08:03:50Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -168,19 +168,19 @@
    "status": "on",
    "stopped": null,
    "n": 5,
-   "clvN": 3,
-   "clvRet": -0.0947,
-   "clvT": -0.83,
-   "days": 3,
-   "beat": 0.667,
-   "settled": 3,
+   "clvN": 4,
+   "clvRet": -0.0941,
+   "clvT": -1.16,
+   "days": 4,
+   "beat": 0.5,
+   "settled": 4,
    "w": 1,
-   "l": 2,
-   "roi": -0.3767,
+   "l": 3,
+   "roi": -0.5325,
    "week": {
-    "n": 3,
-    "clvRet": -0.0947,
-    "clvT": -0.83
+    "n": 4,
+    "clvRet": -0.0941,
+    "clvT": -1.16
    },
    "exp": {
     "clvRet": 0.1126,
@@ -189,58 +189,58 @@
     "n": 109
    },
    "vsExp": {
-    "gap": -0.2073,
-    "z": -1.81,
-    "read": "in line"
+    "gap": -0.2067,
+    "z": -2.56,
+    "read": "below the backtest"
    },
    "check": {
-    "n": 3,
-    "window": 3,
-    "mean": -0.0947,
-    "t": -0.83,
+    "n": 4,
+    "window": 4,
+    "mean": -0.0941,
+    "t": -1.16,
     "p": null,
-    "days": 3,
+    "days": 4,
     "sd": 0.1435,
-    "cusum": 2.01,
-    "cusumMax": 2.01,
+    "cusum": 2.46,
+    "cusumMax": 2.46,
     "h": 10.0,
     "rho": 0.221,
     "edge": {
-     "cusum": 0.52,
-     "cusumMax": 0.52,
+     "cusum": 0.68,
+     "cusumMax": 0.68,
      "h": 4.595
     },
     "stop": false,
     "why": "",
     "drift": {
      "mu1": 0.0295,
-     "n": 3,
+     "n": 4,
      "sd": 0.1435,
      "rho": 0.221,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.418,
-     "info": 0.13,
-     "real": -2.797,
-     "realSe": 2.808,
+     "llr": -0.582,
+     "info": 0.17,
+     "real": -2.944,
+     "realSe": 2.432,
      "need": 139
     }
    },
    "drift": {
     "mu1": 0.0295,
-    "n": 3,
+    "n": 4,
     "sd": 0.1435,
     "rho": 0.221,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": -0.418,
-    "info": 0.13,
-    "real": -2.797,
-    "realSe": 2.808,
+    "llr": -0.582,
+    "info": 0.17,
+    "real": -2.944,
+    "realSe": 2.432,
     "need": 139,
     "path": [
      [
@@ -257,6 +257,11 @@
       "2026-11-18",
       3,
       -0.418
+     ],
+     [
+      "2026-11-21",
+      4,
+      -0.582
      ]
     ]
    }
@@ -3265,19 +3270,19 @@
    "status": "on",
    "stopped": null,
    "n": 3,
-   "clvN": 2,
-   "clvRet": -0.0736,
-   "clvT": -1.9,
-   "days": 2,
-   "beat": 0.5,
-   "settled": 2,
-   "w": 2,
+   "clvN": 3,
+   "clvRet": -0.0831,
+   "clvT": -3.42,
+   "days": 3,
+   "beat": 0.333,
+   "settled": 3,
+   "w": 3,
    "l": 0,
-   "roi": 0.8075,
+   "roi": 0.8683,
    "week": {
-    "n": 2,
-    "clvRet": -0.0736,
-    "clvT": -1.9
+    "n": 3,
+    "clvRet": -0.0831,
+    "clvT": -3.42
    },
    "exp": {
     "clvRet": 0.0994,
@@ -3286,8 +3291,8 @@
     "n": 38
    },
    "vsExp": {
-    "gap": -0.173,
-    "z": -4.46,
+    "gap": -0.1825,
+    "z": -7.5,
     "read": "below the backtest"
    },
    "check": {
@@ -3327,17 +3332,17 @@
    },
    "drift": {
     "mu1": 0.0229,
-    "n": 2,
+    "n": 3,
     "sd": 0.1575,
     "rho": 0.306,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": -0.077,
-    "info": 0.04,
-    "real": -1.328,
-    "realSe": 4.861,
+    "llr": -0.223,
+    "info": 0.06,
+    "real": -3.009,
+    "realSe": 3.969,
     "need": 278,
     "path": [
      [
@@ -3349,6 +3354,11 @@
       "2026-11-20",
       2,
       -0.077
+     ],
+     [
+      "2026-11-21",
+      3,
+      -0.223
      ]
     ]
    }
@@ -3993,13 +4003,13 @@
    "sport": "cbb",
    "mk": "total",
    "label": "CBB total",
-   "n": 192,
-   "du": 121.0,
-   "clvRet": -0.012,
-   "clvT": -1.13,
-   "flat": -0.0049,
-   "adds": -0.0072,
-   "expEdge": 0.0171,
+   "n": 194,
+   "du": 122.75,
+   "clvRet": -0.0132,
+   "clvT": -1.26,
+   "flat": -0.0058,
+   "adds": -0.0074,
+   "expEdge": 0.0174,
    "basis": "backtest + live picks"
   },
   {
@@ -4031,6 +4041,7 @@
  ],
  "stopped": [],
  "flags": [
+  "pick:cbb:total",
   "pick:cbb:spread | line: 9-15",
   "pick:cbb:total | side: under",
   "pick:cbb:total | tier: mixed"
