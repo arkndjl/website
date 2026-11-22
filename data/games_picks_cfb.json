@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-22T11:15:34Z",
+ "asof": "2026-11-22T11:19:22Z",
  "recenter": {
   "week": 0.53
  },
@@ -301,7 +301,7 @@
    "mk": "total",
    "side": "over",
    "line": 52.5,
-   "price": -134.0,
+   "price": -129.0,
    "edge": 4.5,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
@@ -405,6 +405,22 @@
    "tm": 51.2
   },
   {
+   "id": "401858536",
+   "sport": "cfb",
+   "kick": "2026-11-27T17:00:00.000Z",
+   "home": "Iowa",
+   "away": "Nebraska",
+   "mk": "total",
+   "side": "over",
+   "line": 39.5,
+   "price": -114.0,
+   "edge": 0.6,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": 6.9,
+   "tm": 40.1
+  },
+  {
    "id": "401858314",
    "sport": "cfb",
    "kick": "2026-11-28T17:00:00.000Z",
@@ -412,9 +428,9 @@
    "away": "Notre Dame",
    "mk": "spread",
    "side": "away",
-   "line": 1.5,
-   "price": -7255.0,
-   "edge": 25.2,
+   "line": 3.5,
+   "price": -9900.0,
+   "edge": 27.2,
    "x": null,
    "why": "spread market off",
    "m": -23.7,
@@ -573,7 +589,7 @@
    "mk": "spread",
    "side": "home",
    "line": 14.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 3.8,
    "x": null,
    "why": "spread market off",
@@ -637,7 +653,7 @@
    "mk": "total",
    "side": "under",
    "line": 53.5,
-   "price": -129.0,
+   "price": -124.0,
    "edge": 2.4,
    "x": null,
    "why": "total market off",
@@ -659,22 +675,6 @@
    "why": "spread market off",
    "m": 1.2,
    "tm": 49.1
-  },
-  {
-   "id": "401858317",
-   "sport": "cfb",
-   "kick": "2026-11-28T20:00:00.000Z",
-   "home": "Virginia Tech",
-   "away": "Virginia",
-   "mk": "total",
-   "side": "under",
-   "line": 52.5,
-   "price": -114.0,
-   "edge": 2.3,
-   "x": null,
-   "why": "total market off",
-   "m": 1.5,
-   "tm": 50.2
   }
  ],
  "games": {
@@ -727,16 +727,16 @@
    "state": "off"
   },
   "401858536": {
-   "mk": "spread",
-   "side": "home",
-   "line": 5.5,
-   "price": -137.0,
-   "edge": 1.4,
+   "mk": "total",
+   "side": "over",
+   "line": 39.5,
+   "price": -114.0,
+   "edge": 0.6,
    "ev": null,
    "units": 0.0,
    "home": "Iowa",
    "away": "Nebraska",
-   "state": "off"
+   "state": "under"
   },
   "401858540": {
    "mk": "spread",
@@ -850,7 +850,7 @@
    "mk": "spread",
    "side": "home",
    "line": 14.5,
-   "price": -108.0,
+   "price": -106.0,
    "edge": 3.8,
    "ev": null,
    "units": 0.0,
@@ -885,9 +885,9 @@
   "401858314": {
    "mk": "spread",
    "side": "away",
-   "line": 1.5,
-   "price": -7255.0,
-   "edge": 25.2,
+   "line": 3.5,
+   "price": -9900.0,
+   "edge": 27.2,
    "ev": null,
    "units": 0.0,
    "home": "Syracuse",
@@ -922,7 +922,7 @@
    "mk": "total",
    "side": "over",
    "line": 52.5,
-   "price": -134.0,
+   "price": -129.0,
    "edge": 4.5,
    "ev": null,
    "units": 0.0,
@@ -982,7 +982,7 @@
    "mk": "total",
    "side": "under",
    "line": 53.5,
-   "price": -129.0,
+   "price": -124.0,
    "edge": 2.4,
    "ev": null,
    "units": 0.0,
@@ -1115,15 +1115,15 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 25742,
+  "snapshots": 25756,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 5206,
+    "clvN": 5210,
     "clvRet": -0.0311,
-    "clvT": -21.89,
+    "clvT": -21.93,
     "clv": 0.56,
-    "beat": 0.421,
+    "beat": 0.42,
     "still": 0.283
    },
    {
@@ -5898,7 +5898,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-22T11:15:34Z",
+ "checked": "2026-11-22T11:19:22Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
