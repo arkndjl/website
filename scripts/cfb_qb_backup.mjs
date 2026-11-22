@@ -8,6 +8,9 @@
 //   node scripts/cfb_qb_backup.mjs check <cfbd md.json.gz> # ESPN QB EPA against CFBD's season QB PPA (same ids)
 //   node scripts/cfb_qb_backup.mjs fade                    # the charge faded by games missed against the three-game cutoff
 //                                                          # -> data/cfb_qb_backup.json 'fade' (no shape beat the cutoff held out)
+//   node scripts/cfb_qb_backup.mjs era                     # games since QB1 went out weighted more: the team's residuals in them
+//                                                          # added to its margin -> data/cfb_qb_backup.json 'era' (prereg
+//                                                          # /mnt/project-files/qb-era-weight-nov22/prereg.md)
 //   node scripts/cfb_qb_backup.mjs fv                      # each QB's prior moved by his 247 composite (recruit FV input;
 //                                                          # python3 scripts/fv_games_research.py qb247 first) -> data/fv_games_research.json
 // The test: each team's QB1 before the game (most QB plays in its earlier games this season, 60 or more) and whether
@@ -75,7 +78,7 @@ if (mode === 'check') {
   process.exit(0);
 }
 
-if (mode !== 'test' && mode !== 'fv' && mode !== 'fade') { console.log('usage: build | test | check | fv | fade'); process.exit(1); }
+if (mode !== 'test' && mode !== 'fv' && mode !== 'fade' && mode !== 'era') { console.log('usage: build | test | check | fv | fade'); process.exit(1); }
 
 // ---- the test --------------------------------------------------------------------------------------------
 process.env.ONLYSHIP = '1';
@@ -211,6 +214,66 @@ if (mode === 'fade') {
   console.log('pick', pick.k, JSON.stringify(res.pickVsLive));
   const f = path.join(ROOT, 'data', 'cfb_qb_backup.json'), j = fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : {};
   j.fade = res; fs.writeFileSync(f, JSON.stringify(j, null, 1));
+  process.exit(0);
+}
+if (mode === 'era') {
+  // the games since QB1 went out weighted more (Nov 22 2026, Ohio State after Sayin): for a team whose QB1 has missed
+  // streak >= F games in a row, lam x (sum of its residuals in those games) / (n + k) onto its side of the margin,
+  // residuals against the live-charged model, earlier games only. Tune 2016-20, held 2021-26 (2026 weeks 1-10)
+  const SHIP = { ...LIVE, k: 500, repl: -0.2, cap: 10 };
+  const tuneX = x => inTune(x.S), heldX = x => inHold(x.S) && !(x.S === 2026 && (x.w ?? 0) >= 11);
+  const cmpX = (a, b, key, f) => { const A = a.filter(f), B = b.filter(f); const t = paired(A.map(x => x[key]), B.map(x => x[key]), [A.map(x => x.day), A.map(x => x.ht)]); return { d: r4(t.d), t: r2(t.t), n: A.length }; };
+  const bothX = (a, b) => ({ ll: { tune: cmpX(a, b, 'll', tuneX), held: cmpX(a, b, 'll', heldX) }, mae: { tune: cmpX(a, b, 'ae', tuneX), held: cmpX(a, b, 'ae', heldX) } });
+  const live = apply({ ...SHIP, fade: s => s < 3 ? 1 : 0 }, 'st');
+  const L = Object.fromEntries(live.map(x => [String(x.id), x]));
+  const resid = (id, t) => { const x = L[id], r = byId[id]; if (!x || !r || x.res == null) return null; const e = x.res - x.m; return String(r.h) === String(t) ? e : -e; };
+  const seq = {};
+  for (const [key, c] of Object.entries(ctx)) { const [id, t] = key.split('|'); (seq[c.S + '|' + t] ||= []).push({ id, t, c, date: Q.games[id].date }); }
+  const runR = {}, lastR = {};   // id|t -> residuals before this game: in this QB1-out run / the team's last 3 games
+  for (const xs of Object.values(seq)) {
+    xs.sort((a, b) => a.date.localeCompare(b.date));
+    let run = [], q1 = null; const all = [];
+    for (const g of xs) {
+      if (!g.c.out || g.c.q1.aid !== q1) run = [];
+      q1 = g.c.q1.aid;
+      if (g.c.out) runR[g.id + '|' + g.t] = { r: [...run], streak: g.c.streak };
+      lastR[g.id + '|' + g.t] = all.slice(-3);
+      const e = resid(g.id, g.t);
+      if (e != null) { all.push(e); if (g.c.out) run.push(e); }
+    }
+  }
+  const sum = a => a.reduce((p, q) => p + q, 0);
+  const term = (sp, id, t) => {
+    if (sp.ctrl) { const r = lastR[id + '|' + t]; return r?.length ? sp.lam * sum(r) / (r.length + sp.k) : 0; }
+    const o = runR[id + '|' + t]; if (!o || o.streak < sp.F || !o.r.length) return 0;
+    return sp.lam * sum(o.r) / (o.r.length + sp.k);
+  };
+  const withEra = sp => live.map(x => {
+    const r = byId[x.id]; if (!r) return x;
+    const g = term(sp, x.id, r.h) - term(sp, x.id, r.a); if (!g) return x;
+    const m = x.m + g, ph = phi(m / sig[x.S]);
+    return { ...x, m, ph, ll: ll(ph, x.y), ae: Math.abs(x.res - m), era: g };
+  });
+  const grid = [];
+  for (const lam of [0.25, 0.5, 0.75, 1]) for (const k of [0, 1, 2, 4]) for (const F of [1, 3]) {
+    const o = withEra({ lam, k, F });
+    grid.push({ sp: { lam, k, F }, tune: mean(o.filter(tuneX).map(x => x.ll)), held: mean(o.filter(heldX).map(x => x.ll)), n: o.filter(x => x.era).length, o });
+  }
+  grid.sort((a, b) => a.tune - b.tune);
+  const pick = grid[0];
+  const ctrl = withEra({ ...pick.sp, ctrl: true });
+  // residual slope: the era term's miss on its own games (1 = the term is the right size)
+  const sl = o => { const xs = o.filter(x => x.era && (tuneX(x) || heldX(x))); const sxx = sum(xs.map(x => x.era ** 2)), sxy = sum(xs.map(x => x.era * (x.res - (x.m - x.era)))); return { n: xs.length, b: r2(sxy / (sxx || 1)), mean: r2(mean(xs.map(x => Math.abs(x.era)))) }; };
+  const res = { asof: new Date().toISOString().slice(0, 10), prereg: 'fb7fab77537f86f5fa46fc370801ddc8623f0ab75821bad5cb914978050dbbc4',
+    runs: Object.keys(runR).length, grid: grid.map(g => ({ ...g.sp, n: g.n, tune: r4(g.tune), held: r4(g.held) })),
+    pick: pick.sp, pickVsLive: bothX(pick.o, live), slope: sl(pick.o), control: { sp: pick.sp, vsLive: bothX(ctrl, live) },
+    pass: null };
+  const P = res.pickVsLive; res.pass = P.ll.held.t < -1.96 && P.mae.held.t < 0;
+  for (const g of res.grid) console.log(JSON.stringify(g));
+  console.log('pick', JSON.stringify(res.pick), JSON.stringify(res.pickVsLive), 'slope', JSON.stringify(res.slope));
+  console.log('control', JSON.stringify(res.control.vsLive), 'PASS', res.pass);
+  const f = path.join(ROOT, 'data', 'cfb_qb_backup.json'), j = fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : {};
+  j.era = res; fs.writeFileSync(f, JSON.stringify(j, null, 1));
   process.exit(0);
 }
 if (mode === 'fv') {
