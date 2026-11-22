@@ -59,6 +59,23 @@
 {{- else }}<tr><td>--</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>{{ end }}
 </tbody></table>
 {{ partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "wave" "about" "Home games, lowest listed price from ESPN's ticket feed. VAL = 100 x expected / listed; expected from a weekday + month + opponent model fit on every listed home game") }}
+{{- else if eq $p "screen" }}
+{{- $rows := $w.film | default slice -}}
+{{- $ann := where $rows "ann" true -}}
+<div class="win" data-tab="{{ $tab }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-film"/></svg>screen.exe<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="wv-body">
+    {{- with $ann }}
+    <ol class="wv-feed wv-ann">
+    {{- range . }}
+    <li data-who="{{ delimit .who " " }}"><time>{{ with .at }}{{ substr . 5 5 }}{{ end }}</time><svg class="lg lg--xs" aria-hidden="true"><use href="{{ $lg }}{{ index .who 0 }}"/></svg><a href="{{ .u }}" target="_blank" rel="noopener" title="{{ .t }}"><span class="wv-deal">NEW</span> {{ .t }}</a><span class="src">{{ .src }}</span></li>
+    {{- end }}
+    </ol>
+    {{- end }}
+    {{ partial "wave/feed.html" (dict "items" (first 30 $rows)) }}
+  </div>
+  <div class="win__status" title="Timothée Chalamet and Robert Pattinson headlines from Deadline, Variety, IndieWire, The Hollywood Reporter (their actor feeds), /Film and Collider, last 120 days. NEW = the headline reads as a film announcement (casting, joins, to star, trailer, release date, first look, greenlit, filming)"><span>{{ len $ann }} announcements</span><span>{{ len $rows }} headlines</span>{{ partial "fresh.html" (dict "feed" "wave") }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
 {{- else if eq $p "collabs" }}
 {{- $rows := $w.collabs | default slice -}}
 <div class="win" data-tab="{{ $tab }}">
