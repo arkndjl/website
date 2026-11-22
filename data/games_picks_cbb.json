@@ -1,10 +1,10 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-22T23:01:47Z",
+ "asof": "2026-11-22T23:05:21Z",
  "recenter": {
   "2026-11-22": 1.97,
-  "2026-11-23": 1.91
+  "2026-11-23": 1.86
  },
  "monitor": {
   "clocks": {
@@ -1862,13 +1862,13 @@
    "flagged": "2026-11-22T22:39:44Z",
    "paper": true,
    "betTo": 152.0,
-   "close": 144.5,
+   "close": 150.5,
    "now": {
     "mk": "total",
     "side": "over",
-    "line": 144.5,
-    "price": -110,
-    "ev": 0.154,
+    "line": 150.5,
+    "price": -115.0,
+    "ev": 0.131,
     "units": 1.25
    }
   },
@@ -1951,6 +1951,22 @@
    "tm": 147.5
   },
   {
+   "id": "401921708",
+   "sport": "cbb",
+   "kick": "2026-11-23T22:00:00Z",
+   "home": "BYU",
+   "away": "Washington",
+   "mk": "spread",
+   "side": "home",
+   "line": 6.5,
+   "price": -283.0,
+   "edge": 5.2,
+   "x": 4.0,
+   "why": "no edge at -283",
+   "m": 11.7,
+   "tm": 161.0
+  },
+  {
    "id": "401918076",
    "sport": "cbb",
    "kick": "2026-11-23T19:30:00Z",
@@ -1981,22 +1997,6 @@
    "why": "edge under 4 (venue: neutral)",
    "m": 2.8,
    "tm": 149.0
-  },
-  {
-   "id": "401921708",
-   "sport": "cbb",
-   "kick": "2026-11-23T22:00:00Z",
-   "home": "BYU",
-   "away": "Washington",
-   "mk": "total",
-   "side": "under",
-   "line": 165.5,
-   "price": -129.0,
-   "edge": 4.5,
-   "x": 5.0,
-   "why": "edge under 5 (tier: power)",
-   "m": 11.7,
-   "tm": 161.0
   },
   {
    "id": "401926774",
@@ -2039,7 +2039,7 @@
    "mk": "total",
    "side": "under",
    "line": 158.5,
-   "price": -110,
+   "price": -110.0,
    "edge": 4.3,
    "x": 6.5,
    "why": "edge under 6.5 (side: under)",
@@ -2079,22 +2079,6 @@
    "tm": 140.6
   },
   {
-   "id": "401913102",
-   "sport": "cbb",
-   "kick": "2026-11-24T01:00:00Z",
-   "home": "North Carolina",
-   "away": "Monmouth",
-   "mk": "total",
-   "side": "under",
-   "line": 153.5,
-   "price": -110,
-   "edge": 3.1,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": 20.7,
-   "tm": 150.4
-  },
-  {
    "id": "401919020",
    "sport": "cbb",
    "kick": "2026-11-23T00:00:00Z",
@@ -2125,6 +2109,22 @@
    "why": "edge under 6.5 (side: under)",
    "m": 0.3,
    "tm": 151.0
+  },
+  {
+   "id": "401913102",
+   "sport": "cbb",
+   "kick": "2026-11-24T01:00:00Z",
+   "home": "North Carolina",
+   "away": "Monmouth",
+   "mk": "total",
+   "side": "under",
+   "line": 152.5,
+   "price": -105.0,
+   "edge": 2.1,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": 20.7,
+   "tm": 150.4
   }
  ],
  "games": {
@@ -2240,7 +2240,7 @@
    "mk": "total",
    "side": "under",
    "line": 158.5,
-   "price": -110,
+   "price": -110.0,
    "edge": 4.3,
    "ev": null,
    "units": 0.0,
@@ -2249,11 +2249,11 @@
    "state": "under"
   },
   "401921708": {
-   "mk": "total",
-   "side": "under",
-   "line": 165.5,
-   "price": -129.0,
-   "edge": 4.5,
+   "mk": "spread",
+   "side": "home",
+   "line": 6.5,
+   "price": -283.0,
+   "edge": 5.2,
    "ev": null,
    "units": 0.0,
    "home": "BYU",
@@ -2263,12 +2263,12 @@
   "401921658": {
    "mk": "total",
    "side": "over",
-   "line": 144.5,
-   "price": -110,
-   "ev": 0.154,
-   "edge": 14.8,
+   "line": 150.5,
+   "price": -115.0,
+   "ev": 0.131,
+   "edge": 8.8,
    "units": 1.25,
-   "bk": "poly",
+   "bk": "dk",
    "home": "Oregon State",
    "away": "Tulsa",
    "state": "paper"
@@ -2276,9 +2276,9 @@
   "401913102": {
    "mk": "total",
    "side": "under",
-   "line": 153.5,
-   "price": -110,
-   "edge": 3.1,
+   "line": 152.5,
+   "price": -105.0,
+   "edge": 2.1,
    "ev": null,
    "units": 0.0,
    "home": "North Carolina",
@@ -2338,7 +2338,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 23175,
+  "snapshots": 23181,
   "buckets": [
    {
     "when": "24h+",
@@ -2353,7 +2353,7 @@
     "when": "6-24h",
     "clvN": 4591,
     "clvRet": 0.0005,
-    "clvT": 0.25,
+    "clvT": 0.26,
     "clv": 0.73,
     "beat": 0.42,
     "still": 0.399
@@ -18459,7 +18459,7 @@
    "flagged": "2026-11-22T22:39:44Z",
    "paper": true,
    "betTo": 152.0,
-   "close": 144.5
+   "close": 150.5
   }
  ],
  "withdrawnLog": [
@@ -20503,7 +20503,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-22T23:01:47Z",
+ "checked": "2026-11-22T23:05:21Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
