@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-22T08:59:21Z",
+ "asof": "2026-11-22T09:02:53Z",
  "recenter": {
-  "2026-11-22": 1.8
+  "2026-11-22": 1.77
  },
  "monitor": {
   "clocks": {
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-22T01:38:55Z",
-  "ageH": 7.3,
+  "ageH": 7.4,
   "stale": false
  },
  "picks": [],
@@ -1860,7 +1860,7 @@
    "flagged": "2026-11-22T01:41:51Z",
    "paper": true,
    "betTo": 142.5,
-   "close": 141.5,
+   "close": 144.5,
    "now": null
   },
   {
@@ -1896,7 +1896,7 @@
     "side": "under",
     "line": 147.5,
     "price": -119.0,
-    "ev": 0.123,
+    "ev": 0.122,
     "units": 0.25
    }
   }
@@ -1966,22 +1966,6 @@
    "why": "no edge at -114",
    "m": -3.8,
    "tm": 137.7
-  },
-  {
-   "id": "401929202",
-   "sport": "cbb",
-   "kick": "2026-11-22T20:30:00Z",
-   "home": "Texas State",
-   "away": "McNeese",
-   "mk": "total",
-   "side": "over",
-   "line": 141.5,
-   "price": -138.0,
-   "edge": 8.4,
-   "x": 7.0,
-   "why": "no edge at -138",
-   "m": 4.9,
-   "tm": 149.9
   },
   {
    "id": "401921206",
@@ -2078,6 +2062,22 @@
    "why": "edge under 6.5 (side: under)",
    "m": 36.8,
    "tm": 134.4
+  },
+  {
+   "id": "401929202",
+   "sport": "cbb",
+   "kick": "2026-11-22T20:30:00Z",
+   "home": "Texas State",
+   "away": "McNeese",
+   "mk": "total",
+   "side": "over",
+   "line": 144.5,
+   "price": -110.0,
+   "edge": 5.4,
+   "x": 7.0,
+   "why": "edge under 7",
+   "m": 4.9,
+   "tm": 149.9
   },
   {
    "id": "401918988",
@@ -2192,6 +2192,22 @@
    "tm": 138.6
   },
   {
+   "id": "401928802",
+   "sport": "cbb",
+   "kick": "2026-11-22T19:00:00Z",
+   "home": "Western Kentucky",
+   "away": "George Washington",
+   "mk": "total",
+   "side": "under",
+   "line": 148.5,
+   "price": -119.0,
+   "edge": 3.7,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": -4.7,
+   "tm": 144.8
+  },
+  {
    "id": "401918455",
    "sport": "cbb",
    "kick": "2026-11-22T19:00:00Z",
@@ -2256,22 +2272,6 @@
    "tm": 135.8
   },
   {
-   "id": "401928802",
-   "sport": "cbb",
-   "kick": "2026-11-22T19:00:00Z",
-   "home": "Western Kentucky",
-   "away": "George Washington",
-   "mk": "total",
-   "side": "under",
-   "line": 147.5,
-   "price": -106.0,
-   "edge": 2.7,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": -4.7,
-   "tm": 144.8
-  },
-  {
    "id": "401922252",
    "sport": "cbb",
    "kick": "2026-11-22T20:00:00Z",
@@ -2280,7 +2280,7 @@
    "mk": "total",
    "side": "over",
    "line": 141.5,
-   "price": -119.0,
+   "price": -124.0,
    "edge": 2.9,
    "x": 7.0,
    "why": "edge under 7",
@@ -2344,9 +2344,9 @@
   "401929202": {
    "mk": "total",
    "side": "over",
-   "line": 141.5,
-   "price": -138.0,
-   "edge": 8.4,
+   "line": 144.5,
+   "price": -110.0,
+   "edge": 5.4,
    "ev": null,
    "units": 0.0,
    "home": "Texas State",
@@ -2356,9 +2356,9 @@
   "401928802": {
    "mk": "total",
    "side": "under",
-   "line": 147.5,
-   "price": -106.0,
-   "edge": 2.7,
+   "line": 148.5,
+   "price": -119.0,
+   "edge": 3.7,
    "ev": null,
    "units": 0.0,
    "home": "Western Kentucky",
@@ -2526,7 +2526,7 @@
    "side": "under",
    "line": 147.5,
    "price": -119.0,
-   "ev": 0.123,
+   "ev": 0.122,
    "edge": 8.3,
    "units": 0.25,
    "bk": "poly",
@@ -2634,7 +2634,7 @@
    "mk": "total",
    "side": "over",
    "line": 141.5,
-   "price": -119.0,
+   "price": -124.0,
    "edge": 2.9,
    "ev": null,
    "units": 0.0,
@@ -2815,7 +2815,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 22778,
+  "snapshots": 22783,
   "buckets": [
    {
     "when": "24h+",
@@ -2828,9 +2828,9 @@
    },
    {
     "when": "6-24h",
-    "clvN": 4539,
+    "clvN": 4540,
     "clvRet": -0.0007,
-    "clvT": -0.35,
+    "clvT": -0.36,
     "clv": 0.7,
     "beat": 0.413,
     "still": 0.404
@@ -18839,7 +18839,7 @@
    "flagged": "2026-11-22T01:41:51Z",
    "paper": true,
    "betTo": 142.5,
-   "close": 141.5
+   "close": 144.5
   },
   {
    "id": "401926774",
@@ -20912,7 +20912,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-22T08:59:21Z",
+ "checked": "2026-11-22T09:02:53Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {
