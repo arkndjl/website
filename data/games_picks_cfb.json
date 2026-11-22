@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-22T18:50:03Z",
+ "asof": "2026-11-22T18:53:58Z",
  "recenter": {
   "week": 0.4
  },
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-22",
-  "ageH": -5.2,
+  "ageH": -5.1,
   "stale": false
  },
  "picks": [],
@@ -373,22 +373,6 @@
    "tm": 60.9
   },
   {
-   "id": "401856764",
-   "sport": "cfb",
-   "kick": "2026-11-28T20:00:00.000Z",
-   "home": "Clemson",
-   "away": "South Carolina",
-   "mk": "total",
-   "side": "over",
-   "line": 42.5,
-   "price": 120.0,
-   "edge": 4.1,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": -3.8,
-   "tm": 46.6
-  },
-  {
    "id": "401856762",
    "sport": "cfb",
    "kick": "2026-11-27T17:00:00.000Z",
@@ -429,7 +413,7 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -152.0,
+   "price": -146.0,
    "edge": 3.7,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
@@ -581,20 +565,20 @@
    "tm": 52.5
   },
   {
-   "id": "401862838",
+   "id": "401856764",
    "sport": "cfb",
-   "kick": "2026-11-27T20:30:00.000Z",
-   "home": "Memphis",
-   "away": "Temple",
+   "kick": "2026-11-28T20:00:00.000Z",
+   "home": "Clemson",
+   "away": "South Carolina",
    "mk": "spread",
-   "side": "home",
-   "line": -2.5,
-   "price": -7255.0,
-   "edge": 21.8,
+   "side": "away",
+   "line": 17.5,
+   "price": -5413.0,
+   "edge": 21.3,
    "x": null,
    "why": "spread market off",
-   "m": 19.3,
-   "tm": 58.5
+   "m": -3.8,
+   "tm": 46.6
   },
   {
    "id": "401858316",
@@ -611,6 +595,22 @@
    "why": "spread market off",
    "m": -7.8,
    "tm": 56.2
+  },
+  {
+   "id": "401862838",
+   "sport": "cfb",
+   "kick": "2026-11-27T20:30:00.000Z",
+   "home": "Memphis",
+   "away": "Temple",
+   "mk": "spread",
+   "side": "home",
+   "line": -1.5,
+   "price": -7255.0,
+   "edge": 20.8,
+   "x": null,
+   "why": "spread market off",
+   "m": 19.3,
+   "tm": 58.5
   },
   {
    "id": "401864549",
@@ -754,7 +754,7 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -152.0,
+   "price": -146.0,
    "edge": 3.7,
    "ev": null,
    "units": 0.0,
@@ -823,23 +823,23 @@
    "state": "off"
   },
   "401856764": {
-   "mk": "total",
-   "side": "over",
-   "line": 42.5,
-   "price": 120.0,
-   "edge": 4.1,
+   "mk": "spread",
+   "side": "away",
+   "line": 17.5,
+   "price": -5413.0,
+   "edge": 21.3,
    "ev": null,
    "units": 0.0,
    "home": "Clemson",
    "away": "South Carolina",
-   "state": "under"
+   "state": "off"
   },
   "401856873": {
    "mk": "total",
    "side": "under",
-   "line": 56.5,
-   "price": -133.0,
-   "edge": 4.0,
+   "line": 55.5,
+   "price": -134.0,
+   "edge": 3.0,
    "ev": null,
    "units": 0.0,
    "home": "Arizona",
@@ -1114,7 +1114,7 @@
    "mk": "total",
    "side": "under",
    "line": 54.5,
-   "price": -110.0,
+   "price": -119.0,
    "edge": 4.4,
    "ev": null,
    "units": 0.0,
@@ -1269,9 +1269,9 @@
   "401862838": {
    "mk": "spread",
    "side": "home",
-   "line": -2.5,
+   "line": -1.5,
    "price": -7255.0,
-   "edge": 21.8,
+   "edge": 20.8,
    "ev": null,
    "units": 0.0,
    "home": "Memphis",
@@ -1330,7 +1330,7 @@
    "mk": "spread",
    "side": "home",
    "line": 4.5,
-   "price": -122.0,
+   "price": -124.0,
    "edge": 2.4,
    "ev": null,
    "units": 0.0,
@@ -1438,7 +1438,7 @@
    "mk": "spread",
    "side": "home",
    "line": 1.5,
-   "price": -122.0,
+   "price": -124.0,
    "edge": 5.8,
    "ev": null,
    "units": 0.0,
@@ -1511,16 +1511,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 26095,
+  "snapshots": 26125,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 5324,
-    "clvRet": -0.0281,
-    "clvT": -18.14,
-    "clv": 0.64,
+    "clvN": 5333,
+    "clvRet": -0.0282,
+    "clvT": -18.38,
+    "clv": 0.63,
     "beat": 0.42,
-    "still": 0.287
+    "still": 0.288
    },
    {
     "when": "6-24h",
@@ -6294,7 +6294,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-22T18:50:03Z",
+ "checked": "2026-11-22T18:53:58Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
