@@ -146,6 +146,25 @@ SUGGEST = [
 ]
 TAG_WORDS = r'\b(goth\w*|dark|black|leather|grunge|punk|oversized|boxy|baggy|skinny|slim|flare\w*|denim|distressed|archive|runway|capsule|collection|collab\w*|drop|FW\d\d|SS\d\d|fall|winter|spring|summer)\b'
 
+# Actors (Noah, Nov 22): new film announcements. Each actor's tag feed on the trades plus two general film feeds;
+# an item counts only when its title names the actor; ANN = the title reads as an announcement (ANN_WORDS).
+ACTORS = [
+    {'id': 'pattinson', 'name': 'ROBERT PATTINSON', 'kind': 'actor', 'terms': [r'Pattinson'], 'tag': 'robert-pattinson'},
+    {'id': 'chalamet', 'name': 'TIMOTHÉE CHALAMET', 'kind': 'actor', 'terms': [r'Chalamet'], 'tag': 'timothee-chalamet'},
+]
+FILM_FEEDS = [
+    {'n': 'Deadline', 'u': 'https://deadline.com/tag/{tag}/feed/'},
+    {'n': 'Variety', 'u': 'https://variety.com/t/{tag}/feed/'},
+    {'n': 'IndieWire', 'u': 'https://www.indiewire.com/t/{tag}/feed/'},
+    {'n': 'The Hollywood Reporter', 'u': 'https://www.hollywoodreporter.com/t/{tag}/feed/'},
+    {'n': '/Film', 'u': 'https://www.slashfilm.com/feed/'},
+    {'n': 'Collider', 'u': 'https://collider.com/feed/'},
+]
+ANN_WORDS = (r'\b(cast as|is cast|joins|joined|to star|set to star|will star|stars? opposite|to play|will play|in talks|'
+             r'in negotiations|boards|signs on|attached to|lands|becomes|first[- ]look|trailer|teaser|release date|sets? date|'
+             r'dated|title (reveal|revealed)|titled|greenlit|green-?lights?|wraps|begins? (filming|production|shooting)|'
+             r'starts? (filming|production|shooting)|next (film|movie|project)|new (film|movie|project)|lead role|leads)\b')
+
 KEYS = {'TICKETMASTER_API_KEY': 'every NYC Ticketmaster show for the ARKLIBRARY bands (free key at developer.ticketmaster.com)'}
 
 # ------------------------------------------------------------------ helpers
@@ -666,6 +685,39 @@ def run():
                     collabs.append({'t': it['t'].title(), 'u': it['u'], 'img': it['img'], 'at': d['d'] + 'T12:00Z', 'src': "'47", 'who': [t['id']], 'k': 'f', 'price': it.get('price')})
     collabs.sort(key=lambda x: x.get('at') or '', reverse=True)
 
+    # 2b. actors: film announcements
+    film = []
+    seen_f = set()
+    for a in ACTORS:
+        rx = word_rx(a['terms'], case=True)
+        for f in FILM_FEEDS:
+            u = f['u'].format(tag=a['tag'])
+            if u in seen_f and '{tag}' not in f['u']:
+                its = state.get('keep_feed', {}).get('film:' + u, [])
+            else:
+                seen_f.add(u)
+                try:
+                    its = rss({'n': f['n'], 'u': u, 'k': 'v'})
+                    state.setdefault('keep_feed', {})['film:' + u] = its[:40]
+                    status(f"{f['n']} {a['id'] if '{tag}' in f['u'] else 'film'}", 'film', True, len(its), u=u)
+                except Exception as e:
+                    its = state.get('keep_feed', {}).get('film:' + u, [])
+                    status(f"{f['n']} {a['id'] if '{tag}' in f['u'] else 'film'}", 'film', False, 0, e, u=u)
+            for it in its:
+                if rx.search(it['t']) and (parse_time(it.get('at')) or NOW) >= NOW - dt.timedelta(days=120):
+                    film.append({**it, 'who': [a['id']], 'ann': bool(re.search(ANN_WORDS, it['t'], re.I))})
+    byu = {}
+    for x in state.get('keep_film', []) + film:
+        if (parse_time(x.get('at')) or NOW) >= NOW - dt.timedelta(days=120):
+            if x['u'] in byu:
+                byu[x['u']]['who'] = sorted(set(byu[x['u']]['who']) | set(x['who']))
+            else:
+                byu[x['u']] = dict(x)
+    film = sorted(byu.values(), key=lambda x: x.get('at') or '', reverse=True)
+    for x in film:   # re-read every time, so a change to ANN_WORDS applies to kept items too
+        x['ann'] = bool(re.search(ANN_WORDS, x['t'], re.I))
+    state['keep_film'] = film[:200]
+
     # 3. shows
     shows = []
     for v in VENUES:
@@ -763,12 +815,13 @@ def run():
     def last_of(wid):
         ts = [d['d'] + 'T12:00Z' for d in drops + merch if d['who'] == wid] + [x['at'] for x in news if wid in x['who'] and x.get('at')]
         ts += [s['at'] for s in shows if s['who'] == wid]
+        ts += [x['at'] for x in film if wid in x['who'] and x.get('at')]
         return max(ts) if ts else None
     wall = []
-    for o in BRANDS + TEAMS + bands:
+    for o in BRANDS + TEAMS + ACTORS + bands:
         wid = o['id']
         n_items = sum(d['n'] for d in drops + merch if d['who'] == wid)
-        n_news = sum(1 for x in news + collabs if wid in x['who'])
+        n_news = sum(1 for x in news + collabs + film if wid in x['who'])
         n_shows = sum(1 for s in shows if s['who'] == wid)
         n_promo = len(promos) if wid == 'mets' else 0
         wall.append({'id': wid, 'name': o['name'], 'kind': o['kind'], 'items': n_items, 'news': n_news, 'shows': n_shows,
@@ -791,6 +844,7 @@ def run():
         'collabs': trim(collabs, 40, nk),
         'suggested': sugg,
         'collections': trim(colls, 30, nk + ('r',)),
+        'film': trim(film, 60, nk + ('ann',)),
         'sources': STATUS,
         'keys': [{'k': k, 'w': KEYS[k]} for k in missing],
     }

@@ -318,12 +318,25 @@ def logos():
         g.rect(x, 33, 2, 1, A)
     shadow(g, P)
     X['thefashion'] = g
+    for aid, (first, last) in (('pattinson', ('ROBERT', 'PATTINSON')), ('chalamet', ('TIMOTHEE', 'CHALAMET'))):
+        g = pa.Grid(S, S)                                 # a film strip with a clapper, the actor's name under it
+        g.rect(6, 4, 36, 18, L); g.rect(6, 7, 36, 12, D)
+        for x in range(8, 41, 5):
+            g.rect(x, 5, 2, 1, D); g.rect(x, 20, 2, 1, D)
+        g.poly([(14, 17), (14, 10), (30, 8), (30, 15)], A)  # the slate
+        for x in (17, 22, 27):
+            line(g, x, 10, x + 2, 15, D)
+        g.rect(31, 9, 6, 7, M); g.disc(34, 12.5, 2, L)       # the lens
+        cput(g, 27, first, A, F3, 1, track=1)
+        cput(g, 35, last, L, F3, 1, track=1)
+        shadow(g, P, of={A, L})
+        X[aid] = g
     return X
 
 
 def all_logos():
     X = logos()
-    ids = [b['id'] for b in wave.BRANDS] + [t['id'] for t in wave.TEAMS]
+    ids = [b['id'] for b in wave.BRANDS] + [t['id'] for t in wave.TEAMS] + [a['id'] for a in wave.ACTORS]
     bands = [b['name'] for b in wave.library_bands()]
     for i, name in enumerate(bands):
         sid = wave.slug(name)

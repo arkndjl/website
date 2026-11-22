@@ -11,10 +11,11 @@ draft = false
 
 {{< arkndjlnav >}}
 {{< arkndjlwave >}}
-{{< wintabs tabs="drops,merch,shows,mets knicks,suggested" label="WAVE" >}}
+{{< wintabs tabs="drops,merch,shows,screen,mets knicks,suggested" label="WAVE" >}}
 {{< wavepanel p="drops" >}}
 {{< wavepanel p="merch" >}}
 {{< wavepanel p="shows" >}}
+{{< wavepanel p="screen" >}}
 {{< wintabs tab="mets knicks" tabs="tickets,promos,collabs" sub="true" >}}
 {{< wavepanel p="tickets" >}}
 {{< wavepanel p="promos" >}}
