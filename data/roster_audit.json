@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-22T17:03Z",
+ "asof": "2026-11-22T17:12Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -74,7 +74,7 @@
     },
     "static/data/nba-xpm/2027.json": {
      "flags": 3,
-     "rows": 473
+     "rows": 474
     },
     "static/data/pctl-nba.json": {
      "flags": 3,
@@ -287,13 +287,13 @@
    ],
    "joined": 0,
    "players": 603,
-   "rows": 2050
+   "rows": 2051
   },
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
      "flags": 10,
-     "rows": 2159
+     "rows": 2163
     },
     "static/data/nfl-fantasy.json": {
      "flags": 10,
@@ -4387,13 +4387,13 @@
     }
    ],
    "joined": 0,
-   "players": 2297,
-   "rows": 8090
+   "players": 2298,
+   "rows": 8094
   },
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 2,
+     "flags": 0,
      "rows": 637
     },
     "static/data/lines/nhl.json": {
@@ -4402,54 +4402,18 @@
     },
     "static/data/nhl-war/2027.json": {
      "flags": 2,
-     "rows": 861
+     "rows": 863
     },
     "static/data/pctl-nhl.json": {
-     "flags": 1,
-     "rows": 360
+     "flags": 0,
+     "rows": 357
     },
     "static/data/xaav-nhl.json": {
-     "flags": 12,
+     "flags": 11,
      "rows": 850
     }
    },
    "flags": [
-    {
-     "d": "2026-11-22",
-     "field": "depth",
-     "file": "static/data/depth/nhl.json",
-     "flag": "minors",
-     "head": "Dropped to AHL",
-     "kind": "down",
-     "move": {
-      "d": "2026-11-22",
-      "head": "Dropped to AHL",
-      "kind": "down"
-     },
-     "pid": "6309",
-     "player": "Brett Berard",
-     "pos": "LW",
-     "rotowire": "MTL",
-     "site": "MTL"
-    },
-    {
-     "d": "2026-11-22",
-     "field": "depth",
-     "file": "static/data/depth/nhl.json",
-     "flag": "minors",
-     "head": "Sent to AHL",
-     "kind": "down",
-     "move": {
-      "d": "2026-11-22",
-      "head": "Sent to AHL",
-      "kind": "down"
-     },
-     "pid": "6921",
-     "player": "David Reinbacher",
-     "pos": "RD",
-     "rotowire": "MTL",
-     "site": "MTL"
-    },
     {
      "d": "2026-11-13",
      "field": "tm",
@@ -4502,24 +4466,6 @@
      "player": "K'Andre Miller",
      "pos": "D",
      "rotowire": "CAR",
-     "site": "FA"
-    },
-    {
-     "d": "2026-11-21",
-     "field": "tm",
-     "file": "static/data/xaav-nhl.json",
-     "flag": "moved",
-     "head": "Missing Saturday's clash",
-     "kind": null,
-     "move": {
-      "d": "2026-11-19",
-      "head": "Departs Thursday's game",
-      "kind": "exit"
-     },
-     "pid": "4150",
-     "player": "Ryan Pulock",
-     "pos": "D",
-     "rotowire": "NYI",
      "site": "FA"
     },
     {
@@ -4701,29 +4647,11 @@
      "pos": "C",
      "rotowire": "FA",
      "site": "FA"
-    },
-    {
-     "d": "2026-11-13",
-     "field": "tm",
-     "file": "static/data/pctl-nhl.json",
-     "flag": "released",
-     "head": "Two-point effort in Finland",
-     "kind": "exit",
-     "move": {
-      "d": "2026-11-13",
-      "head": "Two-point effort in Finland",
-      "kind": "exit"
-     },
-     "pid": "5744",
-     "player": "K'Andre Miller",
-     "pos": "D",
-     "rotowire": "CAR",
-     "site": "CAR"
     }
    ],
    "joined": 0,
    "players": 1428,
-   "rows": 2740
+   "rows": 2739
   }
  }
 }
