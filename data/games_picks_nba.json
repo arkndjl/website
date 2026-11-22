@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-22T03:36:23Z",
+ "asof": "2026-11-22T06:02:53Z",
  "recenter": {
-  "2026-11-22": 1.43
+  "2026-11-22": 1.44
  },
  "monitor": {
   "clocks": {
@@ -328,7 +328,7 @@
  },
  "model": {
   "asof": "2026-11-22T03:31:25Z",
-  "ageH": 0.1,
+  "ageH": 2.5,
   "stale": false
  },
  "picks": [],
@@ -384,6 +384,22 @@
    "tm": 222.8
   },
   {
+   "id": "401910030",
+   "sport": "nba",
+   "kick": "2026-11-22T23:00:00Z",
+   "home": "MIA",
+   "away": "OKC",
+   "mk": "total",
+   "side": "over",
+   "line": 231.5,
+   "price": -110.0,
+   "edge": 2.0,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: over)",
+   "m": 2.4,
+   "tm": 233.5
+  },
+  {
    "id": "401910031",
    "sport": "nba",
    "kick": "2026-11-23T00:00:00Z",
@@ -398,22 +414,6 @@
    "why": "edge under 6.5 (side: over)",
    "m": -4.2,
    "tm": 223.0
-  },
-  {
-   "id": "401910030",
-   "sport": "nba",
-   "kick": "2026-11-22T23:00:00Z",
-   "home": "MIA",
-   "away": "OKC",
-   "mk": "total",
-   "side": "over",
-   "line": 232.5,
-   "price": -106.0,
-   "edge": 1.0,
-   "x": 6.0,
-   "why": "edge under 6 (total: high)",
-   "m": 2.4,
-   "tm": 233.5
   }
  ],
  "games": {
@@ -432,9 +432,9 @@
   "401910030": {
    "mk": "total",
    "side": "over",
-   "line": 232.5,
-   "price": -106.0,
-   "edge": 1.0,
+   "line": 231.5,
+   "price": -110.0,
+   "edge": 2.0,
    "ev": null,
    "units": 0.0,
    "home": "MIA",
@@ -530,7 +530,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 5255,
+  "snapshots": 5259,
   "buckets": [
    {
     "when": "24h+",
@@ -543,9 +543,9 @@
    },
    {
     "when": "6-24h",
-    "clvN": 1154,
-    "clvRet": -0.0198,
-    "clvT": -5.34,
+    "clvN": 1155,
+    "clvRet": -0.0199,
+    "clvT": -5.35,
     "clv": 0.42,
     "beat": 0.441,
     "still": 0.384
@@ -7205,7 +7205,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-22T03:36:23Z",
+ "checked": "2026-11-22T06:02:53Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
