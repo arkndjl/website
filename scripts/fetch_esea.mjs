@@ -374,6 +374,15 @@ const me = await api(`/players?nickname=${encodeURIComponent(PLAYER)}`);
 // own FACEIT competition). Found in the player's match history; remembered between runs.
 const champs = new Map((prev.season === SEASON ? prev.championships || [] : []).map(c => [c.id, c]));
 if (process.env.ESEA_CHAMPIONSHIP) champs.set(process.env.ESEA_CHAMPIONSHIP, { id: process.env.ESEA_CHAMPIONSHIP });
+// a FACEIT match room link in data/cs.json "eseaPlayoffs" names its championship (playoffs FACEIT has not published)
+const csCfg = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cs.json'), 'utf8')); } catch { return {}; } })();
+const ROOM = /room\/(1-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i;
+for (const g of [].concat(csCfg.eseaPlayoffs || [], process.env.ESEA_PLAYOFFS || [])) {
+  const mid = (ROOM.exec(g) || [])[1]; if (!mid) continue;
+  const m = await api(`/matches/${mid}`).catch(() => null);
+  if (m?.competition_id && isSeason(m.competition_name)) champs.set(m.competition_id, { id: m.competition_id, name: m.competition_name });
+  console.log('room', mid, '->', m?.competition_name || 'not found');
+}
 if (me?.player_id) {
   const hist = await pages(`/players/${me.player_id}/history?game=cs2`, 300);
   for (const m of hist) if (m.competition_type === 'championship' && isSeason(m.competition_name)) champs.set(m.competition_id, { id: m.competition_id, name: m.competition_name });
@@ -450,6 +459,7 @@ for (const c of champs.values()) if (isPo(c.name)) poC.set(c.id, { id: c.id, nam
 try {
   const cs = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cs.json'), 'utf8'));
   for (const g of [].concat(cs.eseaPlayoffs || [], process.env.ESEA_PLAYOFFS || [])) {
+    if (ROOM.test(g)) continue;   // room links were resolved to their championship above
     const id = (/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i.exec(g) || [])[1];
     if (id && !poC.has(id)) poC.set(id, { id, name: null });
   }
