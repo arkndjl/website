@@ -1976,7 +1976,6 @@ function bracket() {
       const opp = feed(cur.r, sib);
       let p = null;
       if (opp.id && QUOTE) { try { const q = QUOTE({ t1: TEAM_ID, t2: opp.id, at: Math.floor((nx?.at || Date.now()) / 1000), div: 'main', bo: 3, ros: [new Set(), new Set()] }); p = q ? Math.round(q.p * 1000) / 1000 : null; } catch (e) { console.log('next quote:', e.message); } }
-      if (nx && p != null && !nx.p) nx.p = nx.a.id === TEAM_ID ? p : 1 - p;
       next = { n: nx?.n || lab(cur.r + 1, k2), at: nx?.at || null, opp, p, from: cur.n };
     }
   } else for (const m of ms) if (m.pos) m.n = `${m.g === 1 ? 'UB' : m.g === 2 ? 'LB' : 'GF'}${m.pos}`;
