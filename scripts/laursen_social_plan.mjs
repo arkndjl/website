@@ -16,6 +16,11 @@ const isoDur = s => { const m = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/.exec(s || 
 const twDur = s => { const m = /(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?/.exec(s || ''); return m ? (+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0) : null; };
 async function json(u, opt = {}) { try { const r = await fetch(u, opt); return r.ok ? await r.json() : null; } catch { return null; } }
 
+// A Short answers youtube.com/shorts/<id> with 200; a long video redirects to /watch (a long video can be under 3 min).
+async function isShort(id) {
+  try { const r = await fetch(`https://www.youtube.com/shorts/${id}`, { method: 'HEAD', redirect: 'manual' }); return r.status === 200; } catch { return true; }
+}
+
 export async function youtube(prev, now, get, ch = YT_CH) {
   const yt = { ...(prev.yt || {}) }; let src = null;
   const seen = {};
@@ -29,7 +34,7 @@ export async function youtube(prev, now, get, ch = YT_CH) {
     for (let i = 0; i < ids.length; i += 50) {
       const j = await json(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id=${ids.slice(i, i + 50).join(',')}&key=${key}`);
       for (const v of j?.items || []) { const dur = isoDur(v.contentDetails.duration);
-        seen[v.id] = { title: v.snippet.title, pub: Date.parse(v.snippet.publishedAt), short: dur != null && dur <= 180, dur, views: +v.statistics.viewCount || 0, likes: +v.statistics.likeCount || 0, comments: +v.statistics.commentCount || 0 }; }
+        seen[v.id] = { title: v.snippet.title, pub: Date.parse(v.snippet.publishedAt), short: yt[v.id]?.short ?? (dur != null && dur <= 180 && await isShort(v.id)), dur, views: +v.statistics.viewCount || 0, likes: +v.statistics.likeCount || 0, comments: +v.statistics.commentCount || 0 }; }
     }
     if (Object.keys(seen).length) src = 'api';
   }

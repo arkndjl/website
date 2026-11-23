@@ -1,0 +1,65 @@
+{{- /* Home page video.exe: newest long-form YouTube uploads (no Shorts) from LAURSEN_111 and ARKNDJL, newest in the
+       player. Data: data/laursen_socials.json + data/arkndjl_socials.json `yt` (channel RSS every 20 min in esea.yml;
+       short = the feed's /shorts/ link, or the API check in scripts/laursen_social_plan.mjs). */ -}}
+{{- $chs := slice (dict "k" "laursen" "n" "LAURSEN_111" "h" "LAURSEN_111" "yt" site.Data.laursen_socials.yt) (dict "k" "arkndjl" "n" "ARKNDJL" "h" "ARKNDJL" "yt" site.Data.arkndjl_socials.yt) -}}
+{{- $v := slice -}}
+{{- range $chs }}{{ $c := . }}
+  {{- range $id, $x := .yt }}
+    {{- if and (not $x.short) (not (findRE `(?i)#shorts?\b` $x.title)) $x.pub }}
+      {{- $v = $v | append (dict "id" $id "t" $x.title "pub" $x.pub "k" $c.k "n" $c.n) }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+{{- $v = sort $v "pub" "desc" -}}
+{{- $show := 8 -}}
+{{- with $v }}
+<div class="win vods hvid" id="video">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-youtube"/></svg>video.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="hvid__chips" role="group" aria-label="channel">
+    <button type="button" data-ch="" aria-pressed="true">all</button>
+    {{- range $chs }}<button type="button" data-ch="{{ .k }}" aria-pressed="false">{{ .n }}</button>{{ end }}
+  </div>
+  {{- $f := index . 0 }}
+  <div class="vods__player"><iframe src="https://www.youtube-nocookie.com/embed/{{ $f.id }}" title="{{ $f.t }}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; fullscreen" allowfullscreen></iframe></div>
+  <ol class="vods__grid" data-show="{{ $show }}">
+    {{- range $i, $x := . }}
+    <li data-ch="{{ .k }}"{{ if ge $i $show }} hidden{{ end }}><a href="https://www.youtube.com/watch?v={{ .id }}" data-vid="{{ .id }}"{{ if eq $i 0 }} class="is-on"{{ end }} rel="noopener">
+      <span class="vods__th"><img src="https://i.ytimg.com/vi/{{ .id }}/mqdefault.jpg" alt="" width="320" height="180" loading="lazy"></span>
+      <span class="vods__t">{{ .t }}</span>
+      <span class="vods__d"><b class="hvid__ch hvid__ch--{{ .k }}">{{ .n }}</b><i>{{ (time.AsTime (int (div .pub 1000))).Format "Jan 2 2006" }}</i></span>
+    </a></li>
+    {{- end }}
+  </ol>
+  <div class="win__status"><span>{{ range $i, $c := $chs }}{{ if $i }} · {{ end }}<a href="https://www.youtube.com/@{{ .h }}/videos" target="_blank" rel="noopener">@{{ .h }} ↗</a>{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{ partial "vods-assets.html" . }}
+<style>
+.hvid{margin:0 0 40px}
+.hvid__chips{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px 0}
+.hvid__chips button{font:inherit;font-size:.8em;letter-spacing:.06em;padding:3px 10px;cursor:pointer;color:var(--foreground);background:var(--win-well);border:0;box-shadow:inset -2px -2px 0 var(--win-dark),inset 2px 2px 0 var(--win-light)}
+.hvid__chips button[aria-pressed="true"]{color:#000;background:#c8c7ff;box-shadow:inset 2px 2px 0 var(--win-dark),inset -2px -2px 0 var(--win-light)}
+.hvid .vods__player{margin:10px auto 0;max-width:860px}
+.hvid .vods__d{display:flex;flex-wrap:wrap;align-items:center;gap:2px 6px}
+.hvid .vods__d i{font-style:normal;white-space:nowrap}
+.hvid__ch{font-weight:normal;padding:0 3px;color:#000}
+.hvid__ch--laursen{background:#7fffd4}
+.hvid__ch--arkndjl{background:#c8c7ff}
+@media (max-width:684px){.hvid .vods__player,.hvid__chips{margin-left:8px;margin-right:8px;padding-left:0;padding-right:0}}
+</style>
+<script>
+(function () {
+  var w = document.getElementById('video'); if (!w) return;
+  var n = matchMedia('(max-width:684px)').matches ? 4 : +w.querySelector('.vods__grid').getAttribute('data-show');
+  function pick(b) {
+    var ch = b.getAttribute('data-ch'), i = 0;
+    w.querySelectorAll('.hvid__chips button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    w.querySelectorAll('.vods__grid li').forEach(function (li) { var ok = !ch || li.getAttribute('data-ch') === ch; li.hidden = !ok || i++ >= n; });
+  }
+  w.querySelector('.hvid__chips').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) pick(b); });
+  pick(w.querySelector('.hvid__chips button'));
+})();
+</script>
+{{- end }}
