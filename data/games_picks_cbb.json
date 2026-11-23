@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-23T00:06:57Z",
+ "asof": "2026-11-23T00:12:23Z",
  "recenter": {
   "2026-11-22": 1.96,
   "2026-11-23": 1.83
@@ -1936,22 +1936,6 @@
  "withdrawn": [],
  "board": [
   {
-   "id": "401917542",
-   "sport": "cbb",
-   "kick": "2026-11-23T02:30:00Z",
-   "home": "UC San Diego",
-   "away": "Seattle U",
-   "mk": "spread",
-   "side": "away",
-   "line": 1.5,
-   "price": -129.0,
-   "edge": 5.8,
-   "x": 4.0,
-   "why": "no edge at -129",
-   "m": -4.3,
-   "tm": 147.5
-  },
-  {
    "id": "401921658",
    "sport": "cbb",
    "kick": "2026-11-23T19:00:00Z",
@@ -1960,10 +1944,10 @@
    "mk": "total",
    "side": "over",
    "line": 151.5,
-   "price": -152.0,
+   "price": -146.0,
    "edge": 7.9,
    "x": 7.0,
-   "why": "no edge at -152",
+   "why": "no edge at -146",
    "m": 4.3,
    "tm": 159.4
   },
@@ -2032,6 +2016,22 @@
    "tm": 151.8
   },
   {
+   "id": "401917542",
+   "sport": "cbb",
+   "kick": "2026-11-23T02:30:00Z",
+   "home": "UC San Diego",
+   "away": "Seattle U",
+   "mk": "spread",
+   "side": "away",
+   "line": -1.5,
+   "price": -101.0,
+   "edge": 2.8,
+   "x": 4.0,
+   "why": "edge under 4 (venue: neutral)",
+   "m": -4.3,
+   "tm": 147.5
+  },
+  {
    "id": "401909743",
    "sport": "cbb",
    "kick": "2026-11-24T04:30:00Z",
@@ -2040,7 +2040,7 @@
    "mk": "total",
    "side": "under",
    "line": 158.5,
-   "price": -129.0,
+   "price": -134.0,
    "edge": 4.2,
    "x": 6.5,
    "why": "edge under 6.5 (side: under)",
@@ -2108,9 +2108,9 @@
   "401917542": {
    "mk": "spread",
    "side": "away",
-   "line": 1.5,
-   "price": -129.0,
-   "edge": 5.8,
+   "line": -1.5,
+   "price": -101.0,
+   "edge": 2.8,
    "ev": null,
    "units": 0.0,
    "home": "UC San Diego",
@@ -2158,7 +2158,7 @@
    "mk": "total",
    "side": "under",
    "line": 158.5,
-   "price": -129.0,
+   "price": -134.0,
    "edge": 4.2,
    "ev": null,
    "units": 0.0,
@@ -2182,7 +2182,7 @@
    "mk": "total",
    "side": "over",
    "line": 151.5,
-   "price": -152.0,
+   "price": -146.0,
    "edge": 7.9,
    "ev": null,
    "units": 0.0,
@@ -2255,34 +2255,34 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 23197,
+  "snapshots": 23203,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 634,
-    "clvRet": 0.004,
-    "clvT": 0.44,
-    "clv": 0.98,
-    "beat": 0.379,
-    "still": 0.27
+    "clvRet": 0.0046,
+    "clvT": 0.51,
+    "clv": 0.99,
+    "beat": 0.382,
+    "still": 0.267
    },
    {
     "when": "6-24h",
     "clvN": 4592,
-    "clvRet": 0.0006,
-    "clvT": 0.28,
+    "clvRet": 0.001,
+    "clvT": 0.48,
     "clv": 0.73,
-    "beat": 0.42,
-    "still": 0.399
+    "beat": 0.422,
+    "still": 0.397
    },
    {
     "when": "1-6h",
-    "clvN": 2159,
-    "clvRet": -0.0398,
-    "clvT": -33.87,
-    "clv": 0.08,
-    "beat": 0.169,
-    "still": 0.701
+    "clvN": 2160,
+    "clvRet": -0.0396,
+    "clvT": -33.57,
+    "clv": 0.09,
+    "beat": 0.17,
+    "still": 0.7
    },
    {
     "when": "<1h",
@@ -20458,7 +20458,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-23T00:06:57Z",
+ "checked": "2026-11-23T00:12:23Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
