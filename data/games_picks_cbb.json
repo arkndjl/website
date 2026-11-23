@@ -1,11 +1,11 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-23T22:57:10Z",
+ "asof": "2026-11-23T23:03:41Z",
  "recenter": {
-  "2026-11-23": 1.89,
-  "2026-11-24": 1.74,
-  "2026-11-25": 1.89
+  "2026-11-23": 1.9,
+  "2026-11-24": 1.71,
+  "2026-11-25": 1.82
  },
  "monitor": {
   "clocks": {
@@ -1832,7 +1832,7 @@
  },
  "model": {
   "asof": "2026-11-23T19:33:50Z",
-  "ageH": 3.4,
+  "ageH": 3.5,
   "stale": false
  },
  "picks": [],
@@ -1929,6 +1929,22 @@
  "withdrawn": [],
  "board": [
   {
+   "id": "401909800",
+   "sport": "cbb",
+   "kick": "2026-11-25T05:30:00Z",
+   "home": "Kansas State",
+   "away": "Gonzaga",
+   "mk": "total",
+   "side": "under",
+   "line": 164.5,
+   "price": -283.0,
+   "edge": 8.6,
+   "x": 6.5,
+   "why": "no edge at -283",
+   "m": -13.3,
+   "tm": 155.9
+  },
+  {
    "id": "401921664",
    "sport": "cbb",
    "kick": "2026-11-24T04:59:00Z",
@@ -1959,6 +1975,22 @@
    "why": "no edge at -110",
    "m": -0.8,
    "tm": 144.8
+  },
+  {
+   "id": "401915942",
+   "sport": "cbb",
+   "kick": "2026-11-25T01:00:00Z",
+   "home": "Louisville",
+   "away": "Texas Tech",
+   "mk": "total",
+   "side": "under",
+   "line": 155.5,
+   "price": -158.0,
+   "edge": 5.3,
+   "x": 5.0,
+   "why": "no edge at -158",
+   "m": -1.8,
+   "tm": 150.2
   },
   {
    "id": "401918057",
@@ -1993,22 +2025,6 @@
    "tm": 159.2
   },
   {
-   "id": "401915942",
-   "sport": "cbb",
-   "kick": "2026-11-25T01:00:00Z",
-   "home": "Louisville",
-   "away": "Texas Tech",
-   "mk": "spread",
-   "side": "home",
-   "line": -5.5,
-   "price": -124.0,
-   "edge": 3.7,
-   "x": 4.0,
-   "why": "edge under 4 (tier: power)",
-   "m": -1.8,
-   "tm": 150.2
-  },
-  {
    "id": "401915941",
    "sport": "cbb",
    "kick": "2026-11-24T20:00:00Z",
@@ -2032,9 +2048,9 @@
    "away": "San Diego State",
    "mk": "total",
    "side": "under",
-   "line": 143.5,
+   "line": 144.5,
    "price": -140.0,
-   "edge": 4.7,
+   "edge": 5.7,
    "x": 6.5,
    "why": "edge under 6.5 (side: under)",
    "m": 11.9,
@@ -2145,7 +2161,7 @@
    "mk": "total",
    "side": "under",
    "line": 145.5,
-   "price": -110.0,
+   "price": -124.0,
    "edge": 2.9,
    "x": 5.0,
    "why": "edge under 5 (tier: power)",
@@ -2167,22 +2183,6 @@
    "why": "edge under 3.5 (inj: with)",
    "m": -0.5,
    "tm": 172.5
-  },
-  {
-   "id": "401909800",
-   "sport": "cbb",
-   "kick": "2026-11-25T05:30:00Z",
-   "home": "Kansas State",
-   "away": "Gonzaga",
-   "mk": "spread",
-   "side": "home",
-   "line": -15.5,
-   "price": -129.0,
-   "edge": 2.2,
-   "x": 4.0,
-   "why": "edge under 4 (venue: neutral)",
-   "m": -13.3,
-   "tm": 155.8
   },
   {
    "id": "401909536",
@@ -2391,11 +2391,11 @@
    "state": "under"
   },
   "401909788": {
-   "mk": "spread",
-   "side": "home",
-   "line": 31.5,
-   "price": -106.0,
-   "edge": 0.5,
+   "mk": "total",
+   "side": "over",
+   "line": 156.5,
+   "price": -119.0,
+   "edge": 0.8,
    "ev": null,
    "units": 0.0,
    "home": "Kansas",
@@ -2547,11 +2547,11 @@
    "state": "under"
   },
   "401915942": {
-   "mk": "spread",
-   "side": "home",
-   "line": -5.5,
-   "price": -124.0,
-   "edge": 3.7,
+   "mk": "total",
+   "side": "under",
+   "line": 155.5,
+   "price": -158.0,
+   "edge": 5.3,
    "ev": null,
    "units": 0.0,
    "home": "Louisville",
@@ -2598,7 +2598,7 @@
    "mk": "total",
    "side": "under",
    "line": 145.5,
-   "price": -110.0,
+   "price": -124.0,
    "edge": 2.9,
    "ev": null,
    "units": 0.0,
@@ -2609,9 +2609,9 @@
   "401909775": {
    "mk": "total",
    "side": "under",
-   "line": 143.5,
+   "line": 144.5,
    "price": -140.0,
-   "edge": 4.7,
+   "edge": 5.7,
    "ev": null,
    "units": 0.0,
    "home": "Iowa State",
@@ -2631,11 +2631,11 @@
    "state": "under"
   },
   "401909800": {
-   "mk": "spread",
-   "side": "home",
-   "line": -15.5,
-   "price": -129.0,
-   "edge": 2.2,
+   "mk": "total",
+   "side": "under",
+   "line": 164.5,
+   "price": -283.0,
+   "edge": 8.6,
    "ev": null,
    "units": 0.0,
    "home": "Kansas State",
@@ -2695,25 +2695,25 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 23999,
+  "snapshots": 24015,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 698,
-    "clvRet": 0.007,
-    "clvT": 0.76,
+    "clvN": 699,
+    "clvRet": 0.0069,
+    "clvT": 0.75,
     "clv": 1.09,
-    "beat": 0.403,
-    "still": 0.264
+    "beat": 0.402,
+    "still": 0.265
    },
    {
     "when": "6-24h",
-    "clvN": 4769,
+    "clvN": 4773,
     "clvRet": 0.0007,
-    "clvT": 0.34,
+    "clvT": 0.32,
     "clv": 0.73,
     "beat": 0.428,
-    "still": 0.391
+    "still": 0.392
    },
    {
     "when": "1-6h",
@@ -21007,7 +21007,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-23T22:57:10Z",
+ "checked": "2026-11-23T23:03:41Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
