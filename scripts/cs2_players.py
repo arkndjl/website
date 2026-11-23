@@ -224,9 +224,21 @@ def tiers(teams, bo3, days=180):
     for j in (1, 2, 3):
         w = logfit(E, (Y <= j).astype(float))
         cuts.append(round(1400 - 100 * w[0] / w[1]) if w[1] > 0 else None)
+    # Tiers 5 and 6 (Nov 23 2026): below Tier 3, a team rated (player Elo + region offset, teams[].pl) under its
+    # region's ESEA Advanced median is Tier 5, under ESEA Main's Tier 6 (data/esea_world.json, scripts/esea_world.py;
+    # Americas and Asia use NA's levels, Europe EU's)
+    lv = {}
+    try:
+        lv = json.loads((ROOT / "data" / "esea_world.json").read_text()).get("levels") or {}
+    except (OSError, ValueError):
+        pass
     for t in teams:
         t["tier"] = next((i + 1 for i, c in enumerate(cuts) if c is not None and t["elo"] >= c), 4)
-    return {"cuts": cuts, "n": int(len(Y)), "days": days}
+        r = lv.get("EU" if t.get("rg") == "Europe" else "NA") or {}
+        if t["tier"] == 4 and t.get("pl") is not None and r.get("Advanced") is not None and t["pl"] < r["Advanced"]:
+            t["tier"] = 6 if r.get("Main") is not None and t["pl"] < r["Main"] else 5
+    return {"cuts": cuts, "n": int(len(Y)), "days": days,
+            "esea": {g: {k: v for k, v in x.items() if k in ("Advanced", "Main")} for g, x in lv.items() if g in ("NA", "EU")}}
 
 
 TUNE = ("2024-07-01", "2025-06-30")
