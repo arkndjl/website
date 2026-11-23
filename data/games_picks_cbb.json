@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-23T05:55:16Z",
+ "asof": "2026-11-23T06:14:30Z",
  "recenter": {
   "2026-11-23": 1.93
  },
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-23T05:18:44Z",
-  "ageH": 0.6,
+  "ageH": 0.9,
   "stale": false
  },
  "picks": [],
@@ -1934,22 +1934,6 @@
  "withdrawn": [],
  "board": [
   {
-   "id": "401921177",
-   "sport": "cbb",
-   "kick": "2026-11-23T20:30:00Z",
-   "home": "IU Indianapolis",
-   "away": "William & Mary",
-   "mk": "spread",
-   "side": "home",
-   "line": -26.5,
-   "price": -9900.0,
-   "edge": 21.0,
-   "x": 4.0,
-   "why": "gap too big: a bad line",
-   "m": -5.5,
-   "tm": 162.4
-  },
-  {
    "id": "401929445",
    "sport": "cbb",
    "kick": "2026-11-23T20:30:00Z",
@@ -1958,10 +1942,10 @@
    "mk": "spread",
    "side": "home",
    "line": -7.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 6.4,
    "x": 4.0,
-   "why": "no edge at -124",
+   "why": "no edge at -119",
    "m": -1.1,
    "tm": 165.7
   },
@@ -2102,7 +2086,7 @@
    "mk": "spread",
    "side": "home",
    "line": -2.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 4.0,
    "x": 5.0,
    "why": "edge under 5 (line: <4)",
@@ -2182,7 +2166,7 @@
    "mk": "total",
    "side": "over",
    "line": 147.5,
-   "price": -119.0,
+   "price": -124.0,
    "edge": 4.9,
    "x": 7.0,
    "why": "edge under 7",
@@ -2230,7 +2214,7 @@
    "mk": "total",
    "side": "under",
    "line": 165.5,
-   "price": -140.0,
+   "price": -152.0,
    "edge": 3.4,
    "x": 6.5,
    "why": "edge under 6.5 (side: under)",
@@ -2252,6 +2236,22 @@
    "why": "edge under 6.5 (side: under)",
    "m": 0.3,
    "tm": 151.3
+  },
+  {
+   "id": "401921177",
+   "sport": "cbb",
+   "kick": "2026-11-23T20:30:00Z",
+   "home": "IU Indianapolis",
+   "away": "William & Mary",
+   "mk": "total",
+   "side": "under",
+   "line": 165.5,
+   "price": -106.0,
+   "edge": 3.1,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": -5.5,
+   "tm": 162.4
   },
   {
    "id": "401921700",
@@ -2294,7 +2294,7 @@
    "mk": "total",
    "side": "under",
    "line": 153.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 2.7,
    "x": 6.5,
    "why": "edge under 6.5 (side: under)",
@@ -2326,7 +2326,7 @@
    "mk": "total",
    "side": "over",
    "line": 133.5,
-   "price": -134.0,
+   "price": -152.0,
    "edge": 1.9,
    "x": 5.0,
    "why": "edge under 5 (total: low)",
@@ -2424,7 +2424,7 @@
    "mk": "total",
    "side": "under",
    "line": 153.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 2.7,
    "ev": null,
    "units": 0.0,
@@ -2448,7 +2448,7 @@
    "mk": "total",
    "side": "over",
    "line": 147.5,
-   "price": -119.0,
+   "price": -124.0,
    "edge": 4.9,
    "ev": null,
    "units": 0.0,
@@ -2568,7 +2568,7 @@
    "mk": "total",
    "side": "under",
    "line": 165.5,
-   "price": -140.0,
+   "price": -152.0,
    "edge": 3.4,
    "ev": null,
    "units": 0.0,
@@ -2577,11 +2577,11 @@
    "state": "under"
   },
   "401921177": {
-   "mk": "spread",
-   "side": "home",
-   "line": -26.5,
-   "price": -9900.0,
-   "edge": 21.0,
+   "mk": "total",
+   "side": "under",
+   "line": 165.5,
+   "price": -106.0,
+   "edge": 3.1,
    "ev": null,
    "units": 0.0,
    "home": "IU Indianapolis",
@@ -2604,7 +2604,7 @@
    "mk": "spread",
    "side": "home",
    "line": -7.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 6.4,
    "ev": null,
    "units": 0.0,
@@ -2664,7 +2664,7 @@
    "mk": "total",
    "side": "over",
    "line": 133.5,
-   "price": -134.0,
+   "price": -152.0,
    "edge": 1.9,
    "ev": null,
    "units": 0.0,
@@ -2688,7 +2688,7 @@
    "mk": "spread",
    "side": "home",
    "line": -2.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 4.0,
    "ev": null,
    "units": 0.0,
@@ -2749,7 +2749,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 23518,
+  "snapshots": 23535,
   "buckets": [
    {
     "when": "24h+",
@@ -2762,11 +2762,11 @@
    },
    {
     "when": "6-24h",
-    "clvN": 4683,
-    "clvRet": -0.0012,
-    "clvT": -0.55,
-    "clv": 0.7,
-    "beat": 0.415,
+    "clvN": 4689,
+    "clvRet": -0.001,
+    "clvT": -0.49,
+    "clv": 0.71,
+    "beat": 0.414,
     "still": 0.403
    },
    {
@@ -20989,7 +20989,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-23T05:55:16Z",
+ "checked": "2026-11-23T06:14:30Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
