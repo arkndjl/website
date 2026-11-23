@@ -326,6 +326,9 @@ def main():
                             'current': sn == cur, 'start': ms[0]['at'] if ms else None, 'end': ms[-1]['at'] if ms else None})
 
     # ---- milestone log
+    # playoff round by match time (1NT's history, this season's matches)
+    rnd = {h['at']: h.get('round') for h in hist.get('matches') or [] if h.get('at')}
+    rnd.update({m['at']: m.get('round') for m in es.get('matches') or [] if m.get('at')})
     log = []
     add = lambda at, sn, kind, t: log.append({'at': at, 's': sn, 'k': kind, 't': t})
     prevs = None
@@ -345,9 +348,13 @@ def main():
             if not po_seen:
                 add(p['series'][0]['at'], sn, 'po', f'First playoffs · {p["name"]}')
                 po_seen = True
-            fw = next((q for q in p['series'] if q['res'] == 'W'), None)
-            if fw and not po_win:
-                add(fw['at'], sn, 'po', f'First playoff series win · {fw["opp"]}')
+            for q in p['series']:
+                if q['res'] != 'W':
+                    continue
+                rd = rnd.get(q['at'])
+                sc = 'forfeit' if q.get('ff') else f'{q["mw"]}-{q["ml"]}'
+                add(q['at'], sn, 'po', f'{"First playoff series win" if not po_win else "Playoff series win"} · {p["name"]}'
+                    f'{f" round {rd}" if rd else ""} · beat {q["opp"]} {sc}')
                 po_win = True
             if p.get('champion'):
                 add(p['series'][-1]['at'], sn, 'po', 'Won ' + p['name'])
