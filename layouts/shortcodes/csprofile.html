@@ -25,6 +25,11 @@
       {{- $v := .v }}{{ if eq .k "FACEIT level" }}{{ $v = $lvl }}{{ else if eq .k "FACEIT elo" }}{{ $v = $elo }}{{ end }}
       <li><span class="csprofile__v">{{ $v }}</span><span class="csprofile__k">{{ .k }}{{ with .src }} <i>({{ . }})</i>{{ end }}</span></li>
       {{- end }}
+      {{- /* CS2 FV on the pro prospects scale: ESEA can't be graded there, so a provisional floor grade
+             (scripts/cs2_prospects_lowtier_research.py -> data/cs2_prospects_lowtier_research.json "laursen") */ -}}
+      {{- with site.Data.cs2_prospects_lowtier_research }}{{ with .laursen }}
+      <li><span class="csprofile__v">{{ .fv }}{{ if .prov }} {{ partial "prov.html" (dict "why" .why) }}{{ end }}</span><span class="csprofile__k">CS2 FV</span></li>
+      {{- end }}{{ end }}
       {{- with $live.matches }}
       <li><span class="csprofile__v">{{ lang.FormatNumber 0 . }}</span><span class="csprofile__k">FACEIT CS2 matches</span></li>
       {{- with $live.winRate }}<li><span class="csprofile__v">{{ . }}%</span><span class="csprofile__k">win rate</span></li>{{ end }}
