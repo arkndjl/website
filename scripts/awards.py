@@ -698,6 +698,8 @@ def cfb(fit, rng):
     M = jload(os.path.join(ROOT, 'data', 'cfb_model.json'), {})
     if not M.get('sim'): return None
     S = int(str(M.get('asof', dt.date.today().isoformat()))[:4])
+    for a in ('bilet', 'butkus'):                      # Nov 23 2026: the v2 retries (+ p5, ap_end, prev_top5) that passed
+        if fit.get(a + '2', {}).get('test', {}).get('pass'): fit[a] = dict(fit[a + '2'], label=fit[a]['label'])
     keys = [a for a in ['heisman'] + list(F.CFB_AWARDS) if fit.get(a, {}).get('test', {}).get('pass')]
     if not keys: return None
     teams, logos = {}, {}
@@ -716,6 +718,7 @@ def cfb(fit, rng):
         nm, logo = logos[f['tid']]
         cands.append({'id': v['id'], 'n': v['n'], 'tid': f['tid'], 'tm': nm, 'logo': logo, 'pos': f['pos'], 'ph': v['id'], 'f': f})
     ROSTER['cfb'] = cands
+    cfb_enrich(cands, S)
     for c in cands:                      # the pool rules use season-end thresholds: test them on full-season pace
         w, g, _, _, G = teams[c['tid']]
         k = G / max(g, 1)
@@ -737,6 +740,35 @@ def cfb(fit, rng):
         p = race(sub, spec, draw, rng)
         races.append((a, rows_out(sub, p, draw, CFB_SHOW[a], rng), CFB_SHOW[a]))
     return {'season': str(S), 'races': races, 'logo': 'cfb'}
+
+
+def cfb_enrich(cands, S):
+    """p5 (power-conference team-season, ESPN groups) and ap_end (the latest AP poll, (26 - rank) / 25, 0 unranked):
+    the Nov 23 2026 terms of the Heisman, Walter Camp, O'Brien, Biletnikoff and Butkus models"""
+    import awards_football as F
+    import awards_football_more as FM
+    import concurrent.futures as cf
+    tids = {c['tid'] for c in cands}
+    try:
+        with cf.ThreadPoolExecutor(8) as ex:
+            conf = dict(zip(tids, ex.map(lambda t: FM.cfb_conf(S, t), tids)))
+    except Exception as e:
+        print('cfb conferences', e); conf = {}
+    ap = {}
+    try:
+        wk = F.get(f'{FM.CORE}/seasons/{S}/types/2/weeks')
+        for w in range(int(wk.get('count') or 16), 0, -1):
+            d = F.get(f'{FM.CORE}/seasons/{S}/types/2/weeks/{w}/rankings/1')
+            if d.get('ranks'):
+                for x in d['ranks']:
+                    m = re.search(r'/teams/(\d+)', x['team']['$ref'])
+                    if m: ap[m.group(1)] = (26 - x['current']) / 25
+                break
+    except Exception as e:
+        print('cfb AP poll', e)
+    for c in cands:
+        c['f']['p5'] = FM.is_p5(conf.get(c['tid']), S, c['tid'])
+        c['f']['ap_end'] = ap.get(str(c['tid']), 0.0)
 
 
 def nfl(fit, rng):
@@ -904,7 +936,9 @@ SV_SHOW = [('svar', 'SVAR', '%.2f'), ('sv', 'SV', '%.1f')]
 NFL_CONV = [('mvp', lambda c: True), ('opoy', lambda c: c['pos'] in OFF), ('dpoy', lambda c: c['pos'] in DEF),
             ('oroy', lambda c: c['rookie'] and c['pos'] in OFF), ('droy', lambda c: c['rookie'] and c['pos'] in DEF)]
 CFB_CONV = [('heisman', lambda c: True), ('obrien', lambda c: c['pos'] == 'QB'), ('doak', lambda c: c['pos'] == 'RB'),
-            ('bilet', lambda c: c['pos'] == 'WR'), ('mackey', lambda c: c['pos'] == 'TE')]
+            ('bilet', lambda c: c['pos'] == 'WR'), ('mackey', lambda c: c['pos'] == 'TE'),
+            ('unitas', lambda c: c['pos'] == 'QB' and c.get('cls') in UNITAS_CLS)]
+UNITAS_CLS = {'Sr', 'RS-Sr', 'Gr', 'RS-Gr', 'RS-Jr'}      # Unitas Golden Arm: seniors and fourth-year juniors
 
 
 def war_lead(sport, teams, rng):
@@ -929,7 +963,7 @@ def war_lead(sport, teams, rng):
         for r in [dict(r, pos='QB') for r in V.get('qbs', [])] + V.get('skill', []):
             if r.get('svar') is None or r.get('t') not in tid: continue
             cands.append({'id': len(cands), 'n': r['n'], 'tid': tid[r['t']], 'tm': r['t'], 'logo': r.get('lo'), 'pos': r.get('pos'),
-                          'ph': r.get('id'), 'f': {'svar': r['svar'], 'sv': r.get('pts') or 0}})
+                          'ph': r.get('id'), 'cls': r.get('cls'), 'f': {'svar': r['svar'], 'sv': r.get('pts') or 0}})
     draw = football_draw(teams, [('svar', 'yds')], sport)
     for aw, ok in (NFL_CONV if sport == 'nfl' else CFB_CONV):
         lead(aw, [c for c in cands if ok(c)], draw, 'svar', SV_SHOW, rng)

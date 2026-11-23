@@ -10,7 +10,18 @@ data/awards_fit.json; failing ones are written too (pass false) so the convictio
 
 Extra history (all free, cached in scripts/.cache/awards): nflverse games (records, coaches, points allowed) and players
 (ESPN id -> draft pick), preseason win totals (sportsoddshistory), AP All-Pro first teams (Wikipedia), ESPN AP polls and
-conferences by team-season, the CFB board's season-end grades (scripts/data/cfb_alltime_rows.json.gz). numpy."""
+conferences by team-season, the CFB board's season-end grades (scripts/data/cfb_alltime_rows.json.gz). numpy.
+
+Results (Nov 23 2026; scripts/research/awards_nov23/<sport>/results.json):
+- NFL, Holm over 9: CPOY t 3.08 (14/20), COY t 4.03 (16/20), All-Pro (six races, one test) t 7.1 (20/21), DPOY v2 t 2.64
+  (16/21) pass. Add-ons on MVP / OPOY / OROY / DROY (last season's yards, preseason win total, prior All-Pro, draft
+  slot) all fail.
+- CFB, Holm over 24: Biletnikoff v2 t 4.96, Butkus v2 t 3.98 pass; Unitas t 3.09, Hornung t 2.85, Lombardi t 1.46 and
+  the other v2 retries fail. Add-ons: p5 passes on the Heisman (t 6.3), Walter Camp (5.4) and O'Brien (4.4) and is
+  shipped there (their fit entries carry prev_cols); ap_end passes Heisman / O'Brien but adds nothing on top of p5
+  (exploratory t .9 / 1.5), not shipped; ap_pre, fv_pre and stars fail.
+Order: scripts/awards_research.py cfb rewrites the Heisman, Maxwell, Walter Camp and O'Brien entries with their
+Nov 14 columns, so run this script (cfb) after it."""
 import collections, concurrent.futures as cf, gzip, html, json, math, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import awards_engine as E
@@ -337,6 +348,14 @@ def nfl_main(cur, dry):
 
 P5 = {'Atlantic Coast Conference', 'Big 12 Conference', 'Big East Conference', 'Big Ten Conference', 'Pac-12 Conference',
       'Pacific-10 Conference', 'Southeastern Conference'}
+def is_p5(conf, S, tid):
+    """power conference that season (Big East to 2012, Pac-10/12 to 2023), Notre Dame counted"""
+    if str(tid) == '87': return 1.0
+    if conf in ('Big East Conference',) and S > 2012: return 0.0
+    if conf in ('Pac-12 Conference', 'Pacific-10 Conference') and S > 2023: return 0.0
+    return 1.0 if conf in P5 else 0.0
+
+
 CORE = 'https://sports.core.api.espn.com/v2/sports/football/leagues/college-football'
 
 
@@ -399,7 +418,7 @@ def cfb_rows():
             r = F.features(v)
             st = v.get('st') or {}
             r['conf'] = conf.get(r['tid'])
-            r['p5'] = 1.0 if (r['conf'] in P5 or str(r['tid']) == '87') else 0.0
+            r['p5'] = is_p5(r['conf'], S, r['tid'])
             r['ap_pre'], r['ap_end'] = pre.get(str(r['tid']), 0.0), end.get(str(r['tid']), 0.0)
             r['sr'] = 1.0 if (v.get('exp') or 0) >= 4 else 0.0
             r['ret_y'] = float(st.get('retu.kickReturnYards') or 0) + float(st.get('retu.puntReturnYards') or 0)
@@ -465,7 +484,9 @@ def cfb_main(cur, dry):
     new = {}
     res = {}
     # 1-3 new awards
-    r, _, _ = test(award_races(R, 'Johnny_Unitas_Golden_Arm_Award', lambda r: r['pos'] == 'QB' and r['pass_y'] >= 1000 and r['sr']),
+    # deviation from the prereg: ESPN's athlete experience is his career-end value (blank before 2012, then nearly every
+    # row 4), so the senior filter is neither point-in-time nor usable; the pool is every 1,000-yard QB
+    r, _, _ = test(award_races(R, 'Johnny_Unitas_Golden_Arm_Award', lambda r: r['pos'] == 'QB' and r['pass_y'] >= 1000),
                    ['pass_y', 'ptd', 'int', 'ypa', 'rush_y', 'wp'], ['pass_y', 'ptd'])
     new['unitas'] = dict(r, award='unitas', label='Unitas', more=True)
     r, _, _ = test(award_races(R, 'Paul_Hornung_Award', lambda r: r['apy'] >= 500 or r['two_way']),
@@ -495,6 +516,21 @@ def cfb_main(cur, dry):
             tests.append(dict(addon(rc, base[a], ex, depth=3 if a == 'heisman' else 1), award=a))
     holm_addons(tests)
     res['addons'] = tests
+    # ship: per award, the passing add-on with the largest t; the race is refit and retested against its null
+    for a in base:
+        ok = sorted([t for t in tests if t['award'] == a and t['pass']], key=lambda t: -t['t'])
+        if not ok: continue
+        cols = base[a] + ok[0]['add']
+        r, _, _ = test(races[a], cols, cur['cfb'][a]['null'], depth=3 if a == 'heisman' else 1)
+        r['test']['pass'] = cur['cfb'][a]['test']['pass']
+        r['test']['addon'] = {'add': ok[0]['add'], 't': ok[0]['t'], 'gain': ok[0]['gain'], 'wins': ok[0]['wins'], 'n': ok[0]['n']}
+        new[a] = dict(cur['cfb'][a], **{k: r[k] for k in ('cols', 'b', 'mu', 'sd', 'seasons')}, test=r['test'], prev_cols=base[a])
+        print('cfb ship', a, '+', ok[0]['add'], 'vs null t', r['test']['t'], 'hit', r['test']['model']['hit'])
+        # exploratory, not shipped: the other passing add-ons on top
+        for t2 in ok[1:]:
+            x = addon(races[a], cols, t2['add'], depth=3 if a == 'heisman' else 1)
+            print('   exploratory', a, cols[-1], '+', t2['add'], 'gain', x['gain'], 't', x['t'], 'wins', x['wins'], '/', x['n'])
+            res.setdefault('exploratory', []).append(dict(x, award=a))
     res['awards'] = new
     res['not_modelled'] = {'outland': '14 of 21 winners 2005-25 are offensive linemen (no free box stats)',
                            'rimington': 'centers: no stats', 'broyles': 'assistant coaches: no free coordinator-unit history',

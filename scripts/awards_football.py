@@ -4,7 +4,9 @@ features for scripts/awards_research.py and scripts/awards.py.
 
 History: ESPN season stats (the leaders by passing, rushing, receiving, touchdowns, sacks, tackles and interceptions,
 each player's regular-season line and his team's record; scripts/.cache/awards/espn/), Heisman voting from each FBS
-season's Wikipedia page, AP award winners from Wikipedia's award pages."""
+season's Wikipedia page, AP award winners from Wikipedia's award pages. The history pools (scripts/.cache, not in CI)
+are rebuilt with `python3 scripts/awards_football.py nfl|cfb` (build_pool). CPOY, COY, All-Pro and the Nov 23 retries:
+scripts/awards_football_more.py."""
 import concurrent.futures as cf, html, json, os, re, sys, time, urllib.parse, urllib.request
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import names as NM
