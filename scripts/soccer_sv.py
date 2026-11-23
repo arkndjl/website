@@ -14,9 +14,10 @@ What GAR leans on that SV drops: GAR's xG plus-minus is a three-season ridge (S-
   alone (rapm_window span 0; offence prior = his own npxG + xA this season), scaled so a side's players add up to its
   xG difference a match (one scale, fit on 2015-26 team-seasons). The weights are fixed parameters, like the
   replacement lines of the football SVs; no player's other season enters.
-- what the xG missed, at face value: finishing (goals, penalties in, less non-penalty xG) and keepers' goals saved
-  against the xG faced. Those goals happened, so a season value counts them; GAR keeps only the part that repeats.
-  With them a side's players add up to its goal difference (R2 in the fit file).
+- what the xG missed: finishing (goals, penalties in, less non-penalty xG) and keepers' goals saved against the xG
+  faced, each shrunk toward the league average by min / (min + k) (Noah, Nov 23 2026). k from split-half reliability
+  within a season (odd vs even matches, scripts/soccer_sv_shrink_research.py): saves r .045 -> k 40,000 minutes,
+  finishing r .12 -> k 6,000. No player's other season enters.
 - league strength as GAR (one scale across the big five; a league constant), its scale re-measured on SV;
   replacement = the xG part of the regulars on each finished league-season's bottom three sides, finishing and saves
   at the league average (bottom-three sides are picked by goal difference, so their finishing and saves are
@@ -69,20 +70,39 @@ def _rel(g, key, raw, shrink):
             r[key] = w * (r['_' + key] - mu) + (1 - w) * pmu
 
 
-def sv_rows(rows, shrink):
+SHRINK_FILE = os.path.join(ROOT, 'research', 'soccer_sv_shrink.json')
+
+
+def face_k(F=None):
+    """(keeper saves k, finishing k) in minutes: split-half shrink (scripts/soccer_sv_shrink_research.py)"""
+    if F and 'kGk' in F:
+        return F['kGk'], F['kFin']
+    try:
+        R = json.load(open(SHRINK_FILE))
+        return R['gk0']['k'] or 1e9, R['fin']['k'] or 1e9
+    except (OSError, KeyError, ValueError):
+        return 0, 0
+
+
+def sv_rows(rows, shrink, F=None):
     """a copy of the rows with the season-only plus-minus in orp / drp, rates at `shrink`; fin (goals less npxG a 90)
-    and gk0 (keeper goals saved vs xG faced a 90) unshrunk, relative to the league-season (gk0: its keepers)"""
+    and gk0 (keeper goals saved vs xG faced a 90) relative to the league-season (gk0: its keepers), each shrunk toward
+    that average (0) by min / (min + k), k from the split-half test (no player prior)"""
+    kg, kf = face_k(F)
     rs = [dict(r, orp=r.get('sorp', 0.0), drp=r.get('sdrp', 0.0)) for r in rows]
     P.prep(rs, shrink)
     by = defaultdict(list)
     for r in rs:
         by[(r['lg'], r['S'])].append(r)
     for g in by.values():
-        _rel(g, 'fin', lambda r: r['g'] - r['x'] + r['pen'], 0)
+        tot = sum(r['min'] for r in g) or 1
+        fm = sum(r['g'] - r['x'] + r['pen'] for r in g) / tot * 90
         ks = [r for r in g if r['pos'] == 'GK']
         km = sum(r['gks'] for r in ks) / max(1, sum(r['min'] for r in ks)) * 90
         for r in g:
-            r['gk0'] = r['gks'] / (max(r['min'], 1) / 90) - km if r['pos'] == 'GK' else 0.0
+            m = max(r['min'], 1)
+            r['fin'] = ((r['g'] - r['x'] + r['pen']) / (m / 90) - fm) * m / (m + kf)
+            r['gk0'] = (r['gks'] / (m / 90) - km) * m / (m + kg) if r['pos'] == 'GK' else 0.0
     return rs
 
 
@@ -114,10 +134,12 @@ def fit():
     seasons = sorted({r['S'] for r in done})
     G = json.load(open(P.FIT))
     feats = [f_ for f_ in G['feats'] if f_ != 'gk']               # keepers: saves at face value (gk0) instead
-    F = {'feats': feats, 'w': {f_: G['w'][f_] for f_ in feats}, 'scale': 1.0, 'shrink': G['shrink'], 'rapmLam': RAPM_LAM}
+    kg, kf = face_k()
+    F = {'feats': feats, 'w': {f_: G['w'][f_] for f_ in feats}, 'scale': 1.0, 'shrink': G['shrink'], 'rapmLam': RAPM_LAM,
+         'kGk': kg, 'kFin': kf}
     segs = {S: P.segments(S) for S in seasons + [S1]}
     season_rapm(done, segs, seasons, RAPM_LAM)
-    rs = sv_rows(done, F['shrink'])
+    rs = sv_rows(done, F['shrink'], F)
     ts = P.team_seasons(P.FIRST, S1 - 1)
     agg = defaultdict(lambda: [0.0, 0.0])
     for r in rs:
@@ -179,7 +201,7 @@ def attach(S, rows, out, LS):
     F = _fit()
     if not F:
         return
-    rs = sv_rows([r for r in rows if r['S'] == S], F['shrink'])
+    rs = sv_rows([r for r in rows if r['S'] == S], F['shrink'], F)
     by = {(r['p'], r['team']): r for r in rs}
     for o in out:
         r = by.get((o['p'], o['team']))
