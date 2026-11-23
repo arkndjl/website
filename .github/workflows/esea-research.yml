@@ -1,8 +1,12 @@
 # Research data for scripts/esea_research.py: ESEA NA league history (scripts/esea_research_fetch.mjs)
 # committed to research/esea_matches.json.gz on the branch it runs on. Run by hand from the Actions tab.
+# Weekly (Mondays): every region's results again (scripts/esea_regions_fetch.mjs), then scripts/esea_world.py ->
+# data/esea_world.json (CS2 Tier 5/6 levels, 1NT's world rank by week, every ESEA team's world rank).
 name: esea research
 
 on:
+  schedule:
+    - cron: "17 9 * * 1"
   workflow_dispatch:
     inputs:
       regions:
@@ -24,25 +28,37 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q numpy
+      - uses: actions/cache/restore@v4
+        with:
+          path: scripts/.cache/cs
+          key: cs2-vrs-v1
       - name: Fetch
-        if: inputs.regions != '1'
+        if: github.event_name == 'workflow_dispatch' && inputs.regions != '1'
         run: node scripts/esea_research_fetch.mjs
         env:
           FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
           ESEA_CRAWL: 150
           ESEA_FROM: 53
       - name: Fetch every region
-        if: inputs.regions == '1'
+        if: github.event_name == 'schedule' || inputs.regions == '1'
         run: node scripts/esea_regions_fetch.mjs
         env:
           FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
           ESEA_FROM: 53
           ESEA_PROBE: ${{ inputs.probe == '1' && '1' || '' }}
+      - name: World ranks and ESEA tiers
+        if: github.event_name == 'schedule' || (inputs.regions == '1' && inputs.probe != '1')
+        run: python3 scripts/esea_world.py
       - name: Commit
         run: |
           git config user.name "arkboard-bot"
           git config user.email "actions@users.noreply.github.com"
           git add -f research/esea_matches.json.gz research/esea_regions.json.gz 2>/dev/null || git add -f research/esea_regions.json.gz || git add -f research/esea_matches.json.gz
+          git add data/esea_world.json 2>/dev/null || true
           git commit -m "ESEA research data ($(date -u +%Y-%m-%dT%H:%MZ))" || exit 0
           git pull --rebase -q origin "${GITHUB_REF_NAME}"
           git push

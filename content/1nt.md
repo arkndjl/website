@@ -6,7 +6,7 @@ draft = false
 +++
 
 {{< n1hub >}}
-{{< wintabs tabs="matchday,roster,history,watch,1NTERLYTICS" label="1NT section" >}}
+{{< wintabs tabs="matchday,roster,history,milestones,watch,1NTERLYTICS" label="1NT section" >}}
 {{< desk tab="matchday" >}}
 {{< n1 part="matchday" class="desk__wide" >}}
 {{< esea part="season" class="desk__wide" >}}
@@ -23,6 +23,9 @@ draft = false
 {{< n1season class="desk__wide" >}}
 {{< n1 part="history" class="desk__wide" >}}
 {{< esea part="alltime" class="desk__wide" >}}
+{{< /desk >}}
+{{< desk tab="milestones" >}}
+{{< esea part="world" class="desk__wide" >}}
 {{< /desk >}}
 {{< desk tab="watch" >}}
 {{< vods title="1nt_vods.exe" only="nt" class="desk__wide" >}}

@@ -240,7 +240,7 @@
     <summary>
       <span class="esea-m__wk">{{ with .round }}wk {{ . }}{{ else }}{{ add $i 1 }}{{ end }}</span>
       <span class="esea-m__res">{{ .result }}</span>
-      <span class="esea-m__opp">{{ with .opp.avatar }}<img class="esea-m__av" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span class="cfb__dim">vs</span> {{ .opp.name }}{{ with .opp.prank }} <span class="esea-rk" title="ARK Ranking">#{{ . }}</span>{{ else }}{{ with .opp.rank }} <span class="esea-rk" title="standing">{{ if $m.opp.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}{{ end }}</span>
+      <span class="esea-m__opp">{{ with .opp.avatar }}<img class="esea-m__av" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span class="cfb__dim">vs</span> {{ .opp.name }}{{ with .opp.prank }} <span class="esea-rk" title="ARK Ranking">#{{ . }}</span>{{ else }}{{ with .opp.rank }} <span class="esea-rk" title="standing">{{ if $m.opp.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}{{ end }}{{ with site.Data.esea_world }}{{ with index .teams $m.opp.id }} <span class="esea-rk" title="world rank (VRS-equivalent) · tier {{ .t }}">W#{{ .w }}</span>{{ end }}{{ end }}</span>
       <span class="esea-m__maps">{{ range .maps }}<span class="esea-map" data-map="{{ .map }}">{{ .map }}</span>{{ end }}</span>
       <span class="esea-m__score">{{ range $j, $x := .maps }}{{ if $j }} · {{ end }}{{ $x.rf }}–{{ $x.ra }}{{ end }}</span>
       <span class="esea-m__me">{{ with $mine.name }}<span class="cfb__dim">{{ $me }}</span> {{ $mine.k }}-{{ $mine.d }} · {{ $mine.adr }} ADR{{ end }}</span>
@@ -253,9 +253,9 @@
       <p class="esea-m__head"><span class="esea-map" data-map="{{ .map }}">{{ .map }}</span>
         <b>1NT</b>{{ with $m.prank }} <span class="esea-rk" title="ARK Ranking">#{{ . }}</span>{{ else }}{{ with $st }} <span class="esea-rk">{{ if .tied }}T-#{{ else }}#{{ end }}{{ .rank }}</span>{{ end }}{{ end }}
         <b class="esea-m__sc">{{ .rf }}–{{ .ra }}</b>
-        <b>{{ $m.opp.name }}</b>{{ with $m.opp.prank }} <span class="esea-rk" title="ARK Ranking">#{{ . }}</span>{{ else }}{{ with $m.opp.rank }} <span class="esea-rk">{{ if $m.opp.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}{{ end }}
+        <b>{{ $m.opp.name }}</b>{{ with $m.opp.prank }} <span class="esea-rk" title="ARK Ranking">#{{ . }}</span>{{ else }}{{ with $m.opp.rank }} <span class="esea-rk">{{ if $m.opp.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}{{ end }}{{ with site.Data.esea_world }}{{ with index .teams $m.opp.id }} <span class="esea-rk" title="world rank (VRS-equivalent) · tier {{ .t }}">W#{{ .w }}</span>{{ end }}{{ end }}
         <span class="cfb__dim">· {{ $rounds }} rounds{{ with $st }} · current ARK Ranking{{ end }}</span>
-        <button type="button" class="cfb__btn cfb__gfx esea-m__gfx" data-gfx data-gfx-mode="esea-box" data-gfx-date="{{ with $m.at }}{{ (time.In "America/New_York" (time (int (div . 1000)))).Format "Jan 2, 2006" }}{{ end }}" data-gfx-title="1NT {{ with $st }}{{ if .tied }}T-#{{ else }}#{{ end }}{{ .rank }} {{ end }}{{ .rf }}–{{ .ra }} {{ $m.opp.name }}{{ with $m.opp.rank }} {{ if $m.opp.tied }}T-#{{ else }}#{{ end }}{{ . }}{{ end }} :: {{ .map }}" title="box score graphic (16:9)">GFX</button></p>
+        <button type="button" class="cfb__btn cfb__gfx esea-m__gfx" data-gfx data-gfx-mode="esea-box" data-gfx-date="{{ with $m.at }}{{ (time.In "America/New_York" (time (int (div . 1000)))).Format "Jan 2, 2006" }}{{ end }}" data-gfx-title="1NT {{ with $st }}{{ if .tied }}T-#{{ else }}#{{ end }}{{ .rank }} {{ end }}{{ with site.Data.esea_world }}{{ with .now }}W#{{ .vrs }} {{ end }}{{ end }}{{ .rf }}–{{ .ra }} {{ $m.opp.name }}{{ with $m.opp.rank }} {{ if $m.opp.tied }}T-#{{ else }}#{{ end }}{{ . }}{{ end }}{{ with site.Data.esea_world }}{{ with index .teams $m.opp.id }} W#{{ .w }}{{ end }}{{ end }} :: {{ .map }}" title="box score graphic (16:9)">GFX</button></p>
       {{- range $side := slice (slice "1NT" .players) (slice $m.opp.name .opp) }}{{ $ps := index $side 1 }}{{ if $ps }}
       <div class="wintable__scroll">
       <table class="esea-box{{ if ne (index $side 0) "1NT" }} esea-box--opp{{ end }}">
@@ -848,12 +848,13 @@
     {{- $ln := "" }}{{ with $pv.spread }}{{ $ln = printf "%s −%.1f" (cond (ge (float .line) 0) "1NT" $o.name) (math.Abs (float .line)) }}{{ end }}
     {{- $oLogo := "" }}{{ with $o.avatar }}{{ $f := path.Base . }}{{ if fileExists (printf "static/img/1nt/opp/%s" $f) }}{{ $oLogo = printf "img/1nt/opp/%s" $f | relURL }}{{ end }}{{ end }}
     {{- $st := $d.standing | default dict }}
+    {{- $uW := "" }}{{ $oW := "" }}{{ with site.Data.esea_world }}{{ with .now }}{{ $uW = printf "#%v" .vrs }}{{ end }}{{ with index .teams ($o.id | default "") }}{{ $oW = printf "#%v" .w }}{{ end }}{{ end }}
     {{- /* knife side: map win % of the team starting T, by map (ARKBOARD Research cs2-side-first, bo3.gg pro maps) */}}
     {{- $sides := dict }}{{ $sf := "research/studies/cs2/cs2-side-first.json" }}{{ if fileExists $sf }}{{ range (index ((os.ReadFile $sf | transform.Unmarshal).chart.series) 0).points }}{{ $sides = merge $sides (dict .x (dict "t" .y "lo" .lo "hi" .hi "n" .n)) }}{{ end }}{{ end }}
     {{- $gd := dict "opp" $o.name "when" (printf "%s ET" ((time.In "America/New_York" (time (int (div $pv.at 1000)))).Format "Mon Jan 2 · 3:04 PM")) "event" (printf "ESEA S%v · Main · Bo%v" $season ($pv.bestOf | default 1)) "bo" (printf "Bo%v" ($pv.bestOf | default 1))
         "win" $pv.p.win "line" $ln "score" (cond (ge (float $pv.spread.line) 0) (printf "1NT %s" $pv.spread.score) (printf "%s %s" $o.name $pv.spread.score))
-        "us" (dict "name" "1NT" "logo" ("img/1nt/1nt-logo.webp" | relURL) "rank" (cond (gt (int ($pv.us.prank | default 0)) 0) (printf "#%v" $pv.us.prank) (printf "%s%v" (cond $pv.us.tied "T-#" "#") $pv.us.rank))  "rec" $pv.us.rec "talent" $pv.talent.us "ark" (cond (gt (int ($pv.us.prank | default 0)) 0) (printf "#%v" $pv.us.prank) "") "std" (cond (gt (int ($pv.us.rank | default 0)) 0) (printf "%s%v" (cond $pv.us.tied "T-#" "#") $pv.us.rank) ""))
-        "them" (dict "name" $o.name "logo" $oLogo "rank" (cond (gt (int ($o.prank | default 0)) 0) (printf "#%v" $o.prank) (cond (gt (int ($o.rank | default 0)) 0) (printf "%s%v" (cond $o.tied "T-#" "#") $o.rank) ""))  "rec" $o.rec "talent" $pv.talent.them "ark" (cond (gt (int ($o.prank | default 0)) 0) (printf "#%v" $o.prank) "") "std" (cond (gt (int ($o.rank | default 0)) 0) (printf "%s%v" (cond $o.tied "T-#" "#") $o.rank) ""))
+        "us" (dict "name" "1NT" "logo" ("img/1nt/1nt-logo.webp" | relURL) "rank" (cond (gt (int ($pv.us.prank | default 0)) 0) (printf "#%v" $pv.us.prank) (printf "%s%v" (cond $pv.us.tied "T-#" "#") $pv.us.rank))  "rec" $pv.us.rec "talent" $pv.talent.us "ark" (cond (gt (int ($pv.us.prank | default 0)) 0) (printf "#%v" $pv.us.prank) "") "std" (cond (gt (int ($pv.us.rank | default 0)) 0) (printf "%s%v" (cond $pv.us.tied "T-#" "#") $pv.us.rank) "") "world" $uW)
+        "them" (dict "name" $o.name "logo" $oLogo "rank" (cond (gt (int ($o.prank | default 0)) 0) (printf "#%v" $o.prank) (cond (gt (int ($o.rank | default 0)) 0) (printf "%s%v" (cond $o.tied "T-#" "#") $o.rank) ""))  "rec" $o.rec "talent" $pv.talent.them "ark" (cond (gt (int ($o.prank | default 0)) 0) (printf "#%v" $o.prank) "") "std" (cond (gt (int ($o.rank | default 0)) 0) (printf "%s%v" (cond $o.tied "T-#" "#") $o.rank) "") "world" $oW)
         "pool" $pv.pool "oppMaps" ($pv.oppMaps | default slice) "bon" ($pv.bestOf | default 1) "sides" $sides
         "five" $five "theirFive" $tf "lineupNote" ($pv.lineupNote | default "") "watch" $watch "vetoes" $pv.vetoes "maps" $pv.maps "matchups" $pv.matchups "plan" $pv.plan "talentUs" $pv.talent.us "talentThem" $pv.talent.them }}
     <p class="esea-pv__gfx">
@@ -1013,6 +1014,39 @@
   {{- else }}<p class="esea__empty-line">no lineup data.</p>{{ end }}
   <div class="win__status"><span>maps, last 90 days, 4+ 1NT members on one side · fives: 1+ official, 2+ scrim maps · pairs: 4+ official, 8+ scrim maps</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
+
+{{- else if eq $part "world" }}
+{{- /* 1NT worldwide: the VRS rank its five's rating would hold, NA ESEA rank, tier, weekly (data/esea_world.json, scripts/esea_world.py) */ -}}
+{{- with site.Data.esea_world }}{{ $w := . }}{{ with .now }}{{ $now := . }}
+<div class="win lzf esea-wr{{ with $.Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>world_rank.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="lzf__body">
+    <ul class="esea__tiles lzf__tiles">
+      <li><span class="esea__v">#{{ $now.vrs }}</span><span class="esea__k" title="the Valve Regional Standings rank a team with 1NT's five's rating would hold, of {{ $now.of }} ranked teams">world</span></li>
+      <li><span class="esea__v"><span class="cs__t cs__t--{{ $now.tier }}">T{{ $now.tier }}</span></span><span class="esea__k" title="Tier 5 = ESEA Advanced level, Tier 6 = ESEA Main level (region medians on the pro scale)">tier</span></li>
+      <li><span class="esea__v">#{{ $now.na }}</span><span class="esea__k" title="among {{ $now.naOf }} NA ESEA teams this season (Advanced, Main, Intermediate)">NA ESEA</span></li>
+      <li><span class="esea__v">{{ partial "num.html" (slice "%+.0f" (float $now.s)) }}</span><span class="esea__k" title="the five's mean player Elo plus Valve's Americas offset, pro scale">rating</span></li>
+    </ul>
+    {{- with $w.weekly }}{{ $pts := . }}{{ $n := len . }}
+    {{- if gt $n 1 }}{{ $lo := (index . 0).vrs }}{{ $hi := $lo }}{{ range . }}{{ if lt .vrs $lo }}{{ $lo = .vrs }}{{ end }}{{ if gt .vrs $hi }}{{ $hi = .vrs }}{{ end }}{{ end }}
+    {{- $span := math.Max (float (sub $hi $lo)) 1.0 }}{{ $W := 400 }}{{ $H := 80.0 }}{{ $sw := div (float $W) (sub $n 1) }}
+    <div class="lzf__tr esea-wr__tr">
+      <p class="lzf__trh"><span class="esea__k">world rank, weekly</span> <b>#{{ (index . (sub $n 1)).vrs }}</b>{{ $dl := sub (index . 0).vrs (index . (sub $n 1)).vrs }} <span class="{{ if ge $dl 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if gt $dl 0 }}+{{ end }}{{ $dl }}</span></p>
+      <svg class="lzf__trc esea-wr__c" viewBox="0 0 {{ $W }} {{ $H }}" preserveAspectRatio="none" shape-rendering="crispEdges" role="img" aria-label="1NT world rank by week, best at the top">
+        {{- range $i, $p := $pts }}{{ $y := add 2.0 (mul (div (float (sub $p.vrs $lo)) $span) (sub $H 4)) }}
+        {{- if lt $i (sub $n 1) }}{{ $nx := index $pts (add $i 1) }}{{ $y2 := add 2.0 (mul (div (float (sub $nx.vrs $lo)) $span) (sub $H 4)) }}<rect x="{{ mul $i $sw }}" y="{{ sub $y 1 }}" width="{{ $sw }}" height="2" class="lzf__trl"><title>{{ $p.d }} · #{{ $p.vrs }} of {{ $p.of }} · S{{ $p.season }} {{ $p.div }}</title></rect><rect x="{{ sub (mul (add $i 1) $sw) 1 }}" y="{{ sub (math.Min $y $y2) 1 }}" width="2" height="{{ add (math.Abs (sub $y2 $y)) 2 }}" class="lzf__trl"/>{{ end }}
+        {{- end }}
+      </svg>
+      <p class="esea-fc__axis lzf__axis"><span>{{ (time (index . 0).d).Format "Jan 2006" }}</span><span>best #{{ $lo }} · worst #{{ $hi }}</span><span>{{ (time (index . (sub $n 1)).d).Format "Jan 2" }}</span></p>
+    </div>
+    {{- end }}{{ end }}
+  </div>
+  <div class="win__status"><span>VRS-equivalent rank · ESEA S{{ index $w.seasons 0 }}–S{{ index $w.seasons 1 }} (FACEIT) on the pro scale · {{ (time $w.asof).Format "Jan 2" }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end }}{{ end }}
 
 {{- else if eq $part "rankings" }}
 {{- /* S59 rankings: every team in the division: standing, record, round differential, team ARK,

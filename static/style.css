@@ -5115,3 +5115,7 @@ a.tick__g--nw:hover .tick__me { color: #fff; }
   .wt-table .st-team .cfb__dim { display: none; }
   .wt-table td, .wt-table th { padding-left: 4px; padding-right: 4px; }
 }
+.cs__t--5 { background: transparent; color: #c9b6ff; border-style: dashed; }   /* Tier 5: ESEA Advanced level */
+.cs__t--6 { background: transparent; color: inherit; opacity: 0.5; border-style: dotted; }   /* Tier 6: ESEA Main level */
+.esea-wr .lzf__body > .esea-wr__tr { grid-column: 1 / -1; } .esea-wr__c { height: 80px; }   /* 1NT world rank chart: best at the top */
+.esea-wr .lzf__tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }

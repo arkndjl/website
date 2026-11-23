@@ -2594,7 +2594,7 @@
       var nw = half - 90 - (logos[k] ? LS + 36 : 0), fs = 120, tn = (t[0].ark ? t[0].ark + ' ' : '') + t[0].name;   // a long name steps the size down before it's cut
       g.textAlign = al; g.font = fs + 'px ' + FONT; while (fs > 56 && g.measureText(tn).width > nw) { fs -= 8; g.font = fs + 'px ' + FONT; }
       g.fillStyle = C.white; g.fillText(fit(g, tn, nw), tx, hy);
-      g.font = '44px ' + FONT; g.fillStyle = C.teal; g.fillText([t[0].std ? 'STANDINGS ' + t[0].std : '', t[0].rec].filter(Boolean).join(' · '), tx, hy + 110);
+      g.font = '44px ' + FONT; g.fillStyle = C.teal; g.fillText([t[0].std ? 'STANDINGS ' + t[0].std : '', t[0].world ? 'WORLD ' + t[0].world : '', t[0].rec].filter(Boolean).join(' · '), tx, hy + 110);
       if (t[0].talent != null) {   // team talent: the five's mean, drawn as stars (half steps)
         var st = Math.round(t[0].talent * 2) / 2, sw = 5 * (40 + 6) - 6, sx = k ? tx - sw : tx;
         drawStars(g, sx, hy + 180, st, 40);

@@ -158,7 +158,7 @@ def equiv(s, lad):
     return max(above) if above else 1
 
 
-def anchored(E, pro, st_snaps, months, dstart, P):
+def anchored(E, pro, st_snaps, months, dstart, P, weeks=None, keep=None):
     """ESEA ratings on the pro scale: a bridged player with ANCHOR+ pro series is fixed at his pro rating (the snapshot
     before the match's month); everyone else carries an ESEA rating that starts at his first division's level
     (dstart) and moves on each match (series result; a Bo1 on round share). -> (per-match rows, final ratings)."""
@@ -169,6 +169,8 @@ def anchored(E, pro, st_snaps, months, dstart, P):
         if any(not m[f].get("id") or m[f]["id"] == "bye" or len(m[f]["roster"]) < 4 for f in ("f1", "f2")):
             continue
         d = dt.datetime.fromtimestamp(m["at"], dt.timezone.utc).date().isoformat()
+        while weeks and d >= weeks[0]:  # ESEA ratings as of each week's start (scripts/esea_world.py)
+            keep[weeks.pop(0)] = dict(rt)
         sn = st_snaps[max([x for x in months if x <= d] or [months[0]])]
         side = []
         for f in ("f1", "f2"):
@@ -199,6 +201,8 @@ def anchored(E, pro, st_snaps, months, dstart, P):
                 k = P["Kmin"] + (P["K"] - P["Kmin"]) * math.exp(-n[pid] / P["n0"])
                 rt[pid] += sg * k * (y - e)
                 n[pid] += 1
+    for w in weeks or []:
+        keep[w] = dict(rt)
     return out, rt
 
 
