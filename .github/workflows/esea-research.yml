@@ -4,6 +4,13 @@ name: esea research
 
 on:
   workflow_dispatch:
+    inputs:
+      regions:
+        description: "1 = every region's Advanced/Main/Intermediate results with nicknames (scripts/esea_regions_fetch.mjs) instead"
+        default: "0"
+      probe:
+        description: "1 = print what the FACEIT API returns for discovery, fetch nothing"
+        default: "0"
 
 permissions:
   contents: write
@@ -18,16 +25,24 @@ jobs:
         with:
           node-version: 22
       - name: Fetch
+        if: inputs.regions != '1'
         run: node scripts/esea_research_fetch.mjs
         env:
           FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
           ESEA_CRAWL: 150
           ESEA_FROM: 53
+      - name: Fetch every region
+        if: inputs.regions == '1'
+        run: node scripts/esea_regions_fetch.mjs
+        env:
+          FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
+          ESEA_FROM: 53
+          ESEA_PROBE: ${{ inputs.probe == '1' && '1' || '' }}
       - name: Commit
         run: |
           git config user.name "arkboard-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -f research/esea_matches.json.gz
+          git add -f research/esea_matches.json.gz research/esea_regions.json.gz 2>/dev/null || git add -f research/esea_regions.json.gz || git add -f research/esea_matches.json.gz
           git commit -m "ESEA research data ($(date -u +%Y-%m-%dT%H:%MZ))" || exit 0
           git pull --rebase -q origin "${GITHUB_REF_NAME}"
           git push
