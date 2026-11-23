@@ -1031,7 +1031,7 @@
     <div class="esea-br__col">
       <p class="esea-br__rh">{{ if eq $g.label "grand final" }}final{{ else }}round {{ add $i 1 }}{{ end }}</p>
       <div class="esea-br__ms">
-      {{- range .m }}{{ $m := . }}{{ $us := or (eq .a.id "a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a") (eq .b.id "a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a") }}
+      {{- range where (where .m "a.name" "!=" "BYE") "b.name" "!=" "BYE" }}{{ $m := . }}{{ $us := or (eq .a.id "a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a") (eq .b.id "a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a") }}
       <div class="esea-br__m{{ if $us }} is-us{{ end }}{{ if eq .st "FINISHED" }} is-done{{ else if ne .st "SCHEDULED" }} is-live{{ end }}" title="{{ with .at }}{{ (time.In "America/New_York" (time (int (div . 1000)))).Format "Mon Jan 2 · 3:04 PM" }} ET{{ end }}{{ with .bo }} · Bo{{ . }}{{ end }}">
         {{- range $k, $t := slice .a .b }}{{ $n := add $k 1 }}{{ $won := eq $m.w $n }}
         <a class="esea-br__t{{ if $won }} is-w{{ else if $m.w }} is-l{{ end }}{{ if eq $t.id "a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a" }} is-1nt{{ end }}"{{ with $m.url }} href="{{ . }}" rel="noopener"{{ end }}>
