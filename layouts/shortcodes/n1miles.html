@@ -16,6 +16,11 @@
 .n1m__rk { display: block; font-size: .75em; opacity: .75; }
 .n1m__rk.is-top { opacity: 1; color: var(--accent); }
 .n1m__up { color: var(--accent); }
+.n1m__mv { display: inline-block; vertical-align: middle; margin: 0 6px 0 0; width: 10px; height: 8px; }
+.esea-wr__mv { fill: var(--accent); opacity: .7; } .esea-wr__mv.is-down { fill: #ff9ec7; }
+.n1m__mv rect { fill: var(--accent); } .n1m__mv.is-down rect { fill: #ff9ec7; }
+.n1m tr.is-up td { box-shadow: inset 0 2px 0 color-mix(in srgb, var(--accent) 55%, transparent); }
+.n1m tr.is-down td { box-shadow: inset 0 2px 0 color-mix(in srgb, #ff9ec7 55%, transparent); }
 .n1m__dn { color: #ff9ec7; }
 .n1m__ser { display: inline-flex; gap: 2px; vertical-align: middle; }
 .n1m__ser i { display: inline-block; width: 10px; height: 10px; background: var(--foreground); font-style: normal; }
@@ -55,9 +60,9 @@
     <thead><tr><th>Season</th><th>Division</th><th>W–L</th><th title="rounds won minus lost">Rd ±</th><th title="final regular-season standing in the division (FACEIT leaderboard)">Finish</th><th>Playoffs</th><th title="playoff series, in order">Series</th><th title="playoff placing: teams knocked out the same day share the range">Place</th><th title="eliminated by">Out</th></tr></thead>
     <tbody>
     {{- range $i, $s := $D.seasons }}
-    <tr>
+    <tr{{ with $s.move }} class="is-{{ . }}"{{ end }}>
       <td>S{{ $s.season }}</td>
-      <td>{{ $s.div }}</td>
+      <td>{{ with $s.move }}{{ partial "px/mv.html" (dict "up" (eq . "up") "title" (printf "%s from %s" (cond (eq . "up") "promoted" "relegated") $s.from)) }}{{ end }}{{ $s.div }}</td>
       <td class="cfb__num">{{ $s.w }}–{{ $s.l }}</td>
       <td class="cfb__num">{{ with $s.rf }}{{ $rd := sub (int $s.rf) (int $s.ra) }}<span class="{{ if gt $rd 0 }}cfb__up{{ else if lt $rd 0 }}cfb__down{{ end }}">{{ if gt $rd 0 }}+{{ end }}{{ $rd }}</span>{{ end }}</td>
       <td class="cfb__num">{{ with $s.standing }}{{ if .rank }}<span title="{{ if eq .src "archive" }}wins then round diff over every match{{ else }}FACEIT leaderboard{{ end }}{{ if $s.current }} · live{{ end }}">{{ if .tied }}T-{{ end }}{{ .rank }}<span class="n1m__rk">of {{ .of }}</span></span>{{ end }}{{ else }}—{{ end }}</td>
@@ -81,7 +86,7 @@
   </div>
   <ol class="n1m__log">
     {{- range . }}
-    <li><span class="cfb__num">{{ (time.In "America/New_York" (time (int (div .at 1000)))).Format "Jan 2006" }}</span><span class="esea__k">{{ with .s }}S{{ . }}{{ end }}</span><i class="n1m__dot is-{{ .k }}" aria-hidden="true"></i><span>{{ .t }}</span></li>
+    <li><span class="cfb__num">{{ (time.In "America/New_York" (time (int (div .at 1000)))).Format "Jan 2006" }}</span><span class="esea__k">{{ with .s }}S{{ . }}{{ end }}</span>{{ if or (eq .k "up") (eq .k "down") }}{{ partial "px/mv.html" (dict "up" (eq .k "up")) }}{{ else }}<i class="n1m__dot is-{{ .k }}" aria-hidden="true"></i>{{ end }}<span>{{ .t }}</span></li>
     {{- end }}
   </ol>
   <div class="win__status"><span title="debut, division moves, playoff firsts, division top 3 on any stat (top 10 on RWA/ARK), world-rank firsts">{{ len . }} milestones · {{ (time $D.asof).Format "Jan 2" }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>

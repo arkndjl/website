@@ -188,6 +188,18 @@ def main():
         byc[m['champ']].append(m)
     full = set()   # championships whose missing matches scripts/esea_div_backfill.mjs filled
     ids = {m['id'] for m in raw.get('matches') or []}
+    # 1NT's own league matches (research/esea_1nt_history.json.gz, both fives' lines) where the archive lacks them
+    ln = lambda q: [q[0], q[2][0], q[2][6], q[2][7], q[2][8], q[2]]
+    for h in hist.get('matches') or []:
+        if h['id'] in ids or h.get('comp') not in (hist.get('comps') or {}) or not h.get('maps'):
+            continue
+        ids.add(h['id'])
+        byc[h['comp']].append({'id': h['id'], 'champ': h['comp'], 'at': (h.get('at') or 0) // 1000,
+                               'winner': 'faction1' if h.get('winner') == 'us' else 'faction2',
+                               'f1': {'id': TEAM, 'roster': (h.get('us') or {}).get('roster') or []},
+                               'f2': {'id': (h.get('opp') or {}).get('id'), 'roster': (h.get('opp') or {}).get('roster') or []},
+                               'maps': [{'map': x['map'], 's1': x['rf'], 's2': x['ra'], 'p1': [ln(q) for q in x.get('us') or []],
+                                         'p2': [ln(q) for q in x.get('them') or []]} for x in h['maps']]})
     for m in (load('research/esea_div_backfill.json.gz', True) or {}).get('matches') or []:
         full.add(m['champ'])
         if m['id'] not in ids:
@@ -326,7 +338,8 @@ def main():
             add(at, sn, 'debut', f'ESEA debut · {x["div"]}')
         elif level(x['div']) != level(prevs['div']):
             up = level(x['div']) > level(prevs['div'])
-            add(at, sn, 'up' if up else 'down', f'{"Up" if up else "Down"} to {x["div"].split(" ")[0]}')
+            add(at, sn, 'up' if up else 'down', f'{"Promoted" if up else "Relegated"} to {x["div"].split(" ")[0]} · from {prevs["div"]}')
+            x['move'], x['from'] = ('up' if up else 'down'), prevs['div']
         p = x['playoffs']
         if p and p['series']:
             if not po_seen:
