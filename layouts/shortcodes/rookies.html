@@ -62,6 +62,7 @@
     function fmt(x, f) {
       if (x == null || x === '') return f === 's' ? '' : DASH;
       if (f === 's') return '<span class="cfb__dim">' + esc(x) + '</span>';
+      if (f === 't') return esc(x);
       if (f === 'i') return Math.round(x).toLocaleString();
       if (f === 'p') return Math.round(x) + '%';
       if (f === 'm') return (x < 0 ? '<span class="cfb__down">-$' : '$') + Math.abs(x).toFixed(1) + 'M' + (x < 0 ? '</span>' : '');
@@ -97,12 +98,19 @@
       var key = view, hasPre = !!D.pre && has('pre'), hasPfv = !!D.pfv && has('pfv');
       var c = [{ k: 'rk', l: 'RK', t: 'rank within the filters, by the view', num: 1, cls: '' }, { k: 'n', l: 'Player', t: '', cls: '' }];
       if (wkIdx() >= 0) c.push({ k: 'wk', l: '±', t: '± = rank change by the view since the last ' + DOW[new Date(season().wkFrom + 'T12:00Z').getUTCDay()] + ' post (' + window.__wk.day(season().wkFrom) + '), within the filters; hover for the rank and value then', num: 1, cls: '' });
-      D.cols.forEach(function (x) { if (x.k !== key && !has(x.k)) return; c.push({ k: x.k, l: x.l, t: x.t, f: x.f, num: x.num, cls: 'nbaxpm__v' + (x.k === key ? ' is-key' : ' nbaxpm__ph') + (x.f === 's' ? ' rookies__line' : ''), val: 1 }); });
-      c.push({ k: 'pos', l: 'Pos', t: 'position, rank at position within the filters', cls: 'cfb__g nbaxpm__ph' });
+      var mob = D.mob || [], lead = D.mob ? ['yr'] : [];   // next up: FV (or the rate stat) stays on phones; position, class and age ride on the team line
+      var posC = { k: 'pos', l: 'Pos', t: 'position, rank at position within the filters', cls: 'cfb__g nbaxpm__ph' },
+          ageC = season().rows.some(function (r) { return r.age != null; }) ? { k: 'age', l: 'Age', t: 'age', num: 1, cls: 'nbaxpm__ph' } : null;   // a view with no ages (CBB top performers) drops the column
+      var col = function (x) { if (x.k !== key && !has(x.k)) return; c.push({ k: x.k, l: x.l, t: x.t, f: x.f, num: x.num, cls: 'nbaxpm__v' + (x.k === key ? ' is-key' : mob.indexOf(x.k) >= 0 ? '' : ' nbaxpm__ph') + (x.f === 's' ? ' rookies__line' : ''), val: 1 }); };
+      if (D.mob) {   // next up: who he is first (position, class, age), then the odds
+        c.push(posC); D.cols.filter(function (x) { return lead.indexOf(x.k) >= 0; }).forEach(col); if (ageC) c.push(ageC);
+      }
+      D.cols.filter(function (x) { return lead.indexOf(x.k) < 0; }).forEach(col);
+      if (!D.mob) c.push(posC);
       if (hasPre) c.push({ k: 'pre', l: D.pre.l, t: D.pre.t, num: 1, cls: 'rookies__pre' });
       if (hasPfv) c.push({ k: 'pfv', l: D.pfv.l, t: D.pfv.t, num: 1, cls: 'nbaxpm__ph' });
       if (hasPre) c.push({ k: 'dl', l: 'Δ', t: 'rank by ' + D.pre.l.toLowerCase() + ' minus rank by the view, among the rows shown that have one: + = playing above where he was picked', num: 1, cls: '' });
-      if (season().rows.some(function (r) { return r.age != null; })) c.push({ k: 'age', l: 'Age', t: 'age', num: 1, cls: 'nbaxpm__ph' });   // a view with no ages (CBB top performers) drops the column
+      if (ageC && !D.mob) c.push(ageC);
       return c;
     }
     function render() {
@@ -151,7 +159,7 @@
       var gfxRow = function (r) {
         return '<tr>' + C.map(function (c) {
           if (c.k === 'rk') return '<td class="cfb__rk">' + r.rk + '</td>';
-          if (c.k === 'n') return '<td>' + face(r.ph) + '<b>' + esc(r.n) + '</b>' + (r.prov ? ' <span class="cfb__dim">prov</span>' : '') + ' <span class="cfb__dim nbaxpm__tm">' + logo(r.lo) + esc(r.tm) + (r.sub ? ' · ' + esc(r.sub) : '') + '</span>' + '</td>';
+          if (c.k === 'n') return '<td>' + face(r.ph) + '<b>' + esc(r.n) + '</b>' + (r.prov ? ' <span class="cfb__dim">prov</span>' : '') + ' <span class="cfb__dim nbaxpm__tm">' + logo(r.lo) + esc(r.tm) + (r.sub ? ' · ' + esc(r.sub) : '') + (D.mob ? '<span class="rookies__mob"><br>' + esc([r.pos, r.yr, r.age == null ? '' : r.age % 1 ? r.age.toFixed(1) : r.age].filter(function (v) { return v !== '' && v != null; }).join(' · ')) + '</span>' : '') + '</span>' + '</td>';
           if (c.k === 'pos') return '<td class="' + c.cls + '">' + esc(r.pos) + '<span class="cfb__dim">' + r.pr + '</span></td>';
           if (c.k === 'pre') return '<td class="cfb__num ' + c.cls + '">' + (r.preL ? esc(r.preL) : DASH) + '</td>';
           if (c.k === 'pfv') return '<td class="cfb__num ' + c.cls + '">' + (r.pfv == null ? DASH : r.pfv) + '</td>';
@@ -183,7 +191,7 @@
       // gfx: the file names the GFX's columns after the view (CFB true freshmen: Stat+, xNIL), a dash where a row has none
       if (D.gfx) gc = ['RK', 'Player', kl].concat(D.gfx.filter(function (k) { return k !== key && has(k); }).map(lab).filter(Boolean));
       if (D.title === 'next up') {   // next up: age, best so far, then the current value and its ceiling (or the workload)
-        gc = ['RK', 'Player', 'Age', kl].concat((lab('xc') ? ['best', 'x', 'xc'] : ['best', 'u']).map(lab).filter(function (l) { return l && l !== kl; }));
+        gc = ['RK', 'Player', 'Pos'].concat(['yr'].map(lab).filter(Boolean), ['Age', kl], ['fv', 'war'].map(lab).filter(Boolean)).concat((lab('xc') ? ['best', 'x', 'xc'] : ['best', 'u']).map(lab).filter(function (l) { return l && l !== kl; }));
       }
       win.dataset.gfxCols = gc.join(',');
       var t = D.asof ? new Date(D.asof.length === 10 ? D.asof + 'T12:00Z' : D.asof) : null;
