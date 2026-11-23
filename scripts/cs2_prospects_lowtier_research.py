@@ -165,9 +165,7 @@ def esea_ids(M):
     import esea_rwa_research as R  # noqa: F401
     e = json.load(gzip.open(ROOT / "research" / "esea_regions.json.gz"))
     nick, teams, mates = defaultdict(set), defaultdict(set), defaultdict(set)
-    for m in e["matches"]:
-        if m.get("region") != "NA":
-            continue
+    for m in e["matches"]:        # every region (Nov 23: EU players reach bo3.gg events too)
         for f in ("f1", "f2"):
             ros = [q for q in m[f]["roster"] if len(q) > 2]
             for q in ros:
