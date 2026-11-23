@@ -4,7 +4,9 @@ features for scripts/awards_research.py and scripts/awards.py.
 
 History: ESPN season stats (the leaders by passing, rushing, receiving, touchdowns, sacks, tackles and interceptions,
 each player's regular-season line and his team's record; scripts/.cache/awards/espn/), Heisman voting from each FBS
-season's Wikipedia page, AP award winners from Wikipedia's award pages."""
+season's Wikipedia page, AP award winners from Wikipedia's award pages. The history pools (scripts/.cache, not in CI)
+are rebuilt with `python3 scripts/awards_football.py nfl|cfb` (build_pool). CPOY, COY, All-Pro and the Nov 23 retries:
+scripts/awards_football_more.py."""
 import concurrent.futures as cf, html, json, os, re, sys, time, urllib.parse, urllib.request
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import names as NM
@@ -29,10 +31,10 @@ STATS = {'passing': ['passingYards', 'passingTouchdowns', 'interceptions', 'pass
                      'QBRating', 'yardsPerPassAttempt', 'sacks'],
          'rushing': ['rushingYards', 'rushingTouchdowns', 'rushingAttempts'],
          'receiving': ['receivingYards', 'receivingTouchdowns', 'receptions'],
-         'defensive': ['sacks', 'totalTackles', 'tacklesForLoss', 'passesDefended', 'stuffs'],
+         'defensive': ['sacks', 'totalTackles', 'tacklesForLoss', 'passesDefended', 'stuffs', 'QBHits'],
          'defensiveInterceptions': ['interceptions', 'interceptionTouchdowns'],
          'general': ['gamesPlayed', 'fumblesForced'], 'scoring': ['totalTouchdowns'],
-         'returning': ['kickReturnTouchdowns', 'puntReturnTouchdowns'],
+         'returning': ['kickReturnTouchdowns', 'puntReturnTouchdowns', 'kickReturnYards', 'puntReturnYards'],
          'kicking': ['fieldGoalsMade', 'fieldGoalAttempts', 'fieldGoalPct', 'longFieldGoalMade', 'fieldGoalsMade50',
                      'fieldGoalAttempts50', 'extraPointsMade'],
          'punting': ['punts', 'grossAvgPuntYards', 'netAvgPuntYards', 'puntsInside20']}
@@ -145,7 +147,8 @@ def heisman_votes(season):
 
 NFL_PAGES = {'mvp': 'AP_NFL_Most_Valuable_Player', 'opoy': 'AP_NFL_Offensive_Player_of_the_Year',
              'dpoy': 'AP_NFL_Defensive_Player_of_the_Year', 'oroy': 'AP_NFL_Offensive_Rookie_of_the_Year',
-             'droy': 'AP_NFL_Defensive_Rookie_of_the_Year'}
+             'droy': 'AP_NFL_Defensive_Rookie_of_the_Year', 'cpoy': 'AP_NFL_Comeback_Player_of_the_Year',
+             'coy': 'AP_NFL_Coach_of_the_Year'}
 
 
 def nfl_winners(award):
@@ -258,7 +261,8 @@ def features(v):
             'itd': g('defe.interceptionTouchdowns'), 'fgm': g('kick.fieldGoalsMade'), 'fga': g('kick.fieldGoalAttempts'),
             'fgpct': g('kick.fieldGoalsMade') / g('kick.fieldGoalAttempts') if g('kick.fieldGoalAttempts') else 0.0,
             'fg50': g('kick.fieldGoalsMade50'), 'long': g('kick.longFieldGoalMade'), 'punts': g('punt.punts'),
-            'gross': g('punt.grossAvgPuntYards'), 'net': g('punt.netAvgPuntYards'), 'in20': g('punt.puntsInside20')}
+            'gross': g('punt.grossAvgPuntYards'), 'net': g('punt.netAvgPuntYards'), 'in20': g('punt.puntsInside20'),
+            'qbh': g('defe.QBHits'), 'rec_td': rtd + ctd, 'gp': g('gene.gamesPlayed')}
 
 
 def _order(pool, names):
@@ -380,3 +384,73 @@ def nfl_races():
             races[a].append((S, pool, o[:1]))
         for n in W['mvp'].get(S, [])[:1]: mvps[NM.key(n)] = mvps.get(NM.key(n), 0) + 1
     return races
+
+
+# ---------------------------------------------------------------- history pools (scripts/.cache, rebuilt on demand)
+
+AP_POS = {'Quarterback': 'QB', 'Running back': 'RB', 'Wide receiver': 'WR', 'Tight end': 'TE', 'Defensive end': 'EDGE',
+          'Edge rusher': 'EDGE', 'Defensive tackle': 'IDL', 'Interior lineman': 'IDL', 'Defensive lineman': 'IDL',
+          'Outside linebacker': 'LB', 'Inside linebacker': 'LB', 'Linebacker': 'LB', 'Middle linebacker': 'LB',
+          'Off-ball linebacker': 'LB', 'Cornerback': 'CB', 'Safety': 'S', 'Interior lineman / defensive tackle': 'IDL'}
+# All-Pro (AP first team) position races, scripts/awards_football_more.py: race -> (ESPN pool rule, AP groups named,
+# voter features, null). k per race = the fewest the AP named in a season 2005-25 (data/awards_fit.json nfl allpro k)
+_FRONT = {'DE', 'DT', 'NT', 'DL', 'LB', 'OLB', 'ILB', 'MLB', 'EDGE'}
+AP_GROUPS = {
+    'QB': (lambda r: r['pos'] == 'QB', ['QB'], ['yds', 'td', 'int', 'wp', 'prev_ap'], ['yds', 'td']),
+    'RB': (lambda r: r['pos'] in ('RB', 'FB'), ['RB'], ['scrim', 'rec_td', 'rec', 'wp', 'prev_ap'], ['scrim', 'td']),
+    'WR': (lambda r: r['pos'] == 'WR', ['WR'], ['rec_y', 'ctd', 'rec', 'wp', 'prev_ap'], ['rec_y', 'ctd']),
+    'TE': (lambda r: r['pos'] == 'TE', ['TE'], ['rec_y', 'ctd', 'rec', 'wp', 'prev_ap'], ['rec_y', 'ctd']),
+    'FRONT': (lambda r: r['def'] and r['pos'] in _FRONT, ['EDGE', 'IDL', 'LB'],
+              ['sacks', 'tfl', 'qbh', 'tackles', 'ff', 'dint', 'wp', 'prev_ap'], ['sacks', 'tackles']),
+    'DB': (lambda r: r['def'] and r['pos'] in ('CB', 'S', 'FS', 'SS', 'DB'), ['CB', 'S'],
+           ['dint', 'pd', 'tackles', 'itd', 'ff', 'wp', 'prev_ap'], ['dint', 'pd'])}
+CFB_MORE_PAGES = ['Outland_Trophy', 'Lombardi_Award', 'Dave_Rimington_Trophy', 'Johnny_Unitas_Golden_Arm_Award',
+                  'Paul_Hornung_Award', 'Burlsworth_Trophy']
+
+
+def allpro(season):
+    """{position group: [names]} of the AP first team (Wikipedia's All-Pro page: entries tagged AP, not AP-2)"""
+    h = wiki(f'{season}_All-Pro_Team')
+    out = {}
+    for t in re.findall(r'<table class="wikitable.*?</table>', h, re.S):
+        for tr in re.findall(r'<tr[^>]*>(.*?)</tr>', t, re.S):
+            c = cells(tr)
+            lab = next((g for k, g in AP_POS.items() if c and c[0].lower().startswith(k.lower())), None)
+            if len(c) < 2 or not lab: continue
+            for n, tags in re.findall(r'([^,()]+?)\s*,\s*[^()]*?\(([^)]*)\)', c[1]):
+                tg = [x.strip() for x in tags.split(',')]
+                if ('AP' in tg or 'AP-t' in tg) and n.strip() not in out.get(lab, []):
+                    out.setdefault(lab, []).append(n.strip())
+    return out
+
+
+def build_pool(lg, seasons):
+    """the history pool of every season (leaders + every named award winner / vote-getter, stats, season teams and
+    records; NFL also each player's line the season before), written to POOL"""
+    extra = {}
+    for s in seasons:
+        ns = []
+        if lg == 'cfb':
+            ns += [n for n, _, _, _ in heisman_votes(s)]
+            for page in [v[0] for v in CFB_AWARDS.values()] + CFB_MORE_PAGES:
+                w = award_winners(page).get(s)
+                if w: ns.append(w)
+        else:
+            for a in NFL_PAGES:
+                if a != 'coy': ns += nfl_winners(a).get(s, [])
+            for v in allpro(s).values(): ns += v
+        extra[s] = ns
+    P = pull(lg, seasons, extra)
+    P = fix_teams(lg, {str(s): v for s, v in P.items()})
+    if lg == 'nfl':
+        for s, ids in P.items():
+            with cf.ThreadPoolExecutor(8) as ex:
+                pv = dict(zip(ids, ex.map(lambda i: athlete_stats(lg, int(s) - 1, i), ids)))
+            for i, v in ids.items(): v['prev'] = pv[i]
+            print(lg, s, 'previous seasons', flush=True)
+    json.dump(P, open(POOL % lg, 'w'))
+    return P
+
+
+if __name__ == '__main__':
+    build_pool(sys.argv[1], range(2005, 2026))
