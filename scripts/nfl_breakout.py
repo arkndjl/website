@@ -545,7 +545,8 @@ def build():
                      'ph': img.replace('/f_auto,q_auto/', '/f_auto,q_auto,w_96/') if img.startswith('https://') else None,
                      'lo': lo if os.path.exists(os.path.join(ROOT, 'static', lo.lstrip('/'))) else None,
                      'p': round(p, 3), 'best': round(best(P, a), 1), 'u': round(a['u'], 1), 't': t,
-                     'sig': [BO_LABEL[k] for v, k in push[:2] if v > 0.1]})
+                     'sig': [BO_LABEL[k] for v, k in push[:2] if v > 0.1],
+                     'st': a.get('pick') if a.get('pick') and a['pick'] < 270 else None})   # draft slot, next up EDGE
     rows.sort(key=lambda r: -r['p'])
     fin = bo['final']
     sw = fit.get('sweep') or {}

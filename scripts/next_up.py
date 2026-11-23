@@ -5,6 +5,7 @@ sport's *_breakout.py) into the shared leaderboard shape layouts/shortcodes/rook
 
     python3 scripts/next_up.py [sport ...]      # default: every sport file present. stdlib only"""
 import json
+import math
 import os
 import sys
 
@@ -18,6 +19,7 @@ BEST = {'nba': ('best BPM', 'best season BPM so far, shrunk by minutes; breakout
         'cfb': ('best z', 'best season PFN score z so far, shrunk; breakout bar .32', 's2')}
 YOUNG = os.path.join(ROOT, 'data', 'next_up_young.json')   # scripts/next_up_young_research.py: who counts as young
 UNDER = ('Fr', 'So', 'RS-Fr', 'RS-So')
+STATUS = os.path.join(ROOT, 'data', 'next_up_status.json')  # scripts/next_up_status_research.py: odds from status alone
 POS = ['PG', 'SG', 'SF', 'PF', 'C', 'G', 'F', 'QB', 'RB', 'WR', 'TE', 'D', 'LW', 'RW', 'FW', 'AM', 'W', 'MF', 'CM',
        'DM', 'DF', 'FB', 'CB', 'GK']
 
@@ -67,6 +69,23 @@ def young(sport, r, Y):
 def convert(sport):
     src = json.load(open(os.path.join(DIR, sport + '.json')))
     Y = json.load(open(YOUNG)) if os.path.exists(YOUNG) else {}
+    SF = (json.load(open(STATUS)) if os.path.exists(STATUS) else {}).get(sport)
+    if SF:
+        import next_up_status_research as NS
+        DR = json.load(open(os.path.join(ROOT, 'scripts', 'nba_draft_picks.json'))) if sport == 'nba' else {}
+
+    def edge(r):
+        """BO% minus the odds his status alone gives (points); a first-year's odds are his status's, so 0"""
+        if not SF or r.get('p') is None or r.get('intl'):
+            return None
+        if r.get('fr'):
+            return 0.0
+        st = r.get('st')
+        if sport == 'nba':
+            st = (DR.get(str(r.get('id'))) or [None, None])[1]
+        x = NS.status_x(sport, st)
+        z = SF['fit']['b0'] + sum(b * v for b, v in zip(SF['fit']['b'], x))
+        return round(100 * r['p'] - 100 / (1 + math.exp(-max(-30, min(30, z)))), 1)
     try:
         M = board(sport)
     except (OSError, ValueError, KeyError) as e:
@@ -75,6 +94,10 @@ def convert(sport):
     tiers, st = src.get('tiers') or [], src.get('stat') or {}
     u = src.get('u') or {}
     cols = [{'k': 'p', 'l': 'BO%', 't': 'breakout odds next season', 'f': 'p', 'ph': 0, 'num': 1}]
+    if SF:
+        cols = [{'k': 'e', 'l': 'EDGE', 't': 'BO%% minus the breakout odds of his status alone (%s), points'
+                 % {'cbb': 'recruiting rank', 'cfb': 'recruiting stars', 'nba': 'draft slot', 'nfl': 'draft slot',
+                    'soccer': 'market value'}[sport], 'f': 's1', 'num': 1}] + cols
     if sport in ('cfb', 'cbb'):
         cols += [{'k': 'yr', 'l': 'Class', 't': 'class this season', 'f': 't', 'num': 0},
                  {'k': 'fv', 'l': 'FV', 't': 'future value (board)', 'f': '0', 'num': 1}]
@@ -87,7 +110,7 @@ def convert(sport):
     if any(r.get('best') is not None for r in src.get('rows') or []) and sport in BEST:
         lb, tt, f = BEST[sport]
         cols.append({'k': 'best', 'l': 'Best', 't': tt, 'f': f, 'ph': 1, 'num': 1})
-    views = [['p', 'BO%', 'breakout odds next season']]
+    views = ([['e', 'EDGE', 'BO% minus the odds his status alone gives']] if SF else []) + [['p', 'BO%', 'breakout odds next season']]
     for k, m in (('x', src.get('cur')), ('xc', src.get('ceil'))):     # current value and its usage-up ceiling
         if m:
             cols.append({'k': k, 'l': m['lab'], 't': m['t'], 'f': str(m.get('dec', 1)), 'ph': 1, 'num': 1})
@@ -108,7 +131,7 @@ def convert(sport):
         o = {'n': r['n'], 'tm': r.get('tm') or '', 'pos': r.get('pos') or '', 'age': r.get('age'), 'ph': r.get('ph'),
              'lo': r.get('lo'), 'sub': r.get('sub') or '', 'p': None if r.get('p') is None else round(100 * r['p'], 1),
              'u': r.get('u'), 'sig': ' · '.join(r.get('sig') or []), 'best': r.get('best'), 'x': r.get('x'),
-             'xc': r.get('xc')}
+             'xc': r.get('xc'), 'e': edge(r)}
         if M is not None:
             m, _ = M.find(o['n'], team=o['tm'], pos=o['pos'] or None,
                           id=str(r.get('id') or '') or None if sport == 'cfb' else None)   # CBB rows carry Barttorvik ids
@@ -135,7 +158,14 @@ def convert(sport):
     y = Y.get(sport) or {}
     mob = ['fv'] if sport in ('cfb', 'cbb') else ['war'] if sport == 'nfl' else ['x']   # phones: + pos, class, age on the team line
     who = ('Fr/So only' if y.get('rule') == 'cls' else 'age %d and under' % y['max_age'] if y.get('max_age') else '')
-    out = {'sport': sport, 'asof': src.get('asof'), 'title': 'next up', 'key': 'p', 'mob': mob,
+    mob = (['p'] if SF else []) + mob
+    # EDGE leads where its held-out top 25s found more breakouts beyond their status than BO%'s did
+    lead = bool(SF) and (SF['top_by_edge']['breakouts'] - SF['top_by_edge']['status_implied']
+                         > SF['top_by_bo']['breakouts'] - SF['top_by_bo']['status_implied'])
+    if SF and not lead:
+        views[0], views[1] = views[1], views[0]
+        cols[0], cols[1] = cols[1], cols[0]
+    out = {'sport': sport, 'asof': src.get('asof'), 'title': 'next up', 'key': 'e' if lead else 'p', 'mob': mob,
            'def': (src.get('about', '') + (' · ' + who if who else '')).strip(' ·'),
            'views': views, 'cols': cols, 'pos': pos if len(pos) <= 12 else [],
            'seasons': [{'s': src.get('season', ''), 'l': src.get('season', '') + (' · base ' + src['base'] if src.get('base') and src.get('base') != src.get('season') else ''), 'rows': rows}]}

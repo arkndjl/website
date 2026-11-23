@@ -293,7 +293,7 @@ def rookies(rows, cur):
         z = ff['fit']['b0'] + ff['fit']['b'][0] * -math.log(r['pre'])
         rows.append({'id': 'rk-' + r['n'], 'n': r['n'], 'x': r.get('sx'), 'xc': None, 'tm': r.get('tm'), 'pos': r.get('pos'),
                      'age': r.get('age'), 'ph': r.get('ph'), 'p': round(1 / (1 + math.exp(-max(-30, min(30, z)))), 3), 'best': None,
-                     'u': None, 't': [], 'sig': ['draft slot']})
+                     'u': None, 't': [], 'sig': ['draft slot'], 'st': r['pre'], 'fr': 1})
         n += 1
     return n
 

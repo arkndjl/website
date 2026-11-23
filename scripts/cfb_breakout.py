@@ -640,7 +640,8 @@ def main():
         rows.append({'id': m.group(1) if m else o['id'], 'n': b['name'], 'tm': b['team'],
                      'pos': 'DT' if o['g'] == 'DL' else o['g'], 'age': b.get('age') or b.get('ageEst'),
                      'ph': ph or None, 'lo': b.get('logo'), 'sub': b.get('conf') or '', 'cls': b.get('cls'),
-                     'p': round(p, 3), 'best': round(top, 2), 'u': round(o['u'], 1), 't': t, 'sig': sig})
+                     'p': round(p, 3), 'best': round(top, 2), 'u': round(o['u'], 1), 't': t, 'sig': sig,
+                     'st': None if o.get('unr') else o.get('stars')})   # status for next up EDGE (scripts/next_up_status_research.py)
     rows.sort(key=lambda r: -r['p'])
     rows = rows[:400]
     sc = fit['scaling']['off']

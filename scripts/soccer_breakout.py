@@ -362,6 +362,7 @@ def main():
                      'pos': a['pos'],
                      'age': round(age, 1) if age else None, 'ph': PH + c['ph'] if c.get('ph') else None,
                      'p': round(pr, 3), 'best': round(ref, 3), 'u': round(a['U'], 1), 't': t, 'sig': sig,
+                     'st': c.get('mv') or a.get('mv'),   # market value, next up EDGE
                      'x': round(shr(c['g90'], c['min']) if c is not a else shr(a['g90'], a['min']), 3),
                      'xc': round(CE.value(cf, ceil_inputs(a, hist), max(0.0, min(cf['scen'], cf['cap'] - a['U']))), 3)})
     rows.sort(key=lambda r: -r['p'])
