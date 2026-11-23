@@ -1,0 +1,14 @@
+name: tmp prize probe
+on:
+  push:
+    branches: [claude/project-thread-kqt824]
+    paths: [scripts/tmp_prize_probe.mjs, .github/workflows/tmp-prize-probe.yml]
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node scripts/tmp_prize_probe.mjs
+        env: {FACEIT_API_KEY: "${{ secrets.FACEIT_API_KEY }}"}
