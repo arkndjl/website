@@ -225,6 +225,7 @@ def main():
     S = RW.state()
     live = S['live']
 
+    rws = (load('data/esea_rwa.json') or {}).get('seasons') or {}
     nick = {}
     for q, n in ((load('data/esea_rwa.json') or {}).get('names') or {}).items():
         nick[q] = n
@@ -301,6 +302,11 @@ def main():
                         'kpr': round(t['k'] / t['r'], 2) if t['r'] else None,
                         'hs': round(100 * t['hk'] / t['hr']) if t['hr'] >= 0.5 * t['k'] and t['hr'] else None,
                         'ok': t['maps'] >= minm}
+            # 1NT's own lines: the one season RWA/ARK every 1NT and LAURSEN_111 window shows (data/esea_rwa.json 'seasons')
+            for q, t in P.items():
+                one = (rws.get(nick.get(q)) or {}).get(str(sn)) if t['team'].get(TEAM) else None
+                if one:
+                    V[q]['rwa'], V[q]['ark'] = one[0], one[1]
             elig = [q for q in V if V[q]['ok']]
             pool = len(elig)
             ranks = {}
@@ -328,7 +334,8 @@ def main():
         seasons_out.append({'season': sn, 'div': div, 'w': rw, 'l': rl, 'rf': s.get('rf'), 'ra': s.get('ra'),
                             'standing': st, 'playoffs': pl, 'players': players, 'pool': pool,
                             'minMaps': max(3, math.ceil(0.4 * max([q['maps'] for q in P.values()] or [0]))),
-                            'current': sn == cur, 'start': ms[0]['at'] if ms else None, 'end': ms[-1]['at'] if ms else None})
+                            'current': sn == cur, 'rsDone': sn != cur or rw + rl >= int((es.get('format') or {}).get('regSeason') or 14),
+                            'start': ms[0]['at'] if ms else None, 'end': ms[-1]['at'] if ms else None})
 
     # ---- milestone log
     # playoff round by match time (1NT's history, this season's matches)

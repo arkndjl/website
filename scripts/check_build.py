@@ -112,6 +112,37 @@ def check_awards():
             for sp, v in d.items() for r in v.get('races', []) for x in r.get('rows', []) if not (x.get('n') and x.get('tm'))]
 
 
+def check_1nt_sync():
+    """1NT + LAURSEN_111 numbers agree everywhere (Noah, Nov 23): season RWA/ARK in the season windows and the
+    milestones = data/esea_rwa.json 'seasons'; the milestones' regular-season W-L = the season log's. A milestones
+    file older than the RWA file (its step failed) only warns."""
+    L = lambda f: json.load(open(os.path.join(ROOT, 'data', f)))
+    try: rw, ss, mi = L('esea_rwa.json'), L('esea_seasons.json'), L('esea_milestones.json')
+    except Exception: return [], []
+    errs = []
+    one = rw.get('seasons') or {}
+    for sn, s in (ss.get('seasons') or {}).items():
+        for p in s.get('players') or []:
+            v = (one.get(p.get('name')) or {}).get(sn)
+            if v and p.get('rwa') != v[0]:
+                errs.append(f'data/esea_seasons.json S{sn} {p["name"]} RWA {p.get("rwa")} but esea_rwa.json has {v[0]}')
+    for s in mi.get('seasons') or []:
+        sn = str(s['season'])
+        for p in s.get('players') or []:
+            v = (one.get(p.get('name')) or {}).get(sn)
+            if v and (p.get('rwa'), p.get('ark')) != (v[0], v[1]):
+                errs.append(f'data/esea_milestones.json S{sn} {p["name"]} RWA/ARK {p.get("rwa")}/{p.get("ark")} but esea_rwa.json has {v[0]}/{v[1]}')
+        x = (ss.get('seasons') or {}).get(sn) or {}
+        if x and not s.get('current'):
+            w = sum(1 for m in x.get('matches') or [] if not m.get('po') and m.get('res') == 'W')
+            l = sum(1 for m in x.get('matches') or [] if not m.get('po') and m.get('res') == 'L')
+            if (w, l) != (s.get('w'), s.get('l')):
+                errs.append(f'S{sn} regular season {w}-{l} in esea_seasons.json but {s.get("w")}-{s.get("l")} in esea_milestones.json')
+    if errs and (mi.get('asof') or '')[:16] < (rw.get('asof') or '')[:16]:
+        return [], ['1NT numbers out of sync (milestones older than RWA: its step failed?): ' + e for e in errs]
+    return errs, []
+
+
 def check_hugo():
     hugo = shutil.which('hugo') or os.environ.get('HUGO')
     if not hugo: return ['hugo not found (set HUGO or put it on PATH)']
@@ -127,6 +158,7 @@ if __name__ == '__main__':
     errs, n = check_json()
     e2, warns = check_sizes(); errs += e2 + check_pairs() + check_cbb_mean() + check_awards()
     e3, w3 = check_fv_scale(); errs += e3; warns += w3
+    e4, w4 = check_1nt_sync(); errs += e4; warns += w4
     if '--hugo' in sys.argv[1:]: errs += check_teams()
     if '--hugo' in sys.argv[1:] and not errs: errs += check_hugo()
     for w in warns: print('warning:', w)

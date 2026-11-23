@@ -109,6 +109,22 @@ def main():
             by[sn].append({'at': (m.get('at') or 0) * 1000, 'opp': 'bye' if opp['id'] == 'bye' else (opp.get('name') or 'TBD'),
                            'res': 'W' if m['winner'] == ('faction1' if us == 'f1' else 'faction2') else 'L',
                            'po': False, 'ff': True, 'bye': opp['id'] == 'bye', 'maps': []})
+    # a forfeit or bye neither list holds: FACEIT's final leaderboard (data/esea_milestones.json 'standings', fetched
+    # once per past regular season) is the record; pad the gap with unlisted forfeits so every window agrees
+    st = (load('data/esea_milestones.json') or {}).get('standings') or {}
+    for cid, name in (H.get('comps') or {}).items():
+        sm = re.search(r'\bS(\d{2})\b', name or '')
+        x = st.get(cid) or {}
+        if not sm or 'Regular Season' not in name or x.get('src') != 'faceit' or x.get('w') is None:
+            continue
+        sn = int(sm.group(1))
+        if sn not in by or (cur and sn >= cur):
+            continue
+        for res, n in (('W', x['w']), ('L', x['l'])):
+            have = sum(1 for m in by[sn] if not m['po'] and m['res'] == res)
+            last = max((m['at'] or 0 for m in by[sn] if not m['po']), default=0)
+            for _ in range(max(0, int(n) - have)):
+                by[sn].append({'at': last, 'opp': 'forfeit (unlisted)', 'res': res, 'po': False, 'ff': True, 'maps': []})
     past = D.get('seasons') or {}
     for sn, ms in by.items():
         ms.sort(key=lambda m: (m['po'], m['at'] or 0))
