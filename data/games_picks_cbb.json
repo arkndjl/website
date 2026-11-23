@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-23T05:49:36Z",
+ "asof": "2026-11-23T05:52:36Z",
  "recenter": {
   "2026-11-23": 1.93
  },
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-23T05:18:44Z",
-  "ageH": 0.5,
+  "ageH": 0.6,
   "stale": false
  },
  "picks": [],
@@ -1934,6 +1934,22 @@
  "withdrawn": [],
  "board": [
   {
+   "id": "401921177",
+   "sport": "cbb",
+   "kick": "2026-11-23T20:30:00Z",
+   "home": "IU Indianapolis",
+   "away": "William & Mary",
+   "mk": "spread",
+   "side": "home",
+   "line": -26.5,
+   "price": -9900.0,
+   "edge": 21.0,
+   "x": 4.0,
+   "why": "gap too big: a bad line",
+   "m": -5.5,
+   "tm": 162.4
+  },
+  {
    "id": "401929445",
    "sport": "cbb",
    "kick": "2026-11-23T20:30:00Z",
@@ -1964,6 +1980,22 @@
    "why": "no edge at -119",
    "m": 15.7,
    "tm": 159.3
+  },
+  {
+   "id": "401917543",
+   "sport": "cbb",
+   "kick": "2026-11-24T00:00:00Z",
+   "home": "Santa Clara",
+   "away": "Illinois State",
+   "mk": "spread",
+   "side": "away",
+   "line": 5.5,
+   "price": -129.0,
+   "edge": 4.6,
+   "x": 4.0,
+   "why": "no edge at -129",
+   "m": 0.9,
+   "tm": 155.4
   },
   {
    "id": "401927397",
@@ -2190,22 +2222,6 @@
    "tm": 162.3
   },
   {
-   "id": "401917543",
-   "sport": "cbb",
-   "kick": "2026-11-24T00:00:00Z",
-   "home": "Santa Clara",
-   "away": "Illinois State",
-   "mk": "total",
-   "side": "over",
-   "line": 151.5,
-   "price": -110.0,
-   "edge": 3.9,
-   "x": 7.0,
-   "why": "edge under 7",
-   "m": 0.9,
-   "tm": 155.4
-  },
-  {
    "id": "401917919",
    "sport": "cbb",
    "kick": "2026-11-24T00:00:00Z",
@@ -2236,22 +2252,6 @@
    "why": "edge under 6.5 (side: under)",
    "m": 0.3,
    "tm": 151.3
-  },
-  {
-   "id": "401921177",
-   "sport": "cbb",
-   "kick": "2026-11-23T20:30:00Z",
-   "home": "IU Indianapolis",
-   "away": "William & Mary",
-   "mk": "total",
-   "side": "under",
-   "line": 165.5,
-   "price": -110.0,
-   "edge": 3.1,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": -5.5,
-   "tm": 162.4
   },
   {
    "id": "401921700",
@@ -2310,7 +2310,7 @@
    "mk": "total",
    "side": "under",
    "line": 149.5,
-   "price": -140.0,
+   "price": -134.0,
    "edge": 2.6,
    "x": 6.5,
    "why": "edge under 6.5 (side: under)",
@@ -2397,11 +2397,11 @@
    "state": "under"
   },
   "401917543": {
-   "mk": "total",
-   "side": "over",
-   "line": 151.5,
-   "price": -110.0,
-   "edge": 3.9,
+   "mk": "spread",
+   "side": "away",
+   "line": 5.5,
+   "price": -129.0,
+   "edge": 4.6,
    "ev": null,
    "units": 0.0,
    "home": "Santa Clara",
@@ -2481,11 +2481,11 @@
    "state": "under"
   },
   "401913530": {
-   "mk": "spread",
-   "side": "away",
-   "line": 44.5,
-   "price": -129.0,
-   "edge": 0.8,
+   "mk": "total",
+   "side": "under",
+   "line": 180.5,
+   "price": -114.0,
+   "edge": 0.4,
    "ev": null,
    "units": 0.0,
    "home": "Illinois",
@@ -2544,7 +2544,7 @@
    "mk": "total",
    "side": "under",
    "line": 149.5,
-   "price": -140.0,
+   "price": -134.0,
    "edge": 2.6,
    "ev": null,
    "units": 0.0,
@@ -2577,11 +2577,11 @@
    "state": "under"
   },
   "401921177": {
-   "mk": "total",
-   "side": "under",
-   "line": 165.5,
-   "price": -110.0,
-   "edge": 3.1,
+   "mk": "spread",
+   "side": "home",
+   "line": -26.5,
+   "price": -9900.0,
+   "edge": 21.0,
    "ev": null,
    "units": 0.0,
    "home": "IU Indianapolis",
@@ -2676,7 +2676,7 @@
    "mk": "total",
    "side": "over",
    "line": 133.5,
-   "price": -134.0,
+   "price": -140.0,
    "edge": 1.0,
    "ev": null,
    "units": 0.0,
@@ -2749,7 +2749,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 23504,
+  "snapshots": 23508,
   "buckets": [
    {
     "when": "24h+",
@@ -2762,12 +2762,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 4677,
-    "clvRet": -0.001,
-    "clvT": -0.48,
+    "clvN": 4678,
+    "clvRet": -0.0012,
+    "clvT": -0.56,
     "clv": 0.7,
-    "beat": 0.416,
-    "still": 0.402
+    "beat": 0.414,
+    "still": 0.403
    },
    {
     "when": "1-6h",
@@ -20989,7 +20989,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-23T05:49:36Z",
+ "checked": "2026-11-23T05:52:36Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
