@@ -6,7 +6,9 @@ odds on each team's power row), data/brackets/cfb.json (CFP odds), data/cfb_rank
 static/data/injuries.json (PR #1129 tags). Writes data/watch.json, read by layouts/shortcodes/watch.html (Standings,
 "games to watch") and the GFX card (assets/js/gfx.js buildWatch). Rerun by the odds-snap workflow every half hour.
 
-Window: games not yet final that start within the next 7 days (a started game stays on for its sport's LIVE hours).
+Window: games that start within the next 7 days. A listed game that has started moves to `played` with its frozen W
+and its live / final score (ESPN scoreboard by event id; tennis and CS2 from the site's own files), and drops 24 hours
+after its final (or 48 hours after its start when no final is seen).
 
 Components, each 0-1 and put on one scale inside its own sport, so no sport dominates by construction:
   Q quality    mean of the two sides' rating scores: 1 - (rank - .5) / min(N, 60) in the sport's rating order
@@ -25,7 +27,7 @@ Components, each 0-1 and put on one scale inside its own sport, so no sport domi
 Score = 100 x (.30 Q + .20 C + .20 S + .20 L + .10 T) + bonus (rivalry 6, division or conference game 2,
 both sides ranked 4, one ranked 1), capped at 100. The list keeps the top 15 with at most 4 games a sport.
 """
-import json, math, os, sys, datetime as D
+import json, math, os, sys, urllib.request, datetime as D
 from statistics import NormalDist
 from zoneinfo import ZoneInfo
 
@@ -174,7 +176,7 @@ def pro(sport, nteams, targets, player_file, val_key, code_map=None, logo_dir=No
         inj = g.get('inj') or {}
         sh, bh = stars(h, inj.get('home')); sa, ba = stars(a, inj.get('away'))
         lg = logo_dir or sport
-        rows.append(dict(sport=sport, id=str(g.get('id')), kick=g.get('kick') or g.get('tip'),
+        rows.append(dict(sport=sport, id=str(g.get('espn') or g.get('id')), kick=g.get('kick') or g.get('tip'),
                          a=dict(n=full.get(a, a), ab=a, logo=f'/img/{lg}/{a.lower()}.png'), h=dict(n=full.get(h, h), ab=h, logo=f'/img/{lg}/{h.lower()}.png'),
                          ph=g.get('pHome', .5), pa=1 - g.get('pHome', .5), tot=g.get('total'),
                          qa=qp.get(a, 0), qh=qp.get(h, 0), sa=sa, sh=sh, la=lev.get(a, 0), lh=lev.get(h, 0),
@@ -431,7 +433,7 @@ def score(sport, rows, pools, now, rivals):
     riv = rivals.get(sport, {})
     for r in rows:
         k = ts(r['kick'])
-        if k is None or k > now + D.timedelta(days=DAYS) or k < now - D.timedelta(hours=LIVE.get(sport, 3)):
+        if k is None or k > now + D.timedelta(days=DAYS) or k <= now:
             continue
         q = (r['qa'] + r['qh']) / 2
         c = cp(1 - (r['ph'] - r['pa']) ** 2)
@@ -467,6 +469,91 @@ def score(sport, rows, pools, now, rivals):
     return out
 
 
+# ---- scores for listed games that have started ----
+ESPN = 'https://site.api.espn.com/apis/site/v2/sports/'
+PATH = {'nfl': 'football/nfl', 'cfb': 'football/college-football', 'nba': 'basketball/nba',
+        'cbb': 'basketball/mens-college-basketball', 'nhl': 'hockey/nhl'}
+EXTRA = {'cfb': '&groups=80&limit=400', 'cbb': '&groups=50&limit=400'}
+KEEP_H, STALE_H = 24, 48
+
+
+def espn_board(path, day, cache={}):
+    key = (path, day)
+    if key not in cache:
+        sport = path.split('/')[0] if '/' in path else 'soccer'
+        url = f"{ESPN}{path}/scoreboard?dates={day}" + EXTRA.get(next((k for k, v in PATH.items() if v == path), ''), '')
+        try:
+            req = urllib.request.Request(url, headers={'User-Agent': 'arkndjl.net watch'})
+            with urllib.request.urlopen(req, timeout=30) as r:
+                ev = json.load(r).get('events') or []
+        except Exception as e:
+            print(f'watch: scoreboard {path} {day} failed ({e})')
+            ev = None
+        out = {}
+        for e in ev or []:
+            c = (e.get('competitions') or [{}])[0]
+            side = {x.get('homeAway'): x for x in c.get('competitors') or []}
+            st = ((e.get('status') or {}).get('type') or {})
+            out[str(e.get('id'))] = dict(st=st.get('state'), det=st.get('shortDetail') or st.get('detail'),
+                                         a=(side.get('away') or {}).get('score'), h=(side.get('home') or {}).get('score'),
+                                         wa=bool((side.get('away') or {}).get('winner')), wh=bool((side.get('home') or {}).get('winner')))
+        cache[key] = out if ev is not None else None
+    return cache[key]
+
+
+def live_score(g):
+    """{st, det, a, h, wa, wh} for a started game, or None when no source has it."""
+    k = ts(g['kick'])
+    if g['sport'] == 'tennis':
+        T = load('data/tennis.json') or {}
+        for m in (T.get('matches') or []) + (T.get('results') or []):
+            if str(m.get('id')) == g['id']:
+                st = m.get('state'); sc = m.get('sc') or ''
+                # the card's away side is the file's a, home its b
+                return dict(st=st, det=m.get('detail'), a=sc, h='', wa=bool((m.get('a') or {}).get('won')), wh=bool((m.get('b') or {}).get('won')))
+        return None
+    if g['sport'] == 'cs2':
+        C = load('data/cs2.json') or {}
+        for r in C.get('results') or []:
+            if g['a'].get('n') == r.get('a') and g['h'].get('n') == r.get('b') and abs((r.get('ts') or 0) - k.timestamp()) < 86400:
+                return dict(st='post', det='Final', a=str(r.get('sa')), h=str(r.get('sb')), wa=r.get('sa', 0) > r.get('sb', 0), wh=r.get('sb', 0) > r.get('sa', 0))
+        return None
+    if g['sport'] in ('nfl', 'nhl') and not str(g['id']).isdigit():   # rows written before ESPN ids were stored
+        for x in (load(f"data/{g['sport']}_games.json") or {}).get('games') or []:
+            if str(x.get('id')) == str(g['id']) and x.get('espn'):
+                g['id'] = str(x['espn'])
+    path = PATH.get(g['sport']) or (f"soccer/{g['lg']}" if g['sport'] == 'soccer' and g.get('lg') else None)
+    if not path:
+        return None
+    for day in {k.astimezone(ET).strftime('%Y%m%d'), k.strftime('%Y%m%d')}:
+        b = espn_board(path, day)
+        if b and g['id'] in b:
+            return b[g['id']]
+    return None
+
+
+def carry(old, now):
+    """Listed games that have started: keep them with their score until 24 h after the final."""
+    out = []
+    for g in (old.get('played') or []) + [x for x in old.get('games') or [] if ts(x['kick']) and ts(x['kick']) <= now]:
+        if any(x['id'] == g['id'] and x['sport'] == g['sport'] for x in out):
+            continue
+        k = ts(g['kick'])
+        sc = live_score(g)
+        if sc:
+            g['sc'] = sc
+            if sc.get('st') == 'post' and not g.get('fin'):
+                g['fin'] = now.strftime('%Y-%m-%dT%H:%M:%SZ')
+        fin = ts(g.get('fin'))
+        if fin and now - fin > D.timedelta(hours=KEEP_H):
+            continue
+        if not fin and now - k > D.timedelta(hours=STALE_H):
+            continue
+        out.append(g)
+    out.sort(key=lambda g: ((g.get('sc') or {}).get('st') != 'in', g['kick']))
+    return out
+
+
 def main():
     now = D.datetime.now(D.timezone.utc)
     rivals = rivalry_set()
@@ -492,10 +579,11 @@ def main():
     for i, g in enumerate(pick):
         g['rk'] = i + 1
     start, end = now.astimezone(ET), (now + D.timedelta(days=DAYS)).astimezone(ET)
-    out = dict(asof=now.strftime('%Y-%m-%dT%H:%M:%SZ'), span=f"{start.strftime('%b %-d')} - {end.strftime('%b %-d')}",
-               weights=W, bonus=BONUS, pool=counts, games=pick)
-    path = os.path.join(ROOT, 'data/watch.json')
     old = load('data/watch.json') or {}
+    played = carry(old, now)
+    out = dict(asof=now.strftime('%Y-%m-%dT%H:%M:%SZ'), span=f"{start.strftime('%b %-d')} - {end.strftime('%b %-d')}",
+               weights=W, bonus=BONUS, pool=counts, games=pick, played=played)
+    path = os.path.join(ROOT, 'data/watch.json')
     if {k: v for k, v in old.items() if k != 'asof'} == {k: v for k, v in out.items() if k != 'asof'}:
         print('watch: unchanged')
         return
@@ -503,6 +591,8 @@ def main():
         json.dump(out, f, ensure_ascii=False, separators=(',', ':'))
         f.write('\n')
     print(f"watch: {len(pick)} games from {sum(counts.values())} ({counts})")
+    for g in played:
+        print(f"  -- {g['lab']:<4} {g['a']['n']} @ {g['h']['n']}  {g.get('sc')}  fin {g.get('fin')}")
     for g in pick:
         print(f"  {g['rk']:>2} {g['lab']:<4} {g['w']:5.1f} {g['a']['n']} @ {g['h']['n']}  {g['et']}  {g['parts']} {g['tags']} {g['stars']}")
 

@@ -1,0 +1,82 @@
+{{- /* Counter-Strike economic value (data/cs2_value.json, scripts/cs2_value.py). view= teams (roster value: the current
+       five's transfer values summed, against the same five's values when each joined) or signings (every current
+       starter: value when he joined the team vs now). Values = prize money added over a replacement-level player, two
+       seasons, priced on reported buyouts. */ -}}
+{{- with site.Data.cs2_value -}}
+{{- $d := . -}}
+{{- $fv := .fit.fees -}}
+{{- $view := $.Get "view" | default "teams" -}}
+{{- $date := lower ((time .asof).Format "Jan 2") -}}
+{{- $ctry := site.Data.soccer_countries.name -}}
+{{- $about := printf "Player value: prize money he adds over a replacement-level player (tier-1 mean - %.0f SD) in a five of average tier-1 starters, two seasons, aged, 15%%/yr discount, x %.2f (fit on %d reported buyouts; leave-one-out error x%.2f, flat price x%.2f). Prize curve: next-182-day prize money on the five's rating, Valve VRS prize ledger, held-out deviance explained %.2f. Reported fees are near flat and mostly Falcons deals, so values are compressed and at that buyer's prices; Eternal Fire to Aurora (reported under $2.5M) prices at $%.1fM. Contracts not public, not modelled. At signing: first map of the current stint; before %s flagged." (float $fv.q) (float $fv.A) (int $fv.n) (float (index $fv.loo 0).fx) (float (index $fv.loo 2).fx) (float (index .fit.curve.tests 0).d2) (div (float (index $fv.checks 0).xtv) 1e6) .jul0 -}}
+{{- if eq $view "teams" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: team values") "icon" "cs" "filter" "Tier" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Value,±,±%,Top" "gfxDate" $date "gfxMax" "25") -}}
+<table class="cfb__table hk cs__table">
+  <thead><tr>
+    <th>RK</th><th>Team</th><th title="event-access tier on the ARK Ranking">Tier</th>
+    <th data-vz class="cfb__g" title="roster value: the current five's transfer values summed (USD)">Value</th>
+    <th title="the same five's values when each joined the team (or at {{ $d.jul0 }} for earlier stints)">Signed</th>
+    <th data-vz title="value now minus value at signing">±</th>
+    <th data-vz title="change since signing, %">±%</th>
+    <th title="the five's most valuable player">Top</th>
+    <th title="prize money won in the last 365 days (Valve VRS prize ledger)">Prize</th>
+    <th title="expected prize money a year from the five's rating (the prize curve the values are built on)">xPrize</th>
+    <th class="hk__x" title="publicly reported buyouts for players on this five (unconfirmed)">Paid</th>
+    <th class="hk__x" title="earliest current-stint start among the five">Since</th>
+  </tr></thead>
+  <tbody>
+  {{- range .teams }}
+  <tr>
+    <td class="cfb__rk">{{ .vrk }}</td>
+    <td style="white-space: nowrap" title="{{ delimit .ros ", " }}">{{ if .logo }}<img class="cs__logo" src="/img/cs2/{{ .k }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b>{{ with .rk }} <span class="cfb__dim">#{{ . }}</span>{{ end }}</td>
+    <td class="cs__tier" data-v="{{ .tier }}" data-filter="Tier {{ .tier }}"><span class="cs__t cs__t--{{ .tier }}">T{{ .tier }}</span></td>
+    <td class="cfb__num" data-v="{{ .v }}"><b>{{ partial "cs2money.html" .v }}</b></td>
+    <td class="cfb__num" data-v="{{ .v0 }}">{{ partial "cs2money.html" .v0 }}</td>
+    <td class="cfb__num" data-v="{{ .dv }}">{{ if ge .dv 0 }}<span class="cs__up">+{{ partial "cs2money.html" .dv }}</span>{{ else }}-{{ partial "cs2money.html" (mul -1 .dv) }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .dp | default 0 }}">{{ with .dp }}{{ partial "num.html" (slice "%+.0f" (float .)) }}%{{ else }}-{{ end }}</td>
+    <td style="white-space: nowrap" data-v="{{ .topv }}">{{ .top }} <span class="cfb__dim">{{ partial "cs2money.html" .topv }}</span></td>
+    <td class="cfb__num" data-v="{{ .prize }}">{{ if .prize }}{{ partial "cs2money.html" .prize }}{{ else }}-{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .xp }}">{{ partial "cs2money.html" .xp }}</td>
+    <td class="cfb__num hk__x" data-v="{{ .paid | default 0 }}">{{ with .paid }}{{ partial "cs2money.html" . }}{{ else }}-{{ end }}</td>
+    <td class="cfb__num hk__x" data-v="{{ .since }}">{{ with .since }}{{ (time .).Format "Jan 06" }}{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .teams) "fresh" "cs2" "note" (printf "USD, estimate · updated %s" $date) "about" $about) -}}
+{{- else -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: signings") "icon" "cs" "filter" "Tier" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Team,Signed,Now,±" "gfxDate" $date "gfxMax" "25") -}}
+<table class="cfb__table hk cs__table">
+  <thead><tr>
+    <th>RK</th><th>Player</th><th>Team</th><th title="event-access tier">Tier</th>
+    <th title="first map of the current stint with this team (≤ = before {{ $d.jul0 }}, valued from then)">Joined</th>
+    <th title="transfer value when he joined (USD)">Signed</th>
+    <th class="cfb__g" title="transfer value now (USD)">Now</th>
+    <th data-vz title="value now minus value at signing">±</th>
+    <th title="RWA when he joined (0 = average tier-1 starter)">RWA0</th>
+    <th title="RWA now">RWA</th>
+    <th>Age</th>
+    <th class="hk__x" title="publicly reported buyout (unconfirmed)">Fee</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $r := .signings }}{{ $dv := sub $r.v $r.v0 }}
+  <tr data-pk="{{ $r.id }}">
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__name" style="white-space: nowrap">{{ partial "face.html" (dict "u" ($r.ph | default "")) }}{{ with $r.nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index $ctry . | default (upper .) }}" width="16" height="11" loading="lazy" onerror="this.remove()">{{ end }}<b>{{ $r.n }}</b></td>
+    <td style="white-space: nowrap">{{ if $r.logo }}<img class="cs__logo" src="/img/cs2/{{ $r.tk }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}{{ $r.tm }}</td>
+    <td class="cs__tier" data-v="{{ $r.tier }}" data-filter="Tier {{ $r.tier }}"><span class="cs__t cs__t--{{ $r.tier }}">T{{ $r.tier }}</span></td>
+    <td class="cfb__num" data-v="{{ $r.since | default "" }}">{{ if $r.pre }}≤{{ (time $d.jul0).Format "Jan 06" }}{{ else }}{{ (time $r.since).Format "Jan 06" }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $r.v0 }}">{{ partial "cs2money.html" $r.v0 }}</td>
+    <td class="cfb__num" data-v="{{ $r.v }}"><b>{{ partial "cs2money.html" $r.v }}</b></td>
+    <td class="cfb__num" data-v="{{ $dv }}">{{ if ge $dv 0 }}<span class="cs__up">+{{ partial "cs2money.html" $dv }}</span>{{ else }}-{{ partial "cs2money.html" (mul -1 $dv) }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $r.rwa0 }}">{{ partial "num.html" (slice "%+.2f" (float $r.rwa0)) }}</td>
+    <td class="cfb__num" data-v="{{ $r.rwa }}">{{ partial "num.html" (slice "%+.2f" (float $r.rwa)) }}</td>
+    <td class="cfb__num" data-v="{{ $r.age | default 0 }}">{{ with $r.age }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ else }}-{{ end }}</td>
+    <td class="cfb__num hk__x" data-v="{{ $r.fee | default 0 }}">{{ with $r.fee }}{{ partial "cs2money.html" . }}{{ else }}-{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .signings) "fresh" "cs2" "note" (printf "USD, estimate · updated %s" $date) "about" $about) -}}
+{{- end -}}
+{{- end -}}
