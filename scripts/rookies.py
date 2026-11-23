@@ -330,6 +330,18 @@ SO_SV_T = ("SV (season value): this season's goals over replacement a 90, from t
 SO_SVAR_T = 'SVAR = SV x 90s played: season total in goals (GAR scale)'
 
 
+# aGAR/90 (Nov 23 2026, scripts/research/port_nov23/soccer/agar.py): the NBA aXPM form on big-five first seasons. b fit
+# on 1,266 rookies (900+ minutes, 2016-17 to 2023-24) against GAR/90 over the next two seasons: .0032 a year (every
+# left-out season .0028 to .0036); held out it ranks the next two seasons better than GAR/90 (Spearman .664 vs .654,
+# squared error t -2.66, 7 of 8 seasons)
+SO_AGAR_B = 0.0032
+SO_AGAR_T = 'aGAR/90 = GAR/90 - .0032 x (age - 21): age-adjusted rate, ranks the next two seasons better than GAR/90'
+
+
+def agar90(g90, age):
+    return None if g90 is None or age is None else round(g90 - SO_AGAR_B * (age - 21), 3)
+
+
 def soccer():
     files = sorted(int(f[:-5]) for f in os.listdir(os.path.join(SD, 'soccer-war')) if f.endswith('.json'))
     link = json.load(gzip.open(os.path.join(HERE, 'data', 'soccer_mv_link.json.gz')))
@@ -361,7 +373,7 @@ def soccer():
                 fv = max((q for q in past[t] if q['season'] <= S - 1), key=lambda q: q['season'], default={}).get('fv')
             rows.append({'n': p['n'], 'tm': p['team'], 'pos': p['pos'], 'age': age, 'gar': p['gar'], 'par': p.get('par'),
                          'sv': p.get('sv'), 'svar': p.get('svar'),
-                         'gar90': p.get('gar90'), 'xmv': p.get('xmv'), 'mv': p.get('mv'), 'min': p['min'], 'g': p.get('g'), 'a': p.get('a'),
+                         'gar90': p.get('gar90'), 'agar90': agar90(p.get('gar90'), age), 'xmv': p.get('xmv'), 'mv': p.get('mv'), 'min': p['min'], 'g': p.get('g'), 'a': p.get('a'),
                          'pre': None, 'preL': '', 'pfv': fv, 'sub': LG.get(p['lg'], p['lg']),
                          'ph': TM_FACE.format(p['ph']) if p.get('ph') else None, 'lo': soccer_logo(p['team'])})
         if rows:
@@ -375,6 +387,7 @@ def soccer():
         'cols': [col('gar', 'GAR', 'goals above replacement', 's1'), col('svar', 'SVAR', SO_SVAR_T, 's1', 1),
                  col('sv', 'SV', SO_SV_T, 's2', 1), col('xmv', 'xMV', 'estimated market value, EUR M', 'e'),
                  col('mv', 'TM', 'Transfermarkt market value, EUR M', 'e', 1), col('gar90', 'GAR/90', 'GAR per 90', 's2', 1),
+                 col('agar90', 'aGAR/90', SO_AGAR_T, 's2', 1),
                  col('par', 'PAR', 'points above replacement', '2', 1), col('min', 'Min', 'minutes', 'i', 1),
                  col('g', 'G', 'goals', 'i', 1), col('a', 'A', 'assists', 'i', 1)],
         'pfv': {'l': 'Pre FV', 't': 'soccer prospects board FV, mean outcome (graded U22 players)'},

@@ -416,6 +416,27 @@
     "xVORX counts 0 for a season out of the NBA (75% of G League seasons): it sits near 0 for most; xXPM is the rate alone.",
     "xXPM held out vs no G League stats: minute-weighted RMSE 1.44 vs 1.60 (t -3.6, 11/15 seasons, Holm), bias .01."
    ]
+  },
+  {
+   "term": "SV (CFB QBs, skill players)",
+   "lines": [
+    "pSV/60: SV per 60 plays over three seasons weighted 1, .7, .5, shrunk to the QB mean with 650 plays.",
+    "Next season wMSE .0258 raw to .0159 (t -11.7, 10 of 10 seasons 2016-25)."
+   ]
+  },
+  {
+   "term": "GAR (soccer, senior)",
+   "lines": [
+    "1Y P20/P80: held out projection residuals in five bands of season share; left out seasons hit .200 and .800 (3Y .201, .800).",
+    "aGAR/90 (first seasons) = GAR/90 less .0032 a year of age over 21. Ranks the next two seasons better than GAR/90: .664 vs .654, t -2.66."
+   ]
+  },
+  {
+   "term": "Tennis ARK",
+   "lines": [
+    "SV: season WAR, calendar year to date, every level, same per match credit as WAR.",
+    "Split half r .81 ATP, .82 WTA (2015 to 2025); next season r .85 ATP, .84 WTA."
+   ]
   }
  ],
  "replace": [

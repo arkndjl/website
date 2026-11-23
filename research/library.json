@@ -725,7 +725,9 @@
       "offence shrunk toward his xG + xA a 90 over the window, defence toward 0.",
       "Replacement per position = regulars (900+ minutes) on the bottom three sides by goal difference of each finished league-season",
       "pooled. League strength counts. Held out R2 .686 (.673 before plus-minus; nested test t -2.97, 9/11 seasons).",
-      "PAR = GAR x points per goal of difference (.626)."
+      "PAR = GAR x points per goal of difference (.626).",
+      "1Y P20/P80: held out projection residuals in five bands of season share; left out seasons hit .200 and .800 (3Y .201, .800).",
+      "aGAR/90 (first seasons) = GAR/90 less .0032 a year of age over 21. Ranks the next two seasons better than GAR/90: .664 vs .654, t -2.66."
      ],
      "where": "Soccer player value, rookies, backup watch",
      "sports": [
@@ -829,7 +831,9 @@
       "Opponent-adjusted for QB and RB (the defense's EPA allowed on that play type over the league's, other games, shrunk 300 plays): split-half r QB .360 -> .403, RB .179 -> .199; WR and TE stay raw (P .84 / .88 on 2025-26, when target ids are complete). Weather (Open-Meteo at the stadium) added nothing.",
       "Replacement = players past the starters by volume in 2025 (QB 134, RB 268, WR 402, TE 134).",
       "Defenders left out: public plays carry no tackles or snaps; splash credits had no split-half reliability.",
-      "Game model: the starter's adjusted season value scored the same as raw season EPA (t +0.5); the QB charge stays."
+      "Game model: the starter's adjusted season value scored the same as raw season EPA (t +0.5); the QB charge stays.",
+      "pSV/60: SV per 60 plays over three seasons weighted 1, .7, .5, shrunk to the QB mean with 650 plays.",
+      "Next season wMSE .0258 raw to .0159 (t -11.7, 10 of 10 seasons 2016-25)."
      ],
      "where": "CFB QB SV + skill players tabs",
      "sports": [
@@ -1342,7 +1346,9 @@
      "short": "Win chance vs the average top-50 player, best of three, over the tour's 52-week surface mix.",
      "body": [
       "Surface Elo blended with a games-won rating and opponent-adjusted serve and return point ratings (Markov chain).",
-      "Fit on 2012-22 tour main draws; held 2023-26 log loss ~.596 vs Elo .603."
+      "Fit on 2012-22 tour main draws; held 2023-26 log loss ~.596 vs Elo .603.",
+      "SV: season WAR, calendar year to date, every level, same per match credit as WAR.",
+      "Split half r .81 ATP, .82 WTA (2015 to 2025); next season r .85 ATP, .84 WTA."
      ],
      "where": "Tennis ATP / WTA ARK Ranking",
      "sports": [

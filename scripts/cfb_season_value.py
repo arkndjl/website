@@ -44,6 +44,32 @@ OPP = {'QB', 'RB'}
 REPL = {'QB': -0.0741, ('RB', 0): -0.0862, ('RB', 1): 0.0828, ('WR', 0): -0.0251, ('WR', 1): 0.3377, ('TE', 0): 0.4468,
         ('TE', 1): 0.4082}
 MIN_QB, MIN_SKILL = 100, 30
+# pSV/60 (QBs): the predictive pair of SV, as NFL pXP/60 is of rXP/60. Points over replacement a play over seasons S, S-1,
+# S-2 (play weights 1 / .7 / .5; past seasons from scripts/data/sv_hist.json.gz), shrunk to the QB mean a play with K plays,
+# x 60. Pre-registered (scripts/research/port_nov23/football/prereg.md C1), next season's rate, 2016-25 leave one season
+# out, 1,714 QB/RB pairs: weighted MSE .0258 raw -> .0159 (paired t -11.7, 10 of 10 seasons), slope .96, K QB 650.
+PSV_K, PSV_W = 650, (1.0, 0.7, 0.5)
+
+
+def add_psv(qbs, y):
+    """adds 'psv' (pSV/60) to each QB row in place; rows keep no field when the history file is missing"""
+    import gzip
+    try:
+        H = [r for r in json.load(gzip.open(os.path.join(ROOT, 'scripts', 'data', 'sv_hist.json.gz'), 'rt'))['cfb'] if r['g'] == 'QB']
+    except (OSError, ValueError, KeyError):
+        return
+    tot, pl = sum(r['tot'] for r in H if r['pl'] > 0), sum(r['pl'] for r in H if r['pl'] > 0)
+    if not pl:
+        return
+    m = tot / pl
+    by = {(str(r['id']), r['y']): r for r in H}
+    for q in qbs:
+        P, S = q['tot'] * PSV_W[0], q['plays'] * PSV_W[0]
+        for i, w in enumerate(PSV_W[1:], 1):
+            h = by.get((str(q['id']), y - i))
+            if h and h['pl'] > 0:
+                P += w * h['tot']; S += w * h['pl']
+        q['psv'] = round((P + PSV_K * m) / (S + PSV_K) * 60, 1)
 
 
 def pts_per_win():
@@ -220,6 +246,7 @@ def main():
                               car=int(X['n0']), tgt=int(X['n1'])))
     for L in (qbs, skill):
         L.sort(key=lambda r: -r['pts'])
+    add_psv(qbs, y)
     try:
         asof = email.utils.parsedate_to_datetime(h.get('modified')).strftime('%Y-%m-%d')
     except (TypeError, ValueError):
@@ -232,4 +259,10 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    if '--psv' in sys.argv:          # add pSV/60 to the file on hand (no release pull)
+        d = json.load(open(OUT))
+        add_psv(d['qbs'], d['season'])
+        with open(OUT, 'w') as fh:
+            json.dump(d, fh, separators=(',', ':'), allow_nan=False)
+    else:
+        main()

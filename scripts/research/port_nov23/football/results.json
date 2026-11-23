@@ -1,0 +1,917 @@
+{
+ "prereg_sha256": "0f2b068b2ef9556c5b5ca9874aa6ae1304cae78ddf845e12562045976c7d09b1",
+ "holm": {
+  "N1": {
+   "tuneD": -0.0258,
+   "p": 0.232,
+   "holm": 0.9137,
+   "pass": false
+  },
+  "N2": {
+   "tuneD": 0.0009,
+   "p": 0.043,
+   "holm": 0.2582,
+   "pass": false
+  },
+  "N3a": {
+   "tuneD": 0.0124,
+   "p": 0.2284,
+   "holm": 0.9137,
+   "pass": false
+  },
+  "N3b": {
+   "tuneD": 0.0025,
+   "p": 0.1443,
+   "holm": 0.7215,
+   "pass": false
+  },
+  "N4": {
+   "tuneD": -1,
+   "p": 0.2621,
+   "holm": 0.9137,
+   "pass": false
+  },
+  "N5": {
+   "tuneD": -1,
+   "p": 0.3388,
+   "holm": 0.9137,
+   "pass": false
+  },
+  "C1": {
+   "tuneD": -1,
+   "p": 0.0,
+   "holm": 0.0,
+   "pass": true
+  }
+ },
+ "matrix": [
+  [
+   "G1 letdown/look-ahead/bounce-back",
+   "NFL",
+   "tested-before",
+   "Oct 28 spots_research: none pass both splits",
+   ""
+  ],
+  [
+   "G1 schedule spots",
+   "CFB",
+   "tested-before",
+   "origin: letdown shipped -1.3",
+   ""
+  ],
+  [
+   "G2 early margin stretch wk1-3",
+   "NFL",
+   "fail",
+   "s .897 (shrink, not stretch); tune t -0.75, held t -0.75 (d -.017)",
+   "wf_tests.py"
+  ],
+  [
+   "G2 early totals shrink wk2-6",
+   "NFL",
+   "fail",
+   "c 1.04; tune t +0.15, held t -1.78",
+   "wf_tests.py"
+  ],
+  [
+   "G2 early-season",
+   "CFB",
+   "tested-before",
+   "origin, shipped",
+   ""
+  ],
+  [
+   "G3 game control",
+   "NFL",
+   "tested-before",
+   "Nov 14 t -0.6",
+   ""
+  ],
+  [
+   "G3 game control",
+   "CFB",
+   "tested-before",
+   "origin, shipped",
+   ""
+  ],
+  [
+   "G4 fumble-neutral EPA margin input",
+   "NFL",
+   "fail",
+   "tune MAE +.012 (t +1.0), held -.006 (t -0.75); fn vs raw EPA t -1.21/-0.53",
+   "fumble_test.py"
+  ],
+  [
+   "G4 fumble-neutral EPA totals",
+   "NFL",
+   "fail",
+   "tune +.0025 (t +0.92), held -.0028 (t -1.07)",
+   "fumble_test.py"
+  ],
+  [
+   "G4 3PT/FT luck",
+   "NFL/CFB",
+   "n/a",
+   "no shooting analogue; CFB turnover/return-TD/ypp luck tested Oct 16/30",
+   ""
+  ],
+  [
+   "G5 market totals ratings",
+   "NFL",
+   "tested-before",
+   "tmkt in model since Oct 15",
+   ""
+  ],
+  [
+   "G5 market disagreement",
+   "NFL",
+   "tested-before",
+   "Nov 14 tune -0.8 held -1.4 fail",
+   ""
+  ],
+  [
+   "G5 last season market totals carried",
+   "NFL",
+   "tested-before",
+   "trev grid Oct 15 (reset each summer picked)",
+   ""
+  ],
+  [
+   "G5 last season market totals carried",
+   "CFB",
+   "tested-before",
+   "Nov 1 pooled vs last-season prior level failed",
+   ""
+  ],
+  [
+   "G6 tempo/asymmetric pace",
+   "NFL/CFB",
+   "tested-before",
+   "pace-terms Oct 29: NFL plays/sec-per-play/drives, CFB plays/drives fail vs close",
+   ""
+  ],
+  [
+   "G7 home x attendance",
+   "NFL",
+   "n/a",
+   "sell-outs; only no-fan 2020, home x post-2020 failed Oct 15",
+   ""
+  ],
+  [
+   "G7 home x attendance",
+   "CFB",
+   "needs data",
+   "attendance not in hist md / wf; ~8k ESPN summaries or CFBD quota",
+   ""
+  ],
+  [
+   "G8 conference hierarchy",
+   "CFB",
+   "tested-before",
+   "Oct 23 fail",
+   ""
+  ],
+  [
+   "G8 conference hierarchy",
+   "NFL",
+   "n/a",
+   "32 teams; div game failed Oct 15",
+   ""
+  ],
+  [
+   "G9 lower-tier carry",
+   "CFB",
+   "tested-before",
+   "fcsm/NEWFBS shipped Nov 13",
+   ""
+  ],
+  [
+   "G9 lower-tier carry",
+   "NFL",
+   "n/a",
+   "closed league",
+   ""
+  ],
+  [
+   "G10 coach change",
+   "NFL",
+   "tested-before",
+   "new coach failed Oct 18",
+   ""
+  ],
+  [
+   "G10 coach change / opt-outs",
+   "CFB",
+   "tested-before",
+   "roster prior coach change failed; bowl terms shipped",
+   ""
+  ],
+  [
+   "G10 tank flags",
+   "NFL",
+   "n/a",
+   "QB term reads the actual starter, rested starters priced; NBA tank failed",
+   ""
+  ],
+  [
+   "G11 returners from lost season",
+   "NFL",
+   "tested-before",
+   "roster prior reads WAR y-1 and y-2 (Oct 21)",
+   ""
+  ],
+  [
+   "G11 returners from lost season",
+   "CFB",
+   "needs data",
+   "ESPN box cache 2014-26 not in container (large pull)",
+   ""
+  ],
+  [
+   "G12 lineup-adjusted ratings",
+   "NFL",
+   "tested-before",
+   "lk/lk_mkt failed",
+   ""
+  ],
+  [
+   "G12 lineup-adjusted ratings",
+   "CFB",
+   "n/a",
+   "no per-game lineup data beyond QB/box",
+   ""
+  ],
+  [
+   "G13 season-out charge until 3 games",
+   "NFL",
+   "tested-before",
+   "Nov 13 A1 ir fade grid h 2/4/8/none, live no fade",
+   ""
+  ],
+  [
+   "G13 season-out absorb",
+   "CFB",
+   "tested-before",
+   "origin SEASON_ABSORB 3",
+   ""
+  ],
+  [
+   "G14 totals recentre",
+   "NFL",
+   "n/a",
+   "no opening-week total bias: wk1 mean tm-close -1.2..+0.7 by season 2015-26",
+   ""
+  ],
+  [
+   "G15 rest band",
+   "NFL/CFB",
+   "tested-before",
+   "rest in NFL model; CFB bye/short week failed",
+   ""
+  ],
+  [
+   "G16 public-rating stack FPI",
+   "NFL",
+   "needs data",
+   "ESPN NFL powerindex by week free (~190 calls) but lastUpdated stale, timing must be checked; nfelo stack failed Nov 19",
+   ""
+  ],
+  [
+   "G16 FPI stack",
+   "CFB",
+   "tested-before",
+   "shipped (+fpi fold)",
+   ""
+  ],
+  [
+   "G17 QB1 out",
+   "NFL/CFB",
+   "tested-before",
+   "both in model",
+   ""
+  ],
+  [
+   "G18 roster turnover prior",
+   "NFL/CFB",
+   "tested-before",
+   "shipped both Oct 21",
+   ""
+  ],
+  [
+   "G19 luck/Kalman/style/penalties",
+   "NFL/CFB",
+   "tested-before",
+   "swept",
+   ""
+  ],
+  [
+   "M1 age-adjusted rookie rate aXP/60",
+   "NFL",
+   "fail",
+   "k -.019/yr, wMSE .2044 -> .2041, t -0.64, 5/7 classes",
+   "rate_tests.py"
+  ],
+  [
+   "M1 age-adjusted rate",
+   "CFB",
+   "n/a",
+   "no CFB rate board with ages; age already an FV driver",
+   ""
+  ],
+  [
+   "M2 raw/predictive pair pSV/60",
+   "CFB",
+   "pass-shipped",
+   "wMSE .0258 -> .0159, t -11.7, 10/10, slope .96, next-season r .32 (raw YoY .29), K QB 650",
+   "cfb_psv.py; scripts/cfb_season_value.py; layouts/shortcodes/cfbseason.html; data/cfb_season_value.json"
+  ],
+  [
+   "M2 raw/predictive pair",
+   "NFL",
+   "tested-before",
+   "rXP/60 + pXP/60 shipped Nov 11",
+   ""
+  ],
+  [
+   "M3 Stat+",
+   "NFL",
+   "n/a",
+   "Pct column (pXP/60 percentile at position) is the same transform",
+   ""
+  ],
+  [
+   "M3 Stat+",
+   "CFB",
+   "tested-before",
+   "origin",
+   ""
+  ],
+  [
+   "M4 SV/SVAR",
+   "NFL/CFB",
+   "tested-before",
+   "shipped Nov 20",
+   ""
+  ],
+  [
+   "M5 over-expected (RYOE/CPOE)",
+   "NFL",
+   "tested-before",
+   "CPOE game input failed Oct 18; ffopportunity expected stats failed Nov 19",
+   ""
+  ],
+  [
+   "M6 call-up value",
+   "NFL/CFB",
+   "n/a",
+   "no minor league",
+   ""
+  ],
+  [
+   "M7 school development",
+   "CFB",
+   "tested-before",
+   "origin, development tab",
+   ""
+  ],
+  [
+   "M7 team development of draftees",
+   "NFL",
+   "not tested",
+   "analogue exists (career WAR vs E[WAR|pick] by drafting team); skipped for budget",
+   ""
+  ],
+  [
+   "M8 on/off",
+   "NFL",
+   "tested-before",
+   "RAPM EDGE/DT and DB EPA tested Nov 19 (fail/lead)",
+   ""
+  ],
+  [
+   "M8 on/off",
+   "CFB",
+   "n/a",
+   "no participation data in public plays",
+   ""
+  ],
+  [
+   "M9 percentiles P20/50/80",
+   "NFL",
+   "tested-before",
+   "shipped Oct 28",
+   ""
+  ],
+  [
+   "M9 percentiles",
+   "CFB",
+   "not tested",
+   "no CFB in-season projection frames; build too large for this pass",
+   ""
+  ],
+  [
+   "M10 market value",
+   "NFL/CFB",
+   "tested-before",
+   "xAAV NFL, xNIL CFB",
+   ""
+  ],
+  [
+   "M11 era-adjusted all-time",
+   "NFL/CFB",
+   "tested-before",
+   "done Nov 20",
+   ""
+  ],
+  [
+   "FV drivers shipped since Nov 16",
+   "CFB",
+   "tested-before",
+   "CBB board-absent analogue = CFB backup hurdle shipped Nov 18; others CBB-only",
+   ""
+  ],
+  [
+   "FV drivers",
+   "NFL",
+   "n/a",
+   "no NFL FV board",
+   ""
+  ]
+ ],
+ "modelToModel": [
+  [
+   "SV (season value)",
+   "NFL SV",
+   "pXP/60 projection",
+   "fail",
+   "N5 wMSE .2438 -> .2436, t -0.42, 6/9 seasons"
+  ],
+  [
+   "pXP/60",
+   "NFL rate",
+   "game model",
+   "tested-before",
+   "Nov 12 rr terms fail"
+  ],
+  [
+   "QB SV",
+   "NFL SV",
+   "game QB term",
+   "tested-before",
+   "Nov 20 held MAE 10.010 -> 10.027/10.034"
+  ],
+  [
+   "non-QB SV",
+   "NFL SV",
+   "injury term",
+   "tested-before",
+   "Nov 20 fail"
+  ],
+  [
+   "market signal (pick, cap %)",
+   "NFL market",
+   "pXP/60, 1Y/3Y",
+   "tested-before",
+   "shipped Nov 13"
+  ],
+  [
+   "college FV",
+   "CFB FV",
+   "NFL rookie WAR / roster prior",
+   "tested-before",
+   "Oct 21 player t -1.9, game t -0.05..-0.8"
+  ],
+  [
+   "questionable model nfl_q",
+   "NFL injuries",
+   "pctl ROS exposure",
+   "not tested",
+   "lead"
+  ],
+  [
+   "team ratings (mkt/Elo)",
+   "NFL game",
+   "1Y/3Y player projection",
+   "not tested",
+   "lead; circularity ok (prior season ratings)"
+  ],
+  [
+   "WAR / SV / SVAR",
+   "NFL board",
+   "awards",
+   "owned-elsewhere",
+   "candidate"
+  ],
+  [
+   "CFB FV / SV / pSV",
+   "CFB board",
+   "mock draft",
+   "owned-elsewhere",
+   "candidate"
+  ],
+  [
+   "game control, FUMN",
+   "CFB game",
+   "ARK ranking",
+   "tested-before",
+   "already in rating (Control column)"
+  ],
+  [
+   "FV / team FV",
+   "CFB FV",
+   "game model",
+   "tested-before",
+   "Oct 21/30 fail"
+  ],
+  [
+   "QB EPA (SV family) / pSV",
+   "CFB SV",
+   "CFB FV",
+   "tested-before",
+   "Nov 3 QB EPA drivers fail Holm"
+  ],
+  [
+   "QB SV / pSV",
+   "CFB SV",
+   "game QB term",
+   "tested-before (SV), pSV not tested",
+   "Nov 20 adjusted=raw t +0.5; pSV needs starter ids (cfbfastR parquet, no pyarrow)"
+  ],
+  [
+   "school development effect",
+   "CFB dev",
+   "recruit/FV driver",
+   "needs data",
+   "dataset rebuild ~22 min ESPN+247 pull"
+  ]
+ ],
+ "raw": {
+  "wf": {
+   "N1": {
+    "s": 0.897,
+    "tune": {
+     "d": -0.025776512530056223,
+     "se": 0.0342537656599756,
+     "t": -0.7525161696360652,
+     "p": 0.23101719323240655,
+     "n": 287,
+     "G": 18,
+     "deff": 1.15
+    },
+    "held": {
+     "d": -0.01735047000456886,
+     "se": 0.023157763035345922,
+     "t": -0.7492291020547479,
+     "p": 0.23198059490066647,
+     "n": 288,
+     "G": 18,
+     "deff": 0.74
+    },
+    "byHeldSeason": {
+     "2021": 0.016,
+     "2022": -0.158,
+     "2023": 0.041,
+     "2024": 0.015,
+     "2025": 0.026,
+     "2026": -0.044
+    }
+   },
+   "N2": {
+    "c": 1.038,
+    "tune": {
+     "d": 0.0009383177476300313,
+     "se": 0.006435172617624468,
+     "t": 0.14581081244972252,
+     "p": 0.5574602255607192,
+     "n": 455,
+     "G": 30,
+     "deff": 1.26
+    },
+    "held": {
+     "d": -0.007712054517852402,
+     "se": 0.004339797214840699,
+     "t": -1.7770541193675309,
+     "p": 0.04302541912789352,
+     "n": 463,
+     "G": 30,
+     "deff": 0.64
+    }
+   }
+  },
+  "fumble": {
+   "tune": {
+    "N3a": {
+     "d": 0.012406710018526782,
+     "se": 0.01239497493880986,
+     "t": 1.000946761068486,
+     "p": 0.840606868653984,
+     "n": 1604,
+     "G": 126,
+     "deff": 1.23
+    },
+    "N3a_rawEpaRef": {
+     "d": 0.016003468598712264,
+     "se": 0.014438239643626997,
+     "t": 1.1084085729091049,
+     "p": 0.8650932405762823,
+     "n": 1604,
+     "G": 126,
+     "deff": 1.17
+    },
+    "N3a_fnVsRaw": {
+     "d": -0.0035967585801854845,
+     "se": 0.0029825865914971396,
+     "t": -1.2059192482254322,
+     "p": 0.11506313246980404,
+     "n": 1604,
+     "G": 126,
+     "deff": 0.86
+    },
+    "N3b": {
+     "d": 0.0025053901852526597,
+     "se": 0.0027250930957416182,
+     "t": 0.9193778330610876,
+     "p": 0.8201656372678787,
+     "n": 1604,
+     "G": 126,
+     "deff": 0.8
+    },
+    "maeBase": 9.950585394679965,
+    "maeFn": 9.962992104698493,
+    "tmaeBase": 10.74133876761928,
+    "tmaeFn": 10.74384415780453
+   },
+   "held": {
+    "N3a": {
+     "d": -0.0062750388159578604,
+     "se": 0.008403202094324318,
+     "t": -0.7467437704724655,
+     "p": 0.22841296967866676,
+     "n": 1424,
+     "G": 110,
+     "deff": 1.24
+    },
+    "N3a_rawEpaRef": {
+     "d": -0.004667082579225418,
+     "se": 0.006101048492533265,
+     "t": -0.7649640196987784,
+     "p": 0.22297301727201918,
+     "n": 1424,
+     "G": 110,
+     "deff": 1.2
+    },
+    "N3a_fnVsRaw": {
+     "d": -0.0016079562367324423,
+     "se": 0.0030495784837062906,
+     "t": -0.527271636169934,
+     "p": 0.2995382642645761,
+     "n": 1424,
+     "G": 110,
+     "deff": 1.21
+    },
+    "N3b": {
+     "d": -0.002759821762355417,
+     "se": 0.0025880623976731825,
+     "t": -1.0663660060270015,
+     "p": 0.14430725547080225,
+     "n": 1424,
+     "G": 110,
+     "deff": 1.06
+    },
+    "maeBase": 9.994324482553232,
+    "maeFn": 9.988049443737275,
+    "tmaeBase": 10.495219874713833,
+    "tmaeFn": 10.492460052951476
+   },
+   "ryoy": "see notes"
+  },
+  "rate": {
+   "N4": {
+    "n": 1549,
+    "wmseBase": 0.2044125670166788,
+    "wmseAge": 0.20408086103629308,
+    "t": -0.6369174020989379,
+    "classesBetter": 5,
+    "k": {
+     "2016": -0.0224,
+     "2017": -0.0192,
+     "2018": -0.0235,
+     "2019": -0.0179,
+     "2020": -0.0193,
+     "2021": -0.015,
+     "2022": -0.0159
+    }
+   },
+   "N5": {
+    "n": 10105,
+    "wmseBase": 0.24383607452837558,
+    "wmseSV": 0.243643425089638,
+    "t": -0.41575698185065496,
+    "seasonsBetter": 6,
+    "by": {
+     "2017": {
+      "base": 0.17624603005840084,
+      "sv": 0.17682582192141735,
+      "b": {
+       "QB": 0.499,
+       "RB": -1.767,
+       "WR": 0.124,
+       "TE": 0.007,
+       "DL": 0.345,
+       "DB": 2.582,
+       "OL": 0.0,
+       "LB": 1.888
+      }
+     },
+     "2018": {
+      "base": 0.2567739415586456,
+      "sv": 0.25638636372652956,
+      "b": {
+       "QB": 0.393,
+       "WR": 0.096,
+       "DB": 1.981,
+       "LB": 1.357,
+       "RB": -1.997,
+       "OL": 0.0,
+       "TE": -0.278,
+       "DL": 0.386
+      }
+     },
+     "2019": {
+      "base": 0.2630985407030031,
+      "sv": 0.2621178647061053,
+      "b": {
+       "QB": 0.468,
+       "WR": 0.295,
+       "DB": 1.568,
+       "LB": 3.311,
+       "RB": -1.5,
+       "OL": 0.0,
+       "TE": -0.173,
+       "DL": 0.799
+      }
+     },
+     "2020": {
+      "base": 0.2522385848382281,
+      "sv": 0.25137981408574717,
+      "b": {
+       "QB": 0.249,
+       "WR": 0.162,
+       "DB": 1.484,
+       "LB": 1.143,
+       "RB": -1.988,
+       "OL": 0.0,
+       "TE": -0.545,
+       "DL": 1.573
+      }
+     },
+     "2021": {
+      "base": 0.23527741606395258,
+      "sv": 0.2348387501652457,
+      "b": {
+       "QB": 0.343,
+       "WR": 0.211,
+       "DB": 1.707,
+       "LB": 1.6,
+       "RB": -2.144,
+       "OL": 0.0,
+       "TE": -0.239,
+       "DL": 1.038
+      }
+     },
+     "2022": {
+      "base": 0.24519312742745855,
+      "sv": 0.24602091923771244,
+      "b": {
+       "QB": 0.571,
+       "WR": 0.351,
+       "DB": 2.597,
+       "LB": 2.79,
+       "RB": -1.428,
+       "OL": 0.0,
+       "TE": -0.454,
+       "DL": 0.391
+      }
+     },
+     "2023": {
+      "base": 0.26555704094011073,
+      "sv": 0.26505008844175676,
+      "b": {
+       "QB": 0.35,
+       "WR": 0.257,
+       "DB": 0.455,
+       "LB": 1.772,
+       "RB": -1.78,
+       "OL": 0.0,
+       "TE": -0.279,
+       "DL": 2.164
+      }
+     },
+     "2024": {
+      "base": 0.2540363745041556,
+      "sv": 0.2526039833027983,
+      "b": {
+       "QB": 0.395,
+       "WR": 0.267,
+       "DB": 2.475,
+       "LB": 1.102,
+       "RB": -1.574,
+       "OL": 0.0,
+       "TE": -0.131,
+       "DL": 1.04
+      }
+     },
+     "2025": {
+      "base": 0.24473458622940028,
+      "sv": 0.24615773098807864,
+      "b": {
+       "QB": 0.449,
+       "WR": 0.316,
+       "DB": 1.335,
+       "LB": 1.771,
+       "RB": -1.889,
+       "OL": 0.0,
+       "TE": -0.159,
+       "DL": 1.051
+      }
+     }
+    }
+   }
+  },
+  "cfb_psv": {
+   "n": 1714,
+   "wmse": {
+    "raw": 0.025847,
+    "shrink1": 0.015934,
+    "marcel": 0.015862
+   },
+   "marcelVsRaw": [
+    -11.69,
+    10
+   ],
+   "shrink1VsRaw": [
+    -11.71,
+    10
+   ],
+   "marcelVsShrink1": [
+    -0.58,
+    6
+   ],
+   "slope": 0.955,
+   "yoyRaw": 0.293,
+   "rMarcelNext": 0.32,
+   "K": {
+    "raw": {
+     "QB": 0,
+     "RB": 0
+    },
+    "shrink1": {
+     "QB": 650,
+     "RB": 300
+    },
+    "marcel": {
+     "QB": 650,
+     "RB": 300
+    }
+   },
+   "by": {
+    "raw": {
+     "2016": 0.023157,
+     "2017": 0.024811,
+     "2018": 0.02213,
+     "2019": 0.023442,
+     "2020": 0.029382,
+     "2021": 0.038549,
+     "2022": 0.02769,
+     "2023": 0.023046,
+     "2024": 0.028183,
+     "2025": 0.020773
+    },
+    "shrink1": {
+     "2016": 0.014944,
+     "2017": 0.016387,
+     "2018": 0.014203,
+     "2019": 0.016161,
+     "2020": 0.020457,
+     "2021": 0.016575,
+     "2022": 0.018054,
+     "2023": 0.018541,
+     "2024": 0.014391,
+     "2025": 0.011666
+    },
+    "marcel": {
+     "2016": 0.014459,
+     "2017": 0.016676,
+     "2018": 0.014974,
+     "2019": 0.0158,
+     "2020": 0.020029,
+     "2021": 0.016822,
+     "2022": 0.018434,
+     "2023": 0.01853,
+     "2024": 0.013899,
+     "2025": 0.011012
+    }
+   }
+  }
+ }
+}
