@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-23T06:21:43Z",
+ "asof": "2026-11-23T06:38:42Z",
  "recenter": {
   "2026-11-23": 1.94
  },
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-23T05:18:44Z",
-  "ageH": 1.0,
+  "ageH": 1.3,
   "stale": false
  },
  "picks": [],
@@ -1933,6 +1933,22 @@
  ],
  "withdrawn": [],
  "board": [
+  {
+   "id": "401921177",
+   "sport": "cbb",
+   "kick": "2026-11-23T20:30:00Z",
+   "home": "IU Indianapolis",
+   "away": "William & Mary",
+   "mk": "spread",
+   "side": "home",
+   "line": -26.5,
+   "price": -9900.0,
+   "edge": 21.0,
+   "x": 4.0,
+   "why": "gap too big: a bad line",
+   "m": -5.5,
+   "tm": 162.4
+  },
   {
    "id": "401929445",
    "sport": "cbb",
@@ -2238,22 +2254,6 @@
    "tm": 151.3
   },
   {
-   "id": "401921177",
-   "sport": "cbb",
-   "kick": "2026-11-23T20:30:00Z",
-   "home": "IU Indianapolis",
-   "away": "William & Mary",
-   "mk": "total",
-   "side": "under",
-   "line": 165.5,
-   "price": -114.0,
-   "edge": 3.1,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": -5.5,
-   "tm": 162.4
-  },
-  {
    "id": "401921700",
    "sport": "cbb",
    "kick": "2026-11-23T16:00:00Z",
@@ -2326,7 +2326,7 @@
    "mk": "total",
    "side": "over",
    "line": 133.5,
-   "price": -152.0,
+   "price": -146.0,
    "edge": 1.9,
    "x": 5.0,
    "why": "edge under 5 (total: low)",
@@ -2577,11 +2577,11 @@
    "state": "under"
   },
   "401921177": {
-   "mk": "total",
-   "side": "under",
-   "line": 165.5,
-   "price": -114.0,
-   "edge": 3.1,
+   "mk": "spread",
+   "side": "home",
+   "line": -26.5,
+   "price": -9900.0,
+   "edge": 21.0,
    "ev": null,
    "units": 0.0,
    "home": "IU Indianapolis",
@@ -2664,7 +2664,7 @@
    "mk": "total",
    "side": "over",
    "line": 133.5,
-   "price": -152.0,
+   "price": -146.0,
    "edge": 1.9,
    "ev": null,
    "units": 0.0,
@@ -2676,7 +2676,7 @@
    "mk": "total",
    "side": "over",
    "line": 133.5,
-   "price": -134.0,
+   "price": -140.0,
    "edge": 1.0,
    "ev": null,
    "units": 0.0,
@@ -2749,7 +2749,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 23545,
+  "snapshots": 23551,
   "buckets": [
    {
     "when": "24h+",
@@ -2762,12 +2762,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 4694,
-    "clvRet": -0.0011,
-    "clvT": -0.52,
-    "clv": 0.71,
+    "clvN": 4696,
+    "clvRet": -0.0013,
+    "clvT": -0.62,
+    "clv": 0.7,
     "beat": 0.414,
-    "still": 0.403
+    "still": 0.404
    },
    {
     "when": "1-6h",
@@ -20989,7 +20989,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-23T06:21:43Z",
+ "checked": "2026-11-23T06:38:42Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
