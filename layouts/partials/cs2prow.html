@@ -33,6 +33,7 @@
   <td class="cfb__num hk__x" data-v="{{ $r.xtv | default 0 }}">{{ with $r.xtv }}{{ partial "cs2money.html" . }}{{ else }}-{{ end }}</td>
   {{- else }}
   <td class="cfb__num" data-v="{{ $r.xtv | default 0 }}"><b>{{ with $r.xtv }}{{ partial "cs2money.html" . }}{{ else }}-{{ end }}</b></td>
+  <td class="cfb__num" data-v="{{ $r.xmv | default 0 }}">{{ with $r.xmv }}{{ partial "cs2money.html" . }}{{ else }}-{{ end }}</td>
   <td style="white-space: nowrap">{{ if and $r.tk $r.logo }}<img class="cs__logo" src="/img/cs2/{{ $r.tk }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}{{ $r.tm }}{{ with $r.trk }} <span class="cfb__dim">#{{ . }}</span>{{ end }}</td>
   <td class="cs__tier" data-v="{{ $r.tier }}" data-filter="Tier {{ $r.tier }}"><span class="cs__t cs__t--{{ $r.tier }}">T{{ $r.tier }}</span></td>
   <td class="cfb__num" data-v="{{ $r.age | default 0 }}">{{ with $r.age }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ else }}-{{ end }}</td>

@@ -60,7 +60,8 @@
 <table class="cfb__table hk cs__table">
   <thead><tr>
     <th>RK</th><th>Player</th>
-    <th class="cfb__g" title="transfer value (USD): round wins added over a replacement-level pro for two seasons, aged and discounted, priced on reported buyouts">xTV</th>
+    <th class="cfb__g" title="transfer value (USD): what a buyout should cost = xMV x the market multiple fit on reported buyouts">xTV</th>
+    <th title="xMV (USD): prize money he adds over a replacement-level pro in a five of average tier-1 starters, two seasons, aged and discounted (no fee data)">xMV</th>
     <th>Team</th>
     <th title="the team's event-access tier">Tier</th>
     <th>Age</th>
@@ -108,8 +109,8 @@
     {{- end }}
     {{- with $f.value }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
-      <thead><tr><th>Reported fee</th><th>Date</th><th>Age</th><th>Reported</th><th>xTV then</th></tr></thead>
-      <tbody>{{ range .pts }}<tr><td>{{ .nick }}</td><td>{{ .date }}</td><td class="cfb__num">{{ with .age }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ else }}-{{ end }}</td><td class="cfb__num">${{ partial "num.html" (slice "%.2f" (div (float .usd) 1e6)) }}M</td><td class="cfb__num">${{ partial "num.html" (slice "%.2f" (div (float .xtv) 1e6)) }}M</td></tr>{{ end }}</tbody>
+      <thead><tr><th>Reported fee</th><th>Date</th><th>Age</th><th>Reported</th><th>xTV then</th><th title="leave-one-out: priced without this fee">Held out</th></tr></thead>
+      <tbody>{{ range .pts }}<tr><td>{{ .nick }}</td><td>{{ .date }}</td><td class="cfb__num">{{ with .age }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ else }}-{{ end }}</td><td class="cfb__num">${{ partial "num.html" (slice "%.2f" (div (float .usd) 1e6)) }}M</td><td class="cfb__num">${{ partial "num.html" (slice "%.2f" (div (float .xtv) 1e6)) }}M</td><td class="cfb__num">{{ with .loo }}${{ partial "num.html" (slice "%.2f" (div (float .) 1e6)) }}M{{ else }}-{{ end }}</td></tr>{{ end }}</tbody>
     </table></div>
     <p class="cfb__dim">fee fit error x{{ .fx }} (leave one out) · aging fit {{ $f.aging.n }} player-years</p>
     {{- end }}
