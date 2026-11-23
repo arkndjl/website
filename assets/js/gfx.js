@@ -2912,7 +2912,8 @@
       g.textAlign = 'left'; g.font = '24px ' + FONT; g.fillStyle = C.lilac;
       var lab = m.n + (m.bye ? ' · BYE' : m.at ? ' · ' + et(m.at) : '');
       var rs = m.reach != null && m.reach < 0.995 ? '1NT ' + pct(m.reach) : '';
-      if (rs && g.measureText(lab + '  ' + rs).width > bw - 24) rs = pct(m.reach);   // cramped: the teal % alone
+      if (rs && g.measureText(lab + '  ' + rs).width > bw - 24) rs = pct(m.reach);   // cramped: the teal % alone, then the date without its time
+      if (m.at && !m.bye && g.measureText(lab + '  ' + rs).width > bw - 24) lab = m.n + ' · ' + et(m.at).split(' ')[0];
       var rw = rs ? (g.measureText(rs).width) : 0;
       g.fillText(fit(g, lab, bw - 24 - (rw ? rw + 12 : 0)), x + 12, y + 20);
       if (rs) { g.fillStyle = HOT; g.textAlign = 'right'; g.fillText(rs, x + bw - 12, y + 20); g.textAlign = 'left'; }
