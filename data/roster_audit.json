@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-23T01:40Z",
+ "asof": "2026-11-23T02:08Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -4335,7 +4335,7 @@
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 0,
+     "flags": 1,
      "rows": 637
     },
     "static/data/lines/nhl.json": {
@@ -4343,7 +4343,7 @@
      "rows": 32
     },
     "static/data/nhl-war/2027.json": {
-     "flags": 2,
+     "flags": 4,
      "rows": 863
     },
     "static/data/pctl-nhl.json": {
@@ -4351,11 +4351,29 @@
      "rows": 356
     },
     "static/data/xaav-nhl.json": {
-     "flags": 12,
+     "flags": 14,
      "rows": 850
     }
    },
    "flags": [
+    {
+     "d": "2026-11-22",
+     "field": "depth",
+     "file": "static/data/depth/nhl.json",
+     "flag": "moved",
+     "head": "Traded to Detroit",
+     "kind": "trade",
+     "move": {
+      "d": "2026-11-22",
+      "head": "Traded to Detroit",
+      "kind": "trade"
+     },
+     "pid": "5964",
+     "player": "Kirby Dach",
+     "pos": "RW",
+     "rotowire": "DET",
+     "site": "MTL"
+    },
     {
      "d": "2026-11-13",
      "field": "tm",
@@ -4375,6 +4393,38 @@
      "site": "CAR"
     },
     {
+     "d": "2026-11-22",
+     "field": "tm",
+     "file": "static/data/nhl-war/2027.json",
+     "flag": "moved",
+     "head": "Sent to Montreal in blockbuster deal",
+     "kind": null,
+     "move": null,
+     "pid": "4396",
+     "player": "Dylan Larkin",
+     "pos": "C",
+     "rotowire": "MTL",
+     "site": "DET"
+    },
+    {
+     "d": "2026-11-22",
+     "field": "tm",
+     "file": "static/data/nhl-war/2027.json",
+     "flag": "moved",
+     "head": "Traded to Detroit",
+     "kind": "trade",
+     "move": {
+      "d": "2026-11-22",
+      "head": "Traded to Detroit",
+      "kind": "trade"
+     },
+     "pid": "5964",
+     "player": "Kirby Dach",
+     "pos": "C",
+     "rotowire": "DET",
+     "site": "MTL"
+    },
+    {
      "d": "2026-11-07",
      "field": "tm",
      "file": "static/data/nhl-war/2027.json",
@@ -4391,6 +4441,20 @@
      "pos": "G",
      "rotowire": "FA",
      "site": "NYR"
+    },
+    {
+     "d": "2026-11-22",
+     "field": "tm",
+     "file": "static/data/xaav-nhl.json",
+     "flag": "moved",
+     "head": "Sent to Montreal in blockbuster deal",
+     "kind": null,
+     "move": null,
+     "pid": "4396",
+     "player": "Dylan Larkin",
+     "pos": "C",
+     "rotowire": "MTL",
+     "site": "DET"
     },
     {
      "d": "2026-11-13",
@@ -4481,6 +4545,24 @@
      "pos": "G",
      "rotowire": "FA",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-22",
+     "field": "tm",
+     "file": "static/data/xaav-nhl.json",
+     "flag": "moved",
+     "head": "Traded to Detroit",
+     "kind": "trade",
+     "move": {
+      "d": "2026-11-22",
+      "head": "Traded to Detroit",
+      "kind": "trade"
+     },
+     "pid": "5964",
+     "player": "Kirby Dach",
+     "pos": "C",
+     "rotowire": "DET",
+     "site": "MTL"
     },
     {
      "d": "2026-08-14",

@@ -1,10 +1,10 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-23T02:06:16Z",
+ "asof": "2026-11-23T02:09:46Z",
  "recenter": {
   "2026-11-22": 1.98,
-  "2026-11-23": 2.01
+  "2026-11-23": 2.0
  },
  "monitor": {
   "clocks": {
@@ -1897,7 +1897,7 @@
     "side": "over",
     "line": 138.5,
     "price": -110.0,
-    "ev": 0.094,
+    "ev": 0.095,
     "units": 0.5
    }
   },
@@ -1957,20 +1957,29 @@
    "tmRaw": 145.0,
    "flagged": "2026-11-23T00:06:57Z",
    "paper": true,
-   "betTo": 148.0,
+   "betTo": 148.5,
    "close": 148.5,
-   "now": {
-    "mk": "total",
-    "side": "under",
-    "line": 148.5,
-    "price": -114.0,
-    "ev": 0.114,
-    "units": 0.25
-   }
+   "now": null
   }
  ],
  "withdrawn": [],
  "board": [
+  {
+   "id": "401921701",
+   "sport": "cbb",
+   "kick": "2026-11-23T18:30:00Z",
+   "home": "Florida Gulf Coast",
+   "away": "Charlotte",
+   "mk": "spread",
+   "side": "away",
+   "line": 6.5,
+   "price": -1730.0,
+   "edge": 12.9,
+   "x": 4.0,
+   "why": "no edge at -1730",
+   "m": -6.4,
+   "tm": 142.7
+  },
   {
    "id": "401919032",
    "sport": "cbb",
@@ -1986,22 +1995,6 @@
    "why": "no edge at -1116",
    "m": 16.8,
    "tm": 144.6
-  },
-  {
-   "id": "401921701",
-   "sport": "cbb",
-   "kick": "2026-11-23T18:30:00Z",
-   "home": "Florida Gulf Coast",
-   "away": "Charlotte",
-   "mk": "spread",
-   "side": "home",
-   "line": -13.5,
-   "price": -349.0,
-   "edge": 7.1,
-   "x": 4.0,
-   "why": "no edge at -349",
-   "m": -6.4,
-   "tm": 142.7
   },
   {
    "id": "401929445",
@@ -2116,6 +2109,22 @@
    "tm": 160.9
   },
   {
+   "id": "401918057",
+   "sport": "cbb",
+   "kick": "2026-11-24T03:00:00Z",
+   "home": "California",
+   "away": "Alabama State",
+   "mk": "total",
+   "side": "under",
+   "line": 148.5,
+   "price": -115.0,
+   "edge": 5.9,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": 23.6,
+   "tm": 142.6
+  },
+  {
    "id": "401909788",
    "sport": "cbb",
    "kick": "2026-11-24T01:00:00Z",
@@ -2132,22 +2141,6 @@
    "tm": 157.2
   },
   {
-   "id": "401918057",
-   "sport": "cbb",
-   "kick": "2026-11-24T03:00:00Z",
-   "home": "California",
-   "away": "Alabama State",
-   "mk": "spread",
-   "side": "home",
-   "line": 19.5,
-   "price": -110,
-   "edge": 4.1,
-   "x": 5.0,
-   "why": "edge under 5 (tier: mixed)",
-   "m": 23.6,
-   "tm": 142.6
-  },
-  {
    "id": "401921157",
    "sport": "cbb",
    "kick": "2026-11-24T00:00:00Z",
@@ -2156,7 +2149,7 @@
    "mk": "spread",
    "side": "home",
    "line": -2.5,
-   "price": -110,
+   "price": -122.0,
    "edge": 4.1,
    "x": 5.0,
    "why": "edge under 5 (line: <4)",
@@ -2300,7 +2293,7 @@
    "mk": "spread",
    "side": "away",
    "line": 45.5,
-   "price": -110,
+   "price": -108.0,
    "edge": 1.7,
    "x": 3.5,
    "why": "edge under 3.5 (inj: with)",
@@ -2402,7 +2395,7 @@
    "side": "under",
    "line": 147.5,
    "price": -101,
-   "ev": 0.023,
+   "ev": 0.022,
    "edge": 5.5,
    "units": 0.5,
    "bk": "poly",
@@ -2547,7 +2540,7 @@
    "mk": "spread",
    "side": "away",
    "line": 45.5,
-   "price": -110,
+   "price": -108.0,
    "edge": 1.7,
    "ev": null,
    "units": 0.0,
@@ -2557,10 +2550,10 @@
   },
   "401921701": {
    "mk": "spread",
-   "side": "home",
-   "line": -13.5,
-   "price": -349.0,
-   "edge": 7.1,
+   "side": "away",
+   "line": 6.5,
+   "price": -1730.0,
+   "edge": 12.9,
    "ev": null,
    "units": 0.0,
    "home": "Florida Gulf Coast",
@@ -2631,7 +2624,7 @@
    "mk": "total",
    "side": "under",
    "line": 163.5,
-   "price": -110,
+   "price": -105.0,
    "edge": 1.5,
    "ev": null,
    "units": 0.0,
@@ -2688,11 +2681,11 @@
    "state": "under"
   },
   "401918057": {
-   "mk": "spread",
-   "side": "home",
-   "line": 19.5,
-   "price": -110,
-   "edge": 4.1,
+   "mk": "total",
+   "side": "under",
+   "line": 148.5,
+   "price": -115.0,
+   "edge": 5.9,
    "ev": null,
    "units": 0.0,
    "home": "California",
@@ -2715,7 +2708,7 @@
    "mk": "spread",
    "side": "home",
    "line": -2.5,
-   "price": -110,
+   "price": -122.0,
    "edge": 4.1,
    "ev": null,
    "units": 0.0,
@@ -2776,22 +2769,22 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 23263,
+  "snapshots": 23274,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 634,
-    "clvRet": -0.0033,
-    "clvT": -0.36,
+    "clvN": 636,
+    "clvRet": -0.0035,
+    "clvT": -0.37,
     "clv": 0.87,
-    "beat": 0.366,
-    "still": 0.27
+    "beat": 0.365,
+    "still": 0.272
    },
    {
     "when": "6-24h",
-    "clvN": 4593,
-    "clvRet": -0.0012,
-    "clvT": -0.54,
+    "clvN": 4596,
+    "clvRet": -0.001,
+    "clvT": -0.47,
     "clv": 0.7,
     "beat": 0.419,
     "still": 0.397
@@ -18934,7 +18927,7 @@
    "tmRaw": 145.0,
    "flagged": "2026-11-23T00:06:57Z",
    "paper": true,
-   "betTo": 148.0,
+   "betTo": 148.5,
    "close": 148.5
   },
   {
@@ -21007,7 +21000,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-23T02:06:16Z",
+ "checked": "2026-11-23T02:09:46Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
