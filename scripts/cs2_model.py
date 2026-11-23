@@ -209,7 +209,7 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
         jm = bo3.joined.get(i) if bo3 is not None else None
         both = (ra or []) + (rb or [])
         if orig[i] is not None:
-            rows.append({"i": orig[i], "d": d, "a": ka, "b": kb, "x": (sa - sb) / 400,
+            rows.append({"i": orig[i], "d": d, "a": ka, "b": kb, "x": (sa - sb) / 400, "sa": sa, "sb": sb,
                          "v": ((va[1] if va else 400) - (vb[1] if vb else 400)) / 400, "t": t,
                          "top": bool(va and vb and va[0] <= TOP and vb[0] <= TOP), "s": s, "r": r,
                          "bo": (jm[9] if jm else 0) or 0, "tier": jm[10] if jm else None,
@@ -217,6 +217,8 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
         kt = p.get("ktier", 1.0) if jm and jm[10] in ("s", "a") else 1.0
         if r[6] == "bo3":  # a bo3.gg-only match (no Valve series): updates only, K x kx
             kt *= p.get("kx", 1.0)
+        elif r[6] == "esea":  # an ESEA league match (scripts/esea_tiers_research.py): K x kxe
+            kt *= p.get("kxe", 1.0)
         team[ka] = team.get(ka, p["mu_new"]) + 32 * (s - e)
         team[kb] = team.get(kb, p["mu_new"]) - 32 * (s - e)
         if p["Kr"] and rga and rgb and rga != rgb:

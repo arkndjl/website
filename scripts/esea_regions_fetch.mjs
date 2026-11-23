@@ -51,6 +51,8 @@ const champs = new Map();
 const add = (id, nm) => { const p = parse(nm); if (id && p && p.season >= FROM && p.season <= TO && !champs.has(id)) champs.set(id, { id, name: nm, ...p }); };
 let seed = []; try { seed = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'esea.json'), 'utf8')).championships || []; } catch {}
 const det0 = seed[0] ? await api(`/championships/${seed[0].id}`) : null;
+console.log('seed', seed[0]?.id, JSON.stringify(det0)?.slice(0, 600));
+console.log('search sample', JSON.stringify(await api(`/search/championships?name=${encodeURIComponent('S58 EU Main')}&game=cs2&type=past&limit=5`))?.slice(0, 1500));
 const org = det0?.organizer_id;
 console.log('organizer', org);
 if (org) for (const type of ['past', 'ongoing']) for (let off = 0; off < 50000; off += 100) {
@@ -58,6 +60,32 @@ if (org) for (const type of ['past', 'ongoing']) for (let off = 0; off < 50000; 
   for (const x of items) add(x.championship_id || x.competition_id, x.name);
   if (items.length < 100) break;
 }
+// FACEIT's league API: each season lists regions > divisions > stages > conferences, each with a championship id
+const LG = 'a14b8616-45b9-4581-8637-4dfd0b5f6af8';
+const lg = await api(`/leagues/${LG}`);
+console.log('league', JSON.stringify(lg)?.slice(0, 1500));
+const walk = (o, ctx, s) => {
+  if (!o || typeof o !== 'object') return;
+  if (Array.isArray(o)) { for (const x of o) walk(x, ctx, s); return; }
+  const nm = o.name || o.region_name || o.division_name || o.stage_name || o.conference_name;
+  const c2 = nm ? [...ctx, String(nm)] : ctx;
+  const id = o.championship_id || o.competition_id;
+  if (id) {
+    const full = `S${s} ` + c2.join(' ');
+    const reg = (c2.find(x => /^(NA|EU|SA|OCE|AS|ASIA|MENA|North America|Europe|South America|Oceania)$/i.test(x)) || c2[0] || '').toUpperCase()
+      .replace('NORTH AMERICA', 'NA').replace('EUROPE', 'EU').replace('SOUTH AMERICA', 'SA').replace('OCEANIA', 'OCE').replace('ASIA', 'AS');
+    const dv = c2.find(x => DIVS.test(x.trim()));
+    if (dv && !champs.has(id)) champs.set(id, { id, name: full, season: s, region: reg, div: dv[0].toUpperCase() + dv.slice(1).toLowerCase(), group: null,
+      stage: /playoff/i.test(full) ? 'Playoffs' : 'Regular Season' });
+  }
+  for (const v of Object.values(o)) if (v && typeof v === 'object') walk(v, c2, s);
+};
+for (let s = FROM; s <= TO; s++) {
+  const ls = await api(`/leagues/${LG}/seasons/${s}`);
+  if (s === TO) console.log('league season', JSON.stringify(ls)?.slice(0, 3000));
+  walk(ls, [], s);
+}
+console.log('after league API', champs.size);
 // FACEIT's organizer list can stop short: name searches per season x region x division fill gaps
 for (let s = FROM; s <= TO; s++) for (const R of ['NA', 'EU', 'SA', 'OCE', 'AS', 'MENA']) for (const d of ['Advanced', 'Main', 'Intermediate'])
   for (const type of ['past', 'ongoing']) {
