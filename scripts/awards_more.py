@@ -88,7 +88,7 @@ def test(races, cols, null, depth, k=None):
 
 def gate(cur, sport, new):
     """Holm over the sport's earlier races and the new ones; sets test.pass on the new"""
-    old = [(a, v['test']['p']) for a, v in cur.get(sport, {}).items() if a != '_prev' and a not in new and 'test' in v]
+    old = [(a, v['test']['p']) for a, v in cur.get(sport, {}).items() if a != '_prev' and a not in new and 'test' in v and not v.get('stat')]
     keys = [a for a, _ in old] + list(new)
     ok = holm([p for _, p in old] + [new[a]['test']['p'] for a in new])
     for a, k in zip(keys, ok):

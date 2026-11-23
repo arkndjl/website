@@ -41,7 +41,7 @@ def votes(season):
 def standings(season):
     h = fetch(f'nhl_season_{season}.html', f'https://www.hockey-reference.com/leagues/NHL_{season}.html')
     out = {}
-    for tid in ('standings_EAS', 'standings_WES'):
+    for tid in ('standings_EAS', 'standings_WES', 'standings'):            # 2020-21: one divisional table
         for r in table(h, tid):
             t = r.get('_tm')
             if t and r.get('points_pct'): out[HR_TM.get(t, t)] = f(r['points_pct'])
