@@ -47,6 +47,7 @@ FEES = ROOT / "data" / "cs2_fees.json"
 STATS = ["k", "d", "a", "adr", "kast", "fk", "fd", "tk", "td", "mk", "cl", "hs", "gd"]  # Nov 3: hs (t -10.4), damage taken (t -6.8)
 TIER = {"s": 1, "a": 2, "b": 3, "c": 4, "d": 5}
 T1_MAPS = 20
+PRO_MIN_R, PRO_MAX = 300, 800   # prospect pool: rounds in the last year (Nov 23 2026, was 1,000), list cap (was 200)
 
 
 def ordd(s):
@@ -820,7 +821,11 @@ def build():
     rw = (pf.get("reach") or {}).get("w")
     pros = []
     ss = sa_share(M, T)
-    for i in pool:
+    # prospects take PRO_MIN_R+ rounds (not the board's 1,000): the kept grade, fit on 1,000+ rows, holds on the
+    # 300-999 band held out (t -6.5 at 600-999, -3.5 at 300-599 vs the band constant; bias vs the live pool's t -0.2;
+    # mostly C/D-tier players t -6.3; scripts/cs2_prospects_lowtier_research.py)
+    actp = (r12 >= PRO_MIN_R) & np.array([M.d[lastrow[i]] >= T - 120 if i in lastrow else False for i in range(len(M.pids))])
+    for i in sorted(np.where(actp)[0], key=lambda i: -th[i]):
         if sm[i] >= T1_MAPS:
             continue
         x = {"th": th[i], "rise": th[i] - th6[i], "age": (age[i] - 22) if age[i] == age[i] else 0.0, "ss": ss[i]}
@@ -835,7 +840,7 @@ def build():
             r["t1p"] = round(float(1 / (1 + math.exp(-z))), 3)
         pros.append(r)
     pros.sort(key=lambda r: (-r["proj"], -r.get("t1p", 0)))
-    pros = pros[:200]
+    pros = [r for r in pros if r["fv"] > 20][:PRO_MAX]   # graded above the 20 floor
     for k, r in enumerate(pros):
         r["rk"] = k + 1
     out = {"asof": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),

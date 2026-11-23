@@ -1,0 +1,199 @@
+{
+ "asof": "2026-11-23",
+ "A": {
+  "cols": [
+   "th",
+   "age",
+   "ss"
+  ],
+  "b": [
+   0.3952,
+   0.8757,
+   -0.0695,
+   -1.5934
+  ],
+  "cuts": [
+   "2024-10-01",
+   "2025-01-01",
+   "2025-04-01",
+   "2025-07-01",
+   "2025-10-01"
+  ],
+  "bands": {
+   "1000+ (live pool)": {
+    "n": 1322,
+    "mse": 0.8122,
+    "mseConst": 2.199,
+    "t": -18.18,
+    "bias": 0.234,
+    "tBias": 9.76,
+    "slope": 1.113
+   },
+   "600-999": {
+    "n": 233,
+    "mse": 1.1185,
+    "mseConst": 2.4719,
+    "t": -6.45,
+    "bias": 0.218,
+    "tBias": 3.05,
+    "slope": 0.87,
+    "dBiasVsLive": -0.015,
+    "tDBias": -0.22
+   },
+   "300-599": {
+    "n": 157,
+    "mse": 1.4634,
+    "mseConst": 2.4421,
+    "t": -3.5,
+    "bias": 0.213,
+    "tBias": 2.13,
+    "slope": 0.789,
+    "dBiasVsLive": -0.021,
+    "tDBias": -0.21
+   },
+   "300-999": {
+    "dBiasVsLive": -0.018,
+    "tDBias": -0.29
+   }
+  },
+  "tiers": {
+   "mostly C/D-tier rounds, 1000+ (live pool)": {
+    "n": 585,
+    "mse": 0.9976,
+    "mseConst": 2.5443,
+    "t": -12.24,
+    "bias": 0.186,
+    "tBias": 4.68,
+    "slope": 1.199
+   },
+   "mostly C/D-tier rounds, 600-999": {
+    "n": 162,
+    "mse": 1.2163,
+    "mseConst": 2.5528,
+    "t": -4.94,
+    "bias": 0.14,
+    "tBias": 1.55,
+    "slope": 0.839
+   },
+   "mostly C/D-tier rounds, 300-999": {
+    "n": 283,
+    "mse": 1.3027,
+    "mseConst": 2.7137,
+    "t": -6.32,
+    "bias": 0.124,
+    "tBias": 1.75,
+    "slope": 0.842
+   },
+   "mostly B-tier or higher, 1000+ (live pool)": {
+    "n": 737,
+    "mse": 0.6735,
+    "mseConst": 1.759,
+    "t": -13.25,
+    "bias": 0.269,
+    "tBias": 9.16,
+    "slope": 1.04
+   },
+   "mostly B-tier or higher, 600-999": {
+    "n": 71,
+    "mse": 0.9052,
+    "mseConst": 2.4327,
+    "t": -4.21,
+    "bias": 0.389,
+    "tBias": 3.52,
+    "slope": 0.94
+   },
+   "mostly B-tier or higher, 300-999": {
+    "n": 107,
+    "mse": 1.1127,
+    "mseConst": 2.2057,
+    "t": -3.69,
+    "bias": 0.459,
+    "tBias": 4.8,
+    "slope": 0.88
+   }
+  },
+  "spread": {
+   "g": -0.5111,
+   "thMean": -0.395,
+   "n": 390,
+   "mseKept": 1.2506,
+   "mseSpread": 1.2187,
+   "t": -0.58,
+   "slopeAfter": 1.101
+  },
+  "refit": {
+   "cols": [
+    "th",
+    "age",
+    "ss",
+    "lr"
+   ],
+   "b": [
+    0.3678,
+    0.7874,
+    -0.0688,
+    -1.031,
+    -0.8176
+   ],
+   "all 300+": {
+    "n": 1712,
+    "mseKept": 0.8955,
+    "mseRefit": 0.9918,
+    "t": 8.57,
+    "biasRefit": 0.318,
+    "tBias": 13.75
+   },
+   "live pool": {
+    "n": 1322,
+    "mseKept": 0.8122,
+    "mseRefit": 0.8684,
+    "t": 9.63,
+    "biasRefit": 0.267,
+    "tBias": 10.86
+   },
+   "300-999": {
+    "n": 390,
+    "mseKept": 1.2506,
+    "mseRefit": 1.5181,
+    "t": 5.05,
+    "biasRefit": 0.537,
+    "tBias": 8.74
+   }
+  }
+ },
+ "B": {
+  "matched": 514,
+  "withBox": 486,
+  "rows": 84,
+  "nTune": 0,
+  "nHeld": 84,
+  "esea_only_held": 28,
+  "floor": {
+   "cut": "2025-10-01",
+   "Intermediate": {
+    "n": 1,
+    "p50": 27.8,
+    "p90": 27.8,
+    "atFloor": 0.0
+   },
+   "Main": {
+    "n": 2,
+    "p50": -0.0,
+    "p90": 11.6,
+    "atFloor": 1.0
+   },
+   "Advanced": {
+    "n": 97,
+    "p50": 7.7,
+    "p90": 25.1,
+    "atFloor": 0.8
+   }
+  },
+  "gradable": false
+ },
+ "laursen": {
+  "fv": 20,
+  "prov": true,
+  "why": "ESEA is not gradable on the pro scale (held rows 84, no tune rows); 80% of NA ESEA Advanced players who went on to 600+ bo3.gg rounds graded at the 20 floor the next year"
+ }
+}
