@@ -52,11 +52,23 @@ def cbb(cur):
     return new
 
 
+def drivers(sport, new):
+    """the driver tests that passed (scripts/research/awards_nov23/<sport>/drivers.json) on each race they joined"""
+    fn = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'research', 'awards_nov23', sport, 'drivers.json')
+    if not os.path.exists(fn): return
+    D = json.load(open(fn))
+    for t in D['tests']:
+        if t['pass'] and t['award'] in new:
+            new[t['award']].setdefault('drivers', {})[t['driver']] = {k: t[k] for k in ('gain', 't', 'p', 'wins', 'n')}
+            new[t['award']]['drivers'][t['driver']]['holm_n'] = D['holm_n']
+
+
 def main(argv):
     want = [a for a in argv if a in ('nba', 'cbb')] or ['nba', 'cbb']
     cur = json.load(open(OUT))
     for sp in want:
         new = (nba if sp == 'nba' else cbb)(cur)
+        drivers(sp, new)
         gate(cur, sp, new)
         cur[sp].update(new)
     json.dump(cur, open(OUT, 'w'), indent=1, sort_keys=True)

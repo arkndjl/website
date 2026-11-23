@@ -56,6 +56,17 @@ def winners(page='John_R._Wooden_Award'):
     return out
 
 
+def ap_pre(season):
+    """{team key: preseason AP rank} (Sports-Reference's polls page, the Pre column: set before the season)"""
+    from awards_nba import fetch, table
+    h = fetch(f'cbb_polls_{season}.html', f'https://www.sports-reference.com/cbb/seasons/men/{season}-polls.html')
+    out = {}
+    for r in table(h, 'ap-polls'):
+        if r.get('school') in (None, 'School') or not (r.get('week1') or '').isdigit(): continue
+        out[NM.team_key(r['school'].replace(' (NY)', ''))] = int(r['week1'])
+    return out
+
+
 def row(r, tm):
     f = lambda k: float(r[k]) if r.get(k) not in (None, '') else 0.0
     mpg = f('min_per') / 100 * 40
@@ -75,7 +86,11 @@ def seasons_data():
     races = {'wooden': []}
     for s in range(FIRST, LAST + 1):
         tm = teams(s)
+        ap = ap_pre(s)
         pool = [row(r, tm) for r in by.get(s, []) if float(r['min_per'] or 0) >= 40 and float(r['gp'] or 0) >= 20]
+        for r in pool:
+            rk = ap.get(NM.team_key(r['tm']))
+            r['ap_pre'] = 26.0 - rk if rk else 0.0
         order = []
         if s in W:
             m = NM.Matcher(pool, name='n', team='tm', pos=None, sport='basketball')
@@ -95,14 +110,16 @@ G_ROLES = {'Pure PG', 'Scoring PG', 'Combo G'}
 ROLE_POOL = {'cousy': G_ROLES, 'west': {'Combo G', 'Wing G', 'Scoring PG', 'Wing F'},
              'erving': {'Combo G', 'Wing G', 'Wing F', 'Stretch 4'},
              'malone': {'Wing F', 'Stretch 4', 'PF/C', 'C'}, 'kareem': {'PF/C', 'C'}}
-# key: (Wikipedia page, voter model cols, null, first season, pool rule on a row)
+# key: (Wikipedia page, voter model cols, null, first season, pool rule on a row). Erving carries the team's preseason
+# AP rank (ap_pre: 26 - rank, 0 unranked), the one driver that passed (scripts/research/awards_nov23/cbb/drivers.py:
+# t 4.11, 10/11 seasons, p .0011, Holm over 31)
 MORE = {'naismith': ('Naismith_College_Player_of_the_Year', WOODEN_COLS, ['bpm'], FIRST, None),
         'ap': ('Associated_Press_College_Basketball_Player_of_the_Year', WOODEN_COLS, ['bpm'], FIRST, None),
         'dpoy': ('NABC_Defensive_Player_of_the_Year', DPOY_COLS, ['dbpm'], FIRST, None),
         'frosh': ('USBWA_National_Freshman_of_the_Year', WOODEN_COLS, ['bpm'], FIRST, lambda r: r['cls'] == 'Fr'),
         'cousy': ('Bob_Cousy_Award', WOODEN_COLS, ['bpm'], FIRST, lambda r: r['role'] in ROLE_POOL['cousy']),
         'west': ('Jerry_West_Award', WOODEN_COLS, ['bpm'], 2015, lambda r: r['role'] in ROLE_POOL['west']),
-        'erving': ('Julius_Erving_Award', WOODEN_COLS, ['bpm'], 2015, lambda r: r['role'] in ROLE_POOL['erving']),
+        'erving': ('Julius_Erving_Award', WOODEN_COLS + ['ap_pre'], ['bpm'], 2015, lambda r: r['role'] in ROLE_POOL['erving']),
         'malone': ('Karl_Malone_Award', WOODEN_COLS, ['bpm'], 2015, lambda r: r['role'] in ROLE_POOL['malone']),
         'kareem': ('Kareem_Abdul-Jabbar_Award', WOODEN_COLS, ['bpm'], 2015, lambda r: r['role'] in ROLE_POOL['kareem'])}
 
