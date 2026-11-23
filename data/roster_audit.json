@@ -1,17 +1,17 @@
 {
- "asof": "2026-11-23T18:23Z",
+ "asof": "2026-11-23T18:26Z",
  "sports": {
   "cbb": {
    "by_file": {
     "static/data/depth/cbb.json": {
      "flags": 0,
-     "rows": 5293
+     "rows": 5294
     }
    },
    "flags": [],
    "joined": 0,
    "players": 972,
-   "rows": 5293
+   "rows": 5294
   },
   "cfb": {
    "by_file": {
@@ -4347,8 +4347,8 @@
      "rows": 865
     },
     "static/data/pctl-nhl.json": {
-     "flags": 0,
-     "rows": 356
+     "flags": 1,
+     "rows": 350
     },
     "static/data/xaav-nhl.json": {
      "flags": 11,
@@ -4589,11 +4589,29 @@
      "pos": "C",
      "rotowire": "FA",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-13",
+     "field": "tm",
+     "file": "static/data/pctl-nhl.json",
+     "flag": "released",
+     "head": "Two-point effort in Finland",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-13",
+      "head": "Two-point effort in Finland",
+      "kind": "exit"
+     },
+     "pid": "5744",
+     "player": "K'Andre Miller",
+     "pos": "D",
+     "rotowire": "CAR",
+     "site": "CAR"
     }
    ],
    "joined": 0,
    "players": 1431,
-   "rows": 2740
+   "rows": 2734
   }
  }
 }
