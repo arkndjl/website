@@ -320,7 +320,12 @@ def main():
                         row[k + 'R'] = ranks[(q, k)]
                 players.append(row)
             players.sort(key=lambda r: (-(r['maps'] >= minm), r.get('rwaR') or 9999, -r['maps']))
-        seasons_out.append({'season': sn, 'div': div, 'w': s.get('w'), 'l': s.get('l'), 'rf': s.get('rf'), 'ra': s.get('ra'),
+        # regular-season record: FACEIT's final leaderboard (counts every forfeit and bye), else the match list
+        rw = sum(1 for m in ms if not m.get('po') and m['res'] == 'W')
+        rl = sum(1 for m in ms if not m.get('po') and m['res'] == 'L')
+        if st and st.get('w') is not None and st.get('l') is not None and not (sn == cur):
+            rw, rl = st['w'], st['l']
+        seasons_out.append({'season': sn, 'div': div, 'w': rw, 'l': rl, 'rf': s.get('rf'), 'ra': s.get('ra'),
                             'standing': st, 'playoffs': pl, 'players': players, 'pool': pool,
                             'minMaps': max(3, math.ceil(0.4 * max([q['maps'] for q in P.values()] or [0]))),
                             'current': sn == cur, 'start': ms[0]['at'] if ms else None, 'end': ms[-1]['at'] if ms else None})

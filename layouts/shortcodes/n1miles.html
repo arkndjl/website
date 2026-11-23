@@ -51,13 +51,13 @@
   </div>
   <ul class="esea__tiles n1m__tiles">
     <li><span class="esea__v">{{ $t.seasons }}</span><span class="esea__k">seasons</span></li>
-    <li><span class="esea__v">{{ $t.w }}–{{ $t.l }}</span><span class="esea__k" title="league matches, regular season + playoffs">record</span></li>
+    <li><span class="esea__v">{{ $t.w }}–{{ $t.l }}</span><span class="esea__k" title="regular season, forfeits and byes included">record</span></li>
     <li><span class="esea__v">{{ $t.poSeasons }}</span><span class="esea__k">playoffs</span></li>
     <li><span class="esea__v">{{ $t.poW }}–{{ $t.poL }}</span><span class="esea__k" title="playoff series won–lost">series</span></li>
   </ul>
   <div class="n1m__tbl">
   <table class="cfb__table">
-    <thead><tr><th>Season</th><th>Division</th><th>W–L</th><th title="rounds won minus lost">Rd ±</th><th title="final regular-season standing in the division (FACEIT leaderboard)">Finish</th><th>Playoffs</th><th title="playoff series, in order">Series</th><th title="playoff placing: teams knocked out the same day share the range">Place</th><th title="eliminated by">Out</th></tr></thead>
+    <thead><tr><th>Season</th><th>Division</th><th title="regular season, FACEIT final standings (forfeits and byes count)">W–L</th><th title="rounds won minus lost">Rd ±</th><th title="final regular-season standing in the division (FACEIT leaderboard)">Finish</th><th>Playoffs</th><th title="playoff series, in order">Series</th><th title="playoff placing: teams knocked out the same day share the range">Place</th><th title="eliminated by">Out</th></tr></thead>
     <tbody>
     {{- range $i, $s := $D.seasons }}
     <tr{{ with $s.move }} class="is-{{ . }}"{{ end }}>
