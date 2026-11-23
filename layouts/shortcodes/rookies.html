@@ -106,7 +106,7 @@
       // every board (Noah, Nov 23): the number it ranks by leads, then what it takes to read it: position, class, age,
       // size, the sample or usage (games, then minutes / snaps / TOI), then the rate stats, the rest, pre-draft last
       var ctx = /^(yr)$/, smp = function (x) { return /^(gp|mp|mpg|min|toi|sn|snp|snpg|u|maps)$/.test(x.k) || (x.k === 'g' && /^games/.test(x.t || '')); },
-          rate = function (x) { return D.mob && /^(fv|x|xpm|splus|war)$/.test(x.k); },
+          rate = function (x) { return D.mob && /^(p|e|fv|x|xpm|splus|war)$/.test(x.k); },
           gms = function (x) { return x.k === 'gp' || x.k === 'g' ? 0 : x.k === 'u' ? 2 : 1; },
           live = function (x) { return x.k !== key && has(x.k); };
       var kc = D.cols.filter(function (x) { return x.k === key; })[0];
