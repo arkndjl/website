@@ -101,14 +101,14 @@
   <div class="n1-body">
   {{- with $d.next }}{{ $n := . }}{{ $pv := dict }}{{ with $d.preview }}{{ if eq .id $n.id }}{{ $pv = . }}{{ end }}{{ end }}
     <div class="n1-md__vs">
-      <div class="n1-md__team"><img src="{{ "img/1nt/1nt-logo.webp" | relURL }}" alt="1NT" width="96" height="96"><span class="n1-md__name">1NT</span><span class="n1-k">{{ with $d.standing }}#{{ .rank }} · {{ .w }}–{{ .l }}{{ end }}</span>{{ with site.Data.esea_world }}{{ with .now }}<span class="n1-k n1-wr" title="world rank: the VRS rank the five's rating would hold, of {{ .of }}">world #{{ .vrs }} <span class="cs__t cs__t--{{ .tier }}">T{{ .tier }}</span></span>{{ end }}{{ end }}</div>
+      <div class="n1-md__team"><img src="{{ "img/1nt/1nt-logo.webp" | relURL }}" alt="1NT" width="96" height="96"><span class="n1-md__name">1NT</span><span class="n1-k">{{ with $d.standing }}#{{ .rank }} · {{ .w }}–{{ .l }}{{ end }}</span>{{ with site.Data.esea_world }}{{ with .now }}<span class="n1-k n1-wr" title="world rank: the CS2 ARK Ranking spot the five's rating would hold, of {{ .of }}">world #{{ .vrs }} <span class="cs__t cs__t--{{ .tier }}">T{{ .tier }}</span></span>{{ end }}{{ end }}</div>
       <div class="n1-md__mid">
         <span class="n1-k">{{ with $pv.stage }}{{ . }}{{ else }}ESEA S{{ $season }}{{ end }}{{ with $pv.bestOf }} · Bo{{ . }}{{ end }}</span>
         <span class="n1-md__vsx">VS</span>
         <span class="n1-md__when" data-n1-at="{{ .at }}">{{ (time.In $et (time (int (div .at 1000)))).Format "Mon Jan 2 · 3:04 PM" }} ET</span>
         <span class="n1-k" data-n1-count="{{ .at }}"></span>
       </div>
-      <div class="n1-md__team">{{ with .opp.avatar }}<img class="n1-md__av" src="{{ . }}" alt="" width="72" height="72" loading="lazy">{{ end }}<span class="n1-md__name">{{ .opp.name }}</span><span class="n1-k">#{{ .opp.rank }} · {{ .opp.rec }}</span>{{ with site.Data.esea_world }}{{ with index .teams $n.opp.id }}<span class="n1-k n1-wr" title="world rank: the VRS rank the five's rating would hold">world #{{ .w }} <span class="cs__t cs__t--{{ .t }}">T{{ .t }}</span></span>{{ end }}{{ end }}</div>
+      <div class="n1-md__team">{{ with .opp.avatar }}<img class="n1-md__av" src="{{ . }}" alt="" width="72" height="72" loading="lazy">{{ end }}<span class="n1-md__name">{{ .opp.name }}</span><span class="n1-k">#{{ .opp.rank }} · {{ .opp.rec }}</span>{{ with site.Data.esea_world }}{{ with index .teams $n.opp.id }}<span class="n1-k n1-wr" title="world rank: the CS2 ARK Ranking spot the five's rating would hold">world #{{ .w }} <span class="cs__t cs__t--{{ .t }}">T{{ .t }}</span></span>{{ end }}{{ end }}</div>
     </div>
     {{- with $pv.p }}{{ with .win }}
     <div class="n1-bar" role="img" aria-label="1NT {{ . }}% to win"><i style="width:{{ . }}%"></i><span>1NT {{ . }}%</span><span>{{ sub 100 . }}% {{ $n.opp.name }}</span></div>
@@ -207,7 +207,7 @@
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>scouting_s{{ $season }}.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
   <div class="wintable__scroll">
   <table class="esea-box n1-tbl">
-    <thead><tr><th>Date</th><th class="is-l">Opponent</th><th>W–L</th><th title="standings rank">Std</th><th title="ARK power rank">Pwr</th><th title="world rank: the VRS rank the five's rating would hold (ESEA results on the pro scale) · tier">World</th><th title="mean FACEIT elo, top five">Elo</th><th title="team RWA: sum of its five most-used players' RWA this season">RWA</th><th title="team ARK rating">ARK</th><th title="team talent, stars">Tal</th><th title="round diff per map">RD/m</th><th class="n1-gap" title="their official maps vs 1NT, their W–L">vs 1NT</th><th>1NT win %</th><th>Result</th></tr></thead>
+    <thead><tr><th>Date</th><th class="is-l">Opponent</th><th>W–L</th><th title="standings rank">Std</th><th title="ARK power rank">Pwr</th><th title="world rank: the CS2 ARK Ranking spot the five's rating would hold (ESEA results on the pro scale) · tier">World</th><th title="mean FACEIT elo, top five">Elo</th><th title="team RWA: sum of its five most-used players' RWA this season">RWA</th><th title="team ARK rating">ARK</th><th title="team talent, stars">Tal</th><th title="round diff per map">RD/m</th><th class="n1-gap" title="their official maps vs 1NT, their W–L">vs 1NT</th><th>1NT win %</th><th>Result</th></tr></thead>
     <tbody>
     {{- $up := slice }}{{ $done := slice }}{{ range sort $d.matches "at" }}{{ if eq .status "FINISHED" }}{{ $done = $done | append . }}{{ else }}{{ $up = $up | append . }}{{ end }}{{ end }}
     {{- range $up | append ($done | collections.Reverse) }}{{ $m := . }}

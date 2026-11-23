@@ -9,9 +9,10 @@ weekly) and plays it on the pro scale (scripts/esea_tiers_research.py anchored()
 are fixed at their pro player Elo, everyone else carries an ESEA rating that starts at his division's level).
   - levels: each region's Advanced / Main median team rating in the latest season, on the pro scale (pl + Valve's
     region offset, the same scale as data/cs2.json teams[].pl). cs2_players.tiers(): a ranked team below the Tier 3 cut
-    is Tier 5 under its region's ESEA Advanced median, Tier 6 under ESEA Main's.
-  - 1NT weekly: its latest five's rating, the VRS rank it would hold (1 + VRS-ranked teams rated above it, the
-    standings snapshot before the week), its rank among NA ESEA teams of the season, and its tier.
+    is Tier 5 under NA's ESEA Advanced median, Tier 6 under NA ESEA Main's (EU's divisions rate above both).
+  - world rank = ARK Ranking equivalent (Noah Nov 23): 1 + teams in ARK's pool (ark_pool) above the five on ARK's sort
+    key. 1NT weekly: its share of the NA ESEA field that week placed on today's pool (so weeks compare), its NA ESEA rank
+    and tier; "raw" keeps the rank against that week's own VRS ladder.
 Rough by construction (Nov 23 2026 study): anchored ratings predict ESEA results worse than ESEA-only ratings, and the
 EU / NA gap rides on Valve's region offsets.
 """
@@ -40,18 +41,67 @@ def ts(m):
     return dt.datetime.fromtimestamp(m["at"], dt.timezone.utc).date().isoformat()
 
 
+def ark_pool(rows, st, vrs, p, raw, today):
+    """ARK Ranking's pool and sort key, as cs2_model.build() has it: every team with 15+ series and one in the last 120
+    days (Valve series and lower-tier bo3.gg matches), ordered on W_top . (five's player Elo + region offset, VRS points or the 400 floor) / 400. The top 150 are
+    re-sorted on the Bo3 chance against the top 20 (team map and RWA terms too), so a rank beyond ~150 is this order."""
+    global W0, W1
+    try:   # the pool cs2_model.build() ranked (rebrands merged, same weights): data/cs2.json arkPool
+        ap = json.loads((ROOT / "data" / "cs2.json").read_text())["arkPool"]
+        W0, W1 = ap["w"]
+        return ap["z"]
+    except (OSError, ValueError, KeyError):
+        pass
+    fitj = json.loads(M.FIT.read_text())
+    w = fitj["weights"]["top"]
+    try:
+        import cs2_players
+        live = cs2_players.Live(cs2_bo3.Bo3(raw))
+        if live.w:
+            w = live.w["top"]
+    except Exception as ex:  # noqa: BLE001
+        print("RWA weights skipped:", ex)
+    W0, W1 = float(w[0]), float(w[1])
+    vt = vrs.tab[vrs.dates[-1]]
+    cut = (today - dt.timedelta(days=120)).isoformat()
+    lastd, n = {}, defaultdict(int)
+    for r in list(rows) + list(st.get("xrows") or []):   # lower-tier bo3.gg matches count, as in cs2_model.build()
+        for k in (r["a"], r["b"]):
+            lastd[k] = max(lastd.get(k, ""), r["d"])
+            n[k] += 1
+    out = []
+    for k in lastd:
+        ros = st["lastros"].get(k)
+        if lastd[k] >= cut and n[k] >= 15 and ros:
+            x = sum(st["pl"].get(q, p["mu_new"]) for q in ros) / len(ros) + st["roff"].get(vrs.region(k, today.isoformat()), 0)
+            v = vt.get(k)
+            out.append(W0 * x / 400 + W1 * (v[1] if v else 400) / 400)
+    return out
+
+
+W0, W1 = 1.0, 0.0
+
+
 def main():
     H = json.load(gzip.open(M.HIST))
     series = [r for r in H["series"] if r[6] == "vrs"]
     raw = cs2_bo3.load()
     E = json.load(gzip.open(R.SRC))
+    # a forfeit FACEIT never started has no time: it takes its stage's median match time (it still counts as a win)
+    st_at = defaultdict(list)
+    for m in E["matches"]:
+        if m.get("at"):
+            st_at[(m["season"], m["region"], m["div"], m["stage"])].append(m["at"])
+    for m in E["matches"]:
+        if not m.get("at") and st_at.get((m["season"], m["region"], m["div"], m["stage"])):
+            m["at"] = int(np.median(st_at[(m["season"], m["region"], m["div"], m["stage"])]))
     E["matches"] = [m for m in E["matches"] if m.get("at")]
     pro = R.pro_nicks(series)
     p = dict(json.loads(M.FIT.read_text())["params"])
     today = dt.date.today()
     months = [f"{y}-{m:02d}-01" for y in range(2024, today.year + 1) for m in range(1, 13)]
     months = [x for x in months if "2024-02-01" <= x <= today.isoformat()]
-    _, st = M.replay(series, M.Vrs(H["vrs"]), p, bo3=cs2_bo3.Bo3(raw), snaps=months)
+    prow, st = M.replay(series, M.Vrs(H["vrs"]), dict(p, xrows=True), bo3=cs2_bo3.Bo3(raw), snaps=months)
     snaps = st["snaps"]
     P = {"anchor": 30, "K": 128, "Kmin": 26, "n0": 50, "span": .5}
     mine = sorted((m for m in E["matches"] if any(m[f].get("id") == ME for f in ("f1", "f2"))), key=lambda m: m["at"])
@@ -93,6 +143,9 @@ def main():
                 lad.append(float(np.mean([sn["pl"].get(x, -100) for x in r5])) + sn["roff"].get(vrs.region(vk, d), 0))
         return lad
 
+    def arkz(s):   # an ESEA five on ARK's sort key: no VRS points = the same 400-point floor every unlisted team gets
+        return W0 * s / 400 + W1 * 1.0
+
     # levels: latest season's median team rating per region x division, second half of the season
     last = max(m["season"] for m in E["matches"])
     levels = {}
@@ -112,15 +165,15 @@ def main():
         sn = snap_at(ds[-1])
         levels.setdefault(rg, {})[dv] = round(float(np.median(med)) + sn["roff"].get(REGV.get(rg, "Asia"), 0.0), 1)
 
-    def tier(s, rg="NA"):
-        lv = levels.get(rg) or levels.get("NA") or {}
+    def tier(s, rg="NA"):   # one ladder (NA's levels) for every region, as cs2_players.tiers()
+        lv = levels.get("NA") or {}
         if "Advanced" in lv and s >= lv["Advanced"]:
             return 4
         return 5 if "Main" in lv and s >= lv["Main"] else 6
 
     def point(d, rts):
         sn = snap_at(d)
-        before = [m for m in mine if ts(m) < d]
+        before = [m for m in mine if ts(m) < d and len(m["f1" if m["f1"]["id"] == ME else "f2"]["roster"]) >= 4]
         if not before:
             return None
         m = before[-1]
@@ -140,9 +193,9 @@ def main():
                 "na": 1 + sum(v > s1 for k, v in na.items() if k != ME), "naOf": len(na), "season": sea, "div": m["div"],
                 "tier": tier(s1)}
 
-    # every team of the latest season (any region): today's world rank (VRS-equivalent) and tier, by FACEIT team id
+    # every team of the latest season (any region): today's world rank (ARK Ranking equivalent) and tier, by FACEIT id
     d1 = (today + dt.timedelta(days=1)).isoformat()
-    sn1, lad1 = snap_at(d1), ladder(d1, snap_at(d1))
+    sn1, lad1 = snap_at(d1), ark_pool(prow, st, vrs, p, raw, today)
     latest = {}
     for x in sorted(E["matches"], key=lambda m: m["at"]):
         if x["season"] >= last - 1:
@@ -152,7 +205,7 @@ def main():
     teams = {}
     for tid, (rg, dv, ros) in latest.items():
         s = five(ros, rt, sn1, rg, dv)
-        teams[tid] = {"w": 1 + sum(v > s for v in lad1), "t": tier(s, rg), "s": round(s, 1)}
+        teams[tid] = {"w": 1 + sum(v > arkz(s) for v in lad1), "t": tier(s, rg), "s": round(s, 1)}
     pts = [x for x in (point(w, keep[w]) for w in weeks) if x]
     now = point((today + dt.timedelta(days=1)).isoformat(), rt)
     # the weekly world rank on today's ladder: the raw rank against each week's own VRS ladder is not comparable over time
@@ -165,11 +218,12 @@ def main():
         if not field:
             return None
         i = min(len(field) - 1, max(0, int(round((1 - q) * (len(field) - 1)))))
-        return 1 + sum(v > field[i] for v in lad1)
+        return 1 + sum(v > arkz(field[i]) for v in lad1)
     for x in pts:
         x["raw"] = x["vrs"]
         x["vrs"] = on_today(x["q"])
         x["of"] = len(lad1)
+    now["raw"], now["vrs"], now["of"] = now["vrs"], 1 + sum(v > arkz(now["s"]) for v in lad1), len(lad1)
     for x in pts + [now]:
         x["q"] = round(x["q"], 3)
         x.pop("field", None)

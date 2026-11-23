@@ -163,11 +163,22 @@ def anchored(E, pro, st_snaps, months, dstart, P, weeks=None, keep=None):
     before the match's month); everyone else carries an ESEA rating that starts at his first division's level
     (dstart) and moves on each match (series result; a Bo1 on round share). -> (per-match rows, final ratings)."""
     rt, n, out = {}, defaultdict(int), []
+    last = {}  # team id -> its latest 4+ roster: a forfeit's no-show side is played as that five (Noah Nov 23: forfeit
+    #            wins count as wins), the result a plain series win
     for m in sorted(E["matches"], key=lambda m: m.get("at") or 0):
         if not m.get("at") or m.get("winner") not in ("faction1", "faction2"):
             continue
-        if any(not m[f].get("id") or m[f]["id"] == "bye" or len(m[f]["roster"]) < 4 for f in ("f1", "f2")):
+        if any(not m[f].get("id") or m[f]["id"] == "bye" for f in ("f1", "f2")):
             continue
+        ros = {}
+        for f in ("f1", "f2"):
+            if len(m[f]["roster"]) >= 4:
+                ros[f] = last[m[f]["id"]] = m[f]["roster"]
+            elif m[f]["id"] in last:
+                ros[f] = last[m[f]["id"]]
+        if len(ros) < 2:
+            continue
+        m = dict(m, f1=dict(m["f1"], roster=ros["f1"]), f2=dict(m["f2"], roster=ros["f2"]))
         d = dt.datetime.fromtimestamp(m["at"], dt.timezone.utc).date().isoformat()
         while weeks and d >= weeks[0]:  # ESEA ratings as of each week's start (scripts/esea_world.py)
             keep[weeks.pop(0)] = dict(rt)
