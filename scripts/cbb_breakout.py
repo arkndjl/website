@@ -382,12 +382,12 @@ def intl(out):
     Score per 100, shrunk by minutes) from last season's pro line (data/cbb_intl_bo_fit.json, calibrated held out).
     Lines: scripts/data/cbb_intl_fit.json live prev (totals) at its league pace and offsets; a prospect already at the
     bar (last season or this one to date) is left out; no pro line last season = no row"""
-    import cbb_intl as I
     try:
+        import cbb_intl as I
         ff = json.load(open(INTL_BO))
         fit = json.load(open(I.FIT))
         board = json.load(open(I.OUT))
-    except (OSError, ValueError):
+    except (ImportError, OSError, ValueError):
         return 0
     C = board['cols']
     rows = {r[C.index('name')]: dict(zip(C, r)) for r in board['rows']}
