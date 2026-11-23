@@ -5131,7 +5131,17 @@ a.tick__g--nw:hover .tick__me { color: #fff; }
 .esea-br__scroll { overflow-x: auto; padding: 0 12px 8px; }
 .esea-br__cols { display: flex; gap: 14px; align-items: stretch; min-width: min-content; }
 .esea-br__col { display: flex; flex-direction: column; width: 190px; flex: 0 0 190px; }
-.esea-br__ms { flex: 1; display: flex; flex-direction: column; justify-content: space-around; gap: 6px; }
+.esea-br__ms { flex: 1; display: flex; flex-direction: column; }
+/* slots split the column evenly, so a match sits level with the middle of its two feeders; 2px pixel connectors */
+.esea-br__s { flex: 1 1 0; display: flex; align-items: center; position: relative; padding: 3px 0; }
+.esea-br__s > .esea-br__m { width: 100%; }
+.esea-br__col.is-pair .esea-br__s::after, .esea-br__col.is-flat .esea-br__s::after, .esea-br__col.has-prev .esea-br__s::before { content: ""; position: absolute; width: 7px; border: 0 solid #5b4a80; pointer-events: none; }
+.esea-br__col.has-prev .esea-br__s::before { left: -7px; top: 50%; border-top-width: 2px; }
+.esea-br__col.is-flat .esea-br__s::after { right: -7px; top: 50%; border-top-width: 2px; }
+.esea-br__col.is-pair .esea-br__s:nth-child(odd)::after { right: -7px; top: 50%; bottom: -1px; border-top-width: 2px; border-right-width: 2px; }
+.esea-br__col.is-pair .esea-br__s:nth-child(even)::after { right: -7px; top: -1px; bottom: calc(50% - 2px); border-bottom-width: 2px; border-right-width: 2px; }
+.esea-br__s.is-us::before, .esea-br__s.is-us::after { border-color: #7fffd4 !important; }
+.esea-br__rw { margin: 0; padding: 1px 4px; font-size: .62em; letter-spacing: .06em; text-transform: uppercase; color: #fff; background: #57068c; box-shadow: inset 1px 1px 0 #8a5cc2, inset -1px -1px 0 #241a3a; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .esea-br__rh { margin: 0 0 2px; font-size: .7em; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
 .esea-br__m { background: var(--win-well, #14101e); box-shadow: inset 1px 1px 0 #241a3a, inset -1px -1px 0 #8a5cc2; padding: 2px; }
 .esea-br__m.is-us { box-shadow: inset 0 0 0 2px #7fffd4; } .esea-br__m.is-live { box-shadow: inset 0 0 0 2px #c8a2ff; }

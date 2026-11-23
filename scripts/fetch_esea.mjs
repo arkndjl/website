@@ -1968,7 +1968,7 @@ function bracket() {
   const up = ms.filter(m => m.g === 1), n1 = up.filter(m => m.r === 1).length;
   const placed = n1 && up.filter(m => m.r === 1).every(m => m.pos);
   const rDate = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cs.json'), 'utf8')).eseaRoundDates || {}; } catch { return {}; } })();
-  let next = null, odds = null;
+  let next = null, odds = null, rewards = null, gfx = null;
   const syn = [];
   if (placed && (n1 & (n1 - 1)) === 0 && n1 >= 2) {
     const R = Math.log2(n1) + 1, LR = 2 * (R - 1);
@@ -2035,6 +2035,36 @@ function bracket() {
     const nOf = new Map([...slots.values()].map(m => [m.n, m])), seq = new Map(order.map(([g, r, k], i) => [lab(g, r, k), i]));
     odds = { title: Math.round(titles.n / N * 10000) / 10000, path: [...reach.entries()].map(([n, c]) => ({ n, p: Math.round(c / N * 1000) / 1000, g: nOf.get(n)?.g, r: nOf.get(n)?.r }))
       .filter(x => x.p >= 0.005).sort((a, b) => seq.get(a.n) - seq.get(b.n)) };
+    // rewards: the worst finish a slot's winner is sure of (its earliest possible exit afterwards), against the tiers in
+    // data/cs.json eseaRewards (S59 move-up table: Main 1st-2nd -> Season Finals, 1st-4th -> Advanced). Shown only on the
+    // slot where a tier is first locked in. Places count all 2*n1 slots, so byes never move a late-round finish.
+    const csCfg_ = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cs.json'), 'utf8')); } catch { return {}; } })();
+    rewards = csCfg_.eseaRewards?.tiers || null;
+    if (rewards) {
+      const tot = 2 * n1, cum = [0]; for (let l = 1; l <= LR; l++) cum[l] = cum[l - 1] + cntL(l);
+      const exitL = L => tot - cum[L] + cntL(L);
+      const worstWin = (g, r) => (g === 3 ? 1 : g === 1 ? (r === R ? 2 : exitL(2 * r)) : (r === LR ? 2 : exitL(r + 1)));
+      const worstIn = (g, r) => (g === 3 ? 2 : g === 1 ? (r === 1 ? tot : worstWin(1, r - 1)) : exitL(r));
+      const tier = w => rewards.filter(t => w <= t.top).sort((a, b) => a.top - b.top)[0] || null;
+      for (const m of slots.values()) { if (m.bye) continue; const a = tier(worstWin(m.g, m.r)); if (a && a !== tier(worstIn(m.g, m.r))) m.rw = { s: a.s, t: a.t, top: a.top, place: worstWin(m.g, m.r) }; }
+    }
+    // the GFX's cut: 1NT's quarter-block of the upper bracket through round 3, its upper slots after that, and the one lower slot
+    // per round 1NT can land in (drops keep FACEIT's order, so a team's lower slot is fixed by its first-round slot)
+    const me = [...slots.values()].find(m => m.g === 1 && m.r === 1 && [m.a.id, m.b.id].includes(TEAM_ID));
+    if (me) {
+      const rch = new Map(odds.path.map(x => [x.n, x.p]));
+      const sd = t => ({ n: t.name, id: t.id || null, seed: t.seed ?? null, tbd: !!t.tbd || !t.id });
+      const cut = m => ({ n: m.n, at: m.at || null, a: sd(m.a), b: sd(m.b), w: m.w || null, s: m.s || null, bye: !!m.bye, rw: m.rw || null, reach: rch.get(m.n) ?? null,
+        p: m.p != null ? m.p : m.a.id && m.b.id && [m.a.id, m.b.id].includes(TEAM_ID) ? Math.round(pr(m.a.id, m.b.id) * 1000) / 1000 : null });
+      const ub = []; for (let r = 1; r <= R; r++) {
+        const ks = r <= 3 ? Array.from({ length: 4 >> (r - 1) }, (_, i) => (Math.ceil(me.pos / 4) - 1) * (4 >> (r - 1)) + i + 1) : [Math.ceil(me.pos / 2 ** (r - 1))];
+        ub.push({ r, m: ks.map(k => slots.get(key(1, r, k))).filter(Boolean).map(cut) });
+      }
+      const lb = []; let k = Math.ceil(me.pos / 2);
+      for (let l = 1; l <= LR; l++) { const m = slots.get(key(2, l, k)); if (m && !m.bye) lb.push({ r: l, ...cut(m) }); if (l % 2 === 0) k = Math.ceil(k / 2); }
+      const gfm = slots.get(key(3, 1, 1));
+      gfx = { ub, lb, gf: gfm ? cut(gfm) : null };
+    }
     // 1NT's next opponent if it wins its current upper match (or, in the lower bracket, its current one)
     const cur = [...slots.values()].filter(m => !m.w && !m.bye && [m.a.id, m.b.id].includes(TEAM_ID)).sort((x, y) => x.g - y.g || x.r - y.r)[0];
     if (cur && cur.g === 1 && cur.r < R) {
@@ -2050,7 +2080,7 @@ function bracket() {
   const groups = [...new Set(all.map(m => m.g))].sort((a, b) => a - b);
   const label = g => (groups.length >= 2 ? { 1: 'upper', 2: 'lower', 3: 'grand final' }[g] || `group ${g}` : 'bracket');
   return { id: c.id, name: c.name, url: `https://www.faceit.com/en/championship/${c.id}`, champs: [...poC.values()].map(x => ({ id: x.id, name: x.name })), next, odds,
-    plc: Object.fromEntries(PLC), sched: Object.fromEntries(SCHED),
+    plc: Object.fromEntries(PLC), sched: Object.fromEntries(SCHED), rewards, gfx,
     groups: groups.map(g => ({ g, label: label(g), rounds: [...new Set(all.filter(m => m.g === g).map(m => m.r))].sort((a, b) => a - b).map(r => ({ r, m: all.filter(m => m.g === g && m.r === r) })) })) };
 }
 
