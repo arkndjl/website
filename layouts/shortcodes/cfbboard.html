@@ -125,15 +125,15 @@
           "mht" (slice "" "measured: combine-equivalent height (in, quarter inch) / weight, BMI. Each listing (ESPN, 247) weighted by its error against NFL combine and pro day measurements (2013-25 classes), shrunk toward the position's combine mean; roster heights run +0.5 in. hover: sources and weights; sorts by height" "Meas · BMI")
           "snaps" (slice "cfb__now" "Snap% = share of the team's snaps this season (the snap share in WAR); hover: snaps" "Snap%")
         -}}
-        {{- $ctx := slice "pos" "team" "cls" "age" "ht" "mht" "snaps" -}}
+        {{- /* context after the key: pos team cls age ht mht snaps (spelled out in each $order: append of a slice does not flatten on Hugo 0.147) */ -}}
         {{- $mkt := slice -}}{{ if $draftCol }}{{ $mkt = $mkt | append "cons" "draft" }}{{ end }}{{ if $upCol }}{{ $mkt = $mkt | append "up" }}{{ end -}}
         {{- $order := slice }}{{ $gs := slice -}}
         {{- if eq $preset "war" -}}
-          {{- $order = slice "rk" "name" "waa" | append $ctx | append (slice "war" "waafs" "xv" "fv" "delta" "stat" "xfer" "xnil" "ynil" "znil") }}{{ $gs = slice "waa" "pos" "war" "fv" "xfer" -}}
+          {{- $order = slice "rk" "name" "waa" "pos" "team" "cls" "age" "ht" "mht" "snaps" "war" "waafs" "xv" "fv" "delta" "stat" "xfer" "xnil" "ynil" "znil" }}{{ $gs = slice "waa" "pos" "war" "fv" "xfer" -}}
         {{- else if eq $preset "nil" -}}
-          {{- $order = slice "rk" "name" "xnil" | append $ctx | append (slice "ynil" "znil" "fv" "delta" "stat" "war" "xfer") }}{{ $gs = slice "xnil" "pos" "ynil" "fv" "xfer" -}}
+          {{- $order = slice "rk" "name" "xnil" "pos" "team" "cls" "age" "ht" "mht" "snaps" "ynil" "znil" "fv" "delta" "stat" "war" "xfer" }}{{ $gs = slice "xnil" "pos" "ynil" "fv" "xfer" -}}
         {{- else -}}
-          {{- $order = slice "rk" "name" "fv" "delta" | append $ctx | append (slice "stat" "war") | append $mkt | append (slice "xfer" "xnil" "ynil" "znil") }}{{ $gs = slice "fv" "pos" "stat" (index ($mkt | append "xfer") 0) -}}
+          {{- $order = slice "rk" "name" "fv" "delta" "pos" "team" "cls" "age" "ht" "mht" "snaps" "stat" "war" }}{{ if $draftCol }}{{ $order = $order | append "cons" "draft" }}{{ end }}{{ if $upCol }}{{ $order = $order | append "up" }}{{ end }}{{ $order = $order | append "xfer" "xnil" "ynil" "znil" }}{{ $gs = slice "fv" "pos" "stat" (index ($mkt | append "xfer") 0) -}}
         {{- end -}}
         {{- $num := slice "rk" "waa" "war" "waafs" "xv" "fv" "delta" "stat" "cons" "draft" "up" "xfer" "xnil" "ynil" "znil" "cls" "age" "ht" "mht" "snaps" -}}
         {{- $sort0 := cond (eq $preset "war") "waa" (cond (eq $preset "nil") "xnil" "rk") -}}
