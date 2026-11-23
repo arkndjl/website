@@ -1950,40 +1950,97 @@ function bracket() {
   }).sort((x, y) => x.g - y.g || x.r - y.r || (x.at || 0) - (y.at || 0) || (x.id < y.id ? -1 : 1));
   // byes: shown as byes (the team goes through), never priced; slots from FACEIT's bracket placement
   for (const m of ms) { m.bye = m.a.name === 'BYE' || m.b.name === 'BYE'; if (m.bye) { m.p = null; m.s = null; } m.pos = PLC.get(m.id) ?? null; }
-  // the upper bracket in full: slot k of round r is fed by slots 2k-1 and 2k of round r-1; rounds FACEIT hasn't
-  // created yet are drawn from their feeders ("winner of UB6"), with a date from data/cs.json eseaRoundDates
+  // Double elimination, drawn in full from round 1's slots. Upper: slot k of round r is fed by the winners of slots
+  // 2k-1 and 2k. Lower (FACEIT's standard drop order, checked against real lower matches once FACEIT creates them):
+  // LB1 slot k = losers of UB1 2k-1 and 2k; LB2i slot k = winner of LB(2i-1) k vs the loser of UB(i+1) k; LB(2i+1) slot
+  // k = winners of LB2i 2k-1 and 2k. Grand final = upper winner vs lower winner. A side that is a bye goes through.
+  // Rounds FACEIT hasn't created yet are drawn from their feeders ("winner of UB6", "loser of UB35"), dated from
+  // data/cs.json eseaRoundDates (upper round number -> ET time).
   const up = ms.filter(m => m.g === 1), n1 = up.filter(m => m.r === 1).length;
   const placed = n1 && up.filter(m => m.r === 1).every(m => m.pos);
   const rDate = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cs.json'), 'utf8')).eseaRoundDates || {}; } catch { return {}; } })();
-  let next = null;
-  if (placed && (n1 & (n1 - 1)) === 0) {
-    const R = Math.log2(n1) + 1, cnt = r => n1 >> (r - 1), off = r => { let o = 0; for (let q = 1; q < r; q++) o += cnt(q); return o; };
-    const slot = (r, k) => up.find(m => m.r === r && m.pos === k);
-    const lab = (r, k) => `UB${off(r) + k}`;
-    const winner = (r, k) => { const m = slot(r, k); if (!m) return null; if (m.bye) return m.a.name === 'BYE' ? m.b : m.a; return m.w ? (m.w === 1 ? m.a : m.b) : null; };
-    const feed = (r, k) => winner(r, k) || { id: null, name: `winner of ${lab(r, k)}`, tbd: true };
-    for (let r = 2; r <= R; r++) for (let k = 1; k <= cnt(r); k++) {
-      const m = slot(r, k);
-      if (m) { for (const [i, sd] of [[2 * k - 1, 'a'], [2 * k, 'b']]) if (!m[sd].id) m[sd] = feed(r - 1, i); continue; }
-      const at = rDate[r] ? Date.parse(rDate[r]) : null;
-      up.push({ id: null, g: 1, r, pos: k, at, st: 'TBD', bo: 3, a: feed(r - 1, 2 * k - 1), b: feed(r - 1, 2 * k), w: null, s: null, p: null, url: null });
+  let next = null, odds = null;
+  const syn = [];
+  if (placed && (n1 & (n1 - 1)) === 0 && n1 >= 2) {
+    const R = Math.log2(n1) + 1, LR = 2 * (R - 1);
+    const cntU = r => n1 >> (r - 1), cntL = r => n1 >> (Math.ceil(r / 2));
+    const offs = (cnt, r) => { let o = 0; for (let q = 1; q < r; q++) o += cnt(q); return o; };
+    const P = { 1: 'UB', 2: 'LB', 3: 'GF' };
+    const lab = (g, r, k) => (g === 3 ? 'GF' : `${P[g]}${offs(g === 1 ? cntU : cntL, r) + k}`);
+    const real = (g, r, k) => ms.find(m => m.g === g && m.r === r && m.pos === k) || (g === 3 ? ms.find(m => m.g === 3) : null);
+    const slots = new Map(), key = (g, r, k) => `${g}-${r}-${k}`;
+    const BYE = { id: null, name: 'BYE' };
+    const isBye = t => t && t.name === 'BYE';
+    // sides: {t: team | BYE | null (undecided), src: label text}
+    const out = (g, r, k, lose) => {   // the side a slot sends on (winner, or loser if lose)
+      const m = slots.get(key(g, r, k)); if (!m) return { id: null, name: 'TBD', tbd: true };
+      const a = m.a, b = m.b;
+      if (isBye(a) || isBye(b)) { const go = isBye(a) ? b : a; if (lose) return BYE; return go; }
+      if (m.w) return (m.w === 1) !== !!lose ? a : b;
+      return { id: null, name: `${lose ? 'loser' : 'winner'} of ${m.n}`, tbd: true };
+    };
+    const put = (g, r, k, a, b, ur) => {
+      const n = lab(g, r, k); let m = real(g, r, k);
+      if (m) { if (!m.a.id && !isBye(m.a)) m.a = a; if (!m.b.id && !isBye(m.b)) m.b = b; }
+      else { m = { id: null, g, r, pos: k, at: rDate[ur] ? Date.parse(rDate[ur]) : null, st: 'TBD', bo: 3, a, b, w: null, s: null, p: null, url: null }; syn.push(m); }
+      m.n = n; m.bye = isBye(m.a) || isBye(m.b); if (m.bye) { m.p = null; m.s = null; } slots.set(key(g, r, k), m); return m;
+    };
+    for (const m of up.filter(m => m.r === 1)) { m.n = lab(1, 1, m.pos); slots.set(key(1, 1, m.pos), m); }
+    // rounds in play order: UB r, then the lower rounds that need UB r's losers
+    for (let r = 2; r <= R; r++) {
+      for (let k = 1; k <= cntU(r); k++) put(1, r, k, out(1, r - 1, 2 * k - 1), out(1, r - 1, 2 * k), r);
+      const l1 = 2 * (r - 1) - 1, l2 = 2 * (r - 1);   // LB rounds unlocked by UB r-1's losers
+      for (let k = 1; k <= cntL(l1); k++) put(2, l1, k, l1 === 1 ? out(1, 1, 2 * k - 1, true) : out(2, l1 - 1, 2 * k - 1), l1 === 1 ? out(1, 1, 2 * k, true) : out(2, l1 - 1, 2 * k), null);
+      for (let k = 1; k <= cntL(l2); k++) put(2, l2, k, out(2, l1, k), out(1, r, k, true), null);
     }
-    for (const m of up) m.n = lab(m.r, m.pos);
-    // 1NT's next opponent if it wins its current match
-    const cur = up.filter(m => !m.w && !m.bye && [m.a.id, m.b.id].includes(TEAM_ID)).sort((x, y) => x.r - y.r)[0];
-    if (cur && cur.r < R) {
-      const k2 = Math.ceil(cur.pos / 2), sib = cur.pos % 2 ? cur.pos + 1 : cur.pos - 1, nx = slot(cur.r + 1, k2) || up.find(m => m.r === cur.r + 1 && m.pos === k2);
-      const opp = feed(cur.r, sib);
-      let p = null;
-      if (opp.id && QUOTE) { try { const q = QUOTE({ t1: TEAM_ID, t2: opp.id, at: Math.floor((nx?.at || Date.now()) / 1000), div: 'main', bo: 3, ros: [new Set(), new Set()] }); p = q ? Math.round(q.p * 1000) / 1000 : null; } catch (e) { console.log('next quote:', e.message); } }
-      next = { n: nx?.n || lab(cur.r + 1, k2), at: nx?.at || null, opp, p, from: cur.n };
+    put(3, 1, 1, out(1, R, 1), out(2, LR, 1), null);
+    // Monte Carlo: each unplayed series at the league model's Bo3 chance (byes go through); 1NT's chance to reach
+    // each slot it can play in, and to win it all
+    const pc = new Map(), pr = (a, b) => {
+      const k = a < b ? a + b : b + a; if (!pc.has(k)) { let q = null; try { q = QUOTE && QUOTE({ t1: a < b ? a : b, t2: a < b ? b : a, at: Math.floor(Date.now() / 1000), div: 'main', bo: 3, ros: [new Set(), new Set()] }); } catch {} pc.set(k, q ? q.p : 0.5); }
+      const q = pc.get(k); return a < b ? q : 1 - q;
+    };
+    const order = []; for (let r = 1; r <= R; r++) { for (let k = 1; k <= cntU(r); k++) order.push([1, r, k]); if (r >= 2) { const l1 = 2 * (r - 1) - 1; for (const l of [l1, l1 + 1]) for (let k = 1; k <= cntL(l); k++) order.push([2, l, k]); } }
+    order.push([3, 1, 1]);
+    const N = 4000, reach = new Map(), titles = { n: 0 };
+    for (let it = 0; it < N; it++) {
+      const W = new Map(), L = new Map();
+      const side = (g, r, k, lose) => (lose ? L : W).get(key(g, r, k));
+      for (const [g, r, k] of order) {
+        const m = slots.get(key(g, r, k)); let a, b;
+        if (g === 1 && r === 1) { a = m.a.id || 'BYE'; b = m.b.id || 'BYE'; }
+        else if (g === 1) { a = side(1, r - 1, 2 * k - 1); b = side(1, r - 1, 2 * k); }
+        else if (g === 3) { a = side(1, R, 1); b = side(2, LR, 1); }
+        else if (r === 1) { a = side(1, 1, 2 * k - 1, true); b = side(1, 1, 2 * k, true); }
+        else if (r % 2 === 0) { a = side(2, r - 1, k); b = side(1, r / 2 + 1, k, true); }
+        else { a = side(2, r - 1, 2 * k - 1); b = side(2, r - 1, 2 * k); }
+        if ((a === TEAM_ID || b === TEAM_ID) && a !== 'BYE' && b !== 'BYE') reach.set(m.n, (reach.get(m.n) || 0) + 1);
+        let w;
+        if (a === 'BYE' || b === 'BYE') w = a === 'BYE' ? b : a;
+        else if (m.w && m.a.id && m.b.id) w = m.w === 1 ? m.a.id : m.b.id;
+        else w = Math.random() < pr(a, b) ? a : b;
+        W.set(key(g, r, k), w); L.set(key(g, r, k), w === a ? b : a);
+        if (g === 3 && w === TEAM_ID) titles.n++;
+      }
+    }
+    const nOf = new Map([...slots.values()].map(m => [m.n, m])), seq = new Map(order.map(([g, r, k], i) => [lab(g, r, k), i]));
+    odds = { title: Math.round(titles.n / N * 1000) / 1000, path: [...reach.entries()].map(([n, c]) => ({ n, p: Math.round(c / N * 1000) / 1000, g: nOf.get(n)?.g, r: nOf.get(n)?.r }))
+      .filter(x => x.p >= 0.005).sort((a, b) => seq.get(a.n) - seq.get(b.n)) };
+    // 1NT's next opponent if it wins its current upper match (or, in the lower bracket, its current one)
+    const cur = [...slots.values()].filter(m => !m.w && !m.bye && [m.a.id, m.b.id].includes(TEAM_ID)).sort((x, y) => x.g - y.g || x.r - y.r)[0];
+    if (cur && cur.g === 1 && cur.r < R) {
+      const k2 = Math.ceil(cur.pos / 2), sib = cur.pos % 2 ? cur.pos + 1 : cur.pos - 1, nx = slots.get(key(1, cur.r + 1, k2));
+      const opp = out(1, cur.r, sib);
+      let p = null; if (opp.id) p = Math.round(pr(TEAM_ID, opp.id) * 1000) / 1000;
+      const lo = [...slots.values()].filter(m => m.g === 2 && !m.bye && [m.a.name, m.b.name].includes(`loser of ${cur.n}`)).sort((x, y) => x.r - y.r)[0];
+      next = { n: nx?.n, at: nx?.at || null, opp, p, from: cur.n, drop: lo ? { n: lo.n, at: lo.at, opp: lo.a.name === `loser of ${cur.n}` ? lo.b : lo.a } : null };
     }
   } else for (const m of ms) if (m.pos) m.n = `${m.g === 1 ? 'UB' : m.g === 2 ? 'LB' : 'GF'}${m.pos}`;
-  const all = ms.concat(up.filter(m => !ms.includes(m)));
+  const all = ms.concat(syn);
   all.sort((x, y) => x.g - y.g || x.r - y.r || (x.pos ?? 999) - (y.pos ?? 999) || (x.at || 0) - (y.at || 0));
   const groups = [...new Set(all.map(m => m.g))].sort((a, b) => a - b);
   const label = g => (groups.length >= 2 ? { 1: 'upper', 2: 'lower', 3: 'grand final' }[g] || `group ${g}` : 'bracket');
-  return { id: c.id, name: c.name, url: `https://www.faceit.com/en/championship/${c.id}`, champs: [...poC.values()].map(x => ({ id: x.id, name: x.name })), next,
+  return { id: c.id, name: c.name, url: `https://www.faceit.com/en/championship/${c.id}`, champs: [...poC.values()].map(x => ({ id: x.id, name: x.name })), next, odds,
     plc: Object.fromEntries(PLC),
     groups: groups.map(g => ({ g, label: label(g), rounds: [...new Set(all.filter(m => m.g === g).map(m => m.r))].sort((a, b) => a - b).map(r => ({ r, m: all.filter(m => m.g === g && m.r === r) })) })) };
 }

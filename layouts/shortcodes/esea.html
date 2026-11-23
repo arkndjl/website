@@ -1073,7 +1073,10 @@
     {{- end }}
   </div></div>
   {{- end }}
-  <div class="win__status"><span>{{ .name }} · <a href="{{ .url }}" rel="noopener">FACEIT</a> · % = league model, frozen at start</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  {{- with .odds }}
+  <p class="esea-br__path"><span class="esea__k">1NT path</span> {{ range .path }}<span class="esea-br__pp">{{ .n }} <b>{{ partial "num.html" (slice "%.0f" (mul (float .p) 100)) }}%</b></span> {{ end }}<span class="esea-br__pp">title <b>{{ partial "num.html" (slice "%.1f" (mul (float .title) 100)) }}%</b></span></p>
+  {{- end }}
+  <div class="win__status"><span title="double elimination: upper losers drop to the lower bracket (FACEIT's standard drop order); path % = 1NT's chance to play each series, title % to win it all, from 4,000 runs of the league model's Bo3 odds">{{ .name }} · <a href="{{ .url }}" rel="noopener">FACEIT</a> · % = league model, frozen at start</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end }}
 
