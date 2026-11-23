@@ -6,19 +6,19 @@
        the college WAR rate, data/cfb_war_backtest.json) in minus out, over the graded players who moved. */ -}}
 {{- $k := site.Data.cfb_war_backtest.constants.cwarPerAv -}}
 {{- with site.Data.cfb_portal -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "transfer portal") "filter" "Pos,To,From" "tab" ($.Get "tab") "gfxCols" "Player,Pos,FV,From,To" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006"))) -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "transfer portal") "filter" "Pos,To,From" "tab" ($.Get "tab") "gfxCols" "Player,FV,Pos,From,To" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006"))) -}}
 <table class="cfb__table">
-  <thead><tr><th>Player</th><th>Pos</th><th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th><th>From</th><th>To</th><th title="247 stars as a transfer">Stars</th><th>Class</th></tr></thead>
+  <thead><tr><th>Player</th><th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th><th>Pos</th><th>From</th><th>To</th><th>Class</th><th title="247 stars as a transfer">Stars</th></tr></thead>
   <tbody>
   {{- range .moves }}
   <tr>
     <td class="cfb__name">{{ partial "face.html" (dict "u" (.photo | default "")) }}{{ .name }}{{ partial "arkstar.html" (dict "sport" "college-football" "name" .name "team" .team) }}</td>
-    <td>{{ replaceRE "^DL$" "DT" .pos }}</td>
     <td class="fv" data-v="{{ .fv }}">{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td>{{ replaceRE "^DL$" "DT" .pos }}</td>
     <td data-v="{{ .from }}"><span class="cfb__team">{{ with .fromLogo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .from }}</span></span></td>
     <td data-v="{{ .to }}"><span class="cfb__team">{{ with .toLogo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .to | default "—" }}</span></span></td>
-    <td class="cfb__num">{{ .stars | default "—" }}</td>
     <td>{{ .cls | default "—" }}</td>
+    <td class="cfb__num">{{ .stars | default "—" }}</td>
   </tr>
   {{- end }}
   </tbody>

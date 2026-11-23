@@ -14,11 +14,13 @@
   <thead><tr>
     <th>RK</th><th>Player</th><th class="cfb__g" title="future value, 20-80: the mean NHL outcome for a player with this profile (steps of 1)">FV</th>{{ partial "wkth.html" (dict "from" $d.wkFrom) }}<th>Pos</th><th>Club</th><th>League</th>
     <th title="age on Sept 15 of the draft year, from the birth date in the CHL, AHL, USHL or Liiga feed; ~ = Tankathon gives the birth month only">Age</th>
-    <th class="hk__x" title="Tankathon's big board rank">Cons</th>
-    <th class="hk__x" title="the draft slot his board rank points to: an October board regresses toward the middle by June (Central Scouting's January ranks against the June slot)">xSlot</th>
+    <th class="hk__x" title="height / weight (lb); sorts by height">Ht / Wt</th>
+    <th class="hk__x" title="games this season">GP</th>
     <th title="chance of a 40+ outcome: an NHL career (top 45 of a draft class)">NHL%</th>
     <th title="chance of a 50+ outcome: an NHL regular (top 20 of a draft class)">Reg%</th>
     <th hidden title="NHLe: NHL points a full season at the league's translation factor (graphic only; shown beside the name on the board)">NHLe</th>
+    <th class="hk__x" title="Tankathon's big board rank">Cons</th>
+    <th class="hk__x" title="the draft slot his board rank points to: an October board regresses toward the middle by June (Central Scouting's January ranks against the June slot)">xSlot</th>
   </tr></thead>
   <tbody>
   {{- range $i, $r := .board }}
@@ -30,11 +32,13 @@
     <td style="white-space: nowrap">{{ with index site.Data.hockey_logos (printf "%s|%s" (.league | default "") (.club | default "")) }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}{{ .club }}</td>
     <td>{{ .league }}</td>
     <td class="cfb__num">{{ if .ageEst }}~{{ partial "num.html" (slice "%.1f" (float .age)) }}{{ else }}{{ with .age }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ end }}{{ end }}</td>
-    <td class="cfb__num hk__x">{{ with .rk }}{{ . }}{{ else }}-{{ end }}</td>
-    <td class="cfb__num hk__x">{{ with .xslot }}{{ . }}{{ else }}-{{ end }}</td>
+    <td class="cfb__num hk__x" data-v="{{ .ht | default 0 }}" style="white-space: nowrap">{{ with .ht }}{{ div (int .) 12 }}-{{ mod (int .) 12 }}{{ end }}{{ if and .ht .wt }} / {{ end }}{{ with .wt }}{{ . }}{{ end }}</td>
+    <td class="cfb__num hk__x">{{ with .gp }}{{ . }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .p40 }}">{{ partial "num.html" (slice "%.0f" (mul .p40 100)) }}%</td>
     <td class="cfb__num" data-v="{{ .p50 }}">{{ partial "num.html" (slice "%.0f" (mul .p50 100)) }}%</td>
     <td class="cfb__num" hidden>{{ with .nhle }}{{ partial "num.html" (slice "%.0f" (float .)) }}{{ end }}</td>
+    <td class="cfb__num hk__x">{{ with .rk }}{{ . }}{{ else }}-{{ end }}</td>
+    <td class="cfb__num hk__x">{{ with .xslot }}{{ . }}{{ else }}-{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>
@@ -43,36 +47,38 @@
 {{- partial "wintable-close.html" (dict "rows" (len .board) "fresh" "hockey" "note" (printf "Tankathon board + %v provisional · updated %s" ($pv.shown | default 0) $date) "about" (printf "Every player on Tankathon's %v big board, graded on what past picks became: the board rank stands in for the draft slot, plus this season's production translated to NHL points a season (NHLe at league factors fit on the careers of every pick since 2008, shrunk toward the slot's typical NHLe until he has %v-odd games). Rows tagged prov are draft-eligibles in the OHL, WHL, QMJHL, AHL and Liiga feeds who are not on the board, graded up from the 20 floor on NHLe, age, weight and position (shown when graded %v+; %v graded in all). FV is the mean outcome of players with this profile, so it sits below the best case: a 60 is a first-liner on average, with busts and stars around it. Above the board's top few players a season the scale stretches, so an 80 comes about once every five seasons; the order is the mean's." .year 20 ($pv.min | default 22) ($pv.n | default 0))) -}}
 {{- partial "prospectjs.html" $ -}}
 {{- else if eq $view "pipe" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "drafted prospects") "icon" "hockey" "filter" "Pos,Org,Class" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Δ,Pos,Org,Class,League,Age,NHLe" "gfxDate" $date "gfxMax" "32") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "drafted prospects") "icon" "hockey" "filter" "Pos,Org,Class" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Δ,Pos,Org,League,Age,NHLe,Class" "gfxDate" $date "gfxMax" "32") -}}
 <table class="cfb__table hk" {{ with .rungs }}data-pd-b="{{ index .p30 1 }},{{ index .p60 1 }}" {{ end }}data-pd-kind="hk-pipe" data-pd-src="{{ (resources.FromString "data/hockey-pipe-detail.json" (jsonify .pipe)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Player</th><th class="cfb__g" title="future value, 20-80: the mean NHL outcome; after the draft year the grade adds his latest season (NHLe, pro or junior), NHL games and WAR so far">FV</th>{{ partial "wkth.html" (dict "from" $d.wkFrom) }}<th>Pos</th><th>Org</th>
-    <th title="draft class">Class</th><th class="hk__x" title="overall pick">Pick</th>
     <th title="his latest full season's league">League</th>
+    <th class="hk__x" title="age">Age</th>
+    <th class="hk__x" title="games in his latest full season">GP</th>
     <th class="hk__x" title="NHL games so far (under 100; goalies under 50)">NHL GP</th>
-    <th class="hk__x" title="the grade on draft day">Draft FV</th>
     <th title="chance of a 40+ outcome: an NHL career">NHL%</th>
     <th title="chance of a 50+ outcome: an NHL regular">Reg%</th>
-    <th hidden title="age (graphic only; shown beside the name on the board)">Age</th>
     <th hidden title="NHLe: NHL points a full season at the league's translation factor (graphic only; shown beside the name on the board)">NHLe</th>
+    <th title="draft class">Class</th><th class="hk__x" title="overall pick">Pick</th>
+    <th class="hk__x" title="the grade on draft day">Draft FV</th>
   </tr></thead>
   <tbody>
   {{- range $i, $r := .pipe }}
   <tr data-pi="{{ $i }}" data-pk="{{ with .id }}n{{ . }}{{ else }}{{ anchorize $r.name }}{{ end }}">
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td class="cfb__name">{{ partial "hockeyface.html" . }}<span class="hk__nm"><button type="button" class="cfb__who" aria-expanded="false">{{ with .nat }}{{ partial "px/flag.html" . }}{{ end }}{{ .name }}</button>{{ partial "badges.html" (dict "b" .bdg "of" "the NHL outcome") }}{{ with .age }} <span class="cfb__dim gfx-off">{{ partial "num.html" (slice "%.0f" (float .)) }}</span>{{ end }}{{ with .nhle }} <span class="cfb__dim gfx-off" title="latest full season NHLe: NHL points a full season at the league's translation factor{{ with $r.etoi }}; {{ $r.league }}: {{ partial "num.html" (slice "%.1f" (float .)) }} min TOI{{ with $r.esog }}, {{ partial "num.html" (slice "%.1f" (float .)) }} shots on goal a game{{ end }}{{ end }}">{{ partial "num.html" (slice "%.0f" (float .)) }} NHLe</span>{{ end }}</span></td>
+    <td class="cfb__name">{{ partial "hockeyface.html" . }}<span class="hk__nm"><button type="button" class="cfb__who" aria-expanded="false">{{ with .nat }}{{ partial "px/flag.html" . }}{{ end }}{{ .name }}</button>{{ partial "badges.html" (dict "b" .bdg "of" "the NHL outcome") }}{{ with .nhle }} <span class="cfb__dim gfx-off" title="latest full season NHLe: NHL points a full season at the league's translation factor{{ with $r.etoi }}; {{ $r.league }}: {{ partial "num.html" (slice "%.1f" (float .)) }} min TOI{{ with $r.esog }}, {{ partial "num.html" (slice "%.1f" (float .)) }} shots on goal a game{{ end }}{{ end }}">{{ partial "num.html" (slice "%.0f" (float .)) }} NHLe</span>{{ end }}</span></td>
     <td class="fv" data-v="{{ .fvx }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>{{ partial "wkfv.html" (dict "r" . "from" $d.wkFrom) }}
     <td>{{ .pos }}</td>
     <td class="cfb__team"><img class="cfb__logo" src="/img/nhl/{{ lower .team }}.png" alt="" width="20" height="20" loading="lazy"><span>{{ .team }}</span></td>
-    <td>{{ .year }}</td>
-    <td class="cfb__num hk__x">{{ .pick }}</td>
     <td>{{ .league | default "-" }}</td>
+    <td class="cfb__num hk__x">{{ with .age }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ end }}</td>
+    <td class="cfb__num hk__x">{{ with .gp }}{{ . }}{{ end }}</td>
     <td class="cfb__num hk__x">{{ .nhlgp }}</td>
-    <td class="cfb__num hk__x">{{ .fv0 }}</td>
     <td class="cfb__num" data-v="{{ .p40 }}">{{ partial "num.html" (slice "%.0f" (mul .p40 100)) }}%</td>
     <td class="cfb__num" data-v="{{ .p50 }}">{{ partial "num.html" (slice "%.0f" (mul .p50 100)) }}%</td>
-    <td class="cfb__num" hidden>{{ with .age }}{{ partial "num.html" (slice "%.0f" (float .)) }}{{ end }}</td>
     <td class="cfb__num" hidden>{{ with .nhle }}{{ partial "num.html" (slice "%.0f" (float .)) }}{{ end }}</td>
+    <td>{{ .year }}</td>
+    <td class="cfb__num hk__x">{{ .pick }}</td>
+    <td class="cfb__num hk__x">{{ .fv0 }}</td>
   </tr>
   {{- end }}
   </tbody>
@@ -80,28 +86,30 @@
 {{- partial "wintable-close.html" (dict "rows" (len .pipe) "fresh" "hockey" "note" (printf "updated %s" $date) "about" "Picks from the last five drafts with fewer than 100 NHL games (goalies 50). On draft day the grade is the draft model with his real slot; after each season it is refit on what that season told us about past picks: the draft grade, his NHLe that season, whether he played pro, NHL games and WAR so far. Players past 100 games are on the NHL page's WAR board. Badges (medals by the name): Shooter, shots a game in the CHL the season after the draft, regressed by games and tiered by percentile among his birth cohort at his position (bronze 75th, silver 90th, gold 97th, platinum 99th); the one CHL trait of eleven tested (scoring, assists, power play, +/-, shooting %, penalties) that predicted the NHL outcome beyond the stage grade, class held out (scripts/hockey_badge_backtest.py).") -}}
 {{- partial "prospectjs.html" $ -}}
 {{- else if eq $view "past" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "past boards") "icon" "hockey" "filter" "Class,Pos,Team" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Class,Pick,FV,Out" "gfxDate" $date "gfxMax" "32") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "past boards") "icon" "hockey" "filter" "Class,Pos,Team" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Pos,Class,Pick,Out" "gfxDate" $date "gfxMax" "32") -}}
 <table class="cfb__table hk">
   <thead><tr>
-    <th>RK</th><th>Player</th><th>Class</th><th title="overall pick">Pick</th><th>Team</th><th>Pos</th>
+    <th>RK</th><th>Player</th>
     <th class="cfb__g" title="the draft-day grade, fit without his class (out of sample)">FV</th>
-    <th title="outcome FV: peak NHL value (best three pWAR seasons in his first seven after the draft; goalies by saves above expected) on the same scale">Out</th>
+    <th>Pos</th><th>Team</th><th>Class</th>
     <th class="hk__x" title="NHL games, first seven seasons after the draft">NHL GP</th>
+    <th title="outcome FV: peak NHL value (best three pWAR seasons in his first seven after the draft; goalies by saves above expected) on the same scale">Out</th>
     <th class="hk__x" title="peak: mean of his best three pWAR seasons (skaters) or goals saved above expected (goalies)">Peak</th>
+    <th title="overall pick">Pick</th>
   </tr></thead>
   <tbody>
   {{- range $i, $r := .past }}
   <tr>
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td class="cfb__name"><b>{{ .name }}</b></td>
-    <td>{{ .year }}</td>
-    <td class="cfb__num">{{ .pick }}</td>
-    <td class="cfb__team"><img class="cfb__logo" src="/img/nhl/{{ lower .team }}.png" alt="" width="20" height="20" loading="lazy"><span>{{ .team }}</span></td>
-    <td>{{ .pos }}</td>
     <td class="fv" data-v="{{ .fv }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
-    <td class="fv" data-v="{{ .out }}"><span class="fv-chip" data-fv="{{ mul (div (int .out) 5) 5 }}">{{ .out }}</span></td>
+    <td>{{ .pos }}</td>
+    <td class="cfb__team"><img class="cfb__logo" src="/img/nhl/{{ lower .team }}.png" alt="" width="20" height="20" loading="lazy"><span>{{ .team }}</span></td>
+    <td>{{ .year }}</td>
     <td class="cfb__num hk__x">{{ .gp }}</td>
+    <td class="fv" data-v="{{ .out }}"><span class="fv-chip" data-fv="{{ mul (div (int .out) 5) 5 }}">{{ .out }}</span></td>
     <td class="cfb__num hk__x">{{ with .peak }}{{ partial "num.html" (slice "%.1f" (float .)) }} pWAR{{ end }}{{ with .gpeak }}{{ partial "num.html" (slice "%+.0f" (float .)) }} GSAx{{ end }}</td>
+    <td class="cfb__num">{{ .pick }}</td>
   </tr>
   {{- end }}
   </tbody>

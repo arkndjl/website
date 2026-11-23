@@ -37,9 +37,9 @@
         <th data-sort="pos" class="cfb__g" title="position, rank at position by odds within the filters">Pos</th>
         <th data-sort="t" class="nflwar__team">Team</th>
         <th data-sort="job" data-num title="if starter = PPR a game at starter snaps; projection + efficiency per route, carry, target, dropback, weighted by fit on past promotions">If starter</th>
-        <th data-sort="why" title="largest inputs">Why</th>
         <th data-sort="proj" data-num title="projected PPR points this week, if playing">Proj</th>
         <th data-sort="ppg" data-num title="PPR points a game, season to date">Pts/G</th>
+        <th data-sort="why" title="largest inputs">Why</th>
       </tr></thead>
       <tbody></tbody>
     </table>
@@ -93,9 +93,9 @@
         '<td class="cfb__g nflff__pos">' + esc(p.pos) + '<span class="cfb__dim">' + p.pr + '</span></td>' +
         '<td class="nflwar__team nflff__team" style="white-space: nowrap">' + tl(p.t) + esc(p.t) + '</td>' +
         '<td class="cfb__num nflff__opp"><span class="nflff__m">if starter </span>' + p.job.toFixed(1) + '</td>' +
-        '<td class="cfb__dim nflff__line">' + esc(p.why) + '</td>' +
         '<td class="cfb__num nflff__av"><span class="nflff__m">proj </span>' + (p.w ? p.proj.toFixed(1) : '<span class="cfb__dim">bye</span>') + '</td>' +
-        '<td class="cfb__num nflff__ppg">' + (p._ppg == null ? '<span class="cfb__dim">–</span>' : p._ppg.toFixed(1)) + '</td></tr>';
+        '<td class="cfb__num nflff__ppg">' + (p._ppg == null ? '<span class="cfb__dim">–</span>' : p._ppg.toFixed(1)) + '</td>' +
+        '<td class="cfb__dim nflff__line">' + esc(p.why) + '</td></tr>';
     }).join('');
     none.hidden = list.length > 0;
     count.textContent = list.length + (list.length === 1 ? ' player' : ' players');

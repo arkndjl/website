@@ -12,10 +12,11 @@
 {{- define "partials/xw-pct" -}}{{- if lt . 0.005 }}&lt;1{{ else if lt . 0.1 }}{{ partial "num.html" (slice "%.1f" (mul . 100)) }}{{ else }}{{ partial "num.html" (slice "%.0f" (mul . 100)) }}{{ end }}%{{- end -}}
 {{- with $w -}}
 {{- if and (eq $view "players") .live .players -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "transfer watch") "icon" $icon "filter" "Pos,Team,Conf,Lean" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Pos,FV,Team,Xfer%,Lean" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "transfer watch") "icon" $icon "filter" "Pos,Team,Conf,Lean" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Pos,Team,Xfer%,Lean" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table xw">
-  <thead><tr><th>RK</th><th>Player</th><th>Pos</th><th>Cls</th><th>Team</th><th title="conference">Conf</th>
-    <th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th>
+  <thead><tr><th>RK</th><th>Player</th>
+    <th title="future value: projected peak on the 20-80 scale (50 = average regular); the rank">FV</th>
+    <th>Pos</th><th>Cls</th><th>Team</th><th title="conference">Conf</th>
     <th title="Transfer% = P(on another {{ $lvl }} roster next season)">Xfer%</th>
     <th title="Lean = likeliest school, P(lands there | he transfers)">Lean</th>
     <th title="2nd likeliest school, P(lands there | he transfers)">2nd</th>
@@ -26,11 +27,11 @@
   <tr>
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td class="cfb__name">{{ with .photo }}{{ partial "face.html" (dict "u" .) }}{{ end }}{{ .name }}{{ partial "arkstar.html" (dict "sport" "college-football" "name" .name "team" .team) }}</td>
+    <td class="fv xw__sub" data-l="FV" data-v="{{ .fv }}">{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td>{{ replaceRE "^DL$" "DT" .pos }}</td>
     <td>{{ .cls | default "—" }}</td>
     <td class="xw__team" data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
     <td>{{ .conf | default "—" }}</td>
-    <td class="fv xw__sub" data-l="FV" data-v="{{ .fv }}">{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num is-key" data-l="Xfer%" data-v="{{ .tp }}"><b class="{{ if ge .tp 0.5 }}cfb__down{{ end }}">{{ partial "num.html" (slice "%.0f" (mul .tp 100)) }}%</b></td>
     {{- range $k := slice 0 1 2 }}
     {{- with index $d $k }}

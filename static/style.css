@@ -4046,6 +4046,7 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
   .nflrk__t1 td { background: none; }
   .nflrk__table tbody tr.nflrk__t1 { background: color-mix(in srgb, #c8c7ff 5%, transparent); }
   .nflrk.is-overall .nflrk__table td.nflrk__av { display: none; }
+  .nflrk.is-overall .nflrk__table td.nflrk__vor { display: block; grid-column: 5; grid-row: 2; text-align: right; font-size: .85em; }   /* the overall key (VOR) stays on the card */
   .nflrk__table td.nflrk__vor { display: block; grid-column: 5; grid-row: 2; text-align: right; font-size: .85em; }
   .nflrk__table td.nflrk__vor::after { content: " VOR"; font-size: .85em; color: color-mix(in srgb, var(--foreground) 55%, transparent); }
 }

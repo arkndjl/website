@@ -172,33 +172,50 @@
       '" data-rk="' + r.ovr + '" data-name="' + esc(r.name) + '" data-team="' + esc(r.team) + '" data-ht="' + inches(r.ht) + '" data-wt="' + esc(r.wt) +
       '" data-cons="' + esc(r.cons) + '" data-xnil="' + esc(r.xnil) + '" data-prk="' + esc(r.posRank) +
       '" data-delta="' + (typeof d === 'number' ? d : '') + '" data-i="' + r.i + '">' +
-      '<td class="cfb__rk"' + (opt.rankBy === 'war' ? ' title="WAA rank among the players in view · #' + r.ovr + ' overall by FV"' : rk && rk !== r.ovr ? ' title="#' + r.ovr + ' overall"' : '') + '>' + (rk || r.ovr) + '</td><td class="cfb__name">' + faceHtml(r.photo, 'pxframe--row', 96) +
-      '<button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button>' +
-      (opt.rankBy === 'war' && r.waa != null ? '<b class="cfb__warin">' + (r.waa > 0 ? '+' : '') + (+r.waa).toFixed(2) + '</b>' : '') + (r.star ? '<span class="cfb__star" title="ARKLIST">★</span>' : '') + (r.carried ? ' <span class="cfb__carried" title="PFN stopped listing him after ' + esc(r.carried) + ': his last grade is kept">carried</span>' : '') + (r.src === 'espn' ? ' ' + prov('on the ESPN roster, not on PFN: graded up from the 20 floor on position, size, NFL frame and BMI, class, age for class, division and recruiting') : '') +
-      (r.riser ? '<span class="cfb__riser" title="riser: ' + esc(r.riserWhy) + '">↗</span>' : '') +
-      (r.inj ? '<span class="cfb__injchip injtag--' + (/season/i.test(r.inj) ? 'long' : r.inj === 'Out' ? 'out' : 'mid') + '" title="' + esc(r.inj.toLowerCase()) + '">' + (/season/i.test(r.inj) ? 'OFS' : r.inj === 'Out' ? 'O' : r.inj.charAt(0)) + '</span>' : '') +
-      (r.moveUp ? '<span class="cfb__upchip" title="FCS move-up candidate: FBS% ' + Math.round(r.up * 100) + '% (P on an FBS roster next season)">▲FBS</span>' : '') +
-      (r.move ? '<span class="cfb__movechip" title="position change: could move to ' + esc(r.move) + (r.moveOdds != null ? ' (' + Math.round(r.moveOdds * 100) + '%)' : '') + '. ' + esc(r.moveWhy) + '">⇄' + esc(r.move) + '</span>' : '') +
-      (multiOf(r).length ? '<span class="cfb__multichip" title="multi-position: ' + esc(multiLine(r)) + '">+' + esc(multiOf(r).map(function (m) { return m.pos; }).join('/')) + '</span>' : '') + '</td>' +
-      (opt.rankBy === 'war' ? '<td class="cfb__num cfb__war is-key">' + waaCell(r) + '</td><td class="cfb__num">' + warCell(r) + '</td><td class="cfb__num">' + fsCell(r) + '</td><td class="cfb__num">' + xvCell(r) + '</td>' : '') +
-      (yx ? '<td class="cfb__pos-cell" title="' + opt.yr + ' position (graded on PFN\'s ' + yx[2] + ' board)' + (yx[2] !== r.pos ? ' · now ' + r.pos : '') + '">' + yx[2] + (prk ? '<span title="rank at position in ' + opt.yr + ', players in view">' + prk + '</span>' : '') + '</td>' :
-      '<td class="cfb__pos-cell"' + (r.arch ? ' title="' + esc(r.arch) + (ROLES[r.rbRole] ? ' · ' + ROLES[r.rbRole][1] : '') + '"' : '') + '>' + r.pos + (prk ? '<span title="rank at position, players in view, by ' + (opt.rankBy === 'war' ? 'WAA' : 'FV') + (prk !== r.posRank && r.posRank ? ' · ' + r.pos + r.posRank + ' overall' : '') + '">' + prk + '</span>' : '') + (r.spot ? '<span class="cfb__dim">·' + esc(r.pos === 'OL' && OL_SPOT[r.spot] && OL_SPOT[r.spot] !== 'IOL' ? OL_SPOT[r.spot] : r.spot) + '</span>' : '') + (ROLES[r.rbRole] ? '<span class="cfb__rbrole" title="' + esc(roleTitle(r)) + '">' + ROLES[r.rbRole][0] + '</span>' : '') + medals(r) + '</td>') +
-      '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + (opt.div && r.div === 'FCS' ? '<span class="cfb__divtag" title="FCS: graded vs FCS players, translated to the FBS scale">FCS</span>' : '') + (ynote ? '<span class="cfb__pastnote">' + opt.yr + ': ' + esc(ynote) + '</span>' : '') + '</span></td>' +
-      (yx ? '<td class="fv cfb__g">' + chipOf(yx[1], opt.yr + ' FV ' + yx[1] + ' (backtest model: production, pedigree, age, team; no On3 or consensus) · FV now ' + (r.fv == null ? '—' : fv)) + '</td>' :
-      '<td class="fv cfb__g">' + (fv ? '<span class="fv-chip" data-fv="' + tier + '"' + (r.fvx != null ? ' title="mean outcome ' + (+r.fvx).toFixed(2) + '"' : '') + '>' + fv + '</span>' : dim) + '</td>') +
-      '<td class="cfb__delta cfb__now">' + delta + '</td>' +
-      '<td class="cfb__num cfb__now">' + (statOf(r) == null ? dim : '<span title="' + esc(statLabel(r)) + ' ' + f1(rawStat(r)) + ' → ' + statOf(r) + ' (100 = average ' + r.pos + ', 25 = one SD)' + (r.snaps ? ' · ' + r.snaps + ' snaps' : '') + '">' + statOf(r) + '</span>') + '</td>' +
-      (opt.rankBy === 'war' ? '' : '<td class="cfb__num cfb__now">' + warCell(r) + '</td>') +
-      (opt.draft ? '<td class="cfb__num cfb__now">' + (r.cons == null ? dim : '<span title="#' + r.consRk + ' on the consensus board · ' + r.consN + ' of 10 boards">' + f1(r.cons) + '</span>') + '</td>' : '') +
-      (opt.draft ? '<td class="cfb__num cfb__now">' + (r.draftP == null ? dim : r.draftP < 0.005 ? '<span class="cfb__dim">&lt;1%</span>' : Math.min(99, Math.round(r.draftP * 100)) + '%') + '</td>' : '') +
-      (opt.up ? '<td class="cfb__num cfb__now">' + (r.up != null ? '<span' + (r.moveUp ? ' class="cfb__upv"' : '') + '>' + Math.round(r.up * 100) + '%</span>' : dim) + '</td>' : '') +
-      '<td class="cfb__num cfb__now">' + xferCell(r) + '</td>' +
-      (opt.nil !== false ? '<td class="cfb__num cfb__g cfb__now">' + (r.xnil ? '<span class="cfb__nil">' + money(r.xnil) + '</span>' : dim) + '</td>' +
-        '<td class="cfb__num cfb__now">' + (r.ynil != null ? money(r.ynil) : dim) + '</td>' +
-        '<td class="cfb__num cfb__now">' + (r.znil != null ? '<span class="' + (r.znil >= 0 ? 'cfb__up' : 'cfb__down') + '">' + zmoney(r.znil) + '</span>' : dim) + '</td>' : '') +
-      '<td class="cfb__g">' + esc(r.cls || '—') + '</td>' +
-      '<td class="cfb__num">' + ageCell(r) + '</td>' +
-      '<td class="cfb__num">' + esc(r.ht || '—') + ' / ' + esc(r.wt || '—') + (r.bmi ? ' <span class="cfb__dim">· ' + f1(r.bmi) + '</span>' : '') + '</td>' + measCell(r) + '</tr>';
+      rowCells(r, rk, opt, prk, fv, tier, yx, ynote, delta) + '</tr>';
+  }
+
+  // the cells of one board row by the header's data-sort key; rowHtml lays them out in the thead's order (opt.cols) and
+  // gives the first cell of each group the rule (opt.g, from the th's cfb__g)
+  function rowCells(r, rk, opt, prk, fv, tier, yx, ynote, delta) {
+    var td = function (c, h, a) { return [c, h, a || '']; }, key = opt.cols[2];
+    var C = {
+      rk: td('cfb__rk', rk || r.ovr, opt.rankBy === 'war' ? ' title="WAA rank among the players in view · #' + r.ovr + ' overall by FV"' : opt.rankBy === 'nil' ? ' title="xNIL rank among the players in view · #' + r.ovr + ' overall by FV"' : rk && rk !== r.ovr ? ' title="#' + r.ovr + ' overall"' : ''),
+      name: td('cfb__name', faceHtml(r.photo, 'pxframe--row', 96) +
+        '<button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button>' +
+        (r.star ? '<span class="cfb__star" title="ARKLIST">★</span>' : '') + (r.carried ? ' <span class="cfb__carried" title="PFN stopped listing him after ' + esc(r.carried) + ': his last grade is kept">carried</span>' : '') + (r.src === 'espn' ? ' ' + prov('on the ESPN roster, not on PFN: graded up from the 20 floor on position, size, NFL frame and BMI, class, age for class, division and recruiting') : '') +
+        (r.riser ? '<span class="cfb__riser" title="riser: ' + esc(r.riserWhy) + '">↗</span>' : '') +
+        (r.inj ? '<span class="cfb__injchip injtag--' + (/season/i.test(r.inj) ? 'long' : r.inj === 'Out' ? 'out' : 'mid') + '" title="' + esc(r.inj.toLowerCase()) + '">' + (/season/i.test(r.inj) ? 'OFS' : r.inj === 'Out' ? 'O' : r.inj.charAt(0)) + '</span>' : '') +
+        (r.moveUp ? '<span class="cfb__upchip" title="FCS move-up candidate: FBS% ' + Math.round(r.up * 100) + '% (P on an FBS roster next season)">▲FBS</span>' : '') +
+        (r.move ? '<span class="cfb__movechip" title="position change: could move to ' + esc(r.move) + (r.moveOdds != null ? ' (' + Math.round(r.moveOdds * 100) + '%)' : '') + '. ' + esc(r.moveWhy) + '">⇄' + esc(r.move) + '</span>' : '') +
+        (multiOf(r).length ? '<span class="cfb__multichip" title="multi-position: ' + esc(multiLine(r)) + '">+' + esc(multiOf(r).map(function (m) { return m.pos; }).join('/')) + '</span>' : '')),
+      waa: td('cfb__num', waaCell(r)), war: td('cfb__num cfb__now', warCell(r)), waafs: td('cfb__num', fsCell(r)), xv: td('cfb__num', xvCell(r)),
+      pos: yx ? td('cfb__pos-cell', yx[2] + (prk ? '<span title="rank at position in ' + opt.yr + ', players in view">' + prk + '</span>' : ''), ' title="' + opt.yr + ' position (graded on PFN\'s ' + yx[2] + ' board)' + (yx[2] !== r.pos ? ' · now ' + r.pos : '') + '"') :
+        td('cfb__pos-cell', r.pos + (prk ? '<span title="rank at position, players in view, by ' + (opt.rankBy === 'war' ? 'WAA' : opt.rankBy === 'nil' ? 'xNIL' : 'FV') + (prk !== r.posRank && r.posRank ? ' · ' + r.pos + r.posRank + ' overall' : '') + '">' + prk + '</span>' : '') + (r.spot ? '<span class="cfb__dim">·' + esc(r.pos === 'OL' && OL_SPOT[r.spot] && OL_SPOT[r.spot] !== 'IOL' ? OL_SPOT[r.spot] : r.spot) + '</span>' : '') + (ROLES[r.rbRole] ? '<span class="cfb__rbrole" title="' + esc(roleTitle(r)) + '">' + ROLES[r.rbRole][0] + '</span>' : '') + medals(r), r.arch ? ' title="' + esc(r.arch) + (ROLES[r.rbRole] ? ' · ' + ROLES[r.rbRole][1] : '') + '"' : ''),
+      team: td('cfb__team', (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + (opt.div && r.div === 'FCS' ? '<span class="cfb__divtag" title="FCS: graded vs FCS players, translated to the FBS scale">FCS</span>' : '') + (ynote ? '<span class="cfb__pastnote">' + opt.yr + ': ' + esc(ynote) + '</span>' : '') + '</span>'),
+      fv: td('fv', yx ? chipOf(yx[1], opt.yr + ' FV ' + yx[1] + ' (backtest model: production, pedigree, age, team; no On3 or consensus) · FV now ' + (r.fv == null ? '—' : fv)) :
+        fv ? '<span class="fv-chip" data-fv="' + tier + '"' + (r.fvx != null ? ' title="mean outcome ' + (+r.fvx).toFixed(2) + '"' : '') + '>' + fv + '</span>' : dim),
+      delta: td('cfb__delta cfb__now', delta),
+      stat: td('cfb__num cfb__now', statOf(r) == null ? dim : '<span title="' + esc(statLabel(r)) + ' ' + f1(rawStat(r)) + ' → ' + statOf(r) + ' (100 = average ' + r.pos + ', 25 = one SD)' + (r.snaps ? ' · ' + r.snaps + ' snaps' : '') + '">' + statOf(r) + '</span>'),
+      cons: td('cfb__num cfb__now', r.cons == null ? dim : '<span title="#' + r.consRk + ' on the consensus board · ' + r.consN + ' of 10 boards">' + f1(r.cons) + '</span>'),
+      draft: td('cfb__num cfb__now', r.draftP == null ? dim : r.draftP < 0.005 ? '<span class="cfb__dim">&lt;1%</span>' : Math.min(99, Math.round(r.draftP * 100)) + '%'),
+      up: td('cfb__num cfb__now', r.up != null ? '<span' + (r.moveUp ? ' class="cfb__upv"' : '') + '>' + Math.round(r.up * 100) + '%</span>' : dim),
+      xfer: td('cfb__num cfb__now', xferCell(r)),
+      xnil: td('cfb__num cfb__now', r.xnil ? '<span class="cfb__nil">' + money(r.xnil) + '</span>' : dim),
+      ynil: td('cfb__num cfb__now', r.ynil != null ? money(r.ynil) : dim),
+      znil: td('cfb__num cfb__now', r.znil != null ? '<span class="' + (r.znil >= 0 ? 'cfb__up' : 'cfb__down') + '">' + zmoney(r.znil) + '</span>' : dim),
+      cls: td('', esc(r.cls || '—')),
+      age: td('cfb__num', ageCell(r)),
+      ht: td('cfb__num', esc(r.ht || '—') + ' / ' + esc(r.wt || '—') + (r.bmi ? ' <span class="cfb__dim">· ' + f1(r.bmi) + '</span>' : '')),
+      mht: measCell(r),
+      snaps: td('cfb__num cfb__now', r.snapShare != null ? (r.snaps ? '<span title="' + r.snaps + ' snaps">' : '<span>') + Math.round(r.snapShare * 100) + '%</span>' : r.snaps ? r.snaps + ' <span class="cfb__dim">sn</span>' : dim)
+    };
+    return opt.cols.map(function (k) {
+      var c = C[k]; if (!c) return '<td>' + dim + '</td>';
+      if (typeof c === 'string') return opt.g[k] ? c.replace('<td class="', '<td class="cfb__g ') : c;
+      var cl = (c[0] + (opt.g[k] ? ' cfb__g' : '') + (k === key && k !== 'fv' ? ' nflwar__war is-key' : '')).trim();
+      return '<td' + (cl ? ' class="' + cl + '"' : '') + c[2] + '>' + c[1] + '</td>';
+    }).join('');
   }
 
   // FV inputs: the composite's weighted feeders (graded players), then each step from the composite to the headline in
@@ -278,7 +295,7 @@
     age: function (r) { return r.age != null ? r.age : r.ageEst; }, ht: function (r) { return inches(r.ht) || null; }, mht: function (r) { return r.mz ? r.mz[0] : null; },
     cons: function (r) { return r.cons; }, stat: statOf, xnil: function (r) { return r.xnil; }, ynil: function (r) { return r.ynil; }, znil: function (r) { return r.znil; },
     up: function (r) { return r.up; }, draft: function (r) { return r.draftP; }, xfer: function (r) { return r.transferP; },
-    war: function (r) { return r.war; }, waa: function (r) { return r.waa; }, waafs: waaFs, xv: function (r) { return r.xv; },
+    snaps: function (r) { return r.snapShare != null ? r.snapShare : null; }, war: function (r) { return r.war; }, waa: function (r) { return r.waa; }, waafs: waaFs, xv: function (r) { return r.xv; },
   };
 
   // filtering and sorting run on the records; only the 50 rows of the current page are ever in the
@@ -290,7 +307,8 @@
         cols = w.querySelectorAll('thead th').length, open = null, openP = '', pos = '', page = 0, match = [];
     var recs = data.filter(function (r) { return (preset !== 'd27' || r.draft27) && (preset !== 'star' || r.star) && (preset !== 'fbs' || r.div !== 'FCS') && (preset !== 'fcs' || r.div === 'FCS') && (preset !== 'war' || r.pos !== 'QB'); }), byI = {}, RK = {};
     var opt = { up: w.hasAttribute('data-cfb-up'), draft: w.hasAttribute('data-cfb-draft'), nil: true, div: preset !== 'fbs' && preset !== 'fcs', rankBy: preset === 'war' ? 'war' : preset === 'nil' ? 'nil' : 'fv',
-      yr: 0 };
+      yr: 0, cols: [].map.call(w.querySelectorAll('thead th'), function (h) { return h.getAttribute('data-sort'); }), g: {} };
+    [].forEach.call(w.querySelectorAll('thead th.cfb__g'), function (h) { opt.g[h.getAttribute('data-sort')] = 1; });
     var gfxCols = w.getAttribute('data-gfx-cols') || '';
     // the WAR leaderboard: ranks (and the default order) by WAA, wins over an average starter at the position, so the
     // ranking is position-neutral (WAR's QB line is real value, but an average QB's 0.6 wins over replacement filled the top

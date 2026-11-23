@@ -9,43 +9,44 @@
 {{- $date := lower ((time .asof).Format "Jan 2") -}}
 {{- $ctry := site.Data.soccer_countries.name -}}
 {{- if eq $view "board" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: players") "icon" "cs" "filter" "Tier" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Team,RWA,RAR,xTV" "gfxDate" $date "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: players") "icon" "cs" "filter" "Tier" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,RWA,Team,Age,Maps,RAR,xTV" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table hk cs__table">
   <thead><tr>
     <th>RK</th><th>Player</th>{{ with $d.wkFrom }}<th data-num title="± = rank change in RWA since {{ (time .).Format "Jan 2" }}; hover for the rank and RWA change">±</th>{{ end }}
     <th data-vz class="cfb__g" title="RWA: round win % added per round, opponent-adjusted, 0 = the average tier-1 starter; recent maps count more (half-life {{ $f.params.h }} days)">RWA</th>
+    <th>Team</th>
+    <th title="the team's event-access tier on the ARK Ranking (Tier 4 = unranked or below the Tier 3 cut)">Tier</th>
+    <th>Age</th>
+    <th title="maps in the last year">Maps</th>
     <th title="projected RWA in six months if still active: RWA and age, fit on the monthly boards since Jul 2024">6M</th>
     <th title="RWA change over the last 90 days">90d</th>
     <th title="rounds above replacement over the last year: extra rounds won against a median active pro in the same seat">RAR</th>
-    <th title="maps in the last year">Maps</th>
     <th class="hk__x" title="kills per round, last year">KPR</th>
     <th class="hk__x" title="average damage per round, last year">ADR</th>
     <th class="hk__x" title="rounds with a kill, assist, survival or trade, last year">KAST</th>
     <th class="hk__x" title="opening kills minus opening deaths per 100 rounds, last year">Open</th>
-    <th title="transfer value: what a buyout would cost, from the prize money he adds over two seasons (aging included), priced on reported fees">xTV</th>
-    <th>Team</th>
-    <th title="the team's event-access tier on the ARK Ranking (Tier 4 = unranked or below the Tier 3 cut)">Tier</th>
-    <th>Age</th>
-  </tr></thead>
+    <th title="transfer value: what a buyout would cost, from the prize money he adds over two seasons (aging included), priced on reported fees">xTV</th>  </tr></thead>
   <tbody>
   {{- range .board }}{{ partial "cs2prow.html" (dict "r" . "ctry" $ctry "view" "board" "from" $d.wkFrom) }}{{ end }}
   </tbody>
 </table>
 {{- partial "wintable-close.html" (dict "rows" (len .board) "fresh" "cs2" "note" (printf "bo3.gg per-map stats · updated %s" $date) "about" (printf "1,000+ rounds in the last year, a map in the last 120 days (%d players). Stat lines weighted by their effect on round share, opponent-adjusted, recency-weighted, small samples regressed. Replacement %.1f. 6M: RWA 182 days on for players still in the pool, from RWA and age (age squared, unknown age flagged); held out Jul 2025 on, RMSE .507 held flat to .485 (t -2.4 by player, 9 of 11 months; scripts/cs2_proj_research.py). Photos: bo3.gg." (int .nPool) .repl)) -}}
 {{- else if eq $view "prospects" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: prospects") "icon" "cs" "filter" "Tier" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Team,FV,1Y,T1%" "gfxDate" $date "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: prospects") "icon" "cs" "filter" "Tier" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Team,Age,1Y,T1%" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table hk sp cs__table">
   <thead><tr>
-    <th>RK</th><th>Player</th><th>Team</th><th title="the team's event-access tier">Tier</th>
+    <th>RK</th><th>Player</th>
     <th class="cfb__g" title="future value, 20-80: the projected rating over the next year against tier-1 starters; 50 = an average tier-1 starter, 10 a standard deviation">FV</th>{{ partial "wkth.html" (dict "from" $d.wkFrom) }}
+    <th>Team</th>
+    <th title="the team's event-access tier">Tier</th>
+    <th>Age</th>
+    <th class="hk__x" title="maps in the last year">Maps</th>
+    <th title="maps at S-tier events since Jan 2024 (prospects have fewer than 20)">S maps</th>
     <th title="projected RWA over the next year (0 = average tier-1 starter)">1Y</th>
     <th title="RWA change over the last six months">Rise</th>
     <th title="chance of 20+ maps at S-tier events within a year (backtested on 2024-25 prospects)">T1%</th>
-    <th>Age</th>
-    <th title="maps at S-tier events since Jan 2024 (prospects have fewer than 20)">S maps</th>
     <th title="share of last year's rounds at S/A-tier events (FV input: lowers the projection at a given rating)">S/A</th>
     <th class="hk__x" title="RWA now">RWA</th>
-    <th class="hk__x" title="maps in the last year">Maps</th>
     <th class="hk__x" title="transfer value">xTV</th>
   </tr></thead>
   <tbody>
@@ -55,15 +56,17 @@
 {{- $pf := $f.prospects -}}
 {{- partial "wintable-close.html" (dict "rows" (len .prospects) "fresh" "cs2" "note" (printf "updated %s" $date) "about" (printf "Not age-based: under 20 S-tier maps, 1,000+ rounds in the last year, any level. FV: projected rating next year (%s), 50 = average tier-1 starter. T1%%: chance of 20+ S-tier maps within a year." $pf.keep)) -}}
 {{- else if eq $view "values" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: transfer values") "icon" "cs" "filter" "Tier" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Team,xTV,RWA,Age" "gfxDate" $date "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: transfer values") "icon" "cs" "filter" "Tier" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,xTV,Team,Age,RWA" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table hk cs__table">
   <thead><tr>
-    <th>RK</th><th>Player</th><th>Team</th><th title="the team's event-access tier">Tier</th>
+    <th>RK</th><th>Player</th>
     <th class="cfb__g" title="transfer value (USD): round wins added over a replacement-level pro for two seasons, aged and discounted, priced on reported buyouts">xTV</th>
+    <th>Team</th>
+    <th title="the team's event-access tier">Tier</th>
     <th>Age</th>
+    <th class="hk__x" title="maps in the last year">Maps</th>
     <th title="RWA now (0 = average tier-1 starter)">RWA</th>
     <th title="rounds above replacement, last year">RAR</th>
-    <th class="hk__x" title="maps in the last year">Maps</th>
   </tr></thead>
   <tbody>
   {{- range $i, $r := first 200 (sort .board "xtv" "desc") }}{{ partial "cs2prow.html" (dict "r" $r "ctry" $ctry "view" "values" "rk" (add $i 1)) }}{{ end }}

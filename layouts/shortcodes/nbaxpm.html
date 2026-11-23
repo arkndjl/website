@@ -12,7 +12,7 @@
        Medals in the name cell: bdg, the predictive badges (scripts/nba_badges.py; data/nba_badge_backtest.json). */ -}}
 {{- $idx := site.Data.nba_xpm -}}
 {{- $pos := slice "PG" "SG" "SF" "PF" "C" -}}
-<div class="win cfb nbaxpm"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbaxpm data-gfx-logo="/img/nba/{}.png" data-src="{{ "data/nba-xpm/" | relURL }}" data-proj="{{ "data/nba-proj.json" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="RK,Player,XPM,O-XPM,D-XPM,VORX,Pos,MP">
+<div class="win cfb nbaxpm"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbaxpm data-gfx-logo="/img/nba/{}.png" data-src="{{ "data/nba-xpm/" | relURL }}" data-proj="{{ "data/nba-proj.json" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="RK,Player,VORX,XPM,O-XPM,D-XPM,Pos,MP">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ .Get "title" | default "nba_xpm.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -51,18 +51,18 @@
         <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, in the order of the view (VORX, XPM, offense or defense)">RK</th>
         <th data-sort="n" title="medals: predictive badges, bronze to platinum (75th / 90th / 97th / 99th percentile at the position, 500+ MP): Shot Creator (usage %), Playmaker (assist %), Two-Way Disruptor (steal % + block %), Foul Drawer (free throws a shot), Workhorse (minutes a game). Each predicted next-season XPM beyond this season's XPM, minutes and age, held out (scripts/nba_badge_backtest.py)">Player</th>
         <th data-sort="wk" data-num title="± = rank change in VORX since the last Tuesday post, within the filters; hover for the rank and VORX then. VORX view, current season">±</th>
-        <th data-sort="xpm" data-num title="XPM = .5 DPM + .5 BPM: points per 100 possessions over an average player, as played. * = BPM only (no DPM row)">XPM</th>
-        <th data-sort="sxpm" data-num class="c-sxpm" title="pXPM: XPM shrunk by minutes: raw x MP / (MP + 600) + mean x 600 / (MP + 600), mean = role mean + r (Marcel prior - role mean), r = H / (H + 1000), H = MP last season + .5 MP the season before; role mean -1 + .5 ln(1 + MP82 / 100) (MP82: minutes on an 82-game pace). Fit on next-season XPM 2011-26. Below: O / D, shrunk">pXPM</th>
-        <th data-sort="pxpm" data-num class="c-pxpm" title="Proj: XPM to date blended with his preseason prior (his two seasons before, aged and shrunk) by minutes, k = 509 minutes for veterans and 809 for newcomers, fit on 2012-26 season-end XPM. Below: the 80% range for his true level. Display only">Proj</th>
-        <th data-sort="p3" data-num class="c-p3" title="3Y: projected XPM over the next three seasons x the chance he plays in them, the rest at replacement (-2). Below: next season (1Y), given he plays. Display only">3Y</th>
-        <th data-sort="oxpm" data-num class="c-oxpm" title="O-XPM = .5 ODPM + .5 OBPM, raw">O-XPM</th>
-        <th data-sort="dxpm" data-num class="c-dxpm" title="D-XPM = .5 DDPM + .5 DBPM, raw">D-XPM</th>
         <th data-sort="vorx" data-num class="c-vorx" title="VORX = .030 x (XPM + 1.4) x MP / 48: wins over a replacement player (XPM -1.4, what freely available players produce), 2.46 wins per point of XPM over a full season's minutes; both fit to NBA team wins 2011-26">VORX</th>
         <th data-sort="pos" class="cfb__g" title="position (Basketball-Reference), rank at position within the filters and view">Pos</th>
         <th data-sort="tm" class="nbaxpm__team">Team</th>
         <th data-sort="age" data-num class="nbaxpm__ph" title="age on Feb 1 of the season">Age</th>
-        <th data-sort="g" data-num class="cfb__g nbaxpm__ph">G</th>
+        <th data-sort="g" data-num class="nbaxpm__ph">G</th>
         <th data-sort="mp" data-num class="nbaxpm__ph">MP</th>
+        <th data-sort="xpm" data-num class="cfb__g" title="XPM = .5 DPM + .5 BPM: points per 100 possessions over an average player, as played. * = BPM only (no DPM row)">XPM</th>
+        <th data-sort="oxpm" data-num class="c-oxpm" title="O-XPM = .5 ODPM + .5 OBPM, raw">O-XPM</th>
+        <th data-sort="dxpm" data-num class="c-dxpm" title="D-XPM = .5 DDPM + .5 DBPM, raw">D-XPM</th>
+        <th data-sort="sxpm" data-num class="c-sxpm" title="pXPM: XPM shrunk by minutes: raw x MP / (MP + 600) + mean x 600 / (MP + 600), mean = role mean + r (Marcel prior - role mean), r = H / (H + 1000), H = MP last season + .5 MP the season before; role mean -1 + .5 ln(1 + MP82 / 100) (MP82: minutes on an 82-game pace). Fit on next-season XPM 2011-26. Below: O / D, shrunk">pXPM</th>
+        <th data-sort="pxpm" data-num class="c-pxpm" title="Proj: XPM to date blended with his preseason prior (his two seasons before, aged and shrunk) by minutes, k = 509 minutes for veterans and 809 for newcomers, fit on 2012-26 season-end XPM. Below: the 80% range for his true level. Display only">Proj</th>
+        <th data-sort="p3" data-num class="c-p3" title="3Y: projected XPM over the next three seasons x the chance he plays in them, the rest at replacement (-2). Below: next season (1Y), given he plays. Display only">3Y</th>
         <th data-sort="dpm" data-num class="cfb__g nbaxpm__src c-dpm" title="databallr DPM (O / D below)">DPM</th>
         <th data-sort="bpm" data-num class="nbaxpm__src c-bpm" title="Basketball-Reference BPM (O / D below)">BPM</th>
       </tr></thead>
@@ -159,24 +159,34 @@
     table.classList.toggle('no-dpm', !data.players.some(function (p) { return p.dpm != null; }));
     table.classList.toggle('no-proj', !data.proj); bar.querySelector('[data-side="p"]').hidden = bar.querySelector('[data-side="3"]').hidden = !data.proj;
     table.classList.toggle('no-bpm', !data.players.some(function (p) { return p.bpm != null; }));
+    // the number the view ranks by sits right after ±, then Pos, Team, Age, G, MP, then XPM's O / D split and the other
+    // value numbers (the board standard, Nov 23 2026); headers move with it
+    var VAL = ['xpm', 'oxpm', 'dxpm', 'vorx', 'sxpm', 'pxpm', 'p3'], rest = VAL.filter(function (c) { return c !== key; }),
+        order = [key, 'pos', 'tm', 'age', 'g', 'mp'].concat(rest, ['dpm', 'bpm']), grp = { pos: 1, dpm: 1 }; grp[rest[0]] = 1;
+    var hr = ths[0].parentNode;
+    ['rk', 'n', 'wk'].concat(order).forEach(function (c) { var th = ths.filter(function (t) { return t.dataset.sort === c; })[0]; if (th) { th.classList.toggle('cfb__g', !!grp[c]); hr.appendChild(th); } });
+    function g(c) { return grp[c] ? ' cfb__g' : ''; }
+    var CELL = {
+      xpm: function (p) { return '<td class="cfb__num nbaxpm__v' + k('xpm') + g('xpm') + '">' + sg(p.xpm) + (p.dpm == null && p.bpm != null ? '<span class="cfb__dim" title="BPM only: no DPM row">*</span>' : '') + '</td>'; },
+      sxpm: function (p) { return '<td class="cfb__num c-sxpm nbaxpm__v' + k('sxpm') + g('sxpm') + '">' + sg(p.sxpm) + od(p.soxpm, p.sdxpm) + '</td>'; },
+      pxpm: function (p) { return '<td class="cfb__num c-pxpm nbaxpm__v' + k('pxpm') + g('pxpm') + '">' + (p.pxpm == null ? '' : sg(p.pxpm) + '<span class="cfb__dim nbaxpm__od" title="80% range">' + p.lo.toFixed(1) + '–' + p.hi.toFixed(1) + '</span>') + '</td>'; },
+      p3: function (p) { return '<td class="cfb__num c-p3 nbaxpm__v' + k('p3') + g('p3') + '">' + (p.p3 == null ? '' : sg(p.p3) + '<span class="cfb__dim nbaxpm__od" title="next season (1Y)">1Y ' + (p.p1 > 0 ? '+' : '') + p.p1.toFixed(1) + '</span>') + '</td>'; },
+      oxpm: function (p) { return '<td class="cfb__num c-oxpm nbaxpm__v' + k('oxpm') + g('oxpm') + '">' + sg(p.oxpm) + '</td>'; },
+      dxpm: function (p) { return '<td class="cfb__num c-dxpm nbaxpm__v' + k('dxpm') + g('dxpm') + '">' + sg(p.dxpm) + '</td>'; },
+      vorx: function (p) { return '<td class="cfb__num c-vorx nbaxpm__v' + k('vorx') + g('vorx') + '">' + p.vorx.toFixed(1) + '</td>'; },
+      pos: function (p) { return '<td class="cfb__g">' + esc(p.pos) + '<span class="cfb__dim">' + p.pr + '</span></td>'; },
+      tm: function (p) { return '<td class="nbaxpm__team" style="white-space: nowrap">' + tl(p.tm) + esc(p.tm) + '</td>'; },
+      age: function (p) { return '<td class="cfb__num nbaxpm__ph">' + (p.ax != null ? p.ax.toFixed(1) : p.age == null ? '' : p.age) + '</td>'; },
+      g: function (p) { return '<td class="cfb__num nbaxpm__ph">' + p.g + '</td>'; },
+      mp: function (p) { return '<td class="cfb__num nbaxpm__ph">' + p.mp + '</td>'; },
+      dpm: function (p) { return '<td class="cfb__num cfb__g nbaxpm__src c-dpm">' + sg(p.dpm) + od(p.odpm, p.ddpm) + '</td>'; },
+      bpm: function (p) { return '<td class="cfb__num nbaxpm__src c-bpm">' + sg(p.bpm) + od(p.obpm, p.dbpm) + '</td>'; }
+    };
     var gfxRow = function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
         '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p) + ' <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + p.mp + ' MP</span></td>' +
         __wk.rk(p, wkf, 'VORX', null, p.vorx) +
-        '<td class="cfb__num nbaxpm__v' + k('xpm') + '">' + sg(p.xpm) + (p.dpm == null && p.bpm != null ? '<span class="cfb__dim" title="BPM only: no DPM row">*</span>' : '') + '</td>' +
-        '<td class="cfb__num c-sxpm nbaxpm__v' + k('sxpm') + '">' + sg(p.sxpm) + od(p.soxpm, p.sdxpm) + '</td>' +
-        '<td class="cfb__num c-pxpm nbaxpm__v' + k('pxpm') + '">' + (p.pxpm == null ? '' : sg(p.pxpm) + '<span class="cfb__dim nbaxpm__od" title="80% range">' + p.lo.toFixed(1) + '–' + p.hi.toFixed(1) + '</span>') + '</td>' +
-        '<td class="cfb__num c-p3 nbaxpm__v' + k('p3') + '">' + (p.p3 == null ? '' : sg(p.p3) + '<span class="cfb__dim nbaxpm__od" title="next season (1Y)">1Y ' + (p.p1 > 0 ? '+' : '') + p.p1.toFixed(1) + '</span>') + '</td>' +
-        '<td class="cfb__num c-oxpm nbaxpm__v' + k('oxpm') + '">' + sg(p.oxpm) + '</td>' +
-        '<td class="cfb__num c-dxpm nbaxpm__v' + k('dxpm') + '">' + sg(p.dxpm) + '</td>' +
-        '<td class="cfb__num c-vorx nbaxpm__v' + k('vorx') + '">' + p.vorx.toFixed(1) + '</td>' +
-        '<td class="cfb__g">' + esc(p.pos) + '<span class="cfb__dim">' + p.pr + '</span></td>' +
-        '<td class="nbaxpm__team" style="white-space: nowrap">' + tl(p.tm) + esc(p.tm) + '</td>' +
-        '<td class="cfb__num nbaxpm__ph">' + (p.ax != null ? p.ax.toFixed(1) : p.age == null ? '' : p.age) + '</td>' +
-        '<td class="cfb__num cfb__g nbaxpm__ph">' + p.g + '</td>' +
-        '<td class="cfb__num nbaxpm__ph">' + p.mp + '</td>' +
-        '<td class="cfb__num cfb__g nbaxpm__src c-dpm">' + sg(p.dpm) + od(p.odpm, p.ddpm) + '</td>' +
-        '<td class="cfb__num nbaxpm__src c-bpm">' + sg(p.bpm) + od(p.obpm, p.dbpm) + '</td></tr>';
+        order.map(function (c) { return CELL[c](p); }).join('') + '</tr>';
     };
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(gfxRow).join('');
     // every filtered row for the GFX card's percentiles (assets/js/gfx.js pcAll), built off the page on demand, photos left out

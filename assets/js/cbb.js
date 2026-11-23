@@ -74,16 +74,16 @@
       (r.src === 'bt' ? prov('not on the preseason board (in this season\'s box scores only). Graded up from the 20 floor on height, weight and BMI, class, age, recruiting rank, conference and team, then on his line as the minutes come in') : r.new ? '<span class="cfb__divtag" title="newcomer: no D-I season yet (graded on recruiting and size)">NEW</span>' : '') +
       (r.intl ? '<span class="cfb__divtag cfb__divtag--intl" title="international: graded on the draft boards and his pro league line, adjusted for league strength and minutes">INTL</span>' : '') +
       (r.low ? '<span class="cfb__divtag" title="' + esc(LOWTAG[r.div] || r.div) + ': D-1% ' + pct(r.d1P) + '">' + esc(r.div) + '</span>' + prov('below D-I: graded on his projected first D-I season, its class and D-1%') : '') + '</td>' +
-      '<td class="cfb__pos-cell"' + (r.role ? ' title="' + esc(r.role) + ' (Barttorvik role, last season)"' : '') + '>' + esc(r.pos) + (prk ? '<span title="rank at position, players in view, by FV">' + prk + '</span>' : '') +
-        moveChip(r) + (r.role ? '<span class="cfb__dim gfx-off">·' + esc(r.role) + '</span>' : '') + '</td>' +
-      '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + '</span></td>' +
       '<td class="fv cfb__g"><span class="fv-chip" data-fv="' + tier + '" title="mean outcome ' + (+r.fvx).toFixed(2) + '">' + fv + '</span></td>' +
       (past || !WKFROM ? '' : r.wkm ? window.__wk.fv(r.fv, r.w0, WKFROM) : window.__wk.none) +
-      '<td class="cfb__num">' + pct(r.nbaP) + '</td>' +
-      (past ? '<td>' + outcome(r) + '</td>' : up ? '<td class="cfb__num">' + (r.d1P == null ? dim : pct(r.d1P)) + '</td>' : bpmCell(r)) +
-      '<td class="cfb__g">' + esc(r.cls || '—') + '</td>' +
+      '<td class="cfb__pos-cell cfb__g"' + (r.role ? ' title="' + esc(r.role) + ' (Barttorvik role, last season)"' : '') + '>' + esc(r.pos) + (prk ? '<span title="rank at position, players in view, by FV">' + prk + '</span>' : '') +
+        moveChip(r) + (r.role ? '<span class="cfb__dim gfx-off">·' + esc(r.role) + '</span>' : '') + '</td>' +
+      '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + '</span></td>' +
+      '<td>' + esc(r.cls || '—') + '</td>' +
       (past ? '' : '<td class="cfb__num">' + (r.age != null ? (+r.age).toFixed(1) : r.ageEst != null ? '<span class="cfb__dim" title="estimated from class year (no birth date yet)">~' + f1(r.ageEst) + '</span>' : '—') + '</td>') +
-      '<td class="cfb__num">' + size(r, past) + '</td></tr>';
+      '<td class="cfb__num">' + size(r, past) + '</td>' +
+      '<td class="cfb__num cfb__g">' + pct(r.nbaP) + '</td>' +
+      (past ? '<td>' + outcome(r) + '</td>' : up ? '<td class="cfb__num">' + (r.d1P == null ? dim : pct(r.d1P)) + '</td>' : bpmCell(r)) + '</tr>';
   }
 
   // historical comps (static/data/cbb-comps.json, scripts/cbb_comps.py): his nearest preseason profiles on the 2009-19
