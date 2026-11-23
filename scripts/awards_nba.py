@@ -44,7 +44,7 @@ def table(h, tid):
             r[k] = cell(v)
             idm = re.search(r'data-append-csv="([^"]+)"', tag.group(0)[:400])
             if idm: r['_id'] = idm.group(1)
-            hm = re.search(r'href="/teams/([A-Z]{3})/', v)
+            hm = re.search(r'href=["\']/teams/([A-Z]{3})/', v)
             if hm: r['_tm'] = hm.group(1)
         if r: out.append(r)
     return out
@@ -59,9 +59,11 @@ def votes(season):
     """{award: [(bbref id, share), ...] in voting order}"""
     h = fetch(f'nba_awards_{season}.html', f'https://www.basketball-reference.com/awards/awards_{season}.html')
     out = {}
-    for aw in ('mvp', 'dpoy', 'roy'):
+    for aw in ('mvp', 'dpoy', 'roy', 'smoy', 'mip'):
         rows = [(r['_id'], f(r.get('award_share'))) for r in table(h, aw) if r.get('_id') and r.get('award_share')]
         out[aw] = sorted(rows, key=lambda t: -t[1])
+    out['coy'] = sorted([(r['_tm'], f(r.get('award_share'))) for r in table(h, 'coy') if r.get('_tm') and r.get('award_share')],
+                        key=lambda t: -t[1])
     return out
 
 
@@ -69,7 +71,10 @@ def standings(season):
     h = fetch(f'nba_season_{season}.html', f'https://www.basketball-reference.com/leagues/NBA_{season}.html')
     out = {}
     for tid in ('confs_standings_E', 'confs_standings_W'):
-        rows = [r for r in table(h, tid) if r.get('_tm') and r.get('wins')]
+        # seasons through 2015 carry only division tables: the conference is the two (or three) divisions together
+        rows = [r for r in table(h, tid) if r.get('_tm') and r.get('wins')] or \
+            [r for r in table(h, tid.replace('confs', 'divs')) if r.get('_tm') and r.get('wins')]
+        rows.sort(key=lambda r: -f(r.get('win_loss_pct')))       # seed = conference rank by record (a stable sort)
         for i, r in enumerate(rows):
             w, l = f(r['wins']), f(r['losses'])
             out[r['_tm']] = {'wp': w / max(w + l, 1), 'seed': i + 1, 'srs': f(r.get('srs'))}
@@ -82,7 +87,7 @@ def per_game(season, fresh=False):
     for r in table(h, 'per_game_stats'):
         i = r.get('_id')
         if not i or i in out: continue                       # first row = season total for a traded player
-        out[i] = {k: f(r.get(k)) for k in ('games', 'pts_per_g', 'trb_per_g', 'ast_per_g', 'stl_per_g',
+        out[i] = {k: f(r.get(k)) for k in ('games', 'games_started', 'pts_per_g', 'trb_per_g', 'ast_per_g', 'stl_per_g',
                                             'blk_per_g', 'mp_per_g')}
         out[i]['tms'] = []
     for r in table(h, 'per_game_stats'):
@@ -106,6 +111,9 @@ PRE_MVP = {'jamesle01': 1, 'bryanko01': 1, 'nowitdi01': 1, 'nashst01': 2, 'dunca
 PRE_DPOY = {'howardw01': 1, 'garneke01': 1, 'cambyma01': 1, 'wallabe01': 4, 'artesro01': 1}
 
 
+ROWS, VOTES, STAND, NG = {}, {}, {}, {}      # filled by seasons_data(): every row, the votes, standings a season
+
+
 def seasons_data():
     """races by award: {award: [(season, rows list of dicts, order list of row indices)]}"""
     seen = set()
@@ -125,6 +133,7 @@ def seasons_data():
             wp = sum(st.get(t, {'wp': .5})['wp'] * g for t, g in tms) / gt
             seed1 = max((1.0 if st.get(t, {}).get('seed') == 1 else 0.0) for t, _ in tms)
             row = {'id': pid, 'n': r['n'], 'tm': r['tm'], 'pos': r.get('pos', ''), 'g': p['games'], 'mp': r['mp'],
+                   'gs': p.get('games_started', 0), 'age': r.get('age') or 0, 'sxpm': r.get('sxpm', r.get('xpm', 0)) or 0,
                    'vorx': r.get('vorx', 0) or 0, 'xpm': r.get('xpm', 0) or 0, 'dxpm': r.get('dxpm', 0) or 0,
                    'ppg': p['pts_per_g'], 'rpg': p['trb_per_g'], 'apg': p['ast_per_g'],
                    'stocks': p['stl_per_g'] + p['blk_per_g'], 'mpg': p['mp_per_g'],
@@ -133,6 +142,7 @@ def seasons_data():
                    'prev_mvp': prev['mvp'].get(pid, 0), 'prev_dpoy': prev['dpoy'].get(pid, 0),
                    'rookie': pid not in seen}
             rows.append(row)
+        ROWS[s], VOTES[s], STAND[s], NG[s] = rows, v, st, n_games
         for aw, pool_min in (('mvp', 1200), ('dpoy', 1200), ('roy', 500)):
             pool = [r for r in rows if r['mp'] >= pool_min and (aw != 'roy' or r['rookie'])]
             ids = [r['id'] for r in pool]
@@ -145,3 +155,96 @@ def seasons_data():
             if v[aw]: prev[aw][v[aw][0][0]] = prev[aw].get(v[aw][0][0], 0) + 1
         seen |= set(X)
     return races
+
+
+# ---------------------------------------------------------------- races added Nov 23 2026 (scripts/awards_bball.py)
+SMOY_COLS = ['vorx', 'xpm', 'ppg', 'mpg', 'wp', 'gfrac']
+MIP_COLS = ['d_vorx', 'd_ppg', 'vorx', 'ppg', 'd_mpg', 'wp', 'gfrac']
+ALLDEF_COLS = ['dxpm', 'stocks', 'rpg', 'big', 'wp', 'mpg', 'gfrac', 'prev_alldef']
+ALLROOK_COLS = ['vorx', 'xpm', 'ppg', 'mpg', 'gfrac', 'wp']
+COY_COLS = ['wp', 'd_wp', 'ovr', 'seed1']
+ALLDEF_K = ALLROOK_K = 10
+
+
+def named(season, tid, col):
+    """bbref ids named to an all-league team (All-Defensive, All-Rookie): first team first, by voting points inside"""
+    h = fetch(f'nba_awards_{season}.html', f'https://www.basketball-reference.com/awards/awards_{season}.html')
+    rows = [(int((r.get(col) or '9')[0]), -f(r.get('points_won')), r['_id'])
+            for r in table(h, tid) if r.get('_id') and (r.get(col) or '')[:1] in '12' and r.get(col)]
+    return [i for _, _, i in sorted(rows)]
+
+
+def preseason_ou(season):
+    """{team: preseason over/under wins} from Basketball-Reference's preseason odds page (set before opening night)"""
+    h = fetch(f'nba_odds_{season}.html', f'https://www.basketball-reference.com/leagues/NBA_{season}_preseason_odds.html')
+    out = {}
+    for r in table(h, 'NBA_preseason_odds'):
+        t = r.get('_tm')
+        ou = re.match(r'\s*([\d.]+)', r.get('over_under') or r.get('wins_ou') or '')
+        if t and ou: out[t] = float(ou.group(1))
+    return out
+
+
+def _order(pool, ids):
+    at = {r['id']: i for i, r in enumerate(pool)}
+    return [at[i] for i in ids if i in at]
+
+
+def annotate(s, rows):
+    """last season's line on each row (the driver tests' preseason terms and MIP's baseline): pre_vorx, pre_sxpm,
+    pre_dxpm from last season's published XPM file, d_vorx / d_ppg / d_mpg, last season's vote shares"""
+    last = xpm(s - 1)
+    pg0 = per_game(s - 1)
+    sh0 = VOTES.get(s - 1) or votes(s - 1)
+    for r in rows:
+        q, p0 = last.get(r['id']), pg0.get(r['id'])
+        r['has_pre'] = q is not None and p0 is not None
+        r['pre_vorx'] = (q or {}).get('vorx', 0) or 0
+        r['pre_sxpm'] = (q.get('sxpm', q.get('xpm', -2)) or 0) if q else -2.0
+        r['pre_dxpm'] = (q or {}).get('dxpm', 0) or 0
+        r['d_vorx'] = r['vorx'] - r['pre_vorx']
+        r['d_ppg'] = r['ppg'] - (p0 or {}).get('pts_per_g', 0)
+        r['d_mpg'] = r['mpg'] - (p0 or {}).get('mp_per_g', 0)
+        for aw in ('mvp', 'dpoy', 'smoy'):
+            r['prev_share_' + aw] = dict(sh0.get(aw, [])).get(r['id'], 0.0)
+
+
+def more_races():
+    """{award: [(season, pool rows, order)]} for smoy, mip, alldef, allrookie, coy, plus prev counts for alldef. Every
+    row carries last season's line (pre_*) and vote shares (prev_share_*) for the driver tests."""
+    seasons_data()
+    out = {k: [] for k in ('smoy', 'mip', 'alldef', 'allrookie', 'coy')}
+    prev_ad = {}
+    for s in sorted(ROWS):
+        rows, v, st = ROWS[s], VOTES[s], STAND[s]
+        annotate(s, rows)
+        for r in rows:
+            r['prev_alldef'] = prev_ad.get(r['id'], 0)
+        bench = [r for r in rows if r['mp'] >= 500 and r['gs'] < r['g'] / 2]
+        out['smoy'].append((s, bench, _order(bench, [i for i, _ in v.get('smoy', [])])))
+        if s > FIRST:
+            mip = [r for r in rows if r['mp'] >= 1000 and r['has_pre']]
+            out['mip'].append((s, mip, _order(mip, [i for i, _ in v.get('mip', [])])))
+        ad = [r for r in rows if r['mp'] >= 1200]
+        nm = named(s, 'leading_all_defense', 'all_defense_team')
+        miss = [i for i in nm if i not in {r['id'] for r in ad}]
+        if miss: print('nba', s, 'all-defensive named outside pool', miss)
+        out['alldef'].append((s, ad, _order(ad, nm)))
+        for i in nm: prev_ad[i] = prev_ad.get(i, 0) + 1
+        if s >= FIRST + 2:
+            rk = [r for r in rows if r['rookie'] and r['mp'] >= 300]
+            nm = named(s, 'leading_all_rookie', 'all_rookie_team')
+            miss = [i for i in nm if i not in {r['id'] for r in rk}]
+            if miss: print('nba', s, 'all-rookie named outside pool', miss)
+            out['allrookie'].append((s, rk, _order(rk, nm)))
+        st0 = STAND.get(s - 1) or standings(s - 1)
+        ou = preseason_ou(s)
+        teams = []
+        g = {2012: 66, 2021: 72}.get(s, 82)                # the scheduled season the line was set on
+        for t, x in st.items():
+            pre = st0.get(t, {}).get('wp', .5)
+            teams.append({'id': t, 'n': t, 'tm': t, 'wp': x['wp'], 'd_wp': x['wp'] - pre, 'pre_wp': pre,
+                          'seed1': 1.0 if x['seed'] == 1 else 0.0,
+                          'ovr': x['wp'] - (ou[t] / g if t in ou else pre), 'has_ou': t in ou})
+        out['coy'].append((s, teams, _order(teams, [t for t, _ in v.get('coy', [])])))
+    return out, prev_ad
