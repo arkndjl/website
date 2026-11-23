@@ -93,6 +93,54 @@
 </div>
 {{- end }}
 
+{{- else if eq $part "player" }}
+{{- /* one player's division ranks after each finished regular season (LAURSEN_111 stats tab): top 10 or top 5% on
+       any stat is an honor; rows for every season he made the division's eligible pool */ -}}
+{{- $who := .Get "name" | default $me }}
+{{- $cols := slice (slice "rwa" "RWA") (slice "ark" "ARK") (slice "adr" "ADR") (slice "kd" "K/D") (slice "kpr" "KPR") (slice "hs" "HS%") }}
+{{- $rows := slice }}{{ $hon := slice }}{{ $lead := 0 }}{{ $best := 0 }}
+{{- range $D.seasons }}{{ $s := . }}{{ if .rsDone }}{{ range .players }}{{ if and (eq .name $who) .rwaR }}{{ $p := . }}
+  {{- $rows = $rows | append (dict "s" $s "p" $p) }}
+  {{- if or (eq $best 0) (lt (int $p.rwaR) $best) }}{{ $best = int $p.rwaR }}{{ end }}
+  {{- range $cols }}{{ $r := index $p (printf "%sR" (index . 0)) }}{{ if $r }}{{ if eq (int $r) 1 }}{{ $lead = add $lead 1 }}{{ end }}
+    {{- if or (le (int $r) 10) (le (mul (int $r) 20) (int $s.pool)) }}{{ $hon = $hon | append (dict "s" $s.season "div" $s.div "pool" $s.pool "r" (int $r) "k" (index . 1) "at" $s.end) }}{{ end }}{{ end }}{{ end }}
+{{- end }}{{ end }}{{ end }}{{ end }}
+{{- with $rows }}
+<div class="win n1m{{ with $.Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>esea_division_ranks.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <ul class="esea__tiles n1m__tiles">
+    <li><span class="esea__v">{{ len $rows }}</span><span class="esea__k">seasons</span></li>
+    <li><span class="esea__v">#{{ $best }}</span><span class="esea__k" title="best RWA rank in the division">best RWA</span></li>
+    <li><span class="esea__v">{{ len $hon }}</span><span class="esea__k" title="division top 10 or top 5% on RWA, ARK, ADR, K/D, KPR or HS%">top finishes</span></li>
+    <li><span class="esea__v">{{ $lead }}</span><span class="esea__k">stat titles</span></li>
+  </ul>
+  <div class="n1m__tbl">
+  <table class="cfb__table">
+    <thead><tr><th>Season</th><th>Division</th><th>Maps</th>{{ range $cols }}<th title="rank in the division (players with 40% of the most-played player's maps)">{{ index . 1 }}</th>{{ end }}</tr></thead>
+    <tbody>
+    {{- range $rows }}{{ $s := .s }}{{ $p := .p }}
+    <tr><td>S{{ $s.season }}</td><td>{{ $s.div }}<span class="n1m__rk">{{ $s.pool }} players</span></td><td class="cfb__num">{{ $p.maps }}</td>
+      {{- range $cols }}{{ $k := index . 0 }}{{ $r := index $p (printf "%sR" $k) }}{{ $v := index $p $k }}
+      <td class="cfb__num">{{ with $r }}{{ $top := or (le (int .) 10) (le (mul (int .) 20) (int $s.pool)) }}<span class="{{ if $top }}n1m__up{{ end }}">{{ if $top }}<b>#{{ . }}</b>{{ else }}#{{ . }}{{ end }}</span>{{ else }}—{{ end }}<span class="n1m__rk">{{ if ne $v nil }}{{ if eq $k "rwa" }}{{ partial "num.html" (slice "%+.1f" (float $v)) }}{{ else if eq $k "ark" }}{{ partial "num.html" (slice "%.2f" (float $v)) }}{{ else }}{{ $v }}{{ end }}{{ end }}</span></td>
+      {{- end }}</tr>
+    {{- end }}
+    </tbody>
+  </table>
+  </div>
+  {{- with $hon }}
+  <ol class="n1m__log">
+    {{- range sort . "s" "desc" }}
+    <li><span class="cfb__num">{{ with .at }}{{ (time.In "America/New_York" (time (int (div . 1000)))).Format "Jan 2006" }}{{ end }}</span><span class="esea__k">S{{ .s }}</span><i class="n1m__dot {{ if eq .r 1 }}is-po{{ else }}is-player{{ end }}" aria-hidden="true"></i><span>{{ if eq .r 1 }}Division leader{{ else }}#{{ .r }}{{ end }} · {{ .k }} · {{ .div }} ({{ .pool }})</span></li>
+    {{- end }}
+  </ol>
+  {{- end }}
+  <div class="win__status"><span title="ESEA League regular seasons, after each ends; ranks vs every division player with 40% of the most-played player's maps; highlighted = top 10 or top 5%">ESEA division ranks · {{ $who }} · FACEIT</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end }}
+
 {{- else if eq $part "ranks" }}
 {{- $cols := slice (slice "rwa" "RWA" "round win % added per round, that season's league maps; 0 = average Main player") (slice "ark" "ARK" "ARK Rating, that season") (slice "adr" "ADR" "average damage a round") (slice "kd" "K/D" "kills per death") (slice "kpr" "KPR" "kills a round") (slice "hs" "HS%" "headshot share of kills") }}
 <div class="win n1m n1m--ranks{{ with .Get "class" }} {{ . }}{{ end }}">
