@@ -1,17 +1,17 @@
 {
- "asof": "2026-11-22T18:41:53Z",
+ "asof": "2026-11-23T00:09:04Z",
  "sport": "nba",
  "season": 2027,
  "loss": "abs margin error",
- "n": 241,
+ "n": 242,
  "logged": 273,
  "expectFrom": "walk-forward 2022-2026, same calendar month, lined games",
- "model": 11.4033,
- "expected": 10.177,
- "z": -0.15,
- "line": 10.998,
- "lineN": 241,
- "modelAtLine": 11.4033,
+ "model": 11.4045,
+ "expected": 10.1766,
+ "z": -0.151,
+ "line": 11.0,
+ "lineN": 242,
+ "modelAtLine": 11.4045,
  "byMonth": [
   {
    "month": "oct",
@@ -21,25 +21,25 @@
   },
   {
    "month": "nov",
-   "n": 157,
-   "model": 11.0631,
+   "n": 158,
+   "model": 11.0671,
    "expected": 10.0779
   }
  ],
  "test": {
-  "n": 241,
-  "window": 241,
-  "mean": -0.1504,
-  "t": -2.04,
-  "p": 0.025,
-  "days": 32,
+  "n": 242,
+  "window": 242,
+  "mean": -0.1506,
+  "t": -2.05,
+  "p": 0.0242,
+  "days": 33,
   "sd": 1.0,
-  "cusum": 0.04,
+  "cusum": 0.0,
   "cusumMax": 11.02,
   "h": 10.0,
   "stop": true,
-  "why": "last 241 worth t -2.04 at the close"
+  "why": "last 242 worth t -2.05 at the close"
  },
  "status": "alarm",
- "why": "last 241 worth t -2.04 at the close"
+ "why": "last 242 worth t -2.05 at the close"
 }
