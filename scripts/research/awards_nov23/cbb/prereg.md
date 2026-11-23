@@ -46,3 +46,11 @@ season (no FV, no board input: bpm, ppg, wp, barthag, mpg, p5 only; clipped at l
 Second candidate awd_any = ln of the sum of his held-out P over Wooden + his position award. Gate: the existing FV
 driver gate (scripts/cbb_fv_sweep2/3: 2009-16 boards out of fold under the three fold rules, held 2017-19, forward
 2020-23). Ship only on a pass.
+
+## Amendment (before any model was fit; after the first pool check)
+
+The first pool check (winners vs pools, no model run) left 9 position-award winners outside their role pool
+(Barttorvik's role is a style, not the listed position; 2008-09 have no role at all). Changes: missing role from height
+(<= 76 in -> Combo G, >= 81 in -> PF/C, else Wing F) when the guard / big flags are 0; pools widened to adjacent roles:
+West + Wing F; Erving + Combo G; Malone + C. Jakob Poeltl / Pöltl added to data/name_aliases.json. Denzel Valentine
+(Erving 2016, Pure PG) stays outside.
