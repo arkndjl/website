@@ -231,6 +231,55 @@ class Bo3:
         return self._tid.get(k)
 
 
+_ROS = {}
+
+
+def map_rosters():
+    """bo3 game id -> {bo3 team id: [nick, ...]} from the per-map player stats (scripts/cs2_pstats.py), cached."""
+    if not _ROS:
+        for f in sorted((ROOT / "scripts" / "data" / "cs2_pstats").glob("*.json.gz")):
+            d = json.load(gzip.open(f))
+            c = {k: i for i, k in enumerate(d["cols"])}
+            for r in d["rows"]:
+                _ROS.setdefault(r[c["g"]], defaultdict(list))[r[c["t"]]].append(r[c["nick"]])
+    return _ROS
+
+
+def lowtier(bo3, series, tiers):
+    """bo3.gg matches that join no Valve series, as extra series rows for the player Elo (scripts/cs2_model.replay):
+    tier in `tiers`, since 2024, 1+ finished map, both sides with 4+ players in the map stats (each side's five = most
+    maps in the match), nicks in Valve's spelling where names.key agrees. Row source "bo3" (updated, never scored).
+    scripts/cs2_lowtier_research.py, Nov 23 2026: held t by month -4.2 with the RWA term, 14/17 months, top 50 even."""
+    import names
+    ros = map_rosters()
+    vn = defaultdict(int)
+    for r in series:
+        for x in (r[4] or []) + (r[5] or []):
+            vn[x] += 1
+    vkey = {}
+    for n in sorted(vn, key=lambda n: -vn[n]):
+        vkey.setdefault(names.key(n), n)
+    used = {m[0] for m in bo3.joined.values()}
+    out = []
+    for m in bo3.mt.values():
+        if m[0] in used or m[6] is None or m[1][:10] < "2024-01-01" or m[10] not in tiers:
+            continue
+        gs = [g for g in bo3.maps.get(m[0], []) if real_map(g)]
+        if not gs:
+            continue
+        side = {}
+        for t in (m[2], m[3]):
+            c = defaultdict(int)
+            for g in gs:
+                for n in ros.get(g[0], {}).get(t, []):
+                    c[n] += 1
+            side[t] = [vkey.get(names.key(n), n) for n in sorted(c, key=lambda n: -c[n])[:5]]
+        if len(side[m[2]]) < 4 or len(side[m[3]]) < 4:
+            continue
+        out.append([m[1][:10], m[4], m[5], 0 if m[6] == m[2] else 1, side[m[2]], side[m[3]], "bo3", None])
+    return out
+
+
 def veto(da, pool, bo):
     """Greedy veto on map edges da[map] (A minus B, logits): ban your worst, pick your best; both orders.
     -> [maps played] for each order (Bo3: pick, pick, decider)."""

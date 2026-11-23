@@ -36,6 +36,10 @@ player rating's teammate prior (scripts/cs2_players.py), and Thunderpick's price
 Map chances on the map-win scale (Nov 2 2026, scripts/cs2_scale_research.py): TeamMaps' round-share logit is ~2.4x too
 flat as a map-win chance, but rescaling it before the veto / Bo3 maths moves held log loss -.00004 (t -1.0, 8/17 months):
 the blend weight absorbs the scale. Kept as is.
+Lower-tier matches (Nov 23 2026, scripts/cs2_lowtier_research.py): bo3.gg tier B/C/D matches that join no Valve series
+(8.4k since 2024, fives from the map stats) update the player Elo at K x kx .5, never scored. Held out with the RWA term
+.5522 -> .5459 (t by month -4.2, 14/17 months), top 50 even (+.0004). Liquipedia was not used: robots.txt bars
+/counterstrike/api.php for every agent and LiquipediaDB is Enterprise-only.
 The map pool and veto chances use c fit on Polymarket Map 1 prices instead (data/cs2_map_scale.json, c 1.82),
 which held out beat the outcome fit's 2.43 on Map 1 results (t -2.51 by day).
 """
@@ -74,7 +78,8 @@ TOP = 50
 RENAMED = {"gosh": "bcgame", "bb": "betboom", "theone": "1win"}
 SHARED = 3
 DEF = {"K": 480, "Kmin": 144, "n0": 100, "mu_new": -100, "Kr": 8, "warm": 1.0, "kmap": 0.6, "span": 0.4,
-       "valid": 1}  # valid: only maps played to the end (13+ rounds) update on round share (forfeits are listed 1-0)
+       "valid": 1,  # valid: only maps played to the end (13+ rounds) update on round share (forfeits are listed 1-0)
+       "kx": 0.5, "xt": "bcd"}  # lower-tier bo3.gg matches with no Valve series update the players at K x kx (Nov 23)
 OLD = {"K": 160, "Kmin": 32, "n0": 100, "mu_new": -100, "Kr": 8, "warm": 1.0}  # the Oct 26 series-level model
 
 
@@ -144,6 +149,15 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
     snaps: ISO dates; the state before the first series on or after each is kept in state["snaps"] (cs2_events)."""
     warm = {} if ignore_warm else warm_start(p)
     tview, tm = {}, None
+    orig = list(range(len(series)))  # combined index -> index in `series` (None: a bo3.gg-only lower-tier match)
+    if bo3 is not None and p.get("kx"):
+        bo3.join(series)
+        ext = cs2_bo3.lowtier(bo3, series, set(p.get("xt", "bcd")))
+        bo3.alias = {}  # the combined join learns its own aliases from scratch (join() starts from the current ones)
+        comb = sorted([(r[0], 0, i, r) for i, r in enumerate(series)] + [(r[0], 1, None, r) for r in ext],
+                      key=lambda z: z[:2])  # Valve rows first within a day
+        orig = [z[2] for z in comb]
+        series = [z[3] for z in comb]
     if bo3 is not None:
         bo3.valid_only = bool(p.get("valid"))
         joined = bo3.join(series)
@@ -194,12 +208,15 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
             t = tview[i][0] if bo3.k(tview[i][1]) == ka else -tview[i][0]
         jm = bo3.joined.get(i) if bo3 is not None else None
         both = (ra or []) + (rb or [])
-        rows.append({"i": i, "d": d, "a": ka, "b": kb, "x": (sa - sb) / 400,
-                     "v": ((va[1] if va else 400) - (vb[1] if vb else 400)) / 400, "t": t,
-                     "top": bool(va and vb and va[0] <= TOP and vb[0] <= TOP), "s": s, "r": r,
-                     "bo": (jm[9] if jm else 0) or 0, "tier": jm[10] if jm else None,
-                     "u": sum(math.exp(-pn[q] / p["n0"]) for q in both) / len(both) if both else 1.0})
+        if orig[i] is not None:
+            rows.append({"i": orig[i], "d": d, "a": ka, "b": kb, "x": (sa - sb) / 400,
+                         "v": ((va[1] if va else 400) - (vb[1] if vb else 400)) / 400, "t": t,
+                         "top": bool(va and vb and va[0] <= TOP and vb[0] <= TOP), "s": s, "r": r,
+                         "bo": (jm[9] if jm else 0) or 0, "tier": jm[10] if jm else None,
+                         "u": sum(math.exp(-pn[q] / p["n0"]) for q in both) / len(both) if both else 1.0})
         kt = p.get("ktier", 1.0) if jm and jm[10] in ("s", "a") else 1.0
+        if r[6] == "bo3":  # a bo3.gg-only match (no Valve series): updates only, K x kx
+            kt *= p.get("kx", 1.0)
         team[ka] = team.get(ka, p["mu_new"]) + 32 * (s - e)
         team[kb] = team.get(kb, p["mu_new"]) - 32 * (s - e)
         if p["Kr"] and rga and rgb and rga != rgb:
@@ -221,7 +238,11 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
             for q in ros or []:
                 pn[q] += 1
         for k, ros, rg in ((ka, ra, rga), (kb, rb, rgb)):
-            hist[k].append((d, tr(ros, k) + (roff[rg] if rg else 0)))
+            if orig[i] is not None:
+                hist[k].append((d, tr(ros, k) + (roff[rg] if rg else 0)))
+    if bo3 is not None:  # joins keyed by the caller's series index, as before
+        bo3.joined_all = bo3.joined
+        bo3.joined = {orig[i]: m for i, m in bo3.joined.items() if orig[i] is not None}
     for w in want:
         kept[w] = {"pl": dict(pl), "lastros": dict(lastros), "roff": dict(roff), "team": dict(team)}
     return rows, {"pl": pl, "pn": pn, "lastros": lastros, "roff": dict(roff), "team": team, "hist": hist, "tm": tm,
