@@ -38,6 +38,7 @@ draft = false
 {{< esea part="daily" class="desk__wide" >}}
 {{< esea part="pugs" class="desk__wide" >}}
 {{< esea part="split" class="desk__wide" >}}
+{{< n1miles part="player" name="LAURSEN_111" class="desk__wide" >}}
 {{< /desk >}}
 {{< /wintabs >}}
 {{< /lzhub >}}

@@ -308,12 +308,28 @@ def run(sp):
                          nt=round(c['nt'], 2), ct=round(c['ct'], 2), co=round(c['co'], 1), sc=round(c['score'], 1),
                          rt=round(c['score'] / (c['n'] + kc), 2), hof=key(cid) in hof))
     test.update(cut=wf[-1]['cut'], rScore=wf[-1]['wax']['score']['r'], rWpct=wf[-1]['wax']['wpct']['r'])
+    test['era'] = era_check([(c['score'], (c['first'] + c['last']) / 2, c['n']) for _, c in ranked])
+    test['eraRate'] = era_check([(c['score'] / (c['n'] + kc), (c['first'] + c['last']) / 2, 1) for _, c in ranked])
     first = min(r['y'] for r in S.rows)
     print(sp, json.dumps({k: v for k, v in test.items() if k != 'walkForward'}))
     for w in wf: print(' wf', w['cut'], {k: (v['r'], v['n']) for k, v in w['wax'].items()}, 'titles', {k: v['r'] for k, v in w['titles'].items()})
     for r in rows[:30]: print(' ', r['c'], r['s'], r['y0'], r['y1'], r['n'], r['wax'], r['war'], r['nt'], r['ct'], r['co'], r['sc'])
     return dict(rows=rows, test=test, R0=R0, lamN=lamN, lamC=lamC, coordW=coordW, kc=kc, from_=first, to=LAST[sp],
                 minN=MIN_N, top=TOP)
+
+
+def era_check(SC, n=100):
+    """era check of the ranking (Nov 23, as scripts/alltime.py): SC = (score, mid-career year, seasons). KL of the top n
+    coaches' mid-career decades vs the ranked coaches' seasons by decade (a career total grows with seasons, so a decade's
+    expected share of the top is its share of coached seasons), and the era-blind 95% line (alltime.null95 on that base)"""
+    from collections import Counter
+    import alltime
+    base = Counter()
+    for _, m, k in SC: base[int(m // 10 * 10)] += k
+    tot = sum(base.values())
+    c = Counter(int(m // 10 * 10) for _, m, _ in sorted(SC, key=lambda t: -t[0])[:n])
+    return [round(sum((c[d] / n) * math.log((c[d] / n) / (base[d] / tot)) for d in c), 3), round(alltime.null95(base, n), 3),
+            {d: c[d] for d in sorted(base)}, {d: round(n * base[d] / tot, 1) for d in sorted(base)}]
 
 
 def main():

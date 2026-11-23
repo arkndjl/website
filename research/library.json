@@ -1568,6 +1568,36 @@
      ]
     },
     {
+     "term": "All-time teams and players",
+     "short": "Best team-seasons (overall, offense, defense) and best player seasons and careers in each sport, each season measured against its own league. One sport at a time: no cross-sport scale.",
+     "body": [
+      "Rtg+ / Off+ / Def+ = 100 + 25 z (the Stat+ scale): z = (rating - that season's league mean) / s, s = the upper semi-deviation x sqrt 2, sqrt(2 x mean of max(rating - mean, 0)^2), pooled over the season and the two either side (Nov 23 2026; was the SD). s equals the SD in a symmetric season but is not stretched by a long bottom tail: a 0-points-allowed floor in low-scoring eras, blowout losers, a wide spread of weak programs. 100 = an average team that season; 125 = one s better; 175 = three.",
+      "Why z and not raw points: scoring levels and the spread between the best and worst teams change by era (fewer, deeper leagues; 1900s college blowouts; dead-ball hockey). Dominance over the league you played in is the comparable quantity; the raw rating is shown beside it.",
+      "Team ratings: CFB ridge SRS on every major-college game (margin capped at 35, home edge, offense / defense the same ridge on capped points; jhowell.net scores 1900-2025); NFL the same ridge on every NFL, AFL and AAFC game including playoffs (FiveThirtyEight scores to 1998, nflverse from 1999; 1920-2025); CBB Sports Reference SRS / OSRS / DSRS (1950-2026); NBA Basketball Reference SRS, ORtg and DRtg against the league average (1947-2026; off / def from 1951-52); NHL Hockey Reference SRS, goals for / against a game against the league + half the SOS (1918-2026, no 2004-05); soccer big-five clubs, goals a match vs the big-five average at season end (2005-2026); CS2 best Valve VRS points in a calendar year, each snapshot's top 50 as the league (2024-2026).",
+      "Lists: the top 250 plus the top 25 of every decade, so the Era filter shows each decade's best. CH = champion (CFB national title share, NFL league / Super Bowl winner).",
+      "Era check: share of the top 100 by decade against the decade's share of all rows, KL divergence (0 = every decade represented by its size), era-adjusted vs raw, and the line = the 95th percentile of the KL when the top 100 are drawn era-blind (4,000 multinomial draws on the decade shares); pass = adjusted under the line. Player lists count each player's best season once (one player's run, such as Gretzky's eight 1980s seasons, is not an era); hockey prospects are binned by draft class (5 years). Teams: CFB 0.042 vs 0.319 (line 0.107); CFB 0.030 vs 0.099 (line 0.107) offense; CFB 0.090 vs 0.554 (line 0.107) defense; NFL 0.019 vs 0.209 (line 0.093); NFL 0.025 vs 0.078 (line 0.093) offense; NFL 0.024 vs 0.206 (line 0.093) defense; CBB 0.042 vs 0.115 (line 0.070); CBB 0.017 vs 0.183 (line 0.070) offense; CBB 0.038 vs 0.104 (line 0.070) defense; NBA 0.023 vs 0.022 (line 0.078); NBA 0.008 vs 0.090 (line 0.071) offense; NBA 0.014 vs 0.066 (line 0.071) defense; NHL 0.024 vs 0.384 (line 0.100); NHL 0.030 vs 0.221 (line 0.100) offense; NHL 0.041 vs 0.294 (line 0.100) defense; soccer 0.002 vs 0.078 (line 0.029); soccer 0.002 vs 0.142 (line 0.029) offense; soccer 0.023 vs 0.056 (line 0.029) defense; CS2 0.000 vs 0.000.",
+      "Players: peak seasons = every player-season ranked on its own (one player can hold several rows), career = sum of seasons, each season valued over replacement in its own league and scaled to a full season where seasons were short.",
+      "NBA: VORX per 82 games (XPM: DPM + BPM blend from 2009-10, BPM before); before 1973-74 BPM is estimated from WS/48 and PER (fit on 1974-85 players with 500+ minutes, r 0.90; tagged est); minutes start 1951-52. NHL: point shares per 82 games (Hockey Reference; skaters OPS + DPS, goalies GPS). CBB: the site's CBB WAR on every Barttorvik season from 2007-08. NFL: peak = the site's AV WAR (rebuilt AV, no special teams) from 2012 (snap counts); career = Pro Football Reference weighted career AV (nflverse draft_picks; drafted players 1980 on). Soccer: the site's GAR, big-five seasons from 2014-15.",
+      "Tennis: Elo on every tour-level singles match 1968 on (Sackmann archive; K = 250 / (matches + 5)^0.4, Slams x 1.1). Elo+ = 100 + 25 x (peak Elo that year - the year's #20 year-end Elo) / SD of the year's top 100; peak counts after 40 career matches. Career = sum over years (20+ matches) of the year-end Elo over the #20 line in those SDs.",
+      "Era adjustment (rate + volume, Nov 20 2026): a season's rate is set against that season's regulars, rate' = mean_ref + SD_ref x (rate - season mean) / season SD (SD pooled over the season and two either side), and its volume against that season's load, vol' = vol x q_ref / q_season (q = 90th percentile of the regulars' volume); the sport's own value formula then runs on rate' and vol'. _ref = the mean over the last 10 seasons, so values read in today's units. Unadj = as played.",
+      "Per sport. NBA: rate XPM, volume minutes per 82 team games, VORX = .030 x (XPM' + 1.4) x min' / 48 (BPM is per 100 possessions, so pace and the 3-point era are in the rate; the volume term takes out 45-minute 1960s loads). NHL: WAR per 82 against the season, skaters and goalies apart (no ice time before 2008-09, so no volume term). CBB: rate BPM (regulars 400+ min), volume minutes (short 2020-21 season scaled up). Soccer: rate GAR per 90 (regulars 900+ min), volume minutes. CS2: calendar years 2024 on, rate RWA over that year's replacement (median of 1,000+ round players; opponents at their year-end ratings), volume rounds (current year to date scaled to a full year), RAR = RWA' x rounds' / 100. Hockey prospects: drafted skaters' seasons outside the NHL (20+ games, ages 16-21), NHLe+ = 100 + 25 z of log(NHLe + 5) against drafted skaters of the same age and position that season. Tennis: Elo against the year's #20 in SDs of the year's top 100 is already a rate against the season; no volume term (peak Elo).",
+      "NFL WAR seasons (Nov 23 2026): rosters grew (1,734 WAR rows in 2013, 2,055 in 2021) and the top thinned, so each season's WAR is set against that season's starters at the position (the top k by WAR, k = the position's share of rows x 704 = 32 teams x 22 starters) in the last 10 seasons' units. CFB QB and RB / WR / TE Yds+: the over-average value is multiplied by the last 10 seasons' SD over the season's SD (pooled over the season and two either side; QBs: TAY/P of qualified passers, skill: AY of the season's starters at the position).",
+      "Player era check (peak list, KL as above, adjusted vs as played): CFB RB / WR / TE 0.014 vs 0.041 (line 0.031); NFL 0.012 vs 0.023 (line 0.019); CBB 0.001 vs 0.020 (line 0.029); NBA 0.044 vs 0.176 (line 0.071); NHL 0.024 vs 0.706 (line 0.100); hockey prospects 0.026 vs 0.018 (line 0.039); soccer 0.003 vs 0.008 (line 0.020); CS2 0.000; ATP 0.049 (line 0.064); WTA 0.061 (line 0.063); CFB QBs 0.009 vs 0.015 (line 0.030); NFL QBs 0.000 vs 0.004 (line 0.019).",
+      "Display only; no model reads these lists."
+     ],
+     "where": "all-time tab (teams group: all-time teams, offenses, defenses) and all-time players tab (players group: peak seasons, careers) on the CFB, CBB, NFL, NBA, NHL and soccer pages; tennis all-time (ATP / WTA peaks and careers); CS2 all-time teams + all-time players; hockey prospects peak seasons",
+     "sports": [
+      "CFB",
+      "CBB",
+      "NFL",
+      "NBA",
+      "NHL",
+      "Soccer",
+      "Tennis",
+      "CS2"
+     ]
+    },
+    {
      "term": "All-time coaches",
      "short": "Head coaches ranked by Score, in wins: value over what the program does with other coaches, plus titles weighted the way the Halls of Fame weigh them.",
      "body": [
@@ -1588,7 +1618,8 @@
       "NBA / NHL tests: Hall of Fame AUC Score 0.96 / 0.89 vs raw wins 0.85 / 0.66; movers r 0.17 (n 100, t 1.75) / 0.15 (n 89, t 1.4); walk-forward from 2010: shrunk WAx to next-10 WAx r -0.07 / -0.14 (win% 0.03 / -0.11), Score per season to next-10 title equity r 0.52 / -0.12 (win% 0.36 / 0.02); split-half 0.74 / 0.86.",
       "NFL: the same method on the all-time teams' ridge points a game (NFL, AFL and AAFC, 1920-2025), a 17-game season, the franchise as the program (one id through relocations); head coaches and their own records from pro-football-history.com, an in-season change split by games. League title = national title; a title-game season (conference championship, the league title game before the merger) = conference title.",
       "NFL replacement level 2.12 wins a season; Score = cWAR + 0 a title + 194.4 a title-game season (Pro Football Hall of Fame coaches 21/65; coaches inducted as players are left out of the fit). Coordinator seasons carry nothing into head-coaching WAx (slope .01, t .07, 94 coaches), so there is no coordinator term.",
-      "NFL tests: Hall of Fame AUC Score 0.88 vs raw wins 0.78; movers r 0.25 (n 75, t 2.21); walk-forward from 2010: shrunk WAx to next-10 WAx r 0.41 (win% 0.25), Score per season to next-10 title equity r 0.39 (win% 0.27); split-half 0.71."
+      "NFL tests: Hall of Fame AUC Score 0.88 vs raw wins 0.78; movers r 0.25 (n 75, t 2.21); walk-forward from 2010: shrunk WAx to next-10 WAx r 0.41 (win% 0.25), Score per season to next-10 title equity r 0.39 (win% 0.27); split-half 0.71.",
+      "Era check (Nov 23 2026): mid-career decades of the top 100 by Score vs every ranked coach's coached seasons by decade (a career total grows with seasons), KL, and the era-blind 95% line (top 100 drawn at random); per-season Score rate vs coaches by decade: CFB 0.066 (line 0.108), rate 0.086 (line 0.108); CBB 0.077 (line 0.077), rate 0.037 (line 0.078); NBA 0.030 (line 0.075), rate 0.019 (line 0.077); NHL 0.023 (line 0.094), rate 0.019 (line 0.095); NFL 0.009 (line 0.095), rate 0.013 (line 0.093)."
      ],
      "where": "all-time coaches tab on the CFB and CBB pages (market group) and the NBA and NHL pages (teams group); NFL page (teams group, all-time)",
      "sports": [
@@ -1597,35 +1628,6 @@
       "NBA",
       "NHL",
       "NFL"
-     ]
-    },
-    {
-     "term": "All-time teams and players",
-     "short": "Best team-seasons (overall, offense, defense) and best player seasons and careers in each sport, each season measured against its own league. One sport at a time: no cross-sport scale.",
-     "body": [
-      "Rtg+ / Off+ / Def+ = 100 + 25 z (the Stat+ scale): z = (rating - that season's league mean) / SD, the SD pooled over the season and the two either side (ratings demeaned by season). 100 = an average team that season; 125 = one SD better; 175 = three.",
-      "Why z and not raw points: scoring levels and the spread between the best and worst teams change by era (fewer, deeper leagues; 1900s college blowouts; dead-ball hockey). Dominance over the league you played in is the comparable quantity; the raw rating is shown beside it.",
-      "Team ratings: CFB ridge SRS on every major-college game (margin capped at 35, home edge, offense / defense the same ridge on capped points; jhowell.net scores 1900-2025); NFL the same ridge on every NFL, AFL and AAFC game including playoffs (FiveThirtyEight scores to 1998, nflverse from 1999; 1920-2025); CBB Sports Reference SRS / OSRS / DSRS (1950-2026); NBA Basketball Reference SRS, ORtg and DRtg against the league average (1947-2026; off / def from 1951-52); NHL Hockey Reference SRS, goals for / against a game against the league + half the SOS (1918-2026, no 2004-05); soccer big-five clubs, goals a match vs the big-five average at season end (2005-2026); CS2 best Valve VRS points in a calendar year, each snapshot's top 50 as the league (2024-2026).",
-      "Lists: the top 250 plus the top 25 of every decade, so the Era filter shows each decade's best. CH = champion (CFB national title share, NFL league / Super Bowl winner).",
-      "Era check: share of the top 100 by decade against the decade's share of all team-seasons, KL divergence (0 = every decade represented by its size), era-adjusted vs raw: CFB 0.052 vs 0.319; NFL 0.022 vs 0.209; CBB 0.048 vs 0.115; NBA 0.051 vs 0.022; NHL 0.042 vs 0.384; soccer 0.008 vs 0.078; CS2 0.000 vs 0.000.",
-      "Players: peak seasons = every player-season ranked on its own (one player can hold several rows), career = sum of seasons, each season valued over replacement in its own league and scaled to a full season where seasons were short.",
-      "NBA: VORX per 82 games (XPM: DPM + BPM blend from 2009-10, BPM before); before 1973-74 BPM is estimated from WS/48 and PER (fit on 1974-85 players with 500+ minutes, r 0.90; tagged est); minutes start 1951-52. NHL: point shares per 82 games (Hockey Reference; skaters OPS + DPS, goalies GPS). CBB: the site's CBB WAR on every Barttorvik season from 2007-08. NFL: peak = the site's AV WAR (rebuilt AV, no special teams) from 2012 (snap counts); career = Pro Football Reference weighted career AV (nflverse draft_picks; drafted players 1980 on). Soccer: the site's GAR, big-five seasons from 2014-15.",
-      "Tennis: Elo on every tour-level singles match 1968 on (Sackmann archive; K = 250 / (matches + 5)^0.4, Slams x 1.1). Elo+ = 100 + 25 x (peak Elo that year - the year's #20 year-end Elo) / SD of the year's top 100; peak counts after 40 career matches. Career = sum over years (20+ matches) of the year-end Elo over the #20 line in those SDs.",
-      "Era adjustment (rate + volume, Nov 20 2026): a season's rate is set against that season's regulars, rate' = mean_ref + SD_ref x (rate - season mean) / season SD (SD pooled over the season and two either side), and its volume against that season's load, vol' = vol x q_ref / q_season (q = 90th percentile of the regulars' volume); the sport's own value formula then runs on rate' and vol'. _ref = the mean over the last 10 seasons, so values read in today's units. Unadj = as played.",
-      "Per sport. NBA: rate XPM, volume minutes per 82 team games, VORX = .030 x (XPM' + 1.4) x min' / 48 (BPM is per 100 possessions, so pace and the 3-point era are in the rate; the volume term takes out 45-minute 1960s loads). NHL: WAR per 82 against the season, skaters and goalies apart (no ice time before 2008-09, so no volume term). CBB: rate BPM (regulars 400+ min), volume minutes (short 2020-21 season scaled up). Soccer: rate GAR per 90 (regulars 900+ min), volume minutes. CS2: calendar years 2024 on, rate RWA over that year's replacement (median of 1,000+ round players; opponents at their year-end ratings), volume rounds (current year to date scaled to a full year), RAR = RWA' x rounds' / 100. Hockey prospects: drafted skaters' seasons outside the NHL (20+ games, ages 16-21), NHLe+ = 100 + 25 z of log(NHLe + 5) against drafted skaters of the same age and position that season. Tennis: Elo against the year's #20 in SDs of the year's top 100 is already a rate against the season; no volume term (peak Elo).",
-      "Player era check (peak list, KL as above, adjusted vs as played): NFL 0.036; CBB 0.000 vs 0.009; NBA 0.098 vs 0.120; NHL 0.133 vs 0.880; hockey prospects 0.048 vs 0.024; soccer 0.019; CS2 0.000; ATP 0.121; WTA 0.072.",
-      "Display only; no model reads these lists."
-     ],
-     "where": "all-time tab (teams group: all-time teams, offenses, defenses) and all-time players tab (players group: peak seasons, careers) on the CFB, CBB, NFL, NBA, NHL and soccer pages; tennis all-time (ATP / WTA peaks and careers); CS2 all-time teams + all-time players; hockey prospects peak seasons",
-     "sports": [
-      "CFB",
-      "CBB",
-      "NFL",
-      "NBA",
-      "NHL",
-      "Soccer",
-      "Tennis",
-      "CS2"
      ]
     }
    ]

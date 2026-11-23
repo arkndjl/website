@@ -92,6 +92,39 @@ def main():
         comps.setdefault(sn, [])
         if m['compName'] not in comps[sn]:
             comps[sn].append(m['compName'])
+    # forfeit wins and byes: FACEIT's team history leaves them out, the league archives keep them (regular season only;
+    # a playoff bye is no series)
+    seen = {m['id'] for m in H.get('matches') or []}
+    TEAM = H.get('team')
+    for f in ('research/esea_matches.json.gz', 'research/esea_div_backfill.json.gz'):
+        for m in (load(f, gz=True) or {}).get('matches') or []:
+            if m['id'] in seen or TEAM not in (m['f1']['id'], m['f2']['id']) or 'Regular' not in (m.get('stage') or ''):
+                continue
+            sn = int(m.get('season') or 0)
+            if sn not in by or (cur and sn >= cur) or m.get('winner') not in ('faction1', 'faction2'):
+                continue
+            seen.add(m['id'])
+            us = 'f1' if m['f1']['id'] == TEAM else 'f2'
+            opp = m['f2' if us == 'f1' else 'f1']
+            by[sn].append({'at': (m.get('at') or 0) * 1000, 'opp': 'bye' if opp['id'] == 'bye' else (opp.get('name') or 'TBD'),
+                           'res': 'W' if m['winner'] == ('faction1' if us == 'f1' else 'faction2') else 'L',
+                           'po': False, 'ff': True, 'bye': opp['id'] == 'bye', 'maps': []})
+    # a forfeit or bye neither list holds: FACEIT's final leaderboard (data/esea_milestones.json 'standings', fetched
+    # once per past regular season) is the record; pad the gap with unlisted forfeits so every window agrees
+    st = (load('data/esea_milestones.json') or {}).get('standings') or {}
+    for cid, name in (H.get('comps') or {}).items():
+        sm = re.search(r'\bS(\d{2})\b', name or '')
+        x = st.get(cid) or {}
+        if not sm or 'Regular Season' not in name or x.get('src') != 'faceit' or x.get('w') is None:
+            continue
+        sn = int(sm.group(1))
+        if sn not in by or (cur and sn >= cur):
+            continue
+        for res, n in (('W', x['w']), ('L', x['l'])):
+            have = sum(1 for m in by[sn] if not m['po'] and m['res'] == res)
+            last = max((m['at'] or 0 for m in by[sn] if not m['po']), default=0)
+            for _ in range(max(0, int(n) - have)):
+                by[sn].append({'at': last, 'opp': 'forfeit (unlisted)', 'res': res, 'po': False, 'ff': True, 'maps': []})
     past = D.get('seasons') or {}
     for sn, ms in by.items():
         ms.sort(key=lambda m: (m['po'], m['at'] or 0))
