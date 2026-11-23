@@ -65,6 +65,27 @@ NFL_FACE = 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/{}
 TM_FACE = 'https://img.a.transfermarkt.technology/portrait/medium/{}'
 
 
+def hw(ht, wt=None, cm=False):
+    """Ht / Wt for the context column: ('6-4 / 222', inches). ht as '6-4', 6' 8", inches, or cm (cm=True)."""
+    h = None
+    if isinstance(ht, (int, float)) and ht:
+        h = ht / 2.54 if cm else float(ht)
+    elif isinstance(ht, str):
+        m = re.match(r"\s*(\d)\s*(?:-|'|ft)\s*(\d{1,2}(?:\.\d+)?)", ht)
+        if m:
+            h = int(m.group(1)) * 12 + float(m.group(2))
+    try:
+        w = int(round(float(wt))) if wt not in (None, '', 0) else None
+    except (TypeError, ValueError):
+        w = None
+    if h is None and w is None:
+        return {}
+    hs = f"{int(h // 12)}-{int(round(h % 12)) if round(h % 12) < 12 else 11}" if h else '–'
+    if cm and h:
+        hs = f'{int(round(h * 2.54))} cm'
+    return {'hw': hs + (f' / {w}' if w else ''), 'hi': round(h, 1) if h else None}
+
+
 def logo(path):
     return path if path and os.path.exists(os.path.join(ROOT, 'static', path.lstrip('/'))) else None
 
@@ -242,7 +263,7 @@ def nba():
                    if p.get('age') and p.get('xpm') is not None else None,
                    'axpm': round(XP.role_sxpm(p, gms) + ak * (p['age'] - a0), 1) if p.get('age') and p.get('xpm') is not None else None,
                    'pre': dr[1] if dr else None, 'preL': (f'{dr[0]} #{dr[1]}' if dr[0] != S - 1 else f'#{dr[1]}') if dr else 'UDFA',
-                   'pfv': c['fv'] if c else None, 'sub': c['team'] if c else '',
+                   'pfv': c['fv'] if c else None, 'sub': c['team'] if c else '', **(hw(c.get('ht')) if c else {}),
                    'ph': ESPN_FACE.format('nba', p['ph']) if p.get('ph') else None, 'lo': logo(f"/img/nba/{p['tm'].lower()}.png")}
             q = pj.get(p['id']) if S == proj['season'] else None
             if S == proj['season']:
@@ -301,7 +322,7 @@ def nhl():
                 rows.append({'n': p['n'], 'tm': p['tm'], 'pos': p['pos'], 'age': p.get('ax', p.get('age')), 'war': p['war'], 'pwar': p.get('pwar'),
                              'hpm': p.get('hpm'), 'toi': p['toi'], 'gp': p['gp'], 'pts': p.get('pts'), 'gsax': p.get('gsax'),
                              'pre': r['pick'] if r else None, 'preL': f"{r['year']} #{r['pick']}" if r else 'undrafted',
-                             'pfv': fv, 'sub': '', 'ph': ESPN_FACE.format('nhl', p['ph']) if p.get('ph') else None,
+                             'pfv': fv, 'sub': '', **(hw(r.get('ht'), r.get('wt')) if r else {}), 'ph': ESPN_FACE.format('nhl', p['ph']) if p.get('ph') else None,
                              'lo': logo(f"/img/nhl/{p['tm'].lower()}.png")})
             seasons.append({'s': S, 'l': d['label'], 'rows': rows, 'games': d.get('games')})
         for p in d['players']:
@@ -448,7 +469,7 @@ def cfb():
     def cpts(r, L=SP, I=SPI):
         m = re.search(r'/id/(\d+)', r.get('espnl') or '')
         return I.get(m.group(1)) if m and I else pts_of(L, r['name'], r.get('team'))
-    rows = [{'n': r['name'], 'tm': r['team'], 'pos': 'DT' if r['pos'] == 'DL' else r['pos'], 'age': r.get('age') or r.get('ageEst'), 'fv': r['fv'], 'war': r.get('war'),
+    rows = [{'n': r['name'], 'tm': r['team'], 'pos': 'DT' if r['pos'] == 'DL' else r['pos'], 'age': r.get('age') or r.get('ageEst'), **hw(r.get('ht'), r.get('wt')), 'fv': r['fv'], 'war': r.get('war'),
              'xv': r.get('xv'), 'pfn': r.get('pfn'), 'sn': r.get('snaps'), 'spts': cpts(r), 'svar': cpts(r, SW, SWI), 'xnil': r['xnil'] / 1e6 if r.get('xnil') else None,
              'pre': r.get('_rk'), 'preL': f"#{r['_rk']}" if r.get('_rk') else '', 'pfv': None,
              'sub': (r.get('pfnLabel') or '') + (f" · {r['div']}" if r.get('div') == 'FCS' else ''), 'div': r.get('div'),
@@ -502,7 +523,7 @@ def cbb():
             continue        # a reclassified or returning player listed Fr with an older recruiting class
         if (r.get('now') or {}).get('yr') not in (None, 'Fr'):
             continue        # Barttorvik's class this season says otherwise: a redshirt, a transfer or an upperclassman
-        rows.append({'n': r['name'], 'tm': r['team'], 'pos': r['pos'], 'age': r.get('age') or r.get('ageEst'), 'fv': r['fv'],
+        rows.append({'n': r['name'], 'tm': r['team'], 'pos': r['pos'], 'age': r.get('age') or r.get('ageEst'), **hw(r.get('ht'), r.get('wt')), 'fv': r['fv'],
                      'xbpm': r.get('xbpm'), 'nbaP': r['nbaP'] * 100 if r.get('nbaP') is not None else None, 'w': r.get('w'),
                      'pre': rec.get('on3rk'), 'preL': f"#{rec['on3rk']}" if rec.get('on3rk') else '', 'pfv': None,
                      'sub': r.get('conf') or '', 'line': cbb_line(r.get('now')), 'ph': r.get('photo'), 'lo': r.get('logo')})
@@ -553,7 +574,7 @@ def hockey():
                          'ppg': round(pts / gpn, 2), 'gp': int(gpn), 'g': int(g), 'pts': int(pts),
                          'fv': (b or q or {}).get('fv'), 'pre': q['pick'] if q else (b.get('xslot') if b else None),
                          'preL': f"{q['year']} #{q['pick']}" if q else (f"x{b['xslot']}" if b and b.get('xslot') else (f'{cls} class' if cls else '')),
-                         'pfv': q['fv0'] if q else None, 'sub': lg + (f' · {cls} class' if cls and not q else ''),
+                         **hw((b or {}).get('ht'), (b or {}).get('wt')), 'pfv': q['fv0'] if q else None, 'sub': lg + (f' · {cls} class' if cls and not q else ''),
                          'ph': f"https://assets.leaguestat.com/{code}/240x240/{p['player_id']}.jpg" if p.get('player_id') else None,
                          'lo': hockey_logo(p.get('logo'))})
     if not rows:
@@ -577,7 +598,7 @@ def soccerp():
     d = J('data', 'soccer_prospects.json')
     rows = [{'n': p['name'], 'tm': p['club'], 'pos': p['grp'], 'age': p.get('age'), 'ageEst': p.get('ageEst'), 'fv': p['fv'], 'gar': p.get('gar'),
              'min': p.get('min'), 'mv': p['mv'] / 1e6 if p.get('mv') else None, 'p50': p['p50'] * 100 if p.get('p50') is not None else None,
-             'pre': None, 'preL': '', 'pfv': None, 'sub': p.get('league') or p.get('lg') or '', 'prov': p.get('prov'),
+             'pre': None, 'preL': '', 'pfv': None, 'sub': p.get('league') or p.get('lg') or '', 'prov': p.get('prov'), **hw(p.get('ht'), cm=True),
              'ph': TM_FACE.format(p['ph']) if p.get('ph') else None, 'lo': soccer_logo(p['club'])}
             for p in d['board'] if not p.get('min1') and (p.get('min') or 0) > 0]
     write('soccerp', {
