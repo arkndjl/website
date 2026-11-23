@@ -1829,6 +1829,7 @@ async function advancedFeed() {
   return { list: A.list, games };
 }
 const LOGP = new Map();   // league log: match id -> faction1's win chance (frozen at start)
+let QUOTE = null;   // the league log's pricer, for bracket matchups that don't exist yet (1NT's next opponent)
 async function leagueLog() {
   const now = Math.floor(Date.now() / 1000), P = playerElo();
   const adv = await advancedFeed().catch(e => (console.log('league log advanced:', e.message), { list: [], games: [] }));
@@ -1867,6 +1868,7 @@ async function leagueLog() {
       in: { elo: sides.map(x => x.elo), tal: sides.map(x => x.tal), rwa: sides.map(x => r2(x.rwa)), known: sides.map(x => r2(x.known)), pelo: sides.map(x => (x.pelo == null ? null : Math.round(x.pelo))),
         lf: Math.round(q.lf * 1e4) / 1e4, rw: Math.round(q.rw * 1e5) / 1e5 } };
   };
+  QUOTE = quote;
   const before = readLog(), { lines, stats } = mergeLog(before, feed, quote, now);
   writeLog(settle(before, lines));
   for (const l of lines) if (l.p != null) LOGP.set(l.id, l.p);
@@ -1910,11 +1912,33 @@ const calib = scored.length ? { n: scored.length, brier: Math.round(scored.reduc
     ouBrier: Math.round(o.reduce((a, c) => a + (c.over / 100 - (c.wentOver ? 1 : 0)) ** 2, 0) / o.length * 1000) / 1000 } : {}; })() } : null;
 
 // the bracket: the playoff championship with 1NT in it, else the one sharing most teams with 1NT's group
-function bracket() {
+// FACEIT's match list for a team in a championship (web API, public) carries each match's bracket slot
+// (bracketPlacement, numbered within the round: UB6 = round 1 slot 6, UB35 = round 2 slot 3 after 32 round-1 slots).
+// Slots never change, so they're remembered; each run asks only for matches it hasn't placed yet.
+const PLC = new Map(Object.entries(prev.season === SEASON ? prev.bracket?.plc || {} : {}));
+async function placeBracket(cid) {
+  const ms = poM.filter(m => m.competition_id === cid);
+  for (let i = 0; i < 80; i++) {
+    const m = ms.find(x => !PLC.has(x.match_id) && !x._asked); if (!m) break; m._asked = true;
+    const tid = [m.teams?.faction1?.faction_id, m.teams?.faction2?.faction_id].find(x => x && !/^bye$/i.test(x)); if (!tid) continue;
+    try {
+      const r = await fetch(`https://www.faceit.com/api/championships/v1/matches?championshipId=${cid}&participantId=${tid}&participantType=TEAM&limit=20&offset=0`, { headers: { 'User-Agent': 'Mozilla/5.0', Accept: 'application/json' } });
+      if (!r.ok) { console.log('bracket slots: HTTP', r.status); break; }
+      for (const x of (await r.json())?.payload?.items || []) if (x.origin?.id && x.bracketPlacement) PLC.set(x.origin.id, x.bracketPlacement);
+    } catch (e) { console.log('bracket slots:', e.message); break; }
+  }
+}
+function poPick() {   // the playoff championship with 1NT in it, else the one sharing most teams with 1NT's group
   if (!poC.size) return null;
   const grp = new Set(Object.keys(standings));
   const score = c => (c.mine ? 1e6 : 0) + poM.filter(m => m.competition_id === c.id).reduce((a, m) => a + [m.teams?.faction1?.faction_id, m.teams?.faction2?.faction_id].filter(x => grp.has(x)).length, 0);
-  const c = [...poC.values()].sort((a, b) => score(b) - score(a))[0];
+  return [...poC.values()].sort((a, b) => score(b) - score(a))[0];
+}
+if (poPick()) await placeBracket(poPick().id);
+function bracket() {
+  if (!poC.size) return null;
+  const grp = new Set(Object.keys(standings));
+  const c = poPick();
   const side = t => (!t || !t.faction_id || /^bye$/i.test(t.faction_id) ? { id: null, name: /^bye$/i.test(t?.faction_id || '') ? 'BYE' : 'TBD' }
     : { id: t.faction_id, name: t.name || t.nickname || 'TBD', avatar: t.avatar || null, seed: standings[t.faction_id]?.rank ?? null });
   const ms = poM.filter(m => m.competition_id === c.id && !['CANCELLED', 'ABORTED'].includes(m.status)).map(m => {
@@ -1924,10 +1948,45 @@ function bracket() {
       p: m.match_id === prev_?.id && prev_?.p?.win != null ? (a.id === TEAM_ID ? prev_.p.win : 100 - prev_.p.win) / 100   // 1NT's previewed match: the matchday number
         : LOGP.has(m.match_id) ? Math.round(LOGP.get(m.match_id) * 1000) / 1000 : null, url: (m.faceit_url || '').replace('{lang}', 'en') || null };
   }).sort((x, y) => x.g - y.g || x.r - y.r || (x.at || 0) - (y.at || 0) || (x.id < y.id ? -1 : 1));
-  const groups = [...new Set(ms.map(m => m.g))].sort((a, b) => a - b);
+  // byes: shown as byes (the team goes through), never priced; slots from FACEIT's bracket placement
+  for (const m of ms) { m.bye = m.a.name === 'BYE' || m.b.name === 'BYE'; if (m.bye) { m.p = null; m.s = null; } m.pos = PLC.get(m.id) ?? null; }
+  // the upper bracket in full: slot k of round r is fed by slots 2k-1 and 2k of round r-1; rounds FACEIT hasn't
+  // created yet are drawn from their feeders ("winner of UB6"), with a date from data/cs.json eseaRoundDates
+  const up = ms.filter(m => m.g === 1), n1 = up.filter(m => m.r === 1).length;
+  const placed = n1 && up.filter(m => m.r === 1).every(m => m.pos);
+  const rDate = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cs.json'), 'utf8')).eseaRoundDates || {}; } catch { return {}; } })();
+  let next = null;
+  if (placed && (n1 & (n1 - 1)) === 0) {
+    const R = Math.log2(n1) + 1, cnt = r => n1 >> (r - 1), off = r => { let o = 0; for (let q = 1; q < r; q++) o += cnt(q); return o; };
+    const slot = (r, k) => up.find(m => m.r === r && m.pos === k);
+    const lab = (r, k) => `UB${off(r) + k}`;
+    const winner = (r, k) => { const m = slot(r, k); if (!m) return null; if (m.bye) return m.a.name === 'BYE' ? m.b : m.a; return m.w ? (m.w === 1 ? m.a : m.b) : null; };
+    const feed = (r, k) => winner(r, k) || { id: null, name: `winner of ${lab(r, k)}`, tbd: true };
+    for (let r = 2; r <= R; r++) for (let k = 1; k <= cnt(r); k++) {
+      const m = slot(r, k);
+      if (m) { for (const [i, sd] of [[2 * k - 1, 'a'], [2 * k, 'b']]) if (!m[sd].id) m[sd] = feed(r - 1, i); continue; }
+      const at = rDate[r] ? Date.parse(rDate[r]) : null;
+      up.push({ id: null, g: 1, r, pos: k, at, st: 'TBD', bo: 3, a: feed(r - 1, 2 * k - 1), b: feed(r - 1, 2 * k), w: null, s: null, p: null, url: null });
+    }
+    for (const m of up) m.n = lab(m.r, m.pos);
+    // 1NT's next opponent if it wins its current match
+    const cur = up.filter(m => !m.w && !m.bye && [m.a.id, m.b.id].includes(TEAM_ID)).sort((x, y) => x.r - y.r)[0];
+    if (cur && cur.r < R) {
+      const k2 = Math.ceil(cur.pos / 2), sib = cur.pos % 2 ? cur.pos + 1 : cur.pos - 1, nx = slot(cur.r + 1, k2) || up.find(m => m.r === cur.r + 1 && m.pos === k2);
+      const opp = feed(cur.r, sib);
+      let p = null;
+      if (opp.id && QUOTE) { try { const q = QUOTE({ t1: TEAM_ID, t2: opp.id, at: Math.floor((nx?.at || Date.now()) / 1000), div: 'main', bo: 3, ros: [new Set(), new Set()] }); p = q ? Math.round(q.p * 1000) / 1000 : null; } catch (e) { console.log('next quote:', e.message); } }
+      if (nx && p != null && !nx.p) nx.p = nx.a.id === TEAM_ID ? p : 1 - p;
+      next = { n: nx?.n || lab(cur.r + 1, k2), at: nx?.at || null, opp, p, from: cur.n };
+    }
+  } else for (const m of ms) if (m.pos) m.n = `${m.g === 1 ? 'UB' : m.g === 2 ? 'LB' : 'GF'}${m.pos}`;
+  const all = ms.concat(up.filter(m => !ms.includes(m)));
+  all.sort((x, y) => x.g - y.g || x.r - y.r || (x.pos ?? 999) - (y.pos ?? 999) || (x.at || 0) - (y.at || 0));
+  const groups = [...new Set(all.map(m => m.g))].sort((a, b) => a - b);
   const label = g => (groups.length >= 2 ? { 1: 'upper', 2: 'lower', 3: 'grand final' }[g] || `group ${g}` : 'bracket');
-  return { id: c.id, name: c.name, url: `https://www.faceit.com/en/championship/${c.id}`, champs: [...poC.values()].map(x => ({ id: x.id, name: x.name })),
-    groups: groups.map(g => ({ g, label: label(g), rounds: [...new Set(ms.filter(m => m.g === g).map(m => m.r))].sort((a, b) => a - b).map(r => ({ r, m: ms.filter(m => m.g === g && m.r === r) })) })) };
+  return { id: c.id, name: c.name, url: `https://www.faceit.com/en/championship/${c.id}`, champs: [...poC.values()].map(x => ({ id: x.id, name: x.name })), next,
+    plc: Object.fromEntries(PLC),
+    groups: groups.map(g => ({ g, label: label(g), rounds: [...new Set(all.filter(m => m.g === g).map(m => m.r))].sort((a, b) => a - b).map(r => ({ r, m: all.filter(m => m.g === g && m.r === r) })) })) };
 }
 
 const out = {
