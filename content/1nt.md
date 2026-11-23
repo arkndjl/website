@@ -9,6 +9,7 @@ draft = false
 {{< wintabs tabs="matchday,roster,history,milestones,watch,1NTERLYTICS" label="1NT section" >}}
 {{< desk tab="matchday" >}}
 {{< n1 part="matchday" class="desk__wide" >}}
+{{< esea part="bracket" class="desk__wide" >}}
 {{< esea part="season" class="desk__wide" >}}
 {{< esea part="stakes" class="desk__wide" >}}
 {{< esea part="matches" class="desk__wide" >}}
