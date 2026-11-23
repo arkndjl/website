@@ -55,7 +55,7 @@ jobs:
           ESEA_PROBE: ${{ inputs.probe == '1' && '1' || '' }}
       - name: Backfill 1NT's divisions
         if: inputs.backfill == '1'
-        run: node scripts/esea_div_backfill.mjs && pip install -q numpy && python3 scripts/esea_milestones.py
+        run: node scripts/esea_div_backfill.mjs   # esea.yml rebuilds data/esea_milestones.json from it
         env:
           FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
       - name: World ranks and ESEA tiers
@@ -67,7 +67,7 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add -f research/esea_matches.json.gz research/esea_regions.json.gz 2>/dev/null || git add -f research/esea_regions.json.gz || git add -f research/esea_matches.json.gz
           git add data/esea_world.json 2>/dev/null || true
-          git add -f research/esea_div_backfill.json.gz data/esea_milestones.json 2>/dev/null || true
+          git add -f research/esea_div_backfill.json.gz 2>/dev/null || true
           git commit -m "ESEA research data ($(date -u +%Y-%m-%dT%H:%MZ))" || exit 0
           git pull --rebase -q origin "${GITHUB_REF_NAME}"
           git push
