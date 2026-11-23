@@ -1,12 +1,10 @@
-const K=process.env.FACEIT_API_KEY, L='a14b8616-45b9-4581-8637-4dfd0b5f6af8';
-const H={'User-Agent':'Mozilla/5.0',Accept:'application/json'}, O={Authorization:'Bearer '+K,Accept:'application/json'};
-function walk(o,p,out){if(o&&typeof o==='object'){for(const[k,v]of Object.entries(o)){const q=p+'.'+k;if(/prize|reward|promot|relegat|move|qualif|placement|description|rules/i.test(k))out.push(q+' = '+JSON.stringify(v).slice(0,1500));walk(v,q,out)}}}
-async function g(u,h){try{const r=await fetch(u,{headers:h});const t=await r.text();console.log('==',r.status,u,t.length);let j;try{j=JSON.parse(t)}catch{console.log(t.slice(0,300));return}const out=[];walk(j,'',out);console.log(out.slice(0,60).join('\n')||t.slice(0,1500));return j}catch(e){console.log('ERR',u,e.message)}}
-const lg=await g(`https://open.faceit.com/data/v4/leagues/${L}`,O);
-const s=await g(`https://open.faceit.com/data/v4/leagues/${L}/seasons/59`,O);
-console.log(JSON.stringify(s).slice(0,4000));
-await g(`https://www.faceit.com/api/team-leagues/v1/leagues/${L}`,H);
-await g(`https://www.faceit.com/api/team-leagues/v2/leagues/${L}/seasons`,H);
-await g(`https://www.faceit.com/api/team-leagues/v1/seasons/71f19bf6`,H);
-await g(`https://www.faceit.com/api/team-leagues/v2/conferences/f3e8413f-d07c-44a1-a39c-1045637223d5`,H);
-await g(`https://www.faceit.com/api/team-leagues/v1/conferences/f3e8413f-d07c-44a1-a39c-1045637223d5`,H);
+const L='a14b8616-45b9-4581-8637-4dfd0b5f6af8';
+const H={'User-Agent':'Mozilla/5.0',Accept:'application/json'};
+async function g(u){try{const r=await fetch(u,{headers:H});const t=await r.text();console.log('==',r.status,u,t.length);return [r.status,t]}catch(e){console.log('ERR',u,e.message);return [0,'']}}
+const [,t]=await g(`https://www.faceit.com/api/team-leagues/v2/leagues/${L}/seasons`);
+const P=JSON.parse(t).payload;
+console.log('FIELDS',Object.keys(P[0]).join(','));
+console.log(P.map(x=>[x.season_number??x.number??x.name,x.id,x.rules_id,x.total_prize_pool].join(' ')).join('\n'));
+const s=P.find(x=>JSON.stringify(x).includes('59'))&&P.find(x=>(x.season_number??x.number)==59)||P[0];
+console.log('S59',JSON.stringify(s).slice(0,9000));
+for(const p of [`team-leagues/v2/seasons/${s.id}`,`team-leagues/v2/seasons/${s.id}/stages`,`team-leagues/v2/seasons/${s.id}/divisions`,`team-leagues/v2/seasons/${s.id}/prizes`,`team-leagues/v2/rules/${s.rules_id}`,`team-leagues/v1/rules/${s.rules_id}`,`rules/v1/rules/${s.rules_id}`,`team-leagues/v2/stages/057c8ad5-617e-40c0-bf90-434fa8b3a24d`]){const [st,b]=await g('https://www.faceit.com/api/'+p);if(st===200)console.log(b.slice(0,12000));}

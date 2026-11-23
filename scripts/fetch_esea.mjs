@@ -1934,7 +1934,16 @@ function poPick() {   // the playoff championship with 1NT in it, else the one s
   const score = c => (c.mine ? 1e6 : 0) + poM.filter(m => m.competition_id === c.id).reduce((a, m) => a + [m.teams?.faction1?.faction_id, m.teams?.faction2?.faction_id].filter(x => grp.has(x)).length, 0);
   return [...poC.values()].sort((a, b) => score(b) - score(a))[0];
 }
-if (poPick()) await placeBracket(poPick().id);
+// round dates per bracket (upper/lower/final), from the championship's own schedule (web API); kept between runs
+const SCHED = new Map(Object.entries(prev.season === SEASON ? prev.bracket?.sched || {} : {}));
+async function schedBracket(cid) {
+  try {
+    const r = await fetch(`https://www.faceit.com/api/championships/v1/championship/${cid}`, { headers: { 'User-Agent': 'Mozilla/5.0', Accept: 'application/json' } });
+    if (!r.ok) { console.log('bracket schedule: HTTP', r.status); return; }
+    for (const [g, x] of Object.entries((await r.json())?.payload?.groups || {})) for (const [rd, y] of Object.entries(x.schedule || {})) if (y?.date) SCHED.set(`${g}-${rd}`, y.date);
+  } catch (e) { console.log('bracket schedule:', e.message); }
+}
+if (poPick()) { await placeBracket(poPick().id); await schedBracket(poPick().id); }
 function bracket() {
   if (!poC.size) return null;
   const grp = new Set(Object.keys(standings));
@@ -1982,7 +1991,7 @@ function bracket() {
     const put = (g, r, k, a, b, ur) => {
       const n = lab(g, r, k); let m = real(g, r, k);
       if (m) { if (!m.a.id && !isBye(m.a)) m.a = a; if (!m.b.id && !isBye(m.b)) m.b = b; }
-      else { m = { id: null, g, r, pos: k, at: rDate[ur] ? Date.parse(rDate[ur]) : null, st: 'TBD', bo: 3, a, b, w: null, s: null, p: null, url: null }; syn.push(m); }
+      else { m = { id: null, g, r, pos: k, at: SCHED.get(`${g}-${r}`) || (g === 1 && rDate[ur] ? Date.parse(rDate[ur]) : null), st: 'TBD', bo: 3, a, b, w: null, s: null, p: null, url: null }; syn.push(m); }
       m.n = n; m.bye = isBye(m.a) || isBye(m.b); if (m.bye) { m.p = null; m.s = null; } slots.set(key(g, r, k), m); return m;
     };
     for (const m of up.filter(m => m.r === 1)) { m.n = lab(1, 1, m.pos); slots.set(key(1, 1, m.pos), m); }
@@ -2002,7 +2011,7 @@ function bracket() {
     };
     const order = []; for (let r = 1; r <= R; r++) { for (let k = 1; k <= cntU(r); k++) order.push([1, r, k]); if (r >= 2) { const l1 = 2 * (r - 1) - 1; for (const l of [l1, l1 + 1]) for (let k = 1; k <= cntL(l); k++) order.push([2, l, k]); } }
     order.push([3, 1, 1]);
-    const N = 4000, reach = new Map(), titles = { n: 0 };
+    const N = 20000, reach = new Map(), titles = { n: 0 };
     for (let it = 0; it < N; it++) {
       const W = new Map(), L = new Map();
       const side = (g, r, k, lose) => (lose ? L : W).get(key(g, r, k));
@@ -2018,13 +2027,13 @@ function bracket() {
         let w;
         if (a === 'BYE' || b === 'BYE') w = a === 'BYE' ? b : a;
         else if (m.w && m.a.id && m.b.id) w = m.w === 1 ? m.a.id : m.b.id;
-        else w = Math.random() < pr(a, b) ? a : b;
+        else w = Math.random() < (m.p != null && m.a.id === a && m.b.id === b ? m.p : pr(a, b)) ? a : b;   // a priced real match keeps its own number
         W.set(key(g, r, k), w); L.set(key(g, r, k), w === a ? b : a);
         if (g === 3 && w === TEAM_ID) titles.n++;
       }
     }
     const nOf = new Map([...slots.values()].map(m => [m.n, m])), seq = new Map(order.map(([g, r, k], i) => [lab(g, r, k), i]));
-    odds = { title: Math.round(titles.n / N * 1000) / 1000, path: [...reach.entries()].map(([n, c]) => ({ n, p: Math.round(c / N * 1000) / 1000, g: nOf.get(n)?.g, r: nOf.get(n)?.r }))
+    odds = { title: Math.round(titles.n / N * 10000) / 10000, path: [...reach.entries()].map(([n, c]) => ({ n, p: Math.round(c / N * 1000) / 1000, g: nOf.get(n)?.g, r: nOf.get(n)?.r }))
       .filter(x => x.p >= 0.005).sort((a, b) => seq.get(a.n) - seq.get(b.n)) };
     // 1NT's next opponent if it wins its current upper match (or, in the lower bracket, its current one)
     const cur = [...slots.values()].filter(m => !m.w && !m.bye && [m.a.id, m.b.id].includes(TEAM_ID)).sort((x, y) => x.g - y.g || x.r - y.r)[0];
@@ -2041,7 +2050,7 @@ function bracket() {
   const groups = [...new Set(all.map(m => m.g))].sort((a, b) => a - b);
   const label = g => (groups.length >= 2 ? { 1: 'upper', 2: 'lower', 3: 'grand final' }[g] || `group ${g}` : 'bracket');
   return { id: c.id, name: c.name, url: `https://www.faceit.com/en/championship/${c.id}`, champs: [...poC.values()].map(x => ({ id: x.id, name: x.name })), next, odds,
-    plc: Object.fromEntries(PLC),
+    plc: Object.fromEntries(PLC), sched: Object.fromEntries(SCHED),
     groups: groups.map(g => ({ g, label: label(g), rounds: [...new Set(all.filter(m => m.g === g).map(m => m.r))].sort((a, b) => a - b).map(r => ({ r, m: all.filter(m => m.g === g && m.r === r) })) })) };
 }
 
