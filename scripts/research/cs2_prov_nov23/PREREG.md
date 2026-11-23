@@ -20,7 +20,9 @@ point and won prize money, + is now in Main and has good stats in Main, maybe so
 - B   constant = tune mean (what any linked ESEA player who reaches 600 pro rounds averages). Current site = FV 20 flat.
 - S1  division: level (Intermediate -1, Main 0, Advanced 1) of the player's highest division in season s, EU dummy, level x EU.
 - S2  S1 + team results in season s: team regular-season round share (Bo1 scores), made playoffs, playoff match wins
-      (log 1 + w), top-3 finish in the playoffs (Noah's "3rd in IM").
+      (log 1 + w), top-3 finish in the playoffs (Noah's "3rd in IM"):
+      the last three teams standing in a bracket (bracket = teams joined by playoff matches in one season / region /
+      division / stage; ordered by their last playoff match). Defined from 1NT's S56 IM Playoffs A run before any outcome.
 - S3  S2 + movement: promoted this season (division above the one he played in season s-1), relegated, ESEA seasons
       played in the last 4 (experience).
 - S4  S3 + FACEIT skill level at match time (mean over season s, the only point-in-time FACEIT rating we hold) and its
