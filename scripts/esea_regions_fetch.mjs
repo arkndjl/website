@@ -52,6 +52,15 @@ const add = (id, nm) => { const p = parse(nm); if (id && p && p.season >= FROM &
 let seed = []; try { seed = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'esea.json'), 'utf8')).championships || []; } catch {}
 const det0 = seed[0] ? await api(`/championships/${seed[0].id}`) : null;
 console.log('seed', seed[0]?.id, JSON.stringify(det0)?.slice(0, 600));
+if (process.env.ESEA_PROBE) {
+  const mm = await api(`/championships/${seed[0].id}/matches?type=past&offset=0&limit=2`);
+  console.log('seed matches', JSON.stringify(mm)?.slice(0, 800));
+  const pid = mm?.items?.[0]?.teams?.faction1?.roster?.[0]?.player_id;
+  if (pid) { const h = await api(`/players/${pid}/history?game=cs2&offset=0&limit=100`); console.log('history comps', JSON.stringify([...new Set((h?.items || []).map(m => m.competition_type + ' | ' + m.competition_name + ' | ' + m.competition_id + ' | ' + m.organizer_id))]).slice(0, 3000)); }
+  for (const q of ['S58 EU Main', 'S58 EU Main - Regular Season', 'S58 EU Main A - Regular Season', 'ESEA S58 EU Main', 'ESEA Season 58 Europe Main', 'S58 EU Advanced - Regular Season', 'S58 NA Main A - Regular Season', 'ESEA EU Main', 'S59 EU Main'])
+    for (const type of ['past', 'all', 'ongoing']) console.log('Q', q, type, JSON.stringify(((await api(`/search/championships?name=${encodeURIComponent(q)}&game=cs2&type=${type}&limit=20`))?.items || []).map(x => x.name + ' / ' + x.organizer_name)));
+  process.exit(0);
+}
 console.log('search sample', JSON.stringify(await api(`/search/championships?name=${encodeURIComponent('S58 EU Main')}&game=cs2&type=past&limit=5`))?.slice(0, 1500));
 const org = det0?.organizer_id;
 console.log('organizer', org);

@@ -8,6 +8,9 @@ on:
       regions:
         description: "1 = every region's Advanced/Main/Intermediate results with nicknames (scripts/esea_regions_fetch.mjs) instead"
         default: "0"
+      probe:
+        description: "1 = print what the FACEIT API returns for discovery, fetch nothing"
+        default: "0"
 
 permissions:
   contents: write
@@ -34,6 +37,7 @@ jobs:
         env:
           FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
           ESEA_FROM: 53
+          ESEA_PROBE: ${{ inputs.probe == '1' && '1' || '' }}
       - name: Commit
         run: |
           git config user.name "arkboard-bot"
