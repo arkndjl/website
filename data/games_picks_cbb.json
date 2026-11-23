@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-23T19:41:17Z",
+ "asof": "2026-11-23T19:48:08Z",
  "recenter": {
   "2026-11-23": 1.83,
   "2026-11-24": 1.66,
@@ -1832,7 +1832,7 @@
  },
  "model": {
   "asof": "2026-11-23T19:33:50Z",
-  "ageH": 0.1,
+  "ageH": 0.2,
   "stale": false
  },
  "picks": [],
@@ -2031,7 +2031,7 @@
    "mk": "total",
    "side": "under",
    "line": 177.5,
-   "price": -110.0,
+   "price": -110,
    "edge": 5.0,
    "x": 5.0,
    "why": "edge under 5 (tier: power)",
@@ -2063,7 +2063,7 @@
    "mk": "total",
    "side": "under",
    "line": 147.5,
-   "price": -110.0,
+   "price": -110,
    "edge": 4.9,
    "x": 5.0,
    "why": "edge under 5 (tier: power)",
@@ -2111,7 +2111,7 @@
    "mk": "total",
    "side": "under",
    "line": 144.5,
-   "price": -110.0,
+   "price": -110,
    "edge": 5.7,
    "x": 6.5,
    "why": "edge under 6.5 (side: under)",
@@ -2175,7 +2175,7 @@
    "mk": "spread",
    "side": "home",
    "line": 4.5,
-   "price": -134.0,
+   "price": -129.0,
    "edge": 3.0,
    "x": 4.0,
    "why": "edge under 4 (tier: power)",
@@ -2295,6 +2295,22 @@
    "tm": 153.4
   },
   {
+   "id": "401919032",
+   "sport": "cbb",
+   "kick": "2026-11-24T00:30:00Z",
+   "home": "Wichita State",
+   "away": "Texas A&M-Corpus Christi",
+   "mk": "spread",
+   "side": "away",
+   "line": 19.5,
+   "price": -110.0,
+   "edge": 2.9,
+   "x": 5.0,
+   "why": "edge under 5 (role: dog)",
+   "m": 16.6,
+   "tm": 144.9
+  },
+  {
    "id": "401920721",
    "sport": "cbb",
    "kick": "2026-11-24T03:00:00Z",
@@ -2341,22 +2357,6 @@
    "why": "edge under 5 (tier: mixed)",
    "m": 45.1,
    "tm": 179.8
-  },
-  {
-   "id": "401919032",
-   "sport": "cbb",
-   "kick": "2026-11-24T00:30:00Z",
-   "home": "Wichita State",
-   "away": "Texas A&M-Corpus Christi",
-   "mk": "total",
-   "side": "over",
-   "line": 141.5,
-   "price": -114.0,
-   "edge": 3.4,
-   "x": 7.0,
-   "why": "edge under 7",
-   "m": 16.6,
-   "tm": 144.9
   }
  ],
  "games": {
@@ -2469,11 +2469,11 @@
    "state": "under"
   },
   "401919032": {
-   "mk": "total",
-   "side": "over",
-   "line": 141.5,
-   "price": -114.0,
-   "edge": 3.4,
+   "mk": "spread",
+   "side": "away",
+   "line": 19.5,
+   "price": -110.0,
+   "edge": 2.9,
    "ev": null,
    "units": 0.0,
    "home": "Wichita State",
@@ -2688,7 +2688,7 @@
    "mk": "total",
    "side": "under",
    "line": 177.5,
-   "price": -110.0,
+   "price": -110,
    "edge": 5.0,
    "ev": null,
    "units": 0.0,
@@ -2700,7 +2700,7 @@
    "mk": "spread",
    "side": "home",
    "line": 4.5,
-   "price": -134.0,
+   "price": -129.0,
    "edge": 3.0,
    "ev": null,
    "units": 0.0,
@@ -2724,7 +2724,7 @@
    "mk": "total",
    "side": "under",
    "line": 147.5,
-   "price": -110.0,
+   "price": -110,
    "edge": 4.9,
    "ev": null,
    "units": 0.0,
@@ -2736,7 +2736,7 @@
    "mk": "total",
    "side": "under",
    "line": 144.5,
-   "price": -110.0,
+   "price": -110,
    "edge": 5.7,
    "ev": null,
    "units": 0.0,
@@ -2821,16 +2821,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 23917,
+  "snapshots": 23924,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 684,
-    "clvRet": -0.005,
-    "clvT": -0.56,
+    "clvN": 688,
+    "clvRet": -0.0052,
+    "clvT": -0.59,
     "clv": 0.84,
-    "beat": 0.344,
-    "still": 0.316
+    "beat": 0.342,
+    "still": 0.32
    },
    {
     "when": "6-24h",
@@ -21090,7 +21090,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-23T19:41:17Z",
+ "checked": "2026-11-23T19:48:08Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
