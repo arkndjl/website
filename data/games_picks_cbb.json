@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-23T06:17:45Z",
+ "asof": "2026-11-23T06:21:43Z",
  "recenter": {
   "2026-11-23": 1.94
  },
@@ -1966,6 +1966,22 @@
    "tm": 159.3
   },
   {
+   "id": "401917543",
+   "sport": "cbb",
+   "kick": "2026-11-24T00:00:00Z",
+   "home": "Santa Clara",
+   "away": "Illinois State",
+   "mk": "spread",
+   "side": "away",
+   "line": 5.5,
+   "price": -129.0,
+   "edge": 4.6,
+   "x": 4.0,
+   "why": "no edge at -129",
+   "m": 0.9,
+   "tm": 155.4
+  },
+  {
    "id": "401921209",
    "sport": "cbb",
    "kick": "2026-11-23T17:30:00Z",
@@ -2190,22 +2206,6 @@
    "tm": 162.3
   },
   {
-   "id": "401917543",
-   "sport": "cbb",
-   "kick": "2026-11-24T00:00:00Z",
-   "home": "Santa Clara",
-   "away": "Illinois State",
-   "mk": "total",
-   "side": "over",
-   "line": 151.5,
-   "price": -110.0,
-   "edge": 3.9,
-   "x": 7.0,
-   "why": "edge under 7",
-   "m": 0.9,
-   "tm": 155.4
-  },
-  {
    "id": "401917919",
    "sport": "cbb",
    "kick": "2026-11-24T00:00:00Z",
@@ -2397,11 +2397,11 @@
    "state": "under"
   },
   "401917543": {
-   "mk": "total",
-   "side": "over",
-   "line": 151.5,
-   "price": -110.0,
-   "edge": 3.9,
+   "mk": "spread",
+   "side": "away",
+   "line": 5.5,
+   "price": -129.0,
+   "edge": 4.6,
    "ev": null,
    "units": 0.0,
    "home": "Santa Clara",
@@ -2749,7 +2749,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 23542,
+  "snapshots": 23545,
   "buckets": [
    {
     "when": "24h+",
@@ -2762,11 +2762,11 @@
    },
    {
     "when": "6-24h",
-    "clvN": 4692,
-    "clvRet": -0.0009,
-    "clvT": -0.42,
+    "clvN": 4694,
+    "clvRet": -0.0011,
+    "clvT": -0.52,
     "clv": 0.71,
-    "beat": 0.416,
+    "beat": 0.414,
     "still": 0.403
    },
    {
@@ -20989,7 +20989,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-23T06:17:45Z",
+ "checked": "2026-11-23T06:21:43Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
