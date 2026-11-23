@@ -104,6 +104,27 @@ SV_T = ('SV (season value): points over replacement a game that season, EPA a pl
         "season's league EPA (era)")
 
 
+def soccer_sv_attach(P, S):
+    """SV (goals over replacement a 90) and SVAR (season total) on the soccer peak list, as played (scripts/soccer_sv.py);
+    the list also takes the top seasons by SVAR, so a sort by SVAR ranks the real leaders"""
+    if not any(x.get('svar') is not None for x in S): return
+    k = lambda n, y, tm: (fixenc(n), y, tm)
+    m = {k(x['n'], x['y'], x.get('tm')): x for x in S}
+    have = {k(r['n'], r['y'], r.get('tm')) for r in P['peak']}
+    for x in sorted((x for x in S if x.get('svar') is not None), key=lambda x: -x['svar'])[:TOP]:
+        if k(x['n'], x['y'], x.get('tm')) not in have:
+            P['peak'].append(dict(n=fixenc(x['n']), y=x['y'], tm=x.get('tm'), pos=x.get('pos'), v=None if x['v'] is None else round(x['v'], 2),
+                                  raw=x.get('raw'), est=None, ph=x.get('ph'), ox=None, dx=None, u=None if x.get('v0') is None else round(x['v0'], 2)))
+    for r in P['peak']:
+        x = m.get(k(r['n'], r['y'], r.get('tm'))) or {}
+        r['sv'], r['svar'] = x.get('sv'), x.get('svar')
+    P['peak'].sort(key=lambda r: (r.get('v') is None, -(r.get('v') or 0)))
+    P['sv'], P['svf'], P['svarf'] = True, '%+.2f', '%+.1f'
+    P['svT'] = ("SV (season value): goals over replacement a 90 that season from that season alone (GAR's weights on its "
+                "inputs with a one-season xG plus-minus, plus finishing and keeper saves at face value), as played; 2014-15 on")
+    P['svarT'] = 'SVAR = SV x 90s played: the season total in goals, GAR scale, as played'
+
+
 # ---------------------------------------------------------------- ridge ratings from scores (NFL)
 def ridge(G, cap=CAP, lam=2.0):
     """G: dicts a, b, pa, pb, h (+1 a home, -1 b home, 0 neutral). -> {team: (rating, off, def, games)}"""
@@ -587,7 +608,8 @@ def soccer_players():
         d = json.load(open(f))
         if d['season'] >= json.load(open(os.path.join(ROOT, 'data', 'soccer_war.json')))['current']: continue
         for p in d['players']:
-            if p.get('gar') is not None: out.append(dict(id=p['p'], n=p['n'], y=d['season'], tm=p['team'], pos=p['pos'], v=p['gar'], raw=p.get('min'), w=p.get('min', 1), ph=p.get('ph')))
+            if p.get('gar') is not None: out.append(dict(id=p['p'], n=p['n'], y=d['season'], tm=p['team'], pos=p['pos'], v=p['gar'], raw=p.get('min'), w=p.get('min', 1), ph=p.get('ph'),
+                                                         sv=p.get('sv'), svar=p.get('svar')))
     return out
 
 
@@ -1033,6 +1055,7 @@ def main():
             src['cfbqb'] = cfb_qb_pull()
             src['cfbsk'] = cfb_skill_pull()
             json.dump(src, gzip.open(SNAP, 'wt'), separators=(',', ':'))
+        src['soccerS'] = soccer_players()      # local season files: SV / SVAR (scripts/soccer_sv.py) without a re-pull
     else:
         nT, nS, nfit = nba(); hT, hS = nhl()
         nflpk, nflcar = nfl_players()
@@ -1150,6 +1173,7 @@ def main():
             if kk not in P_: P_[kk] = old_[kk]
         P_['era'] = ERA[sp_]; P_['drift'] = era_drift(src[k_]); P_['u'] = True
         res[sp_]['players'] = P_
+    soccer_sv_attach(res['soccer']['players'], src['soccerS'])
     res['cs2']['players'] = players_out(cs, dict(l='RAR', t="rounds won over a replacement player: RWA over replacement x rounds / 100, in today's units (RWA vs that year's players, rounds vs that year's load)", f='%.1f', rl='RWA', rt="round win % added per round over that year's replacement level", rf='%+.2f'),
                                         dict(l='RAR', t='career RAR, each year in today\'s units', f='%.0f', s=1, pl='Peak', pt='best year RAR'),
                                         'bo3.gg', pos=False, abouts=('Calendar years, 2024 on; current year to date.', ''), every=True)

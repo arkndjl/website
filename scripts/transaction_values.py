@@ -7,7 +7,7 @@
   nfl          WAR (static/data/nfl-war.json) + SVAR (data/nfl_qb.json, data/nfl_season_value.json; QBs, skill, defense)
   nba          XPM + VORX (static/data/nba-xpm/<latest season>.json)
   nhl          WAR (static/data/nhl-war/<latest>.json)
-  soccer       GAR (static/data/soccer-war/<latest>.json)
+  soccer       GAR, SVAR (static/data/soccer-war/<latest>.json)
   recruits     ARK stars + FV (year-1 xFV, rounded) from static/data/cfb-recruits.json (full class, future classes) and
                data/cbb_recruits.json (classes, international); a row that is no recruit (a portal move) takes the board FV
 Rows join by name through scripts/names.py (club from or to checked first, then the name alone when it is unique);
@@ -115,7 +115,7 @@ def pro_values():
     o = {}
     for r in tx['soccer']:
         h = m and m.find(r['n'], team=tuple(x for x in (r.get('fr'), r.get('to')) if x) or None)[0]
-        if h and h.get('gar') is not None: o[f"{r['d']}|{r['n']}|{r['k']}"] = [rnd(h.get('gar')), None]
+        if h and h.get('gar') is not None: o[f"{r['d']}|{r['n']}|{r['k']}"] = [rnd(h.get('gar')), rnd(h.get('svar'))]
     out['soccer'] = o
     return out
 

@@ -325,6 +325,11 @@ def nhl():
 LG = {'eng.1': 'EPL', 'esp.1': 'LaLiga', 'ger.1': 'BuLi', 'ita.1': 'Serie A', 'fra.1': 'Ligue 1'}
 
 
+SO_SV_T = ("SV (season value): this season's goals over replacement a 90, from this season alone (GAR's weights on its inputs "
+           "with a one-season xG plus-minus, plus finishing and keeper saves at face value)")
+SO_SVAR_T = 'SVAR = SV x 90s played: season total in goals (GAR scale)'
+
+
 def soccer():
     files = sorted(int(f[:-5]) for f in os.listdir(os.path.join(SD, 'soccer-war')) if f.endswith('.json'))
     link = json.load(gzip.open(os.path.join(HERE, 'data', 'soccer_mv_link.json.gz')))
@@ -355,6 +360,7 @@ def soccer():
             elif t and t in past:
                 fv = max((q for q in past[t] if q['season'] <= S - 1), key=lambda q: q['season'], default={}).get('fv')
             rows.append({'n': p['n'], 'tm': p['team'], 'pos': p['pos'], 'age': age, 'gar': p['gar'], 'par': p.get('par'),
+                         'sv': p.get('sv'), 'svar': p.get('svar'),
                          'gar90': p.get('gar90'), 'xmv': p.get('xmv'), 'mv': p.get('mv'), 'min': p['min'], 'g': p.get('g'), 'a': p.get('a'),
                          'pre': None, 'preL': '', 'pfv': fv, 'sub': LG.get(p['lg'], p['lg']),
                          'ph': TM_FACE.format(p['ph']) if p.get('ph') else None, 'lo': soccer_logo(p['team'])})
@@ -365,8 +371,9 @@ def soccer():
         'asof': json.load(open(os.path.join(SD, 'soccer-war', f'{cur}.json'))).get('asof'), 'title': 'rookies', 'key': 'gar',
         'def': 'rookies: first big-five league season (Understat, 2015-16 on). prospect FV = the soccer prospects board (U22) where the player was graded.',
         'views': [['gar', 'GAR', 'goals above replacement this season'], ['gar90', 'GAR/90', 'GAR per 90 minutes'],
-                  ['xmv', 'xMV', 'estimated market value, EUR M']],
-        'cols': [col('gar', 'GAR', 'goals above replacement', 's1'), col('xmv', 'xMV', 'estimated market value, EUR M', 'e'),
+                  ['xmv', 'xMV', 'estimated market value, EUR M'], ['svar', 'SVAR', SO_SVAR_T], ['sv', 'SV', SO_SV_T]],
+        'cols': [col('gar', 'GAR', 'goals above replacement', 's1'), col('svar', 'SVAR', SO_SVAR_T, 's1', 1),
+                 col('sv', 'SV', SO_SV_T, 's2', 1), col('xmv', 'xMV', 'estimated market value, EUR M', 'e'),
                  col('mv', 'TM', 'Transfermarkt market value, EUR M', 'e', 1), col('gar90', 'GAR/90', 'GAR per 90', 's2', 1),
                  col('par', 'PAR', 'points above replacement', '2', 1), col('min', 'Min', 'minutes', 'i', 1),
                  col('g', 'G', 'goals', 'i', 1), col('a', 'A', 'assists', 'i', 1)],
