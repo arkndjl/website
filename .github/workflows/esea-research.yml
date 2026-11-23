@@ -37,14 +37,20 @@ jobs:
           path: scripts/.cache/cs
           key: cs2-vrs-v1
       - name: Fetch
-        if: github.event_name == 'workflow_dispatch' && inputs.regions != '1'
+        if: github.event_name == 'workflow_dispatch' && inputs.regions != '1' && inputs.probe != '2'
         run: node scripts/esea_research_fetch.mjs
         env:
           FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
           ESEA_CRAWL: 150
           ESEA_FROM: 53
+      - name: Bracket probe
+        if: inputs.probe == '2'
+        run: node scripts/esea_bracket_probe.mjs
+        env:
+          FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
+          PO_ID: ${{ inputs.regions }}
       - name: Fetch every region
-        if: github.event_name == 'schedule' || inputs.regions == '1'
+        if: github.event_name == 'schedule' || (inputs.regions == '1' && inputs.probe != '2')
         run: node scripts/esea_regions_fetch.mjs
         env:
           FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
@@ -54,6 +60,7 @@ jobs:
         if: github.event_name == 'schedule' || (inputs.regions == '1' && inputs.probe != '1')
         run: python3 scripts/esea_world.py
       - name: Commit
+        if: inputs.probe != '2'
         run: |
           git config user.name "arkboard-bot"
           git config user.email "actions@users.noreply.github.com"
