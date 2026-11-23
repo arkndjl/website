@@ -1,11 +1,11 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-23T23:03:41Z",
+ "asof": "2026-11-23T23:07:04Z",
  "recenter": {
-  "2026-11-23": 1.9,
-  "2026-11-24": 1.71,
-  "2026-11-25": 1.82
+  "2026-11-23": 1.91,
+  "2026-11-24": 1.73,
+  "2026-11-25": 1.6
  },
  "monitor": {
   "clocks": {
@@ -1832,7 +1832,7 @@
  },
  "model": {
   "asof": "2026-11-23T19:33:50Z",
-  "ageH": 3.5,
+  "ageH": 3.6,
   "stale": false
  },
  "picks": [],
@@ -1936,13 +1936,13 @@
    "away": "Gonzaga",
    "mk": "total",
    "side": "under",
-   "line": 164.5,
-   "price": -283.0,
-   "edge": 8.6,
+   "line": 186.5,
+   "price": -5413.0,
+   "edge": 30.4,
    "x": 6.5,
-   "why": "no edge at -283",
+   "why": "gap too big: a bad line",
    "m": -13.3,
-   "tm": 155.9
+   "tm": 156.1
   },
   {
    "id": "401921664",
@@ -1977,22 +1977,6 @@
    "tm": 144.8
   },
   {
-   "id": "401915942",
-   "sport": "cbb",
-   "kick": "2026-11-25T01:00:00Z",
-   "home": "Louisville",
-   "away": "Texas Tech",
-   "mk": "total",
-   "side": "under",
-   "line": 155.5,
-   "price": -158.0,
-   "edge": 5.3,
-   "x": 5.0,
-   "why": "no edge at -158",
-   "m": -1.8,
-   "tm": 150.2
-  },
-  {
    "id": "401918057",
    "sport": "cbb",
    "kick": "2026-11-24T03:00:00Z",
@@ -2023,6 +2007,22 @@
    "why": "edge under 7",
    "m": 15.6,
    "tm": 159.2
+  },
+  {
+   "id": "401915942",
+   "sport": "cbb",
+   "kick": "2026-11-25T01:00:00Z",
+   "home": "Louisville",
+   "away": "Texas Tech",
+   "mk": "spread",
+   "side": "home",
+   "line": -5.5,
+   "price": -124.0,
+   "edge": 3.7,
+   "x": 4.0,
+   "why": "edge under 4 (tier: power)",
+   "m": -1.8,
+   "tm": 150.2
   },
   {
    "id": "401915941",
@@ -2057,6 +2057,38 @@
    "tm": 138.8
   },
   {
+   "id": "401917543",
+   "sport": "cbb",
+   "kick": "2026-11-24T00:00:00Z",
+   "home": "Santa Clara",
+   "away": "Illinois State",
+   "mk": "total",
+   "side": "over",
+   "line": 149.5,
+   "price": -119.0,
+   "edge": 5.6,
+   "x": 7.0,
+   "why": "edge under 7",
+   "m": 0.9,
+   "tm": 155.1
+  },
+  {
+   "id": "401909495",
+   "sport": "cbb",
+   "kick": "2026-11-24T22:30:00Z",
+   "home": "Michigan",
+   "away": "Creighton",
+   "mk": "spread",
+   "side": "home",
+   "line": 4.5,
+   "price": -129.0,
+   "edge": 3.0,
+   "x": 4.0,
+   "why": "edge under 4 (tier: power)",
+   "m": 7.5,
+   "tm": 160.9
+  },
+  {
    "id": "401921663",
    "sport": "cbb",
    "kick": "2026-11-24T02:30:00Z",
@@ -2087,22 +2119,6 @@
    "why": "edge under 6.5 (side: under)",
    "m": -9.5,
    "tm": 162.2
-  },
-  {
-   "id": "401917543",
-   "sport": "cbb",
-   "kick": "2026-11-24T00:00:00Z",
-   "home": "Santa Clara",
-   "away": "Illinois State",
-   "mk": "total",
-   "side": "over",
-   "line": 150.5,
-   "price": -110.0,
-   "edge": 4.6,
-   "x": 7.0,
-   "why": "edge under 7",
-   "m": 0.9,
-   "tm": 155.1
   },
   {
    "id": "401909743",
@@ -2209,28 +2225,12 @@
    "mk": "spread",
    "side": "home",
    "line": 42.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 2.6,
    "x": 5.0,
    "why": "edge under 5 (tier: mixed)",
    "m": 45.1,
    "tm": 179.7
-  },
-  {
-   "id": "401909495",
-   "sport": "cbb",
-   "kick": "2026-11-24T22:30:00Z",
-   "home": "Michigan",
-   "away": "Creighton",
-   "mk": "spread",
-   "side": "home",
-   "line": 5.5,
-   "price": -119.0,
-   "edge": 2.0,
-   "x": 4.0,
-   "why": "edge under 4 (tier: power)",
-   "m": 7.5,
-   "tm": 160.9
   },
   {
    "id": "401919032",
@@ -2357,9 +2357,9 @@
   "401917543": {
    "mk": "total",
    "side": "over",
-   "line": 150.5,
-   "price": -110.0,
-   "edge": 4.6,
+   "line": 149.5,
+   "price": -119.0,
+   "edge": 5.6,
    "ev": null,
    "units": 0.0,
    "home": "Santa Clara",
@@ -2430,7 +2430,7 @@
    "mk": "spread",
    "side": "home",
    "line": 42.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 2.6,
    "ev": null,
    "units": 0.0,
@@ -2547,11 +2547,11 @@
    "state": "under"
   },
   "401915942": {
-   "mk": "total",
-   "side": "under",
-   "line": 155.5,
-   "price": -158.0,
-   "edge": 5.3,
+   "mk": "spread",
+   "side": "home",
+   "line": -5.5,
+   "price": -124.0,
+   "edge": 3.7,
    "ev": null,
    "units": 0.0,
    "home": "Louisville",
@@ -2573,9 +2573,9 @@
   "401909495": {
    "mk": "spread",
    "side": "home",
-   "line": 5.5,
-   "price": -119.0,
-   "edge": 2.0,
+   "line": 4.5,
+   "price": -129.0,
+   "edge": 3.0,
    "ev": null,
    "units": 0.0,
    "home": "Michigan",
@@ -2633,9 +2633,9 @@
   "401909800": {
    "mk": "total",
    "side": "under",
-   "line": 164.5,
-   "price": -283.0,
-   "edge": 8.6,
+   "line": 186.5,
+   "price": -5413.0,
+   "edge": 30.4,
    "ev": null,
    "units": 0.0,
    "home": "Kansas State",
@@ -2695,16 +2695,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 24015,
+  "snapshots": 24024,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 699,
-    "clvRet": 0.0069,
-    "clvT": 0.75,
-    "clv": 1.09,
-    "beat": 0.402,
-    "still": 0.265
+    "clvN": 700,
+    "clvRet": 0.0057,
+    "clvT": 0.62,
+    "clv": 1.07,
+    "beat": 0.384,
+    "still": 0.283
    },
    {
     "when": "6-24h",
@@ -21007,7 +21007,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-23T23:03:41Z",
+ "checked": "2026-11-23T23:07:04Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
