@@ -1126,7 +1126,76 @@ def soccer(fit, rng):
     lead('ballon', conv, draw, 'svar', [('svar', 'SVAR', '%.1f'), ('ga', 'G+A', '%.0f'), ('lgw', 'LG', 'pct'), ('uclw', 'UCL', 'pct')], rng)
     pool = prune(cands, spec, draw, rng)
     p = race(pool, spec, draw, rng)
-    return {'season': f'{S - 1}-{str(S)[2:]}', 'races': [('ballon', rows_out(pool, p, draw, show, rng), show)], 'logo': 'soccer'}
+    out = [('ballon', rows_out(pool, p, draw, show, rng), show)]
+    out += soccer_more(fit, rng, S, rows, G, tinfo, ph, teams_draw)
+    return {'season': f'{S - 1}-{str(S)[2:]}', 'races': out, 'logo': 'soccer'}
+
+
+def soccer_more(fit, rng, S, rows, G, tinfo, ph, teams_draw):
+    """the league player-of-the-season awards, Golden Boy, Kopa, Yashin (scripts/awards_soccer_more.py) and each league's
+    Golden Boot. Predictive where the voter model passed; conviction (P(lead) on SVAR, Golden Boot on goals, the games
+    left at this season's own rate) for every one"""
+    import awards_soccer_more as SM
+    xp = {}
+    for lg, L in G['leagues'].items():
+        n = len(L['teams'])
+        for t in L['teams']:
+            left = max(2 * (n - 1) - (t.get('gp') or 0), 0)
+            xp[t['id']] = (t.get('xpts') or 0, 1.2 * math.sqrt(left), 3 * 2 * (n - 1), t.get('pts') or 0)
+    today = dt.date.today()
+    to_end = (dt.date(S, 7, 1) - today).days / 365.25            # the file's age is today's; the rules read July 1
+    age = {r['p']: (r.get('age') or 30) + to_end for r in (jload(os.path.join(SO_WAR(), f'{S}.json'), {}) or {}).get('players', [])}
+
+    def cand(r, aw):
+        c = {'id': r['id'], 'n': r['n'], 'tid': r['tid'], 'tm': r['team'], 'lg': r['lg'], 'pos': r.get('pos'),
+             'logo': f"/img/soccer/{r['tid']}.png", 'gar': r['gar'], 'svar': r.get('svar') or 0.0, 'ga': r['g'] + r['a'],
+             'g': r['g'], 'min': r['min'], 'age': age.get(r['id'], 30), 'prev': fit.get('_prev', {}).get(aw, {}).get(NM.key(r['n']), 0)}
+        if ph.get(r['id']): c['phu'] = 'https://img.a.transfermarkt.technology/portrait/medium/' + ph[r['id']]
+        return c
+
+    def draw(c, td, rng):
+        gp, tot = tinfo[c['tid']]
+        gr = games_left(rng, max(tot - gp, 0), .93, 'soccer')
+        o = {}
+        for k, kind in (('gar', 'yds'), ('svar', 'yds'), ('ga', 'count'), ('g', 'count')):
+            mu = c[k] / max(gp, 1) * gr
+            o[k] = c[k] + (gauss(rng, mu, .3 * abs(mu)) if kind == 'yds' else max(gauss(rng, mu, math.sqrt(max(mu, 0))), 0))
+        x0, sd, P, now = xp.get(c['tid'], (0, 0, 1, 0))
+        o.update(lgw=1.0 if c['tid'] in td['champ'] else 0.0, ucl=1.0 if c['tid'] == td['uw'] else .5 if c['tid'] == td['ul'] else 0.0,
+                 natw=0.0, prev=c['prev'], age=c['age'], tppg=max(gauss(rng, x0, sd), now) / P,
+                 uclw=1.0 if c['tid'] == td['uw'] else 0.0)
+        return o
+
+    draw.teams = teams_draw
+    live = [r for r in rows if r['tid'] in tinfo]
+    out = []
+    for aw, (lab, _, lg, depth) in SM.AWARDS.items():
+        spec = fit.get(aw)
+        if not spec: continue
+        if lg: P = [cand(r, aw) for r in live if r['lg'] == lg]
+        elif aw == 'yashin': P = [cand(r, aw) for r in live if r.get('pos') == 'GK']
+        else: P = [c for c in (cand(r, aw) for r in live) if c['age'] < 20.5]
+        if not P: continue
+        top = sorted(P, key=lambda c: -c['svar'])[:80]
+        cshow = [('svar', 'SVAR', '%.1f'), ('ga', 'G+A', '%.0f'), ('lgw', 'LG', 'pct')]
+        lead(aw, top, draw, 'svar', cshow, rng)
+        if not spec['test'].get('pass'): continue
+        show = [('gar', 'GAR', '%.1f'), ('ga', 'G+A', '%.0f'), ('lgw', 'LG', 'pct'), ('tppg', 'PTS%', 'pct')]
+        pool = prune(sorted(P, key=lambda c: -c['gar'])[:120], spec, draw, rng)
+        out.append((aw, rows_out(pool, race(pool, spec, draw, rng), draw, show, rng), show))
+    # Golden Boot: the league's top scorer (a stat title; conviction only: there is no to-date archive of big-five
+    # scorers to test a projection on)
+    for lg, nm in SM.LEAGUES.items():
+        aw = 'boot_' + lg.split('.')[0]
+        if aw not in fit: continue
+        P = sorted([cand(r, aw) for r in live if r['lg'] == lg], key=lambda c: -c['g'])[:60]
+        lead(aw, P, draw, 'g', [('g', 'G', '%.0f'), ('ga', 'G+A', '%.0f')], rng)
+    return out
+
+
+def SO_WAR():
+    import awards_soccer as SO
+    return SO.WAR
 
 
 # ---------------------------------------------------------------- output

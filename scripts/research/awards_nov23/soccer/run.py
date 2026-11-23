@@ -40,6 +40,10 @@ def races_cmd():
         new[a]['test']['out_of_pool'] = len(races) - n
     gate(cur, 'soccer', new)
     cur['soccer'].update(new)
+    # Golden Boot per league: a stat title with no to-date scorer archive to test a projection on, so conviction only
+    for lg, nm in M.LEAGUES.items():
+        cur['soccer']['boot_' + lg.split('.')[0]] = {'award': 'boot_' + lg.split('.')[0], 'label': f'{nm} Golden Boot',
+                                                    'stat': True, 'more': True, 'null': ['g'], 'test': {'pass': False}}
     pv = cur['soccer'].setdefault('_prev', {})
     for a in new: pv[a] = prev.get(a, {})
     json.dump(cur, open(OUT, 'w'), indent=1, sort_keys=True)
