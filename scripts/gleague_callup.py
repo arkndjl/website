@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """G League call-up odds for the NBA ARKBOARD: every G League player this season with his chance of NBA minutes next
-season, of being an NBA regular next season (1,000+ minutes), and his expected NBA VORX per season over the next three.
+season, of being an NBA regular next season (1,000+ minutes), his expected NBA VORX per season over the next three,
+and his expected NBA XPM over the minutes he plays in those three (xXPM).
 
     python3 scripts/gleague_callup.py --research   # fetch every season, fit, backtest -> data/gleague_callup_fit.json
     python3 scripts/gleague_callup.py              # this season -> static/data/gleague.json (uses the fit file)
@@ -19,7 +20,9 @@ round 1 / 2, log pick, years since the draft; `part` = 1 while only the Showcase
 34-game regular season fills. Training pools full seasons 2009-25 (2008-09 on) with Showcase-only rows 2022-25 (part 1).
 Targets: NBA 1 = any NBA minutes next season; REG = 1,000+ minutes (per 82 games; the league's 270th player, nine a team, plays about
 1,000 every season, and that line splits later VORX best: Nov 17 2026, was 500); xVORX 3Y = P(any NBA game in the
-next 3 seasons) x E[3-season VORX | he plays] (ridge, lambda POS_LAM, on those who played), shown per season (/ 3).
+next 3 seasons) x E[3-season VORX | he plays] (ridge, lambda POS_LAM, on those who played), shown per season (/ 3); a season out
+of the NBA counts 0, so xVORX sits near 0 for most of the league. xXPM = E[minute-weighted XPM, next 3 seasons | he plays]
+(ridge, lambda XX_LAM, weighted by those minutes): the rate, without the chance or the minutes.
 Ridge logistic (lambda 1), standardized. Draft slot counts only drafts held before the G League season.
 Backtest: leave one season out, scored per season against the same model without G League production.
 Display only (build): exact age on Feb 1 from the G League team rosters' birth dates (ESPN's NBA rosters for assigned
@@ -244,7 +247,11 @@ class World:
         vx = lambda z: (self.NB.get(z, {}).get(b, {}).get('vorx') or 0) if b else 0.0
         t = {'nba1': 1.0 if mp(y + 1) > 0 else 0.0, 'stick': 1.0 if mp(y + 1) >= REG_MP else 0.0,
              'any3': 1.0 if b and any(self.NB.get(z, {}).get(b) for z in (y + 1, y + 2, y + 3)) else 0.0,
-             'xv3': sum(vx(z) for z in (y + 1, y + 2, y + 3))}
+             'xv3': sum(vx(z) for z in (y + 1, y + 2, y + 3)), 'mp3': 0.0, 'xpm3': 0.0}
+        for z in (y + 1, y + 2, y + 3):     # NBA minutes and minute-weighted XPM over the next three seasons (xXPM target)
+            q = self.NB.get(z, {}).get(b) if b else None
+            if q and q.get('xpm') is not None and (q.get('mp') or 0) > 0: t['mp3'] += q['mp']; t['xpm3'] += q['xpm'] * q['mp']
+        if t['mp3'] > 0: t['xpm3'] /= t['mp3']
         return f, t, info
 
 
@@ -273,9 +280,18 @@ def logit_fit(X, y, lam=1.0):
 POS_LAM = 300.0
 
 
-def ridge_fit(X, y, lam=3.0):
+def ridge_fit(X, y, lam=3.0, w=None):
     n, k = X.shape; Xb = np.column_stack([np.ones(n), X]); P = lam * np.eye(k + 1); P[0, 0] = 0
-    return np.linalg.solve(Xb.T @ Xb + P, Xb.T @ y)
+    w = np.ones(n) if w is None else w / w.mean()
+    return np.linalg.solve(Xb.T @ (Xb * w[:, None]) + P, Xb.T @ (w * y))
+
+
+# xXPM = E[NBA XPM over his NBA minutes, next 3 seasons | he plays]: ridge (lambda XX_LAM) on the rows that played, weighted
+# by those minutes (Nov 23 2026). Leave one season out, minute-weighted MSE vs the same model without G League stats:
+# full seasons 2.23 vs 2.62, t -3.6, 11/15 (lambda 30 / 300 / 3000 and weight caps 250 / 1,000 / 3,000 / none all pass;
+# uncapped = unbiased on the minute-weighted target, bias .00 vs +.43 capped at 1,000). Boards 3 / 6 / 10 games in: 2.04 vs
+# 2.28, t -1.45, 9/13, slope .75 (better, not significant)
+XX_LAM = 300.0
 
 
 def lin(b, X): return np.column_stack([np.ones(len(X)), X]) @ b
@@ -293,6 +309,8 @@ def fit_all(rows, feats):
     out['any3'] = logit_fit(X[m3], a[m3]).tolist()
     pos = m3 & (a == 1)
     out['pos'] = ridge_fit(X[pos], np.array([r[2]['xv3'] for r in rows])[pos], POS_LAM).tolist()
+    mp3 = np.array([r[2]['mp3'] for r in rows]); pl = m3 & (mp3 > 0)
+    out['xx'] = ridge_fit(X[pl], np.array([r[2]['xpm3'] for r in rows])[pl], XX_LAM, mp3[pl]).tolist()
     return out
 
 
@@ -301,7 +319,8 @@ def predict(fit, F, feats):
     p1, p5 = sig(lin(np.array(fit['nba1']), X)), sig(lin(np.array(fit['stick']), X))
     p5 = np.minimum(p5, p1)
     xv = sig(lin(np.array(fit['any3']), X)) * lin(np.array(fit['pos']), X)
-    return p1, p5, xv
+    xx = lin(np.array(fit['xx']), X)
+    return p1, p5, xv, xx
 
 
 LAST1, LAST3 = 2025, 2023
@@ -353,24 +372,26 @@ def research():
         tr = [r for r in rows if r[0] != s]; te = [r for r in rows if r[0] == s]
         for name, feats in (('full', FEATS), ('hist', HIST)):
             fit = fit_all([(r[0], r[1], r[2]) for r in tr], feats)
-            p1, p5, xv = predict(fit, [r[1] for r in te], feats)
+            p1, p5, xv, xx = predict(fit, [r[1] for r in te], feats)
             for i, r in enumerate(te):
-                oos[name]['p1'].append(p1[i]); oos[name]['p5'].append(p5[i]); oos[name]['xv'].append(xv[i])
+                oos[name]['p1'].append(p1[i]); oos[name]['p5'].append(p5[i]); oos[name]['xv'].append(xv[i]); oos[name]['xx'].append(xx[i])
                 if name == 'full':
                     oos['y'] = oos.get('y', collections.defaultdict(list))
-                    for k in ('nba1', 'stick', 'xv3'): oos['y'][k].append(r[2][k])
+                    for k in ('nba1', 'stick', 'xv3', 'xpm3', 'mp3'): oos['y'][k].append(r[2][k])
                     oos['y']['yr'].append(r[0]); oos['y']['part'].append(r[3]); oos['y']['nonba'].append(r[1]['lnmp_c'] == 0)
     Y = {k: np.array(v) for k, v in oos['y'].items()}
     P = {n: {k: np.array(v) for k, v in oos[n].items()} for n in ('full', 'hist')}
     tests, rep = [], {}
-    for key, tk, kind, last in (('p1', 'nba1', 'll', LAST1), ('p5', 'stick', 'll', LAST1), ('xv', 'xv3', 'mse', LAST3)):
+    for key, tk, kind, last in (('p1', 'nba1', 'll', LAST1), ('p5', 'stick', 'll', LAST1), ('xv', 'xv3', 'mse', LAST3),
+                                ('xx', 'xpm3', 'wmse', LAST3)):
         d = []; ss = [s for s in yrs if s <= last]
+        sel = (lambda m: m & (Y['mp3'] > 0) & (Y['part'] == 0)) if kind == 'wmse' else (lambda m: m)
         for s in ss:
-            m = Y['yr'] == s; y = Y[tk][m]
-            sc = (lambda p: ll(p, y)) if kind == 'll' else (lambda p: float(np.mean((p - y) ** 2)))
+            m = sel(Y['yr'] == s); y = Y[tk][m]; w = Y['mp3'][m]
+            sc = (lambda p: ll(p, y)) if kind == 'll' else (lambda p: float(np.mean((p - y) ** 2))) if kind == 'mse' else (lambda p: float(np.average((p - y) ** 2, weights=w)))
             d.append(sc(P['full'][key][m]) - sc(P['hist'][key][m]))
         d = np.array(d); t = float(d.mean() / (d.std(ddof=1) / math.sqrt(len(d))))
-        m = Y['yr'] <= last; y = Y[tk][m]; pf = P['full'][key][m]; ph = P['hist'][key][m]
+        m = sel(Y['yr'] <= last); y = Y[tk][m]; pf = P['full'][key][m]; ph = P['hist'][key][m]
         e = {'target': tk, 'seasons': len(ss), 'n': int(m.sum()), 't': round(t, 2), 'p': round(tdist_p(t, len(ss) - 1), 4),
              'wins': int((d < 0).sum())}
         if kind == 'll':
@@ -384,13 +405,17 @@ def research():
                 s_ = (pf >= q[i]) & (pf <= q[i + 1]) if i == 9 else (pf >= q[i]) & (pf < q[i + 1])
                 bins.append([round(float(pf[s_].mean()), 3), round(float(y[s_].mean()), 3), int(s_.sum())])
             e['calibration'] = bins
+        elif kind == 'wmse':
+            w = Y['mp3'][m]
+            e.update({'rmse': round(float(np.sqrt(np.average((pf - y) ** 2, weights=w))), 3), 'rmse_hist': round(float(np.sqrt(np.average((ph - y) ** 2, weights=w))), 3),
+                      'bias': round(float(np.average(y - pf, weights=w)), 3)})
         else:
             e.update({'rmse': round(float(np.sqrt(np.mean((pf - y) ** 2))), 3), 'rmse_hist': round(float(np.sqrt(np.mean((ph - y) ** 2))), 3),
                       'corr': round(float(np.corrcoef(pf, y)[0, 1]), 3), 'corr_hist': round(float(np.corrcoef(ph, y)[0, 1]), 3)})
         tests.append(e); print(e)
-    # Holm over the three
-    order = sorted(range(3), key=lambda i: tests[i]['p'])
-    for j, i in enumerate(order): tests[i]['holm'] = bool(tests[i]['p'] < .05 / (3 - j) and tests[i]['t'] < 0 and all(tests[k]['holm'] for k in order[:j]))
+    # Holm over the four
+    order = sorted(range(len(tests)), key=lambda i: tests[i]['p'])
+    for j, i in enumerate(order): tests[i]['holm'] = bool(tests[i]['p'] < .05 / (len(tests) - j) and tests[i]['t'] < 0 and all(tests[k]['holm'] for k in order[:j]))
     fit = fit_all([(r[0], r[1], r[2]) for r in rows], FEATS)
     fit.update({'feats': FEATS, 'extra': ['age2'], 'tests': tests, 'rows': len(rows), 'seasons': [yrs[0], yrs[-1]],
                 'updated': datetime.date.today().isoformat()})
@@ -412,7 +437,7 @@ def build():
         if not o['n'] or (o['MIN'] or 0) < MIN_ROW: continue
         W.link(p, o['n'], [y - o['age']] if o['age'] else [])
         f, t, info = W.row(y, o, part); F.append(f); keep.append((o, f, info))
-    p1, p5, xv = predict(fit, F, fit['feats'])
+    p1, p5, xv, xx = predict(fit, F, fit['feats'])
     players = []
     for i, (o, f, info) in enumerate(keep):
         b = info['b']; nb = W.NB.get(y, {}).get(b, {}) if b else {}
@@ -423,7 +448,8 @@ def build():
                         'gp': o['GP'], 'min': round(o['MIN']), 'pts': round(f['pts36'], 1), 'gs': round(f['gs36'], 1),
                         'ts': round(100 * o['TS_PCT'], 1) if o['MIN'] else None,
                         'cmp': round(info['cmp'] + now), 'ph': ph, 'pk': info['pk'], 'dy': info['dy'], 'bb': b,
-                        'p1': round(float(p1[i]), 3), 'p5': round(float(p5[i]), 3), 'xv': round(float(xv[i]) / 3, 2)})
+                        'p1': round(float(p1[i]), 3), 'p5': round(float(p5[i]), 3), 'xv': round(float(xv[i]) / 3, 2),
+                        'xx': round(float(xx[i]), 1)})
     try:
         stt = status(y, players)
     except Exception as e:
@@ -475,12 +501,14 @@ def past():
         X, mu, sd = design([r[1] for r in tr1], FEATS)
         b1 = logit_fit(X, np.array([r[2]['nba1'] for r in tr1])); b5 = logit_fit(X, np.array([r[2]['stick'] for r in tr1]))
         Xt, _, _ = design([r[1] for r in te], FEATS, mu, sd)
-        p1 = sig(lin(b1, Xt)); p5 = np.minimum(sig(lin(b5, Xt)), p1); xv = [None] * len(te)
+        p1 = sig(lin(b1, Xt)); p5 = np.minimum(sig(lin(b5, Xt)), p1); xv = [None] * len(te); xx = [None] * len(te)
         if len({r[0] for r in tr3}) >= 4:
             X3, m3, s3 = design([r[1] for r in tr3], FEATS); a = np.array([r[2]['any3'] for r in tr3])
             ba = logit_fit(X3, a); bp = ridge_fit(X3[a == 1], np.array([r[2]['xv3'] for r in tr3])[a == 1], POS_LAM)
             Xt3, _, _ = design([r[1] for r in te], FEATS, m3, s3)
             xv = (sig(lin(ba, Xt3)) * lin(bp, Xt3)).tolist()
+            mp3 = np.array([r[2]['mp3'] for r in tr3]); pl = mp3 > 0
+            xx = lin(ridge_fit(X3[pl], np.array([r[2]['xpm3'] for r in tr3])[pl], XX_LAM, mp3[pl]), Xt3).tolist()
         players = []
         for i, (y, f, t, part, info, o) in enumerate(te):
             b = info['b']; nb = W.NB.get(s, {}).get(b, {}) if b else {}
@@ -493,7 +521,9 @@ def past():
                             'gp': o['GP'], 'min': round(o['MIN']), 'gs': round(f['gs36'], 1), 'ts': round(100 * o['TS_PCT'], 1) if o['MIN'] else None,
                             'cmp': round(info['cmp'] + (nb.get('mp') or 0)), 'ph': ph, 'pk': info['pk'], 'dy': info['dy'],
                             'p1': round(float(p1[i]), 3), 'p5': round(float(p5[i]), 3), 'xv': None if xv[i] is None else round(float(xv[i]) / 3, 2),
-                            'o1': mp1 if done1 else None, 'o3': round(t['xv3'] / 3, 2) if done3 else None})
+                            'xx': None if xx[i] is None else round(float(xx[i]), 1),
+                            'o1': mp1 if done1 else None, 'o3': round(t['xv3'] / 3, 2) if done3 else None,
+                            'ox': round(t['xpm3'], 1) if done3 and t['mp3'] > 0 else None})
             if done1:
                 score['p1'].append(float(p1[i])); score['y1'].append(t['nba1'])
         players.sort(key=lambda r: (-r['p1'], -(r['xv'] or 0)))

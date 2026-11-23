@@ -1,7 +1,7 @@
 {{- /* G League call-up odds: every G League player this season (static/data/gleague.json, scripts/gleague_callup.py),
        50 to a page. The season select swaps in a past season's end-of-season board (static/data/gleague-past.json,
        gleague_callup.py --past: fit walk forward) with what happened next (MP next, VORX 3Y). {{< gleague title="..." tab="..." >}}. Filters ride in the address with a g prefix. */ -}}
-<div class="win cfb nbagl"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbagl data-src="{{ "data/gleague.json" | relURL }}" data-past="{{ "data/gleague-past.json" | relURL }}" data-gfx-cols="RK,Player,Age,GP,MIN,GmSc/36,TS%,NBA MP,NBA%,REG%,xVORX">
+<div class="win cfb nbagl"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbagl data-src="{{ "data/gleague.json" | relURL }}" data-past="{{ "data/gleague-past.json" | relURL }}" data-gfx-cols="RK,Player,Age,GP,MIN,GmSc/36,TS%,NBA MP,NBA%,REG%,xVORX,xXPM">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ .Get "title" | default "gleague.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -22,6 +22,7 @@
       <button type="button" class="cfb__chip is-on" data-view="p1" aria-pressed="true" title="chance of NBA minutes next season">NBA%</button>
       <button type="button" class="cfb__chip" data-view="p5" aria-pressed="false" title="chance of being an NBA regular next season: 1,000+ NBA minutes">REG%</button>
       <button type="button" class="cfb__chip" data-view="xv" aria-pressed="false" title="expected NBA VORX per season, next 3 seasons">xVORX</button>
+      <button type="button" class="cfb__chip" data-view="xx" aria-pressed="false" title="expected NBA XPM if he plays, next 3 seasons">xXPM</button>
     </fieldset>
   </form>
   <div class="wintable__scroll cfb__scroll">
@@ -38,15 +39,17 @@
         <th data-sort="p1" data-num class="c-p1" title="chance of NBA minutes next season. Out of sample: AUC .88, calibrated by decile">NBA%</th>
         <th data-sort="p5" data-num class="c-p5" title="chance of being an NBA regular next season: 1,000+ NBA minutes (per 82 games). Out of sample: AUC .89">REG%</th>
         <th data-sort="xv" data-num class="c-xv" title="expected NBA VORX (wins over replacement) per season, averaged over the next 3 seasons; 0 for seasons out of the NBA">xVORX</th>
+        <th data-sort="xx" data-num class="c-xx" title="expected NBA XPM (points per 100 over an average player) over the NBA minutes he plays in the next 3 seasons, if he plays; the rate, without the chance or the minutes">xXPM</th>
         <th data-sort="o1" data-num data-gl-out hidden title="what happened: NBA minutes the next season (per 82 games)">MP next</th>
         <th data-sort="o3" data-num data-gl-out hidden title="what happened: NBA VORX per season over the next 3 seasons">VORX 3Y</th>
+        <th data-sort="ox" data-num data-gl-out hidden title="what happened: NBA XPM over his NBA minutes in the next 3 seasons (blank: no NBA minutes)">XPM 3Y</th>
       </tr></thead>
       <tbody></tbody>
     </table>
     <p class="cfb__none" data-gl-loading>loading…<noscript> (needs JavaScript)</noscript></p>
     <p class="cfb__none" data-gl-none hidden>no players match.</p>
   </div>
-  <div class="win__status" data-gl-def title="NBA%, REG% and xVORX: ridge logistic on G League seasons 2009-25 (age, minutes, per-36 box, TS%, usage, AST%, rebound %, net rating, PIE, NBA minutes and XPM through last season, draft slot), Showcase Cup-only seasons pooled in; xVORX ridge lambda 300 (tested on boards 3, 6 and 10 games into past seasons); tested leaving one season out against the same model without G League stats (all three pass Holm). Players with 50+ G League minutes."><span data-gl-count></span>
+  <div class="win__status" data-gl-def title="NBA%, REG%, xVORX and xXPM: ridge logistic on G League seasons 2009-25 (age, minutes, per-36 box, TS%, usage, AST%, rebound %, net rating, PIE, NBA minutes and XPM through last season, draft slot), Showcase Cup-only seasons pooled in; xVORX ridge lambda 300 (tested on boards 3, 6 and 10 games into past seasons); xXPM ridge lambda 300 on those who played, weighted by NBA minutes; tested leaving one season out against the same model without G League stats (all four pass Holm). Players with 50+ G League minutes."><span data-gl-count></span>
     <span class="winpager" data-gl-pager hidden>
       <button type="button" class="winpager__btn" data-gl-step="-1" aria-label="previous page"><svg aria-hidden="true" viewBox="0 0 5 7"><path d="M4 0h1v7H4zM3 1h1v5H3zM2 2h1v3H2zM1 3h1v1H1z"/></svg></button>
       <span class="winpager__at" aria-live="polite"><span data-gl-page>1</span>/<span data-gl-pages>1</span></span>
@@ -67,7 +70,7 @@
   var bar = win.querySelector('[data-gl-bar]'), table = win.querySelector('table'), body = win.querySelector('tbody'), ths = [].slice.call(win.querySelectorAll('thead th')),
       count = win.querySelector('[data-gl-count]'), none = win.querySelector('[data-gl-none]'), loading = win.querySelector('[data-gl-loading]'),
       asof = win.querySelector('[data-gl-asof]'), defEl = win.querySelector('[data-gl-def]'), DEF = defEl.title, pager = win.querySelector('[data-gl-pager]'), pageEl = win.querySelector('[data-gl-page]'), pagesEl = win.querySelector('[data-gl-pages]');
-  var PER = 50, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' '), VIEWS = ['p1', 'p5', 'xv'];
+  var PER = 50, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' '), VIEWS = ['p1', 'p5', 'xv', 'xx'];
   var cur = null, past = null, data = null, view = 'p1', sortKey = 'rk', dir = 1, best = 1, page = 0;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   // ESPN headshot from the XPM board, else NBA's own by person id; a miss shows the neutral frame
@@ -120,8 +123,8 @@
     table.dataset.key = key;
     var isPast = data !== cur;
     ths.forEach(function (th) { if (th.hasAttribute('data-gl-out')) th.hidden = !isPast; });
-    win.dataset.gfxCols = 'RK,Player,Age,GP,MIN,GmSc/36,TS%,NBA MP,NBA%,REG%,xVORX' + (isPast ? ',MP next,VORX 3Y' : '');
-    defEl.title = isPast ? DEF + ' Past seasons: the board the day that season ended, refit walk forward on the seasons known by then (NBA% and REG% through the season before, xVORX three back, from 2014-15); out of sample 2010-11 to 2024-25: NBA% AUC ' + past.test.auc + ', Brier ' + past.test.brier + ' (rate ' + past.test.rate + ').' : DEF;
+    win.dataset.gfxCols = 'RK,Player,Age,GP,MIN,GmSc/36,TS%,NBA MP,NBA%,REG%,xVORX,xXPM' + (isPast ? ',MP next,VORX 3Y,XPM 3Y' : '');
+    defEl.title = isPast ? DEF + ' Past seasons: the board the day that season ended, refit walk forward on the seasons known by then (NBA% and REG% through the season before, xVORX and xXPM three back, from 2014-15); out of sample 2010-11 to 2024-25: NBA% AUC ' + past.test.auc + ', Brier ' + past.test.brier + ' (rate ' + past.test.rate + ').' : DEF;
     function k(c) { return c === key ? ' is-key' : ''; }
     var row = function (p) {
       var dr = p.pk ? '#' + p.pk + " '" + String(p.dy).slice(2) : 'UDFA';
@@ -137,7 +140,8 @@
         '<td class="cfb__num c-p1 nbaxpm__v' + k('p1') + '">' + pct(p.p1) + '</td>' +
         '<td class="cfb__num c-p5 nbaxpm__v' + k('p5') + '">' + pct(p.p5) + '</td>' +
         '<td class="cfb__num c-xv nbaxpm__v' + k('xv') + '">' + sg(p.xv) + '</td>' +
-        (isPast ? '<td class="cfb__num">' + (p.o1 == null ? '<span class="cfb__dim">–</span>' : p.o1) + '</td><td class="cfb__num">' + sg(p.o3) + '</td>' : '') + '</tr>';
+        '<td class="cfb__num c-xx nbaxpm__v' + k('xx') + '">' + sg(p.xx) + '</td>' +
+        (isPast ? '<td class="cfb__num">' + (p.o1 == null ? '<span class="cfb__dim">–</span>' : p.o1) + '</td><td class="cfb__num">' + sg(p.o3) + '</td><td class="cfb__num">' + sg(p.ox) + '</td>' : '') + '</tr>';
     };
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(row).join('');
     var gfxAll = null; body.parentNode.__gfxOff = page * PER;
