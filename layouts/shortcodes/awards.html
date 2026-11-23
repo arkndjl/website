@@ -21,7 +21,7 @@
 {{- end }}
 {{- range $i, $r := $races }}
 {{- $t := .test }}
-{{- $pl := cond (isset . "k") "P(team)" (cond $conv "P(lead)" "P(win)") }}
+{{- $pl := cond (isset . "k") "P(team)" (cond (or $conv .stat) "P(lead)" "P(win)") }}
 {{- $ol := cond $conv "Pred" "Conv" }}
 {{- $ok := cond $conv "pp" "pc" }}
 {{- $other := false }}{{ range .rows }}{{ if ne (index . $ok) nil }}{{ $other = true }}{{ end }}{{ end }}
@@ -31,7 +31,7 @@
 <table class="cfb__table awards__table">
   <thead><tr>
     <th>RK</th><th>Player</th><th>Team</th>
-    <th title="{{ $pl }}: {{ if $conv }}the share of {{ lang.FormatNumber 0 $d.sims }} simulated rests of the season in which he {{ with .k }}is in the top {{ . }}{{ else }}leads the pool{{ end }} on {{ .metric }}{{ else }}{{ with .blend }}the voter model blended with Polymarket ({{ mul . 100 | int }}% market, log-linear); the model alone in each cell's hover{{ else }}the voter model over {{ lang.FormatNumber 0 $d.sims }} simulated rests of the season{{ end }}{{ end }}">{{ $pl }}</th>
+    <th title="{{ $pl }}: {{ if $conv }}the share of {{ lang.FormatNumber 0 $d.sims }} simulated rests of the season in which he {{ with .k }}is in the top {{ . }}{{ else }}leads the pool{{ end }} on {{ .metric }}{{ else if .stat }}the share of {{ lang.FormatNumber 0 $d.sims }} simulated rests of the season in which he leads the league{{ else }}{{ with .blend }}the voter model blended with Polymarket ({{ mul . 100 | int }}% market, log-linear); the model alone in each cell's hover{{ else }}the voter model over {{ lang.FormatNumber 0 $d.sims }} simulated rests of the season{{ end }}{{ end }}">{{ $pl }}</th>
     {{- if .mkt }}<th title="Polymarket, no vig">Mkt</th>{{ end }}
     {{- if $other }}<th title="{{ if $conv }}the predictive view's {{ cond (isset . "k") "P(team)" "P(win)" }}{{ else }}the conviction view's {{ cond (isset . "k") "P(team)" "P(lead)" }}{{ end }}">{{ $ol }}</th>{{ end }}
     {{- range $k, $c := .show }}<th{{ if gt $k 0 }} class="awards__x"{{ end }} title="projected finish">{{ .l }}</th>{{ end }}
@@ -60,11 +60,12 @@
 {{- if $conv }}
 {{- $about = printf "P(lead): the share of %v simulated rests of the season in which he leads the award's pool on %s, the games left at this season's own rate. No voter model, no market." $d.sims .metric }}
 {{- with .k }}{{ $about = printf "P(team): the share of %v simulated rests of the season in which he is in the pool's top %v on %s. No voter model, no market." $d.sims . $r.metric }}{{ end }}
-{{- else }}
+{{- else if not .stat }}
 {{- $about = printf "Voter model fit on %v-%v; held out a season at a time it gave the winner %.0f%% on average and picked him %v of %v times (%s alone: %v). P(win) averages it over %v simulated rests of the season." $t.from $t.to (mul $t.pw 100) $t.hit $t.n (delimit $t.null " + ") $t.hit0 $d.sims }}
 {{- with $d.temp }}{{ $about = printf "%s In season the odds are flattened: p^(1/T), T %.2f today." $about . }}{{ end }}
 {{- with .k }}{{ $about = printf "Voter model fit on %v-%v; held out a season at a time its top %v held %v of the %v named (%s alone: %v). P(team) is the share of %v simulated rests of the season in which he is named." $t.from $t.to . $t.hit (mul $t.n .) (delimit $t.null " + ") $t.hit0 $d.sims }}{{ end }}
 {{- end }}
+{{- with .about }}{{ $about = . }}{{ end }}
 {{- partial "wintable-close.html" (dict "rows" (len .rows) "fresh" (printf "awards.%s" $sport) "note" (printf "updated %s" $date) "about" $about) }}
 </div>
 {{- end }}
