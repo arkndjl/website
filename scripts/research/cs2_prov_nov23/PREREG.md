@@ -43,3 +43,7 @@ birth dates), LAN appearances, role, pug stats, prize money (placing stands in).
 
 ## Cross-sport: whatever passes is tried for provisional players in sports with an analogue (team results / playoffs /
 promotion for hockey provisional and soccer prospects).
+
+## Amendment 1 (after the early fetch landed, before any outcome was computed)
+- bo3.gg history starts 2024-01: a cutoff needs 90+ days of it before T, else an established pro would read as
+  ESEA-only. Earlier cutoffs are dropped from tune.

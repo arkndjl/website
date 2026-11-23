@@ -91,12 +91,16 @@ jobs:
       - name: ESEA pro history and retest
         if: github.event_name == 'schedule' || (inputs.regions == '1' && inputs.probe != '1')
         run: python3 scripts/esea_pro_history.py || echo "ESEA pro history failed; keeping the committed files"
+      # standing retest of the pre-registered provisional (ESEA-only) CS2 FV drivers (scripts/research/cs2_prov_nov23)
+      - name: CS2 provisional driver retest
+        if: github.event_name == 'schedule' || (inputs.regions == '1' && inputs.probe != '1')
+        run: python3 scripts/cs2_prov_research.py > /dev/null || echo "provisional retest failed; keeping the committed result"
       - name: Commit
         run: |
           git config user.name "arkboard-bot"
           git config user.email "actions@users.noreply.github.com"
           git add -f research/esea_matches.json.gz research/esea_regions.json.gz 2>/dev/null || git add -f research/esea_regions.json.gz || git add -f research/esea_matches.json.gz
-          git add data/esea_world.json data/esea_board_research.json data/esea_pro_test.json scripts/data/esea_pro_history 2>/dev/null || true
+          git add data/esea_world.json data/esea_board_research.json data/esea_pro_test.json data/cs2_prov_research.json scripts/data/esea_pro_history 2>/dev/null || true
           git add -f research/esea_div_backfill.json.gz 2>/dev/null || true
           git add -f research/esea_regions_early.json.gz research/esea_matches_early.json.gz 2>/dev/null || true
           git commit -m "ESEA research data ($(date -u +%Y-%m-%dT%H:%MZ))" || exit 0

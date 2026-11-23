@@ -26,7 +26,7 @@ import names  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "data" / "cs2_prov_research.json"
 LV = {"Intermediate": -1, "Main": 0, "Advanced": 1}
-HELD = (53, 54)
+HELD = (53, 54)   # pre-registered held seasons; the weekly standing retest holds out every season 53+ with a full year
 SPECS = {
     "S1": ["lv", "eu", "lv_eu"],
     "S2": ["lv", "eu", "lv_eu", "rs", "po", "pw", "top3"],
@@ -119,6 +119,7 @@ def features(ms, bx):
     for m in ms:
         end[m["season"]] = max(end[m["season"]], dt.date.fromtimestamp(m["at"]).toordinal())
     pl = defaultdict(lambda: defaultdict(lambda: {"n": 0, "lv": -9, "rg": Counter(), "tm": Counter(), "sk": []}))
+    nick, tnm = {}, {}
     team_rs = defaultdict(lambda: [0, 0])          # (season, team id) -> [rounds for, rounds total] regular season
     po = defaultdict(lambda: defaultdict(int))     # (season, region, div, stage) -> team -> playoff wins
     po_last = {}
@@ -145,6 +146,9 @@ def features(ms, bx):
             for q in m[f]["roster"]:
                 r = pl[q[0]][s]
                 r["n"] += 1
+                if len(q) > 2 and q[1]:
+                    nick[q[0]] = q[1]
+                tnm[m[f]["id"]] = m[f]["name"]
                 r["lv"] = max(r["lv"], LV[m["div"]])
                 r["rg"][m.get("region")] += 1
                 r["tm"][(m[f]["id"], m["div"])] += 1
@@ -214,7 +218,7 @@ def features(ms, bx):
                            "up": int(bool(prev) and r["lv"] > prev["lv"]), "down": int(bool(prev) and r["lv"] < prev["lv"]),
                            "exp": sum(1 for t in range(s - 3, s) if t in ss and ss[t]["n"] >= 3),
                            "sk": sk, "dsk": (sk - psk) if sk is not None and psk is not None else 0.0,
-                           "na": int(r["rg"].most_common(1)[0][0] == "NA"), "kdp": pct.get((fid, s))}
+                           "nk": nick.get(fid), "tn": tnm.get(tid), "na": int(r["rg"].most_common(1)[0][0] == "NA"), "kdp": pct.get((fid, s))}
     return F, end
 
 
@@ -283,7 +287,7 @@ def main():
     cache = {}
     for s in sorted(end):
         T = end[s] + 1
-        if T + 182 > last:
+        if T + 182 > last or T < int(M.gd.min()) + 90:   # 90+ days of bo3.gg history before the cutoff (amendment 1)
             continue
         th, _ = CP.ratings(M, c, T, p)
         _, r12 = CP.window_stats(M, c, th, T - 365, T, p)
@@ -305,7 +309,7 @@ def main():
                    for k, v in Counter((r["eu"], r["lv"]) for r in rows).items()}}
     early = [r for r in rows if r["s"] < HELD[0]]
     if len(early) >= 60:
-        tune, held, split = early, [r for r in rows if r["s"] in HELD], "tune S<=52, held S53-54"
+        tune, held, split = early, [r for r in rows if r["s"] >= HELD[0]], "tune S<=52, held S53+"
     else:
         tune, held, split = [r for r in rows if r["s"] == 53], [r for r in rows if r["s"] == 54], "fallback: tune S53, held S54"
     out["split"], out["nTune"], out["nHeld"] = split, len(tune), len(held)
@@ -363,12 +367,18 @@ def main():
         b = CP.ols(design(allr, cols, fill), np.array([r["y"] for r in allr]), np.array([r["w"] for r in allr]))
         out["live"] = {"spec": keep, "b": [round(float(v), 4) for v in b], "fill": fill, "mu1": mu1, "sd1": sd1}
         g = []
+        try:   # ESEA RWA and rounds for the prospects tab's ESEA table (NA box lines; 0 where none)
+            ew = json.load(open(ROOT / "data" / "esea_rwa.json"))["p"]
+        except (OSError, ValueError, KeyError):
+            ew = {}
         a = p["a"]
         for (fid, s), x in F.items():
             if s != fin or (fid in ids and r12[ids[fid]] >= 300):
                 continue
-            pr = float(design([x], cols, fill) @ b)
-            g.append({"fid": fid, "proj": round(a / 2 * (pr - mu1), 2), "fv": CP.fv_of(pr, mu1, sd1)})
+            pr = float((design([x], cols, fill) @ b)[0])
+            rw = ew.get(fid) or [0.0, 0]
+            g.append({"fid": fid, "n": x["nk"], "tm": x["tn"], "rg": "EU" if x["eu"] else "NA" if x["na"] else "other",
+                      "div": [k for k, v in LV.items() if v == x["lv"]][0], "rwa": rw[0] or 0.0, "r": rw[1] or 0, "proj": round(a / 2 * (pr - mu1), 2), "fv": CP.fv_of(pr, mu1, sd1)})
         out["grades"] = sorted(g, key=lambda r: -r["proj"])
     # floor share by cell (FV of linked reachers on the pro scale), all rows
     cells = defaultdict(list)
