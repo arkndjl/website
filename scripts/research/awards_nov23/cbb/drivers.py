@@ -1,12 +1,12 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CBB award driver tests, Nov 23 2026 (preregistered in prereg.md beside this file).
 
-    python3 scripts/research/awards_nov23/cbb/drivers.py     # -> drivers.json, heldout_p.json beside it
+    python3 scripts/research/awards_nov23/cbb/drivers.py     # -> drivers.json, scripts/.cache/awards/cbb_heldout_p.json
 
 Each driver is added on its own to the race's voter model (its cols in data/awards_fit.json); leave one season out,
 held-out log P(winner), one-sided paired t vs the voter model alone, Holm at .05 over every test, gain > 0 and most
 seasons won. Also writes every player-season's held-out season-end P(win) for Wooden and the position awards
-(heldout_p.json: the awards -> FV candidate, fv_test.py). numpy."""
+(scripts/.cache/awards/cbb_heldout_p.json: the awards -> FV candidate, fv_test.py). numpy."""
 import csv, json, math, os, sys
 from collections import defaultdict
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -172,7 +172,7 @@ def main():
     rows = defaultdict(dict)
     for aw, d in HP.items():
         for (pid, s), p in d.items(): rows[f'{pid}|{s}'][aw] = round(p, 6)
-    json.dump(rows, open(os.path.join(HERE, 'heldout_p.json'), 'w'), separators=(',', ':'))
+    json.dump(rows, open(os.path.join(SCR, '.cache', 'awards', 'cbb_heldout_p.json'), 'w'), separators=(',', ':'))
 
 
 if __name__ == '__main__':
