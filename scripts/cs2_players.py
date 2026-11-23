@@ -857,6 +857,16 @@ def build():
         es = [dict(g, fv=fv_of(g["proj"], mu1, sd1), proj=round(float(a / 2 * (g["proj"] - mu1)), 2)) for g in et.get("grades") or []]
         out["esea"] = sorted((g for g in es if g["fv"] > 20), key=lambda g: -g["proj"])[:PRO_MAX]
         out["eseaFv"] = {g["fid"]: g["fv"] for g in es}
+    # or once the pre-registered provisional-driver retest passes (scripts/cs2_prov_research.py, weekly; Nov 23 2026:
+    # division + team results + movement + FACEIT level all fail held out, so nothing is graded yet)
+    if "esea" not in out:
+        try:
+            pv = json.loads((ROOT / "data" / "cs2_prov_research.json").read_text())
+        except (OSError, ValueError):
+            pv = {}
+        if pv.get("keep") and pv.get("grades"):
+            out["esea"] = [g for g in pv["grades"] if g["fv"] > 20][:PRO_MAX]
+            out["eseaFv"] = {g["fid"]: g["fv"] for g in pv["grades"]}
     out["fit"]["value"] = v
     try:    # every flag the board and prospects show (static/img/flags/<iso2>.png), so a new country doesn't 404
         import soccer_faces
