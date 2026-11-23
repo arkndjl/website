@@ -173,7 +173,7 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
     for i, r in enumerate(series):
         d, a, b, y, ra, rb = r[:6]
         while want and d >= want[0]:
-            kept[want.pop(0)] = {"pl": dict(pl), "lastros": dict(lastros), "roff": dict(roff), "team": dict(team)}
+            kept[want.pop(0)] = {"pl": dict(pl), "pn": dict(pn), "lastros": dict(lastros), "roff": dict(roff), "team": dict(team)}
         ka, kb = key(a), key(b)
         ra = ra or lastros.get(ka)
         rb = rb or lastros.get(kb)
@@ -246,7 +246,7 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
         bo3.joined_all = bo3.joined
         bo3.joined = {orig[i]: m for i, m in bo3.joined.items() if orig[i] is not None}
     for w in want:
-        kept[w] = {"pl": dict(pl), "lastros": dict(lastros), "roff": dict(roff), "team": dict(team)}
+        kept[w] = {"pl": dict(pl), "pn": dict(pn), "lastros": dict(lastros), "roff": dict(roff), "team": dict(team)}
     return rows, {"pl": pl, "pn": pn, "lastros": lastros, "roff": dict(roff), "team": team, "hist": hist, "tm": tm,
                   "snaps": kept}
 

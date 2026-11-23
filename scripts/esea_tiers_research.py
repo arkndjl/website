@@ -6,7 +6,15 @@ matches (research/esea_regions.json.gz, scripts/esea_regions_fetch.mjs) through 
 = a Valve / bo3.gg nick, names.key, 4+ characters), then read where each region's divisions sit against Valve's VRS
 ranks and bo3.gg's event tiers, and where 1NT ranks.
 
-    python3 scripts/esea_tiers_research.py   # ~15-25 min -> data/esea_tiers_research.json
+    python3 scripts/esea_tiers_research.py              # test + placement, ~25 min -> data/esea_tiers_research.json
+    python3 scripts/esea_tiers_research.py --describe   # placement only (keeps the test numbers), ~8 min
+    python3 scripts/esea_tiers_research.py --profile    # bo3.gg event tiers of each division's pro-record players
+
+RESULTS (Nov 23 2026, S53-S59, 33,156 ESEA matches NA + EU): ESEA rows in the pro model FAIL (held -.0008, t by
+month -1.97, 12/17; not shipped). Placement through anchors is rough: anchored ESEA ratings predict S58-59 ESEA
+results worse than ESEA-only ratings (.678 vs .658), nick bridges are noisy below Advanced. Robust part (--profile,
+players with 20+ bo3.gg maps): EU Advanced 32-50% of players, maps ~80% tier C / 20% B; NA Advanced ~20%, ~half B /
+half C; Main and Intermediate <= 2% (the few hits are mostly nick collisions).
 
 Pre-registered before any held number was read:
   - Predictive test: ESEA rows update players at K x kxe, kxe in {.25, .5, 1} picked on tune (Aug 2024 - Jun 2025,
@@ -35,7 +43,7 @@ from cs2_data import key  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "research" / "esea_regions.json.gz"
 OUT = ROOT / "data" / "esea_tiers_research.json"
-REG = {"NA": "Americas", "SA": "Americas", "EU": "Europe", "MENA": "Europe", "OCE": "Asia", "AS": "Asia"}
+REG = {"NA": "Americas", "SA": "Americas", "EU": "Europe", "MENA": "Europe", "OCE": "Asia", "AS": "Asia", "SEA": "Asia"}
 ME = "a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a"  # 1NT's FACEIT team id (data/esea.json team.id)
 
 
@@ -150,99 +158,241 @@ def equiv(s, lad):
     return max(above) if above else 1
 
 
-if __name__ == "__main__":
+def anchored(E, pro, st_snaps, months, dstart, P):
+    """ESEA ratings on the pro scale: a bridged player with ANCHOR+ pro series is fixed at his pro rating (the snapshot
+    before the match's month); everyone else carries an ESEA rating that starts at his first division's level
+    (dstart) and moves on each match (series result; a Bo1 on round share). -> (per-match rows, final ratings)."""
+    rt, n, out = {}, defaultdict(int), []
+    for m in sorted(E["matches"], key=lambda m: m.get("at") or 0):
+        if not m.get("at") or m.get("winner") not in ("faction1", "faction2"):
+            continue
+        if any(not m[f].get("id") or m[f]["id"] == "bye" or len(m[f]["roster"]) < 4 for f in ("f1", "f2")):
+            continue
+        d = dt.datetime.fromtimestamp(m["at"], dt.timezone.utc).date().isoformat()
+        sn = st_snaps[max([x for x in months if x <= d] or [months[0]])]
+        side = []
+        for f in ("f1", "f2"):
+            vals, free = [], []
+            for pid, nick, gname, lvl in m[f]["roster"]:
+                hit = next((pro[names.key(c)] for c in (gname, nick) if c and len(names.key(c)) >= 4
+                            and names.key(c) in pro), None)
+                if hit and sn["pn"].get(hit, 0) >= P["anchor"]:
+                    vals.append(sn["pl"][hit])
+                else:
+                    if pid not in rt:
+                        rt[pid] = dstart.get((m["region"], m["div"]), 0.0)
+                    vals.append(rt[pid])
+                    free.append(pid)
+            side.append((float(np.mean(vals)), free, m[f]["id"]))
+        e = 1 / (1 + 10 ** (-(side[0][0] - side[1][0]) / 400))
+        y = 1.0 if m["winner"] == "faction1" else 0.0
+        sc = m.get("score") or {}
+        s1, s2 = sc.get("faction1"), sc.get("faction2")
+        if m.get("bo", 1) == 1 and s1 is not None and s2 is not None and s1 + s2 >= 13:
+            sh = s1 / (s1 + s2)
+            y = min(1.0, max(0.0, .5 + (sh - .5) / P["span"] / 2))
+        out.append({"d": d, "season": m["season"], "region": m["region"], "div": m["div"], "e": e,
+                    "w": 1.0 if m["winner"] == "faction1" else 0.0, "a": side[0][2], "b": side[1][2],
+                    "sa": side[0][0], "sb": side[1][0]})
+        for (sv, free, _), sg in ((side[0], 1), (side[1], -1)):
+            for pid in free:
+                k = P["Kmin"] + (P["K"] - P["Kmin"]) * math.exp(-n[pid] / P["n0"])
+                rt[pid] += sg * k * (y - e)
+                n[pid] += 1
+    return out, rt
+
+
+def describe(out, res, H, st_snaps, months):
+    vrs = M.Vrs(H["vrs"])
+    REGV = {"NA": "Americas", "EU": "Europe", "SEA": "Asia"}
+    table = []
+    for (sn, rg, dv) in sorted({(o["season"], o["region"], o["div"]) for o in out}):
+        os_ = [o for o in out if (o["season"], o["region"], o["div"]) == (sn, rg, dv)]
+        ds = sorted(o["d"] for o in os_)
+        lo, hi = ds[len(ds) // 2], ds[-1]
+        by = defaultdict(list)
+        for o in os_:
+            if o["d"] >= lo:
+                by[o["a"]].append(o["sa"])
+                by[o["b"]].append(o["sb"])
+        med = [float(np.median(v)) for v in by.values() if len(v) >= 3]
+        if len(med) < 6:
+            continue
+        snap = st_snaps[max([x for x in months if x <= hi])]
+        roff = snap["roff"].get(REGV.get(rg, "Europe"), 0.0)
+        q = np.percentile(med, [10, 50, 90]) + roff
+        vd = vrs.before(hi)
+        lad = []
+        for vk, (rk, pts, nm, _) in vrs.tab[vd].items():
+            r5 = snap["lastros"].get(vk)
+            if r5:
+                lad.append((rk, float(np.mean([snap["pl"].get(x, -100) for x in r5])) + snap["roff"].get(vrs.region(vk, hi), 0)))
+        lad.sort()
+        eq = lambda x: 1 + sum(v > x for _, v in lad)  # noqa: E731
+        bands = {b: round(float(np.median([v for r, v in lad if lo_ <= r <= hi_])), 1)
+                 for b, (lo_, hi_) in {"1-20": (1, 20), "21-50": (21, 50), "51-100": (51, 100), "101-200": (101, 200),
+                                       "201+": (201, 9999)}.items() if any(lo_ <= r <= hi_ for r, _ in lad)}
+        table.append({"season": sn, "region": rg, "div": dv, "teams": len(med), "p10": round(q[0], 1), "med": round(q[1], 1),
+                      "p90": round(q[2], 1), "vrsEqMed": eq(q[1]), "vrsEqP90": eq(q[2]), "vrsEqP10": eq(q[0]),
+                      "vrsTeams": len(lad), "vrsBands": bands})
+    return table
+
+
+if __name__ == "__main__" and "--profile" not in sys.argv:
     H = json.load(gzip.open(M.HIST))
     series = [r for r in H["series"] if r[6] == "vrs"]
     raw = cs2_bo3.load()
     E = json.load(gzip.open(SRC))
     pro = pro_nicks(series)
-    ext, meta, ereg, bridged = esea_rows(E, pro)
-    print("esea rows", len(ext), flush=True)
     p = dict(json.loads(M.FIT.read_text())["params"])
-    base, _ = run(series, [], p, raw, ereg)
-    lb, he, tb = score(base)
-    grid = []
-    for kxe in (.25, .5, 1.0):
-        rows, st = run(series, ext, dict(p, kxe=kxe), raw, ereg)
-        l, _, t = score(rows)
-        grid.append({"kxe": kxe, "tune": t, "dTune": t - tb, "_l": l, "_rows": rows, "_st": st})
-        print(kxe, "tune", round(t - tb, 5), flush=True)
-    best = min(grid, key=lambda g: g["tune"])
-    dl = best["_l"] - lb
-    top = np.array([r["top"] for r in he])
-    t, neg, nm = bymonth(dl, he)
-    res = {"nEsea": len(ext), "base": {"held": float(lb.mean()), "tune": tb},
-           "grid": [{k: v for k, v in g.items() if not k.startswith("_")} for g in grid], "pick": best["kxe"],
-           "held": {"n": len(he), "d": float(dl.mean()), "tMonth": t, "monthsBetter": [neg, nm],
-                    "top50": {"d": float(dl[top].mean())}}}
-    res["ship"] = bool(dl.mean() < 0 and t <= -2 and dl[top].mean() <= .0005)
-    print(json.dumps(res, indent=1), flush=True)
-
-    # ---- descriptive, on the picked setting
-    rows, st = best["_rows"], best["_st"]
-    vrs = M.Vrs(H["vrs"])
-    seasons = defaultdict(list)
-    for r in rows:
-        if r["r"][6] == "esea":
-            seasons[r["r"][7]["season"]].append(r["d"])
-    table = []
-    for sn, ds in sorted(seasons.items()):
-        lo, hi = sorted(ds)[len(ds) // 2], max(ds)  # the season's second half
-        lad = ladder(rows, vrs, lo, hi)
-        tierm = defaultdict(list)
-        for x in lad:
-            if x["tier"]:
-                tierm[x["tier"]].append(x["s"])
-        tmed = {k: round(float(np.median(v)), 1) for k, v in tierm.items() if len(v) >= 5}
-        teams = defaultdict(lambda: defaultdict(list))
-        for r in rows:
-            if r["r"][6] == "esea" and r["r"][7]["season"] == sn and lo <= r["d"] <= hi:
-                g = (r["r"][7]["region"], r["r"][7]["div"])
-                teams[g][r["a"]].append(r["sa"])
-                teams[g][r["b"]].append(r["sb"])
-        for (rg, dv), tt in sorted(teams.items()):
-            med = [float(np.median(v)) for v in tt.values() if len(v) >= 3]
-            if len(med) < 6:
-                continue
-            q = np.percentile(med, [25, 50, 75, 90])
-            b = bridged[(sn, rg, dv)]
-            near = min(tmed, key=lambda k: abs(tmed[k] - q[1])) if tmed else None
-            table.append({"season": sn, "region": rg, "div": dv, "teams": len(med), "bridged": round(b[1] / max(b[0], 1), 3),
-                          "p25": round(q[0], 1), "med": round(q[1], 1), "p75": round(q[2], 1), "p90": round(q[3], 1),
-                          "vrsMed": equiv(q[1], lad), "vrsP90": equiv(q[3], lad), "tierNear": near, "tierMed": tmed})
-    res["divisions"] = table
-    # 1NT now: the last five to play, today's ratings, against today's VRS-ranked teams
+    if "--describe" not in sys.argv:
+        ext, meta, ereg, bridged = esea_rows(E, pro)
+        print("esea rows", len(ext), flush=True)
+        base, _ = run(series, [], p, raw, ereg)
+        lb, he, tb = score(base)
+        grid = []
+        for kxe in (.25, .5, 1.0):
+            rows, st = run(series, ext, dict(p, kxe=kxe), raw, ereg)
+            l, _, t = score(rows)
+            grid.append({"kxe": kxe, "tune": t, "dTune": t - tb, "_l": l})
+            print(kxe, "tune", round(t - tb, 5), flush=True)
+        best = min(grid, key=lambda g: g["tune"])
+        dl = best["_l"] - lb
+        top = np.array([r["top"] for r in he])
+        t, neg, nm = bymonth(dl, he)
+        res = {"nEsea": len(ext), "base": {"held": float(lb.mean()), "tune": tb},
+               "grid": [{k: v for k, v in g.items() if not k.startswith("_")} for g in grid], "pick": best["kxe"],
+               "held": {"n": len(he), "d": float(dl.mean()), "tMonth": t, "monthsBetter": [neg, nm],
+                        "top50": {"d": float(dl[top].mean())}}}
+        res["ship"] = bool(dl.mean() < 0 and t <= -2 and dl[top].mean() <= .0005)
+        OUT.write_text(json.dumps(res, indent=1, default=float))
+        print(json.dumps(res, indent=1), flush=True)
+    res = json.loads(OUT.read_text())
+    # ---- descriptive: ESEA on the pro scale through fixed anchors (the live pro model, ESEA never feeds it)
+    months = sorted({f"{y}-{m:02d}-01" for y in range(2024, 2027) for m in range(1, 13)})
+    months = [x for x in months if "2024-02-01" <= x <= dt.date.today().isoformat()]
+    _, st = M.replay(series, M.Vrs(H["vrs"]), p, bo3=cs2_bo3.Bo3(raw), snaps=months)
+    snaps = st["snaps"]
+    P = {"anchor": 30, "K": 128, "Kmin": 26, "n0": 50, "span": .5}  # ESEA player Elo settings (esea-standin, Nov 3)
+    dstart = {}
+    for it in range(3):  # each division's start level = its teams' median rating on the previous pass
+        out, rt = anchored(E, pro, snaps, months, dstart, P)
+        lv = defaultdict(list)
+        for o in out:
+            lv[(o["region"], o["div"])] += [o["sa"], o["sb"]]
+        dstart = {k: float(np.median(v)) for k, v in lv.items()}
+        print("pass", it, {f"{k[0]} {k[1]}": round(v) for k, v in sorted(dstart.items())}, flush=True)
+    # sanity: anchored ESEA ratings vs the same Elo with no anchors, on ESEA S58-59 results (log loss)
+    held = [o for o in out if o["season"] >= 58]
+    res["eseaLL"] = {"anchored": float(np.mean(M.ll(np.array([o["e"] for o in held]), np.array([o["w"] for o in held])))),
+                     "n": len(held)}
+    out0, _ = anchored(E, {}, snaps, months, dstart, P)
+    h0 = [o for o in out0 if o["season"] >= 58]
+    res["eseaLL"]["noAnchors"] = float(np.mean(M.ll(np.array([o["e"] for o in h0]), np.array([o["w"] for o in h0]))))
+    br = defaultdict(lambda: [0, 0])
+    for m in E["matches"]:
+        for f in ("f1", "f2"):
+            for pid, nick, gname, lvl in m[f].get("roster") or []:
+                b = br[(m["region"], m["div"])]
+                b[0] += 1
+                b[1] += any(c and len(names.key(c)) >= 4 and names.key(c) in pro for c in (gname, nick))
+    res["bridged"] = {f"{k[0]} {k[1]}": round(v[1] / max(v[0], 1), 3) for k, v in sorted(br.items())}
+    res["divisions"] = describe(out, res, H, snaps, months)
+    # 1NT now
     last = max((m for m in E["matches"] if any(m[f].get("id") == ME for f in ("f1", "f2")) and m.get("at")),
                key=lambda m: m["at"], default=None)
     if last:
         f = "f1" if last["f1"]["id"] == ME else "f2"
-        k = key(f"esea {last['region']} {ME[:13]}")
-        ros = st["lastros"].get(k) or []
-        rg = ereg.get(k)
-        s1 = float(np.mean([st["pl"].get(q, p["mu_new"]) for q in ros])) + st["roff"].get(rg, 0) if ros else None
-        vt = vrs.tab[vrs.dates[-1]]
+        snap = snaps[months[-1]]
+        vals = []
+        for pid, nick, gname, lvl in last[f]["roster"]:
+            hit = next((pro[names.key(c)] for c in (gname, nick) if c and len(names.key(c)) >= 4 and names.key(c) in pro), None)
+            vals.append(snap["pl"][hit] if hit and snap["pn"].get(hit, 0) >= P["anchor"] else rt.get(pid, dstart.get(("NA", last["div"]), 0)))
+        s1 = float(np.mean(vals)) + snap["roff"].get("Americas", 0)
+        vrs = M.Vrs(H["vrs"])
         lad = []
-        for vk, (rk, pts, nm, _) in vt.items():
+        for vk, (rk, pts, nm, _) in vrs.tab[vrs.dates[-1]].items():
             r5 = st["lastros"].get(vk)
             if r5:
-                lad.append({"k": vk, "vrk": rk, "s": float(np.mean([st["pl"].get(q, p["mu_new"]) for q in r5]))
-                            + st["roff"].get(vrs.region(vk, "9999"), 0)})
-        esea_now = defaultdict(list)
-        lastseason = max(seasons)
-        for ek in {r["a"] for r in rows if r["r"][6] == "esea" and r["r"][7]["season"] == lastseason} | \
-                {r["b"] for r in rows if r["r"][6] == "esea" and r["r"][7]["season"] == lastseason}:
-            r5 = st["lastros"].get(ek)
-            if r5:
-                esea_now[meta[ek]["region"]].append(float(np.mean([st["pl"].get(q, p["mu_new"]) for q in r5]))
-                                                  + st["roff"].get(ereg[ek], 0))
-        res["oneNT"] = {"asof": dt.datetime.utcfromtimestamp(last["at"]).date().isoformat(), "region": last["region"],
-                        "div": last["div"], "rating": round(s1, 1) if s1 is not None else None,
-                        "five": ros, "vrsEquiv": equiv(s1, lad) if s1 is not None else None,
-                        "vrsTeamsAbove": sum(x["s"] > s1 for x in lad) if s1 is not None else None, "vrsTeams": len(lad),
-                        "eseaRankBy": {r: [1 + sum(x > s1 for x in v), len(v)] for r, v in esea_now.items()},
-                        "eseaRankAll": [1 + sum(x > s1 for v in esea_now.values() for x in v),
-                                        sum(len(v) for v in esea_now.values())]}
-    OUT.write_text(json.dumps(res, indent=1))
-    print(json.dumps({k: v for k, v in res.items() if k != "divisions"}, indent=1))
-    for r in table:
+                lad.append((rk, nm, float(np.mean([st["pl"].get(x, -100) for x in r5])) + st["roff"].get(vrs.region(vk, "9999"), 0)))
+        lad.sort(key=lambda z: -z[2])
+        eq = 1 + sum(v > s1 for _, _, v in lad)
+        # ESEA teams this season, latest five each, same scale
+        lastm = {}
+        for m in sorted(E["matches"], key=lambda m: m.get("at") or 0):
+            if m["season"] == max(x["season"] for x in E["matches"]):
+                for g in ("f1", "f2"):
+                    if m[g].get("id") and m[g]["id"] != "bye" and len(m[g]["roster"]) >= 4:
+                        lastm[m[g]["id"]] = (m["region"], m["div"], m[g]["roster"], m[g]["name"])
+        tv = {}
+        for tid, (rg, dv, ros, nm) in lastm.items():
+            v = []
+            for pid, nick, gname, lvl in ros:
+                hit = next((pro[names.key(c)] for c in (gname, nick) if c and len(names.key(c)) >= 4 and names.key(c) in pro), None)
+                v.append(snap["pl"][hit] if hit and snap["pn"].get(hit, 0) >= P["anchor"] else rt.get(pid, dstart.get((rg, dv), 0)))
+            tv[tid] = (rg, dv, nm, float(np.mean(v)) + snap["roff"].get({"NA": "Americas", "EU": "Europe"}.get(rg, "Asia"), 0))
+        na = sorted([x for x in tv.values() if x[0] == "NA"], key=lambda z: -z[3])
+        dvr = sorted([x for x in tv.values() if x[0] == "NA" and x[1] == last["div"]], key=lambda z: -z[3])
+        res["oneNT"] = {"asof": dt.datetime.fromtimestamp(last["at"], dt.timezone.utc).date().isoformat(),
+                        "div": last["div"], "rating": round(s1, 1), "vrsEquiv": eq, "vrsTeams": len(lad),
+                        "vrsNeighbours": [(rk, nm, round(v, 1)) for rk, nm, v in lad[max(0, eq - 3):eq + 2]],
+                        "naRank": [1 + sum(x[3] > s1 for x in na), len(na)],
+                        "divRank": [1 + sum(x[3] > s1 for x in dvr), len(dvr)],
+                        "allRank": [1 + sum(x[3] > s1 for x in tv.values()), len(tv)]}
+    OUT.write_text(json.dumps(res, indent=1, default=float))
+    print(json.dumps({k: v for k, v in res.items() if k != "divisions"}, indent=1, default=float))
+    for r in res["divisions"]:
+        print(r)
+
+
+def profile():
+    """Where each ESEA division's players play pro: for players whose FACEIT name is a bo3.gg nick with 20+ maps in
+    the 6 months around the season, the share of those maps by bo3.gg event tier (S, A, B, C, D)."""
+    E = json.load(gzip.open(SRC))
+    bo3 = cs2_bo3.Bo3()
+    gm = {g[0]: g for gs in bo3.maps.values() for g in gs}
+    maps = defaultdict(list)  # nick key -> [(date, tier)]
+    for g, sides in cs2_bo3.map_rosters().items():
+        gg = gm.get(g)
+        m = bo3.mt.get(gg[1]) if gg else None
+        if not m:
+            continue
+        for ros in sides.values():
+            for q in ros:
+                maps[names.key(q)].append((m[1][:10], m[10] or "d"))
+    span = defaultdict(list)
+    for m in E["matches"]:
+        if m.get("at"):
+            span[m["season"]].append(dt.datetime.fromtimestamp(m["at"], dt.timezone.utc).date())
+    out = []
+    for (sn, rg, dv) in sorted({(m["season"], m["region"], m["div"]) for m in E["matches"]}):
+        if sn < 56:
+            continue
+        lo = (min(span[sn]) - dt.timedelta(days=90)).isoformat()
+        hi = (max(span[sn]) + dt.timedelta(days=90)).isoformat()
+        pl = set()
+        for m in E["matches"]:
+            if (m["season"], m["region"], m["div"]) == (sn, rg, dv):
+                for f in ("f1", "f2"):
+                    for pid, nick, gname, lvl in m[f].get("roster") or []:
+                        pl.add((pid, next((names.key(c) for c in (gname, nick) if c and len(names.key(c)) >= 4
+                                           and names.key(c) in maps), None)))
+        tiers, nb = defaultdict(float), 0
+        for pid, k in pl:
+            v = [t for d, t in maps.get(k, []) if lo <= d <= hi] if k else []
+            if len(v) >= 20:
+                nb += 1
+                for t in v:
+                    tiers[t] += 1 / len(v)  # each player counts once
+        tot = sum(tiers.values()) or 1
+        out.append({"season": sn, "region": rg, "div": dv, "players": len(pl), "proPlayers": nb,
+                    "share": round(nb / max(len(pl), 1), 3), "tiers": {t: round(tiers[t] / tot, 3) for t in "sabcd"}})
+    return out
+
+
+if __name__ == "__main__" and "--profile" in sys.argv:
+    res = json.loads(OUT.read_text())
+    res["profile"] = profile()
+    OUT.write_text(json.dumps(res, indent=1, default=float))
+    for r in res["profile"]:
         print(r)
