@@ -189,7 +189,7 @@ def main():
                         latest[x[g]["id"]] = (x["div"], x[g]["roster"])
         na = {tid: five(ros, rts, sn, "NA", dv) for tid, (dv, ros) in latest.items()}
         na[ME] = s1
-        return {"d": d, "s": round(s1, 1), "vrs": 1 + sum(v > s1 for v in lad), "of": len(lad), "q": sum(v > s1 for k, v in na.items() if k != ME) / max(1, len(na) - 1), "field": sorted(na.values()),
+        return {"d": d, "s": round(s1, 1), "ros": [x[1] for x in m[f]["roster"]], "vrs": 1 + sum(v > s1 for v in lad), "of": len(lad), "q": sum(v > s1 for k, v in na.items() if k != ME) / max(1, len(na) - 1), "field": sorted(na.values()),
                 "na": 1 + sum(v > s1 for k, v in na.items() if k != ME), "naOf": len(na), "season": sea, "div": m["div"],
                 "tier": tier(s1)}
 
@@ -227,6 +227,8 @@ def main():
     for x in pts + [now]:
         x["q"] = round(x["q"], 3)
         x.pop("field", None)
+        if x is not now:
+            x.pop("ros", None)
     res = {"asof": today.isoformat(), "data": E.get("asof"), "levels": levels, "now": now, "weekly": pts,
            "seasons": [min(m["season"] for m in E["matches"]), last], "nMatches": len(E["matches"]), "teams": teams}
     OUT.write_text(json.dumps(res, indent=1, default=float))

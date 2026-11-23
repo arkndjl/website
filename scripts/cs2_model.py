@@ -627,9 +627,41 @@ def build():
                       "w90": sum(y90), "l90": len(y90) - sum(y90),
                       "form": "".join("W" if w else "L" for _, w in form[k][-10:]), "last": lastd[k],
                       "logo": (LOGOS / f"{k}.png").exists()})
+    # 1NT (ESEA, no Valve or bo3.gg series): placed at its world rank (scripts/esea_world.py, same pool and sort key),
+    # ARK and Elo read off the teams either side
+    try:
+        ew = json.loads((ROOT / "data" / "esea_world.json").read_text())["now"]
+        at = max(0, min(len(teams), int(ew["vrs"]) - 1))
+        res1 = []   # 1NT's ESEA series results (data/esea.json, scripts/fetch_esea.mjs)
+        try:
+            em = json.loads((ROOT / "data" / "esea.json").read_text()).get("matches") or []
+            res1 = sorted((m["at"] / 1000, m["result"] == "W") for m in em if m.get("result") in ("W", "L") and m.get("at"))
+        except (OSError, ValueError):
+            pass
+        r90 = [w for t_, w in res1 if t_ >= time.time() - 90 * 86400]
+        if at < len(teams):
+            teams.insert(at, {"rk": at + 1, "k": "1nt", "n": "1NT", "ros": ew.get("ros") or [], "rg": "Americas",
+                              "ark": None, "elo": None, "pl": round(ew["s"]),
+                              "d30": None, "vrk": None, "vpts": None, "w90": sum(r90), "l90": len(r90) - sum(r90),
+                              "form": "".join("W" if w else "L" for _, w in res1[-10:]),
+                              "last": time.strftime("%Y-%m-%d", time.gmtime(res1[-1][0])) if res1 else today,
+                              "logo": (LOGOS / "1nt.png").exists(), "esea": ew.get("div") or "Main", "fl": "us"})
+            for i, t in enumerate(teams):
+                t["rk"] = i + 1
+            # ARK and Elo read off the neighbours: its own figure has no team map or RWA term (no pro maps), which
+            # the teams around it carry, so a computed one would sit far above them at the same rank
+            nb = [teams[j] for j in (at - 1, at + 1) if 0 <= j < len(teams)]
+            teams[at]["ark"] = round(float(np.mean([t["ark"] for t in nb])), 4)
+            teams[at]["elo"] = round(float(np.mean([t["elo"] for t in nb])))
+            teams[at]["tierE"] = ew.get("tier")
+    except (OSError, ValueError, KeyError) as ex:
+        print("1NT placement skipped:", ex)
     fetch_logos([t["k"] for t in teams], H.get("logos", {}))
     # event-access tiers (Tier 1-4) on the ranked teams' Elo
     tier_fit = cs2_players.tiers(teams, bo3)
+    for t in teams:
+        if t.get("tierE"):   # an ESEA-placed team keeps the tier its ESEA rating gives (scripts/esea_world.py)
+            t["tier"] = t.pop("tierE")
     for t in teams:
         t["logo"] = (LOGOS / f"{t['k']}.png").exists()
     rank = {t["k"]: t["rk"] for t in teams}
