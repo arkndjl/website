@@ -1881,7 +1881,8 @@ function bracket() {
     const a = side(m.teams?.faction1), b = side(m.teams?.faction2), w = m.results?.winner;
     return { id: m.match_id, g: m.group ?? 1, r: m.round ?? 1, at: (m.scheduled_at || m.started_at || 0) * 1000 || null, st: m.status, bo: m.best_of ?? null,
       a, b, w: w === 'faction1' ? 1 : w === 'faction2' ? 2 : null, s: m.results?.score ? [m.results.score.faction1 ?? 0, m.results.score.faction2 ?? 0] : null,
-      p: LOGP.has(m.match_id) ? Math.round(LOGP.get(m.match_id) * 1000) / 1000 : null, url: (m.faceit_url || '').replace('{lang}', 'en') || null };
+      p: m.match_id === prev_?.id && prev_?.p?.win != null ? (a.id === TEAM_ID ? prev_.p.win : 100 - prev_.p.win) / 100   // 1NT's previewed match: the matchday number
+        : LOGP.has(m.match_id) ? Math.round(LOGP.get(m.match_id) * 1000) / 1000 : null, url: (m.faceit_url || '').replace('{lang}', 'en') || null };
   }).sort((x, y) => x.g - y.g || x.r - y.r || (x.at || 0) - (y.at || 0) || (x.id < y.id ? -1 : 1));
   const groups = [...new Set(ms.map(m => m.g))].sort((a, b) => a - b);
   const label = g => (groups.length >= 2 ? { 1: 'upper', 2: 'lower', 3: 'grand final' }[g] || `group ${g}` : 'bracket');
