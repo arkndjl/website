@@ -108,11 +108,24 @@ def nhl_skaters(S, i, day):
     fn = os.path.join(CACHE, f'sk_{S}_{i}.json')
     if os.path.exists(fn): return json.load(open(fn))
     q = f'seasonId={S - 1}{S} and gameTypeId=2 and gameDate<="{day} 23:59:59"'
-    r = get('https://api.nhle.com/stats/rest/en/skater/summary?limit=-1&cayenneExp=' + urllib.parse.quote(q))
+    data = stats_pages('skater/summary', q)
     os.makedirs(CACHE, exist_ok=True)
-    json.dump(r['data'], open(fn, 'w'))
-    time.sleep(1)
-    return r['data']
+    json.dump(data, open(fn, 'w'))
+    return data
+
+
+def stats_pages(report, q, page=100):
+    """every row of an NHL stats API report: the API returns at most 100 rows a call (limit=-1 included, Nov 2026),
+    so page through it by player id"""
+    out, start = [], 0
+    srt = urllib.parse.quote('[{"property":"playerId","direction":"ASC"}]')
+    while True:
+        r = get(f'https://api.nhle.com/stats/rest/en/{report}?limit={page}&start={start}&sort={srt}&cayenneExp=' + urllib.parse.quote(q))
+        d = (r or {}).get('data') or []
+        out += d
+        start += len(d)
+        time.sleep(.3)
+        if not d or start >= (r.get('total') or 0): return out
 
 
 SK_X = lambda r: [r['gp'], r['toi'], r['g'], r['a'], r['pp'], r['sh'], r['pm'], r['ev']]

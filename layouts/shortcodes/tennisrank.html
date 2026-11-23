@@ -9,50 +9,53 @@
 {{- $mvFrom := $t.mvFrom -}}
 {{- $ctry := site.Data.soccer_countries.name -}}
 {{- $tl := cond (eq $tour "atp") "ATP" "WTA" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%s :: ARK Ranking" $tl)) "icon" "tennis" "filter" "Plays" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,ARK,Hard,Clay,Grass,Elo,Rank" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%s :: ARK Ranking" $tl)) "icon" "tennis" "filter" "Plays" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,ARK,Age,Hard,Clay,Grass,Elo,Rank" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table tstick2 tennis__table">
   <thead><tr>
-    <th>RK</th><th title="rank change over the last week; hover: rank and rating then">±</th><th>Player</th>
+    <th>RK</th><th>Player</th><th title="rank change over the last week; hover: rank and rating then">±</th>
     <th data-vz title="ARK: win chance against the average top-50 player, best of three, over the tour's last-52-week surface mix ({{ range $i, $s := slice "H" "C" "G" }}{{ if $i }} / {{ end }}{{ index (dict "H" "hard" "C" "clay" "G" "grass") $s }} {{ partial "num.html" (slice "%.0f" (mul (index $t.mix $s) 100)) }}%{{ end }})">ARK</th>
+    <th>Age</th>
+    <th title="nationality">Nat</th>
+    <th title="plays right- or left-handed">Plays</th>
+    <th title="won-lost, last 52 weeks, every level (tour level in brackets)">W-L</th>
     <th title="projected ARK in 12 months if still active: from ARK, age, matches in the last 52 weeks, career matches and official rank, fit on {{ $tl }} top-300 boards each quarter end 2006-25 (cell: 24 and 36 months, projected Elo)">1Y</th>
-    <th title="WAR: wins above replacement, last 52 weeks, every level: wins minus the chance a replacement player (Elo of the No. 101-150 ranked) beats the same opponents on the same surfaces">WAR</th>
-    <th title="SV: season WAR, this calendar year to date, every level (same per-match credit as WAR)">SV</th>
-    <th title="PA: points won a 100 points over the average top-100 player against the same opponents, serve and return, opponent-adjusted; each match weighted by recency (half-life a year), shrunk by 300 points">PA</th>
     <th title="win chance against the average top-50 player on hard courts (best of three)">Hard</th>
     <th title="win chance against the average top-50 player on clay">Clay</th>
     <th title="win chance against the average top-50 player on grass">Grass</th>
+    <th title="WAR: wins above replacement, last 52 weeks, every level: wins minus the chance a replacement player (Elo of the No. 101-150 ranked) beats the same opponents on the same surfaces">WAR</th>
+    <th title="SV: season WAR, this calendar year to date, every level (same per-match credit as WAR)">SV</th>
+    <th title="PA: points won a 100 points over the average top-100 player against the same opponents, serve and return, opponent-adjusted; each match weighted by recency (half-life a year), shrunk by 300 points">PA</th>
     <th title="overall Elo on wins and losses, every level (1500 start)">Elo</th>
     <th title="overall Elo change over the last 13 weeks">13wk</th>
     <th title="highest overall Elo after 20+ matches, and when">Peak</th>
     <th title="serve points won over the average top-100 player, percentage points, opponent-adjusted (hard court)">SPW+</th>
     <th title="return points won over the average top-100 player, percentage points, opponent-adjusted (hard court)">RPW+</th>
     <th title="official {{ $tl }} singles ranking and points">Rank</th>
-    <th title="won-lost, last 52 weeks, every level (tour level in brackets)">W-L</th>
-    <th>Age</th>
-    <th title="plays right- or left-handed">Plays</th>
   </tr></thead>
   <tbody>
   {{- range $t.players }}{{ $r := . }}
   <tr>
-    <td class="cfb__rk">{{ .rk }}</td>{{ partial "rkmove.html" (dict "r" . "from" $mvFrom "fmt" "%+.1f pts" "mul" 100) }}
+    <td class="cfb__rk">{{ .rk }}</td>
     <td class="cfb__name" data-v="{{ .n }}" style="white-space: nowrap">{{ partial "tennisface.html" . }}{{ with .nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index $ctry . | default . }}" width="16" height="11" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b>{{ partial "badges.html" (dict "b" .bdg "of" "next season's Elo") }}</td>
+    {{ partial "rkmove.html" (dict "r" . "from" $mvFrom "fmt" "%+.1f pts" "mul" 100) }}
     <td class="cfb__num" data-v="{{ .ark }}"><b>{{ partial "num.html" (slice "%.1f" (mul .ark 100)) }}</b></td>
+    <td class="cfb__num" data-v="{{ with .age }}{{ . }}{{ end }}">{{ with .age }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td data-v="{{ .nat }}">{{ with .nat }}<span title="{{ index $ctry . | default . }}">{{ upper . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td>{{ cond (eq .hand "L") "left" (cond (eq .hand "R") "right" "—") }}</td>
+    <td class="cfb__num" data-v="{{ .w }}">{{ .w }}-{{ .l }} <span class="cfb__dim">({{ .tw }}-{{ .tl }})</span></td>
     <td class="cfb__num" data-v="{{ .pj12 | default 0 }}"{{ with .pj24 }} title="24 mo {{ partial "num.html" (slice "%.1f" (mul . 100)) }} · 36 mo {{ partial "num.html" (slice "%.1f" (mul ($r.pj36 | default 0) 100)) }}{{ with $r.pe12 }} · Elo {{ . }} (12 mo){{ end }}"{{ end }}>{{ with .pj12 }}{{ partial "num.html" (slice "%.1f" (mul . 100)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .war | default 0 }}">{{ with .war }}{{ partial "num.html" (slice "%+.1f" (float .)) }}{{ else }}<span class="cfb__dim">0.0</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .sv | default 0 }}">{{ with .sv }}{{ partial "num.html" (slice "%+.1f" (float .)) }}{{ else }}<span class="cfb__dim">0.0</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .ppa | default 0 }}">{{ if isset . "ppa" }}{{ partial "num.html" (slice "%+.1f" (float .ppa)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .pH }}">{{ partial "num.html" (slice "%.0f" (mul .pH 100)) }}% <span class="cfb__dim">#{{ .rkH }}</span></td>
     <td class="cfb__num" data-v="{{ .pC }}">{{ partial "num.html" (slice "%.0f" (mul .pC 100)) }}% <span class="cfb__dim">#{{ .rkC }}</span></td>
     <td class="cfb__num" data-v="{{ .pG }}">{{ partial "num.html" (slice "%.0f" (mul .pG 100)) }}% <span class="cfb__dim">#{{ .rkG }}</span></td>
+    <td class="cfb__num" data-v="{{ .war | default 0 }}">{{ with .war }}{{ partial "num.html" (slice "%+.1f" (float .)) }}{{ else }}<span class="cfb__dim">0.0</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .sv | default 0 }}">{{ with .sv }}{{ partial "num.html" (slice "%+.1f" (float .)) }}{{ else }}<span class="cfb__dim">0.0</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .ppa | default 0 }}">{{ if isset . "ppa" }}{{ partial "num.html" (slice "%+.1f" (float .ppa)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" title="hard {{ .eH }} · clay {{ .eC }} · grass {{ .eG }}">{{ .elo }}</td>
     <td class="cfb__num" data-v="{{ .d90 | default 0 }}">{{ with .d90 }}{{ printf "%+d" (int .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .peak | default 0 }}">{{ with .peak }}{{ . }}{{ with $r.peakd }} <span class="cfb__dim">’{{ printf "%02d" (mod (div (int .) 10000) 100) }}</span>{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .spwp }}">{{ partial "num.html" (slice "%+.1f" (float .spwp)) }}</td>
     <td class="cfb__num" data-v="{{ .rpwp }}">{{ partial "num.html" (slice "%+.1f" (float .rpwp)) }}</td>
     <td class="cfb__num" data-v="{{ with .rank }}{{ . }}{{ end }}">{{ with .rank }}{{ . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .pts }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .w }}">{{ .w }}-{{ .l }} <span class="cfb__dim">({{ .tw }}-{{ .tl }})</span></td>
-    <td class="cfb__num" data-v="{{ with .age }}{{ . }}{{ end }}">{{ with .age }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td>{{ cond (eq .hand "L") "left" (cond (eq .hand "R") "right" "—") }}</td>
   </tr>
   {{- end }}
   </tbody>

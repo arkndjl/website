@@ -4,13 +4,24 @@
 {{- with site.Data.soccer_extra -}}
 {{- with index . ($.Get "k") -}}
 {{- $cols := .cols -}}
+{{- /* column order (board standard, Nov 23 2026): name, the number the rows rank by, then club / position / minutes;
+       labels not named here keep their place after these */ -}}
+{{- $ord := index (dict
+    "mls" (slice "Player" "g+" "Pos" "Club" "Min" "g+/96" "Pass" "Recv" "Drib" "Int" "Shot" "Foul" "G" "A" "xG" "xA" "Pay $m")
+    "mlsgk" (slice "Keeper" "Saved" "Club" "Min" "/96" "Shots" "Saves" "GA" "PSxG" "g+" "Stop" "Pay $m")
+    "speed" (slice "Player" "Top km/h" "Pos" "Club" "Nat" "Comp" "Min" "km/90")
+    "managers" (slice "Manager" "Shrunk" "Last club" "League" "MP" "GD +/-" "Clubs" "Last")
+    "scorers" (slice "Player" "Goals" "Nation" "Years" "Non-pen" "Pens" "Scored in")) ($.Get "k") | default slice -}}
+{{- $ix := slice -}}
+{{- range $o := $ord }}{{ range $j, $c := $cols }}{{ if eq (index $c 0) $o }}{{ $ix = $ix | append $j }}{{ end }}{{ end }}{{ end -}}
+{{- range $j, $c := $cols }}{{ if not (in $ix $j) }}{{ $ix = $ix | append $j }}{{ end }}{{ end -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default .title) "icon" "soccer" "filter" .filter "tab" ($.Get "tab")) -}}
 <table class="cfb__table tstick2">
-  <thead><tr><th>#</th>{{ range $cols }}<th{{ with index . 2 }} title="{{ . }}"{{ end }}>{{ index . 0 }}</th>{{ end }}</tr></thead>
+  <thead><tr><th>#</th>{{ range $ix }}{{ with index $cols . }}<th{{ with index . 2 }} title="{{ . }}"{{ end }}>{{ index . 0 }}</th>{{ end }}{{ end }}</tr></thead>
   <tbody>
   {{- range $i, $r := .rows }}
   <tr><td class="cfb__num">{{ add $i 1 }}</td>
-    {{- range $j, $c := $cols }}{{ $v := index $r $j }}{{ $f := index $c 1 }}
+    {{- range $j := $ix }}{{ $c := index $cols $j }}{{ $v := index $r $j }}{{ $f := index $c 1 }}
     {{- if eq $f "s" }}<td{{ if eq $j 0 }} style="white-space: nowrap"{{ end }}>{{ if eq $j 0 }}<b>{{ $v }}</b>{{ else }}{{ with $v }}{{ . }}{{ end }}{{ end }}</td>
     {{- else if eq $v nil }}<td class="cfb__num" data-v=""><span class="cfb__dim">-</span></td>
     {{- else }}<td class="cfb__num" data-v="{{ $v }}">{{ if eq $f "d" }}{{ int $v }}{{ else if eq $f "1" }}{{ printf "%.1f" (float $v) }}{{ else if eq $f "2" }}{{ printf "%.2f" (float $v) }}{{ else if eq $f "3" }}{{ printf "%.3f" (float $v) }}{{ else if eq $f "+2" }}{{ printf "%+.2f" (float $v) }}{{ else }}{{ printf "%+.3f" (float $v) }}{{ end }}</td>

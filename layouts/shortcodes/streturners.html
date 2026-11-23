@@ -20,21 +20,24 @@
   {{- $v := index $d $kind }}{{ $rows := $v.rows | default slice }}{{ $h := $v.h }}
   {{- $lbl := cond (eq $kind "kr") "kick returns" "punt returns" }}
   <div data-brk-pane="{{ $kind }}"{{ if ne $kind "kr" }} style="display:none"{{ end }}>
-  {{- partial "wintable-open.html" (dict "title" (printf "%s · %s" ($.Get "title" | default "special teams") $lbl) "icon" "football" "filter" (cond $col "Pos,Team,Yr" "Pos,Team") "rerank" true "gfxCols" "RK,Player,Pos,Team,Ret,Avg,Adj" "gfxDate" (printf "%s · %v" $lbl $d.season) "gfxMax" "25") }}
+  {{- partial "wintable-open.html" (dict "title" (printf "%s · %s" ($.Get "title" | default "special teams") $lbl) "icon" "football" "filter" (cond $col "Pos,Team,Yr" "Pos,Team") "rerank" true "gfxCols" "RK,Player,Adj,Pos,Team,Ret,Avg" "gfxDate" (printf "%s · %v" $lbl $d.season) "gfxMax" "25") }}
 <table class="cfb__table bw brk__table">
   <thead><tr>
-    <th>RK</th><th>Player</th><th class="brk__pt">Pos</th><th class="brk__pt">Team</th>
-    {{- if $col }}<th class="bw__x" title="class">Yr</th><th class="bw__x" title="future value, 20-80">FV</th>{{ end }}
+    {{- /* Adj (the rank) first, then position, team, class, the sample (returns), Adj's companions (Yds+, YOE, Pts), FV, the return line */}}
+    <th>RK</th><th>Player</th>
+    <th title="YOE shrunk for sample: total yards over expected / (returns + {{ $h.k }}); the rank">Adj</th>
+    <th class="brk__pt">Pos</th><th class="brk__pt">Team</th>
+    {{- if $col }}<th class="bw__x" title="class">Yr</th>{{ end }}
     <th title="returns: fielded and run back, or muffed; fair catches, touchbacks and plays with a penalty left out">Ret</th>
-    <th class="bw__x" title="return yards">Yds</th>
+    <th class="bw__x" title="Adj x returns: yards over expected, shrunk">Yds+</th>
+    <th class="bw__x" title="yards over expected a return: return yards minus the mean return from the same spot (5-yard bins, this season)">YOE</th>
+    <th class="bw__x" title="{{ if $col }}points over expected, total: drive points by field position at the end of the return (a TD 7, a lost fumble the other side's drive), minus the mean from the same spot{{ else }}EPA over expected, total: EPA from the receiving side minus the mean EPA of returns from the same spot{{ end }}">Pts</th>
+    {{- if $col }}<th class="bw__x" title="future value, 20-80">FV</th>{{ end }}
     <th title="yards a return">Avg</th>
+    <th class="bw__x" title="return yards">Yds</th>
     <th class="bw__x" title="longest return">Lng</th>
     <th class="bw__x" title="return touchdowns">TD</th>
     <th class="bw__x" title="fumbles lost">Fum</th>
-    <th class="bw__x" title="yards over expected a return: return yards minus the mean return from the same spot (5-yard bins, this season)">YOE</th>
-    <th title="YOE shrunk for sample: total yards over expected / (returns + {{ $h.k }}); the rank">Adj</th>
-    <th class="bw__x" title="Adj x returns: yards over expected, shrunk">Yds+</th>
-    <th class="bw__x" title="{{ if $col }}points over expected, total: drive points by field position at the end of the return (a TD 7, a lost fumble the other side's drive), minus the mean from the same spot{{ else }}EPA over expected, total: EPA from the receiving side minus the mean EPA of returns from the same spot{{ end }}">Pts</th>
   </tr></thead>
   <tbody>
   {{- range $i, $r := $rows }}
@@ -42,25 +45,27 @@
     <td class="cfb__rk">{{ add $i 1 }}</td>
     {{- if $col }}
     <td class="cfb__name"><b>{{ .n }}</b><span class="brk__meta cfb__dim">{{ .pos }} · {{ .t }}</span></td>
-    <td class="brk__pt">{{ .pos }}</td>
-    <td class="cfb__team brk__pt">{{ with .lg }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span>{{ .t }}</span></td>
-    <td class="bw__x">{{ .cls }}</td>
-    <td class="cfb__num bw__x">{{ .fv }}</td>
     {{- else }}
     <td class="cfb__name">{{ partial "face.html" (dict "u" (cond (ne .ph nil) (printf "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/%v" .ph) "")) }}<b>{{ .n }}</b><span class="brk__meta cfb__dim">{{ .pos }} · {{ .t }}</span></td>
+    {{- end }}
+    <td class="cfb__num is-key" data-v="{{ .sry }}"><span class="{{ if ge (float .sry) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ partial "num.html" (slice "%+.2f" (float .sry)) }}</span></td>
     <td class="brk__pt">{{ .pos }}</td>
+    {{- if $col }}
+    <td class="cfb__team brk__pt">{{ with .lg }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span>{{ .t }}</span></td>
+    <td class="bw__x">{{ .cls }}</td>
+    {{- else }}
     <td class="cfb__team brk__pt"><img class="cfb__logo" src="/img/nfl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"><span>{{ .t }}</span></td>
     {{- end }}
     <td class="cfb__num">{{ .ret }}</td>
-    <td class="cfb__num bw__x">{{ .yds }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .val }}">{{ partial "num.html" (slice "%+.1f" (float .val)) }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .ryoe }}">{{ partial "num.html" (slice "%+.1f" (float .ryoe)) }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .poe }}">{{ partial "num.html" (slice "%+.2f" (float .poe)) }}</td>
+    {{- if $col }}<td class="cfb__num bw__x">{{ .fv }}</td>{{ end }}
     <td class="cfb__num" data-v="{{ .avg }}">{{ partial "num.html" (slice "%.1f" (float .avg)) }}</td>
+    <td class="cfb__num bw__x">{{ .yds }}</td>
     <td class="cfb__num bw__x">{{ .lng }}</td>
     <td class="cfb__num bw__x">{{ .td }}</td>
     <td class="cfb__num bw__x">{{ .fum }}</td>
-    <td class="cfb__num bw__x" data-v="{{ .ryoe }}">{{ partial "num.html" (slice "%+.1f" (float .ryoe)) }}</td>
-    <td class="cfb__num is-key" data-v="{{ .sry }}"><span class="{{ if ge (float .sry) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ partial "num.html" (slice "%+.2f" (float .sry)) }}</span></td>
-    <td class="cfb__num bw__x" data-v="{{ .val }}">{{ partial "num.html" (slice "%+.1f" (float .val)) }}</td>
-    <td class="cfb__num bw__x" data-v="{{ .poe }}">{{ partial "num.html" (slice "%+.2f" (float .poe)) }}</td>
   </tr>
   {{- end }}
   </tbody>

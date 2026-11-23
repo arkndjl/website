@@ -9,7 +9,7 @@
        game this week and a chance to play; lists stop at QB 32, RB 60, WR 72, TE 32, K 20, DST 20.
        {{< nflrank title="..." tab="..." >}} */ -}}
 {{- $d := site.Data.nfl_fantasy -}}
-<div class="win cfb nflwar nflrk"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nflrk data-src="{{ "data/nfl-fantasy.json" | relURL }}" data-gfx-cols="RK,Player,Pos,Tier,Opp,PPR" data-gfx-max="26"{{ with $d }} data-gfx-date="week {{ .week }} · updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
+<div class="win cfb nflwar nflrk"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nflrk data-src="{{ "data/nfl-fantasy.json" | relURL }}" data-gfx-cols="RK,Player,VOR,PPR,Pos,Tier,Opp" data-gfx-max="26"{{ with $d }} data-gfx-date="week {{ .week }} · updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ .Get "title" | default "rankings" }}<span data-rk-when>{{ with $d }} :: week {{ .week }}{{ end }}</span><span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -29,8 +29,8 @@
       <thead><tr>
         <th title="rank within view, scoring, position">RK</th>
         <th>Player</th>
-        <th title="position rank (RB12 = 12th RB)">Pos</th>
         <th data-rk-vor title="VOR = projection - replacement projection at position; replacement = first non-starter, 12-team league (QB13, RB30, WR31, TE13, K13, DST13). overall rank by VOR">VOR</th>
+        <th title="position rank (RB12 = 12th RB)">Pos</th>
         <th title="tier = 1-D k-means (Ckmeans) on projected points at position or across FLEX; k = ceil(n/6), 3-10">Tier</th>
         <th data-rk-opp title="opponent this week (@ = away); rest of season: team games left">Opp</th>
         <th data-rk-pts title="projected points = stat line if playing x P(plays)">PPR</th>
@@ -118,6 +118,8 @@
       list.forEach(function (p, i) { p.ft = ft[i]; });
     } else if (pos) list = by[pos] || [];
     else list = ORDER.reduce(function (acc, ps) { return acc.concat(by[ps] || []); }, []).sort(function (a, b) { return b.vor - a.vor || b.pts - a.pts; });
+    // the key column after the player: VOR overall, PPR within a position (VOR hidden there); PPR otherwise after Opp
+    if (pos) vorTh.parentNode.insertBefore(ptsTh, vorTh); else oppTh.parentNode.insertBefore(ptsTh, oppTh.nextSibling);
     vorTh.hidden = !!pos; win.classList.toggle('is-overall', !pos);
     list.forEach(function (p, i) { p.rk = i + 1; });
     var shown = q ? list.filter(function (p) { return (p.n + ' ' + p.t + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; }) : list;
@@ -130,13 +132,14 @@
       var tag = p.st ? ' <span class="nflff__st nflff__st--' + esc(p.st.toLowerCase()) + '">' + esc(p.st) + '</span>' : '';
       if (p.bo && p.bo.p >= BOCUT) tag += ' <span class="nflff__st nflff__st--brk" title="breakout: P(starter-line points, next 4 games) = ' + Math.round(p.bo.p * 100) + '%">BRK</span>';
       var opp = ros ? String(p.rg) : (p.home ? '' : '<span class="cfb__dim">@</span>') + esc(p.opp || '');
+      var ptsTd = '<td class="cfb__num' + (pos ? ' nflwar__war is-key' : '') + ' nflrk__pts" data-u="' + LABEL[bar.elements.fmt.value] + '">' + p.pts.toFixed(1) + '</td>';
       html += '<tr class="nflrk__t' + (tr % 2) + '"><td class="cfb__rk">' + p.rk + '</td>' +
         '<td class="nflrk__name">' + face(p) + '<b>' + esc(p.n) + '</b>' + tag + (p.pos === 'DST' ? '' : ' <span class="cfb__dim">' + tl(p.t) + esc(p.t) + '</span>') + '</td>' +
+        (pos ? ptsTd : '<td class="cfb__num nflwar__war is-key nflrk__vor">' + (p.vor >= 0 ? '+' : '') + p.vor.toFixed(1) + '</td>') +
         '<td class="nflrk__pos">' + p.pos + p.pr + '</td>' +
-        (pos ? '' : '<td class="cfb__num nflrk__vor">' + (p.vor >= 0 ? '+' : '') + p.vor.toFixed(1) + '</td>') +
         '<td class="nflrk__tr">' + (pos === 'FLEX' ? 'T' + p.ft : (pos ? '' : p.pos + ' ') + 'T' + p.tier) + '</td>' +
         '<td class="nflrk__opp">' + (ros ? '<span class="nflff__m">games </span>' : '') + opp + '</td>' +
-        '<td class="cfb__num nflwar__war is-key nflrk__pts" data-u="' + LABEL[bar.elements.fmt.value] + '">' + p.pts.toFixed(1) + '</td>' +
+        (pos ? '' : ptsTd) +
         '<td class="cfb__num nflrk__av">' + (ros ? p.eg.toFixed(1) : Math.round(p.av * 100) + '%') + '</td>' +
         '<td class="cfb__num nflrk__ppg">' + (p._ppg == null ? '<span class="cfb__dim">–</span>' : p._ppg.toFixed(1)) + '</td></tr>';
     });

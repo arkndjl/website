@@ -2,11 +2,17 @@
        listed start), ranked by SV, this season's points over a replacement QB a game (spts), with the game model's QB term (Proj), WAR from the WAR board and this season's play-by-play line. The WAR leaders tab
        holds everyone else. */ -}}
 {{- with site.Data.nfl_qb -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "QBs") "filter" "Role" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,QB,Team,SV,SVAR,aEPA,Proj,EPA/db,CPOE,ANY/A" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "QBs") "filter" "Role" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,QB,SV,Team,Age,SVAR,aEPA,Proj,EPA/db,CPOE,ANY/A" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
 <table class="cfb__table">
   <thead><tr>
-    <th title="rank by SV within the filter">RK</th><th>QB</th><th>Team</th>
+    <th title="rank by SV within the filter">RK</th><th>QB</th>
     <th title="SV (season value) = this season's points over a replacement QB a game played: every dropback and QB run, EPA less the defense's EPA allowed a play over the league's (its other games, shrunk 300 plays), minus replacement (-0.12 a play), over games with 10+ plays. this season only">SV</th>
+    <th>Team</th>
+    <th title="starter: QB1 (depth chart); status in parentheses if listed on the injury report. fill-in: starts this week in place of QB1. backup: neither">Role</th>
+    <th title="age">Age</th>
+    <th title="games played, 10+ plays">G</th>
+    <th title="dropbacks + QB runs">Plays</th>
+    <th title="dropbacks: passes, sacks, scrambles">DB</th>
     <th title="opponent-adjusted EPA a play, dropbacks + QB runs, this season">aEPA</th>
     <th title="Proj = the game model's QB term: b_qb x (rating - replacement) x 38 plays; rating = EPA/play (passing + rushing), career-weighted (each past season x .7), shrunk toward replacement (-0.12) with 100 plays. a projection, not this season alone">Proj</th>
     <th title="SVAR = SV over replacement, season total, in wins: points / 36 a win (the game model's points a win). this season only">SVAR</th>
@@ -21,14 +27,18 @@
     <th title="interceptions / attempts">INT%</th>
     <th title="big throws: completions 10+ air yards with a completion chance of 45% or less, per dropback">Big%</th>
     <th title="EPA on QB runs (designed + scrambles, kneels out), season total">Rush EPA</th>
-    <th title="dropbacks: passes, sacks, scrambles">DB</th>
-    <th title="starter: QB1 (depth chart); status in parentheses if listed on the injury report. fill-in: starts this week in place of QB1. backup: neither">Role</th>
   </tr></thead>
   <tbody>
   {{- range $i, $q := .rows }}
   <tr>
-    <td class="cfb__rk">{{ add $i 1 }}</td><td class="cfb__name">{{ partial "face.html" (dict "u" (.photo | default "")) }}<b>{{ .n }}</b></td><td style="white-space: nowrap">{{ with .t }}<img class="cfb__logo" src="/img/nfl/{{ lower (replaceRE ".*/" "" .) }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}{{ .t }}</td>
+    <td class="cfb__rk">{{ add $i 1 }}</td><td class="cfb__name">{{ partial "face.html" (dict "u" (.photo | default "")) }}<b>{{ .n }}</b></td>
     <td class="cfb__num nflwar__war is-key">{{ with .spts }}{{ partial "num.html" (slice "%+.1f" (float .)) }}{{ end }}</td>
+    <td style="white-space: nowrap">{{ with .t }}<img class="cfb__logo" src="/img/nfl/{{ lower (replaceRE ".*/" "" .) }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}{{ .t }}</td>
+    <td>{{ .role }}{{ with .status }} <span class="cfb__dim">({{ lower . }})</span>{{ end }}</td>
+    <td class="cfb__num">{{ .age }}</td>
+    <td class="cfb__num">{{ .gp }}</td>
+    <td class="cfb__num">{{ .plays }}</td>
+    <td class="cfb__num">{{ .db }}</td>
     <td class="cfb__num">{{ with .aepa }}{{ partial "num.html" (slice "%+.3f" (float .)) }}{{ end }}</td>
     <td class="cfb__num">{{ with .pts }}{{ partial "num.html" (slice "%+.1f" (float .)) }}{{ end }}</td>
     <td class="cfb__num">{{ with .svar }}{{ partial "num.html" (slice "%+.2f" (float .)) }}{{ end }}</td>
@@ -43,8 +53,6 @@
     <td class="cfb__num">{{ with .int }}{{ printf "%.1f" (mul 100 (float .)) }}{{ end }}</td>
     <td class="cfb__num">{{ with .btt }}{{ printf "%.1f" (mul 100 (float .)) }}{{ end }}</td>
     <td class="cfb__num">{{ with .rush }}{{ partial "num.html" (slice "%+.1f" (float .)) }}{{ end }}</td>
-    <td class="cfb__num">{{ .db }}</td>
-    <td>{{ .role }}{{ with .status }} <span class="cfb__dim">({{ lower . }})</span>{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>

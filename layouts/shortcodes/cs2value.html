@@ -8,7 +8,7 @@
 {{- $view := $.Get "view" | default "teams" -}}
 {{- $date := lower ((time .asof).Format "Jan 2") -}}
 {{- $ctry := site.Data.soccer_countries.name -}}
-{{- $about := printf "Player value: prize money he adds over a replacement-level player (tier-1 mean - %.0f SD) in a five of average tier-1 starters, two seasons, aged, 15%%/yr discount, x %.2f (fit on %d reported buyouts; leave-one-out error x%.2f, flat price x%.2f). Prize curve: next-182-day prize money on the five's rating, Valve VRS prize ledger, held-out deviance explained %.2f. Reported fees are near flat and mostly Falcons deals, so values are compressed and at that buyer's prices; Eternal Fire to Aurora (reported under $2.5M) prices at $%.1fM. Contracts not public, not modelled. At signing: first map of the current stint; before %s flagged." (float $fv.q) (float $fv.A) (int $fv.n) (float (index $fv.loo 0).fx) (float (index $fv.loo 2).fx) (float (index .fit.curve.tests 0).d2) (div (float (index $fv.checks 0).xtv) 1e6) .jul0 -}}
+{{- $about := printf "Player value: prize money he adds over a replacement-level player (tier-1 mean - %.0f SD) in a five of average tier-1 starters, two seasons, aged, 15%%/yr discount, x %.2f (xTV = xMV x that multiple, fit on %d reported buyouts; leave-one-out error x%.2f, flat price x%.2f). Prize curve: next-182-day prize money on the five's rating, Valve VRS prize ledger, held-out deviance explained %.2f. Reported fees are near flat and mostly Falcons deals, so values are compressed and at that buyer's prices; Eternal Fire to Aurora (reported under $2.5M) prices at $%.1fM. Contracts not public, not modelled. At signing: first map of the current stint; before %s flagged." (float $fv.q) (float $fv.A) (int $fv.n) (float (index $fv.loo 0).fx) (float (index $fv.loo 2).fx) (float (index .fit.curve.tests 0).d2) (div (float (index $fv.checks 0).xtv) 1e6) .jul0 -}}
 {{- if eq $view "teams" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: team values") "icon" "cs" "filter" "Tier" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Value,±,±%,Top" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table hk cs__table">
@@ -21,6 +21,7 @@
     <th title="the five's most valuable player">Top</th>
     <th title="prize money won in the last 365 days (Valve VRS prize ledger)">Prize</th>
     <th title="expected prize money a year from the five's rating (the prize curve the values are built on)">xPrize</th>
+    <th class="hk__x" title="xMV summed: the prize money the five's play adds over replacement players, two seasons (no fee data)">xMV</th>
     <th class="hk__x" title="publicly reported buyouts for players on this five (unconfirmed)">Paid</th>
     <th class="hk__x" title="earliest current-stint start among the five">Since</th>
   </tr></thead>
@@ -37,6 +38,7 @@
     <td style="white-space: nowrap" data-v="{{ .topv }}">{{ .top }} <span class="cfb__dim">{{ partial "cs2money.html" .topv }}</span></td>
     <td class="cfb__num" data-v="{{ .prize }}">{{ if .prize }}{{ partial "cs2money.html" .prize }}{{ else }}-{{ end }}</td>
     <td class="cfb__num" data-v="{{ .xp }}">{{ partial "cs2money.html" .xp }}</td>
+    <td class="cfb__num hk__x" data-v="{{ .m }}">{{ partial "cs2money.html" .m }}</td>
     <td class="cfb__num hk__x" data-v="{{ .paid | default 0 }}">{{ with .paid }}{{ partial "cs2money.html" . }}{{ else }}-{{ end }}</td>
     <td class="cfb__num hk__x" data-v="{{ .since }}">{{ with .since }}{{ (time .).Format "Jan 06" }}{{ end }}</td>
   </tr>
@@ -56,7 +58,8 @@
     <th title="RWA when he joined (0 = average tier-1 starter)">RWA0</th>
     <th title="RWA now">RWA</th>
     <th>Age</th>
-    <th class="hk__x" title="publicly reported buyout (unconfirmed)">Fee</th>
+    <th class="hk__x" title="publicly reported buyout (unconfirmed; a group deal split evenly)">Fee</th>
+    <th class="hk__x" title="surplus paid: reported fee minus xTV at signing (positive = paid above the model's price)">Over</th>
   </tr></thead>
   <tbody>
   {{- range $i, $r := .signings }}{{ $dv := sub $r.v $r.v0 }}
@@ -73,6 +76,7 @@
     <td class="cfb__num" data-v="{{ $r.rwa }}">{{ partial "num.html" (slice "%+.2f" (float $r.rwa)) }}</td>
     <td class="cfb__num" data-v="{{ $r.age | default 0 }}">{{ with $r.age }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ else }}-{{ end }}</td>
     <td class="cfb__num hk__x" data-v="{{ $r.fee | default 0 }}">{{ with $r.fee }}{{ partial "cs2money.html" . }}{{ else }}-{{ end }}</td>
+    <td class="cfb__num hk__x" data-v="{{ if $r.fee }}{{ sub $r.fee $r.v0 }}{{ end }}">{{ with $r.fee }}{{ $o := sub . $r.v0 }}{{ if ge $o 0 }}+{{ partial "cs2money.html" $o }}{{ else }}-{{ partial "cs2money.html" (mul -1 $o) }}{{ end }}{{ else }}-{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>

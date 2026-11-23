@@ -1,0 +1,407 @@
+{
+ "drivers": {
+  "laliga:age": {
+   "gain": 0.303,
+   "hit": 2,
+   "hit0": 2,
+   "n": 5,
+   "p": 0.2756,
+   "pass": false,
+   "t": 0.65,
+   "wins": 4
+  },
+  "laliga:ucl": {
+   "gain": -0.9381,
+   "hit": 2,
+   "hit0": 2,
+   "n": 5,
+   "p": 0.7096,
+   "pass": false,
+   "t": -0.6,
+   "wins": 3
+  },
+  "ligue1:age": {
+   "gain": 0.0655,
+   "hit": 7,
+   "hit0": 7,
+   "n": 11,
+   "p": 0.213,
+   "pass": false,
+   "t": 0.83,
+   "wins": 7
+  },
+  "ligue1:ucl": {
+   "gain": 0.248,
+   "hit": 8,
+   "hit0": 7,
+   "n": 11,
+   "p": 0.0973,
+   "pass": false,
+   "t": 1.39,
+   "wins": 7
+  },
+  "pfa:age": {
+   "gain": -0.0381,
+   "hit": 4,
+   "hit0": 4,
+   "n": 12,
+   "p": 0.9621,
+   "pass": false,
+   "t": -1.96,
+   "wins": 5
+  },
+  "pfa:ucl": {
+   "gain": 0.1813,
+   "hit": 5,
+   "hit0": 4,
+   "n": 12,
+   "p": 0.3135,
+   "pass": false,
+   "t": 0.5,
+   "wins": 9
+  },
+  "pl_pots:age": {
+   "gain": -0.0522,
+   "hit": 4,
+   "hit0": 4,
+   "n": 12,
+   "p": 0.9881,
+   "pass": false,
+   "t": -2.62,
+   "wins": 4
+  },
+  "pl_pots:ucl": {
+   "gain": -0.0116,
+   "hit": 4,
+   "hit0": 4,
+   "n": 12,
+   "p": 0.5117,
+   "pass": false,
+   "t": -0.03,
+   "wins": 9
+  },
+  "seriea:age": {
+   "gain": 0.015,
+   "hit": 6,
+   "hit0": 7,
+   "n": 12,
+   "p": 0.4495,
+   "pass": false,
+   "t": 0.13,
+   "wins": 8
+  },
+  "seriea:ucl": {
+   "gain": -0.0075,
+   "hit": 7,
+   "hit0": 7,
+   "n": 12,
+   "p": 0.6693,
+   "pass": false,
+   "t": -0.45,
+   "wins": 3
+  },
+  "vdv:age": {
+   "gain": 0.302,
+   "hit": 6,
+   "hit0": 5,
+   "n": 12,
+   "p": 0.1433,
+   "pass": false,
+   "t": 1.12,
+   "wins": 8
+  },
+  "vdv:ucl": {
+   "gain": -0.0024,
+   "hit": 5,
+   "hit0": 5,
+   "n": 12,
+   "p": 0.8547,
+   "pass": false,
+   "t": -1.11,
+   "wins": 3
+  }
+ },
+ "races": {
+  "goldenboy": {
+   "cols": [
+    "gar",
+    "ga",
+    "ucl",
+    "lgw",
+    "age",
+    "prev"
+   ],
+   "null": [
+    "gar"
+   ],
+   "test": {
+    "gain": 0.0477,
+    "holm_n": 9,
+    "model": {
+     "fav": 0.33,
+     "hit": 2,
+     "ll": -3.205,
+     "n": 9,
+     "pw": 0.116
+    },
+    "null": {
+     "fav": 0.26,
+     "hit": 1,
+     "ll": -3.253,
+     "n": 9,
+     "pw": 0.051
+    },
+    "out_of_pool": 3,
+    "p": 0.4614,
+    "pass": false,
+    "t": 0.1,
+    "wins": 4
+   }
+  },
+  "kopa": {
+   "cols": [
+    "gar",
+    "ga",
+    "ucl",
+    "lgw",
+    "age"
+   ],
+   "null": [
+    "gar"
+   ],
+   "test": {
+    "gain": -0.0664,
+    "holm_n": 9,
+    "model": {
+     "fav": 0.554,
+     "hit": 4,
+     "ll": -1.509,
+     "n": 7,
+     "pw": 0.447
+    },
+    "null": {
+     "fav": 0.528,
+     "hit": 4,
+     "ll": -1.442,
+     "n": 7,
+     "pw": 0.395
+    },
+    "out_of_pool": 1,
+    "p": 0.5609,
+    "pass": false,
+    "t": -0.16,
+    "wins": 5
+   }
+  },
+  "ligue1": {
+   "cols": [
+    "gar",
+    "ga",
+    "lgw",
+    "tppg",
+    "prev"
+   ],
+   "null": [
+    "gar"
+   ],
+   "test": {
+    "gain": 0.9316,
+    "holm_n": 9,
+    "model": {
+     "fav": 0.806,
+     "hit": 7,
+     "ll": -0.864,
+     "n": 11,
+     "pw": 0.62
+    },
+    "null": {
+     "fav": 0.555,
+     "hit": 7,
+     "ll": -1.796,
+     "n": 11,
+     "pw": 0.387
+    },
+    "out_of_pool": 0,
+    "p": 0.0069,
+    "pass": true,
+    "t": 2.98,
+    "wins": 9
+   }
+  },
+  "pfa": {
+   "cols": [
+    "gar",
+    "ga",
+    "lgw",
+    "tppg",
+    "prev"
+   ],
+   "null": [
+    "gar"
+   ],
+   "test": {
+    "gain": 0.3815,
+    "holm_n": 9,
+    "model": {
+     "fav": 0.441,
+     "hit": 4,
+     "ll": -2.642,
+     "n": 12,
+     "pw": 0.264
+    },
+    "null": {
+     "fav": 0.362,
+     "hit": 3,
+     "ll": -3.024,
+     "n": 12,
+     "pw": 0.142
+    },
+    "out_of_pool": 0,
+    "p": 0.2231,
+    "pass": false,
+    "t": 0.79,
+    "wins": 8
+   }
+  },
+  "pl_pots": {
+   "cols": [
+    "gar",
+    "ga",
+    "lgw",
+    "tppg",
+    "prev"
+   ],
+   "null": [
+    "gar"
+   ],
+   "test": {
+    "gain": 0.4202,
+    "holm_n": 9,
+    "model": {
+     "fav": 0.385,
+     "hit": 4,
+     "ll": -3.07,
+     "n": 12,
+     "pw": 0.215
+    },
+    "null": {
+     "fav": 0.302,
+     "hit": 4,
+     "ll": -3.49,
+     "n": 12,
+     "pw": 0.112
+    },
+    "out_of_pool": 0,
+    "p": 0.2345,
+    "pass": false,
+    "t": 0.75,
+    "wins": 8
+   }
+  },
+  "seriea": {
+   "cols": [
+    "gar",
+    "ga",
+    "lgw",
+    "tppg",
+    "prev"
+   ],
+   "null": [
+    "gar"
+   ],
+   "test": {
+    "gain": 1.5279,
+    "holm_n": 9,
+    "model": {
+     "fav": 0.529,
+     "hit": 7,
+     "ll": -2.207,
+     "n": 12,
+     "pw": 0.37
+    },
+    "null": {
+     "fav": 0.245,
+     "hit": 2,
+     "ll": -3.735,
+     "n": 12,
+     "pw": 0.067
+    },
+    "out_of_pool": 0,
+    "p": 0.0025,
+    "pass": true,
+    "t": 3.49,
+    "wins": 10
+   }
+  },
+  "vdv": {
+   "cols": [
+    "gar",
+    "ga",
+    "lgw",
+    "tppg",
+    "prev"
+   ],
+   "null": [
+    "gar"
+   ],
+   "test": {
+    "gain": 0.5031,
+    "holm_n": 9,
+    "model": {
+     "fav": 0.595,
+     "hit": 5,
+     "ll": -2.064,
+     "n": 12,
+     "pw": 0.295
+    },
+    "null": {
+     "fav": 0.413,
+     "hit": 3,
+     "ll": -2.567,
+     "n": 12,
+     "pw": 0.175
+    },
+    "out_of_pool": 0,
+    "p": 0.1495,
+    "pass": false,
+    "t": 1.09,
+    "wins": 9
+   }
+  },
+  "yashin": {
+   "cols": [
+    "gar",
+    "lgw",
+    "ucl",
+    "natw",
+    "prev"
+   ],
+   "null": [
+    "gar"
+   ],
+   "test": {
+    "gain": 0.5672,
+    "holm_n": 9,
+    "model": {
+     "fav": 0.548,
+     "hit": 3,
+     "ll": -3.505,
+     "n": 7,
+     "pw": 0.259
+    },
+    "null": {
+     "fav": 0.166,
+     "hit": 0,
+     "ll": -4.072,
+     "n": 7,
+     "pw": 0.034
+    },
+    "out_of_pool": 0,
+    "p": 0.2915,
+    "pass": false,
+    "t": 0.58,
+    "wins": 3
+   }
+  }
+ }
+}

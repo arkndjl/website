@@ -6,10 +6,11 @@
 {{- $icon := cond (eq $sport "cbb") "basketball" "football" -}}
 {{- $lp := cond (and $d $d.lockP) (index $d.lockP $sport) nil -}}
 {{- with $s.locks -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "re-signed :: %v" $s.target)) "icon" $icon "filter" "Pos,Team,Conf,Status" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Pos,FV,Team,Status,Reported,xNIL" "gfxDate" (lower ((time $d.asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "re-signed :: %v" $s.target)) "icon" $icon "filter" "Pos,Team,Conf,Status" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Pos,Team,Status,Reported,xNIL" "gfxDate" (lower ((time $d.asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table xw">
-  <thead><tr><th>RK</th><th>Player</th><th>Pos</th><th>Cls</th><th>Team</th><th title="conference">Conf</th>
+  <thead><tr><th>RK</th><th>Player</th>
     <th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th>
+    <th>Pos</th><th>Cls</th><th>Team</th><th title="conference">Conf</th>
     <th title="signed = re-signed or announced; close = deal reported close">Status</th>
     <th title="reported deal value (largest any report gives)">Reported</th>
     <th title="xNIL = open-market NIL worth now">xNIL</th><th title="yNIL = estimated pay this season">yNIL</th>
@@ -20,11 +21,11 @@
   <tr>
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td class="cfb__name">{{ with .photo }}{{ partial "face.html" (dict "u" .) }}{{ end }}{{ .name }}{{ partial "arkstar.html" (dict "sport" (cond (eq $sport "cbb") "college-basketball" "college-football") "name" .name "team" .team) }}</td>
+    <td class="fv" data-l="FV" data-v="{{ .fv }}">{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td>{{ replaceRE "^DL$" "DT" .pos }}</td>
     <td>{{ .cls | default "—" }}</td>
     <td class="xw__team" data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
     <td>{{ .conf | default "—" }}</td>
-    <td class="fv" data-l="FV" data-v="{{ .fv }}">{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td data-l="Status" data-v="{{ cond (eq .state "pending") "close" "signed" }}"><span class="cfb__lockchip{{ if eq .state "pending" }} is-pend{{ end }}">{{ cond (eq .state "pending") "CLOSE" "LOCK" }}</span></td>
     <td class="cfb__num is-key" data-l="Reported" data-v="{{ .amt | default 0 }}">{{ with .amt }}<b>{{ partial "nil.html" . }}</b>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-l="xNIL" data-v="{{ .xnil | default 0 }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>

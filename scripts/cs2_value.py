@@ -18,6 +18,9 @@ a multiple A (sponsor and brand value per prize dollar, and contract length) fit
 (data/cs2_fees.json; group deals priced as the sum of the players), with the replacement level (tier-1 mean minus
 q tier-1 SDs) picked on the same fees. Validation: leave one fee out, q and A refit each time.
 
+xMV = the prize money itself (what his play earns a team; no fee data); xTV = A x xMV (what a buyout costs). A blend
+toward flat prices (A x xMV^g) is tested on the same leave-one-out and fails.
+
 Team value = the sum of the current five (Valve rosters in data/cs2.json). "At signing" = the same value at the
 player's first map of his current stint with the team (bo3.gg maps); stints that began before the ratings had six
 months of maps start at JUL0 and are flagged. Contract terms are not public and are not modelled.
@@ -275,16 +278,17 @@ def fee_points(C, bounds=False):
     return pts
 
 
-def fee_mrp(C, cv, pt, q=None):
+def fee_mrp(C, cv, pt, q=None, each=False):
     """Summed MRP of a deal's players at their move dates; q: replacement = tier-1 mean - q tier-1 SDs instead of
     the live rule (the VRS 51-100 starters' mean)."""
-    tot = 0.0
+    tot = [] if each else 0.0
     for pi, T in pt["pl"]:
         th = C.th(T)
         mu1, sd1 = C.tier1(T)
         repl = C.repl(T) if q is None else mu1 - q * sd1
         age = P.ages(C.M, C.pdir, T)[pi]
-        tot += mrp(cv, th[pi], age if age == age else 24.0, mu1, repl, C.a, C.ag)
+        x = mrp(cv, th[pi], age if age == age else 24.0, mu1, repl, C.a, C.ag)
+        tot = tot + [x] if each else tot + x
     return tot
 
 
@@ -309,19 +313,41 @@ def fee_fit(C, cv):
                 r.append((float(np.mean((ly[ix] - la - np.log(g)) ** 2)), q, la))
         return min(r)
 
-    loo = {"live": [], "tuned": [], "flat": []}
+    # blend: price = A x sum over the deal's players of xMV^g (g < 1 = buyouts flatter than prize value)
+    GP = {q: [np.array(fee_mrp(C, cv, pt, q, each=True)) for pt in pts] for q in qs}
+    gs = [round(x, 2) for x in np.arange(0.1, 1.51, 0.05)]
+
+    def best_qg(ix):
+        r = []
+        for q in qs:
+            for g in gs:
+                if any((GP[q][i] <= 0).all() for i in ix):
+                    continue
+                lg = np.log([max(float((np.maximum(GP[q][i], 1.0) ** g).sum()), 1.0) for i in ix])
+                la = float(np.mean(ly[ix] - lg))
+                r.append((float(np.mean((ly[ix] - la - lg) ** 2)), q, g, la))
+        return min(r)
+
+    def pred_qg(j, q, g, la):
+        return la + math.log(max(float((np.maximum(GP[q][j], 1.0) ** g).sum()), 1.0))
+
+    loo = {"live": [], "tuned": [], "flat": [], "elastic": []}
     for j in range(n):
         ix = np.array([i for i in range(n) if i != j])
         loo["live"].append(ly[j] - float(np.mean(ly[ix] - np.log(G[ix]))) - math.log(G[j]))
         _, q, la = best_q(ix)
         loo["tuned"].append(ly[j] - la - math.log(GQ[q][j]))
         loo["flat"].append(ly[j] - float(np.mean(ly[ix] - np.log(npl[ix]))) - math.log(npl[j]))
+        _, q2, g2, la2 = best_qg(ix)
+        loo["elastic"].append(ly[j] - pred_qg(j, q2, g2, la2))
     err = {k: math.sqrt(float(np.mean(np.square(v)))) for k, v in loo.items()}
     e, q, la = best_q(np.arange(n))
     out = {"A": round(math.exp(la), 3), "q": q, "n": n, "rmseLog": round(math.sqrt(e), 3),
            "loo": [{"name": nm, "log": round(err[k], 3), "fx": round(math.exp(err[k]), 2)} for k, nm in
                    (("tuned", "prize MRP, replacement level tuned on the fees (live)"),
-                    ("live", "prize MRP, replacement = VRS 51-100 starters"), ("flat", "flat price per player"))],
+                    ("live", "prize MRP, replacement = VRS 51-100 starters"), ("flat", "flat price per player"),
+                    ("elastic", "price = A x xMV^g, g fit (blend toward flat)"))],
+           "gFit": best_qg(np.arange(n))[2],
            "pts": []}
     for j, pt in enumerate(pts):
         out["pts"].append({"nick": pt["nick"].replace("+", ", "), "to": pt["to"], "date": pt["date"], "usd": pt["usd"],
@@ -355,6 +381,119 @@ def stint_start(C, pi, tk):
         else:
             break
     return start
+
+
+def transactions(C, price, T, days=183, min_maps=20, standin=5):
+    """Player moves and org changes in the last `days` from bo3.gg map lineups (scripts/cs2_pstats.py): a stint = a
+    run of maps for one team key. join = first map of a new stint (stints under `standin` maps are stand-ins and are
+    skipped), out = a player's last stint ended 45+ days ago while that team kept playing (benched, released or
+    inactive: the maps can't tell which), rebrand = a bo3 team id whose name key changed, core = 3+ players from one
+    team joining one team within 30 days (drop when the new "team" is ex-<org>: the org released the five), exit = a team with 50+ maps in the year before its last map, none in 60
+    days. price(pi, day) -> (xTV, RWA) at that day. Loans and contract terms are not in the data."""
+    M, bo3 = C.M, C.bo3
+    t0 = T - days
+    name = {}
+    for r in sorted(bo3.mt.values(), key=lambda r: r[1]):
+        name[bo3.k(r[2])], name[bo3.k(r[3])] = r[4], r[5]
+    order = np.lexsort((M.d, M.p))
+    stints = defaultdict(list)    # pi -> [[team key, first day, last day, maps]]
+    tlast = defaultdict(int)
+    tmaps = defaultdict(list)
+    ttier = defaultdict(list)
+    for i in order:
+        pi, d, tk = int(M.p[i]), int(M.d[i]), bo3.k(int(M.team[i]))
+        if d >= t0 - 365:
+            ttier[tk].append(int(M.tier[i]))
+        tlast[tk] = max(tlast[tk], d)
+        tmaps[tk].append(d)
+        st = stints[pi]
+        if st and st[-1][0] == tk:
+            st[-1][2], st[-1][3] = d, st[-1][3] + 1
+        else:
+            st.append([tk, d, d, 1])
+    rows = []
+    for pi, st in stints.items():
+        if sum(x[3] for x in st) < min_maps:
+            continue
+        real = [x for x in st if x[3] >= standin]
+        for a, b in zip(real, real[1:]):
+            if b[1] >= t0 and a[0] != b[0]:
+                rows.append({"d": b[1], "k": "join", "pi": pi, "fr": a[0], "to": b[0]})
+        if real and real[-1][1] < T - 45 and t0 <= real[-1][2] and tlast[real[-1][0]] > real[-1][2] + 45 \
+                and st[-1][2] <= real[-1][2] + 30:
+            rows.append({"d": real[-1][2], "k": "out", "pi": pi, "fr": real[-1][0], "to": None})
+        if real and real[0][1] >= t0 and len(real) == 1 and real[0][1] > int(M.d.min()) + 60:
+            rows.append({"d": real[0][1], "k": "join", "pi": pi, "fr": None, "to": real[0][0]})
+    # cores: 3+ players from one team to one team within 30 days
+    by = defaultdict(list)
+    for r in rows:
+        if r["k"] == "join" and r["fr"]:
+            by[(r["fr"], r["to"])].append(r)
+    org = []
+    for (fr, to), rs in by.items():
+        rs.sort(key=lambda r: r["d"])
+        i = 0
+        while i < len(rs):
+            grp = [x for x in rs if 0 <= x["d"] - rs[i]["d"] <= 30]
+            if len(grp) >= 3:
+                org.append({"d": grp[0]["d"], "k": "core", "fr": fr, "to": to, "pis": [x["pi"] for x in grp]})
+                i += len(grp)
+            else:
+                i += 1
+    # rebrands: a bo3 team id whose name key changed inside the window
+    seen = {}
+    for r in sorted(bo3.mt.values(), key=lambda r: r[1]):
+        d = P.ordd(r[1])
+        for tid, nm in ((r[2], r[4]), (r[3], r[5])):
+            k = key(nm)
+            if tid in seen and seen[tid][0] != k and d >= t0:
+                org.append({"d": d, "k": "rebrand", "fr": seen[tid][0], "to": k, "frn": seen[tid][1], "ton": nm})
+            seen[tid] = (k, nm)
+    for tk, ds in tmaps.items():
+        last = max(ds)
+        if t0 <= last < T - 60 and sum(1 for d in ds if d > last - 365) >= 250:   # 50 maps x 5 players
+            org.append({"d": last, "k": "exit", "fr": tk, "to": None})
+    # keep moves that touch a team playing mostly B-tier events or better over the last two years (bo3.gg tiers s/a/b)
+    big = {tk for tk, v in ttier.items() if float(np.median(v)) <= 3}
+    for r in org:
+        if r["k"] == "core" and r["to"] in ("ex" + r["fr"], "ex" + r["fr"] + "s"):
+            r["k"] = "drop"   # the org let its whole roster go (bo3 lists the five as ex-<org>)
+    # a join that is part of a core or drop row shows once, on the group row; a lone move to "ex-<org>" is an out
+    grouped = {(pi, r["to"]) for r in org if r["k"] in ("core", "drop") for pi in r["pis"]}
+    keep = []
+    for r in rows:
+        if r["k"] == "join" and (r["pi"], r["to"]) in grouped:
+            continue
+        if r["k"] == "join" and r["fr"] and r["to"] in ("ex" + r["fr"], "ex" + r["fr"] + "s"):
+            r["k"], r["to"] = "out", None
+        keep.append(r)
+    rows = keep
+    out = []
+    cache = {}
+    for r in rows + org:
+        if not ({r["fr"], r["to"]} & big):
+            continue
+        pis = [r["pi"]] if "pi" in r else r.get("pis", [])
+        vals = []
+        for pi in pis:
+            day = dt.date.fromordinal(r["d"]).replace(day=1).toordinal()
+            if (pi, day) not in cache:
+                cache[(pi, day)] = price(pi, day)
+            vals.append(cache[(pi, day)])
+        nowv = [price(pi, T) for pi in pis]
+        row = {"d": dt.date.fromordinal(r["d"]).isoformat(), "k": r["k"],
+               "fr": r.get("frn") or (name.get(r["fr"]) if r["fr"] else None), "frk": r["fr"],
+               "to": r.get("ton") or (name.get(r["to"]) if r["to"] else None), "tok": r["to"]}
+        if pis:
+            row["n"] = ", ".join(M.nick.get(int(M.pids[pi]), "?") for pi in pis)
+            row["id"] = int(M.pids[pis[0]]) if len(pis) == 1 else None
+            row["v0"] = int(round(sum(v[0] for v in vals), -3))
+            row["v"] = int(round(sum(v[0] for v in nowv), -3))
+            row["rwa"] = round(float(np.mean([v[1] for v in nowv])), 2)
+            row["rwa0"] = round(float(np.mean([v[1] for v in vals])), 2)
+        out.append(row)
+    out.sort(key=lambda r: (r["d"], r["k"] in ("core", "rebrand", "exit")), reverse=True)
+    return out
 
 
 def build():
@@ -406,7 +545,7 @@ def build():
             row = {"id": pid, "n": C.M.nick.get(pid) or nick, "ph": r.get("ph"), "nat": r.get("nat"),
                    "age": None if age[pi] != age[pi] else round(float(age[pi]), 1),
                    "rwa": round(float((th[pi] - mu1) * C.a / 2), 2), "rwa0": round(float((ths[pi] - m1s) * C.a / 2), 2),
-                   "v": int(round(now, -3)), "v0": int(round(then, -3)),
+                   "v": int(round(now, -3)), "v0": int(round(then, -3)), "m": int(round(now / A, -3)),
                    "since": dt.date.fromordinal(s0).isoformat() if s0 else None, "pre": bool(not s0 or s0 < j0),
                    "fee": f,
                    "tm": t["n"], "tk": tk, "tier": t.get("tier", 4), "logo": bool(t.get("logo")), "trk": t.get("rk")}
@@ -416,9 +555,10 @@ def build():
         if len(got) < 4:
             continue
         v, v0 = sum(x["v"] for x in got), sum(x["v0"] for x in got)
+        m = sum(x["m"] for x in got)
         top = max(got, key=lambda x: x["v"])
         teams.append({"k": tk, "n": t["n"], "rk": t.get("rk"), "tier": t.get("tier", 4), "logo": bool(t.get("logo")),
-                      "fl": t.get("fl"), "v": v, "v0": v0, "dv": v - v0, "dp": round(100 * (v - v0) / v0, 1) if v0 >= 50000 else None,
+                      "fl": t.get("fl"), "v": v, "v0": v0, "m": m, "dv": v - v0, "dp": round(100 * (v - v0) / v0, 1) if v0 >= 50000 else None,
                       "top": top["n"], "topv": top["v"], "nk": len(got),
                       "prize": int(round(C.prize_fwd(tk, T - 365, 365), -2)),
                       "xp": int(round(prize_yr(cv, (C.five_mean(t["ros"], tk, th) - mu1) * C.a / 2), -3)),
@@ -429,8 +569,26 @@ def build():
     for i, r in enumerate(teams):
         r["vrk"] = i + 1
     signs.sort(key=lambda r: -(r["v"] - r["v0"]))
+
+    def price(pi, day):
+        thd = C.th(day)
+        m1, s1 = C.tier1(day)
+        ad = P.ages(C.M, C.pdir, day)[pi]
+        return (A * mrp(cv, thd[pi], ad if ad == ad else 24.0, m1, m1 - q * s1, C.a, C.ag), float((thd[pi] - m1) * C.a / 2))
+
+    tx = transactions(C, price, T)
+    tinfo = {t["k"]: t for t in cs["teams"]}
+    for r in tx:
+        for side in ("frk", "tok"):
+            ti = tinfo.get(r.get(side) or "")
+            r[side + "l"] = bool(ti and ti.get("logo"))
+            r[side + "t"] = ti.get("tier", 4) if ti else 4
+        fee = paid.get(r.get("tok") or "", {})
+        f = sum(fee.get(names.key(n.strip()), 0) for n in (r.get("n") or "").split(","))
+        r["fee"] = f or None
+        r["tier"] = min(r["frkt"], r["tokt"])
     out = {"asof": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "jul0": JUL0,
-           "repl": round((repl - mu1) * C.a / 2, 2), "teams": teams, "signings": signs,
+           "repl": round((repl - mu1) * C.a / 2, 2), "teams": teams, "signings": signs, "tx": tx,
            "fit": {"A": A, "q": q, "curve": cv, "fees": fv,
                    "prizeYr": {str(x): int(round(prize_yr(cv, x), -3)) for x in (-1.0, -0.5, 0.0, 0.5)}}}
     OUT.write_text(json.dumps(out, separators=(",", ":"), allow_nan=False))
@@ -439,7 +597,8 @@ def build():
         j = int(np.searchsorted(C.M.pids, r["id"]))
         if j < len(C.M.pids) and int(C.M.pids[j]) == r["id"]:
             a0 = age[j] if age[j] == age[j] else 24.0
-            r["xtv"] = int(round(A * mrp(cv, th[j], a0, mu1, repl, C.a, C.ag), -3))
+            r["xmv"] = int(round(mrp(cv, th[j], a0, mu1, repl, C.a, C.ag), -3))
+            r["xtv"] = int(round(A * r["xmv"], -3))
     pl["fit"]["value"] = {"n": fv["n"], "fx": fv["loo"][0]["fx"], "pts": fv["pts"]}
     (ROOT / "data" / "cs2_players.json").write_text(json.dumps(pl, separators=(",", ":"), allow_nan=False))
     print(f"teams {len(teams)}: #1 {teams[0]['n']} ${teams[0]['v'] / 1e6:.1f}M; signings {len(signs)}")

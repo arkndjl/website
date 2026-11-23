@@ -4,57 +4,68 @@
 {{- $sk := eq ($.Get "group") "skill" -}}
 {{- with site.Data.nfl_season_value -}}
 {{- $rows := cond $sk .skill .defense -}}
-{{- $gfx := cond $sk "RK,Player,Team,Pos,SV,aEPA,Rush,Rec Yds" "RK,Player,Team,Pos,SV,SV/100,Sk,INT,PD" -}}
+{{- $gfx := cond $sk "RK,Player,SV,Pos,Team,G,aEPA,Rush,Rec Yds" "RK,Player,SV,Pos,Team,G,SV/100,Sk,INT,PD" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (cond $sk "skill players" "defenders")) "filter" "Pos" "rerank" true "tab" ($.Get "tab") "gfxCols" $gfx "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
 <table class="cfb__table">
   <thead><tr>
-    <th title="rank by SV within the filter">RK</th><th>Player</th><th>Team</th><th title="position group">Pos</th>
+    {{- /* SV (the rank) first, then position, team, the sample (games, plays or snaps), SV's companions, WAR, the stat line */}}
+    <th title="rank by SV within the filter">RK</th><th>Player</th>
   {{- if $sk }}
     <th title="SV (season value) = this season's points over replacement a game with an offensive snap: every designed run and target, EPA less the defense's EPA allowed a play of that kind over the league's (its other games, shrunk 300 plays; RB, WR) and the play's weather (RB), minus replacement (the starters-past-the-line level a run / target, 2016-25). this season only">SV</th>
-    <th title="adjusted EPA a play (runs + targets), this season">aEPA</th>
-    <th title="this season's points over replacement, total">Pts</th>
-    <th title="adjusted EPA a designed run">EPA/run</th>
-    <th title="adjusted EPA a target">EPA/tgt</th>
+  {{- else }}
+    <th title="SV (season value) = this season's points over replacement a game with a defensive snap: on each play with negative EPA, the defenders credited (sack, half sack .5, INT, pass defensed, forced fumble, TFL, QB hit, tackle on a failed run or completion) split -(EPA less the offense's EPA a play over the league's, other games, shrunk 300 plays; DL, DB), minus replacement credit a snap (2016-25) x snaps. this season only">SV</th>
+  {{- end }}
+    <th title="position group">Pos</th><th>Team</th>
+  {{- if $sk }}
     <th title="games with an offensive snap">G</th>
     <th title="runs + targets">Plays</th>
+    <th title="adjusted EPA a play (runs + targets), this season">aEPA</th>
+  {{- else }}
+    <th title="games with a defensive snap">G</th>
+    <th title="defensive snaps">Snaps</th>
+    <th title="points over replacement a 100 defensive snaps">SV/100</th>
+  {{- end }}
+    <th title="this season's points over replacement, total">Pts</th>
+    <th title="SVAR = SV over replacement, season total, in wins: points / 36 a win (the game model's points a win). this season only">SVAR</th>
+    <th title="WAR = .6 x AV WAR + .4 x XV, season to date (WAR leaders board)">WAR</th>
+  {{- if $sk }}
+    <th title="adjusted EPA a designed run">EPA/run</th>
+    <th title="adjusted EPA a target">EPA/tgt</th>
     <th title="carries">Car</th><th title="rushing yards">Rush</th><th title="rushing TD">RTD</th>
     <th title="targets">Tgt</th><th title="receptions">Rec</th><th title="receiving yards">Rec Yds</th><th title="receiving TD">RecTD</th>
   {{- else }}
-    <th title="SV (season value) = this season's points over replacement a game with a defensive snap: on each play with negative EPA, the defenders credited (sack, half sack .5, INT, pass defensed, forced fumble, TFL, QB hit, tackle on a failed run or completion) split -(EPA less the offense's EPA a play over the league's, other games, shrunk 300 plays; DL, DB), minus replacement credit a snap (2016-25) x snaps. this season only">SV</th>
-    <th title="points over replacement a 100 defensive snaps">SV/100</th>
-    <th title="this season's points over replacement, total">Pts</th>
     <th title="credited EPA, total (before replacement)">Credit</th>
-    <th title="games with a defensive snap">G</th>
-    <th title="defensive snaps">Snaps</th>
     <th title="sacks">Sk</th><th title="QB hits">QBH</th><th title="tackles for loss">TFL</th><th title="interceptions">INT</th>
     <th title="passes defensed">PD</th><th title="forced fumbles">FF</th><th title="tackles (solo + assists)">Tk</th>
   {{- end }}
-    <th title="SVAR = SV over replacement, season total, in wins: points / 36 a win (the game model's points a win). this season only">SVAR</th>
-    <th title="WAR = .6 x AV WAR + .4 x XV, season to date (WAR leaders board)">WAR</th>
   </tr></thead>
   <tbody>
   {{- range $i, $r := $rows }}
   <tr>
-    <td class="cfb__rk">{{ add $i 1 }}</td><td class="cfb__name">{{ partial "face.html" (dict "u" (.ph | default "")) }}<b>{{ .n }}</b></td><td style="white-space: nowrap">{{ with .t }}<img class="cfb__logo" src="/img/nfl/{{ lower . }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}{{ .t }}</td><td>{{ .pos }}</td>
+    <td class="cfb__rk">{{ add $i 1 }}</td><td class="cfb__name">{{ partial "face.html" (dict "u" (.ph | default "")) }}<b>{{ .n }}</b></td>
     <td class="cfb__num nflwar__war is-key">{{ partial "num.html" (slice "%+.1f" (float .pts)) }}</td>
+    <td>{{ .pos }}</td>
+    <td style="white-space: nowrap">{{ with .t }}<img class="cfb__logo" src="/img/nfl/{{ lower . }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}{{ .t }}</td>
   {{- if $sk }}
+    <td class="cfb__num">{{ .g }}</td><td class="cfb__num">{{ .opp }}</td>
     <td class="cfb__num">{{ partial "num.html" (slice "%+.3f" (float .aepa)) }}</td>
+  {{- else }}
+    <td class="cfb__num">{{ .g }}</td><td class="cfb__num">{{ .sn }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%+.2f" (float .p100)) }}</td>
+  {{- end }}
     <td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float .tot)) }}</td>
+    <td class="cfb__num">{{ with .svar }}{{ partial "num.html" (slice "%+.2f" (float .)) }}{{ end }}</td>
+    <td class="cfb__num">{{ with .war }}{{ printf "%.2f" (float .) }}{{ end }}</td>
+  {{- if $sk }}
     <td class="cfb__num">{{ with .ra }}{{ partial "num.html" (slice "%+.3f" (float .)) }}{{ end }}</td>
     <td class="cfb__num">{{ with .ta }}{{ partial "num.html" (slice "%+.3f" (float .)) }}{{ end }}</td>
-    <td class="cfb__num">{{ .g }}</td><td class="cfb__num">{{ .opp }}</td>
     <td class="cfb__num">{{ .car }}</td><td class="cfb__num">{{ .ry }}</td><td class="cfb__num">{{ .rtd }}</td>
     <td class="cfb__num">{{ .tgt }}</td><td class="cfb__num">{{ .rec }}</td><td class="cfb__num">{{ .recy }}</td><td class="cfb__num">{{ .rectd }}</td>
   {{- else }}
-    <td class="cfb__num">{{ partial "num.html" (slice "%+.2f" (float .p100)) }}</td>
-    <td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float .tot)) }}</td>
     <td class="cfb__num">{{ printf "%.1f" (float .cr) }}</td>
-    <td class="cfb__num">{{ .g }}</td><td class="cfb__num">{{ .sn }}</td>
     <td class="cfb__num">{{ .sk }}</td><td class="cfb__num">{{ .qbh }}</td><td class="cfb__num">{{ .tfl }}</td><td class="cfb__num">{{ .int }}</td>
     <td class="cfb__num">{{ .pd }}</td><td class="cfb__num">{{ .ff }}</td><td class="cfb__num">{{ .tk }}</td>
   {{- end }}
-    <td class="cfb__num">{{ with .svar }}{{ partial "num.html" (slice "%+.2f" (float .)) }}{{ end }}</td>
-    <td class="cfb__num">{{ with .war }}{{ printf "%.2f" (float .) }}{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>

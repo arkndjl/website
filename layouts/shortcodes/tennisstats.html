@@ -16,6 +16,8 @@
     <th title="ARK Ranking">RK</th><th>Player</th>
     <th title="serve points won over the average top-100 player, percentage points, opponent-adjusted (hard court, against an average top-100 returner)">SPW+</th>
     <th title="return points won over the average top-100 player, percentage points, opponent-adjusted (against an average top-100 server)">RPW+</th>
+    <th>Age</th>
+    <th title="matches with statistics, last 52 weeks">M</th>
     <th title="service games held against an average top-100 returner, from SPW+ through the game chain">xHold</th>
     <th title="return games broken against an average top-100 server, from RPW+">xBreak</th>
     <th title="rPA: points won a 100 points over the average top-100 player against the same opponents, last 52 weeks, unweighted (PA on the ARK Ranking is the recency-weighted, shrunk version)">rPA</th>
@@ -32,7 +34,6 @@
     <th title="break points saved, and over the player's own serve-point rate (pp, 20+ faced)">BP saved</th>
     <th title="break points converted, and over the player's own return-point rate (pp, 20+ chances)">BP conv</th>
     <th title="games won share, last 52 weeks, every level">Games</th>
-    <th title="matches with statistics, last 52 weeks">M</th>
   </tr></thead>
   <tbody>
   {{- range $t.players }}
@@ -41,6 +42,8 @@
     <td class="cfb__name" data-v="{{ .n }}" style="white-space: nowrap">{{ with .nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index $ctry . | default . }}" width="16" height="11" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b>{{ partial "badges.html" (dict "b" .bdg "of" "next season's Elo") }}</td>
     <td class="cfb__num" data-v="{{ .spwp }}"><b>{{ partial "num.html" (slice "%+.1f" (float .spwp)) }}</b></td>
     <td class="cfb__num" data-v="{{ .rpwp }}"><b>{{ partial "num.html" (slice "%+.1f" (float .rpwp)) }}</b></td>
+    <td class="cfb__num" data-v="{{ with .age }}{{ . }}{{ end }}">{{ with .age }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num">{{ .sm }}</td>
     <td class="cfb__num" data-v="{{ .xhold }}">{{ partial "num.html" (slice "%.0f" (float .xhold)) }}%</td>
     <td class="cfb__num" data-v="{{ .xbrk }}">{{ partial "num.html" (slice "%.0f" (float .xbrk)) }}%</td>
     <td class="cfb__num" data-v="{{ if ne .rpa nil }}{{ .rpa }}{{ end }}">{{ if eq .rpa nil }}<span class="cfb__dim">—</span>{{ else }}{{ partial "num.html" (slice "%+.1f" (float .rpa)) }}{{ end }}</td>
@@ -54,7 +57,6 @@
     <td class="cfb__num" data-v="{{ if ne .bps nil }}{{ .bps }}{{ end }}">{{ with .bps }}{{ partial "num.html" (slice "%.0f" (float .)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .bpsx }} <span class="cfb__dim">{{ partial "num.html" (slice "%+.1f" (float .)) }}</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ if ne .bpc nil }}{{ .bpc }}{{ end }}">{{ with .bpc }}{{ partial "num.html" (slice "%.0f" (float .)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ with .bpcx }} <span class="cfb__dim">{{ partial "num.html" (slice "%+.1f" (float .)) }}</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ if ne .gwp nil }}{{ .gwp }}{{ end }}">{{ with .gwp }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
-    <td class="cfb__num">{{ .sm }}</td>
   </tr>
   {{- end }}
   </tbody>

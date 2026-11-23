@@ -41,14 +41,30 @@ REPORTS = {
 }
 
 
+def pages(rep, S, n=100):
+    """one report, every row: the stats API caps a call at 100 rows (limit=-1 included), so page by start"""
+    rows, total = [], None
+    while total is None or len(rows) < total:
+        j = D.get(f'{D.STATS}/skater/{rep}?start={len(rows)}&limit={n}&sort=playerId'
+                  f'&cayenneExp=seasonId={D.sid(S)}%20and%20gameTypeId=2')
+        if not j or not j.get('data'):
+            break
+        rows += j['data']
+        total = j.get('total') or 0
+    return {'data': rows, 'total': total} if rows else None
+
+
 def pull(S, fresh=False):
     """{player id: {field: value}} for one season (regular season, skaters), cached; a finished season is fetched once"""
     path = os.path.join(CACHE, f'{S}.json.gz')
     if os.path.exists(path) and not fresh:
-        return D.load(path)
+        c = D.load(path)
+        w = max(map(len, c.values()), default=0)
+        if sum(len(o) == w for o in c.values()) >= .9 * len(c) > 100:
+            return c              # else cut by the API's 100-row cap (each report a different 100): fetch again
     out = {}
     for rep, fields in REPORTS.items():
-        j = D.get(f'{D.STATS}/skater/{rep}?limit=-1&cayenneExp=seasonId={D.sid(S)}%20and%20gameTypeId=2')
+        j = pages(rep, S)
         if not j or not j.get('data'):
             if os.path.exists(path):
                 return D.load(path)

@@ -4,7 +4,7 @@
        Views: xAAV (default), underpaid (xAAV over his deal), overpaid. Filters ride in the address with an x prefix. */ -}}
 {{- $s := .Get "sport" -}}
 {{- $nhl := eq $s "nhl" -}}
-<div class="win cfb nbaxpm xaav"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-xaav="{{ $s }}" data-gfx-logo="/img/{{ $s }}/{}.png" data-src="{{ printf "data/xaav-%s.json" $s | relURL }}" data-gfx-cols="{{ if $nhl }}RK,Player,WAR,pWAR,3Y,Cap hit,xAAV,Gap,xTerm,Surplus{{ else }}RK,Player,WAR,WAA,Snaps,APY,xAAV,Gap{{ end }}">
+<div class="win cfb nbaxpm xaav"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-xaav="{{ $s }}" data-gfx-logo="/img/{{ $s }}/{}.png" data-src="{{ printf "data/xaav-%s.json" $s | relURL }}" data-gfx-cols="{{ if $nhl }}RK,Player,xAAV,Pos,Age,Gap,Cap hit,xTerm,Surplus,WAR,pWAR,3Y{{ else }}RK,Player,xAAV,Pos,Age,Gap,APY,WAR,WAA,Snaps{{ end }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ if $nhl }}hockey{{ else }}football{{ end }}"/></svg>{{ .Get "title" | default (printf "%s_contracts.exe" $s) }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -29,22 +29,27 @@
       <thead><tr>
         <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, in the order of the view">RK</th>
         <th data-sort="n">Player</th>
-        {{- if $nhl }}
-        <th data-sort="war" data-num class="nbaxpm__ph" title="WAR, last full season">WAR</th>
-        <th data-sort="pwar" data-num class="nbaxpm__ph" title="pWAR: projected WAR a season, at the end of the last full season">pWAR</th>
-        <th data-sort="p3" data-num class="nbaxpm__ph" title="3Y: projected WAR over the next three seasons, at the end of the last full season">3Y</th>
-        <th data-sort="cap" data-num class="nbaxpm__ph" title="cap hit this season, $M (CapWages); ELC = entry-level">Cap hit</th>
-        {{- else }}
-        <th data-sort="war" data-num class="nbaxpm__ph" title="WAR, last full season (special teams in)">WAR</th>
-        <th data-sort="waa" data-num class="nbaxpm__ph" title="WAA: wins above an average regular at his position, last full season">WAA</th>
-        <th data-sort="sn" data-num class="nbaxpm__ph" title="snaps, last full season">Snaps</th>
-        <th data-sort="apy" data-num class="nbaxpm__ph" title="APY of his current contract, $M (OverTheCap via nflverse); year signed and years below">APY</th>
-        {{- end }}
         <th data-sort="x" data-num class="c-x" title="xAAV, $M: the AAV he would sign for as a free agent now, from position, age and last full season's {{ if $nhl }}WAR, pWAR, 3Y, points and ice time{{ else }}WAR and snaps{{ end }}, priced at this season's cap">xAAV</th>
+        <th data-sort="pos" class="cfb__g">Pos</th>
+        <th data-sort="tm" class="nbaxpm__team">Team</th>
+        <th data-sort="age" data-num class="nbaxpm__ph">Age</th>
+        {{- if $nhl }}
+        <th data-sort="gp" data-num class="nbaxpm__ph" title="games played, last full season">GP</th>
+        {{- else }}
+        <th data-sort="sn" data-num class="nbaxpm__ph" title="snaps, last full season">Snaps</th>
+        {{- end }}
         <th data-sort="gap" data-num class="c-gap" title="xAAV minus his current {{ if $nhl }}cap hit{{ else }}APY{{ end }}, $M: over 0 = paid under what he would get now">Gap</th>
         {{- if $nhl }}
+        <th data-sort="cap" data-num class="cfb__g nbaxpm__ph" title="cap hit this season, $M (CapWages); ELC = entry-level">Cap hit</th>
         <th data-sort="xt" data-num class="nbaxpm__ph" title="xTerm: the contract length, in years, he would sign for as a free agent now, from the same inputs as xAAV">xTerm</th>
         <th data-sort="sv" data-num class="nbaxpm__ph" title="Surplus, $M: Gap x seasons left on his deal">Surplus</th>
+        <th data-sort="war" data-num class="cfb__g nbaxpm__ph" title="WAR, last full season">WAR</th>
+        <th data-sort="pwar" data-num class="nbaxpm__ph" title="pWAR: projected WAR a season, at the end of the last full season">pWAR</th>
+        <th data-sort="p3" data-num class="nbaxpm__ph" title="3Y: projected WAR over the next three seasons, at the end of the last full season">3Y</th>
+        {{- else }}
+        <th data-sort="apy" data-num class="cfb__g nbaxpm__ph" title="APY of his current contract, $M (OverTheCap via nflverse); year signed and years below">APY</th>
+        <th data-sort="war" data-num class="cfb__g nbaxpm__ph" title="WAR, last full season (special teams in)">WAR</th>
+        <th data-sort="waa" data-num class="nbaxpm__ph" title="WAA: wins above an average regular at his position, last full season">WAA</th>
         {{- end }}
       </tr></thead>
       <tbody></tbody>
@@ -124,18 +129,29 @@
     if (sortKey !== 'rk') __rr(list, 'rk', dir, best, function (p) { return p[sortKey]; });
     if (q) list = list.filter(function (p) { return (p.n + ' ' + p.tm + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; });
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
+    // the number the view ranks by (xAAV, or Gap on underpaid / overpaid) right after the name, then Pos, Team, Age and the
+    // sample, then the other of the two, the deal and the value line (the board standard, Nov 23 2026); headers move with it
+    var order = [view ? 'gap' : 'x', 'pos', 'tm', 'age', NHL ? 'gp' : 'sn', view ? 'x' : 'gap'].concat(NHL ? ['cap', 'xt', 'sv', 'war', 'pwar', 'p3'] : ['apy', 'war', 'waa']), hr = ths[0].parentNode;
+    ['rk', 'n'].concat(order).forEach(function (c) { var th = ths.filter(function (t) { return t.dataset.sort === c; })[0]; if (th) hr.appendChild(th); });
     var gfxRow = function (p) {
       var d = deal(p), sub = esc(p.tm) + ' · ' + esc(p.pos) + (p.age == null ? '' : ' · ' + p.age) + (d == null ? '' : ' · $' + d.toFixed(1) + 'M');
-      var cells = NHL
-        ? '<td class="cfb__num nbaxpm__ph">' + f(p.war) + '</td><td class="cfb__num nbaxpm__ph">' + f(p.pwar) + '</td><td class="cfb__num nbaxpm__ph">' + f(p.p3) + '</td>' +
-          '<td class="cfb__num nbaxpm__ph"' + (p.yl ? ' title="' + p.yl + ' season' + (p.yl > 1 ? 's' : '') + ' left' + (p.st ? ', then ' + esc(p.st) : '') + '"' : '') + '>' + f(p.cap, 2) + (p.ct ? '<span class="cfb__dim"> ' + esc(p.ct) + '</span>' : '') + '</td>'
-        : '<td class="cfb__num nbaxpm__ph">' + f(p.war, 2) + '</td><td class="cfb__num nbaxpm__ph">' + sg(p.waa, 2) + '</td><td class="cfb__num nbaxpm__ph">' + (p.sn || 0) + '</td>' +
-          '<td class="cfb__num nbaxpm__ph"' + (p.ys ? ' title="signed ' + p.ys + (p.yrs ? ', ' + p.yrs + ' years' : '') + '"' : '') + '>' + f(p.apy, 2) + '</td>';
+      var C = {
+        x: '<td class="cfb__num c-x nbaxpm__v' + (view ? '' : ' is-key') + '">' + p.x.toFixed(1) + '</td>',
+        gap: '<td class="cfb__num c-gap nbaxpm__v' + (view ? ' is-key' : '') + '">' + sg(p.gap) + '</td>',
+        pos: '<td class="cfb__g">' + esc(p.pos || '') + '</td>',
+        tm: '<td class="nbaxpm__team" style="white-space: nowrap">' + tl(p.tm) + esc(p.tm || '') + '</td>',
+        age: '<td class="cfb__num nbaxpm__ph">' + (p.age == null ? '' : p.age) + '</td>',
+        gp: '<td class="cfb__num nbaxpm__ph">' + (p.gp == null ? '' : p.gp) + '</td>',
+        sn: '<td class="cfb__num nbaxpm__ph">' + (p.sn || 0) + '</td>',
+        cap: '<td class="cfb__num cfb__g nbaxpm__ph"' + (p.yl ? ' title="' + p.yl + ' season' + (p.yl > 1 ? 's' : '') + ' left' + (p.st ? ', then ' + esc(p.st) : '') + '"' : '') + '>' + f(p.cap, 2) + (p.ct ? '<span class="cfb__dim"> ' + esc(p.ct) + '</span>' : '') + '</td>',
+        apy: '<td class="cfb__num cfb__g nbaxpm__ph"' + (p.ys ? ' title="signed ' + p.ys + (p.yrs ? ', ' + p.yrs + ' years' : '') + '"' : '') + '>' + f(p.apy, 2) + '</td>',
+        xt: '<td class="cfb__num nbaxpm__ph">' + f(p.xt) + '</td>', sv: '<td class="cfb__num nbaxpm__ph">' + sg(p.sv) + '</td>',
+        war: '<td class="cfb__num cfb__g nbaxpm__ph">' + f(p.war, NHL ? 1 : 2) + '</td>', pwar: '<td class="cfb__num nbaxpm__ph">' + f(p.pwar) + '</td>',
+        p3: '<td class="cfb__num nbaxpm__ph">' + f(p.p3) + '</td>', waa: '<td class="cfb__num nbaxpm__ph">' + sg(p.waa, 2) + '</td>'
+      };
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
-        '<td>' + face(p) + '<b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + sub + '</span></td>' + cells +
-        '<td class="cfb__num c-x nbaxpm__v' + (view ? '' : ' is-key') + '">' + p.x.toFixed(1) + '</td>' +
-        '<td class="cfb__num c-gap nbaxpm__v' + (view ? ' is-key' : '') + '">' + sg(p.gap) + '</td>' +
-        (NHL ? '<td class="cfb__num nbaxpm__ph">' + f(p.xt) + '</td><td class="cfb__num nbaxpm__ph">' + sg(p.sv) + '</td>' : '') + '</tr>';
+        '<td>' + face(p) + '<b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + sub + '</span></td>' +
+        order.map(function (c) { return C[c]; }).join('') + '</tr>';
     };
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(gfxRow).join('');
     // every filtered row for the GFX card's percentiles (assets/js/gfx.js pcAll), built off the page on demand, photos left out
