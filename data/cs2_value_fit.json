@@ -1,0 +1,110 @@
+{
+ "asof": "2026-11-23",
+ "curve": {
+  "n": 9341,
+  "nTest": 2637,
+  "held": [
+   "2025-07-07",
+   "2026-04-06"
+  ],
+  "tests": [
+   {
+    "name": "five's rating (live)",
+    "d2": 0.79,
+    "t": null
+   },
+   {
+    "name": "VRS points",
+    "d2": 0.755,
+    "t": 2.6
+   },
+   {
+    "name": "rating + VRS points",
+    "d2": 0.805,
+    "t": -6.9
+   }
+  ],
+  "b": [
+   12.69644,
+   0.95565,
+   -0.07286
+  ],
+  "xmax": 1.92
+ },
+ "fees": {
+  "A": 1.656,
+  "q": 4.0,
+  "n": 5,
+  "rmseLog": 0.325,
+  "loo": [
+   {
+    "name": "prize MRP, replacement level tuned on the fees (live)",
+    "log": 0.406,
+    "fx": 1.5
+   },
+   {
+    "name": "prize MRP, replacement = VRS 51-100 starters",
+    "log": 0.894,
+    "fx": 2.44
+   },
+   {
+    "name": "flat price per player",
+    "log": 0.497,
+    "fx": 1.64
+   }
+  ],
+  "pts": [
+   {
+    "nick": "m0NESY",
+    "to": "Falcons",
+    "date": "2025-04-21",
+    "usd": 2500000,
+    "xtv": 2607000,
+    "loo": 2635000
+   },
+   {
+    "nick": "kyousuke",
+    "to": "Falcons",
+    "date": "2025-07-26",
+    "usd": 2000000,
+    "xtv": 1409000,
+    "loo": 1290000
+   },
+   {
+    "nick": "electroNic",
+    "to": "Virtus.pro",
+    "date": "2024-04-23",
+    "usd": 1600000,
+    "xtv": 1599000,
+    "loo": 1599000
+   },
+   {
+    "nick": "NiKo",
+    "to": "Falcons",
+    "date": "2025-01-15",
+    "usd": 1100000,
+    "xtv": 1957000,
+    "loo": 2261000
+   },
+   {
+    "nick": "MUTiRiS, krazy, aragornN",
+    "to": "BC.Game",
+    "date": "2026-01-21",
+    "usd": 2500000,
+    "xtv": 1914000,
+    "loo": 1790000
+   }
+  ],
+  "checks": [
+   {
+    "nick": "XANTARES, woxic, Wicadia, MAJ3R, jottAAA",
+    "to": "Aurora",
+    "date": "2025-04-06",
+    "bound": "max",
+    "usd": 2500000,
+    "xtv": 7097000,
+    "ok": false
+   }
+  ]
+ }
+}
