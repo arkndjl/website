@@ -75,7 +75,7 @@ console.log('after organizer list', champs.size);
 // FACEIT's league API: each season lists regions > divisions > stages > conferences, each with a championship id
 const LG = 'a14b8616-45b9-4581-8637-4dfd0b5f6af8';
 const lg = await api(`/leagues/${LG}`);
-console.log('league', JSON.stringify(lg)?.slice(0, 1500));
+console.log('league', JSON.stringify(lg)?.slice(0, 200));
 const walk = (o, ctx, s) => {
   if (!o || typeof o !== 'object') return;
   if (Array.isArray(o)) { for (const x of o) walk(x, ctx, s); return; }
@@ -94,7 +94,7 @@ const walk = (o, ctx, s) => {
 };
 for (let s = FROM; s <= TO; s++) {
   const ls = await api(`/leagues/${LG}/seasons/${s}`);
-  if (s === TO) console.log('league season', JSON.stringify(ls)?.slice(0, 3000));
+  
   walk(ls, [], s);
 }
 console.log('after league API', champs.size);
@@ -104,6 +104,37 @@ for (let s = FROM; s <= TO; s++) for (const R of ['NA', 'EU', 'SA', 'OCE', 'AS',
     const r = await api(`/search/championships?name=${encodeURIComponent(`S${s} ${R} ${d}`)}&game=cs2&type=${type}&limit=100`);
     for (const x of r?.items || []) add(x.competition_id || x.championship_id, x.name);
   }
+// history crawl (the reliable route): players from ESEA qualifiers in each region and from the groups found so far;
+// each player's match history names the league championships they played (competition_name)
+const seeds = new Set([...champs.keys()].slice(0, 40));
+for (const q of ['ESEA League EU Main', 'ESEA League EU Advanced', 'ESEA League EU Intermediate', 'ESEA League NA Main', 'ESEA League NA Advanced',
+  'ESEA League SA Main', 'ESEA League SA Advanced', 'ESEA League OCE Main', 'ESEA League Asia Main', 'ESEA League MENA Main'])
+  for (const type of ['past', 'all']) for (const x of (await api(`/search/championships?name=${encodeURIComponent(q)}&game=cs2&type=${type}&limit=100`))?.items || [])
+    if (/^ESEA League /i.test(x.name || '') && x.organizer_id === org) seeds.add(x.competition_id || x.championship_id);
+if (seed[0]) seeds.add(seed[0].id);
+console.log('crawl seeds', seeds.size);
+const queue = [], seenP = new Set();
+for (const id of seeds) {
+  const ms = (await api(`/championships/${id}/matches?type=past&offset=0&limit=100`))?.items || [];
+  for (const m of ms.slice(0, 60)) for (const f of ['faction1', 'faction2']) for (const p of (m.teams?.[f]?.roster || []).slice(0, 2)) queue.push(p.player_id);
+}
+const MAXP = +(process.env.ESEA_CRAWL ?? 900), T0 = Date.UTC(2025, 2, 1) / 1000;
+for (let i = queue.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [queue[i], queue[j]] = [queue[j], queue[i]]; }
+while (queue.length && seenP.size < MAXP) {
+  const pid = queue.shift(); if (!pid || seenP.has(pid)) continue; seenP.add(pid);
+  let to = Math.floor(Date.now() / 1000);
+  for (let pg = 0; pg < 6; pg++) {
+    const items = (await api(`/players/${pid}/history?game=cs2&from=${T0}&to=${to}&offset=0&limit=100`))?.items || [];
+    for (const m of items) if (m.competition_type === 'championship' && m.organizer_id === org) {
+      const before = champs.size; add(m.competition_id, m.competition_name);
+      if (champs.size > before) for (const f of ['faction1', 'faction2']) for (const p of (m.teams?.[f]?.players || []).slice(0, 2)) queue.push(p.player_id);
+    }
+    const oldest = Math.min(...items.map(m => m.started_at || m.finished_at || Infinity));
+    if (items.length < 100 || !isFinite(oldest) || oldest < T0) break;
+    to = oldest - 1;
+  }
+  if (seenP.size % 100 === 0) console.log(`crawled ${seenP.size}, championships ${champs.size}, calls ${calls}`);
+}
 const cnt = {};
 for (const c of champs.values()) cnt[`${c.region} ${c.div}`] = (cnt[`${c.region} ${c.div}`] || 0) + 1;
 console.log(`${champs.size} championships`, cnt);
