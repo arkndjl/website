@@ -23,30 +23,5 @@
   </ol>
   <div class="win__status"><span><a href="https://www.youtube.com/@LAURSEN_111/videos" target="_blank" rel="noopener">youtube.com/@LAURSEN_111 ↗</a></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
-{{- if not ($.Page.Store.Get "vods-css") }}{{ $.Page.Store.Set "vods-css" true }}
-<style>
-.vods__player{aspect-ratio:16/9;background:#000}
-.vods__player iframe{display:block;width:100%;height:100%;border:0}
-.vods__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;list-style:none;margin:0;padding:12px}
-.vods__grid li::before{content:none!important}
-.vods__grid a{display:flex;flex-direction:column;gap:4px;color:var(--foreground);text-decoration:none;height:100%;padding:4px;background:var(--win-well);box-shadow:inset 2px 2px 0 var(--win-dark),inset -2px -2px 0 var(--win-light)}
-.vods__grid a:hover,.vods__grid a:focus-visible,.vods__grid a.is-on{box-shadow:0 0 0 2px var(--n1-lilac,var(--accent))}
-.vods__th{position:relative;display:block;aspect-ratio:16/9;overflow:hidden;background:#000}
-.vods__th img{display:block;width:100%;height:100%;object-fit:cover;border:0;padding:0;margin:0;box-shadow:none;image-rendering:pixelated}
-.vods__grid a.is-on .vods__th::after{content:"";position:absolute;left:6px;top:6px;border:7px solid transparent;border-left:11px solid var(--n1-lilac,var(--accent));filter:drop-shadow(2px 2px 0 #000)}
-.vods__t{font-size:.85em;line-height:1.3;overflow-wrap:anywhere}
-.vods__d{margin-top:auto;font-size:.72em;letter-spacing:.08em;color:var(--n1-grey,var(--accent))}
-@media (max-width:684px){.vods__grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:8px}}
-</style>
-<script>
-document.addEventListener('click', function (e) {
-  var a = e.target.closest && e.target.closest('.vods__grid a[data-vid]'); if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return;
-  var w = a.closest('.vods'), f = w.querySelector('.vods__player iframe'); if (!f) return;
-  e.preventDefault();
-  f.src = 'https://www.youtube-nocookie.com/embed/' + a.getAttribute('data-vid') + '?autoplay=1';
-  w.querySelectorAll('.vods__grid a.is-on').forEach(function (x) { x.classList.remove('is-on'); }); a.classList.add('is-on');
-  w.querySelector('.vods__player').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-});
-</script>
-{{- end }}
+{{- if not ($.Page.Store.Get "vods-css") }}{{ $.Page.Store.Set "vods-css" true }}{{ partial "vods-assets.html" . }}{{ end }}
 {{- end }}
