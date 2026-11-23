@@ -1,10 +1,10 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-23T00:12:23Z",
+ "asof": "2026-11-23T00:15:52Z",
  "recenter": {
   "2026-11-22": 1.96,
-  "2026-11-23": 1.83
+  "2026-11-23": 1.82
  },
  "monitor": {
   "clocks": {
@@ -1831,7 +1831,7 @@
  },
  "model": {
   "asof": "2026-11-22T22:33:27Z",
-  "ageH": 1.6,
+  "ageH": 1.7,
   "stale": false
  },
  "picks": [],
@@ -1863,7 +1863,14 @@
    "paper": true,
    "betTo": 152.0,
    "close": 151.5,
-   "now": null
+   "now": {
+    "mk": "total",
+    "side": "over",
+    "line": 151.5,
+    "price": -140.0,
+    "ev": 0.05,
+    "units": 0.25
+   }
   },
   {
    "id": "401926774",
@@ -1922,35 +1929,12 @@
    "flagged": "2026-11-23T00:06:57Z",
    "paper": true,
    "betTo": 148.5,
-   "close": 148.5,
-   "now": {
-    "mk": "total",
-    "side": "under",
-    "line": 148.5,
-    "price": -106.0,
-    "ev": 0.137,
-    "units": 0.25
-   }
+   "close": 149.5,
+   "now": null
   }
  ],
  "withdrawn": [],
  "board": [
-  {
-   "id": "401921658",
-   "sport": "cbb",
-   "kick": "2026-11-23T19:00:00Z",
-   "home": "Oregon State",
-   "away": "Tulsa",
-   "mk": "total",
-   "side": "over",
-   "line": 151.5,
-   "price": -146.0,
-   "edge": 7.9,
-   "x": 7.0,
-   "why": "no edge at -146",
-   "m": 4.3,
-   "tm": 159.4
-  },
   {
    "id": "401921206",
    "sport": "cbb",
@@ -1976,7 +1960,7 @@
    "mk": "total",
    "side": "under",
    "line": 165.5,
-   "price": -129.0,
+   "price": -119.0,
    "edge": 4.4,
    "x": 5.0,
    "why": "edge under 5 (tier: power)",
@@ -2040,7 +2024,7 @@
    "mk": "total",
    "side": "under",
    "line": 158.5,
-   "price": -134.0,
+   "price": -129.0,
    "edge": 4.2,
    "x": 6.5,
    "why": "edge under 6.5 (side: under)",
@@ -2133,9 +2117,9 @@
    "mk": "total",
    "side": "under",
    "line": 148.5,
-   "price": -106.0,
-   "ev": 0.137,
-   "edge": 5.3,
+   "price": -106,
+   "ev": 0.006,
+   "edge": 6.3,
    "units": 0.25,
    "bk": "poly",
    "home": "Clemson",
@@ -2158,7 +2142,7 @@
    "mk": "total",
    "side": "under",
    "line": 158.5,
-   "price": -134.0,
+   "price": -129.0,
    "edge": 4.2,
    "ev": null,
    "units": 0.0,
@@ -2170,7 +2154,7 @@
    "mk": "total",
    "side": "under",
    "line": 165.5,
-   "price": -129.0,
+   "price": -119.0,
    "edge": 4.4,
    "ev": null,
    "units": 0.0,
@@ -2182,13 +2166,14 @@
    "mk": "total",
    "side": "over",
    "line": 151.5,
-   "price": -146.0,
+   "price": -140.0,
+   "ev": 0.05,
    "edge": 7.9,
-   "ev": null,
-   "units": 0.0,
+   "units": 0.25,
+   "bk": "poly",
    "home": "Oregon State",
    "away": "Tulsa",
-   "state": "under"
+   "state": "paper"
   },
   "401913102": {
    "mk": "total",
@@ -2255,7 +2240,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 23203,
+  "snapshots": 23204,
   "buckets": [
    {
     "when": "24h+",
@@ -18414,7 +18399,7 @@
    "flagged": "2026-11-23T00:06:57Z",
    "paper": true,
    "betTo": 148.5,
-   "close": 148.5
+   "close": 149.5
   }
  ],
  "withdrawnLog": [
@@ -20458,7 +20443,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-23T00:12:23Z",
+ "checked": "2026-11-23T00:15:52Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}

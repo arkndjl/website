@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-23T00:12:13Z",
+ "asof": "2026-11-23T00:15:39Z",
  "recenter": {
   "week": 0.43
  },
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-23",
-  "ageH": -23.8,
+  "ageH": -23.7,
   "stale": false
  },
  "picks": [],
@@ -325,6 +325,22 @@
    "tm": 46.6
   },
   {
+   "id": "401862837",
+   "sport": "cfb",
+   "kick": "2026-11-28T18:00:00.000Z",
+   "home": "East Carolina",
+   "away": "Florida Atlantic",
+   "mk": "total",
+   "side": "over",
+   "line": 55.5,
+   "price": -129.0,
+   "edge": 5.4,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": 1.6,
+   "tm": 60.9
+  },
+  {
    "id": "401856765",
    "sport": "cfb",
    "kick": "2026-11-29T00:00:00.000Z",
@@ -371,22 +387,6 @@
    "why": "edge under 7.5 (side: over)",
    "m": -5.8,
    "tm": 57.1
-  },
-  {
-   "id": "401862837",
-   "sport": "cfb",
-   "kick": "2026-11-28T18:00:00.000Z",
-   "home": "East Carolina",
-   "away": "Florida Atlantic",
-   "mk": "total",
-   "side": "over",
-   "line": 56.5,
-   "price": -129.0,
-   "edge": 4.4,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": 1.6,
-   "tm": 60.9
   },
   {
    "id": "401856762",
@@ -451,22 +451,6 @@
    "why": "edge under 7.5 (side: over)",
    "m": -8.6,
    "tm": 51.3
-  },
-  {
-   "id": "401856756",
-   "sport": "cfb",
-   "kick": "2026-11-28T00:30:00.000Z",
-   "home": "Texas A&M",
-   "away": "Texas",
-   "mk": "total",
-   "side": "over",
-   "line": 40.5,
-   "price": -129.0,
-   "edge": 3.7,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": -12.1,
-   "tm": 44.2
   },
   {
    "id": "401862839",
@@ -581,6 +565,22 @@
    "tm": 46.3
   },
   {
+   "id": "401856756",
+   "sport": "cfb",
+   "kick": "2026-11-28T00:30:00.000Z",
+   "home": "Texas A&M",
+   "away": "Texas",
+   "mk": "total",
+   "side": "over",
+   "line": 41.5,
+   "price": -101.0,
+   "edge": 2.7,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": -12.1,
+   "tm": 44.2
+  },
+  {
    "id": "401858541",
    "sport": "cfb",
    "kick": "2026-11-29T00:30:00.000Z",
@@ -669,7 +669,7 @@
    "mk": "spread",
    "side": "home",
    "line": -7.5,
-   "price": -124.0,
+   "price": -122.0,
    "edge": 8.3,
    "x": null,
    "why": "spread market off",
@@ -718,7 +718,7 @@
    "mk": "spread",
    "side": "home",
    "line": -7.5,
-   "price": -124.0,
+   "price": -122.0,
    "edge": 8.3,
    "ev": null,
    "units": 0.0,
@@ -741,9 +741,9 @@
   "401858540": {
    "mk": "spread",
    "side": "home",
-   "line": 9.5,
-   "price": -119.0,
-   "edge": 7.6,
+   "line": 10.5,
+   "price": -104.0,
+   "edge": 6.6,
    "ev": null,
    "units": 0.0,
    "home": "Ohio State",
@@ -753,9 +753,9 @@
   "401856756": {
    "mk": "total",
    "side": "over",
-   "line": 40.5,
-   "price": -129.0,
-   "edge": 3.7,
+   "line": 41.5,
+   "price": -101.0,
+   "edge": 2.7,
    "ev": null,
    "units": 0.0,
    "home": "Texas A&M",
@@ -850,7 +850,7 @@
    "mk": "spread",
    "side": "away",
    "line": 2.5,
-   "price": -127.0,
+   "price": -110.0,
    "edge": 1.4,
    "ev": null,
    "units": 0.0,
@@ -1053,9 +1053,9 @@
   "401862837": {
    "mk": "total",
    "side": "over",
-   "line": 56.5,
+   "line": 55.5,
    "price": -129.0,
-   "edge": 4.4,
+   "edge": 5.4,
    "ev": null,
    "units": 0.0,
    "home": "East Carolina",
@@ -1547,16 +1547,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 26856,
+  "snapshots": 26876,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 5525,
-    "clvRet": -0.0234,
-    "clvT": -13.5,
-    "clv": 0.76,
-    "beat": 0.418,
-    "still": 0.298
+    "clvN": 5531,
+    "clvRet": -0.0231,
+    "clvT": -13.37,
+    "clv": 0.77,
+    "beat": 0.42,
+    "still": 0.297
    },
    {
     "when": "6-24h",
@@ -6330,7 +6330,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-23T00:12:13Z",
+ "checked": "2026-11-23T00:15:39Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}

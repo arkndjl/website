@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-23T00:09Z",
+ "asof": "2026-11-23T00:14Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -65,7 +65,7 @@
   "nba": {
    "by_file": {
     "static/data/depth/nba.json": {
-     "flags": 0,
+     "flags": 1,
      "rows": 596
     },
     "static/data/nba-proj.json": {
@@ -86,6 +86,20 @@
     }
    },
    "flags": [
+    {
+     "d": "2026-11-22",
+     "field": "depth",
+     "file": "static/data/depth/nba.json",
+     "flag": "released",
+     "head": "Finalizing deal with Sacramento",
+     "kind": null,
+     "move": null,
+     "pid": "4631",
+     "player": "Gabe Vincent",
+     "pos": "PG",
+     "rotowire": "FA",
+     "site": "SAC"
+    },
     {
      "d": "2026-11-06",
      "field": "tm",
@@ -297,7 +311,7 @@
     },
     "static/data/nfl-fantasy.json": {
      "flags": 9,
-     "rows": 636
+     "rows": 633
     },
     "static/data/nfl-war.json": {
      "flags": 76,
@@ -4174,24 +4188,6 @@
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
      "flag": "practice",
-     "head": "Reverts to Miami's practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Reverts to Miami's practice squad",
-      "kind": "practice"
-     },
-     "pid": "14421",
-     "player": "Jalen Reagor",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "MIA"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
      "head": "Back to practice squad",
      "kind": "practice",
      "move": {
@@ -4204,6 +4200,24 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "ARI"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "practice",
+     "head": "Reverts to Miami's practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Reverts to Miami's practice squad",
+      "kind": "practice"
+     },
+     "pid": "14421",
+     "player": "Jalen Reagor",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "MIA"
     },
     {
      "d": "2026-11-16",
@@ -4246,6 +4260,24 @@
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
      "flag": "practice",
+     "head": "Reverts to Green Bay's practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Reverts to Green Bay's practice squad",
+      "kind": "practice"
+     },
+     "pid": "19137",
+     "player": "Drake Dabney",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "GB"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "practice",
      "head": "Back on Buccaneers' practice squad",
      "kind": "practice",
      "move": {
@@ -4282,24 +4314,6 @@
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
      "flag": "practice",
-     "head": "Reverts to Green Bay's practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Reverts to Green Bay's practice squad",
-      "kind": "practice"
-     },
-     "pid": "19137",
-     "player": "Drake Dabney",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "GB"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
      "head": "Reverts to Cleveland's practice squad",
      "kind": "practice",
      "move": {
@@ -4316,12 +4330,12 @@
    ],
    "joined": 0,
    "players": 2306,
-   "rows": 8103
+   "rows": 8100
   },
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 2,
+     "flags": 0,
      "rows": 637
     },
     "static/data/lines/nhl.json": {
@@ -4329,12 +4343,12 @@
      "rows": 32
     },
     "static/data/nhl-war/2027.json": {
-     "flags": 3,
+     "flags": 2,
      "rows": 863
     },
     "static/data/pctl-nhl.json": {
-     "flags": 0,
-     "rows": 358
+     "flags": 1,
+     "rows": 357
     },
     "static/data/xaav-nhl.json": {
      "flags": 12,
@@ -4342,42 +4356,6 @@
     }
    },
    "flags": [
-    {
-     "d": "2026-11-22",
-     "field": "depth",
-     "file": "static/data/depth/nhl.json",
-     "flag": "minors",
-     "head": "Assigned to AHL",
-     "kind": "down",
-     "move": {
-      "d": "2026-11-22",
-      "head": "Assigned to AHL",
-      "kind": "down"
-     },
-     "pid": "7799",
-     "player": "Dillon Boucher",
-     "pos": "RW",
-     "rotowire": "CHI",
-     "site": "CHI"
-    },
-    {
-     "d": "2026-11-22",
-     "field": "depth",
-     "file": "static/data/depth/nhl.json",
-     "flag": "minors",
-     "head": "Returned to AHL",
-     "kind": "down",
-     "move": {
-      "d": "2026-11-22",
-      "head": "Returned to AHL",
-      "kind": "down"
-     },
-     "pid": "5388",
-     "player": "Steven Lorentz",
-     "pos": "LW",
-     "rotowire": "CBJ",
-     "site": "CBJ"
-    },
     {
      "d": "2026-11-13",
      "field": "tm",
@@ -4395,24 +4373,6 @@
      "pos": "D",
      "rotowire": "CAR",
      "site": "CAR"
-    },
-    {
-     "d": "2026-11-22",
-     "field": "tm",
-     "file": "static/data/nhl-war/2027.json",
-     "flag": "moved",
-     "head": "Claimed off waivers",
-     "kind": "claim",
-     "move": {
-      "d": "2026-11-22",
-      "head": "Claimed off waivers",
-      "kind": "claim"
-     },
-     "pid": "4268",
-     "player": "Luke Glendening",
-     "pos": "C",
-     "rotowire": "CHI",
-     "site": "NYR"
     },
     {
      "d": "2026-11-07",
@@ -4647,11 +4607,29 @@
      "pos": "C",
      "rotowire": "CHI",
      "site": "NYR"
+    },
+    {
+     "d": "2026-11-13",
+     "field": "tm",
+     "file": "static/data/pctl-nhl.json",
+     "flag": "released",
+     "head": "Two-point effort in Finland",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-13",
+      "head": "Two-point effort in Finland",
+      "kind": "exit"
+     },
+     "pid": "5744",
+     "player": "K'Andre Miller",
+     "pos": "D",
+     "rotowire": "CAR",
+     "site": "CAR"
     }
    ],
    "joined": 0,
    "players": 1430,
-   "rows": 2740
+   "rows": 2739
   }
  }
 }
