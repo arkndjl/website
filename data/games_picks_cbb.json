@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-23T04:08:20Z",
+ "asof": "2026-11-23T04:12:12Z",
  "recenter": {
   "2026-11-22": 1.98,
   "2026-11-23": 1.88
@@ -1661,19 +1661,19 @@
     }
    },
    "total | side: under": {
-    "n": 17,
-    "window": 17,
-    "mean": 0.0249,
-    "t": 1.04,
+    "n": 18,
+    "window": 18,
+    "mean": 0.0226,
+    "t": 0.99,
     "p": null,
-    "days": 6,
+    "days": 7,
     "sd": 0.1355,
-    "cusum": 0.27,
+    "cusum": 0.0,
     "cusumMax": 0.83,
     "h": 10.0,
     "rho": 0.306,
     "edge": {
-     "cusum": 0.68,
+     "cusum": 0.53,
      "cusumMax": 0.68,
      "h": 4.595
     },
@@ -1681,17 +1681,17 @@
     "why": "",
     "drift": {
      "mu1": 0.04,
-     "n": 17,
+     "n": 18,
      "sd": 0.1355,
      "rho": 0.306,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.596,
-     "info": 1.48,
-     "real": 0.274,
-     "realSe": 1.026,
+     "llr": -0.456,
+     "info": 1.57,
+     "real": 0.376,
+     "realSe": 0.971,
      "need": 68
     }
    },
@@ -1808,9 +1808,9 @@
   "since": "2026-11-11T20:00:00Z",
   "why": "owner: paper until live picks beat the close (Nov 11 2026)",
   "pooled": {
-   "n": 406,
+   "n": 407,
    "days": 13,
-   "llr": -6.203,
+   "llr": -6.205,
    "lo": -2.944,
    "hi": 2.944,
    "state": "paused",
@@ -1823,15 +1823,15 @@
    "evDU": 0.0223
   },
   "back": {
-   "n": 287,
+   "n": 288,
    "clvRet": 0.0037,
-   "t": 0.7,
+   "t": 0.68,
    "days": 10
   }
  },
  "model": {
   "asof": "2026-11-23T02:02:54Z",
-  "ageH": 2.1,
+  "ageH": 2.2,
   "stale": false
  },
  "picks": [],
@@ -2126,7 +2126,7 @@
    "mk": "total",
    "side": "over",
    "line": 154.5,
-   "price": -129.0,
+   "price": -124.0,
    "edge": 4.6,
    "x": 7.0,
    "why": "edge under 7",
@@ -2142,7 +2142,7 @@
    "mk": "total",
    "side": "under",
    "line": 158.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 4.2,
    "x": 6.5,
    "why": "edge under 6.5 (side: under)",
@@ -2190,7 +2190,7 @@
    "mk": "spread",
    "side": "home",
    "line": 7.5,
-   "price": -129.0,
+   "price": -124.0,
    "edge": 2.9,
    "x": 5.0,
    "why": "edge under 5 (line: 4-9)",
@@ -2384,7 +2384,7 @@
    "mk": "total",
    "side": "under",
    "line": 158.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 4.2,
    "ev": null,
    "units": 0.0,
@@ -2553,7 +2553,7 @@
    "mk": "spread",
    "side": "home",
    "line": 7.5,
-   "price": -129.0,
+   "price": -124.0,
    "edge": 2.9,
    "ev": null,
    "units": 0.0,
@@ -2577,7 +2577,7 @@
    "mk": "total",
    "side": "over",
    "line": 154.5,
-   "price": -129.0,
+   "price": -124.0,
    "edge": 4.6,
    "ev": null,
    "units": 0.0,
@@ -2734,7 +2734,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 23402,
+  "snapshots": 23408,
   "buckets": [
    {
     "when": "24h+",
@@ -2747,9 +2747,9 @@
    },
    {
     "when": "6-24h",
-    "clvN": 4647,
+    "clvN": 4648,
     "clvRet": -0.0008,
-    "clvT": -0.39,
+    "clvT": -0.4,
     "clv": 0.71,
     "beat": 0.416,
     "still": 0.402
@@ -20974,7 +20974,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-23T04:08:20Z",
+ "checked": "2026-11-23T04:12:12Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
