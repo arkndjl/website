@@ -2,18 +2,18 @@
        each team's record. A team's WAR adds up to about its wins less what replacement players would win. */ -}}
 {{- with site.Data.nfl_games -}}
 {{- $grp := slice "QB" "RB" "WR/TE" "OL" "DL" "LB" "DB" "K/P" -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "team WAR") "filter" "Div" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Div,Rec,WAR,QB,RB,WR/TE,OL,DL,LB,DB,K/P" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "team WAR") "filter" "Div" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Div,WAR,Rec,QB,RB,WR/TE,OL,DL,LB,DB,K/P" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
 <table class="cfb__table">
   <thead><tr>
-    <th>RK</th><th>Team</th><th title="division">Div</th><th title="record (won-lost)">Rec</th><th title="team WAR = sum of player WAR, season to date">WAR</th>
+    <th>RK</th><th>Team</th><th title="division">Div</th><th title="team WAR = sum of player WAR, season to date">WAR</th><th title="record (won-lost)">Rec</th>
     {{- range $grp }}<th title="{{ if eq . "DL" }}DL and EDGE{{ else if eq . "DB" }}CB and S{{ else if eq . "K/P" }}kickers and punters (special teams over average; returners count in their own group){{ else }}{{ . }}{{ end }} WAR">{{ . }}</th>{{ end }}
   </tr></thead>
   <tbody>
   {{- range $i, $p := sort (where .power "war" "!=" nil) "war" "desc" }}{{ with $p }}{{ $w := .wars }}
   <tr>
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td><img class="cfb__logo cfb__logo--in" src="/img/nfl/{{ lower .t }}.png" alt="" width="16" height="16" loading="lazy" onerror="this.style.display='none'"> <b>{{ .t }}</b></td><td>{{ .dv }}</td><td class="cfb__num">{{ .rec }}</td>
-    <td class="cfb__num nflwar__war is-key">{{ partial "num.html" (slice "%.1f" (float .war)) }}</td>
+    <td><img class="cfb__logo cfb__logo--in" src="/img/nfl/{{ lower .t }}.png" alt="" width="16" height="16" loading="lazy" onerror="this.style.display='none'"> <b>{{ .t }}</b></td><td>{{ .dv }}</td>
+    <td class="cfb__num nflwar__war is-key">{{ partial "num.html" (slice "%.1f" (float .war)) }}</td><td class="cfb__num">{{ .rec }}</td>
     {{- range $grp }}{{ $v := index $w . | default 0 }}<td class="cfb__num{{ if lt $v 0.0 }} cfb__dim{{ end }}">{{ partial "num.html" (slice "%.1f" (float $v)) }}</td>{{ end }}
   </tr>
   {{- end }}{{ end }}

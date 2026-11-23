@@ -6,7 +6,7 @@
        same minutes, $ per win grown with the cap; a player option counts only when it costs the team (he opts in when
        paid over his value), a team option only when it pays. Views: contract (the default) or this season. Filters ride
        in the address with a c prefix, apart from the XPM tab's (#cteam=OKC&cview=s). */ -}}
-<div class="win cfb nbasur"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbasur data-gfx-logo="/img/nba/{}.png" data-src="{{ "data/nba-proj.json" | relURL }}" data-xaav="{{ "data/xaav-nba.json" | relURL }}" data-gfx-cols="RK,Player,XPM (proj),Salary,xAAV,Value,Surplus,Contract">
+<div class="win cfb nbasur"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbasur data-gfx-logo="/img/nba/{}.png" data-src="{{ "data/nba-proj.json" | relURL }}" data-xaav="{{ "data/xaav-nba.json" | relURL }}" data-gfx-cols="RK,Player,Contract,Pos,Surplus,Salary,Value,xAAV,XPM (proj)">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ .Get "title" | default "nba_contracts.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -30,14 +30,18 @@
       <thead><tr>
         <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, in the order of the view">RK</th>
         <th data-sort="n">Player</th>
-        <th data-sort="pxpm" data-num class="nbaxpm__ph" title="XPM (proj): XPM to date blended with his preseason prior by minutes; below, the 80% range for his true level">XPM (proj)</th>
-        <th data-sort="pvorx" data-num class="nbaxpm__ph" title="projected VORX this season: VORX to date plus the rest of the season at XPM (proj), his minutes per game and his share of games last season">VORX</th>
-        <th data-sort="sal" data-num class="nbaxpm__ph" title="salary this season, $M (Basketball-Reference)">Salary</th>
-        <th data-sort="xa" data-num class="nbaxpm__ph" title="xAAV, $M: the AAV he would sign for as a free agent now, from position, age, years in the league and last full season's XPM, VORX, minutes and points, at this season's cap (25/30/35% max by years in the league)">xAAV</th>
-        <th data-sort="val" data-num class="nbaxpm__ph" title="value this season, $M: minimum salary + projected VORX x $ per win">Value</th>
+        <th data-sort="csur" data-num class="c-csur" title="contract surplus, $M: every year left, value minus salary (options taken only when they pay their holder)">Contract</th>
+        <th data-sort="pos" class="cfb__g" title="position (Basketball-Reference)">Pos</th>
+        <th data-sort="tm" class="nbaxpm__team">Team</th>
+        <th data-sort="age" data-num class="nbaxpm__ph" title="age (Basketball-Reference)">Age</th>
+        <th data-sort="mp" data-num class="nbaxpm__ph" title="minutes this season">MP</th>
         <th data-sort="sur" data-num class="c-sur" title="surplus this season, $M: value minus salary">Surplus</th>
         <th data-sort="ny" data-num class="nbaxpm__ph" title="years left including this one; P = player option, T = team option">Yrs</th>
-        <th data-sort="csur" data-num class="c-csur" title="contract surplus, $M: every year left, value minus salary (options taken only when they pay their holder)">Contract</th>
+        <th data-sort="sal" data-num class="cfb__g nbaxpm__ph" title="salary this season, $M (Basketball-Reference)">Salary</th>
+        <th data-sort="val" data-num class="nbaxpm__ph" title="value this season, $M: minimum salary + projected VORX x $ per win">Value</th>
+        <th data-sort="xa" data-num class="nbaxpm__ph" title="xAAV, $M: the AAV he would sign for as a free agent now, from position, age, years in the league and last full season's XPM, VORX, minutes and points, at this season's cap (25/30/35% max by years in the league)">xAAV</th>
+        <th data-sort="pxpm" data-num class="nbaxpm__ph" title="XPM (proj): XPM to date blended with his preseason prior by minutes; below, the 80% range for his true level">XPM (proj)</th>
+        <th data-sort="pvorx" data-num class="nbaxpm__ph" title="projected VORX this season: VORX to date plus the rest of the season at XPM (proj), his minutes per game and his share of games last season">VORX</th>
       </tr></thead>
       <tbody></tbody>
     </table>
@@ -112,18 +116,29 @@
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
     table.dataset.key = key;
     function k(c) { return c === key ? ' is-key' : ''; }
+    // the surplus the view ranks by sits right after the name, then Pos, Team, Age, MP, then the other surplus, the contract,
+    // salary and value, then XPM (proj) and VORX (the board standard, Nov 23 2026); headers move with it
+    var order = [key, 'pos', 'tm', 'age', 'mp', key === 'sur' ? 'csur' : 'sur', 'ny', 'sal', 'val', 'xa', 'pxpm', 'pvorx'], hr = ths[0].parentNode;
+    ['rk', 'n'].concat(order).forEach(function (c) { var th = ths.filter(function (t) { return t.dataset.sort === c; })[0]; if (th) hr.appendChild(th); });
+    var CELL = {
+      pxpm: function (p) { return '<td class="cfb__num nbaxpm__ph">' + sg(p.pxpm) + '<span class="cfb__dim nbaxpm__od" title="80% range">' + p.lo.toFixed(1) + '–' + p.hi.toFixed(1) + '</span></td>'; },
+      pvorx: function (p) { return '<td class="cfb__num nbaxpm__ph">' + p.pvorx.toFixed(1) + '</td>'; },
+      sal: function (p) { return '<td class="cfb__num cfb__g nbaxpm__ph">' + m(p.sal) + '</td>'; },
+      xa: function (p) { return '<td class="cfb__num nbaxpm__ph"' + (p.xa == null ? '>' : ' title="xAAV minus salary: ' + (p.xa - p.sal > 0 ? '+' : '') + (p.xa - p.sal).toFixed(1) + '">') + (p.xa == null ? '<span class="cfb__dim">–</span>' : m(p.xa)) + '</td>'; },
+      val: function (p) { return '<td class="cfb__num nbaxpm__ph">' + m(p.val) + '</td>'; },
+      sur: function (p) { return '<td class="cfb__num c-sur nbaxpm__v' + k('sur') + '">' + sg(p.sur) + '</td>'; },
+      ny: function (p, yrs) { return '<td class="cfb__num nbaxpm__ph" title="' + esc(yrs) + '">' + p.ny + '<span class="cfb__dim">' + p.yrs.map(function (y) { return y[2]; }).join('') + '</span></td>'; },
+      csur: function (p) { return '<td class="cfb__num c-csur nbaxpm__v' + k('csur') + '">' + sg(p.csur) + '</td>'; },
+      pos: function (p) { return '<td class="cfb__g">' + esc(p.pos || '') + '</td>'; },
+      tm: function (p) { return '<td class="nbaxpm__team" style="white-space: nowrap">' + tl(p.tm) + esc(p.tm || '') + '</td>'; },
+      age: function (p) { return '<td class="cfb__num nbaxpm__ph">' + (p.age == null ? '' : p.age) + '</td>'; },
+      mp: function (p) { return '<td class="cfb__num nbaxpm__ph">' + (p.mp == null ? '' : p.mp) + '</td>'; }
+    };
     var gfxRow = function (p) {
       var yrs = p.yrs.map(function (y, i) { return (data.season - 1 + i) + '-' + String(data.season + i).slice(2) + ': $' + m(y[0]) + 'M salary, $' + m(y[1]) + 'M value' + (y[2] ? ' (' + (y[2] === 'P' ? 'player' : 'team') + ' option)' : ''); }).join('\n');
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
         '<td>' + face(p) + '<b>' + esc(p.n) + '</b> <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + (p.age == null ? '' : p.age + ' · ') + '$' + m(p.sal) + 'M</span></td>' +
-        '<td class="cfb__num nbaxpm__ph">' + sg(p.pxpm) + '<span class="cfb__dim nbaxpm__od" title="80% range">' + p.lo.toFixed(1) + '–' + p.hi.toFixed(1) + '</span></td>' +
-        '<td class="cfb__num nbaxpm__ph">' + p.pvorx.toFixed(1) + '</td>' +
-        '<td class="cfb__num nbaxpm__ph">' + m(p.sal) + '</td>' +
-        '<td class="cfb__num nbaxpm__ph"' + (p.xa == null ? '>' : ' title="xAAV minus salary: ' + (p.xa - p.sal > 0 ? '+' : '') + (p.xa - p.sal).toFixed(1) + '">') + (p.xa == null ? '<span class="cfb__dim">–</span>' : m(p.xa)) + '</td>' +
-        '<td class="cfb__num nbaxpm__ph">' + m(p.val) + '</td>' +
-        '<td class="cfb__num c-sur nbaxpm__v' + k('sur') + '">' + sg(p.sur) + '</td>' +
-        '<td class="cfb__num nbaxpm__ph" title="' + esc(yrs) + '">' + p.ny + '<span class="cfb__dim">' + p.yrs.map(function (y) { return y[2]; }).join('') + '</span></td>' +
-        '<td class="cfb__num c-csur nbaxpm__v' + k('csur') + '">' + sg(p.csur) + '</td></tr>';
+        order.map(function (c) { return CELL[c](p, yrs); }).join('') + '</tr>';
     };
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(gfxRow).join('');
     // every filtered row for the GFX card's percentiles (assets/js/gfx.js pcAll), built off the page on demand, photos left out

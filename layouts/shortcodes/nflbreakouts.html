@@ -17,19 +17,19 @@
   {{- range $w := seq $last 1 }}
   {{- $rows := index $d.weeks (string $w) | default slice }}
   <div data-brk-pane="{{ $w }}"{{ if ne $w $last }} style="display:none"{{ end }}>
-  {{- partial "wintable-open.html" (dict "title" (printf "%s · week %v" ($.Get "title" | default "breakouts") $w) "icon" "football" "filter" "Pos,Team,Yr" "rerank" true "gfxCols" "RK,Player,+WAR,z,Opp,Pos,Team" "gfxDate" (printf "week %v · %v" $w $d.season) "gfxMax" "25") }}
+  {{- partial "wintable-open.html" (dict "title" (printf "%s · week %v" ($.Get "title" | default "breakouts") $w) "icon" "football" "filter" "Pos,Team,Yr" "rerank" true "gfxCols" "RK,Player,+WAR,Pos,Team,z,Opp" "gfxDate" (printf "week %v · %v" $w $d.season) "gfxMax" "25") }}
 <table class="cfb__table bw brk__table">
   <thead><tr>
     <th>RK</th><th>Player</th>
     <th title="WAR - xWAR; the rank">+WAR</th>
+    <th class="brk__pt">Pos</th><th class="brk__pt">Team</th>
+    <th class="bw__x" title="NFL season: R = rookie, with his draft pick (U = undrafted)">Yr</th>
+    <th class="bw__x" title="snaps in the game">Snaps</th>
     <th title="+WAR in SDs of a game's WAR over expected at his snaps (fit on every player-week this season)">z</th>
     <th class="brk__war" title="the board's WAR for the game: WAR through the week minus WAR before it">WAR</th>
     <th class="bw__x" title="expected WAR: his WAR rate a snap before the week (last three seasons shrunk to his group, updated with the season so far) x his snaps in the game">xWAR</th>
-    <th class="bw__x" title="snaps in the game">Snaps</th>
     <th class="bw__x" title="opponent">Opp</th>
     <th class="bw__x" title="his stat line in the game">Line</th>
-    <th class="brk__pt">Pos</th><th class="brk__pt">Team</th>
-    <th class="bw__x" title="NFL season: R = rookie, with his draft pick (U = undrafted)">Yr</th>
     <th class="bw__x">Note</th>
   </tr></thead>
   <tbody>
@@ -38,15 +38,15 @@
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td class="cfb__name">{{ partial "face.html" (dict "u" (cond (ne .ph nil) (printf "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/%v" .ph) "")) }}<b>{{ .n }}</b>{{ with .age }} <span class="cfb__dim" title="age">{{ int . }}</span>{{ end }}<span class="brk__meta cfb__dim">{{ .pos }} · {{ .t }} · {{ .ha }} {{ .op }}</span></td>
     <td class="cfb__num is-key" data-v="{{ .ov }}"><span class="{{ if ge (float .ov) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ partial "num.html" (slice "%+.3f" (float .ov)) }}</span></td>
-    <td class="cfb__num">{{ with .z }}{{ partial "num.html" (slice "%+.1f" (float .)) }}{{ end }}</td>
-    <td class="cfb__num brk__war" data-v="{{ .war }}">{{ partial "num.html" (slice "%+.3f" (float .war)) }}</td>
-    <td class="cfb__num bw__x" data-v="{{ .x }}">{{ partial "num.html" (slice "%+.3f" (float .x)) }}</td>
-    <td class="cfb__num bw__x">{{ .sn }}</td>
-    <td class="bw__x">{{ .ha }} {{ .op }}</td>
-    <td class="bw__x cfb__dim">{{ .line }}</td>
     <td class="brk__pt">{{ .pos }}</td>
     <td class="cfb__team brk__pt"><img class="cfb__logo" src="/img/nfl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"><span>{{ .t }}</span></td>
     <td class="bw__x">{{ .yr }}{{ if ne .pk nil }} <span class="cfb__dim">{{ cond (gt (int .pk) 0) (printf "#%v" .pk) "U" }}</span>{{ end }}</td>
+    <td class="cfb__num bw__x">{{ .sn }}</td>
+    <td class="cfb__num">{{ with .z }}{{ partial "num.html" (slice "%+.1f" (float .)) }}{{ end }}</td>
+    <td class="cfb__num brk__war" data-v="{{ .war }}">{{ partial "num.html" (slice "%+.3f" (float .war)) }}</td>
+    <td class="cfb__num bw__x" data-v="{{ .x }}">{{ partial "num.html" (slice "%+.3f" (float .x)) }}</td>
+    <td class="bw__x">{{ .ha }} {{ .op }}</td>
+    <td class="bw__x cfb__dim">{{ .line }}</td>
     <td class="bw__x cfb__dim">{{ .note }}</td>
   </tr>
   {{- end }}

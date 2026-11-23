@@ -36,21 +36,56 @@ def board(sport):
     if sport in ('cfb', 'cbb'):
         d = json.load(open(os.path.join(ROOT, 'static', 'data', sport + '-all.json')))
         ix = {c: i for i, c in enumerate(d['cols'])}
-        rows = []
+        rows, sp = [], {}
+        if sport == 'cfb':      # Stat+ = 100 + 25 z against the snap-weighted mean and SD at the position and division, as assets/js/cfb.js
+            raw = lambda r: r[ix['pfn']] if r[ix['pfn']] is not None else r[ix['kp']] if 'kp' in ix else None
+            grp = lambda r: (r[ix['pos']], r[ix['div']] or 'FBS')
+            N = {}
+            for r in d['rows']:
+                if raw(r) is not None:
+                    n = N.setdefault(grp(r), [0, 0]); n[0] += 1; n[1] += bool(r[ix['snaps']])
+            M = {}
+            for r in d['rows']:
+                x = raw(r)
+                if x is None:
+                    continue
+                w = (r[ix['snaps']] or 1) if N[grp(r)][1] >= N[grp(r)][0] / 2 else 1
+                m = M.setdefault(grp(r), [0, 0, 0]); m[0] += w; m[1] += x * w; m[2] += x * x * w
+            for r in d['rows']:
+                x, m = raw(r), M.get(grp(r))
+                if x is not None and m:
+                    mu = m[1] / m[0]
+                    sp[id(r)] = round(100 + 25 * (x - mu) / max(1e-3, (max(1e-6, m[2] / m[0] - mu * mu)) ** .5))
         for r in d['rows']:
             lk = r[ix['espnl']] if 'espnl' in ix else (r[ix['links']] or {}).get('espn') if 'links' in ix else None
             eid = lk.rstrip('/').split('/id/')[1].split('/')[0] if lk and '/id/' in lk else None
+            now = r[ix['now']] if 'now' in ix else None
+            sn = r[ix['snapShare']] if 'snapShare' in ix else None
             rows.append({'name': r[ix['name']], 'team': r[ix['team']], 'pos': r[ix['pos']], 'id': eid,
-                         'cls': r[ix['cls']], 'fv': r[ix['fv']]})
+                         'cls': r[ix['cls']], 'fv': r[ix['fv']],
+                         'mpg': (now or {}).get('mpg') if sport == 'cbb' else None,                  # usage: minutes a game this season
+                         'splus': sp.get(id(r)),                                                    # rate: Stat+ (100 = average at the position)
+                         'snp': round(100 * sn, 1) if sport == 'cfb' and isinstance(sn, (int, float)) else None})   # usage: share of team snaps
         if sport == 'cbb' and os.path.exists(os.path.join(ROOT, 'static', 'data', 'cbb-intl.json')):   # international prospects
             d = json.load(open(os.path.join(ROOT, 'static', 'data', 'cbb-intl.json')))
             ix = {c: i for i, c in enumerate(d['cols'])}
             rows += [{'name': r[ix['name']], 'team': r[ix['team']], 'pos': r[ix['pos']], 'id': None, 'cls': 'Intl',
-                      'fv': r[ix['fv']]} for r in d['rows']]
+                      'fv': r[ix['fv']], 'mpg': r[ix['mpg']] if 'mpg' in ix else None} for r in d['rows']]
         return NM.Matcher(rows, id='id', sport='football' if sport == 'cfb' else 'basketball')
+    if sport == 'nba':          # rate: XPM this season (raw, points per 100 over average); usage: minutes a game
+        fs = sorted(f for f in os.listdir(os.path.join(ROOT, 'static', 'data', 'nba-xpm')) if f[:4].isdigit())
+        d = json.load(open(os.path.join(ROOT, 'static', 'data', 'nba-xpm', fs[-1])))
+        return NM.Matcher([{'name': p['n'], 'team': p.get('tm'), 'pos': p.get('pos'), 'xpm': p.get('xpm'),
+                            'mpg': round(p['mp'] / p['g'], 1) if p.get('g') else None} for p in d['players']], sport='basketball')
+    if sport == 'soccer':       # usage: league minutes an appearance
+        fs = sorted(f for f in os.listdir(os.path.join(ROOT, 'static', 'data', 'soccer-war')) if f[:4].isdigit())
+        d = json.load(open(os.path.join(ROOT, 'static', 'data', 'soccer-war', fs[-1])))
+        return NM.Matcher([{'name': p['n'], 'team': p.get('team'), 'pos': p.get('pos'),
+                            'mpg': round(p['min'] / p['mp']) if p.get('mp') else None} for p in d['players']], sport='soccer')
     if sport == 'nfl':
         d = json.load(open(os.path.join(ROOT, 'static', 'data', 'nfl-war.json')))
-        return NM.Matcher([{'name': p['n'], 'team': p.get('tm'), 'pos': p.get('pos'), 'war': p.get('pace')}
+        return NM.Matcher([{'name': p['n'], 'team': p.get('tm'), 'pos': p.get('pos'), 'war': p.get('pace'),
+                            'snpg': round(p['sn'] / p['g'], 1) if p.get('g') and p.get('sn') else None}
                            for p in d['players']], sport='football')
     return None
 
@@ -107,6 +142,14 @@ def convert(sport):
             {'k': 'sig', 'l': 'Signals', 't': 'signals pushing his odds up most', 'f': 's', 'ph': 1},
             {'k': 'u', 'l': u.get('lab', 'USE'), 't': u.get('t') or (u.get('lab', 'workload') + ' now'),
              'f': str(u.get('dec', 1)), 'ph': 1, 'num': 1}]
+    # Noah (Nov 23): every sport shows a rate stat (XPM in the NBA, Stat+ in CFB) and a minutes-type usage figure
+    cols += {'nba': [{'k': 'mpg', 'l': 'MPG', 't': 'minutes a game this season', 'f': '1', 'ph': 1, 'num': 1},
+                     {'k': 'xpm', 'l': 'XPM', 't': 'XPM this season: Cross Plus-Minus, points per 100 over average (raw)', 'f': 's1', 'ph': 1, 'num': 1}],
+             'cbb': [{'k': 'mpg', 'l': 'MPG', 't': 'minutes a game this season', 'f': '1', 'ph': 1, 'num': 1}],
+             'cfb': [{'k': 'snp', 'l': 'Snap%', 't': 'share of team snaps this season', 'f': 'p', 'ph': 1, 'num': 1},
+                     {'k': 'splus', 'l': 'Stat+', 't': 'Stat+ this season: 100 + 25 z of the position score (PFN), 100 = average at the position', 'f': '0', 'ph': 1, 'num': 1}],
+             'nfl': [{'k': 'snpg', 'l': 'Snaps/G', 't': 'snaps a game this season', 'f': '1', 'ph': 1, 'num': 1}],
+             'soccer': [{'k': 'mpg', 'l': 'Min/G', 't': 'league minutes an appearance this season', 'f': 'i', 'ph': 1, 'num': 1}]}.get(sport, [])
     if any(r.get('best') is not None for r in src.get('rows') or []) and sport in BEST:
         lb, tt, f = BEST[sport]
         cols.append({'k': 'best', 'l': 'Best', 't': tt, 'f': f, 'ph': 1, 'num': 1})
@@ -136,7 +179,7 @@ def convert(sport):
             m, _ = M.find(o['n'], team=o['tm'], pos=o['pos'] or None,
                           id=str(r.get('id') or '') or None if sport == 'cfb' else None)   # CBB rows carry Barttorvik ids
             if m:
-                for k in ('fv', 'war'):
+                for k in ('fv', 'war', 'xpm', 'mpg', 'splus', 'snp', 'snpg'):
                     if m.get(k) is not None:
                         o[k] = m[k]
                 if m.get('cls'):
@@ -156,7 +199,7 @@ def convert(sport):
         seen.add(o['pos'])
     pos = [p for p in POS if p in seen] + sorted(p for p in seen if p and p not in POS)
     y = Y.get(sport) or {}
-    mob = ['fv'] if sport in ('cfb', 'cbb') else ['war'] if sport == 'nfl' else ['x']   # phones: + pos, class, age on the team line
+    mob = ['fv', 'splus'] if sport == 'cfb' else ['fv', 'x'] if sport == 'cbb' else ['war'] if sport == 'nfl' else ['x']   # phones: + pos, class, age on the team line
     who = ('Fr/So only' if y.get('rule') == 'cls' else 'age %d and under' % y['max_age'] if y.get('max_age') else '')
     mob = (['p'] if SF else []) + mob
     # EDGE leads where its held-out top 25s found more breakouts beyond their status than BO%'s did

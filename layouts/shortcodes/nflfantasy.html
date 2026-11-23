@@ -42,6 +42,8 @@
         <th data-sort="t" class="nflwar__team">Team</th>
         <th data-sort="opp" data-ff-opp title="opponent this week (@ = away); rest of season: team games left">Opp</th>
         <th data-sort="kick" data-num class="nflff__kick" data-ff-kick title="kickoff, local time">Kick</th>
+        <th data-sort="av" data-num title="P(plays) this week by injury designation (Q, D, O), roster status (IR, other reserve lists), played last game; fit 2016-25. rest of season: expected games played">Play</th>
+        <th data-sort="ppg" data-num title="points a game, season to date, selected scoring">Pts/G</th>
         <th data-sort="line" title="projected stat line if playing; rest of season: expected totals">Line</th>
         <th data-sort="py" data-num class="nflff__x">Pass Yds</th>
         <th data-sort="ptd" data-num class="nflff__x">Pass TD</th>
@@ -49,8 +51,6 @@
         <th data-sort="yds" data-num class="nflff__x" title="rushing + receiving yards">Yds</th>
         <th data-sort="rc" data-num class="nflff__x">Rec</th>
         <th data-sort="td" data-num class="nflff__x" title="rushing + receiving + return touchdowns">TD</th>
-        <th data-sort="av" data-num title="P(plays) this week by injury designation (Q, D, O), roster status (IR, other reserve lists), played last game; fit 2016-25. rest of season: expected games played">Play</th>
-        <th data-sort="ppg" data-num title="points a game, season to date, selected scoring">Pts/G</th>
       </tr></thead>
       <tbody></tbody>
     </table>
@@ -175,13 +175,14 @@
         '<td class="nflwar__team nflff__team" style="white-space: nowrap">' + tl(p.t) + esc(p.t) + '</td>' +
         '<td class="nflff__opp">' + (ros ? '<span class="nflff__m">games </span>' : '') + opp + '</td>' +
         (ros ? '' : '<td class="cfb__num nflff__kick" data-v="' + esc(p.kick || '') + '">' + kick + '</td>') +
+        '<td class="cfb__num nflff__av"><span class="nflff__m">' + (ros ? 'exp. games ' : 'plays ') + '</span>' + (ros ? p.eg.toFixed(1) : Math.round(p.av * 100) + '%') + '</td>' +
+        '<td class="cfb__num nflff__ppg">' + (p._ppg == null ? '<span class="cfb__dim">–</span>' : p._ppg.toFixed(1)) + '</td>' +
         '<td class="cfb__dim nflff__line">' + p.line + '</td>' +
         (dst || !v ? '<td class="nflff__x"></td><td class="nflff__x"></td><td class="nflff__x"></td><td class="nflff__x"></td><td class="nflff__x"></td><td class="nflff__x"></td>' :
           '<td class="cfb__num nflff__x">' + fx(p.py, 0) + '</td><td class="cfb__num nflff__x">' + fx(p.ptd, ros ? 1 : 2) + '</td>' +
           '<td class="cfb__num nflff__x">' + fx(p.pint, ros ? 1 : 2) + '</td><td class="cfb__num nflff__x">' + fx(p.yds, 0) + '</td>' +
           '<td class="cfb__num nflff__x">' + fx(p.rc, 1) + '</td><td class="cfb__num nflff__x">' + fx(p.td, ros ? 1 : 2) + '</td>') +
-        '<td class="cfb__num nflff__av"><span class="nflff__m">' + (ros ? 'exp. games ' : 'plays ') + '</span>' + (ros ? p.eg.toFixed(1) : Math.round(p.av * 100) + '%') + '</td>' +
-        '<td class="cfb__num nflff__ppg">' + (p._ppg == null ? '<span class="cfb__dim">–</span>' : p._ppg.toFixed(1)) + '</td></tr>';
+        '</tr>';
     };
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(gfxRow).join('');
     // every filtered row for the GFX card's percentiles (assets/js/gfx.js pcAll), built off the page on demand, photos left out

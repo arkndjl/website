@@ -32,16 +32,15 @@
 {{- $T := index $A $sport | default dict -}}
 {{- $xfmt := cond (eq $sport "cbb") "%+.1f" (cond (eq $sport "nba") "%+.2f" "%+.3f") -}}
 {{- $date := cond (eq $sport "nfl") (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2"))) (lower ((time .asof).Format "Jan 2")) -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "backup watch") "icon" (cond (in (slice "cbb" "nba") $sport) "basketball" (cond (eq $sport "nhl") "hockey" (cond (eq $sport "soccer") "soccer" "football"))) "filter" $filter "rerank" true "tab" ($.Get "tab") "gfxCols" (printf "RK,Player,Pos,Team,%s,Starter,Gap,xGap" $g) "gfxDate" $date "gfxMax" "30") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "backup watch") "icon" (cond (in (slice "cbb" "nba") $sport) "basketball" (cond (eq $sport "nhl") "hockey" (cond (eq $sport "soccer") "soccer" "football"))) "filter" $filter "rerank" true "tab" ($.Get "tab") "gfxCols" (printf "RK,Player,xGap,Pos,Team,%s,Starter,Gap" $g) "gfxDate" $date "gfxMax" "30") -}}
 <table class="cfb__table bw">
   <thead><tr>
-    <th>RK</th><th>Player</th><th>Pos</th><th>Team</th>{{ if $college }}<th class="bw__x">Conf</th>{{ end }}
+    <th>RK</th><th>Player</th><th title="the gap projected over the next two seasons, from today's gap and the {{ if $college }}class{{ else }}age{{ end }} gap to the starter (fit on past seasons); the rank">xGap</th><th>Pos</th><th>Team</th>{{ if $college }}<th class="bw__x">Conf</th>{{ end }}
     <th title="2nd or 3rd string on the depth chart{{ if $college }} (order by playing time){{ end }}">Str</th>
     <th title="{{ index $gtitle $sport }}">{{ $g }}</th>
     <th title="the starter he backs up{{ if $college }}: the lowest-graded starter at his position{{ else }}: first on the chart at his slot{{ end }}">Starter</th>
     <th title="the starter's {{ $g }}">St {{ $g }}</th>
     <th title="backup {{ $g }} - starter {{ $g }}">Gap</th>
-    <th title="the gap projected over the next two seasons, from today's gap and the {{ if $college }}class{{ else }}age{{ end }} gap to the starter (fit on past seasons); the rank">xGap</th>
     <th class="bw__x" title="{{ index $utitle $sport }}">{{ $use }}</th>
     <th class="bw__x" title="the starter's: {{ index $utitle $sport }}">St {{ $use }}</th>
   </tr></thead>
@@ -51,6 +50,8 @@
   <tr>
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td class="cfb__name">{{ partial "face.html" (dict "u" (.photo | default "")) }}<b>{{ .name }}</b>{{ with .cls }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ with .age }} <span class="cfb__dim" title="age">{{ int . }}</span>{{ end }}{{ with .inj }} <span class="cfb__dim" title="injury report">({{ lower . }})</span>{{ end }}</td>
+    {{- $x := .xgap | default .gap }}
+    <td class="cfb__num is-key" data-v="{{ $x }}">{{ partial "num.html" (slice $xfmt (float $x)) }}</td>
     <td{{ if and (eq $sport "nfl") .pos2 }} title="depth chart slot {{ .pos }}">{{ .pos2 }}{{ else }}>{{ .pos }}{{ end }}</td>
     {{- $logo := .logo }}{{ if and (not $logo) (eq $sport "soccer") }}{{ with index site.Data.soccer_logos.espn (.team | default "") }}{{ $logo = printf "/img/soccer/%v.png" . }}{{ end }}{{ end }}{{ if and (not $logo) .team (in (slice "nba" "nfl" "nhl") $sport) }}{{ $logo = printf "/img/%s/%s.png" $sport (lower .team) }}{{ end }}
     <td class="cfb__team">{{ with $logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
@@ -67,8 +68,6 @@
     <td class="cfb__num" data-v="{{ $s.g }}">{{ partial "num.html" (slice (cond (in (slice "nfl" "nhl" "soccer" "cfb") $sport) "%+.2f" "%+.1f") (float $s.g)) }}</td>
     <td class="cfb__num" data-v="{{ .gap }}"><span class="cfb__up">{{ partial "num.html" (slice (cond (in (slice "nfl" "nhl" "soccer" "cfb") $sport) "+%.2f" "+%.1f") (float .gap)) }}</span></td>
     {{- end }}
-    {{- $x := .xgap | default .gap }}
-    <td class="cfb__num is-key" data-v="{{ $x }}">{{ partial "num.html" (slice $xfmt (float $x)) }}</td>
     <td class="cfb__num bw__x">{{ if $college }}{{ .use | default .mpg }}{{ with .unit }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ else }}{{ lang.FormatNumber 0 .use }}{{ end }}</td>
     <td class="cfb__num bw__x">{{ if $college }}{{ $s.use | default $s.mpg }}{{ else }}{{ lang.FormatNumber 0 $s.use }}{{ end }}</td>
   </tr>
