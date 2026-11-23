@@ -32,15 +32,18 @@ class _Done(Exception):
     pass
 
 
-def capture(sport):
+def capture(sport, full=False):
+    """the sport's breakout rows: age, class and label; full=True adds the season line's scalars ('a'), the feature
+    dict ('f') and the held-out season ('S')"""
     R = importlib.import_module(sport + '_breakout_research')
     fn = 'bo_row' if sport == 'soccer' else 'bo_feats'
     rec, out, orig = [], [], getattr(R.B, fn)
     ai = 1 if sport == 'nfl' else 0
 
     def wrap(*a, **k):
-        rec.append(a[ai])
-        return orig(*a, **k)
+        res = orig(*a, **k)
+        rec.append((a[ai], res[1] if sport == 'soccer' else res))
+        return res
     setattr(R.B, fn, wrap)
     oloso = R.L.loso
 
@@ -54,8 +57,13 @@ def capture(sport):
                     except ValueError:
                         continue
                     if isinstance(v, np.ndarray) and v.ndim == 1 and len(v) == n and set(np.unique(v)) <= {0.0, 1.0}:
-                        out.extend({'age': a.get('age'), 'cls': a.get(COLLEGE.get(sport, 'cls')), 'hit': float(h)}
-                                   for a, h in zip(rec, v))
+                        for (a, f), h, sy in zip(rec, v, S):
+                            o = {'age': a.get('age'), 'cls': a.get(COLLEGE.get(sport, 'cls')), 'hit': float(h)}
+                            if full:
+                                o.update(S=float(sy), a={k: x for k, x in a.items() if isinstance(x, (int, float, str))},
+                                         f={k: np.atleast_1d(np.asarray(x, float)).tolist() for k, x in f.items()
+                                            if not isinstance(x, str)})
+                            out.append(o)
                         raise _Done
         return oloso(S, fp, err)
     R.L.loso = loso
@@ -66,6 +74,8 @@ def capture(sport):
         pass
     finally:
         sys.argv = argv
+        R.L.loso = oloso
+        setattr(R.B, fn, orig)
     return out
 
 

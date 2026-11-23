@@ -369,6 +369,7 @@ def freshmen(rows, bar, out):
         out.append({'id': 'fr-' + r['name'], 'n': r['name'], 'tm': r['team'], 'lo': r.get('logo'), 'sub': r.get('conf') or '',
                     'pos': r.get('pos') or '', 'age': age, 'ph': r.get('photo'), 'p': round(1 / (1 + math.exp(-z)), 3),
                     'u': now.get('usg') if (now.get('gp') or 0) >= 2 else None, 'best': None, 't': [], 'sig': ['recruit rank'],
+                    'st': round(math.exp(-lrk), 1),
                     'x': None if cur is None else round(cur, 1), 'xc': None, 'fr': 1})
         n += 1
     return n
@@ -529,6 +530,7 @@ def main():
         out.append({'id': a['pid'], 'n': r['name'], 'tm': r['team'], 'lo': r.get('logo'), 'sub': r.get('conf') or '', 'pos': r.get('pos') or '',
                     'age': age, 'ph': r.get('photo'), 'p': round(p, 3), 'u': round(u, 1), 'u0': round(a['usg'], 1),
                     'best': round(best, 1), 't': tiers, 'sig': sig,
+                    'st': round(math.exp(-a['rg_lrk']), 1) if a.get('unranked2', 1) < 0.5 else None,   # recruit rank, next up EDGE
                     'x': round(shr(now['bpm'], m_now) if now.get('bpm') is not None and (now.get('gp') or 0) >= 2 else shr(a['bpm'], a['m']), 1),
                     'xc': round(ceiling(cf, a, [o for o in hist if o['y'] < a['y']]), 1)})
     nfr = freshmen(rows, bar, out)
