@@ -26,7 +26,7 @@
   {{- range first $top .teams }}
   <tr>
     <td class="cfb__rk">{{ .rk }}</td>{{ partial "rkmove.html" (dict "r" . "from" $mvFrom "fmt" "%+.1f pts" "mul" 100) }}
-    <td class="cfb__name" data-v="{{ .n }}" style="white-space: nowrap">{{ with .fl }}{{ partial "px/flag.html" . }}{{ end }}{{ if .logo }}<img class="cs__logo" src="/img/cs2/{{ .k }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b></td>
+    <td class="cfb__name" data-v="{{ .n }}" style="white-space: nowrap">{{ with .fl }}{{ partial "px/flag.html" . }}{{ end }}{{ if .logo }}<img class="cs__logo" src="/img/cs2/{{ .k }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b>{{ with .esea }} <span class="lzd__tag" title="ESEA {{ . }}: placed by its five's ESEA results on the pro scale (no Valve or bo3.gg series); ARK and Elo read off the teams either side">ESEA</span>{{ end }}</td>
     <td class="cs__tier" data-v="{{ .tier | default 4 }}" data-filter="Tier {{ .tier | default 4 }}"><span class="cs__t cs__t--{{ .tier | default 4 }}">T{{ .tier | default 4 }}</span>{{ with .ev }} <span class="cfb__dim" title="share of series at S-tier events, last 180 days">{{ partial "num.html" (slice "%.0f" (mul (index . 0) 100)) }}%</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .ark }}"><b>{{ partial "num.html" (slice "%.1f" (mul .ark 100)) }}</b></td>
     <td class="cfb__num" data-v="{{ .elo }}">{{ .elo }}</td>
