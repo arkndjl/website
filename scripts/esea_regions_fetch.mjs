@@ -14,7 +14,7 @@ import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const OUT = path.join(ROOT, 'research', 'esea_regions.json.gz');
+const OUT = path.join(ROOT, process.env.ESEA_OUT || path.join('research', 'esea_regions.json.gz'));   // ESEA_OUT: early seasons go to their own file
 const KEY = process.env.FACEIT_API_KEY;
 const API = 'https://open.faceit.com/data/v4';
 const FROM = +(process.env.ESEA_FROM || 53), TO = +(process.env.ESEA_TO || 59);
@@ -118,7 +118,7 @@ for (const id of seeds) {
   const ms = (await api(`/championships/${id}/matches?type=past&offset=0&limit=100`))?.items || [];
   for (const m of ms.slice(0, 60)) for (const f of ['faction1', 'faction2']) for (const p of (m.teams?.[f]?.roster || []).slice(0, 2)) queue.push(p.player_id);
 }
-const MAXP = +(process.env.ESEA_CRAWL ?? 900), T0 = Date.UTC(2025, 2, 1) / 1000;
+const MAXP = +(process.env.ESEA_CRAWL ?? 900), T0 = (process.env.ESEA_T0 ? Date.parse(process.env.ESEA_T0) : Date.UTC(2025, 2, 1)) / 1000;
 for (let i = queue.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [queue[i], queue[j]] = [queue[j], queue[i]]; }
 while (queue.length && seenP.size < MAXP) {
   const pid = queue.shift(); if (!pid || seenP.has(pid)) continue; seenP.add(pid);

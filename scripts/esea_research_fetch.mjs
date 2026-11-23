@@ -13,7 +13,7 @@ import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const OUT = path.join(ROOT, 'research', 'esea_matches.json.gz');
+const OUT = path.join(ROOT, process.env.ESEA_OUT || path.join('research', 'esea_matches.json.gz'));   // ESEA_OUT: early seasons go to their own file
 const KEY = process.env.FACEIT_API_KEY;
 const API = 'https://open.faceit.com/data/v4';
 const FROM = +(process.env.ESEA_FROM || 56), TO = +(process.env.ESEA_TO || 59);
