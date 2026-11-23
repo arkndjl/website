@@ -771,6 +771,8 @@ def nfl(fit, rng):
         cands.append({'id': v['id'], 'n': v['n'], 'tid': f['tid'], 'tm': tmap[f['tid']], 'pos': f['pos'], 'ph': v['id'],
                       'war': wr.get('war'), 'f': f})
     ROSTER['nfl'] = cands
+    try: nfl_enrich(fit, cands, tmap, S)
+    except Exception as e: print('nfl prior-season inputs skipped:', e)
     war_lead.tmap = tmap
     war_lead('nfl', teams, rng)
     out = []
@@ -781,7 +783,117 @@ def nfl(fit, rng):
         if r: out.append((r[0], rows_out(r[1], temper(r[2], T), r[3], r[4], rng), r[4]))
     except Exception as e:
         print('nfl droy skipped:', e)
+    try:
+        for aw, pl, p, draw, show in nfl_more(fit, rng, cands, teams, tmap, S): out.append((aw, rows_out(pl, temper(p, T), draw, show, rng), show))
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        print('nfl cpoy / coy / all-pro skipped:', e)
     return {'season': str(S), 'races': out, 'logo': 'nfl', 'T': T}
+
+
+def nfl_enrich(fit, cands, tmap, S):
+    """the Nov 23 inputs every candidate line carries: his ESPN line the season before (prev_gp, prev_yds, prev_def),
+    AP first-team All-Pro selections and DPOY wins before this season (the fit's _prev), and his team's points-allowed
+    rank so far (drank: 32 = fewest a game; nflverse games)"""
+    import awards_football as F
+    import awards_nflverse as V
+    import concurrent.futures as cf
+    prev = fit.get('_prev', {})
+    ap, dpw = prev.get('allpro', {}), prev.get('dpoy_wins', {})
+    with cf.ThreadPoolExecutor(8) as ex:
+        pv = dict(zip([c['id'] for c in cands], ex.map(lambda c: F.athlete_stats('nfl', S - 1, c['id']), cands)))
+    G = V.nfl_file('games.csv', 'https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv', fresh=True)
+    nfl_enrich.games = G
+    pa = {}
+    for x in G:
+        if x['game_type'] != 'REG' or int(x['season']) != S or x['home_score'] in ('', 'NA'): continue
+        for tm, op in ((x['home_team'], x['away_score']), (x['away_team'], x['home_score'])):
+            tm = V.TEAM_FIX.get(tm, tm)
+            a = pa.setdefault(tm, [0, 0]); a[0] += int(op); a[1] += 1
+    rk = {t: 32 - i for i, t in enumerate(sorted(pa, key=lambda t: pa[t][0] / max(pa[t][1], 1)))}
+    for c in cands:
+        f = c['f']
+        q = F.features({'id': c['id'], 'n': c['n'], 'st': pv.get(c['id']) or {}, 'pos': c['pos']})
+        ab = ESPN_NFLV.get(tmap.get(c['tid']), tmap.get(c['tid']))
+        f.update(prev_gp=float((pv.get(c['id']) or {}).get('gene.gamesPlayed') or 0), prev_yds=q['yds'],
+                 prev_def=q['sacks'] + q['dint'], prev_ap=float(ap.get(NM.key(c['n']), 0)),
+                 prev_dpoy=float(dpw.get(NM.key(c['n']), 0)), drank=float(rk.get(ab, 16)))
+
+
+nfl_enrich.games = []
+NFL_MORE_LEFT = [('pass_y', 'yds'), ('rush_y', 'yds'), ('rec_y', 'yds'), ('ptd', 'count'), ('rtd', 'count'), ('ctd', 'count'),
+                 ('int', 'count'), ('rec', 'count'), ('sacks', 'count'), ('dint', 'count'), ('tackles', 'yds'), ('tfl', 'count'),
+                 ('pd', 'count'), ('ff', 'count'), ('itd', 'count'), ('qbh', 'count')]
+ESPN_NFLV = {'WSH': 'WAS', 'LAR': 'LA'}
+AFC = {'BAL', 'BUF', 'CIN', 'CLE', 'DEN', 'HOU', 'IND', 'JAX', 'KC', 'LV', 'LAC', 'MIA', 'NE', 'NYJ', 'PIT', 'TEN'}
+
+
+def nfl_more(fit, rng, cands, teams, tmap, S, sims=SIMS):
+    """the Nov 23 2026 races (scripts/awards_football_more.py): Comeback Player, Coach of the Year, the All-Pro position
+    races (top k), each run only if it passed; prior-season inputs from the fit's _prev and the ESPN line the season
+    before. yields (award, pool, P, draw, shown stats)"""
+    import awards_football as F
+    prev = fit.get('_prev', {})
+    base = football_draw(teams, NFL_MORE_LEFT, 'nfl')
+
+    def draw(c, td, rng):
+        f = base(c, td, rng)
+        if f is not None: f['rec_td'] = f['rtd'] + f['ctd']
+        return f
+    draw.teams = base.teams
+    spec = fit.get('cpoy')
+    if spec and spec['test'].get('pass'):
+        big = lambda f: (not f['def'] and f['yds'] * 17 / max(teams[f['tid']][1], 1) >= 400) or (f['def'] and max(f['tackles'], 0) * 17 / max(teams[f['tid']][1], 1) >= 30) or f['sacks'] >= 3 or f['dint'] >= 2
+        pl = prune([c for c in cands if not c['f']['rookie'] and big(c['f'])], spec, draw, rng)
+        yield 'cpoy', pl, race(pl, spec, draw, rng, sims), draw, [('yds', 'YDS', '%.0f'), ('td', 'TD', '%.0f'), ('sacks', 'SCK', '%.1f'), ('prev_gp', 'GP LY', '%.0f')]
+    ap_spec = fit.get('allpro')
+    if ap_spec and ap_spec['test'].get('pass'):
+        for g, (rule, _, _, _) in F.AP_GROUPS.items():
+            sp = dict(ap_spec['races'][g], label='All-Pro ' + {'FRONT': 'DL/LB'}.get(g, g), k=ap_spec['k'][g])
+            aw = 'allpro_' + g.lower()
+            fit[aw] = sp                                    # in memory: main() reads the race's spec from the fit
+            pl = [c for c in cands if rule(dict(c['f'], pos=c['pos']))]
+            if not pl: continue
+            show = {'QB': [('yds', 'YDS', '%.0f'), ('td', 'TD', '%.0f'), ('wp', 'W%', 'pct')],
+                    'RB': [('scrim', 'SCRIM', '%.0f'), ('rec_td', 'TD', '%.0f'), ('wp', 'W%', 'pct')],
+                    'WR': [('rec_y', 'YDS', '%.0f'), ('ctd', 'TD', '%.0f'), ('rec', 'REC', '%.0f')],
+                    'TE': [('rec_y', 'YDS', '%.0f'), ('ctd', 'TD', '%.0f'), ('rec', 'REC', '%.0f')],
+                    'FRONT': [('sacks', 'SCK', '%.1f'), ('qbh', 'QBH', '%.0f'), ('tackles', 'TKL', '%.0f')],
+                    'DB': [('dint', 'INT', '%.0f'), ('pd', 'PD', '%.0f'), ('tackles', 'TKL', '%.0f')]}[g]
+            pl = sorted(pl, key=lambda c: -sum(b * ((c['f'][x] - m) / v) for b, x, m, v in zip(sp['b'], sp['cols'], sp['mu'], sp['sd'])))[:60]
+            yield aw, pl, race_k(pl, sp, draw, rng, sp['k'], sims), draw, show
+    spec = fit.get('coy')
+    if spec and spec['test'].get('pass'):
+        import awards_nflverse as V
+        G = nfl_enrich.games
+        co, w25 = {}, {}
+        for x in G:
+            if x['game_type'] != 'REG' or int(x['season']) not in (S - 1, S): continue
+            for tm, c, me, op in ((x['home_team'], x['home_coach'], x['home_score'], x['away_score']), (x['away_team'], x['away_coach'], x['away_score'], x['home_score'])):
+                tm = V.TEAM_FIX.get(tm, tm)
+                co.setdefault((int(x['season']), tm), {}).setdefault(c, 0)
+                if me not in ('', 'NA'): co[(int(x['season']), tm)][c] += 1
+                if int(x['season']) == S - 1 and me not in ('', 'NA'):
+                    w25[tm] = w25.get(tm, 0) + (1 if int(me) > int(op) else .5 if me == op else 0)
+        top = lambda d: max(d, key=d.get) if d else None
+        tot = (prev.get('wintot') or {}).get(str(S), {})
+        cc = []
+        for tid, ab in tmap.items():
+            if tid not in teams: continue
+            nv = ESPN_NFLV.get(ab, ab)
+            now = top(co.get((S, nv), {}))
+            if not now: continue
+            cc.append({'id': 'coach' + tid, 'n': now, 'tid': tid, 'tm': ab, 'logo': f'/img/nfl/{ab.lower()}.png', 'afc': nv in AFC,
+                       'tot': tot.get(nv, 8.5), 'wprev': w25.get(nv, 8.5), 'first': 0.0 if top(co.get((S - 1, nv), {})) == now else 1.0})
+
+        def cdraw(c, td, rng):
+            G_ = teams[c['tid']][4]
+            w = td[c['tid']] * G_
+            conf = sorted((v for t, v in td.items() if (tmap.get(t) and (ESPN_NFLV.get(tmap[t], tmap[t]) in AFC) == c['afc'])), reverse=True)
+            return {'w': w, 'dtot': w - c['tot'], 'dprev': w - c['wprev'], 'first': c['first'], 'bye': 1.0 if td[c['tid']] >= conf[min(1, len(conf) - 1)] else 0.0,
+                    'tot': c['tot']}
+        cdraw.teams = base.teams
+        yield 'coy', cc, race(cc, spec, cdraw, rng, sims), cdraw, [('w', 'W', '%.1f'), ('dprev', '+/- LY', '%+.1f')]
 
 
 NFLV_TEAM = {'LA': 'LAR', 'WAS': 'WSH'}
@@ -821,6 +933,34 @@ def war_lead(sport, teams, rng):
     draw = football_draw(teams, [('svar', 'yds')], sport)
     for aw, ok in (NFL_CONV if sport == 'nfl' else CFB_CONV):
         lead(aw, [c for c in cands if ok(c)], draw, 'svar', SV_SHOW, rng)
+    if sport == 'nfl': nfl_conv_more(cands, rook, draw, rng)
+
+
+# Nov 23 2026: Comeback Player of the Year = SV players (not rookies) with fewer than CPOY_GP games last season (nflverse
+# weekly lines of the finished season); All-Pro = the AP first team's position groups, top k on SVAR (k = the fewest
+# the AP named in a season 2005-25, scripts/awards_football_more.py)
+CPOY_GP = 9
+ALLPRO_CONV = [('allpro_qb', 'All-Pro QB', ('QB',), 1), ('allpro_rb', 'All-Pro RB', ('RB',), 1),
+               ('allpro_wr', 'All-Pro WR', ('WR',), 2), ('allpro_te', 'All-Pro TE', ('TE',), 1),
+               ('allpro_front', 'All-Pro DL/LB', ('DL', 'LB'), 7), ('allpro_db', 'All-Pro DB', ('DB',), 4)]
+
+
+def nfl_conv_more(cands, rook, draw, rng):
+    try:
+        import awards_nflverse as V
+        S = int((jload(os.path.join(ROOT, 'data', 'nfl_season_value.json'), {}) or {}).get('season') or dt.date.today().year)
+        gp = {}
+        for x in V.nfl_weekly(S - 1):
+            gp.setdefault(x['id'], {'n': x['n'], 'pos': x['grp'], 'g': 0})['g'] += 1
+        m = NM.Matcher(list(gp.values()), name='n', team=None, pos='pos')
+        pool = [c for c in cands if not c['rookie'] and ((m.find(c['n'], pos=c['pos'])[0] or {}).get('g', 0) < CPOY_GP)]
+        lead('cpoy', pool, draw, 'svar', SV_SHOW, rng)
+        if 'cpoy' in CONV: CONV['cpoy'].label = 'CPOY'
+    except Exception as e:
+        print('nfl cpoy conviction skipped:', e)
+    for aw, lab, ps, k in ALLPRO_CONV:
+        lead(aw, [c for c in cands if c['pos'] in ps], draw, 'svar', SV_SHOW, rng, k=k)
+        if aw in CONV: CONV[aw].label = lab
 
 
 war_lead.tmap, war_lead.logos = {}, {}
@@ -855,7 +995,10 @@ def nfl_races(fit, rng, cands, teams, sims=SIMS):
     """yields (award, pool, P(win), draw, shown stats) for each passing NFL award. cands: to-date lines ('f' = features,
     'tid' = team key); teams: {tid: (wins, games, mean final wins, sd, G)}"""
     draw = football_draw(teams, [('pass_y', 'yds'), ('scrim', 'yds'), ('td', 'count'), ('int', 'count'),
-                                 ('sacks', 'count'), ('dint', 'count'), ('tfl', 'count'), ('pd', 'count'), ('ff', 'count')], 'nfl')
+                                 ('sacks', 'count'), ('dint', 'count'), ('tfl', 'count'), ('pd', 'count'), ('ff', 'count'),
+                                 ('qbh', 'count')], 'nfl')
+    if fit.get('dpoy2', {}).get('test', {}).get('pass') and all('drank' in c['f'] for c in cands):          # Nov 23 2026: DPOY v2 replaces the failed Nov 14 model
+        fit['dpoy'] = dict(fit['dpoy2'], label='DPOY')
     for aw, pool_f, show in (
             ('mvp', lambda c: not c['f']['def'], [('yds', 'YDS', '%.0f'), ('td', 'TD', '%.0f'), ('int', 'INT', '%.0f'), ('wp', 'W%', 'pct')]),
             ('opoy', lambda c: not c['f']['def'], [('pass_y', 'PASS', '%.0f'), ('scrim', 'SCRIM', '%.0f'), ('td', 'TD', '%.0f'), ('wp', 'W%', 'pct')]),
@@ -984,11 +1127,12 @@ def main(argv):
                         if NM.key(x['n']) in allp: x['pc'] = allp[NM.key(x['n'])]
             for x in rows:
                 if NM.key(x['n']) in pred.get(aw, {}): x['pp'] = pred[aw][NM.key(x['n'])]
-            conv.append({'key': aw, 'label': fit[sp][aw]['label'], 'rows': list(rows), 'pred': aw in pred,
+            lab = getattr(rows, 'label', None) or fit[sp][aw]['label']
+            conv.append({'key': aw, 'label': lab, 'rows': list(rows), 'pred': aw in pred,
                          'metric': NULL_LABEL.get(rows.metric, rows.metric),
                          'show': [{'k': k, 'l': l, 'f': f} for k, l, f in rows.show]})
             if getattr(rows, 'k', None): conv[-1]['k'] = rows.k
-            print(sp, fit[sp][aw]['label'], 'conviction:', ', '.join(f"{r['n']} {r['p']:.0%}" for r in rows[:5]))
+            print(sp, lab, 'conviction:', ', '.join(f"{r['n']} {r['p']:.0%}" for r in rows[:5]))
         cur[sp] = {'season': res['season'], 'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
                    'sims': SIMS, 'logo': res['logo'], 'races': races, 'conv': conv}
         if abs(res.get('T', 1) - 1) > 1e-9: cur[sp]['temp'] = round(res['T'], 3)
