@@ -20,8 +20,9 @@ Two views a sport (Noah, Nov 20 2026): "races" = predictive (who the voters will
 leads the award's pool on this season's value alone: P(lead), no voter model and no market; lead()). Noah, Nov 20:
 conviction rests on SV / SVAR, nothing that leans on other seasons. So its draws run the games left at this season's
 own rates (SEASON_ONLY: no last-season blend, no shrunk or predictive rate), and football's pools are the SV boards
-(war_lead: SVAR by position; covers awards whose voter model failed, leaves out positions with no SV). Soccer's GAR
-is the exception: its plus-minus term is a three-season ridge and there is no season-only soccer value yet. Stdlib only."""
+(war_lead: SVAR by position; covers awards whose voter model failed, leaves out positions with no SV). Soccer's pool
+is the season's best by SVAR (scripts/soccer_sv.py: GAR rebuilt from this season alone), run out at this season's rate
+a match. Stdlib only."""
 import datetime as dt, json, math, os, random, re, sys, urllib.request
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import awards_engine as E
@@ -899,14 +900,15 @@ def soccer(fit, rng):
     uw = [(t['id'], t.get('win') or 0) for t in U]
     ul = {t['id']: max((t.get('fin') or 0) - (t.get('win') or 0), 0) for t in U}
     prev = fit.get('_prev', {}).get('ballon', {})
-    cands = []
-    for r in sorted(rows, key=lambda r: -r['gar'])[:SO.POOL_N]:
-        if r['tid'] not in tinfo: continue
-        cands.append({'id': r['id'], 'n': r['n'], 'tid': r['tid'], 'tm': r['team'], 'lg': r['lg'], 'pos': r.get('pos'),
-                      'logo': f"/img/soccer/{r['tid']}.png", 'gar': r['gar'], 'ga': r['g'] + r['a'],
-                      'prev': prev.get(NM.key(r['n']), 0)})
+    def cand(r):
+        return {'id': r['id'], 'n': r['n'], 'tid': r['tid'], 'tm': r['team'], 'lg': r['lg'], 'pos': r.get('pos'),
+                'logo': f"/img/soccer/{r['tid']}.png", 'gar': r['gar'], 'svar': r.get('svar') or 0.0, 'ga': r['g'] + r['a'],
+                'prev': prev.get(NM.key(r['n']), 0)}
+    cands = [cand(r) for r in sorted(rows, key=lambda r: -r['gar'])[:SO.POOL_N] if r['tid'] in tinfo]
+    # conviction pool: the season's best by SVAR (season value over replacement, scripts/soccer_sv.py)
+    conv = [cand(r) for r in sorted((r for r in rows if r.get('svar') is not None), key=lambda r: -r['svar'])[:SO.POOL_N] if r['tid'] in tinfo]
     ph = {r['p']: r.get('ph') for r in (jload(os.path.join(SO.WAR, f'{S}.json'), {}) or {}).get('players', [])}
-    for c in cands:
+    for c in cands + conv:
         if ph.get(c['id']): c['phu'] = 'https://img.a.transfermarkt.technology/portrait/medium/' + ph[c['id']]
 
     def teams_draw(rng):
@@ -919,7 +921,7 @@ def soccer(fit, rng):
         gp, tot = tinfo[c['tid']]
         gr = games_left(rng, max(tot - gp, 0), .93, 'soccer')
         out = {}
-        for k, kind in (('gar', 'yds'), ('ga', 'count')):
+        for k, kind in (('gar', 'yds'), ('svar', 'yds'), ('ga', 'count')):
             mu = c[k] / max(gp, 1) * gr
             out[k] = c[k] + (gauss(rng, mu, .3 * abs(mu)) if kind == 'yds' else max(gauss(rng, mu, math.sqrt(max(mu, 0))), 0))
         out.update(lgw=1.0 if c['tid'] in td['champ'] else 0.0, ucl=1.0 if c['tid'] == td['uw'] else .5 if c['tid'] == td['ul'] else 0.0,
@@ -928,7 +930,7 @@ def soccer(fit, rng):
 
     draw.teams = teams_draw
     show = [('gar', 'GAR', '%.1f'), ('ga', 'G+A', '%.0f'), ('lgw', 'LG', 'pct'), ('uclw', 'UCL', 'pct')]
-    lead('ballon', cands, draw, spec['null'][0], first(show, spec['null'][0]), rng)
+    lead('ballon', conv, draw, 'svar', [('svar', 'SVAR', '%.1f'), ('ga', 'G+A', '%.0f'), ('lgw', 'LG', 'pct'), ('uclw', 'UCL', 'pct')], rng)
     pool = prune(cands, spec, draw, rng)
     p = race(pool, spec, draw, rng)
     return {'season': f'{S - 1}-{str(S)[2:]}', 'races': [('ballon', rows_out(pool, p, draw, show, rng), show)], 'logo': 'soccer'}

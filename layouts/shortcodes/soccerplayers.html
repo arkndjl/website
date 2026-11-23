@@ -6,7 +6,8 @@
        season's team goal difference (data/soccer_war_fit.json), plus his league's strength x a scale measured on
        players who changed league, so every big-five league sits on one scale; PAR = GAR x league points per goal. xMV = estimated
        market value from GAR, minutes, age, position, league and club (scripts/soccer_mv.py, data/soccer_mv_fit.json),
-       next to Transfermarkt's value (TM) and the gap (xMV - TM), EUR millions. Proj / 3Y = projected GAR next season and
+       next to Transfermarkt's value (TM) and the gap (xMV - TM), EUR millions. SV / SVAR = the season-only value
+       (scripts/soccer_sv.py, data/soccer_sv_fit.json): SV a 90 over replacement, SVAR the season total. Proj / 3Y = projected GAR next season and
        over the next three (pj, p3: scripts/soccer_proj_research.py, data/soccer_proj_fit.json).
        view="stats": Understat's counting stats and per-90 rates (goals, assists, xG, npxG, xA, npxG+xA a 90, xGChain,
        xGBuildup, shots, key passes); the league picker also reaches the 13 other leagues on the page, from FotMob's
@@ -62,8 +63,10 @@
         <th data-sort="bu" data-num title="xGBuildup: xGChain without his shots and key passes">xGBuild</th>
         {{- else }}
         <th data-sort="gar" data-num title="goals above replacement (the regulars of bottom-three sides at his position), on one scale across the big five: his league's strength counts">GAR</th>
+        <th data-sort="svar" data-num title="SVAR = SV over replacement, season total, in goals (GAR scale): SV x 90s played. this season only">SVAR</th>
         <th data-sort="par" data-num title="league points above replacement: GAR x points per goal of difference">PAR</th>
         <th data-sort="gar90" data-num title="goals above replacement a 90 minutes">/90</th>
+        <th data-sort="sv" data-num title="SV (season value) = this season's goals over replacement a 90: team xG for and against with him on, xGBuildup, keepers' goals saved vs xG faced, finishing (goals less npxG) and a this-season xG plus-minus, at the weights that describe this season's team goal difference; league strength in; replacement = bottom-three regulars. this season only">SV</th>
         <th data-sort="pg90" data-num title="predictive GAR a 90: this season and the two before (weights 1, .5, .25), shrunk toward the position mean by 450 minutes (defenders 900; keepers sit near the mean)">p/90</th>
         <th data-sort="pj" data-num title="projected GAR next season, if he plays in the big five: this season at full-season pace, the two seasons before, minutes, age and position. Over the earlier fringe line until its refit">1Y</th>
         <th data-sort="p3" data-num title="projected GAR over the next three seasons (a season out of the big five counts 0). Over the earlier fringe line until its refit">3Y</th>
@@ -207,7 +210,7 @@
         var mid = stats
           ? '<td class="cfb__num">' + p.g + '</td><td class="cfb__num">' + fx(p.xg, 1) + '</td><td class="cfb__num">' + fx(p.npxg, 1) + '</td><td class="cfb__num">' + p.a + '</td><td class="cfb__num">' + fx(p.xa, 1) + '</td>' +
             '<td class="cfb__num nbaxpm__v is-key">' + fx(p.nx90, 2) + '</td><td class="cfb__num">' + sg(p.gx) + '</td><td class="cfb__num">' + p.sh + '</td><td class="cfb__num">' + p.kp + '</td><td class="cfb__num">' + fx(p.ch, 1) + '</td><td class="cfb__num">' + fx(p.bu, 1) + '</td>'
-          : '<td class="cfb__num nbaxpm__v is-key">' + sg(p.gar) + '</td><td class="cfb__num">' + sg(p.par) + '</td><td class="cfb__num">' + sg(p.gar90, 2) + '</td><td class="cfb__num">' + sg(p.pg90, 2) + '</td><td class="cfb__num">' + sg(p.pj) + '</td><td class="cfb__num">' + sg(p.p3) + '</td><td class="cfb__num">' + sg(p.off) + '</td><td class="cfb__num">' + sg(p.def) + '</td><td class="cfb__num nbaxpm__ph">' + sg(p.onxgd, 2) + '</td>' +
+          : '<td class="cfb__num nbaxpm__v is-key">' + sg(p.gar) + '</td><td class="cfb__num">' + sg(p.svar) + '</td><td class="cfb__num">' + sg(p.par) + '</td><td class="cfb__num">' + sg(p.gar90, 2) + '</td><td class="cfb__num">' + sg(p.sv, 2) + '</td><td class="cfb__num">' + sg(p.pg90, 2) + '</td><td class="cfb__num">' + sg(p.pj) + '</td><td class="cfb__num">' + sg(p.p3) + '</td><td class="cfb__num">' + sg(p.off) + '</td><td class="cfb__num">' + sg(p.def) + '</td><td class="cfb__num nbaxpm__ph">' + sg(p.onxgd, 2) + '</td>' +
             '<td class="cfb__num">' + eur(p.xmv) + '</td><td class="cfb__num">' + eur(p.mv) + '</td><td class="cfb__num">' + gapc(p) + '</td>';
         var fv = '<td class="cfb__num">' + (p.fv ? '<b>' + p.fv + '</b>' + (p.prov ? '<span class="cfb__dim" title="provisional grade">*</span>' : '') : '<span class="cfb__dim">–</span>') + '</td>';
         return head + mid + fv + '<td class="cfb__g">' + esc(p.pos || '–') + '<span class="cfb__dim">' + p['pr' + KEY] + '</span></td><td class="nbaxpm__team" style="white-space: nowrap">' + lgo(p) + esc(p.team) + '</td><td class="cfb__num">' + (p.age != null ? p.age.toFixed(1) : '<span class="cfb__dim">–</span>') + '</td>' +
