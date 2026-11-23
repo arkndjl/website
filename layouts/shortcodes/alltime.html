@@ -39,7 +39,8 @@
   {{- end }}
   </tbody>
 </table>
-{{- $about := printf "%s team-seasons %v-%v (%v rows: top %v plus the top %v of each decade). Era check, top 100 by decade vs all team-seasons (KL, lower = no era favoured): %.3f adjusted, %.3f raw." (string .n) .from .to (len $rows) site.Data.alltime.top site.Data.alltime.perDec (index $chk 0) (index $chk 1) -}}
+{{- $line := "" -}}{{- if gt (len $chk) 2 }}{{ $line = printf ", era-blind 95%% line %.3f" (index $chk 2) }}{{ end -}}
+{{- $about := printf "%s team-seasons %v-%v (%v rows: top %v plus the top %v of each decade). Era check, top 100 by decade vs all team-seasons (KL, lower = no era favoured): %.3f adjusted, %.3f raw%s." (string .n) .from .to (len $rows) site.Data.alltime.top site.Data.alltime.perDec (index $chk 0) (index $chk 1) $line -}}
 {{- partial "wintable-close.html" (dict "rows" (len $rows) "note" (printf "%s · updated %s" .src $asof) "about" $about) -}}
 {{- end -}}
 {{- else if $D -}}{{- with index $D ($.Get "group" | default "players") -}}

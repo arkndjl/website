@@ -58,7 +58,10 @@ def main():
                  f'Movers (old-job WAx rate vs new job, 3+ seasons each): CFB r {tf["movers"]["r"]:.2f} (n {tf["movers"]["n"]}, t {tf["movers"]["t"]}); CBB r {tb["movers"]["r"]:.2f} (n {tb["movers"]["n"]}, t {tb["movers"]["t"]}).',
                  f'Walk-forward from {wf(tf)["cut"]}: shrunk WAx predicts the next 10 seasons\' WAx at r {wf(tf)["wax"]["wax"]["r"]:.2f} CFB / {wf(tb)["wax"]["wax"]["r"]:.2f} CBB (win% {wf(tf)["wax"]["wpct"]["r"]:.2f} / {wf(tb)["wax"]["wpct"]["r"]:.2f}); Score per season predicts next-10 title equity at r {wf(tf)["titles"]["score"]["r"]:.2f} / {wf(tb)["titles"]["score"]["r"]:.2f} (win% {wf(tf)["titles"]["wpct"]["r"]:.2f} / {wf(tb)["titles"]["wpct"]["r"]:.2f}).',
                  f'Stability: top-100 rank correlation across expectation settings (decay 3-12, shrink 1-3, no skip) {min(tf["stability"].values()):.2f}+ CFB, {min(tb["stability"].values()):.2f}+ CBB; odd/even-season WAx split-half {tf["splitHalf"]["r"]:.2f} / {tb["splitHalf"]["r"]:.2f}.',
-             ] + pro(d) + nfl(d),
+             ] + pro(d) + nfl(d) + ([
+                 'Era check (Nov 23 2026): mid-career decades of the top 100 by Score vs every ranked coach\'s coached seasons by decade (a career total grows with seasons), KL, and the era-blind 95% line (top 100 drawn at random); per-season Score rate vs coaches by decade: '
+                 + '; '.join(f"{k.upper()} {d[k]['test']['era'][0]:.3f} (line {d[k]['test']['era'][1]:.3f}), rate {d[k]['test']['eraRate'][0]:.3f} (line {d[k]['test']['eraRate'][1]:.3f})" for k in ('cfb', 'cbb', 'nba', 'nhl', 'nfl') if k in d and 'era' in d[k]['test']) + '.']
+                 if all('era' in d[k]['test'] for k in ('cfb', 'cbb') if k in d) else []),
              where='all-time coaches tab on the CFB and CBB pages (market group)' + (' and the NBA and NHL pages (teams group)' if pro(d) else '') + ('; NFL page (teams group, all-time)' if nfl(d) else ''),
              sports=['CFB', 'CBB'] + [k.upper() for k in ('nba', 'nhl', 'nfl') if k in d])
     p = os.path.join(ROOT, 'research', 'library.json'); lib = json.load(open(p))
