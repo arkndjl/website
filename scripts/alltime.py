@@ -121,7 +121,7 @@ def soccer_sv_attach(P, S):
     P['peak'].sort(key=lambda r: (r.get('v') is None, -(r.get('v') or 0)))
     P['sv'], P['svf'], P['svarf'] = True, '%+.2f', '%+.1f'
     P['svT'] = ("SV (season value): goals over replacement a 90 that season from that season alone (GAR's weights on its "
-                "inputs with a one-season xG plus-minus, plus finishing and keeper saves at face value), as played; 2014-15 on")
+                "inputs with a one-season xG plus-minus, plus finishing and keeper saves shrunk by split-half reliability), as played; 2014-15 on")
     P['svarT'] = 'SVAR = SV x 90s played: the season total in goals, GAR scale, as played'
 
 

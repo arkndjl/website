@@ -856,8 +856,8 @@
      "short": "SV (season value) = this season's goals over replacement a 90 from this season alone; SVAR = SV x 90s, the season total in goals. Shown next to GAR; the models keep GAR.",
      "body": [
       "GAR's weights on this season's inputs only: on-pitch xG for / against, on minus off, npxG, xGBuildup, and an xG plus-minus over this season's spells alone (GAR's spans three seasons). The xG part is scaled x0.943 so a side's players add up to its xG difference (R2 0.97).",
-      "Finishing (goals less npxG) and keepers' goals saved vs xG faced count at face value: with them a side's players add up to its goal difference, R2 0.975 over 1170 team-seasons 2014-2026 (GAR on the same season 0.879).",
-      "Replacement = the xG part of bottom-three sides' regulars (GK -0.127, D -0.080, M -0.041, F -0.007 a 90), finishing and saves at league average. League strength x 0.063 a goal of club rating.",
+      "Finishing (goals less npxG) and keepers' goals saved vs xG faced, shrunk toward the league average by min / (min + k): k 40,000 minutes for saves, 6,000 for finishing, from split-half reliability within a season (odd vs even matches: r 0.045 saves, 0.120 finishing; no player prior). A side's players then add up to its goal difference with R2 0.890 over 1170 team-seasons 2014-2026 (GAR on the same season 0.879).",
+      "Replacement = the xG part of bottom-three sides' regulars (GK -0.127, D -0.080, M -0.041, F -0.007 a 90), finishing and saves at league average. League strength x 0.058 a goal of club rating.",
       "Weights fit on the same season (team goal difference, or first half to second half) could not split a side's xG between its players: team totals are the same either way, so GAR's split is kept."
      ],
      "where": "soccer GAR leaders, rookies, all-time players, transactions; conviction awards (Ballon d'Or pool by SVAR)",

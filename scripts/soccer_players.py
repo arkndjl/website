@@ -39,7 +39,7 @@ per goal of difference (a team-season regression). The line before it (replFring
 season) sat at about the league median; the fits trained on it still read GAR on it through gar_fringe() until they
 are refit (xMV, the projections, backup watch, the game model's injury term).
 SV / SVAR (scripts/soccer_sv.py, data/soccer_sv_fit.json): the season-only value, GAR's weights on this season's inputs
-alone (an xG plus-minus over this season's spells, rapm_window span 0) plus finishing and keeper saves at face value.
+alone (an xG plus-minus over this season's spells, rapm_window span 0) plus finishing and keeper saves shrunk to the league average (split-half k).
 Projections (pj = GAR next season, p3 = GAR over the next three, 0 for a season out of the big five): OLS on the season
 so far at full-season pace, the two seasons before pooled per 90, minutes, age and position, per share of the season
 played (scripts/soccer_proj_research.py -> data/soccer_proj_fit.json).

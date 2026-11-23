@@ -326,7 +326,7 @@ LG = {'eng.1': 'EPL', 'esp.1': 'LaLiga', 'ger.1': 'BuLi', 'ita.1': 'Serie A', 'f
 
 
 SO_SV_T = ("SV (season value): this season's goals over replacement a 90, from this season alone (GAR's weights on its inputs "
-           "with a one-season xG plus-minus, plus finishing and keeper saves at face value)")
+           "with a one-season xG plus-minus, plus finishing and keeper saves shrunk by split-half reliability)")
 SO_SVAR_T = 'SVAR = SV x 90s played: season total in goals (GAR scale)'
 
 
