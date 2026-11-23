@@ -2890,6 +2890,107 @@
     return F.canvas;
   }
 
+  // ESEA playoff bracket (layouts/shortcodes/esea.html bracket part, data/esea.json bracket.gfx): 1NT's corner of the
+  // upper bracket with pixel connectors, its one lower slot per round, the grand final; reward chips where a finish is locked in
+  async function buildEseaBracket(win, btn) {
+    var D; try { D = JSON.parse(btn.getAttribute('data-gfx-br') || '{}'); } catch (e) { return null; }
+    if (!D.ub || !D.ub.length) return null;
+    var US = 'a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a';
+    var F = await frame(2560, 1440, String(D.title || '1NT :: playoffs').toUpperCase(), btn.getAttribute('data-gfx-date'));
+    var g = F.g, x0 = F.x, y0 = F.y, w = F.w, h = F.h;
+    var LINE = '#8a5cc2', HOT = C.teal;
+    var pct = function (p) { return p >= 0.995 ? '>99%' : p > 0 && p < 0.005 ? '<1%' : Math.round(p * 100) + '%'; };
+    var et = function (t) { if (!t) return ''; var d = new Date(t); return d.toLocaleDateString('en-US', { timeZone: 'America/New_York', month: 'numeric', day: 'numeric' }) + ' ' + d.toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' }).replace(':00', '').replace(' ', ''); };
+    var short = function (n) { var q = /^(winner|loser) of (\S+)$/i.exec(n); return q ? q[2] + ' ' + q[1].toUpperCase() : n; };   // "LB34 WINNER" when the long form won't fit
+    var isUs = function (m) { return m.a.id === US || m.b.id === US || m.reach != null; };
+    var BW, BH = 118, RWH = 34;
+    // one match box: label line (slot, date, 1NT reach), two team rows (seed, name, score or win %), reward chip under it
+    function box(m, x, y, bw) {
+      var us = isUs(m);
+      well(g, x, y, bw, BH);
+      if (us) { g.fillStyle = HOT; g.fillRect(x, y, bw, 3); g.fillRect(x, y + BH - 3, bw, 3); g.fillRect(x, y, 3, BH); g.fillRect(x + bw - 3, y, 3, BH); }
+      g.textAlign = 'left'; g.font = '24px ' + FONT; g.fillStyle = C.lilac;
+      var lab = m.n + (m.bye ? ' · BYE' : m.at ? ' · ' + et(m.at) : '');
+      var rs = m.reach != null && m.reach < 0.995 ? '1NT ' + pct(m.reach) : '';
+      if (rs && g.measureText(lab + '  ' + rs).width > bw - 24) rs = pct(m.reach);   // cramped: the teal % alone
+      var rw = rs ? (g.measureText(rs).width) : 0;
+      g.fillText(fit(g, lab, bw - 24 - (rw ? rw + 12 : 0)), x + 12, y + 20);
+      if (rs) { g.fillStyle = HOT; g.textAlign = 'right'; g.fillText(rs, x + bw - 12, y + 20); g.textAlign = 'left'; }
+      [m.a, m.b].forEach(function (t, k) {
+        var cy = y + 56 + k * 40, won = m.w === k + 1 || (m.bye && t.n !== 'BYE'), lost = (m.w && !won) || (m.bye && t.n === 'BYE');
+        if (k) { g.fillStyle = C.dark; g.fillRect(x + 8, cy - 21, bw - 16, 2); }
+        g.font = '24px ' + FONT; g.fillStyle = C.lilac; g.textAlign = 'right';
+        if (t.seed != null) g.fillText(String(t.seed), x + 46, cy);
+        var v = m.bye ? '' : m.s ? String(m.s[k]) : m.p != null ? pct(k ? 1 - m.p : m.p) : '';
+        g.font = '30px ' + FONT; var vw = v ? g.measureText(v).width : 0;
+        g.fillStyle = won ? HOT : C.white; if (v) g.fillText(v, x + bw - 12, cy);
+        g.textAlign = 'left';
+        g.fillStyle = t.id === US ? HOT : t.tbd ? C.lilac : lost ? C.lilac : C.white;
+        g.font = (t.tbd ? '24px ' : '30px ') + FONT;
+        var room = bw - 60 - 12 - (vw ? vw + 14 : 0), nm = t.n === 'BYE' ? 'bye' : t.tbd ? String(t.n).toUpperCase() : t.n;
+        if (t.tbd && g.measureText(nm).width > room) nm = short(t.n).toUpperCase();
+        g.fillText(fit(g, nm, room), x + 58, cy);
+      });
+      if (m.rw) {
+        g.font = '24px ' + FONT; var t = 'WIN: ' + String(m.rw.s).toUpperCase(), tw = g.measureText(t).width + 24;
+        g.fillStyle = C.title; g.fillRect(x, y + BH + 6, tw, RWH - 6); bevel(g, x, y + BH + 6, tw, RWH - 6, true, 2);
+        g.fillStyle = C.white; g.fillText(t, x + 12, y + BH + 6 + (RWH - 6) / 2);
+      }
+    }
+    function hline(xa, xb, y, hot) { g.fillStyle = hot ? HOT : LINE; g.fillRect(Math.min(xa, xb), y - 2, Math.abs(xb - xa), 4); }
+    function vline(x, ya, yb, hot) { g.fillStyle = hot ? HOT : LINE; g.fillRect(x - 2, Math.min(ya, yb), 4, Math.abs(yb - ya) + 2); }
+    // ---- upper: one column per round + the final
+    var cols = D.ub.length + (D.gf ? 1 : 0), CG = 44;
+    BW = Math.floor((w - (cols - 1) * CG) / cols);
+    var UY = y0 + 110, UH = Math.round(h * 0.58) - 110;
+    g.textAlign = 'left'; g.font = '40px ' + FONT; g.fillStyle = C.white; g.fillText('UPPER', x0, y0 + 18);
+    var centers = [];
+    D.ub.forEach(function (rd, c) {
+      var cx = x0 + c * (BW + CG), n = rd.m.length;
+      g.font = '26px ' + FONT; g.fillStyle = C.teal; g.textAlign = 'left';
+      g.fillText('ROUND ' + rd.r, cx, UY - 14);
+      centers[c] = rd.m.map(function (m, i) { var cy = UY + (i + 0.5) * UH / n; box(m, cx, cy - BH / 2, BW); return cy; });
+    });
+    // connectors: pairs fold into the next round's slot; single slots run straight
+    D.ub.forEach(function (rd, c) {
+      if (c === D.ub.length - 1) return;
+      var xa = x0 + c * (BW + CG) + BW, xm = xa + CG / 2, xb = xa + CG, nx = D.ub[c + 1].m.length;
+      rd.m.forEach(function (m, i) {
+        var j = rd.m.length === 2 * nx ? Math.floor(i / 2) : rd.m.length === nx ? i : 0, ty = centers[c + 1][j], hot = isUs(m) && isUs(D.ub[c + 1].m[j]);
+        hline(xa, xm, centers[c][i], hot); vline(xm, centers[c][i], ty, hot); hline(xm, xb, ty, hot);
+      });
+    });
+    var gfX = null, gfY = null;
+    if (D.gf) {
+      var c = D.ub.length, cx = x0 + c * (BW + CG), last = centers[c - 1][0];
+      g.font = '26px ' + FONT; g.fillStyle = C.teal; g.fillText('GRAND FINAL', cx, UY - 14);
+      box(D.gf, cx, last - BH / 2, BW); gfX = cx + BW / 2; gfY = last + BH / 2;
+      hline(cx - CG, cx, last, D.gf.reach != null);
+    }
+    // ---- lower: 1NT's slot in each lower round, left to right
+    var LY = y0 + Math.round(h * 0.58) + 90;
+    g.font = '40px ' + FONT; g.fillStyle = C.white; g.textAlign = 'left'; g.fillText('LOWER', x0, LY - 34);
+    var lb = D.lb || [], LG = 28, LW = lb.length ? Math.floor((w - (lb.length - 1) * LG) / lb.length) : 0, lcy = LY + 40 + BH / 2;
+    lb.forEach(function (m, i) {
+      var lx = x0 + i * (LW + LG);
+      g.font = '24px ' + FONT; g.fillStyle = C.teal; g.fillText('ROUND ' + m.r, lx, LY + 14);
+      box(m, lx, LY + 40, LW);
+      if (i) hline(lx - LG, lx, lcy, isUs(m) && isUs(lb[i - 1]));
+    });
+    if (gfX != null && lb.length) {   // the lower final feeds the grand final
+      var lxe = x0 + (lb.length - 1) * (LW + LG) + LW / 2, hot = D.gf.reach != null;
+      var ym = LY - 60; vline(gfX, gfY + (D.gf.rw ? RWH : 0) + 4, ym, hot); hline(lxe, gfX, ym, hot); vline(lxe, ym, LY + 40, hot);
+    }
+    // footer line: title odds and what each chip means
+    var fy = y0 + h - 18;
+    g.font = '30px ' + FONT; g.textAlign = 'left';
+    var fx = x0;
+    if (D.title_p !== '' && D.title_p != null) { g.fillStyle = C.lilac; g.fillText('1NT TITLE', fx, fy); fx += g.measureText('1NT TITLE ').width; g.fillStyle = HOT; var tp = D.title_p < 0.001 ? '<0.1%' : (D.title_p * 100).toFixed(1) + '%'; g.fillText(tp, fx, fy); fx += g.measureText(tp).width + 40; }
+    (D.rewards || []).forEach(function (t) { g.fillStyle = C.lilac; var s1 = String(t.s).toUpperCase() + ' = TOP ' + t.top; g.fillText(s1, fx, fy); fx += g.measureText(s1).width + 40; });
+    g.textAlign = 'left';
+    return F.canvas;
+  }
+
   // CS2 Major Pick'Em (layouts/shortcodes/cs2pickem.html): coin chances, then 3-0 / 0-3 picks left and 3-1 / 3-2 right,
   // or the playoff bracket picks (QF, SF, champion) once the Swiss stages are done
   async function buildPickem(win, btn) {
@@ -3705,6 +3806,7 @@
       var canvas = mode === 'term' ? await buildTerm(win, btn) : mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn) : mode === 'bracket' ? await buildBracket(win, btn) : mode === 'pickem' ? await buildPickem(win, btn) : mode === 'perf' ? await buildPerf(win, btn) : mode === 'depth' ? await buildDepth(win, btn)
         : mode === 'lz-social' ? await buildSocial(win, btn) : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
         : mode === 'esea-summary' ? await buildEseaSummary(win, btn)
+        : mode === 'esea-bracket' ? await buildEseaBracket(win, btn)
         : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);
       if (canvas) {
         var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : SITE === 'arkndjl.net/laursen_111' ? 'laursen-111-' : 'arkboard-';

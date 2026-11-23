@@ -1049,15 +1049,19 @@
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>playoffs_s{{ $season }}.exe<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
+  {{- with .gfx }}{{ $tp := "" }}{{ with $b.odds }}{{ $tp = .title }}{{ end }}
+  <div class="esea__gfxbar"><button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="esea-bracket" data-gfx-br="{{ merge . (dict "title" (printf "1NT :: S%v Main playoffs" $season) "title_p" $tp "rewards" $b.rewards) | jsonify }}" data-gfx-title="1nt-s{{ $season }}-bracket" data-gfx-date="{{ now.Format "Jan 2" }}" title="bracket graphic: 1NT's upper corner, lower path, rewards (16:9)">GFX</button></div>
+  {{- end }}
   {{- range .groups }}{{ $g := . }}
   <p class="esea-br__h">{{ .label }}</p>
   <div class="esea-br__scroll"><div class="esea-br__cols">
-    {{- range $i, $rd := .rounds }}
-    <div class="esea-br__col">
+    {{- $rs := .rounds }}{{ $nr := len $rs }}
+    {{- range $i, $rd := .rounds }}{{ $nm := len .m }}{{ $ln := "" }}{{ if lt (add $i 1) $nr }}{{ $nx := len (index $rs (add $i 1)).m }}{{ if eq (mul $nx 2) $nm }}{{ $ln = " is-pair" }}{{ else if eq $nx $nm }}{{ $ln = " is-flat" }}{{ end }}{{ end }}
+    <div class="esea-br__col{{ $ln }}{{ if gt $i 0 }} has-prev{{ end }}">
       <p class="esea-br__rh">{{ if eq $g.label "grand final" }}final{{ else }}round {{ add $i 1 }}{{ end }}</p>
       <div class="esea-br__ms">
       {{- range .m }}{{ $m := . }}{{ $us := or (eq .a.id "a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a") (eq .b.id "a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a") }}
-      <div class="esea-br__m{{ if $us }} is-us{{ end }}{{ if .bye }} is-bye{{ else if eq .st "FINISHED" }} is-done{{ else if eq .st "TBD" }} is-tbd{{ else if ne .st "SCHEDULED" }} is-live{{ end }}" title="{{ with .n }}{{ . }} · {{ end }}{{ with .at }}{{ (time.In "America/New_York" (time (int (div . 1000)))).Format "Mon Jan 2 · 3:04 PM" }} ET{{ end }}{{ with .bo }} · Bo{{ . }}{{ end }}">
+      <div class="esea-br__s{{ if $us }} is-us{{ end }}"><div class="esea-br__m{{ if $us }} is-us{{ end }}{{ if .bye }} is-bye{{ else if eq .st "FINISHED" }} is-done{{ else if eq .st "TBD" }} is-tbd{{ else if ne .st "SCHEDULED" }} is-live{{ end }}" title="{{ with .n }}{{ . }} · {{ end }}{{ with .at }}{{ (time.In "America/New_York" (time (int (div . 1000)))).Format "Mon Jan 2 · 3:04 PM" }} ET{{ end }}{{ with .bo }} · Bo{{ . }}{{ end }}">
         <p class="esea-br__mn">{{ with .n }}{{ . }}{{ end }}{{ if .bye }} · bye{{ else }}{{ with .at }} · {{ (time.In "America/New_York" (time (int (div . 1000)))).Format "Jan 2 3:04 PM" }}{{ end }}{{ end }}</p>
         {{- range $k, $t := slice .a .b }}{{ $n := add $k 1 }}{{ $won := or (eq $m.w $n) (and $m.bye (ne $t.name "BYE")) }}
         <a class="esea-br__t{{ if $won }} is-w{{ else if or $m.w $m.bye }} is-l{{ end }}{{ if or $t.tbd (eq $t.name "BYE") }} is-tbd{{ end }}{{ if eq $t.id "a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a" }} is-1nt{{ end }}"{{ with $m.url }} href="{{ . }}" rel="noopener"{{ end }}>
@@ -1065,8 +1069,9 @@
           <span class="esea-br__n">{{ if eq $t.name "BYE" }}bye{{ else }}{{ $t.name }}{{ end }}</span>{{ with $t.id }}{{ with index $wt . }}<span class="esea-br__wr" title="world rank: CS2 ARK Ranking equivalent">W#{{ .w }}</span>{{ end }}{{ end }}
           <b class="esea-br__v">{{ if $m.bye }}{{ if $won }}✓{{ end }}{{ else if $m.s }}{{ index $m.s $k }}{{ else if $m.p }}{{ $q := cond (eq $k 0) (float $m.p) (sub 1.0 (float $m.p)) }}{{ partial "num.html" (slice "%.0f" (mul $q 100)) }}%{{ end }}</b>
         </a>
-        {{- end }}
-      </div>
+        {{- end }}{{ with .rw }}
+        <p class="esea-br__rw" title="{{ .t }}">win: {{ .s }}</p>{{ end }}
+      </div></div>
       {{- end }}
       </div>
     </div>
@@ -1074,9 +1079,9 @@
   </div></div>
   {{- end }}
   {{- with .odds }}
-  <p class="esea-br__path"><span class="esea__k">1NT path</span> {{ range .path }}<span class="esea-br__pp">{{ .n }} <b>{{ partial "num.html" (slice "%.0f" (mul (float .p) 100)) }}%</b></span> {{ end }}<span class="esea-br__pp">title <b>{{ partial "num.html" (slice "%.1f" (mul (float .title) 100)) }}%</b></span></p>
+  <p class="esea-br__path"><span class="esea__k">1NT path</span> {{ range .path }}<span class="esea-br__pp">{{ .n }} <b>{{ partial "num.html" (slice "%.0f" (mul (float .p) 100)) }}%</b></span> {{ end }}<span class="esea-br__pp">title <b>{{ if lt (float .title) 0.001 }}&lt;0.1{{ else }}{{ partial "num.html" (slice "%.1f" (mul (float .title) 100)) }}{{ end }}%</b></span></p>
   {{- end }}
-  <div class="win__status"><span title="double elimination: upper losers drop to the lower bracket (FACEIT's standard drop order); path % = 1NT's chance to play each series, title % to win it all, from 4,000 runs of the league model's Bo3 odds">{{ .name }} · <a href="{{ .url }}" rel="noopener">FACEIT</a> · % = league model, frozen at start</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span title="double elimination: upper losers drop to the lower bracket (FACEIT's standard drop order); path % = 1NT's chance to play each series, title % to win it all, from 20,000 runs of the league model's Bo3 odds; win chips mark the slot where a finish is locked in: top 2 = S59 NA Season Finals (best two of each Main playoff group, per the ESEA S59 rules), top 4 = moves up to Advanced (FACEIT S59 move-up table)">{{ .name }} · <a href="{{ .url }}" rel="noopener">FACEIT</a> · % = league model, frozen at start</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end }}
 
