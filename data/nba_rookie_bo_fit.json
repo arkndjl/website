@@ -1,0 +1,85 @@
+{
+ "source": "LAKER_history RS + NBA drafts 1990-2025",
+ "definition": "rookie season 1,000+ MP at or over the bar",
+ "L": 1.0,
+ "n": 2101,
+ "rate": 0.0143,
+ "tests": {
+  "second round": {
+   "base": 0.0595,
+   "cand": 0.05982,
+   "gain": -0.000317,
+   "t": -0.72,
+   "won": 27,
+   "seasons": 36,
+   "p": 0.7642,
+   "pass": false
+  },
+  "top-5 hinge": {
+   "base": 0.0595,
+   "cand": 0.06006,
+   "gain": -0.000566,
+   "t": -2.9,
+   "won": 7,
+   "seasons": 36,
+   "p": 0.9981,
+   "pass": false
+  }
+ },
+ "keep": [],
+ "final_vs_flat": {
+  "base": 0.07524,
+  "cand": 0.0595,
+  "gain": 0.015745,
+  "t": 4.05,
+  "won": 18,
+  "seasons": 36
+ },
+ "calib_heldout": [
+  [
+   0,
+   0.02,
+   1813,
+   0.006,
+   0.006
+  ],
+  [
+   0.02,
+   0.05,
+   165,
+   0.031,
+   0.036
+  ],
+  [
+   0.05,
+   0.1,
+   53,
+   0.064,
+   0.075
+  ],
+  [
+   0.1,
+   0.2,
+   35,
+   0.109,
+   0.057
+  ],
+  [
+   0.2,
+   0.35,
+   35,
+   0.215,
+   0.229
+  ]
+ ],
+ "top_decile_share": 0.6,
+ "fit": {
+  "cols": [
+   "-ln pick"
+  ],
+  "b0": -1.301353,
+  "b": [
+   1.201219
+  ]
+ }
+}

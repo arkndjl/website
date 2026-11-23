@@ -38,6 +38,8 @@ the line holds still through a season); GAR = (value - replacement) x matches of
 per goal of difference (a team-season regression). The line before it (replFringe: players with 90-899 minutes, every
 season) sat at about the league median; the fits trained on it still read GAR on it through gar_fringe() until they
 are refit (xMV, the projections, backup watch, the game model's injury term).
+SV / SVAR (scripts/soccer_sv.py, data/soccer_sv_fit.json): the season-only value, GAR's weights on this season's inputs
+alone (an xG plus-minus over this season's spells, rapm_window span 0) plus finishing and keeper saves shrunk to the league average (split-half k).
 Projections (pj = GAR next season, p3 = GAR over the next three, 0 for a season out of the big five): OLS on the season
 so far at full-season pace, the two seasons before pooled per 90, minutes, age and position, per share of the season
 played (scripts/soccer_proj_research.py -> data/soccer_proj_fit.json).
@@ -323,15 +325,15 @@ def _pcg(mv, b, diag, iters=3000, tol=1e-8):
     return x
 
 
-def rapm_window(segs, rows, S, lam=RAPM_LAM):
-    """player id -> (offence, defence) xG plus-minus a 90 over seasons S-2..S: weighted ridge of each spell's npxG a
+def rapm_window(segs, rows, S, lam=RAPM_LAM, span=2):
+    """player id -> (offence, defence) xG plus-minus a 90 over seasons S-span..S (span 0: season S alone, for SV): weighted ridge of each spell's npxG a
     90 on the attacking side's players (offence), the defending side's (defence), a league-season level and the home
     side; shrunk toward a box prior (his non-penalty xG + xA a 90 over the window, less its average, with 450
     minutes of regression) for offence and 0 for defence. Defence is returned with fewer against = higher"""
-    W = [(lg, s_, x) for s_, v in segs.items() if S - 2 <= s_ <= S for lg, *x in v]
+    W = [(lg, s_, x) for s_, v in segs.items() if S - span <= s_ <= S for lg, *x in v]
     box = defaultdict(lambda: [0.0, 0.0])
     for r in rows:
-        if S - 2 <= r['S'] <= S:
+        if S - span <= r['S'] <= S:
             e = box[str(r['p'])]
             e[0] += r['x'] - r['pen'] + r['xA']; e[1] += r['min']
     tot = sum(e[1] for e in box.values()) or 1
@@ -582,6 +584,7 @@ def fit():
         D.save(ROWS, rows)
     segs = {S: segments(S) for S in range(FIRST, S1 + 1)}
     rapm(rows, range(FIRST, S1 + 1), segs)
+    sv_rapm(rows, segs, range(FIRST, S1 + 1))
     D.save(ROWS, rows)
     D.save(SEGF, {str(S): segs[S] for S in (S1 - 2, S1 - 1) if S in segs})     # the live window's finished seasons
     ts = team_seasons(FIRST, S1)
@@ -642,6 +645,8 @@ def fit():
            'seasons': [FIRST, S1 - 1]}
     json.dump(out, open(FIT, 'w'), indent=1, allow_nan=False)
     print(json.dumps(out, indent=1))
+    import soccer_sv as SV                                # SV keeps GAR's weights: refit it on the new ones
+    SV.fit()
     write(rows, out, ts, all_seasons=True)
 
 
@@ -799,6 +804,8 @@ def write(rows, F, ts, all_seasons=False):
         MV.attach(S, out)
         proj_attach(S, out, league_share(S, out) if S == cur else None)   # pj / p3: data/soccer_proj_fit.json
         rate_attach(S, out)
+        import soccer_sv as SV                           # SV / SVAR: the season-only value (scripts/soccer_sv.py)
+        SV.attach(S, rows, out, LS)
         txt = json.dumps({'season': S, 'label': f'{S - 1}-{S % 100:02d}', 'games': games,
                           'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'players': out,
                           'mv': MV.meta(S), 'stale': staleness(S) if S == cur else []}, separators=(',', ':'), allow_nan=False)
@@ -1054,7 +1061,16 @@ def current():
     segs = load_segs()
     segs[S] = segments(S)
     rapm(rows, [S], segs)
+    sv_rapm(rows, segs, [S])
     write(rows, F, None)
+
+
+def sv_rapm(rows, segs, seasons):
+    """the season-only xG plus-minus (sorp / sdrp) that SV reads (scripts/soccer_sv.py)"""
+    import soccer_sv as SV
+    F = SV._fit()
+    if F:
+        SV.season_rapm(rows, segs, seasons, F['rapmLam'])
 
 
 def inject_badges():

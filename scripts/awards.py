@@ -20,8 +20,9 @@ Two views a sport (Noah, Nov 20 2026): "races" = predictive (who the voters will
 leads the award's pool on this season's value alone: P(lead), no voter model and no market; lead()). Noah, Nov 20:
 conviction rests on SV / SVAR, nothing that leans on other seasons. So its draws run the games left at this season's
 own rates (SEASON_ONLY: no last-season blend, no shrunk or predictive rate), and football's pools are the SV boards
-(war_lead: SVAR by position; covers awards whose voter model failed, leaves out positions with no SV). Soccer's GAR
-is the exception: its plus-minus term is a three-season ridge and there is no season-only soccer value yet. Stdlib only."""
+(war_lead: SVAR by position; covers awards whose voter model failed, leaves out positions with no SV). Soccer's pool
+is the season's best by SVAR (scripts/soccer_sv.py: GAR rebuilt from this season alone), run out at this season's rate
+a match. Stdlib only."""
 import datetime as dt, json, math, os, random, re, sys, urllib.request
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import awards_engine as E
@@ -366,6 +367,7 @@ def nba(fit, rng):
     for s in range(A.FIRST, S): seen |= set(A.xpm(s))
     pg = A.per_game(S, fresh=True)
     pg0 = A.per_game(S - 1)
+    X0 = A.xpm(S - 1)
     G = jload(os.path.join(ROOT, 'data', 'nba_games.json'), {})
     E2B = {'SA': 'SAS', 'GS': 'GSW', 'NY': 'NYK', 'NO': 'NOP', 'UTAH': 'UTA', 'WSH': 'WAS', 'BKN': 'BRK', 'PHX': 'PHO', 'CHA': 'CHO'}
     teams, conf = {}, {}
@@ -388,17 +390,28 @@ def nba(fit, rng):
                       'ppg': p['pts_per_g'], 'ppg0': q.get('pts_per_g'), 'rpg': p['trb_per_g'], 'rpg0': q.get('trb_per_g'),
                       'apg': p['ast_per_g'], 'apg0': q.get('ast_per_g'), 'st': p['stl_per_g'] + p['blk_per_g'],
                       'st0': (q.get('stl_per_g', 0) + q.get('blk_per_g', 0)) if q else None,
-                      'mpg': p['mp_per_g'], 'pos': r.get('pos', ''), 'rookie': pid not in seen})
+                      'mpg': p['mp_per_g'], 'pos': r.get('pos', ''), 'rookie': pid not in seen,
+                      'gs': p.get('games_started', 0), 'has_pre': pid in X0 and bool(q),
+                      'pre_vorx': (X0.get(pid) or {}).get('vorx') or 0.0, 'mpg0': q.get('mp_per_g') or 0.0})
     ROSTER['nba'] = cands
     out = []
     T = season_T('nba', sum(v[1] for v in teams.values()) / max(82 * len(teams), 1))
-    for aw, pool, p, dm, show in nba_races(fit, rng, cands, teams, conf):
-        if aw == 'allnba': out.append((aw, rows_out(pool, p, dm, show, rng, top=30), show))
+    for aw, pool, p, dm, show in nba_races(fit, rng, cands, teams, conf, coy=nba_coy_teams(S, teams)):
+        if fit[aw].get('k'): out.append((aw, rows_out(pool, p, dm, show, rng, top=30 if aw == 'allnba' else 20), show))
         else: out.append((aw, rows_out(pool, temper(p, T), dm, show, rng), show))
     return {'season': f'{S - 1}-{str(S)[2:]}', 'races': out, 'logo': 'nba', 'T': T}
 
 
-def nba_races(fit, rng, cands, teams, conf, G=82, min_g=65, sims=SIMS):
+def nba_coy_teams(S, teams):
+    """COY candidates: one a team (its coach), with last season's win share and the preseason over/under"""
+    import awards_nba as A
+    st0, ou = A.standings(S - 1), A.preseason_ou(S)
+    names = A.coaches(S)
+    return [{'id': t, 'n': names.get(t, t), 'tm': t, 'wp0': st0.get(t, {}).get('wp', .5),
+             'ou': ou[t] / 82 if t in ou else st0.get(t, {}).get('wp', .5)} for t in teams]
+
+
+def nba_races(fit, rng, cands, teams, conf, G=82, min_g=65, sims=SIMS, coy=()):
     """yields (award, pool, P(win), draw for the shown stats, shown stats) for each passing NBA award. cands: to-date
     lines; teams: {t: (wins, games, mean final wins, sd, G)}; conf: {t: conference}; min_g: the games rule (0 = none)"""
     TAU, TAUD, K = 2.05, 0.95, 600
@@ -440,7 +453,10 @@ def nba_races(fit, rng, cands, teams, conf, G=82, min_g=65, sims=SIMS):
                 'vorx': .030 * (xpm + 1.4) * mp / 48, 'xpm': xpm, 'dxpm': dx, 'ppg': ppg, 'rpg': rp, 'stocks': st,
                 'mpg': mp / max(gf, 1), 'big': 1.0 if c['pos'] in ('C', 'PF') else 0.0, 'wp': td[c['tm']],
                 'seed1': 1.0 if c['tm'] in td['_seed1'] else 0.0, 'gfrac': gf / G,
-                'prev_mvp': prev.get('mvp', {}).get(c['id'], 0), 'prev_dpoy': prev.get('dpoy', {}).get(c['id'], 0)}
+                'prev_mvp': prev.get('mvp', {}).get(c['id'], 0), 'prev_dpoy': prev.get('dpoy', {}).get(c['id'], 0),
+                'prev_alldef': prev.get('alldef', {}).get(c['id'], 0),
+                'd_vorx': .030 * (xpm + 1.4) * mp / 48 - c.get('pre_vorx', 0), 'd_ppg': ppg - (c.get('ppg0') or 0),
+                'd_mpg': mp / max(gf, 1) - c.get('mpg0', 0)}
 
     for aw, pool_f, elig, show in (
             ('mvp', lambda c: c['mpg'] >= 20, True, [('vorx', 'VORX', '%.1f'), ('ppg', 'PPG', '%.1f'), ('wp', 'W%', 'pct'), ('gfrac', 'G', 'g82')]),
@@ -467,6 +483,37 @@ def nba_races(fit, rng, cands, teams, conf, G=82, min_g=65, sims=SIMS):
         dm = lambda c, td, rng: draw(c, td, rng, False)
         dm.teams = teams_draw
         yield 'allnba', pool, race_k(pool, spec, dr, rng, spec.get('k', 15), sims), dm, show
+    # Nov 23 2026: Sixth Man (bench: started under half his games, bbref's rule), Most Improved (VORX gain on last
+    # season's published VORX), All-Defensive and All-Rookie (10 named), Coach of the Year (a team's coach)
+    for aw, pool_f, elig, metric, show in (
+            ('smoy', lambda c: c['gs'] < c['g'] / 2 and c['mpg'] >= 12, False, 'vorx',
+             [('vorx', 'VORX', '%.1f'), ('ppg', 'PPG', '%.1f'), ('mpg', 'MPG', '%.1f'), ('wp', 'W%', 'pct')]),
+            ('mip', lambda c: c['has_pre'] and c['mpg'] >= 20, False, 'd_vorx',
+             [('d_vorx', '+VORX', '%+.1f'), ('vorx', 'VORX', '%.1f'), ('d_ppg', '+PPG', '%+.1f'), ('ppg', 'PPG', '%.1f')]),
+            ('alldef', lambda c: c['mpg'] >= 20, True, 'dxpm',
+             [('dxpm', 'D-XPM', '%+.1f'), ('stocks', 'STL+BLK', '%.1f'), ('rpg', 'RPG', '%.1f'), ('gfrac', 'G', 'g82')]),
+            ('allrookie', lambda c: c['rookie'] and c['mpg'] >= 10, False, 'vorx',
+             [('vorx', 'VORX', '%.1f'), ('ppg', 'PPG', '%.1f'), ('mpg', 'MPG', '%.1f'), ('wp', 'W%', 'pct')])):
+        spec = fit.get(aw)
+        if not spec or not spec['test'].get('pass'): continue
+        pool = [c for c in cands if pool_f(c)]
+        dr = lambda c, td, rng, e=elig: draw(c, td, rng, e)
+        dr.teams = teams_draw
+        k = spec.get('k')
+        lead(aw, pool, dr, metric, first(show, metric), rng, k=k or 1)
+        pool = prune(pool, spec, dr, rng, keep=60 if k else 45)
+        dm = lambda c, td, rng: draw(c, td, rng, False)
+        dm.teams = teams_draw
+        yield aw, pool, (race_k(pool, spec, dr, rng, k, sims) if k else race(pool, spec, dr, rng, sims)), dm, show
+    spec = fit.get('coy')
+    if coy and spec and spec['test'].get('pass'):
+        def cdraw(c, td, rng):
+            wp = td[c['tm']]
+            return {'wp': wp, 'd_wp': wp - c['wp0'], 'ovr': wp - c['ou'], 'seed1': 1.0 if c['tm'] in td['_seed1'] else 0.0,
+                    'dw': (wp - c['wp0']) * G, 'ovw': (wp - c['ou']) * G}
+        cdraw.teams = teams_draw
+        yield 'coy', list(coy), race(list(coy), spec, cdraw, rng, sims), cdraw, [
+            ('wp', 'W%', 'pct'), ('ovw', 'vs O/U', '%+.1f'), ('dw', 'vs LY', '%+.1f')]
 
 
 # ---------------------------------------------------------------- NHL
@@ -697,6 +744,12 @@ def cbb(fit, rng):
     P5 = {'ACC', 'B10', 'B12', 'BE', 'SEC'}
     K, TAU = 300, 3.5
     cands = []
+    try:
+        import awards_cbb as AC
+        S = int(str(G.get('season', ''))[:4] or dt.date.today().year) + 1
+        cbb_ap = {k: 26.0 - v for k, v in AC.ap_pre(S).items()}        # the team's preseason AP rank (Erving's term)
+    except Exception as e:
+        print('cbb preseason AP', e); cbb_ap = {}
     for row in d['rows']:
         r = dict(zip(C, row))
         now = r.get('now') or {}
@@ -711,7 +764,11 @@ def cbb(fit, rng):
         cands.append({'id': r['name'] + '|' + r['team'], 'n': r['name'], 'tm': r['team'], 'logo': r.get('logo'),
                       'ph': espn.group(1) if espn else None, 'cls': r.get('cls'), 'gp': now['gp'], 'tg': g, 'tot': tot,
                       'mpg': now.get('mpg') or 0, 'ppg': now.get('ppg') or 0, 'bpm': now.get('bpm') or 0, 'prior': prior,
-                      'pp0': pp0})
+                      'pp0': pp0, 'dbpm': now.get('dbpm') or 0, 'blk': now.get('blk') or 0, 'stl': now.get('stl') or 0,
+                      'drb': now.get('drb'), 'yr': now.get('yr') or r.get('cls'),
+                      'dprior': last['dbpm'] if last.get('dbpm') is not None and (last.get('gp') or 0) >= 8 else .5 * (now.get('dbpm') or 0),
+                      'role': now.get('role') or r.get('role') or {'G': 'Combo G', 'C': 'PF/C'}.get(r.get('pos'), 'Wing F'),
+                      'ap_pre': cbb_ap.get(NM.team_key(r['team']), 0.0)})
 
     def teams_draw(rng):
         td = team_draws(teams, rng)
@@ -731,18 +788,37 @@ def cbb(fit, rng):
         pp0 = c['pp0'] if c['pp0'] is not None else .6 * c['ppg'] + 4
         p_rest = gauss(rng, c['ppg'] if SEASON_ONLY else (c['ppg'] * c['gp'] + pp0 * 10) / (c['gp'] + 10), 3.0 * math.sqrt(10 / (c['gp'] + 10)))
         ppg = (c['ppg'] * c['gp'] + p_rest * gr) / max(gp, 1)
+        dmean = c['dbpm'] if SEASON_ONLY else (c['dbpm'] * m0 + c['dprior'] * K) / (m0 + K)
+        d_rest = gauss(rng, dmean, 1.5 * math.sqrt(K / (m0 + K)) + (1.5 * math.sqrt(K / mr) if mr > 0 else 0))
+        dbpm = (c['dbpm'] * m0 + d_rest * mr) / max(m0 + mr, 1)
         return {'bpm': bpm, 'ppg': ppg, 'wp': td[c['tm']], 'barthag': td['_b' + c['tm']], 'mpg': c['mpg'],
-                'p5': 1.0 if tinfo[c['tm']][2] in P5 else 0.0}
+                'p5': 1.0 if tinfo[c['tm']][2] in P5 else 0.0, 'dbpm': dbpm, 'blk': c['blk'], 'stl': c['stl'],
+                'drb': c['drb'] if c['drb'] is not None else DRB_MU, 'ap_pre': c['ap_pre']}
 
     draw.teams = teams_draw
-    spec = fit.get('wooden')
-    if not spec or not spec['test'].get('pass'): return None
+    # the board's line has no DR% yet on older builds: the DPOY race then holds it at the fit's mean (no effect)
+    dsp = fit.get('dpoy') or {}
+    DRB_MU = dsp['mu'][dsp['cols'].index('drb')] if 'drb' in dsp.get('cols', []) else 0.0
+    if not fit.get('wooden', {}).get('test', {}).get('pass'): return None
     show = [('bpm', 'BPM', '%+.1f'), ('ppg', 'PPG', '%.1f'), ('wp', 'W%', 'pct')]
-    pool = [c for c in cands if c['mpg'] >= 20]
-    lead('wooden', pool, draw, spec['null'][0], first(show, spec['null'][0]), rng)
-    pool = prune(pool, spec, draw, rng, keep=60)
-    p = race(pool, spec, draw, rng)
-    return {'season': G.get('season', ''), 'races': [('wooden', rows_out(pool, p, draw, show, rng), show)], 'logo': 'cbb'}
+    dshow = [('dbpm', 'DBPM', '%+.1f'), ('blk', 'BLK%', '%.1f'), ('stl', 'STL%', '%.1f'), ('wp', 'W%', 'pct')]
+    import awards_cbb as AC
+    role = lambda aw: (lambda c: c['mpg'] >= 20 and c['role'] in AC.ROLE_POOL[aw])
+    races = []
+    # Wooden, then the races added Nov 23 2026 (scripts/awards_bball.py): Naismith, AP, DPOY (NABC), Freshman
+    # (USBWA), the five position awards; pools by this season's class and Barttorvik role
+    for aw, pool_f, sh in (('wooden', None, show), ('naismith', None, show), ('ap', None, show), ('dpoy', None, dshow),
+                           ('frosh', lambda c: c['mpg'] >= 15 and c['yr'] == 'Fr', show),
+                           ('cousy', role('cousy'), show), ('west', role('west'), show), ('erving', role('erving'), show),
+                           ('malone', role('malone'), show), ('kareem', role('kareem'), show)):
+        spec = fit.get(aw)
+        if not spec or not spec['test'].get('pass'): continue
+        pool = [c for c in cands if (pool_f or (lambda c: c['mpg'] >= 20))(c)]
+        lead(aw, pool, draw, spec['null'][0], first(sh, spec['null'][0]), rng)
+        pool = prune(pool, spec, draw, rng, keep=60)
+        p = race(pool, spec, draw, rng)
+        races.append((aw, rows_out(pool, p, draw, sh, rng), sh))
+    return {'season': G.get('season', ''), 'races': races, 'logo': 'cbb'}
 
 
 # ---------------------------------------------------------------- football (ESPN season stats)
@@ -1017,14 +1093,15 @@ def soccer(fit, rng):
     uw = [(t['id'], t.get('win') or 0) for t in U]
     ul = {t['id']: max((t.get('fin') or 0) - (t.get('win') or 0), 0) for t in U}
     prev = fit.get('_prev', {}).get('ballon', {})
-    cands = []
-    for r in sorted(rows, key=lambda r: -r['gar'])[:SO.POOL_N]:
-        if r['tid'] not in tinfo: continue
-        cands.append({'id': r['id'], 'n': r['n'], 'tid': r['tid'], 'tm': r['team'], 'lg': r['lg'], 'pos': r.get('pos'),
-                      'logo': f"/img/soccer/{r['tid']}.png", 'gar': r['gar'], 'ga': r['g'] + r['a'],
-                      'prev': prev.get(NM.key(r['n']), 0)})
+    def cand(r):
+        return {'id': r['id'], 'n': r['n'], 'tid': r['tid'], 'tm': r['team'], 'lg': r['lg'], 'pos': r.get('pos'),
+                'logo': f"/img/soccer/{r['tid']}.png", 'gar': r['gar'], 'svar': r.get('svar') or 0.0, 'ga': r['g'] + r['a'],
+                'prev': prev.get(NM.key(r['n']), 0)}
+    cands = [cand(r) for r in sorted(rows, key=lambda r: -r['gar'])[:SO.POOL_N] if r['tid'] in tinfo]
+    # conviction pool: the season's best by SVAR (season value over replacement, scripts/soccer_sv.py)
+    conv = [cand(r) for r in sorted((r for r in rows if r.get('svar') is not None), key=lambda r: -r['svar'])[:SO.POOL_N] if r['tid'] in tinfo]
     ph = {r['p']: r.get('ph') for r in (jload(os.path.join(SO.WAR, f'{S}.json'), {}) or {}).get('players', [])}
-    for c in cands:
+    for c in cands + conv:
         if ph.get(c['id']): c['phu'] = 'https://img.a.transfermarkt.technology/portrait/medium/' + ph[c['id']]
 
     def teams_draw(rng):
@@ -1037,7 +1114,7 @@ def soccer(fit, rng):
         gp, tot = tinfo[c['tid']]
         gr = games_left(rng, max(tot - gp, 0), .93, 'soccer')
         out = {}
-        for k, kind in (('gar', 'yds'), ('ga', 'count')):
+        for k, kind in (('gar', 'yds'), ('svar', 'yds'), ('ga', 'count')):
             mu = c[k] / max(gp, 1) * gr
             out[k] = c[k] + (gauss(rng, mu, .3 * abs(mu)) if kind == 'yds' else max(gauss(rng, mu, math.sqrt(max(mu, 0))), 0))
         out.update(lgw=1.0 if c['tid'] in td['champ'] else 0.0, ucl=1.0 if c['tid'] == td['uw'] else .5 if c['tid'] == td['ul'] else 0.0,
@@ -1046,7 +1123,7 @@ def soccer(fit, rng):
 
     draw.teams = teams_draw
     show = [('gar', 'GAR', '%.1f'), ('ga', 'G+A', '%.0f'), ('lgw', 'LG', 'pct'), ('uclw', 'UCL', 'pct')]
-    lead('ballon', cands, draw, spec['null'][0], first(show, spec['null'][0]), rng)
+    lead('ballon', conv, draw, 'svar', [('svar', 'SVAR', '%.1f'), ('ga', 'G+A', '%.0f'), ('lgw', 'LG', 'pct'), ('uclw', 'UCL', 'pct')], rng)
     pool = prune(cands, spec, draw, rng)
     p = race(pool, spec, draw, rng)
     return {'season': f'{S - 1}-{str(S)[2:]}', 'races': [('ballon', rows_out(pool, p, draw, show, rng), show)], 'logo': 'soccer'}
@@ -1058,6 +1135,8 @@ NULL_LABEL = {'svar': 'SVAR', 'vorx': 'VORX', 'dxpm': 'D-XPM', 'war': 'WAR', 'gs
               'td': 'TDs', 'sacks': 'sacks', 'dint': 'INTs', 'pass_y': 'pass yards', 'ptd': 'pass TDs', 'gross': 'gross average',
               'rush_y': 'rush yards', 'rtd': 'rush TDs', 'rec_y': 'receiving yards', 'ctd': 'receiving TDs', 'tackles': 'tackles',
               'fgm': 'FGs', 'fgpct': 'FG%', 'pd': 'PDs', 'gar': 'GAR', 'pts': 'points', 'g': 'goals', 'gd': 'defensive goals (WAR)'}
+NULL_LABEL.update({'d_vorx': 'VORX gain', 'dbpm': 'DBPM'})     # NBA / CBB races added Nov 23 2026
+POLY[('cbb', 'naismith')] = POLY[('cbb', 'wooden')]              # the market is on the Naismith
 BUILD = {'nba': nba, 'nhl': nhl, 'cbb': cbb, 'cfb': cfb, 'nfl': nfl, 'soccer': soccer}
 
 

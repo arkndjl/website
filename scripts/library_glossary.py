@@ -332,6 +332,19 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
        'All-time SV history: NFL 1999 on (defenders 2013 on, snap counts); CFB 2014 on (cfbfastR play-by-play), CFB WR/TE and RB targets 2025 on (target ids); replacement moved with each season\'s league EPA a play (era).',
        'Game model: every SV test failed against WAR (NFL QB MAE 10.010 -> 10.034; NFL non-QB injury term 0/5 seasons; CFB QB = raw), so WAR stays the model input.'],
       'NFL QBs, skill players, defenders; CFB QB SV, skill players; rookie boards; all-time peak seasons', ['NFL', 'CFB']),
+    E('SV / SVAR (soccer)', 'SV (season value) = this season\'s goals over replacement a 90 from this season alone; SVAR = SV x 90s, the season total in goals. Shown next to GAR; the models keep GAR.',
+      (lambda F, R: ['GAR\'s weights on this season\'s inputs only: on-pitch xG for / against, on minus off, npxG, xGBuildup, and an xG plus-minus over this season\'s spells alone '
+                  '(GAR\'s spans three seasons). The xG part is scaled x%.3f so a side\'s players add up to its xG difference (R2 %.2f).' % (F['scale'], F['r2XgPart']),
+                  'Finishing (goals less npxG) and keepers\' goals saved vs xG faced, shrunk toward the league average by min / (min + k): k %s minutes for saves, %s for finishing, '
+                  'from split-half reliability within a season (odd vs even matches: r %.3f saves, %.3f finishing; no player prior). '
+                  'A side\'s players then add up to its goal difference with R2 %.3f over %d team-seasons %d-%d (GAR on the same season %.3f).'
+                  % (f"{F['kGk']:,}", f"{F['kFin']:,}", R['gk0']['splitHalfR'], R['fin']['splitHalfR'], F['r2Gd'], F['teamSeasons'], F['seasons'][0] - 1, F['seasons'][1], F['r2GarGd']),
+                  'Replacement = the xG part of bottom-three sides\' regulars (GK %+.3f, D %+.3f, M %+.3f, F %+.3f a 90), finishing and saves at league average. League strength x %.3f a goal of club rating.'
+                  % (F['repl']['GK'], F['repl']['D'], F['repl']['M'], F['repl']['F'], F['lgScale']['k']),
+                  'Weights fit on the same season (team goal difference, or first half to second half) could not split a side\'s xG between its players: '
+                  'team totals are the same either way, so GAR\'s split is kept.'])(json.load(open(os.path.join(ROOT, 'data', 'soccer_sv_fit.json'))),
+                                                         json.load(open(os.path.join(ROOT, 'research', 'soccer_sv_shrink.json')))),
+      'soccer GAR leaders, rookies, all-time players, transactions; conviction awards (Ballon d\'Or pool by SVAR)', ['Soccer']),
     E('Yds+ / YOE (returners)', 'Kick and punt return yards over expected, shrunk.',
       ['YOE = return yards minus the mean return from the same spot (5-yard bins, this season). Yards, not EPA (EPA does not repeat).'],
       'special teams tab on NFL and CFB pages', ['NFL', 'CFB']),
