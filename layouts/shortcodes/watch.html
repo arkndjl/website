@@ -1,5 +1,6 @@
 {{- /* Games to watch: the next seven days' best games across every sport, data/watch.json (scripts/watch_games.py,
-       rerun by the odds-snap workflow). {{< watch tab="games to watch" >}} on the Standings page. Score parts live
+       rerun by the odds-snap workflow). {{< watch tab="games to watch" >}} on the Standings page. Listed games that have started sit under "scores" with
+       their live / final score until 24 h after the final. Score parts live
        only in hover (row title, th titles); the GFX card is assets/js/gfx.js buildWatch (rows on the button). */ -}}
 {{- with site.Data.watch }}{{ with .games -}}
 {{- $D := site.Data.watch -}}
@@ -18,21 +19,24 @@
   </div>
   <div class="wintable__scroll">
 <table class="cfb__table st-table wt-table">
-  <thead><tr><th title="rank by W">RK</th><th title="sport">Lg</th><th>Away</th><th></th><th>Home</th><th title="start, ET">ET</th><th title="watchability, 0-100: hover a row for its parts">W</th></tr></thead>
+  <thead><tr><th title="rank by W">RK</th><th class="wt-lg" title="sport">Lg</th><th>Away</th><th></th><th>Home</th><th title="start, ET">ET</th><th title="watchability, 0-100: hover a row for its parts">W</th></tr></thead>
   <tbody>
-  {{- range . }}{{ $g := . }}{{ $p := .parts }}
-    <tr title="Q quality {{ $p.q }} · C closeness {{ $p.c }} · S stars {{ $p.s }} · L leverage {{ $p.l }} · T total {{ $p.t }}{{ with $p.b }} · +{{ . }}{{ end }}{{ with .tags }} {{ delimit . ", " }}{{ end }}{{ with .stars }} · {{ delimit . ", " }}{{ end }}">
+  {{- $played := site.Data.watch.played | default slice -}}
+  {{- range $gi, $grp := slice (dict "lab" "scores" "rows" $played) (dict "lab" "next" "rows" .) }}{{ if $grp.rows }}
+    {{- if $played }}<tr class="st-grp"><th colspan="7">{{ $grp.lab }}</th></tr>{{ end }}
+  {{- range $grp.rows }}{{ $g := . }}{{ $p := .parts }}{{ $sc := .sc }}{{ $post := and $sc (eq $sc.st "post") }}
+    <tr{{ if and $sc (eq $sc.st "in") }} class="st-live"{{ end }} title="Q quality {{ $p.q }} · C closeness {{ $p.c }} · S stars {{ $p.s }} · L leverage {{ $p.l }} · T total {{ $p.t }}{{ with $p.b }} · +{{ . }}{{ end }}{{ with .tags }} {{ delimit . ", " }}{{ end }}{{ with .stars }} · {{ delimit . ", " }}{{ end }}{{ if $sc }} · {{ .et }} ET{{ end }}">
       <td class="cfb__rk">{{ .rk }}</td>
       <td class="wt-lg"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ .icon }}"/></svg><span>{{ .lab }}</span></td>
-      {{- range $i, $t := slice .a .h }}
+      {{- range $i, $t := slice .a .h }}{{ $s := "" }}{{ $w := false }}{{ with $sc }}{{ $s = index . (cond (eq $i 0) "a" "h") }}{{ $w = and $post (index . (cond (eq $i 0) "wa" "wh")) }}{{ end }}
       {{- if $i }}<td class="cfb__dim wt-at">{{ cond (eq $g.at false) "v" "@" }}</td>{{ end }}
-      <td class="st-team">{{ with $t.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.style.display='none'"> {{ end }}{{ with $t.rk }}<span class="cfb__dim">{{ . }}</span> {{ end }}<span class="wt-n">{{ $t.n }}</span>{{ with $t.ab }}<span class="wt-ab">{{ . }}</span>{{ end }}</td>
+      <td class="st-team{{ if $w }} st-w{{ end }}">{{ with $t.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.style.display='none'"> {{ end }}{{ with $t.rk }}<span class="cfb__dim">{{ . }}</span> {{ end }}<span class="wt-n">{{ $t.n }}</span>{{ with $t.ab }}<span class="wt-ab">{{ . }}</span>{{ end }}{{ with $s }} <b class="wt-sc">{{ . }}</b>{{ end }}</td>
       {{- end }}
-      <td class="cfb__dim wt-et"><span class="wt-n">{{ .et }}</span><span class="wt-ab">{{ .ets | default .et }}</span></td>
+      <td class="cfb__dim wt-et">{{ with $sc }}{{ .det | default .st }}{{ else }}<span class="wt-n">{{ $g.et }}</span><span class="wt-ab">{{ $g.ets | default $g.et }}</span>{{ end }}</td>
       <td class="cfb__num wt-w"><b>{{ printf "%.0f" .w }}</b><i class="wt-bar__fill" style="--w:{{ .w }}%"></i></td>
     </tr>
-  {{- end }}
+  {{- end }}{{ end }}{{ end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len .) "about" $about "fresh" "watch") -}}
+{{- partial "wintable-close.html" (dict "rows" (add (len .) (len (site.Data.watch.played | default slice))) "about" $about "fresh" "watch") -}}
 {{- end }}{{ end -}}
