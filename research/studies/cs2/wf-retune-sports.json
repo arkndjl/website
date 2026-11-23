@@ -1,0 +1,73 @@
+{
+ "id": "wf-retune-sports",
+ "sport": "CS2",
+ "question": "Does re-picking a rating's settings each season beat keeping them fixed?",
+ "answer": "Passes in CS2, NHL, CBB; fails in Tennis, Soccer, NFL, NBA.",
+ "findings": [
+  "CS2: -1.56 log loss x1000, t by month -3.49, 13/16 months.",
+  "NHL: -0.65 log loss x1000, t by month -2.85, 18/27 months.",
+  "CBB: -0.65 log loss x1000, t by month -2.52, 27/36 months.",
+  "Tennis: -0.09 log loss x1000, t by month -1.19, 26/46 months."
+ ],
+ "method": "Each season (CS2: month), the settings with the lowest walk-forward log loss on every earlier season are picked from the shipped set and one-step moves on each tuned setting, then scored once on that season against the shipped settings. Held-out seasons only; pass at t by month <= -2.",
+ "data": "Each sport's game-model history, held-out seasons before the 2026-27 lockbox; CS2 Jul 2025 to its last sealed month.",
+ "n": 95174,
+ "robust": true,
+ "interest": 3,
+ "split_check": "3 of 7 sports pass.",
+ "chart": {
+  "type": "bar",
+  "title": "t by month, re-picked minus fixed settings",
+  "x_label": "sport",
+  "y_label": "t by month",
+  "y_fmt": "num",
+  "ref": {
+   "y": -2,
+   "label": "pass"
+  },
+  "mark": null,
+  "series": [
+   {
+    "name": "t",
+    "points": [
+     {
+      "x": "CS2",
+      "y": -3.49,
+      "n": 21038
+     },
+     {
+      "x": "NHL",
+      "y": -2.85,
+      "n": 4192
+     },
+     {
+      "x": "CBB",
+      "y": -2.52,
+      "n": 32673
+     },
+     {
+      "x": "Tennis",
+      "y": -1.19,
+      "n": 20345
+     },
+     {
+      "x": "Soccer",
+      "y": -0.64,
+      "n": 8901
+     },
+     {
+      "x": "NFL",
+      "y": 1.04,
+      "n": 1420
+     },
+     {
+      "x": "NBA",
+      "y": 1.22,
+      "n": 6605
+     }
+    ]
+   }
+  ]
+ },
+ "auto": "scripts/wf_retune.py"
+}
