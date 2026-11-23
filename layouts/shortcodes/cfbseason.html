@@ -14,6 +14,7 @@
     <th title="SV (season value) = this season's points over replacement a game with 10+ plays: every dropback and QB run, EPA less the defense's EPA allowed a play of that kind over the league's (its other games, shrunk 300 plays), minus replacement (-0.074 a play: QBs past the 134 starters by volume, 2025). FBS games, this season only">SV</th>
     <th title="opponent-adjusted EPA a play, dropbacks + QB runs">aEPA</th>
     <th title="this season's points over replacement, total">Pts</th>
+    <th title="pSV/60 = predictive SV: points over replacement a 60 plays over this season and the two before (play weights 1 / .7 / .5), shrunk to the QB mean with 650 plays; predicts next season's rate better than this season's alone (2016-25, t -11.7, 10 of 10 seasons)">pSV/60</th>
     <th title="EPA a play before the opponent adjustment">EPA/play</th>
     <th title="games with 10+ plays">G</th><th title="dropbacks + QB runs">Plays</th><th title="dropbacks: passes, sacks">DB</th><th title="QB runs (designed + scrambles)">Runs</th>
   {{- else }}
@@ -34,6 +35,7 @@
     <td class="cfb__num">{{ partial "num.html" (slice "%+.3f" (float .aepa)) }}</td>
     <td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float .tot)) }}</td>
   {{- if $qb }}
+    <td class="cfb__num">{{ with .psv }}{{ partial "num.html" (slice "%+.1f" (float .)) }}{{ end }}</td>
     <td class="cfb__num">{{ partial "num.html" (slice "%+.3f" (float .epa)) }}</td>
     <td class="cfb__num">{{ .g }}</td><td class="cfb__num">{{ .plays }}</td><td class="cfb__num">{{ .db }}</td><td class="cfb__num">{{ .runs }}</td>
   {{- else }}

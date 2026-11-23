@@ -350,6 +350,11 @@ class Model:
         """wins above replacement, the 52 weeks to day"""
         return sum(v for _, v, _ in self._wq(pid, day))
 
+    def sv(self, pid, day, d0):
+        """SV: season WAR, the calendar year to date (d0 = Jan 1's day number). Split-half r .81 ATP / .82 WTA (odd vs
+        even matches, 30+ in a season, 2015-25), next season r .85 / .84 (scripts/research/port_nov23/tennis_cs/)"""
+        return sum(v for d, v, _ in self._wq(pid, day) if d >= d0)
+
     def war_rate(self, pid, day):
         q = self._wq(pid, day)
         return sum(v for _, v, _ in q) / (len(q) + 10)
@@ -1068,7 +1073,7 @@ def build(rows, players, tn):
                 'elo': round(e[0]), 'eH': round(e[2]['H'][0]), 'eC': round(e[2]['C'][0]), 'eG': round(e[2]['G'][0]),
                 'd90': round(e[0] - old[p]) if p in old else None,
                 'peak': round(m.peak[p][0]) if p in m.peak else None, 'peakd': m.peak[p][1] if p in m.peak else None,
-                '_s': x[0], '_r': x[2], 'war': round(m.war(p, tday), 1), '_pp': m.ppa(p, tday), '_rp': m.rpa(p, tday),
+                '_s': x[0], '_r': x[2], 'war': round(m.war(p, tday), 1), 'sv': round(m.sv(p, tday, (dt.date(today.year, 1, 1) - DAY0).days), 1), '_pp': m.ppa(p, tday), '_rp': m.rpa(p, tday),
                 'unc': round((x[1] + x[3]) ** 0.5, 3),
                 'w': rw.get('w', 0), 'l': rw.get('l', 0), 'tw': rw.get('tw', 0), 'tl': rw.get('tl', 0),
                 'gwp': rate(rw.get('gw', 0), rw.get('gw', 0) + rw.get('gl', 0)), 'sm': rw.get('m', 0),

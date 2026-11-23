@@ -334,6 +334,7 @@
      "n = games left; playoff 1, division / bye / top four .5, soccer title and relegation 1; side L = min(1, sum / .35);",
      "game L = .6 x higher side + .4 x lower; postseason games 1. Tennis and CS2: round and format levels.",
      "Bonus: named rivalry 6, division or conference game 2, both ranked 4, one ranked 1. Top 15, at most 4 a sport.",
+     "A listed game that starts moves to \"scores\" with its W frozen and its live / final score (ESPN scoreboard; tennis and CS2 from the site's files); it drops 24 hours after the final.",
      "Source: scripts/watch_games.py -> data/watch.json, every half hour."
     ],
     "where": "Standings: games to watch",
@@ -345,6 +346,30 @@
      "NHL",
      "Soccer",
      "Tennis",
+     "CS2"
+    ]
+   }
+  },
+  {
+   "section": "value",
+   "after": "RWA (CS2)",
+   "entry": {
+    "term": "xTV / team value (CS2)",
+    "short": "Transfer value in USD: prize money a player adds over replacement for two seasons, priced on reported buyouts; team value sums the five.",
+    "body": [
+     "Player: prize money he adds over a replacement-level player in a five of four average tier-1 starters, for two seasons",
+     "(aging curve, 15% a year discount), x A, the dollars a team pays per prize dollar added. Team value = the current five summed.",
+     "Prize curve: a roster's prize money over the next 182 days on its five's mean RWA vs the tier-1 starter mean (VRS top 20),",
+     "Poisson, rating + rating squared, Valve's VRS prize ledger (every snapshot's top-ten winnings, Feb 2024 on).",
+     "Held out from Jul 2025: deviance explained 0.79 vs VRS points 0.76; both together 0.81 (rosters only, players can't carry VRS points).",
+     "A and the replacement level (tier-1 mean - q SDs) fit on 5 reported buyouts (insider/press, unconfirmed): A 1.66, q 4.",
+     "Leave one fee out: x1.50 typical miss vs x2.44 for a flat price per player; replacement fixed at the VRS 51-100 starters x1.64.",
+     "Reported fees sit near flat ($1.1M-2.5M) and three are Falcons deals, so values are compressed and at that buyer's prices.",
+     "Eternal Fire to Aurora (reported under $2.5M for five) prices at $7.1M: a miss. Contracts are not public and not modelled.",
+     "Signed = the same value at the first map of the player's current stint (bo3.gg); stints from before Jul 2024 start there."
+    ],
+    "where": "Counter-Strike transfer values, team values, signings",
+    "sports": [
      "CS2"
     ]
    }
@@ -415,6 +440,27 @@
     "xXPM = ridge E[NBA XPM over his NBA minutes, next 3 seasons | plays], weighted by those minutes (lambda 300).",
     "xVORX counts 0 for a season out of the NBA (75% of G League seasons): it sits near 0 for most; xXPM is the rate alone.",
     "xXPM held out vs no G League stats: minute-weighted RMSE 1.44 vs 1.60 (t -3.6, 11/15 seasons, Holm), bias .01."
+   ]
+  },
+  {
+   "term": "SV (CFB QBs, skill players)",
+   "lines": [
+    "pSV/60: SV per 60 plays over three seasons weighted 1, .7, .5, shrunk to the QB mean with 650 plays.",
+    "Next season wMSE .0258 raw to .0159 (t -11.7, 10 of 10 seasons 2016-25)."
+   ]
+  },
+  {
+   "term": "GAR (soccer, senior)",
+   "lines": [
+    "1Y P20/P80: held out projection residuals in five bands of season share; left out seasons hit .200 and .800 (3Y .201, .800).",
+    "aGAR/90 (first seasons) = GAR/90 less .0032 a year of age over 21. Ranks the next two seasons better than GAR/90: .664 vs .654, t -2.66."
+   ]
+  },
+  {
+   "term": "Tennis ARK",
+   "lines": [
+    "SV: season WAR, calendar year to date, every level, same per match credit as WAR.",
+    "Split half r .81 ATP, .82 WTA (2015 to 2025); next season r .85 ATP, .84 WTA."
    ]
   }
  ],

@@ -22,7 +22,7 @@
     <th class="hk__x" title="average damage per round, last year">ADR</th>
     <th class="hk__x" title="rounds with a kill, assist, survival or trade, last year">KAST</th>
     <th class="hk__x" title="opening kills minus opening deaths per 100 rounds, last year">Open</th>
-    <th title="transfer value: what a buyout would cost, from the round wins he adds over two seasons (aging included), priced on reported fees">xTV</th>
+    <th title="transfer value: what a buyout would cost, from the prize money he adds over two seasons (aging included), priced on reported fees">xTV</th>
     <th>Team</th>
     <th title="the team's event-access tier on the ARK Ranking (Tier 4 = unranked or below the Tier 3 cut)">Tier</th>
     <th>Age</th>
@@ -70,7 +70,7 @@
   </tbody>
 </table>
 {{- with $f.value }}
-{{- partial "wintable-close.html" (dict "rows" 200 "fresh" "cs2" "note" "USD, estimate" "about" (printf "Round wins added over replacement, two seasons ahead with aging, 15%% a year discount, scaled to %d reported buyouts (unconfirmed). Order of magnitude." (int .n))) -}}
+{{- partial "wintable-close.html" (dict "rows" 200 "fresh" "cs2" "note" "USD, estimate" "about" (printf "Prize money added over a replacement-level player in a five of average tier-1 starters, two seasons ahead with aging, 15%% a year discount, scaled to %d reported buyouts (unconfirmed; leave-one-out error x%.2f). Order of magnitude." (int .n) (float .fx))) -}}
 {{- end }}
 {{- else if eq $view "model" -}}
 <div class="win cfbk"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
@@ -108,7 +108,18 @@
       <thead><tr><th>Reported fee</th><th>Date</th><th>Age</th><th>Reported</th><th>xTV then</th></tr></thead>
       <tbody>{{ range .pts }}<tr><td>{{ .nick }}</td><td>{{ .date }}</td><td class="cfb__num">{{ with .age }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ else }}-{{ end }}</td><td class="cfb__num">${{ partial "num.html" (slice "%.2f" (div (float .usd) 1e6)) }}M</td><td class="cfb__num">${{ partial "num.html" (slice "%.2f" (div (float .xtv) 1e6)) }}M</td></tr>{{ end }}</tbody>
     </table></div>
-    <p class="cfb__dim">fee fit error x{{ .fx }} · aging fit {{ $f.aging.n }} player-years</p>
+    <p class="cfb__dim">fee fit error x{{ .fx }} (leave one out) · aging fit {{ $f.aging.n }} player-years</p>
+    {{- end }}
+    {{- with site.Data.cs2_value.fit }}
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Prize money, next 182 days, held out {{ index .curve.held 0 }} to {{ index .curve.held 1 }} ({{ .curve.nTest }} roster-months)</th><th title="share of Poisson deviance explained vs a flat mean">D²</th><th title="paired t on per-roster deviance vs the five's rating (negative = better)">t</th></tr></thead>
+      <tbody>{{ range .curve.tests }}<tr><td>{{ .name }}</td><td class="cfb__num">{{ partial "num.html" (slice "%.3f" (float .d2)) }}</td><td class="cfb__num">{{ with .t }}{{ partial "num.html" (slice "%+.1f" (float .)) }}{{ else }}-{{ end }}</td></tr>{{ end }}</tbody>
+    </table></div>
+    <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
+      <thead><tr><th>Reported fees, leave one out ({{ .fees.n }})</th><th title="typical miss as a factor (exp of log RMSE)">Error</th></tr></thead>
+      <tbody>{{ range .fees.loo }}<tr><td>{{ .name }}</td><td class="cfb__num">x{{ partial "num.html" (slice "%.2f" (float .fx)) }}</td></tr>{{ end }}
+      {{ range .fees.checks }}<tr><td>{{ .nick }} to {{ .to }}, reported {{ if eq .bound "max" }}under{{ else }}over{{ end }} ${{ partial "num.html" (slice "%.1f" (div (float .usd) 1e6)) }}M</td><td class="cfb__num">{{ partial "cs2money.html" .xtv }} {{ if .ok }}ok{{ else }}miss{{ end }}</td></tr>{{ end }}</tbody>
+    </table></div>
     {{- end }}
   </div>
   <div class="win__status"><span>bo3.gg per-map stats · {{ $d.nMaps }} maps</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>

@@ -889,7 +889,8 @@ def proj_attach(S, out, cur_f=None):
         return
     gv = (lambda o: o['gar']) if P.get('garLine') == 'bottom3' else (lambda o: gar_fringe(o)[0])   # the fit's own line
     for o in out:
-        o.pop('pj', None); o.pop('p3', None)
+        for k in ('pj', 'p3', 'pjl', 'pjh', 'p3l', 'p3h'):
+            o.pop(k, None)
     attach_age(S, out)
     if not os.path.exists(os.path.join(SDIR, f'{S - 2}.json')):    # fit on seasons with two before them on file
         return
@@ -929,6 +930,31 @@ def proj_attach(S, out, cur_f=None):
         for key, tgt in (('pj', '1y'), ('p3', '3y')):
             c = coef(P[tgt]['grid'], f)
             o[key] = round(sum(u * v for u, v in zip(c, x)), 1)
+            proj_range(o, key, tgt, f)
+
+
+PCTL_FIT = os.path.join(ROOT, 'data', 'soccer_proj_pctl.json')
+_PCTL = []
+
+
+def proj_range(o, key, tgt, f):
+    """P20 / P80 around pj or p3 (o[key + 'l'], o[key + 'h']): the held-out residual quantiles in 5 bins of the
+    projection at the nearest season share f (data/soccer_proj_pctl.json, scripts/research/port_nov23/soccer/pctl.py;
+    leave-one-season-out coverage 1Y .200 / .800, 3Y .201 / .800, every share, position and season within its gate)"""
+    if not _PCTL:
+        try:
+            _PCTL.append(json.load(open(PCTL_FIT)))
+        except (OSError, ValueError):
+            _PCTL.append(None)
+    T = _PCTL[0]
+    o.pop(key + 'l', None); o.pop(key + 'h', None)
+    if not T or tgt not in T or o.get(key) is None:
+        return
+    g = min(T[tgt]['grid'], key=lambda x: abs(x['f'] - f))
+    v = o[key]
+    b = sum(1 for e in g['edges'] if v > e)
+    o[key + 'l'] = round(v + g['q'][b][0], 1)
+    o[key + 'h'] = round(v + g['q'][b][1], 1)
 
 
 def league_share(S, out):

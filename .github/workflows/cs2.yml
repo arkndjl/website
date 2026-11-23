@@ -66,6 +66,11 @@ jobs:
         run: |
           if [ "$(date -u +%d%H)" = "0100" ] || [ ! -e data/cs2_players_fit.json ]; then python3 scripts/cs2_players.py --fit; python3 scripts/cs2_proj_research.py || echo "6-month projection refit failed; keeping the committed fit"; fi
           python3 scripts/cs2_players.py
+      # team values, signings, one transfer value for every player (prize ledger from the VRS clone); refit on the 1st
+      - name: Team values (prize money + reported fees)
+        run: |
+          if [ "$(date -u +%d%H)" = "0100" ] || [ ! -e data/cs2_value_fit.json ]; then python3 scripts/cs2_value.py --fit || echo "value refit failed; keeping the committed fit"; fi
+          python3 scripts/cs2_value.py || echo "team values failed; keeping the committed values"
       # Major event odds backtest (scripts/cs2_events.py): new S-tier events from bo3.gg, refit on the 1st of each month
       # (the live event odds run inside cs2_model.py)
       - name: Event odds backtest
@@ -88,7 +93,7 @@ jobs:
         run: python3 scripts/board_moves.py cs2
       - name: Commit if anything changed
         run: |
-          files="scripts/data/moves scripts/data/ledger/cs2 data/cs2.json data/cs2_econ.json data/cs2_events.json data/cs2_events_fit.json data/cs2_pickem.json data/cs2_pickem_fit.json scripts/data/cs2_pickem_prep.json.gz scripts/data/cs2_events.json.gz data/cs2_players.json data/cs2_players_fit.json data/cs2_proj_fit.json scripts/data/cs2_pstats scripts/data/cs2_rounds scripts/data/cs2_pdir.json.gz scripts/data/cs2_history.json.gz scripts/data/cs2_lp_results.json.gz scripts/data/cs2_bo3.json.gz scripts/data/cs2odds_closes.json.gz data/cs2_picks_fit.json static/img/cs2 data/model_monitor/cs2.json scripts/data/model_monitor/cs2.json"
+          files="scripts/data/moves scripts/data/ledger/cs2 data/cs2.json data/cs2_econ.json data/cs2_events.json data/cs2_events_fit.json data/cs2_pickem.json data/cs2_pickem_fit.json scripts/data/cs2_pickem_prep.json.gz scripts/data/cs2_events.json.gz data/cs2_players.json data/cs2_players_fit.json data/cs2_value.json data/cs2_value_fit.json scripts/data/cs2_prizes.json.gz data/cs2_proj_fit.json scripts/data/cs2_pstats scripts/data/cs2_rounds scripts/data/cs2_pdir.json.gz scripts/data/cs2_history.json.gz scripts/data/cs2_lp_results.json.gz scripts/data/cs2_bo3.json.gz scripts/data/cs2odds_closes.json.gz data/cs2_picks_fit.json static/img/cs2 data/model_monitor/cs2.json scripts/data/model_monitor/cs2.json"
           for f in $files; do if [ -e "$f" ]; then git add "$f"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
