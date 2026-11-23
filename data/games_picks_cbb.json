@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-23T05:37:28Z",
+ "asof": "2026-11-23T05:49:36Z",
  "recenter": {
   "2026-11-23": 1.93
  },
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-23T05:18:44Z",
-  "ageH": 0.3,
+  "ageH": 0.5,
   "stale": false
  },
  "picks": [],
@@ -1966,22 +1966,6 @@
    "tm": 159.3
   },
   {
-   "id": "401917543",
-   "sport": "cbb",
-   "kick": "2026-11-24T00:00:00Z",
-   "home": "Santa Clara",
-   "away": "Illinois State",
-   "mk": "spread",
-   "side": "away",
-   "line": 5.5,
-   "price": -129.0,
-   "edge": 4.6,
-   "x": 4.0,
-   "why": "no edge at -129",
-   "m": 0.9,
-   "tm": 155.4
-  },
-  {
    "id": "401927397",
    "sport": "cbb",
    "kick": "2026-11-23T16:00:00Z",
@@ -2006,10 +1990,10 @@
    "mk": "spread",
    "side": "away",
    "line": 2.5,
-   "price": 102.0,
+   "price": -100.0,
    "edge": 4.0,
    "x": 4.0,
-   "why": "no edge at +102",
+   "why": "no edge at -100",
    "m": -1.5,
    "tm": 150.0
   },
@@ -2150,7 +2134,7 @@
    "mk": "total",
    "side": "over",
    "line": 154.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 4.9,
    "x": 7.0,
    "why": "edge under 7",
@@ -2198,12 +2182,28 @@
    "mk": "spread",
    "side": "home",
    "line": 7.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 2.9,
    "x": 5.0,
    "why": "edge under 5 (line: 4-9)",
    "m": 10.4,
    "tm": 162.3
+  },
+  {
+   "id": "401917543",
+   "sport": "cbb",
+   "kick": "2026-11-24T00:00:00Z",
+   "home": "Santa Clara",
+   "away": "Illinois State",
+   "mk": "total",
+   "side": "over",
+   "line": 151.5,
+   "price": -110.0,
+   "edge": 3.9,
+   "x": 7.0,
+   "why": "edge under 7",
+   "m": 0.9,
+   "tm": 155.4
   },
   {
    "id": "401917919",
@@ -2246,7 +2246,7 @@
    "mk": "total",
    "side": "under",
    "line": 165.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 3.1,
    "x": 6.5,
    "why": "edge under 6.5 (side: under)",
@@ -2388,7 +2388,7 @@
    "mk": "total",
    "side": "over",
    "line": 154.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 4.9,
    "ev": null,
    "units": 0.0,
@@ -2397,11 +2397,11 @@
    "state": "under"
   },
   "401917543": {
-   "mk": "spread",
-   "side": "away",
-   "line": 5.5,
-   "price": -129.0,
-   "edge": 4.6,
+   "mk": "total",
+   "side": "over",
+   "line": 151.5,
+   "price": -110.0,
+   "edge": 3.9,
    "ev": null,
    "units": 0.0,
    "home": "Santa Clara",
@@ -2481,11 +2481,11 @@
    "state": "under"
   },
   "401913530": {
-   "mk": "total",
-   "side": "under",
-   "line": 180.5,
-   "price": -114.0,
-   "edge": 0.4,
+   "mk": "spread",
+   "side": "away",
+   "line": 44.5,
+   "price": -129.0,
+   "edge": 0.8,
    "ev": null,
    "units": 0.0,
    "home": "Illinois",
@@ -2532,7 +2532,7 @@
    "mk": "spread",
    "side": "home",
    "line": 7.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 2.9,
    "ev": null,
    "units": 0.0,
@@ -2580,7 +2580,7 @@
    "mk": "total",
    "side": "under",
    "line": 165.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 3.1,
    "ev": null,
    "units": 0.0,
@@ -2628,7 +2628,7 @@
    "mk": "spread",
    "side": "away",
    "line": 2.5,
-   "price": 102.0,
+   "price": -100.0,
    "edge": 4.0,
    "ev": null,
    "units": 0.0,
@@ -2749,7 +2749,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 23489,
+  "snapshots": 23504,
   "buckets": [
    {
     "when": "24h+",
@@ -2762,11 +2762,11 @@
    },
    {
     "when": "6-24h",
-    "clvN": 4673,
-    "clvRet": -0.0011,
-    "clvT": -0.53,
+    "clvN": 4677,
+    "clvRet": -0.001,
+    "clvT": -0.48,
     "clv": 0.7,
-    "beat": 0.415,
+    "beat": 0.416,
     "still": 0.402
    },
    {
@@ -20989,7 +20989,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-23T05:37:28Z",
+ "checked": "2026-11-23T05:49:36Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
