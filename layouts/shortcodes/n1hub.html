@@ -67,7 +67,7 @@ html:has(.n1) .wintable__scroll{background:var(--win-well);border-color:var(--wi
     {{- with $d.record }}
     <ul class="n1-hero__stats">
       <li><b>{{ .w }}–{{ .l }}</b><span>S{{ $season }} record</span></li>
-      {{- with $d.standing }}{{ with .power }}<li><b>#{{ . }}</b><span>ARK power</span></li>{{ end }}<li><b>{{ if .tied }}T-{{ end }}#{{ .rank }}<small class="n1-dim">/{{ .of }}</small></b><span>standings</span></li>{{ end }}
+      {{- with site.Data.esea_world }}{{ with .now }}<li><b>#{{ .vrs }} <span class="cs__t cs__t--{{ .tier }}">T{{ .tier }}</span></b><span>world</span></li>{{ end }}{{ end }}{{ with $d.standing }}<li><b>{{ if .tied }}T-{{ end }}#{{ .rank }}<small class="n1-dim">/{{ .of }}</small></b><span>standings</span></li>{{ end }}
       {{- with $d.sim }}<li class="is-l"><b>{{ math.Round .pPlayoffs }}%</b><span>playoffs</span></li>{{ end }}
       {{- with .streak }}{{ if .t }}<li><b>{{ .t }}{{ .n }}</b><span>streak</span></li>{{ end }}{{ end }}
     </ul>
