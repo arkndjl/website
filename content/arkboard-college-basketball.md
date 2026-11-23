@@ -11,15 +11,15 @@ cover = "/og/college-basketball.png"
 
 {{< winpane title="basketball_prospects.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="daily in season · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="players:board,leaders,true freshmen,standouts,awards,all-time players,ARKLIST|rosters:depth chart,lineups,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,season odds,units,talent,all-time|market:portal,NIL,team builder,coaches|recruits:classes,class rankings,recruit transactions|draft:draft board,mock draft|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
+{{< wintabs groups="players:board,leaders,standouts,awards,all-time players,ARKLIST|rosters:depth chart,lineups,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,units,talent,all-time|market:portal,NIL,coaches|recruits:classes,class rankings,recruit transactions|draft:draft board,mock draft|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
 {{< wintabs tab="board" tabs="all,international" sub="true" label="board views" >}}
 {{< cbbboard title="CBB 2026-27" tab="all" >}}
 {{< lazytab tab="international" >}}
 {{< cbbintl title="international" tab="international" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
+{{< wintabs tab="standouts" tabs="standouts,next up,true freshmen" sub="true" label="standouts views" >}}
 {{< rookies sport="cbb" icon="basketball" title="true freshmen" tab="true freshmen" >}}
-{{< wintabs tab="standouts" tabs="standouts,next up" sub="true" label="standouts views" >}}
 {{< lazytab tab="standouts" >}}
 {{< rookies sport="cbb" src="data/cbb/breakouts.json" icon="basketball" title="standouts" tab="standouts" >}}
 {{< /lazytab >}}
@@ -40,7 +40,6 @@ cover = "/og/college-basketball.png"
 {{< lazytab tab="top performers" >}}
 {{< rookies sport="cbb" src="data/cbb/top.json" icon="basketball" title="top performers" tab="top performers" >}}
 {{< /lazytab >}}
-{{< cbbpower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< desk tab="fv model" >}}
 {{< deskcol >}}
 {{< cbbfv title="fv conversions" >}}
@@ -56,11 +55,13 @@ cover = "/og/college-basketball.png"
 {{< lazytab tab="returning" >}}
 {{< teamunits sport="cbb" feed="cbb_teamtabs" view="returning" title="returning" tab="returning" >}}
 {{< /lazytab >}}
+{{< wintabs tab="portal" tabs="portal,team builder" sub="true" label="portal views" >}}
 {{< lazytab tab="portal" >}}
 {{< xferwatch sport="cbb" view="players" tab="portal" >}}
 {{< rookies sport="cbb" src="data/cbb/portal.json" icon="basketball" title="transfer portal" tab="portal" unless="cbb" >}}
 {{< /lazytab >}}
 {{< cbbbuilder title="team builder" tab="team builder" >}}
+{{< /wintabs >}}
 {{< lazytab tab="recruit transactions" >}}
 {{< recruitnews sport="cbb" title="recruit transactions" tab="recruit transactions" >}}
 {{< /lazytab >}}
@@ -145,7 +146,8 @@ cover = "/og/college-basketball.png"
 {{< cbblineups view="onoff" title="on/off" tab="on/off" >}}
 {{< lineupleaders sport="cbb" title="lineup leaders" tab="lineup leaders" >}}
 {{< /wintabs >}}
-{{< wintabs tab="season odds" tabs="season odds,tournament odds,bracket" sub="true" label="season odds views" >}}
+{{< wintabs tab="ARK Ranking" tabs="ARK Ranking,season odds,tournament odds,bracket" sub="true" label="ARK Ranking views" >}}
+{{< cbbpower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< cbbsim title="season odds" tab="season odds" >}}
 {{< cbbtourney title="ncaa tournament odds" tab="tournament odds" >}}
 {{< lazytab tab="bracket" >}}{{< bracket k="cbb" title="projected bracket" tab="bracket" icon="basketball" >}}{{< /lazytab >}}
