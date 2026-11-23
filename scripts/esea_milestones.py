@@ -356,10 +356,20 @@ def main():
             add(at, sn, 'up' if up else 'down', f'{"Promoted" if up else "Relegated"} to {x["div"].split(" ")[0]} · from {prevs["div"]}')
             x['move'], x['from'] = ('up' if up else 'down'), prevs['div']
         p = x['playoffs']
+        sm = (seas.get(str(sn)) or {}).get('matches') or []
+        rs_end = max((m['at'] or 0 for m in sm if not m.get('po')), default=0) or x['end']
+        made = bool(p and (p['series'] or p.get('name'))) or (x['current'] and bool((es.get('stakes') or {}).get('inPlayoffs')))
+        st = x['standing'] or {}
+        fin = f' · {"T-" if st.get("tied") else ""}{st["rank"]} of {st["of"]}' if st.get('rank') else ''
+        if x['rsDone'] and rs_end:
+            add(rs_end, sn, 'record', f'Regular season {x["w"]}-{x["l"]}{fin} · {x["div"]}')
+        if made and rs_end:
+            add(rs_end, sn, 'po', f'Made playoffs{" (first time)" if not po_seen else ""}' + (f' · {p["name"]}' if p and p.get('name') else ''))
+            po_seen = True
+        if p and p['series'] and not x['current'] or (p and p['series'] and x['current'] and p.get('out')):
+            add(p['series'][-1]['at'], sn, 'record', 'Season over · ' + ('won ' + p['name'] if p.get('champion') else
+                f'playoff series {p["w"]}-{p["l"]}' + (f', out vs {p["out"]}' if p.get('out') else '')) + f' · regular season {x["w"]}-{x["l"]}')
         if p and p['series']:
-            if not po_seen:
-                add(p['series'][0]['at'], sn, 'po', f'First playoffs · {p["name"]}')
-                po_seen = True
             for q in p['series']:
                 if q['res'] != 'W':
                     continue
