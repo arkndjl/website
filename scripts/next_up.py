@@ -40,6 +40,11 @@ def board(sport):
             eid = lk.rstrip('/').split('/id/')[1].split('/')[0] if lk and '/id/' in lk else None
             rows.append({'name': r[ix['name']], 'team': r[ix['team']], 'pos': r[ix['pos']], 'id': eid,
                          'cls': r[ix['cls']], 'fv': r[ix['fv']]})
+        if sport == 'cbb' and os.path.exists(os.path.join(ROOT, 'static', 'data', 'cbb-intl.json')):   # international prospects
+            d = json.load(open(os.path.join(ROOT, 'static', 'data', 'cbb-intl.json')))
+            ix = {c: i for i, c in enumerate(d['cols'])}
+            rows += [{'name': r[ix['name']], 'team': r[ix['team']], 'pos': r[ix['pos']], 'id': None, 'cls': 'Intl',
+                      'fv': r[ix['fv']]} for r in d['rows']]
         return NM.Matcher(rows, id='id', sport='football' if sport == 'cfb' else 'basketball')
     if sport == 'nfl':
         d = json.load(open(os.path.join(ROOT, 'static', 'data', 'nfl-war.json')))
@@ -54,7 +59,7 @@ def young(sport, r, Y):
         return True
     if y['rule'] == 'cls':
         if r.get('yr'):
-            return r['yr'] in y['keep']
+            return r['yr'] in y['keep'] or r['yr'] == 'Intl'      # board internationals are all draft-age prospects
         return r.get('age') is not None and r['age'] < 21            # no class found: a true underclassman's age
     return r.get('age') is not None and int(r['age']) <= y['max_age']
 

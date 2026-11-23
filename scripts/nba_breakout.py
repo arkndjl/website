@@ -270,6 +270,34 @@ def sig_x(fit, X):
     return 1 / (1 + math.exp(-max(-30, min(30, f['b0'] + sum(b * x for b, x in zip(f['b'], X))))))
 
 
+ROOKIE = os.path.join(ROOT, 'data', 'nba_rookie_bo_fit.json')   # scripts/nba_rookie_bo_research.py
+
+
+def rookies(rows, cur):
+    """this season's drafted rookies (no NBA line last season, so no returner row): odds of a rookie season at the bar
+    from the draft slot (data/nba_rookie_bo_fit.json, calibrated held out); rows from the rookies tab
+    (static/data/rookies/nba.json, pick = pre)"""
+    try:
+        ff = json.load(open(ROOKIE))
+        rk = json.load(open(os.path.join(ROOT, 'static', 'data', 'rookies', 'nba.json')))
+    except (OSError, ValueError):
+        return 0
+    S = next((x for x in rk['seasons'] if int(x['s']) == cur), None)
+    if not S:
+        return 0
+    have = {r['n'] for r in rows}
+    n = 0
+    for r in S['rows']:
+        if not r.get('pre') or r['n'] in have:
+            continue
+        z = ff['fit']['b0'] + ff['fit']['b'][0] * -math.log(r['pre'])
+        rows.append({'id': 'rk-' + r['n'], 'n': r['n'], 'x': r.get('sx'), 'xc': None, 'tm': r.get('tm'), 'pos': r.get('pos'),
+                     'age': r.get('age'), 'ph': r.get('ph'), 'p': round(1 / (1 + math.exp(-max(-30, min(30, z)))), 3), 'best': None,
+                     'u': None, 't': [], 'sig': ['draft slot']})
+        n += 1
+    return n
+
+
 def main():
     import gzip
     import nba_xpm as X
@@ -366,6 +394,7 @@ def main():
                 r['ph'] = 'https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/%s.png&w=96&h=70&scale=crop' % xp[r['id']]
     except (OSError, KeyError, ValueError):
         pass
+    nrk = rookies(rows, cur)
     rows.sort(key=lambda r: -r['p'])
     B = fit['breakout']
     lab = lambda y: f'{y - 1}-{str(y)[2:]}'  # noqa: E731
@@ -387,7 +416,9 @@ def main():
                      f'CEIL = 80th percentile of next-season XPM with usage +{cf["scen"]:g} (cap {cf["ucap"]:g}): ridge on base-season shrunk XPM, '
                      'age, ln MP + usage change x age, usage, 2P%+, 3PAr+, XPM, held-out 80th-percentile loss '
                      f'(t {cf["final"]["t"]}, {cf["final"]["won"]}/{cf["final"]["seasons"]} seasons; '
-                     f'{round(100 * cf["coverage"]["up"])}% of usage-up seasons under it)'),
+                     f'{round(100 * cf["coverage"]["up"])}% of usage-up seasons under it)'
+                     + (f'; rookies: odds of a rookie season at the bar from the draft slot (-ln pick, drafts 1990-2025, held-out t '
+                        f'{json.load(open(ROOKIE))["final_vs_flat"]["t"]} vs the base rate)' if nrk else '')),
            'rows': rows[:400]}
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     json.dump(out, open(OUT, 'w'), separators=(',', ':'))

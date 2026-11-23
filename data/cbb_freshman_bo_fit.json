@@ -1,0 +1,134 @@
+{
+ "source": "Barttorvik research seasons 2010-2026, first D-I season (class Fr)",
+ "definition": "first season at or over L = 2.8 shrunk BPM on 40%+ of minutes",
+ "L": 2.8,
+ "n": 19836,
+ "rate": 0.0371,
+ "base_vs_flat": {
+  "base": 0.15857,
+  "cand": 0.11433,
+  "gain": 0.044241,
+  "t": 12.58,
+  "won": 17,
+  "seasons": 17
+ },
+ "tests": {
+  "height": {
+   "base": 0.11433,
+   "cand": 0.11425,
+   "gain": 8.3e-05,
+   "t": 0.68,
+   "won": 11,
+   "seasons": 17,
+   "p": 0.2483,
+   "pass": false
+  },
+  "team level": {
+   "base": 0.11433,
+   "cand": 0.11366,
+   "gain": 0.000672,
+   "t": 1.71,
+   "won": 12,
+   "seasons": 17,
+   "p": 0.0436,
+   "pass": false
+  },
+  "minutes open": {
+   "base": 0.11433,
+   "cand": 0.11436,
+   "gain": -3.3e-05,
+   "t": -0.51,
+   "won": 10,
+   "seasons": 17,
+   "p": 0.695,
+   "pass": false
+  },
+  "arriving transfers": {
+   "base": 0.11433,
+   "cand": 0.11443,
+   "gain": -0.0001,
+   "t": -1.05,
+   "won": 10,
+   "seasons": 17,
+   "p": 0.8531,
+   "pass": false
+  },
+  "other top-100 freshmen": {
+   "base": 0.11433,
+   "cand": 0.11435,
+   "gain": -2e-05,
+   "t": -0.85,
+   "won": 8,
+   "seasons": 17,
+   "p": 0.8023,
+   "pass": false
+  }
+ },
+ "keep": [],
+ "final_vs_flat": {
+  "base": 0.15857,
+  "cand": 0.11433,
+  "gain": 0.044241,
+  "t": 12.58,
+  "won": 17,
+  "seasons": 17
+ },
+ "calib_heldout": [
+  [
+   0,
+   0.02,
+   13178,
+   0.007,
+   0.007
+  ],
+  [
+   0.02,
+   0.05,
+   3236,
+   0.032,
+   0.03
+  ],
+  [
+   0.05,
+   0.1,
+   1586,
+   0.07,
+   0.076
+  ],
+  [
+   0.1,
+   0.2,
+   1100,
+   0.14,
+   0.135
+  ],
+  [
+   0.2,
+   0.35,
+   433,
+   0.259,
+   0.268
+  ],
+  [
+   0.35,
+   1,
+   303,
+   0.533,
+   0.548
+  ]
+ ],
+ "top_decile_share": 0.599,
+ "fit": {
+  "cols": [
+   "-ln rank",
+   "unranked",
+   "top-100 hinge"
+  ],
+  "b0": 3.296971,
+  "b": [
+   1.167689,
+   -1.074218,
+   -0.280099
+  ]
+ }
+}

@@ -337,6 +337,85 @@ def top100(rec):
     return bool(rk) and sum(-math.log(max(r, 1)) for r in rk) / len(rk) >= -math.log(100)
 
 
+FRESH = os.path.join(ROOT, 'data', 'cbb_freshman_bo_fit.json')   # scripts/cbb_freshman_bo_research.py
+
+
+def freshmen(rows, bar, out):
+    """this season's freshmen (no college line yet, so no returner row): odds of a first season at the bar from the
+    recruiting rank (data/cbb_freshman_bo_fit.json, calibrated held out). Ranked recruits only (top 300, On3 / 247
+    mean of -ln rank); a freshman already at the bar this season (shrunk BPM to date, as for returners) is left out"""
+    if not os.path.exists(FRESH):
+        return 0
+    ff = json.load(open(FRESH))
+    b0, bb = ff['fit']['b0'], ff['fit']['b']
+    n = 0
+    for r in rows:
+        if r.get('cls') != 'Fr' or not r.get('new'):
+            continue
+        rk = [r['rec'][k] for k in ('on3rk', 'rk247') if r.get('rec') and r['rec'].get(k)]
+        if not rk:
+            continue
+        lrk = max(-math.log(500), sum(-math.log(max(x, 1)) for x in rk) / len(rk))
+        if lrk < -math.log(300):
+            continue
+        now = r.get('now') or {}
+        m_now = (now.get('mpg') or 0) / 40 * 100 * min(1.0, (now.get('gp') or 0) / 31)
+        cur = shr(now['bpm'], m_now) if now.get('bpm') is not None and (now.get('gp') or 0) >= 2 else None
+        if cur is not None and cur >= bar:
+            continue
+        x = [lrk, 0.0, max(0.0, lrk + math.log(100))][:len(bb)]
+        z = max(-30, min(30, b0 + sum(b * v for b, v in zip(bb, x))))
+        age = r.get('age') if r.get('age') is not None else r.get('ageEst')
+        out.append({'id': 'fr-' + r['name'], 'n': r['name'], 'tm': r['team'], 'lo': r.get('logo'), 'sub': r.get('conf') or '',
+                    'pos': r.get('pos') or '', 'age': age, 'ph': r.get('photo'), 'p': round(1 / (1 + math.exp(-z)), 3),
+                    'u': now.get('usg') if (now.get('gp') or 0) >= 2 else None, 'best': None, 't': [], 'sig': ['recruit rank'],
+                    'x': None if cur is None else round(cur, 1), 'xc': None, 'fr': 1})
+        n += 1
+    return n
+
+
+INTL_BO = os.path.join(ROOT, 'data', 'cbb_intl_bo_fit.json')   # scripts/cbb_intl_bo_research.py
+
+
+def intl(out):
+    """the board's international prospects: odds of next season 500+ minutes at the pro bar (EuroLeague-level Game
+    Score per 100, shrunk by minutes) from last season's pro line (data/cbb_intl_bo_fit.json, calibrated held out).
+    Lines: scripts/data/cbb_intl_fit.json live prev (totals) at its league pace and offsets; a prospect already at the
+    bar (last season or this one to date) is left out; no pro line last season = no row"""
+    try:
+        import cbb_intl as I
+        ff = json.load(open(INTL_BO))
+        fit = json.load(open(I.FIT))
+        board = json.load(open(I.OUT))
+    except (ImportError, OSError, ValueError):
+        return 0
+    C = board['cols']
+    rows = {r[C.index('name')]: dict(zip(C, r)) for r in board['rows']}
+    LF, bar, K, REP = fit['factors'], ff['L'], ff['k'], ff['rep']
+    b0, bb = ff['fit']['b0'], ff['fit']['b']
+    n = 0
+    for p in fit['live']:
+        r = rows.get(p['name'])
+        mp = sum(s['mp'] for s in p['prev'])
+        if not r or mp < 100:
+            continue
+        gw = sum(s['mp'] * I.translate(I.per100(s['tot'], fit['pace'].get(s['lg'], 72.0)), s['lg'], LF)['gmsc'] for s in p['prev'])
+        gm = (gw + REP * K) / (mp + K)
+        now = r.get('last') or {}
+        m_now = (now.get('mpg') or 0) * (now.get('gp') or 0)
+        g_now = (now['gmscEl'] * m_now + REP * K) / (m_now + K) if now.get('gmscEl') is not None else None
+        if gm >= bar or (g_now is not None and g_now >= bar):
+            continue
+        z = max(-30, min(30, b0 + bb[0] * gm + bb[1] * math.log(mp)))
+        age = r.get('age') if r.get('age') is not None else r.get('ageEst')
+        lg = (now.get('lg') or '')
+        out.append({'id': 'intl-' + p['name'], 'n': p['name'], 'tm': r.get('team'), 'lo': r.get('logo'), 'sub': lg,
+                    'pos': r.get('pos') or '', 'age': age, 'ph': r.get('photo'), 'p': round(1 / (1 + math.exp(-z)), 3),
+                    'u': None, 'best': None, 't': [], 'sig': ['pro line'], 'x': None, 'xc': None, 'intl': 1})
+        n += 1
+    return n
+
+
 def main():
     import names as N
     fit = json.load(open(FIT))
@@ -452,8 +531,11 @@ def main():
                     'best': round(best, 1), 't': tiers, 'sig': sig,
                     'x': round(shr(now['bpm'], m_now) if now.get('bpm') is not None and (now.get('gp') or 0) >= 2 else shr(a['bpm'], a['m']), 1),
                     'xc': round(ceiling(cf, a, [o for o in hist if o['y'] < a['y']]), 1)})
+    nfr = freshmen(rows, bar, out)
+    nin = intl(out)
     out.sort(key=lambda o: -o['p'])
-    out = out[:400]
+    out = [o for o in out if o.get('fr') or o.get('intl')] + [o for o in out if not (o.get('fr') or o.get('intl'))][:600]
+    out.sort(key=lambda o: -o['p'])
     d = bfit['definition']
     f = bfit['final']
     more = ''
@@ -468,6 +550,12 @@ def main():
              f"shrunk BPM, Marcel, age, ln min% + usage change x age, usage, rim and 3PA rates, assist %, BPM, spread by age, minutes, "
              f"usage (held-out 80th-percentile loss t {cf['final']['t']}, {cf['final']['won']}/{cf['final']['seasons']} seasons; "
              f"{round(100 * cf['coverage']['up'])}% of usage-up seasons under it)")
+    if nfr:
+        ff = json.load(open(FRESH))
+        g = ff['final_vs_flat']
+        about += (f"; freshmen (no line yet, top-300 recruits): odds of a first season at the bar from the recruiting rank, "
+                  f"held-out log loss vs the base rate {g['base']:.4f} -> {g['cand']:.4f} (t {g['t']}, {g['won']}/{g['seasons']} seasons), "
+                  f"top decile {round(100 * ff['top_decile_share'])}% of freshman breakouts")
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     json.dump({'sport': 'cbb', 'season': '2026-27', 'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
                'base': label, 'u': {'lab': 'USG', 'dec': 1},
@@ -477,7 +565,7 @@ def main():
                'ceil': {'lab': 'CEIL', 't': 'ceiling BPM: 80th percentile season if usage rises %g points' % cf['scen'], 'dec': 1},
                'about': about, 'rows': out},
               open(OUT, 'w'), separators=(',', ':'))
-    print(f'{len(match)} board players with a {label} line, {done} already at the bar ({bar}), {len(out)} rows -> {OUT}')
+    print(f'{len(match)} board players with a {label} line, {done} already at the bar ({bar}), {nfr} freshmen, {nin} internationals, {len(out)} rows -> {OUT}')
 
 
 if __name__ == '__main__':

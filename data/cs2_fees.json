@@ -1,10 +1,55 @@
 {
- "note": "Publicly reported Counter-Strike buyout fees (estimates from insiders and press, none confirmed by the clubs), used only to set the dollar scale of the transfer values (scripts/cs2_players.py). The transfer date is the player's first map for the buying team in the bo3.gg stats.",
+ "note": "Publicly reported Counter-Strike buyout fees (insider and press estimates, none confirmed by the clubs), used only to set the dollar scale of the transfer values (scripts/cs2_value.py). A '+'-joined nick is a group deal, priced as the sum of its players. The transfer date is the players' first map for the buying team in the bo3.gg stats; moves before Jul 2024 (under six months of stats) are not used.",
  "fees": [
-  {"nick": "m0NESY", "from": "G2", "to": "Falcons", "usd": 2500000, "src": "reported ~$2.5M (Dexerto, Jun 2025: 'rumored at $2.5 million')"},
-  {"nick": "kyousuke", "from": "Spirit Academy", "to": "Falcons", "usd": 2000000, "src": "insider OverDrive ~$2M; Falcons' chairman said it was lower (Dexerto, Jun 23 2025)"},
-  {"nick": "electroNic", "from": "Cloud9", "to": "Virtus.pro", "usd": 1600000, "src": "~$1.6M per Esports Transfers (press roundups)"},
-  {"nick": "NiKo", "from": "G2", "to": "Falcons", "usd": 1100000, "src": "reported $1.0-1.2M (press roundups; other lists say free)"},
-  {"nick": "sh1ro", "from": "Cloud9", "to": "Spirit", "usd": 1400000, "src": "reported $1.1-1.75M (press roundups); midpoint"}
+  {
+   "nick": "m0NESY",
+   "from": "G2",
+   "to": "Falcons",
+   "usd": 2500000,
+   "src": "reported ~$2.5M (Dexerto, Jun 2025: 'rumored at $2.5 million')"
+  },
+  {
+   "nick": "kyousuke",
+   "from": "Spirit Academy",
+   "to": "Falcons",
+   "usd": 2000000,
+   "src": "insider OverDrive ~$2M; Falcons' chairman said it was lower (Dexerto, Jun 23 2025); insider OverDrive ~$2M"
+  },
+  {
+   "nick": "electroNic",
+   "from": "Cloud9",
+   "to": "Virtus.pro",
+   "usd": 1600000,
+   "src": "~$1.6M per Esports Transfers (press roundups)"
+  },
+  {
+   "nick": "NiKo",
+   "from": "G2",
+   "to": "Falcons",
+   "usd": 1100000,
+   "src": "reported $1.0-1.2M (press roundups; other lists say free)"
+  },
+  {
+   "nick": "sh1ro",
+   "from": "Cloud9",
+   "to": "Spirit",
+   "usd": 1400000,
+   "src": "reported $1.1-1.75M (press roundups); midpoint"
+  },
+  {
+   "nick": "MUTiRiS+krazy+aragornN",
+   "from": "SAW",
+   "to": "BC.Game",
+   "usd": 2500000,
+   "src": "OverDrive ~$2.5M for the SAW core (Jan 2026); BC.Game's CEO told HLTV it was not $2M, without saying higher or lower (dust2.us, Jun 2026)"
+  },
+  {
+   "nick": "XANTARES+woxic+Wicadia+MAJ3R+jottAAA",
+   "from": "Eternal Fire",
+   "to": "Aurora",
+   "usd": 2500000,
+   "bound": "max",
+   "src": "upper bound: OverDrive said m0NESY's ~$2-2.5M was more than Aurora paid for the whole Eternal Fire roster (game-tournaments.com, Apr 2025); a check, not fit"
+  }
  ]
 }
