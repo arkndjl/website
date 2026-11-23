@@ -1,0 +1,114 @@
+{
+ "source": "Basketball-Reference international totals, 12 leagues, EuroLeague-level Game Score per 100",
+ "L": 15.19,
+ "k": 100.0,
+ "rep": -4.0,
+ "reg": 500.0,
+ "n": 4911,
+ "rate": 0.0595,
+ "base_vs_flat": {
+  "base": 0.2264,
+  "cand": 0.18835,
+  "gain": 0.038047,
+  "t": 5.59,
+  "won": 15,
+  "seasons": 18
+ },
+ "tests": {
+  "career season": {
+   "base": 0.18835,
+   "cand": 0.18799,
+   "gain": 0.000355,
+   "t": 0.56,
+   "won": 9,
+   "seasons": 18,
+   "p": 0.2877,
+   "pass": false
+  },
+  "league level": {
+   "base": 0.18835,
+   "cand": 0.18844,
+   "gain": -8.9e-05,
+   "t": -0.25,
+   "won": 10,
+   "seasons": 18,
+   "p": 0.5987,
+   "pass": false
+  },
+  "EuroLeague share": {
+   "base": 0.18835,
+   "cand": 0.18845,
+   "gain": -0.000104,
+   "t": -0.38,
+   "won": 10,
+   "seasons": 18,
+   "p": 0.648,
+   "pass": false
+  }
+ },
+ "keep": [],
+ "final_vs_flat": {
+  "base": 0.2264,
+  "cand": 0.18835,
+  "gain": 0.038047,
+  "t": 5.59,
+  "won": 15,
+  "seasons": 18
+ },
+ "calib_heldout": [
+  [
+   0,
+   0.02,
+   1956,
+   0.008,
+   0.007
+  ],
+  [
+   0.02,
+   0.05,
+   1040,
+   0.033,
+   0.034
+  ],
+  [
+   0.05,
+   0.1,
+   898,
+   0.072,
+   0.071
+  ],
+  [
+   0.1,
+   0.2,
+   709,
+   0.145,
+   0.162
+  ],
+  [
+   0.2,
+   0.35,
+   304,
+   0.24,
+   0.211
+  ],
+  [
+   0.35,
+   1,
+   4,
+   0.367,
+   0.25
+  ]
+ ],
+ "top_decile_share": 0.342,
+ "fit": {
+  "cols": [
+   "EL GmSc",
+   "ln min"
+  ],
+  "b0": -3.745257,
+  "b": [
+   0.324704,
+   -0.328409
+  ]
+ }
+}
