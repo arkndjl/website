@@ -504,16 +504,48 @@ def nhl(fit, rng):
                       'gsx0': (q.get('gsax') or 0) / max(q.get('toi') or 1, 1) * 60 if q.get('gp') else None,
                       'rookie': rookie, 'key': k})
 
+    nhl_lines(cands, S)
     ROSTER['nhl'] = cands
     out = []
     T = season_T('nhl', sum(TG.values()) / max(82 * len(TG), 1))
-    for aw, pool, p, draw, show in nhl_races(fit, rng, cands, teams): out.append((aw, rows_out(pool, temper(p, T), draw, show, rng), show))
+    for aw, pool, p, draw, show in nhl_races(fit, rng, cands, teams):
+        if aw == 'allstar': out.append((aw, rows_out(pool, p, draw, show, rng, top=30), show))        # P(team): no temper
+        else: out.append((aw, rows_out(pool, temper(p, T), draw, show, rng), show))
+    for aw, pool, p, draw, show in nhl_titles(fit, rng, cands, nhl_draw(fit, teams)):
+        out.append((aw, rows_out(pool, p, draw, show, rng), show))                                 # stat titles: no temper
     return {'season': f'{S - 1}-{str(S)[2:]}', 'races': out, 'logo': 'nhl', 'T': T}
 
 
-def nhl_races(fit, rng, cands, teams, G=82, sims=SIMS):
-    """yields (award, pool, P(win), draw, shown stats) for each passing NHL award. cands: to-date lines; teams:
-    {t: (points, 2 x games, mean final points, sd, 2 x G)}"""
+def nhl_lines(cands, S):
+    """+/- (scaled by games in the draws), PIM a game, faceoff share over .5 (centres: 5+ draws a game), takeaways a
+    game: NHL stats API skater reports for the season (the Selke and Lady Byng voter models' inputs)"""
+    import urllib.parse
+    q = urllib.parse.quote(f'seasonId={S - 1}{S} and gameTypeId=2')
+    srt = urllib.parse.quote('[{"property":"playerId","direction":"ASC"}]')
+    rep = {}
+    for r in ('summary', 'realtime', 'faceoffwins'):
+        start = 0
+        try:
+            while True:                                   # 100 rows a call at most (limit=-1 included): page through
+                d = json.loads(urllib.request.urlopen(urllib.request.Request(
+                    f'https://api.nhle.com/stats/rest/en/skater/{r}?limit=100&start={start}&sort={srt}&cayenneExp={q}',
+                    headers={'User-Agent': UA}), timeout=60).read())
+                for x in d.get('data', []): rep.setdefault(str(x['playerId']), {}).update(x)
+                start += len(d.get('data', []))
+                if not d.get('data') or start >= (d.get('total') or 0): break
+        except Exception as e:
+            print('nhl stats api', r, e)
+    for c in cands:
+        x = rep.get(str(c['id']))
+        if not x or c['grp'] == 'G': continue
+        gp = max(c['gp'], 1)
+        fo = (x.get('totalFaceoffWins') or 0) + (x.get('totalFaceoffLosses') or 0)
+        c.update(pm=x.get('plusMinus') or 0, pimpg=(x.get('penaltyMinutes') or 0) / gp, tk=(x.get('takeaways') or 0) / gp,
+                 fo=((x.get('totalFaceoffWins') or 0) / fo - .5) if fo >= 5 * gp else 0.0)
+
+
+def nhl_draw(fit, teams, G=82):
+    """one simulated finish of a candidate (draw(c, td, rng) -> features) and draw.teams(rng) -> team points %"""
     prev = fit.get('_prev', {})
 
     def draw(c, td, rng):
@@ -538,10 +570,16 @@ def nhl_races(fit, rng, cands, teams, G=82, sims=SIMS):
         gs_rate = c['gsax'] / max(c['toi'], 1) * 60
         if not SEASON_ONLY: gs_rate = bl(gs_rate, c['gsx0'], 40) if c['gsx0'] is not None else gs_rate * c['gp'] / (c['gp'] + 40)
         gsax = c['gsax'] + gauss(rng, gs_rate * tr / 60, 1.4 * math.sqrt(max(tr / 60, 0)))   # 1.4 goals a game
+        # defensive goals (WAR's gd) run out with his WAR; +/- by games; PIM, faceoffs, takeaways at this season's rates
+        gd = c['gd'] + (c['gd'] / c['war'] * war_r if c['grp'] != 'G' and abs(c['war']) > .5 else c['gd'] / max(c['gp'], 1) * gr)
+        k = c.get('key')
         return {'war': war, 'pts': pts, 'g': g, 'gsax': gsax, 'gp': gp, 'gfrac': gp / G, 'toipg': tpg,
-                'tpct': td[c['tm']], 'goalie': 1.0 if c['grp'] == 'G' else 0.0, 'gd': c['gd'] * gp / max(c['gp'], 1),
-                'prev_hart': prev.get('hart', {}).get(c['key'], 0), 'prev_norris': prev.get('norris', {}).get(c['key'], 0),
-                'prev_vezina': prev.get('vezina', {}).get(c['key'], 0)}
+                'tpct': td[c['tm']], 'goalie': 1.0 if c['grp'] == 'G' else 0.0, 'gd': gd, 'dman': 1.0 if c['grp'] == 'D' else 0.0,
+                'pm': c.get('pm', 0.0) * gp / max(c['gp'], 1), 'pimpg': c.get('pimpg', 0.0), 'fo': c.get('fo', 0.0), 'tk': c.get('tk', 0.0),
+                'prev_hart': prev.get('hart', {}).get(k, 0), 'prev_norris': prev.get('norris', {}).get(k, 0),
+                'prev_vezina': prev.get('vezina', {}).get(k, 0), 'prev_selke': prev.get('selke', {}).get(k, 0),
+                'prev_byng': prev.get('byng', {}).get(k, 0), 'prev_allstar': prev.get('allstar', {}).get(k, 0),
+                'prev_lindsay': prev.get('lindsay', {}).get(k, 0)}
 
     def teams_draw(rng):
         out = {}
@@ -550,17 +588,97 @@ def nhl_races(fit, rng, cands, teams, G=82, sims=SIMS):
         return out
 
     draw.teams = teams_draw
+    return draw
+
+
+NHL_AS_K = {'F': 6, 'D': 4, 'G': 2}       # All-Star: first and second team by group (C/LW/RW, D, G)
+
+
+def nhl_races(fit, rng, cands, teams, G=82, sims=SIMS):
+    """yields (award, pool, P(win), draw, shown stats) for each passing NHL award. cands: to-date lines; teams:
+    {t: (points, 2 x games, mean final points, sd, 2 x G)}. Conviction (lead()) also runs for Selke and the All-Star
+    teams (their own value metric: WAR's defensive goals, WAR)"""
+    draw = nhl_draw(fit, teams, G)
     for aw, pool_f, show in (
             ('hart', lambda c: c['gp'] >= 5, [('war', 'WAR', '%.1f'), ('pts', 'PTS', '%.0f'), ('tpct', 'PTS%', 'pct')]),
             ('norris', lambda c: c['grp'] == 'D' and c['gp'] >= 5, [('war', 'WAR', '%.1f'), ('pts', 'PTS', '%.0f'), ('toipg', 'TOI', 'toi'), ('tpct', 'PTS%', 'pct')]),
             ('vezina', lambda c: c['grp'] == 'G' and c['gp'] >= 3, [('gsax', 'GSAx', '%+.1f'), ('war', 'WAR', '%.1f'), ('gp', 'GP', '%.0f'), ('tpct', 'PTS%', 'pct')]),
-            ('calder', lambda c: c['rookie'] and c['gp'] >= 3, [('war', 'WAR', '%.1f'), ('pts', 'PTS', '%.0f'), ('g', 'G', '%.0f'), ('tpct', 'PTS%', 'pct')])):
+            ('calder', lambda c: c['rookie'] and c['gp'] >= 3, [('war', 'WAR', '%.1f'), ('pts', 'PTS', '%.0f'), ('g', 'G', '%.0f'), ('tpct', 'PTS%', 'pct')]),
+            ('selke', lambda c: c['grp'] == 'F' and c['gp'] >= 5, [('gd', 'DEF', '%+.1f'), ('war', 'WAR', '%.1f'), ('pts', 'PTS', '%.0f'), ('pm', '+/-', '%+.0f')]),
+            ('byng', lambda c: c['grp'] != 'G' and c['gp'] >= 5, [('pimpg', 'PIM/G', '%.2f'), ('pts', 'PTS', '%.0f'), ('war', 'WAR', '%.1f')])):
         spec = fit.get(aw)
-        if not spec or not spec['test'].get('pass'): continue
-        lead(aw, [c for c in cands if pool_f(c)], draw, spec['null'][0], first(show, spec['null'][0]), rng)
+        if not spec: continue
+        if aw == 'selke': lead(aw, [c for c in cands if pool_f(c)], draw, 'gd', show, rng)
+        if not spec['test'].get('pass'): continue
+        if aw not in ('selke', 'byng'):          # Byng: no value metric of ours for sportsmanship, so no conviction race
+            lead(aw, [c for c in cands if pool_f(c)], draw, spec['null'][0], first(show, spec['null'][0]), rng)
         pool = prune([c for c in cands if pool_f(c)], spec, draw, rng)
         p = race(pool, spec, draw, rng, sims)
         yield aw, pool, p, draw, show
+    # All-Star teams: a top-k race in each group (first and second team), one table
+    spec = fit.get('allstar')
+    if spec:
+        show = [('war', 'WAR', '%.1f'), ('pts', 'PTS', '%.0f'), ('gsax', 'GSAx', '%+.1f'), ('tpct', 'PTS%', 'pct')]
+        grp = lambda g: [c for c in cands if c['grp'] == g and c['gp'] >= (3 if g == 'G' else 5)]
+        conv = []
+        for g, k in NHL_AS_K.items():
+            lead('allstar', grp(g), draw, 'war', show, rng, k=k)
+            if CONV is not None and 'allstar' in CONV: conv.append(CONV.pop('allstar'))
+        if conv:
+            rows = Rows(sorted([r for x in conv for r in x], key=lambda r: -r['p'])[:30])
+            rows.rest = [r for x in conv for r in x.rest] + sorted([r for x in conv for r in x], key=lambda r: -r['p'])[30:]
+            rows.show, rows.metric, rows.k = show, 'war', sum(NHL_AS_K.values())
+            rows.about = (f"P(team): the share of {SIMS:,} simulated rests of the season in which he is in his group's top "
+                          "two on WAR (forwards top six, defencemen top four), the games left at this season's own rate. "
+                          "No voter model, no market.")
+            CONV['allstar'] = rows
+        if spec['test'].get('pass'):
+            pool, p = [], []
+            for g, k in NHL_AS_K.items():
+                pl = prune(grp(g), spec, draw, rng, keep=max(30, 5 * k))
+                pool += pl; p += race_k(pl, spec, draw, rng, k, sims)
+            yield 'allstar', pool, p, draw, show
+
+
+def nhl_titles(fit, rng, cands, draw, sims=SIMS):
+    """Art Ross (points, goals break ties) and Rocket Richard (goals): stat titles, so P(lead) is the race itself.
+    Predictive = the live draw (rates blended toward last season); conviction = this season's own rate (lead()).
+    The predictive table is written only where the as-of test (data/awards_fit.json, stat: true) passed."""
+    sk = [c for c in cands if c['grp'] != 'G' and c['gp'] >= 1]
+    for aw, metric, tie, show in (('artross', 'pts', 'g', [('pts', 'PTS', '%.0f'), ('g', 'G', '%.0f'), ('gp', 'GP', '%.0f')]),
+                                  ('richard', 'g', None, [('g', 'G', '%.0f'), ('pts', 'PTS', '%.0f'), ('gp', 'GP', '%.0f')])):
+        spec = fit.get(aw)
+        if not spec: continue
+        pool = title_pool(sk, metric, tie)
+        lead(aw, pool, draw, metric, show, rng)
+        if spec['test'].get('pass'):
+            yield aw, pool, title_p(pool, draw, metric, tie, rng, sims), draw, show
+
+
+def title_pool(sk, metric, tie, n=60):
+    """the n best on the metric so far and the n best on pace (a short list for the stat-title simulation)"""
+    by_now = sorted(sk, key=lambda c: -(c[metric] + 1e-3 * (c[tie] if tie else 0)))[:n]
+    by_pace = sorted(sk, key=lambda c: -c[metric] / max(c['gp'], 1) * min(c['gp'], 10) / 10)[:n]
+    seen, out = set(), []
+    for c in by_now + by_pace:
+        if c['id'] not in seen: seen.add(c['id']); out.append(c)
+    return out
+
+
+def title_p(pool, draw, metric, tie, rng, sims=SIMS):
+    """P(lead the league) per candidate over simulated finishes (a tie in the metric broken by `tie`, then shared)"""
+    win = [0.0] * len(pool)
+    for _ in range(sims):
+        td = draw.teams(rng)
+        z = []
+        for i, c in enumerate(pool):
+            f = draw(c, td, rng)
+            if f is not None: z.append((round(f[metric]) + (round(f[tie]) / 1000 if tie else 0), i))
+        if not z: continue
+        m = max(v for v, _ in z)
+        top = [i for v, i in z if v == m]
+        for i in top: win[i] += 1 / len(top)
+    return [w / sims for w in win]
 
 
 # ---------------------------------------------------------------- CBB
@@ -939,7 +1057,7 @@ def soccer(fit, rng):
 NULL_LABEL = {'svar': 'SVAR', 'vorx': 'VORX', 'dxpm': 'D-XPM', 'war': 'WAR', 'gsax': 'GSAx', 'bpm': 'BPM', 'yds': 'yards',
               'td': 'TDs', 'sacks': 'sacks', 'dint': 'INTs', 'pass_y': 'pass yards', 'ptd': 'pass TDs', 'gross': 'gross average',
               'rush_y': 'rush yards', 'rtd': 'rush TDs', 'rec_y': 'receiving yards', 'ctd': 'receiving TDs', 'tackles': 'tackles',
-              'fgm': 'FGs', 'fgpct': 'FG%', 'pd': 'PDs', 'gar': 'GAR'}
+              'fgm': 'FGs', 'fgpct': 'FG%', 'pd': 'PDs', 'gar': 'GAR', 'pts': 'points', 'g': 'goals', 'gd': 'defensive goals (WAR)'}
 BUILD = {'nba': nba, 'nhl': nhl, 'cbb': cbb, 'cfb': cfb, 'nfl': nfl, 'soccer': soccer}
 
 
@@ -961,6 +1079,11 @@ def main(argv):
         races = []
         for aw, rows, show in res['races']:
             spec = fit[sp][aw]
+            if spec.get('stat'):                   # a stat title: P(lead) is the race; its as-of test is the about
+                races.append({'key': aw, 'label': spec['label'], 'rows': rows, 'mkt': False, 'stat': True, 'about': spec['about'],
+                              'show': [{'k': k, 'l': l, 'f': f} for k, l, f in show]})
+                print(sp, spec['label'], 'top:', ', '.join(f"{r['n']} {r['p']:.0%}" for r in rows[:5]))
+                continue
             mk, bl = (False, False) if spec.get('k') else attach_market(rows, sp, aw)
             t = spec['test']
             races.append({'key': aw, 'label': spec['label'], 'rows': rows, 'mkt': mk,
@@ -984,10 +1107,13 @@ def main(argv):
                         if NM.key(x['n']) in allp: x['pc'] = allp[NM.key(x['n'])]
             for x in rows:
                 if NM.key(x['n']) in pred.get(aw, {}): x['pp'] = pred[aw][NM.key(x['n'])]
+            if getattr(rows, 'about', None): x_about = rows.about
+            else: x_about = None
             conv.append({'key': aw, 'label': fit[sp][aw]['label'], 'rows': list(rows), 'pred': aw in pred,
                          'metric': NULL_LABEL.get(rows.metric, rows.metric),
                          'show': [{'k': k, 'l': l, 'f': f} for k, l, f in rows.show]})
             if getattr(rows, 'k', None): conv[-1]['k'] = rows.k
+            if x_about: conv[-1]['about'] = x_about
             print(sp, fit[sp][aw]['label'], 'conviction:', ', '.join(f"{r['n']} {r['p']:.0%}" for r in rows[:5]))
         cur[sp] = {'season': res['season'], 'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
                    'sims': SIMS, 'logo': res['logo'], 'races': races, 'conv': conv}

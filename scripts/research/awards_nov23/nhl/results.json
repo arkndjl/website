@@ -1,0 +1,483 @@
+{
+ "drivers": {
+  "calder:age": {
+   "coef": -0.461,
+   "gain": 0.145,
+   "hit": 7,
+   "hit0": 7,
+   "ll": -1.778,
+   "ll0": -1.923,
+   "n": 15,
+   "p": 0.0364,
+   "pass": false,
+   "t": 1.94,
+   "wins": 10
+  },
+  "calder:dfv": {
+   "coef": 0.292,
+   "gain": 0.1709,
+   "hit": 7,
+   "hit0": 7,
+   "ll": -1.752,
+   "ll0": -1.923,
+   "n": 15,
+   "p": 0.0398,
+   "pass": false,
+   "t": 1.89,
+   "wins": 10
+  },
+  "calder:lslot": {
+   "coef": -0.333,
+   "gain": 0.213,
+   "hit": 8,
+   "hit0": 7,
+   "ll": -1.71,
+   "ll0": -1.923,
+   "n": 15,
+   "p": 0.0234,
+   "pass": false,
+   "t": 2.18,
+   "wins": 10
+  },
+  "calder:pm": {
+   "coef": 0.057,
+   "gain": -0.0215,
+   "hit": 7,
+   "hit0": 7,
+   "ll": -1.945,
+   "ll0": -1.923,
+   "n": 15,
+   "p": 0.8787,
+   "pass": false,
+   "t": -1.22,
+   "wins": 7
+  },
+  "calder:pwar0": {
+   "coef": -0.811,
+   "gain": 0.3594,
+   "hit": 7,
+   "hit0": 7,
+   "ll": -1.564,
+   "ll0": -1.923,
+   "n": 15,
+   "p": 0.0537,
+   "pass": false,
+   "t": 1.72,
+   "wins": 13
+  },
+  "calder:trank": {
+   "coef": 0.17,
+   "gain": -0.0272,
+   "hit": 7,
+   "hit0": 7,
+   "ll": -1.95,
+   "ll0": -1.923,
+   "n": 15,
+   "p": 0.9472,
+   "pass": false,
+   "t": -1.73,
+   "wins": 5
+  },
+  "hart:pm": {
+   "coef": -0.247,
+   "gain": 0.0218,
+   "hit": 8,
+   "hit0": 8,
+   "ll": -1.888,
+   "ll0": -1.91,
+   "n": 17,
+   "p": 0.34,
+   "pass": false,
+   "t": 0.42,
+   "wins": 12
+  },
+  "hart:prevvote": {
+   "coef": -0.017,
+   "gain": -0.0685,
+   "hit": 8,
+   "hit0": 8,
+   "ll": -1.978,
+   "ll0": -1.91,
+   "n": 17,
+   "p": 0.9209,
+   "pass": false,
+   "t": -1.48,
+   "wins": 6
+  },
+  "hart:pwar0": {
+   "coef": 0.215,
+   "gain": 0.0961,
+   "hit": 9,
+   "hit0": 8,
+   "ll": -1.814,
+   "ll0": -1.91,
+   "n": 17,
+   "p": 0.1011,
+   "pass": false,
+   "t": 1.33,
+   "wins": 8
+  },
+  "hart:title": {
+   "coef": 0.106,
+   "gain": 0.1807,
+   "hit": 8,
+   "hit0": 8,
+   "ll": -1.729,
+   "ll0": -1.91,
+   "n": 17,
+   "p": 0.0552,
+   "pass": false,
+   "t": 1.69,
+   "wins": 14
+  },
+  "hart:trank": {
+   "coef": -0.386,
+   "gain": 0.0087,
+   "hit": 8,
+   "hit0": 8,
+   "ll": -1.901,
+   "ll0": -1.91,
+   "n": 17,
+   "p": 0.3085,
+   "pass": false,
+   "t": 0.51,
+   "wins": 11
+  },
+  "norris:gfrac": {
+   "coef": 0.323,
+   "gain": 0.0062,
+   "hit": 7,
+   "hit0": 7,
+   "ll": -1.794,
+   "ll0": -1.801,
+   "n": 17,
+   "p": 0.2983,
+   "pass": false,
+   "t": 0.54,
+   "wins": 11
+  },
+  "norris:pm": {
+   "coef": 0.737,
+   "gain": 0.1613,
+   "hit": 7,
+   "hit0": 7,
+   "ll": -1.639,
+   "ll0": -1.801,
+   "n": 17,
+   "p": 0.1129,
+   "pass": false,
+   "t": 1.26,
+   "wins": 12
+  },
+  "norris:prevvote": {
+   "coef": 0.064,
+   "gain": -0.027,
+   "hit": 7,
+   "hit0": 7,
+   "ll": -1.828,
+   "ll0": -1.801,
+   "n": 17,
+   "p": 0.705,
+   "pass": false,
+   "t": -0.55,
+   "wins": 9
+  },
+  "norris:pwar0": {
+   "coef": -0.018,
+   "gain": -0.0363,
+   "hit": 7,
+   "hit0": 7,
+   "ll": -1.837,
+   "ll0": -1.801,
+   "n": 17,
+   "p": 0.9889,
+   "pass": false,
+   "t": -2.53,
+   "wins": 4
+  },
+  "norris:title": {
+   "coef": -0.077,
+   "gain": 0.0125,
+   "hit": 6,
+   "hit0": 7,
+   "ll": -1.788,
+   "ll0": -1.801,
+   "n": 17,
+   "p": 0.453,
+   "pass": false,
+   "t": 0.12,
+   "wins": 10
+  },
+  "norris:trank": {
+   "coef": -0.196,
+   "gain": 0.0036,
+   "hit": 7,
+   "hit0": 7,
+   "ll": -1.797,
+   "ll0": -1.801,
+   "n": 17,
+   "p": 0.3436,
+   "pass": false,
+   "t": 0.41,
+   "wins": 12
+  },
+  "vezina:gfrac": {
+   "coef": 1.293,
+   "gain": 0.0145,
+   "hit": 10,
+   "hit0": 10,
+   "ll": -1.242,
+   "ll0": -1.256,
+   "n": 17,
+   "p": 0.2039,
+   "pass": false,
+   "t": 0.85,
+   "wins": 12
+  },
+  "vezina:pm": {
+   "coef": 0.0,
+   "gain": -0.0,
+   "hit": 10,
+   "hit0": 10,
+   "ll": -1.256,
+   "ll0": -1.256,
+   "n": 17,
+   "p": 0.759,
+   "pass": false,
+   "t": -0.72,
+   "wins": 4
+  },
+  "vezina:prevvote": {
+   "coef": -0.071,
+   "gain": 0.0006,
+   "hit": 10,
+   "hit0": 10,
+   "ll": -1.255,
+   "ll0": -1.256,
+   "n": 17,
+   "p": 0.4882,
+   "pass": false,
+   "t": 0.03,
+   "wins": 9
+  },
+  "vezina:pwar0": {
+   "coef": -0.221,
+   "gain": -0.0743,
+   "hit": 9,
+   "hit0": 10,
+   "ll": -1.33,
+   "ll0": -1.256,
+   "n": 17,
+   "p": 0.8854,
+   "pass": false,
+   "t": -1.25,
+   "wins": 6
+  },
+  "vezina:title": {
+   "coef": 0.244,
+   "gain": -0.0885,
+   "hit": 9,
+   "hit0": 10,
+   "ll": -1.345,
+   "ll0": -1.256,
+   "n": 17,
+   "p": 0.8704,
+   "pass": false,
+   "t": -1.17,
+   "wins": 8
+  },
+  "vezina:trank": {
+   "coef": -0.865,
+   "gain": -0.0271,
+   "hit": 10,
+   "hit0": 10,
+   "ll": -1.283,
+   "ll0": -1.256,
+   "n": 17,
+   "p": 0.7117,
+   "pass": false,
+   "t": -0.57,
+   "wins": 8
+  }
+ },
+ "races": {
+  "adams": {
+   "cols": [
+    "tpct",
+    "dexp",
+    "gdpg",
+    "prev_adams"
+   ],
+   "null": [
+    "tpct"
+   ],
+   "test": {
+    "gain": 0.58,
+    "holm_n": 9,
+    "model": {
+     "fav": 0.429,
+     "hit": 8,
+     "ll": -1.969,
+     "n": 17,
+     "pw": 0.263
+    },
+    "null": {
+     "fav": 0.247,
+     "hit": 3,
+     "ll": -2.549,
+     "n": 17,
+     "pw": 0.112
+    },
+    "p": 0.0148,
+    "pass": false,
+    "t": 2.39,
+    "wins": 14
+   }
+  },
+  "allstar": {
+   "cols": [
+    "war",
+    "pts",
+    "g",
+    "gsax",
+    "tpct",
+    "gfrac",
+    "prev_allstar"
+   ],
+   "null": [
+    "war"
+   ],
+   "test": {
+    "gain": 18.3625,
+    "holm_n": 9,
+    "model": {
+     "fav": 0.0,
+     "hit": 141,
+     "ll": -22.25,
+     "n": 17,
+     "pw": 0.694
+    },
+    "null": {
+     "fav": 0.0,
+     "hit": 83,
+     "ll": -40.613,
+     "n": 17,
+     "pw": 0.408
+    },
+    "p": 0.0,
+    "pass": true,
+    "t": 11.47,
+    "wins": 17
+   }
+  },
+  "byng": {
+   "cols": [
+    "pimpg",
+    "pts",
+    "war",
+    "gfrac",
+    "tpct",
+    "dman",
+    "prev_byng"
+   ],
+   "null": [
+    "war"
+   ],
+   "test": {
+    "gain": 3.135,
+    "holm_n": 9,
+    "model": {
+     "fav": 0.29,
+     "hit": 7,
+     "ll": -2.265,
+     "n": 17,
+     "pw": 0.165
+    },
+    "null": {
+     "fav": 0.092,
+     "hit": 0,
+     "ll": -5.4,
+     "n": 17,
+     "pw": 0.01
+    },
+    "p": 0.0,
+    "pass": true,
+    "t": 9.96,
+    "wins": 17
+   }
+  },
+  "lindsay": {
+   "cols": [
+    "war",
+    "pts",
+    "g",
+    "tpct",
+    "gfrac",
+    "goalie",
+    "prev_lindsay"
+   ],
+   "null": [
+    "war"
+   ],
+   "test": {
+    "gain": 1.6617,
+    "holm_n": 9,
+    "model": {
+     "fav": 0.594,
+     "hit": 11,
+     "ll": -1.618,
+     "n": 17,
+     "pw": 0.488
+    },
+    "null": {
+     "fav": 0.284,
+     "hit": 5,
+     "ll": -3.28,
+     "n": 17,
+     "pw": 0.107
+    },
+    "p": 0.0351,
+    "pass": false,
+    "t": 1.94,
+    "wins": 15
+   }
+  },
+  "selke": {
+   "cols": [
+    "gd",
+    "war",
+    "pts",
+    "pm",
+    "fo",
+    "tk",
+    "tpct",
+    "prev_selke"
+   ],
+   "null": [
+    "gd"
+   ],
+   "test": {
+    "gain": 2.8427,
+    "holm_n": 9,
+    "model": {
+     "fav": 0.58,
+     "hit": 8,
+     "ll": -1.649,
+     "n": 17,
+     "pw": 0.383
+    },
+    "null": {
+     "fav": 0.056,
+     "hit": 2,
+     "ll": -4.492,
+     "n": 17,
+     "pw": 0.019
+    },
+    "p": 0.0,
+    "pass": true,
+    "t": 11.56,
+    "wins": 16
+   }
+  }
+ }
+}
