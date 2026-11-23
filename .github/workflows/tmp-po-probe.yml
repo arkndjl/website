@@ -1,0 +1,14 @@
+name: tmp po probe
+on:
+  push:
+    branches: [claude/project-thread-kqt824]
+    paths: [scripts/esea_po_probe.mjs, .github/workflows/tmp-po-probe.yml]
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node scripts/esea_po_probe.mjs
+        env: { FACEIT_API_KEY: "${{ secrets.FACEIT_API_KEY }}" }
