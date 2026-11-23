@@ -100,8 +100,9 @@ def season_rows(S):
     esp = json.load(open(os.path.join(ROOT, 'data', 'soccer_logos.json'))).get('espn', {})    # Understat name -> ESPN id
     out = {}
     for r in d['players']:
-        x = out.setdefault(r['p'], {'id': r['p'], 'n': r['n'], 'gar': 0.0, 'g': 0, 'a': 0, 'min': 0, '_m': -1})
+        x = out.setdefault(r['p'], {'id': r['p'], 'n': r['n'], 'gar': 0.0, 'svar': None, 'g': 0, 'a': 0, 'min': 0, '_m': -1})
         x['gar'] += r.get('gar') or 0; x['g'] += r.get('g') or 0; x['a'] += r.get('a') or 0; x['min'] += r.get('min') or 0
+        if r.get('svar') is not None: x['svar'] = (x['svar'] or 0.0) + r['svar']      # SV over replacement (soccer_sv.py)
         if (r.get('min') or 0) > x['_m']:
             x['_m'] = r.get('min') or 0
             x.update(team=r['team'], lg=r['lg'], tid=esp.get(r['team']), pos=r.get('pos'))
