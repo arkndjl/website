@@ -1,0 +1,5 @@
+{{- /* pixel promotion / relegation arrow (1NT milestones): dict "up" bool, "title" optional */ -}}
+<svg class="n1m__mv{{ if not .up }} is-down{{ end }}" viewBox="0 0 5 4" shape-rendering="crispEdges"{{ with .title }} role="img" aria-label="{{ . }}"{{ else }} aria-hidden="true"{{ end }}>{{ with .title }}<title>{{ . }}</title>{{ end }}
+{{- if .up }}<rect x="2" y="0" width="1" height="1"/><rect x="1" y="1" width="3" height="1"/><rect x="0" y="2" width="5" height="1"/><rect x="2" y="3" width="1" height="1"/>
+{{- else }}<rect x="2" y="0" width="1" height="1"/><rect x="0" y="1" width="5" height="1"/><rect x="1" y="2" width="3" height="1"/><rect x="2" y="3" width="1" height="1"/>{{ end -}}
+</svg>

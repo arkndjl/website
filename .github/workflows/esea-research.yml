@@ -12,6 +12,9 @@ on:
       regions:
         description: "1 = every region's Advanced/Main/Intermediate results with nicknames (scripts/esea_regions_fetch.mjs) instead"
         default: "0"
+      backfill:
+        description: "1 = fill 1NT's past regular seasons past FACEIT's 600-match list (scripts/esea_div_backfill.mjs) instead"
+        default: "0"
       probe:
         description: "1 = print what the FACEIT API returns for discovery, fetch nothing"
         default: "0"
@@ -37,7 +40,7 @@ jobs:
           path: scripts/.cache/cs
           key: cs2-vrs-v1
       - name: Fetch
-        if: github.event_name == 'workflow_dispatch' && inputs.regions != '1'
+        if: github.event_name == 'workflow_dispatch' && inputs.regions != '1' && inputs.backfill != '1'
         run: node scripts/esea_research_fetch.mjs
         env:
           FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
@@ -50,6 +53,11 @@ jobs:
           FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
           ESEA_FROM: 53
           ESEA_PROBE: ${{ inputs.probe == '1' && '1' || '' }}
+      - name: Backfill 1NT's divisions
+        if: inputs.backfill == '1'
+        run: node scripts/esea_div_backfill.mjs && pip install -q numpy && python3 scripts/esea_milestones.py
+        env:
+          FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
       - name: World ranks and ESEA tiers
         if: github.event_name == 'schedule' || (inputs.regions == '1' && inputs.probe != '1')
         run: python3 scripts/esea_world.py
@@ -59,6 +67,7 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add -f research/esea_matches.json.gz research/esea_regions.json.gz 2>/dev/null || git add -f research/esea_regions.json.gz || git add -f research/esea_matches.json.gz
           git add data/esea_world.json 2>/dev/null || true
+          git add -f research/esea_div_backfill.json.gz data/esea_milestones.json 2>/dev/null || true
           git commit -m "ESEA research data ($(date -u +%Y-%m-%dT%H:%MZ))" || exit 0
           git pull --rebase -q origin "${GITHUB_REF_NAME}"
           git push

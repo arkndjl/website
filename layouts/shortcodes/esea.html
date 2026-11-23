@@ -1075,6 +1075,11 @@
         {{- range $i, $p := $pts }}{{ $y := add 2.0 (mul (div (float (sub $p.vrs $lo)) $span) (sub $H 4)) }}
         {{- if lt $i (sub $n 1) }}{{ $nx := index $pts (add $i 1) }}{{ $y2 := add 2.0 (mul (div (float (sub $nx.vrs $lo)) $span) (sub $H 4)) }}<rect x="{{ mul $i $sw }}" y="{{ sub $y 1 }}" width="{{ $sw }}" height="2" class="lzf__trl"><title>{{ $p.d }} · #{{ $p.vrs }} of {{ $p.of }} · S{{ $p.season }} {{ $p.div }}</title></rect><rect x="{{ sub (mul (add $i 1) $sw) 1 }}" y="{{ sub (math.Min $y $y2) 1 }}" width="2" height="{{ add (math.Abs (sub $y2 $y)) 2 }}" class="lzf__trl"/>{{ end }}
         {{- end }}
+        {{- /* division moves (data/esea_milestones.json): a column at the first week of the new season */}}
+        {{- with site.Data.esea_milestones }}{{ range .seasons }}{{ if and .move .start }}{{ $mv := . }}{{ $sd := (time.In "America/New_York" (time (int (div .start 1000)))).Format "2006-01-02" }}
+          {{- $ix := -1 }}{{ range $i, $p := $pts }}{{ if and (lt $ix 0) (ge $p.d $sd) }}{{ $ix = $i }}{{ end }}{{ end }}
+          {{- if ge $ix 0 }}<rect x="{{ sub (mul $ix $sw) 1 }}" y="0" width="2" height="{{ $H }}" class="esea-wr__mv{{ if eq $mv.move "down" }} is-down{{ end }}"><title>S{{ $mv.season }} · {{ if eq $mv.move "up" }}promoted{{ else }}relegated{{ end }} to {{ $mv.div }}</title></rect>{{ end }}
+        {{- end }}{{ end }}{{ end }}
       </svg>
       <p class="esea-fc__axis lzf__axis"><span>{{ (time (index . 0).d).Format "Jan 2006" }}</span><span>best #{{ $lo }} · worst #{{ $hi }}</span><span>{{ (time (index . (sub $n 1)).d).Format "Jan 2" }}</span></p>
     </div>
