@@ -57,7 +57,8 @@ for (const [cid, name] of Object.entries(comps)) {
   const ms = arc.matches.filter(m => m.champ === cid);
   const at = ms.map(m => m.at).filter(Boolean);
   if (!at.length) { console.log(`${name}: not in the archive, skipped`); continue; }
-  const from = Math.min(...at) - 3 * 86400, to = Math.max(...at) + 45 * 86400;
+  // the archive keeps one end of the list, so reach a full season either side of what it holds
+  const from = Math.min(...at) - 80 * 86400, to = Math.max(...at) + 80 * 86400;
   const seen = {};   // team -> player -> matches in the archive
   for (const m of ms) for (const f of ['f1', 'f2']) if (m[f].id !== 'bye') for (const [q] of m[f].roster || []) { const t = (seen[m[f].id] ||= {}); t[q] = (t[q] || 0) + 1; }
   const found = new Set();
