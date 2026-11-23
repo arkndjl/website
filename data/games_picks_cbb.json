@@ -1,10 +1,10 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-23T04:12:12Z",
+ "asof": "2026-11-23T04:15:36Z",
  "recenter": {
   "2026-11-22": 1.98,
-  "2026-11-23": 1.88
+  "2026-11-23": 1.92
  },
  "monitor": {
   "clocks": {
@@ -1897,7 +1897,7 @@
     "side": "over",
     "line": 138.5,
     "price": -114.0,
-    "ev": 0.088,
+    "ev": 0.093,
     "units": 0.5
    }
   },
@@ -1934,7 +1934,7 @@
     "side": "under",
     "line": 149.5,
     "price": -119.0,
-    "ev": 0.129,
+    "ev": 0.131,
     "units": 0.5
    }
   }
@@ -1972,22 +1972,6 @@
    "why": "no edge at -129",
    "m": 0.7,
    "tm": 155.2
-  },
-  {
-   "id": "401921157",
-   "sport": "cbb",
-   "kick": "2026-11-24T00:00:00Z",
-   "home": "South Carolina State",
-   "away": "North Carolina A&T",
-   "mk": "total",
-   "side": "under",
-   "line": 154.5,
-   "price": -214.0,
-   "edge": 7.8,
-   "x": 6.5,
-   "why": "no edge at -214",
-   "m": 1.6,
-   "tm": 146.7
   },
   {
    "id": "401927397",
@@ -2102,6 +2086,22 @@
    "tm": 142.7
   },
   {
+   "id": "401921157",
+   "sport": "cbb",
+   "kick": "2026-11-24T00:00:00Z",
+   "home": "South Carolina State",
+   "away": "North Carolina A&T",
+   "mk": "spread",
+   "side": "home",
+   "line": -2.5,
+   "price": -114.0,
+   "edge": 4.1,
+   "x": 5.0,
+   "why": "edge under 5 (line: <4)",
+   "m": 1.6,
+   "tm": 146.7
+  },
+  {
    "id": "401921701",
    "sport": "cbb",
    "kick": "2026-11-23T18:30:00Z",
@@ -2142,7 +2142,7 @@
    "mk": "total",
    "side": "under",
    "line": 158.5,
-   "price": -119.0,
+   "price": 102.0,
    "edge": 4.2,
    "x": 6.5,
    "why": "edge under 6.5 (side: under)",
@@ -2360,7 +2360,7 @@
    "side": "under",
    "line": 149.5,
    "price": -119.0,
-   "ev": 0.129,
+   "ev": 0.131,
    "edge": 6.4,
    "units": 0.5,
    "bk": "poly",
@@ -2384,7 +2384,7 @@
    "mk": "total",
    "side": "under",
    "line": 158.5,
-   "price": -119.0,
+   "price": 102.0,
    "edge": 4.2,
    "ev": null,
    "units": 0.0,
@@ -2670,11 +2670,11 @@
    "state": "under"
   },
   "401921157": {
-   "mk": "total",
-   "side": "under",
-   "line": 154.5,
-   "price": -214.0,
-   "edge": 7.8,
+   "mk": "spread",
+   "side": "home",
+   "line": -2.5,
+   "price": -114.0,
+   "edge": 4.1,
    "ev": null,
    "units": 0.0,
    "home": "South Carolina State",
@@ -2734,7 +2734,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 23408,
+  "snapshots": 23412,
   "buckets": [
    {
     "when": "24h+",
@@ -2747,8 +2747,8 @@
    },
    {
     "when": "6-24h",
-    "clvN": 4648,
-    "clvRet": -0.0008,
+    "clvN": 4649,
+    "clvRet": -0.0009,
     "clvT": -0.4,
     "clv": 0.71,
     "beat": 0.416,
@@ -20974,7 +20974,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-23T04:12:12Z",
+ "checked": "2026-11-23T04:15:36Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
