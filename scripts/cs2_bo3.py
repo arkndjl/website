@@ -85,6 +85,28 @@ def pull(kind, full):
     return out
 
 
+def upcoming(hours=72):
+    """bo3.gg's upcoming and live matches starting within `hours` (any tier): [id, start, team1, team2, name1, name2, bo,
+    tier, event, status, score1, score2]. Odds fields are not read."""
+    q = ("matches?page[offset]={}&page[limit]=100&sort=start_date&filter[matches.status][in]=upcoming,current"
+         "&with=teams,tournament")
+    end = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=hours)).isoformat()
+    out = []
+    for off in range(0, 1000, 100):
+        res = get(q.format(off))["results"]
+        for r in res:
+            if (r.get("start_date") or "") > end:
+                return out
+            t1, t2, tn = r.get("team1") or {}, r.get("team2") or {}, r.get("tournament") or {}
+            if r.get("team1_id") and r.get("team2_id"):
+                out.append([r["id"], r["start_date"], r["team1_id"], r["team2_id"], t1.get("name"), t2.get("name"),
+                            r.get("bo_type"), r.get("tier"), tn.get("name"), r.get("status"), r.get("team1_score"),
+                            r.get("team2_score")])
+        if len(res) < 100:
+            break
+    return out
+
+
 def load():
     try:
         with gzip.open(OUT, "rt") as f:

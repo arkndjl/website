@@ -10,9 +10,15 @@ for (const q of ['S59 NA Main A - Playoffs', 'S58 NA Main A - Playoffs', 'S58 NA
 const t = await api(`/teams/${TEAM}/tournaments?limit=50`);
 console.log('team tournaments', JSON.stringify((t.items || []).map(x => [x.name, x.championship_id || x.tournament_id, x.status])).slice(0, 2000));
 const org = '08b06cfc-74d0-454b-9a51-feda4b6b18da';
-for (const type of ['upcoming', 'ongoing', 'past']) {
-  const r = await api(`/organizers/${org}/championships?type=${type}&limit=100`);
-  console.log('org', type, JSON.stringify(r).slice(0, 300), (r.items || []).filter(x => /playoff/i.test(x.name || '')).map(x => `${x.name} [${x.championship_id || x.competition_id}]`).join(' | ').slice(0, 1500));
+for (const type of ['upcoming', 'ongoing', 'past', 'all']) {
+  let n = 0; const hit = [];
+  for (let off = 0; off < 5000; off += 100) {
+    const r = await api(`/organizers/${org}/championships?type=${type}&offset=${off}&limit=100`);
+    const it = r.items || []; n += it.length;
+    for (const x of it) if (/S5[89].*NA.*(Main|Advanced)/i.test(x.name || '')) hit.push(`${x.name} [${x.championship_id}] ${x.status} start=${x.championship_start}`);
+    if (it.length < 100) break;
+  }
+  console.log('org', type, n, hit.join(' | '));
 }
 const id = process.env.PO_ID;
 if (id) {
