@@ -1,17 +1,17 @@
 {
- "asof": "2026-11-23T04:14Z",
+ "asof": "2026-11-23T05:25Z",
  "sports": {
   "cbb": {
    "by_file": {
     "static/data/depth/cbb.json": {
      "flags": 0,
-     "rows": 5294
+     "rows": 5293
     }
    },
    "flags": [],
    "joined": 0,
-   "players": 970,
-   "rows": 5294
+   "players": 971,
+   "rows": 5293
   },
   "cfb": {
    "by_file": {
@@ -315,7 +315,7 @@
     },
     "static/data/nfl-war.json": {
      "flags": 76,
-     "rows": 1826
+     "rows": 1827
     },
     "static/data/pctl-nfl.json": {
      "flags": 74,
@@ -548,6 +548,24 @@
      "site": "NE"
     },
     {
+     "d": "2026-11-14",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "released",
+     "head": "No longer on IR",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-14",
+      "head": "No longer on IR",
+      "kind": "exit"
+     },
+     "pid": "18602",
+     "player": "Jordan Hancock",
+     "pos": "CB",
+     "rotowire": "BUF",
+     "site": "BUF"
+    },
+    {
      "d": "2026-11-17",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -642,6 +660,24 @@
      "field": "t",
      "file": "static/data/nfl-war.json",
      "flag": "practice",
+     "head": "Back to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Back to practice squad",
+      "kind": "practice"
+     },
+     "pid": "11751",
+     "player": "Zay Jones",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "ARI"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "practice",
      "head": "Set to join Tampa Bay practice squad",
      "kind": "practice",
      "move": {
@@ -654,24 +690,6 @@
      "pos": "QB",
      "rotowire": "FA",
      "site": "TB"
-    },
-    {
-     "d": "2026-11-14",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "released",
-     "head": "No longer on IR",
-     "kind": "exit",
-     "move": {
-      "d": "2026-11-14",
-      "head": "No longer on IR",
-      "kind": "exit"
-     },
-     "pid": "18602",
-     "player": "Jordan Hancock",
-     "pos": "CB",
-     "rotowire": "BUF",
-     "site": "BUF"
     },
     {
      "d": "2026-11-18",
@@ -764,24 +782,6 @@
      "site": "CLE"
     },
     {
-     "d": "2026-11-12",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "practice",
-     "head": "Rejoins Vikings on practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-12",
-      "head": "Rejoins Vikings on practice squad",
-      "kind": "practice"
-     },
-     "pid": "9255",
-     "player": "Odell Beckham Jr.",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "MIN"
-    },
-    {
      "d": "2026-10-19",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -870,24 +870,6 @@
      "pos": "TE",
      "rotowire": "FA",
      "site": "DET"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "practice",
-     "head": "Joins Saints' practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-10",
-      "head": "Joins Saints' practice squad",
-      "kind": "practice"
-     },
-     "pid": "18263",
-     "player": "Treyton Welch",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "NO"
     },
     {
      "d": "2026-10-22",
@@ -1160,24 +1142,6 @@
      "site": "BUF"
     },
     {
-     "d": "2026-11-09",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "practice",
-     "head": "Back to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Back to practice squad",
-      "kind": "practice"
-     },
-     "pid": "17465",
-     "player": "Carlos Washington",
-     "pos": "RB",
-     "rotowire": "FA",
-     "site": "MIA"
-    },
-    {
      "d": "2026-10-26",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1433,24 +1397,6 @@
      "d": "2026-11-16",
      "field": "t",
      "file": "static/data/nfl-war.json",
-     "flag": "practice",
-     "head": "Back to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Back to practice squad",
-      "kind": "practice"
-     },
-     "pid": "11751",
-     "player": "Zay Jones",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "ARI"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
      "flag": "released",
      "head": "Cut loose by Rams",
      "kind": "waived",
@@ -1538,6 +1484,24 @@
      "site": "CLE"
     },
     {
+     "d": "2026-11-12",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "practice",
+     "head": "Rejoins Vikings on practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-12",
+      "head": "Rejoins Vikings on practice squad",
+      "kind": "practice"
+     },
+     "pid": "9255",
+     "player": "Odell Beckham Jr.",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "MIN"
+    },
+    {
      "d": "2026-11-11",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1556,22 +1520,22 @@
      "site": "NE"
     },
     {
-     "d": "2026-10-26",
+     "d": "2026-11-10",
      "field": "t",
      "file": "static/data/nfl-war.json",
      "flag": "practice",
-     "head": "Added to Falcons' practice squad",
+     "head": "Joins Saints' practice squad",
      "kind": "practice",
      "move": {
-      "d": "2026-10-26",
-      "head": "Added to Falcons' practice squad",
+      "d": "2026-11-10",
+      "head": "Joins Saints' practice squad",
       "kind": "practice"
      },
-     "pid": "17218",
-     "player": "E.J. Jenkins",
+     "pid": "18263",
+     "player": "Treyton Welch",
      "pos": "TE",
      "rotowire": "FA",
-     "site": "ATL"
+     "site": "NO"
     },
     {
      "d": "2026-10-17",
@@ -1592,24 +1556,6 @@
      "site": "CHI"
     },
     {
-     "d": "2026-08-30",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "released",
-     "head": "Waived by Dallas",
-     "kind": "waived",
-     "move": {
-      "d": "2026-08-30",
-      "head": "Waived by Dallas",
-      "kind": "waived"
-     },
-     "pid": "18259",
-     "player": "Reddy Steward",
-     "pos": "CB",
-     "rotowire": "FA",
-     "site": "DAL"
-    },
-    {
      "d": "2026-10-16",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1628,22 +1574,22 @@
      "site": "HOU"
     },
     {
-     "d": "2026-11-19",
+     "d": "2026-11-09",
      "field": "t",
      "file": "static/data/nfl-war.json",
-     "flag": "released",
-     "head": "Gets waived by Steelers",
-     "kind": "waived",
+     "flag": "practice",
+     "head": "Back to practice squad",
+     "kind": "practice",
      "move": {
-      "d": "2026-11-19",
-      "head": "Gets waived by Steelers",
-      "kind": "waived"
+      "d": "2026-11-09",
+      "head": "Back to practice squad",
+      "kind": "practice"
      },
-     "pid": "15307",
-     "player": "Brandon Smith",
-     "pos": "WR",
+     "pid": "17465",
+     "player": "Carlos Washington",
+     "pos": "RB",
      "rotowire": "FA",
-     "site": "PIT"
+     "site": "MIA"
     },
     {
      "d": "2026-11-17",
@@ -1754,6 +1700,42 @@
      "site": "BAL"
     },
     {
+     "d": "2026-10-26",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "practice",
+     "head": "Added to Falcons' practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-10-26",
+      "head": "Added to Falcons' practice squad",
+      "kind": "practice"
+     },
+     "pid": "17218",
+     "player": "E.J. Jenkins",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "ATL"
+    },
+    {
+     "d": "2026-08-30",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "released",
+     "head": "Waived by Dallas",
+     "kind": "waived",
+     "move": {
+      "d": "2026-08-30",
+      "head": "Waived by Dallas",
+      "kind": "waived"
+     },
+     "pid": "18259",
+     "player": "Reddy Steward",
+     "pos": "CB",
+     "rotowire": "FA",
+     "site": "DAL"
+    },
+    {
      "d": "2026-11-16",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1790,6 +1772,24 @@
      "site": "PIT"
     },
     {
+     "d": "2026-11-19",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "released",
+     "head": "Gets waived by Steelers",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-19",
+      "head": "Gets waived by Steelers",
+      "kind": "waived"
+     },
+     "pid": "15307",
+     "player": "Brandon Smith",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "PIT"
+    },
+    {
      "d": "2026-11-17",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1808,24 +1808,6 @@
      "site": "BAL"
     },
     {
-     "d": "2026-11-10",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "practice",
-     "head": "Joins Dallas practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-10",
-      "head": "Joins Dallas practice squad",
-      "kind": "practice"
-     },
-     "pid": "16898",
-     "player": "Kendre Miller",
-     "pos": "RB",
-     "rotowire": "FA",
-     "site": "DAL"
-    },
-    {
      "d": "2026-11-21",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -1842,6 +1824,24 @@
      "pos": "RB",
      "rotowire": "FA",
      "site": "GB"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "practice",
+     "head": "Joins Dallas practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Joins Dallas practice squad",
+      "kind": "practice"
+     },
+     "pid": "16898",
+     "player": "Kendre Miller",
+     "pos": "RB",
+     "rotowire": "FA",
+     "site": "DAL"
     },
     {
      "d": "2026-11-06",
@@ -2906,22 +2906,22 @@
      "site": "NYG"
     },
     {
-     "d": "2026-11-17",
+     "d": "2026-11-14",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
-     "flag": "practice",
-     "head": "Back with practice squad",
-     "kind": "practice",
+     "flag": "released",
+     "head": "No longer on IR",
+     "kind": "exit",
      "move": {
-      "d": "2026-11-17",
-      "head": "Back with practice squad",
-      "kind": "practice"
+      "d": "2026-11-14",
+      "head": "No longer on IR",
+      "kind": "exit"
      },
-     "pid": "10994",
-     "player": "Chris Moore",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "BAL"
+     "pid": "18602",
+     "player": "Jordan Hancock",
+     "pos": "CB",
+     "rotowire": "BUF",
+     "site": "BUF"
     },
     {
      "d": "2026-08-31",
@@ -3018,6 +3018,24 @@
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
      "flag": "practice",
+     "head": "Back to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Back to practice squad",
+      "kind": "practice"
+     },
+     "pid": "11751",
+     "player": "Zay Jones",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "ARI"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "practice",
      "head": "Set to join Tampa Bay practice squad",
      "kind": "practice",
      "move": {
@@ -3032,22 +3050,22 @@
      "site": "TB"
     },
     {
-     "d": "2026-11-14",
+     "d": "2026-11-17",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
-     "flag": "released",
-     "head": "No longer on IR",
-     "kind": "exit",
+     "flag": "practice",
+     "head": "Back with practice squad",
+     "kind": "practice",
      "move": {
-      "d": "2026-11-14",
-      "head": "No longer on IR",
-      "kind": "exit"
+      "d": "2026-11-17",
+      "head": "Back with practice squad",
+      "kind": "practice"
      },
-     "pid": "18602",
-     "player": "Jordan Hancock",
-     "pos": "CB",
-     "rotowire": "BUF",
-     "site": "BUF"
+     "pid": "10994",
+     "player": "Chris Moore",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "BAL"
     },
     {
      "d": "2026-09-17",
@@ -3158,24 +3176,6 @@
      "site": "CLE"
     },
     {
-     "d": "2026-11-12",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "practice",
-     "head": "Rejoins Vikings on practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-12",
-      "head": "Rejoins Vikings on practice squad",
-      "kind": "practice"
-     },
-     "pid": "9255",
-     "player": "Odell Beckham Jr.",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "MIN"
-    },
-    {
      "d": "2026-10-19",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -3264,24 +3264,6 @@
      "pos": "TE",
      "rotowire": "FA",
      "site": "DET"
-    },
-    {
-     "d": "2026-11-10",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "practice",
-     "head": "Joins Saints' practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-10",
-      "head": "Joins Saints' practice squad",
-      "kind": "practice"
-     },
-     "pid": "18263",
-     "player": "Treyton Welch",
-     "pos": "TE",
-     "rotowire": "FA",
-     "site": "NO"
     },
     {
      "d": "2026-10-22",
@@ -3516,24 +3498,6 @@
      "pos": "DL",
      "rotowire": "FA",
      "site": "BUF"
-    },
-    {
-     "d": "2026-11-09",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "practice",
-     "head": "Back to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-09",
-      "head": "Back to practice squad",
-      "kind": "practice"
-     },
-     "pid": "17465",
-     "player": "Carlos Washington",
-     "pos": "RB",
-     "rotowire": "FA",
-     "site": "MIA"
     },
     {
      "d": "2026-10-26",
@@ -3809,24 +3773,6 @@
      "d": "2026-11-16",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
-     "flag": "practice",
-     "head": "Back to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Back to practice squad",
-      "kind": "practice"
-     },
-     "pid": "11751",
-     "player": "Zay Jones",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "ARI"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
      "flag": "released",
      "head": "Cut loose by Rams",
      "kind": "waived",
@@ -3896,6 +3842,24 @@
      "site": "BUF"
     },
     {
+     "d": "2026-11-12",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "practice",
+     "head": "Rejoins Vikings on practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-12",
+      "head": "Rejoins Vikings on practice squad",
+      "kind": "practice"
+     },
+     "pid": "9255",
+     "player": "Odell Beckham Jr.",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "MIN"
+    },
+    {
      "d": "2026-11-11",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -3914,22 +3878,22 @@
      "site": "NE"
     },
     {
-     "d": "2026-10-26",
+     "d": "2026-11-10",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
      "flag": "practice",
-     "head": "Added to Falcons' practice squad",
+     "head": "Joins Saints' practice squad",
      "kind": "practice",
      "move": {
-      "d": "2026-10-26",
-      "head": "Added to Falcons' practice squad",
+      "d": "2026-11-10",
+      "head": "Joins Saints' practice squad",
       "kind": "practice"
      },
-     "pid": "17218",
-     "player": "E.J. Jenkins",
+     "pid": "18263",
+     "player": "Treyton Welch",
      "pos": "TE",
      "rotowire": "FA",
-     "site": "ATL"
+     "site": "NO"
     },
     {
      "d": "2026-10-17",
@@ -3950,24 +3914,6 @@
      "site": "CHI"
     },
     {
-     "d": "2026-08-30",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "released",
-     "head": "Waived by Dallas",
-     "kind": "waived",
-     "move": {
-      "d": "2026-08-30",
-      "head": "Waived by Dallas",
-      "kind": "waived"
-     },
-     "pid": "18259",
-     "player": "Reddy Steward",
-     "pos": "CB",
-     "rotowire": "FA",
-     "site": "DAL"
-    },
-    {
      "d": "2026-10-16",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -3986,22 +3932,22 @@
      "site": "HOU"
     },
     {
-     "d": "2026-11-19",
+     "d": "2026-11-09",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
-     "flag": "released",
-     "head": "Gets waived by Steelers",
-     "kind": "waived",
+     "flag": "practice",
+     "head": "Back to practice squad",
+     "kind": "practice",
      "move": {
-      "d": "2026-11-19",
-      "head": "Gets waived by Steelers",
-      "kind": "waived"
+      "d": "2026-11-09",
+      "head": "Back to practice squad",
+      "kind": "practice"
      },
-     "pid": "15307",
-     "player": "Brandon Smith",
-     "pos": "WR",
+     "pid": "17465",
+     "player": "Carlos Washington",
+     "pos": "RB",
      "rotowire": "FA",
-     "site": "PIT"
+     "site": "MIA"
     },
     {
      "d": "2026-11-16",
@@ -4076,6 +4022,42 @@
      "site": "BAL"
     },
     {
+     "d": "2026-10-26",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "practice",
+     "head": "Added to Falcons' practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-10-26",
+      "head": "Added to Falcons' practice squad",
+      "kind": "practice"
+     },
+     "pid": "17218",
+     "player": "E.J. Jenkins",
+     "pos": "TE",
+     "rotowire": "FA",
+     "site": "ATL"
+    },
+    {
+     "d": "2026-08-30",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "released",
+     "head": "Waived by Dallas",
+     "kind": "waived",
+     "move": {
+      "d": "2026-08-30",
+      "head": "Waived by Dallas",
+      "kind": "waived"
+     },
+     "pid": "18259",
+     "player": "Reddy Steward",
+     "pos": "CB",
+     "rotowire": "FA",
+     "site": "DAL"
+    },
+    {
      "d": "2026-11-16",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -4112,22 +4094,22 @@
      "site": "PIT"
     },
     {
-     "d": "2026-11-10",
+     "d": "2026-11-19",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
-     "flag": "practice",
-     "head": "Joins Dallas practice squad",
-     "kind": "practice",
+     "flag": "released",
+     "head": "Gets waived by Steelers",
+     "kind": "waived",
      "move": {
-      "d": "2026-11-10",
-      "head": "Joins Dallas practice squad",
-      "kind": "practice"
+      "d": "2026-11-19",
+      "head": "Gets waived by Steelers",
+      "kind": "waived"
      },
-     "pid": "16898",
-     "player": "Kendre Miller",
-     "pos": "RB",
+     "pid": "15307",
+     "player": "Brandon Smith",
+     "pos": "WR",
      "rotowire": "FA",
-     "site": "DAL"
+     "site": "PIT"
     },
     {
      "d": "2026-11-21",
@@ -4146,6 +4128,24 @@
      "pos": "RB",
      "rotowire": "FA",
      "site": "GB"
+    },
+    {
+     "d": "2026-11-10",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "practice",
+     "head": "Joins Dallas practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-10",
+      "head": "Joins Dallas practice squad",
+      "kind": "practice"
+     },
+     "pid": "16898",
+     "player": "Kendre Miller",
+     "pos": "RB",
+     "rotowire": "FA",
+     "site": "DAL"
     },
     {
      "d": "2026-11-06",
@@ -4330,12 +4330,12 @@
    ],
    "joined": 0,
    "players": 2310,
-   "rows": 8100
+   "rows": 8101
   },
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 1,
+     "flags": 0,
      "rows": 637
     },
     "static/data/lines/nhl.json": {
@@ -4343,12 +4343,12 @@
      "rows": 32
     },
     "static/data/nhl-war/2027.json": {
-     "flags": 4,
-     "rows": 863
+     "flags": 2,
+     "rows": 865
     },
     "static/data/pctl-nhl.json": {
      "flags": 0,
-     "rows": 356
+     "rows": 354
     },
     "static/data/xaav-nhl.json": {
      "flags": 14,
@@ -4356,24 +4356,6 @@
     }
    },
    "flags": [
-    {
-     "d": "2026-11-22",
-     "field": "depth",
-     "file": "static/data/depth/nhl.json",
-     "flag": "moved",
-     "head": "Traded to Detroit",
-     "kind": "trade",
-     "move": {
-      "d": "2026-11-22",
-      "head": "Traded to Detroit",
-      "kind": "trade"
-     },
-     "pid": "5964",
-     "player": "Kirby Dach",
-     "pos": "RW",
-     "rotowire": "DET",
-     "site": "MTL"
-    },
     {
      "d": "2026-11-13",
      "field": "tm",
@@ -4391,38 +4373,6 @@
      "pos": "D",
      "rotowire": "CAR",
      "site": "CAR"
-    },
-    {
-     "d": "2026-11-22",
-     "field": "tm",
-     "file": "static/data/nhl-war/2027.json",
-     "flag": "moved",
-     "head": "Sent to Montreal in blockbuster deal",
-     "kind": null,
-     "move": null,
-     "pid": "4396",
-     "player": "Dylan Larkin",
-     "pos": "C",
-     "rotowire": "MTL",
-     "site": "DET"
-    },
-    {
-     "d": "2026-11-22",
-     "field": "tm",
-     "file": "static/data/nhl-war/2027.json",
-     "flag": "moved",
-     "head": "Traded to Detroit",
-     "kind": "trade",
-     "move": {
-      "d": "2026-11-22",
-      "head": "Traded to Detroit",
-      "kind": "trade"
-     },
-     "pid": "5964",
-     "player": "Kirby Dach",
-     "pos": "C",
-     "rotowire": "DET",
-     "site": "MTL"
     },
     {
      "d": "2026-11-07",
