@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-23T18:16Z",
+ "asof": "2026-11-23T18:20Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -59,7 +59,7 @@
     }
    ],
    "joined": 0,
-   "players": 2615,
+   "players": 2616,
    "rows": 16742
   },
   "nba": {
@@ -4335,7 +4335,7 @@
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 2,
+     "flags": 0,
      "rows": 637
     },
     "static/data/lines/nhl.json": {
@@ -4348,50 +4348,14 @@
     },
     "static/data/pctl-nhl.json": {
      "flags": 0,
-     "rows": 353
+     "rows": 356
     },
     "static/data/xaav-nhl.json": {
-     "flags": 14,
+     "flags": 11,
      "rows": 850
     }
    },
    "flags": [
-    {
-     "d": "2026-11-23",
-     "field": "depth",
-     "file": "static/data/depth/nhl.json",
-     "flag": "minors",
-     "head": "Dropped to minors",
-     "kind": "down",
-     "move": {
-      "d": "2026-11-23",
-      "head": "Dropped to minors",
-      "kind": "down"
-     },
-     "pid": "4787",
-     "player": "Jansen Harkins",
-     "pos": "C",
-     "rotowire": "TBL",
-     "site": "TBL"
-    },
-    {
-     "d": "2026-11-23",
-     "field": "depth",
-     "file": "static/data/depth/nhl.json",
-     "flag": "minors",
-     "head": "Dropped to AHL",
-     "kind": "down",
-     "move": {
-      "d": "2026-11-23",
-      "head": "Dropped to AHL",
-      "kind": "down"
-     },
-     "pid": "6888",
-     "player": "Nikita Tolopilo",
-     "pos": "G",
-     "rotowire": "VAN",
-     "site": "VAN"
-    },
     {
      "d": "2026-11-13",
      "field": "tm",
@@ -4427,20 +4391,6 @@
      "pos": "G",
      "rotowire": "FA",
      "site": "NYR"
-    },
-    {
-     "d": "2026-11-23",
-     "field": "tm",
-     "file": "static/data/xaav-nhl.json",
-     "flag": "moved",
-     "head": "Set to make team debut Monday",
-     "kind": null,
-     "move": null,
-     "pid": "4396",
-     "player": "Dylan Larkin",
-     "pos": "C",
-     "rotowire": "MTL",
-     "site": "DET"
     },
     {
      "d": "2026-11-13",
@@ -4531,24 +4481,6 @@
      "pos": "G",
      "rotowire": "FA",
      "site": "FA"
-    },
-    {
-     "d": "2026-11-22",
-     "field": "tm",
-     "file": "static/data/xaav-nhl.json",
-     "flag": "moved",
-     "head": "Traded to Detroit",
-     "kind": "trade",
-     "move": {
-      "d": "2026-11-22",
-      "head": "Traded to Detroit",
-      "kind": "trade"
-     },
-     "pid": "5964",
-     "player": "Kirby Dach",
-     "pos": "C",
-     "rotowire": "DET",
-     "site": "MTL"
     },
     {
      "d": "2026-08-14",
@@ -4657,29 +4589,11 @@
      "pos": "C",
      "rotowire": "FA",
      "site": "FA"
-    },
-    {
-     "d": "2026-11-22",
-     "field": "tm",
-     "file": "static/data/xaav-nhl.json",
-     "flag": "moved",
-     "head": "Claimed off waivers",
-     "kind": "claim",
-     "move": {
-      "d": "2026-11-22",
-      "head": "Claimed off waivers",
-      "kind": "claim"
-     },
-     "pid": "4268",
-     "player": "Luke Glendening",
-     "pos": "C",
-     "rotowire": "CHI",
-     "site": "NYR"
     }
    ],
    "joined": 0,
    "players": 1431,
-   "rows": 2737
+   "rows": 2740
   }
  }
 }
