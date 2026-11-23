@@ -1,0 +1,132 @@
+{{- /* 1NT milestones (data/esea_milestones.json, scripts/esea_milestones.py).
+       part="finishes": career tiles + one row per ESEA season (division, record, final standing, playoffs).
+       part="log": dated milestone log (debut, division moves, playoff firsts, division top ranks, world-rank firsts).
+       part="ranks": per season, each 1NT player's rank in the division on RWA, ARK, ADR, K/D, KPR, HS%.
+       Season buttons use data-n1m, not data-wintab, so they don't share hash names with other tabs. */ -}}
+{{- $D := site.Data.esea_milestones -}}
+{{- $part := .Get "part" | default "finishes" -}}
+{{- $me := "LAURSEN_111" -}}
+{{- if and $D $D.seasons }}
+{{- if not ($.Page.Store.Get "n1miles-css") }}{{ $.Page.Store.Set "n1miles-css" true }}
+<style>
+.n1m__tiles { padding: 14px 14px 4px; }
+.n1m__tbl { margin: 0 14px 12px; overflow-x: auto; }
+.n1m__tbl td { white-space: nowrap !important; }
+.n1m__tbl td:first-child > * { display: inline-block; vertical-align: middle; }
+.n1m__rk { display: block; font-size: .75em; opacity: .75; }
+.n1m__rk.is-top { opacity: 1; color: var(--accent); }
+.n1m__up { color: var(--accent); }
+.n1m__dn { color: #ff9ec7; }
+.n1m__ser { display: inline-flex; gap: 2px; vertical-align: middle; }
+.n1m__ser i { display: inline-block; width: 10px; height: 10px; background: var(--foreground); font-style: normal; }
+.n1m__ser i.is-l { background: #ff9ec7; }
+.n1m__log { list-style: none; margin: 0; padding: 10px 14px 12px; display: flex; flex-direction: column; gap: 4px; }
+.n1m__log li { display: grid; grid-template-columns: 9ch 4ch 12px minmax(0, 1fr); gap: 8px; align-items: center; }
+.n1m__log li::before { content: none !important; }
+.n1m__dot { width: 10px; height: 10px; background: var(--foreground); }
+.n1m__dot.is-po { background: var(--accent); }
+.n1m__dot.is-world { background: #c8c7ff; }
+.n1m__dot.is-down { background: #ff9ec7; }
+.n1m__dot.is-player { background: var(--foreground); box-shadow: inset 0 0 0 2px var(--accent); }
+.n1m__strip { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 10px 0; }
+.n1m__panel[hidden] { display: none; }
+.n1m__h { margin: 10px 14px 4px; }
+@media (max-width: 684px) {
+  .n1m__tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .n1m__log li { grid-template-columns: 7ch 4ch 10px minmax(0, 1fr); gap: 6px; font-size: .9em; }
+}
+</style>
+{{- end }}
+
+{{- if eq $part "finishes" }}{{ $t := $D.totals }}
+<div class="win n1m{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>finishes.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <ul class="esea__tiles n1m__tiles">
+    <li><span class="esea__v">{{ $t.seasons }}</span><span class="esea__k">seasons</span></li>
+    <li><span class="esea__v">{{ $t.w }}–{{ $t.l }}</span><span class="esea__k" title="league matches, regular season + playoffs">record</span></li>
+    <li><span class="esea__v">{{ $t.poSeasons }}</span><span class="esea__k">playoffs</span></li>
+    <li><span class="esea__v">{{ $t.poW }}–{{ $t.poL }}</span><span class="esea__k" title="playoff series won–lost">series</span></li>
+  </ul>
+  <div class="n1m__tbl">
+  <table class="cfb__table">
+    <thead><tr><th>Season</th><th>Division</th><th>W–L</th><th title="rounds won minus lost">Rd ±</th><th title="final regular-season standing in the division (FACEIT leaderboard)">Finish</th><th>Playoffs</th><th title="playoff series, in order">Series</th><th title="playoff placing: teams knocked out the same day share the range">Place</th><th title="eliminated by">Out</th></tr></thead>
+    <tbody>
+    {{- range $i, $s := $D.seasons }}
+    <tr>
+      <td>S{{ $s.season }}</td>
+      <td>{{ $s.div }}</td>
+      <td class="cfb__num">{{ $s.w }}–{{ $s.l }}</td>
+      <td class="cfb__num">{{ with $s.rf }}{{ $rd := sub (int $s.rf) (int $s.ra) }}<span class="{{ if gt $rd 0 }}cfb__up{{ else if lt $rd 0 }}cfb__down{{ end }}">{{ if gt $rd 0 }}+{{ end }}{{ $rd }}</span>{{ end }}</td>
+      <td class="cfb__num">{{ with $s.standing }}{{ if .rank }}<span title="{{ if eq .src "archive" }}wins then round diff over every match{{ else }}FACEIT leaderboard{{ end }}{{ if $s.current }} · live{{ end }}">{{ if .tied }}T-{{ end }}{{ .rank }}<span class="n1m__rk">of {{ .of }}</span></span>{{ end }}{{ else }}—{{ end }}</td>
+      <td>{{ with $s.playoffs }}{{ .name }}{{ else }}{{ if $s.current }}—{{ else }}missed{{ end }}{{ end }}</td>
+      <td>{{ with $s.playoffs }}{{ with .series }}<span class="n1m__ser" aria-label="series results">{{ range . }}<i class="{{ if eq .res "L" }}is-l{{ end }}" title="{{ (time.In "America/New_York" (time (int (div .at 1000)))).Format "Jan 2" }} · {{ .opp }} · {{ .res }}{{ if .ff }} · forfeit{{ else }} {{ .mw }}-{{ .ml }}{{ end }}"></i>{{ end }}</span>{{ end }} <span class="cfb__num">{{ .w }}–{{ .l }}</span>{{ end }}</td>
+      <td class="cfb__num">{{ with $s.playoffs }}{{ if .champion }}<b class="n1m__up">1st</b>{{ else }}{{ with .place }}{{ $lo := index . 0 }}{{ $hi := index . 1 }}{{ $lo }}{{ if ne $lo $hi }}–{{ $hi }}{{ end }}{{ end }}{{ end }}{{ with .teams }}<span class="n1m__rk">of {{ . }}</span>{{ end }}{{ end }}</td>
+      <td>{{ with $s.playoffs }}{{ .out }}{{ end }}</td>
+    </tr>
+    {{- end }}
+    </tbody>
+  </table>
+  </div>
+  <div class="win__status"><span title="regular season standing = FACEIT final leaderboard; playoffs = 1NT's playoff series; place from every team's last playoff match">ESEA S{{ (index $D.seasons (sub (len $D.seasons) 1)).season }}–S{{ (index $D.seasons 0).season }} · FACEIT</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "log" }}{{ with $D.log }}
+<div class="win n1m{{ with $.Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>milestones.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <ol class="n1m__log">
+    {{- range . }}
+    <li><span class="cfb__num">{{ (time.In "America/New_York" (time (int (div .at 1000)))).Format "Jan 2006" }}</span><span class="esea__k">{{ with .s }}S{{ . }}{{ end }}</span><i class="n1m__dot is-{{ .k }}" aria-hidden="true"></i><span>{{ .t }}</span></li>
+    {{- end }}
+  </ol>
+  <div class="win__status"><span title="debut, division moves, playoff firsts, division top 3 on any stat (top 10 on RWA/ARK), world-rank firsts">{{ len . }} milestones · {{ (time $D.asof).Format "Jan 2" }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end }}
+
+{{- else if eq $part "ranks" }}
+{{- $cols := slice (slice "rwa" "RWA" "round win % added per round, that season's league maps; 0 = average Main player") (slice "ark" "ARK" "ARK Rating, that season") (slice "adr" "ADR" "average damage a round") (slice "kd" "K/D" "kills per death") (slice "kpr" "KPR" "kills a round") (slice "hs" "HS%" "headshot share of kills") }}
+<div class="win n1m n1m--ranks{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg><span class="n1m__ttl">division_ranks_s{{ (index $D.seasons 0).season }}.exe</span><span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="n1m__strip wintabs__strip" role="tablist" aria-label="season">
+    {{- range $i, $s := $D.seasons }}<button type="button" class="wintabs__tab{{ if eq $i 0 }} is-active{{ end }}" role="tab" aria-selected="{{ if eq $i 0 }}true{{ else }}false{{ end }}" data-n1m="{{ $s.season }}">S{{ $s.season }}</button>{{ end }}
+  </div>
+  {{- range $i, $s := $D.seasons }}
+  <div class="n1m__panel" data-n1m-panel="{{ $s.season }}"{{ if gt $i 0 }} hidden{{ end }}>
+    <p class="esea__k n1m__h">S{{ $s.season }} · {{ $s.div }} · {{ $s.pool }} players · {{ $s.minMaps }}+ maps</p>
+    <div class="n1m__tbl">
+    <table class="cfb__table">
+      <thead><tr><th>Player</th><th>Maps</th>{{ range $cols }}<th title="{{ index . 2 }} · rank among the division's {{ $s.pool }} players with {{ $s.minMaps }}+ maps">{{ index . 1 }}</th>{{ end }}</tr></thead>
+      <tbody>
+      {{- range $s.players }}{{ $p := . }}
+      <tr{{ if eq .name $me }} class="is-me"{{ end }}><td>{{ with .country }}{{ partial "px/flag.html" . }}{{ end }}{{ .name }}</td><td class="cfb__num">{{ .maps }}</td>
+        {{- range $cols }}{{ $k := index . 0 }}{{ $v := index $p $k }}{{ $r := index $p (printf "%sR" $k) }}
+        <td class="cfb__num">{{ if ne $v nil }}{{ if eq $k "rwa" }}<b>{{ partial "num.html" (slice "%+.1f" (float $v)) }}</b>{{ else if eq $k "ark" }}{{ partial "num.html" (slice "%.2f" (float $v)) }}{{ else }}{{ $v }}{{ end }}{{ else }}—{{ end }}{{ with $r }}<span class="n1m__rk{{ if le (mul . 10) $s.pool }} is-top{{ end }}">#{{ . }}</span>{{ end }}</td>
+        {{- end }}</tr>
+      {{- end }}
+      </tbody>
+    </table>
+    </div>
+  </div>
+  {{- end }}
+  <div class="win__status"><span title="rank among every player in 1NT's regular-season division with 40% of its most-played player's maps; RWA/ARK over the season's league maps, box stats over the regular season; top 10% highlighted">ranks vs division · FACEIT</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+<script>document.querySelectorAll('.n1m--ranks').forEach(function (w) {
+  var t = w.querySelector('.n1m__ttl');
+  w.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-n1m]'); if (!b || !w.contains(b)) return;
+    var k = b.getAttribute('data-n1m');
+    w.querySelectorAll('[data-n1m]').forEach(function (x) { var on = x === b; x.classList.toggle('is-active', on); x.setAttribute('aria-selected', on ? 'true' : 'false'); });
+    w.querySelectorAll('[data-n1m-panel]').forEach(function (p) { p.hidden = p.getAttribute('data-n1m-panel') !== k; });
+    if (t) t.textContent = 'division_ranks_s' + k + '.exe';
+  });
+});</script>
+{{- end }}
+{{- end -}}
