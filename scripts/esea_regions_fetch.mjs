@@ -62,13 +62,16 @@ if (process.env.ESEA_PROBE) {
   process.exit(0);
 }
 console.log('search sample', JSON.stringify(await api(`/search/championships?name=${encodeURIComponent('S58 EU Main')}&game=cs2&type=past&limit=5`))?.slice(0, 1500));
-const org = det0?.organizer_id;
+// ESEA's FACEIT organizer (every league match names it; the championship detail call returns nothing for league groups)
+const org = det0?.organizer_id || '08b06cfc-74d0-454b-9a51-feda4b6b18da';
 console.log('organizer', org);
 if (org) for (const type of ['past', 'ongoing']) for (let off = 0; off < 50000; off += 100) {
   const items = (await api(`/organizers/${org}/championships?type=${type}&offset=${off}&limit=100`))?.items || [];
   for (const x of items) add(x.championship_id || x.competition_id, x.name);
+  if (off === 0) console.log(`organizer ${type}:`, items.length, items.slice(0, 8).map(x => x.name));
   if (items.length < 100) break;
 }
+console.log('after organizer list', champs.size);
 // FACEIT's league API: each season lists regions > divisions > stages > conferences, each with a championship id
 const LG = 'a14b8616-45b9-4581-8637-4dfd0b5f6af8';
 const lg = await api(`/leagues/${LG}`);
