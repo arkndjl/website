@@ -65,12 +65,16 @@ jobs:
       - name: World ranks and ESEA tiers
         if: github.event_name == 'schedule' || (inputs.regions == '1' && inputs.probe != '1')
         run: python3 scripts/esea_world.py
+      # ESEA -> pro history snapshot (weekly) and the standing ESEA-only prospect retest (data/esea_pro_test.json)
+      - name: ESEA pro history and retest
+        if: github.event_name == 'schedule' || (inputs.regions == '1' && inputs.probe != '1')
+        run: python3 scripts/esea_pro_history.py || echo "ESEA pro history failed; keeping the committed files"
       - name: Commit
         run: |
           git config user.name "arkboard-bot"
           git config user.email "actions@users.noreply.github.com"
           git add -f research/esea_matches.json.gz research/esea_regions.json.gz 2>/dev/null || git add -f research/esea_regions.json.gz || git add -f research/esea_matches.json.gz
-          git add data/esea_world.json data/esea_board_research.json 2>/dev/null || true
+          git add data/esea_world.json data/esea_board_research.json data/esea_pro_test.json scripts/data/esea_pro_history 2>/dev/null || true
           git add -f research/esea_div_backfill.json.gz 2>/dev/null || true
           git commit -m "ESEA research data ($(date -u +%Y-%m-%dT%H:%MZ))" || exit 0
           git pull --rebase -q origin "${GITHUB_REF_NAME}"

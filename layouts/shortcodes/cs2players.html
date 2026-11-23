@@ -55,6 +55,14 @@
 </table>
 {{- $pf := $f.prospects -}}
 {{- partial "wintable-close.html" (dict "rows" (len .prospects) "fresh" "cs2" "note" (printf "updated %s" $date) "about" (printf "Not age-based: under 20 S-tier maps, 300+ rounds in the last year and a map in the last 120 days, any bo3.gg tier; FV 21+ shown. FV: projected rating next year (%s), 50 = average tier-1 starter. T1%%: chance of 20+ S-tier maps within a year." $pf.keep)) -}}
+{{- with .esea }}
+{{- partial "wintable-open.html" (dict "title" "Counter-Strike :: ESEA prospects" "icon" "cs" "tab" ($.Get "tab")) -}}
+<table class="cfb__table hk sp cs__table">
+  <thead><tr><th>RK</th><th>Player</th><th class="cfb__g" title="future value on the pro scale, from ESEA RWA and division (scripts/esea_pro_history.py retest)">FV</th><th>Team</th><th>Region</th><th>Division</th><th title="ESEA round win % added per round">ESEA RWA</th><th title="ESEA rounds rated">Rounds</th></tr></thead>
+  <tbody>{{ range $i, $r := . }}<tr><td class="cfb__num">{{ add $i 1 }}</td><td>{{ $r.n }}</td><td class="cfb__num">{{ $r.fv }}</td><td>{{ $r.tm }}</td><td>{{ $r.rg }}</td><td>{{ $r.div }}</td><td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float $r.rwa)) }}</td><td class="cfb__num">{{ $r.r }}</td></tr>{{ end }}</tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .) "note" "ESEA (FACEIT)" "about" "ESEA-only players (under 300 bo3.gg rounds a year) graded on the pro scale; added when the standing held-out retest passes.") -}}
+{{- end }}
 {{- else if eq $view "values" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: transfer values") "icon" "cs" "filter" "Tier" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,xTV,Team,Age,RWA" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table hk cs__table">

@@ -848,6 +848,15 @@ def build():
            "repl": round(a / 2 * (repl - mu1), 2), "t1sd": round(a / 2 * sd1, 2), "board": board, "prospects": pros,
            "fit": {k: fitj.get(k) for k in ("beta", "r2", "params", "score", "tune", "held", "aging", "game")}}
     out["fit"]["prospects"] = {k: pf.get(k) for k in ("models", "keep", "reach", "cuts", "nTune")}
+    # ESEA-only prospects: only once scripts/esea_pro_history.py's standing retest passes (data/esea_pro_test.json)
+    try:
+        et = json.loads((ROOT / "data" / "esea_pro_test.json").read_text())
+    except (OSError, ValueError):
+        et = {}
+    if et.get("status") == "pass":
+        es = [dict(g, fv=fv_of(g["proj"], mu1, sd1), proj=round(float(a / 2 * (g["proj"] - mu1)), 2)) for g in et.get("grades") or []]
+        out["esea"] = sorted((g for g in es if g["fv"] > 20), key=lambda g: -g["proj"])[:PRO_MAX]
+        out["eseaFv"] = {g["fid"]: g["fv"] for g in es}
     out["fit"]["value"] = v
     try:    # every flag the board and prospects show (static/img/flags/<iso2>.png), so a new country doesn't 404
         import soccer_faces
