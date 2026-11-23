@@ -92,6 +92,23 @@ def main():
         comps.setdefault(sn, [])
         if m['compName'] not in comps[sn]:
             comps[sn].append(m['compName'])
+    # forfeit wins and byes: FACEIT's team history leaves them out, the league archives keep them (regular season only;
+    # a playoff bye is no series)
+    seen = {m['id'] for m in H.get('matches') or []}
+    TEAM = H.get('team')
+    for f in ('research/esea_matches.json.gz', 'research/esea_div_backfill.json.gz'):
+        for m in (load(f, gz=True) or {}).get('matches') or []:
+            if m['id'] in seen or TEAM not in (m['f1']['id'], m['f2']['id']) or 'Regular' not in (m.get('stage') or ''):
+                continue
+            sn = int(m.get('season') or 0)
+            if sn not in by or (cur and sn >= cur) or m.get('winner') not in ('faction1', 'faction2'):
+                continue
+            seen.add(m['id'])
+            us = 'f1' if m['f1']['id'] == TEAM else 'f2'
+            opp = m['f2' if us == 'f1' else 'f1']
+            by[sn].append({'at': (m.get('at') or 0) * 1000, 'opp': 'bye' if opp['id'] == 'bye' else (opp.get('name') or 'TBD'),
+                           'res': 'W' if m['winner'] == ('faction1' if us == 'f1' else 'faction2') else 'L',
+                           'po': False, 'ff': True, 'bye': opp['id'] == 'bye', 'maps': []})
     past = D.get('seasons') or {}
     for sn, ms in by.items():
         ms.sort(key=lambda m: (m['po'], m['at'] or 0))
