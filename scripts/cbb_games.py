@@ -1351,6 +1351,8 @@ def season_walk(W, s, games, d1, av, collect, live_prior=None, upto=None):
 # (t -2.43) / -0.038 (t -3.12); lined D-I -0.0078 (t -4.9) / -0.0065 (t -2.8); first 14 days -0.16 / -0.17. Half carry
 # (.5) gains less on 2016-20; X's prior precision (xprec 4, 30) flat
 APLK = 1.0107
+# data/cbb_games_fit.json runs lam 8 (tune() kept 4): re-picking the settings each season on the seasons before it beat
+# the fixed ones held out 2021-26 (scripts/wf_retune.py, Nov 23 2026: -.00065 log loss, t by month -2.52, 27/36; lam 8 every season)
 DEFAULT = {'xcar': 1.0, 'ldft': 0.5, 'aplmix': 0.5, 'aplo': 1.0, 'apld': 4.0, 'thl': 20.0, 'lw3': 0.5, 'cv': 0.1, 'hl': 45.0, 'lam': 4.0, 'mu0': 103.0, 'h0': 1.4, 'tau0': 68.0, 'split': 0.5, 'tcarry': 1.0, 'ecarry': 0.6,
            'mrev': 0.0, 'mk': 0.15, 'tk': 0.5, 'K': 25.0, 'ehfa': 80.0, 'tlam': 2.0, 'tcar': 0.75}
 

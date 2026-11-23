@@ -92,6 +92,8 @@ TFEATS = ['xgT', 'gT', 'mtot', 'gkT', 'one']
 GK_LAST, GK_B2B = 0.5, -2.5
 P0 = {'K': 6.0, 'reg': 0.3, 'hl': 60.0, 'car': 0.5, 'ghl': 45.0, 'gcar': 0.5, 'mhl': 40.0, 'mcar': 0.4,
       'gk_car': 0.6, 'gk_k': 25.0, 'gk_0': -0.1, 'pen': 4.0}
+# data/nhl_games_fit.json runs hl 60 (tune() picked 120): re-picking the settings each season on the seasons before it
+# beat the fixed ones held out 2024-26 (scripts/wf_retune.py, Nov 23 2026: -.00065 log loss, t by month -2.85, 18/27)
 
 
 # ---------------------------------------------------------------- odds
