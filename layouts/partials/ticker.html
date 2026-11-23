@@ -22,7 +22,7 @@
   <div class="tick__pin" hidden>
     <a class="tick__g tick__g--lz" href="{{ "laursen_111/" | relURL }}" data-lz="laursen_111" hidden>
       <span class="tick__l1"><span class="tick__me">LAURSEN_111</span></span>
-      <span class="tick__l2"><span class="tick__live">live</span><span class="tick__when">twitch</span></span>
+      <span class="tick__l2"><span class="tick__live"><i class="tick__cast" aria-hidden="true"><b></b></i>live</span><span class="tick__when">twitch</span></span>
     </a>
     {{- if and (not $home) $nt }}{{ with $nt.games }}{{ partial "inline/tick-nt.html" $nt }}{{ end }}{{ end }}
     {{- if not $home }}{{ range where ((site.Data.ticker | default dict).teams | default slice) "key" "knicks" }}{{ $t := . }}{{ range $i, $g := .games }}
