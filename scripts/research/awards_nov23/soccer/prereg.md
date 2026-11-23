@@ -54,3 +54,12 @@ awards, Golden Boy / Kopa, Ballon d'Or); the voter models keep GAR.
 Golden Boy / Kopa P(win) as an input to the soccer prospects FV: test with the board's own harness
 (scripts/soccer_fv_drivers.py, LOSO by season, t >= 2 and 6/8) only if its rows rebuild here (they need the
 Transfermarkt dump in scripts/.cache, 45 minutes of pulls); else blocked (reported).
+
+## Amendments (after the first run; reported as such)
+
+- Pools: the top-60 / top-40 GAR cuts left three winners out (Kante 2016-17 PL and PFA, Donnarumma 2025 and Unai
+  Simon 2026 Yashin), so pools became minutes floors (league awards 1,000+, Golden Boy / Kopa 600+, keepers 900+).
+  Mbappe was missing as "Kylian Mbappe-Lottin" (Understat): name alias added (data/name_aliases.json).
+- LaLiga best player: awarded 2015-16 and 2023-24 on only (5 seasons with a winner): not tested.
+- B (SGAR) not built: scripts/soccer_sv.py (another thread, Nov 23) already writes a season-only SV / SVAR on every
+  season-file row, keepers' saves included; conviction uses SVAR, so Yashin gets a conviction view.

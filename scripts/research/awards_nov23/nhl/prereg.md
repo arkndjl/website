@@ -64,3 +64,12 @@ Player / Rookie of the Year from the HockeyTech feeds) are not in the frozen row
 season-end P(top 3) for a pick in his first NHL season as an extra input to the stage-k FV of picks still on the
 pipeline (class-out rule of scripts/hockey_fv_drivers.py: t >= 2, 8/12 classes, top-64 and forward checks). Run only if
 the stage rows rebuild from scripts/data/hockey_rows.json.gz.
+
+## Amendments (after the first run; reported as such)
+
+- Hockey-Reference's 2020-21 standings sit in one divisional table ("standings"), which the loaders skipped (every
+  team at .500 in 2021). Fixed in awards_nhl.standings; the four existing races were refit (awards_research.py nhl).
+- The NHL stats API now returns at most 100 rows a call (limit=-1 included). awards_asof.nhl_skaters pages through
+  (stats_pages); the breakout rows for the BO% test were pulled the same way into nhl_breakout's cache format.
+- C (awards -> FV) as run: the Calder model's held-out P(win) in a pick's stage season (k = 1-3) as an extra input
+  to the stage FV (stage inputs from data/hockey_fit.json less comps), class-out rule + top-64 check, Holm over 3.
