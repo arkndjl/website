@@ -1,7 +1,7 @@
 {
  "params": {
   "K": 480,
-  "Kmin": 144,
+  "Kmin": 180.0,
   "n0": 100,
   "mu_new": -100,
   "Kr": 8,
@@ -31,14 +31,14 @@
  ],
  "weights": {
   "top": [
-   1.1499,
-   0.3929,
-   0.9088
+   1.1085,
+   0.3987,
+   0.9137
   ],
   "rest": [
-   1.8546,
-   0.1462,
-   1.1142
+   1.7835,
+   0.1535,
+   1.1417
   ]
  },
  "weightsTune": {
@@ -463,5 +463,21 @@
    "term": "closing line",
    "note": "Thunderpick forward archive: the model's picks lose to the close, so no picks"
   }
- ]
+ ],
+ "loop": {
+  "sealed": "2026-10",
+  "from": {
+   "K": 480,
+   "Kmin": 144,
+   "n0": 100,
+   "mu_new": -100,
+   "Kr": 8,
+   "warm": 1.0,
+   "kmap": 0.6,
+   "span": 0.4,
+   "valid": 1,
+   "kx": 0.5,
+   "xt": "bcd"
+  }
+ }
 }

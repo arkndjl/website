@@ -1,0 +1,118 @@
+{
+ "id": "cs2-ark-loop",
+ "sport": "CS2",
+ "question": "Does retuning the CS2 ARK rating every month beat keeping its settings fixed?",
+ "answer": "Monthly retune passes; retunes ship monthly: -0.0016 log loss per series, t by month -3.49 (bar -2.00), through 2026-10.",
+ "findings": [
+  "Won 13 of 16 months; top-50 series t -2.01.",
+  "Calibration slope 0.968 on 21,038 scored series.",
+  "Picks: Kmin 180 (16 months).",
+  "Shipped Kmin 180."
+ ],
+ "method": "Each month, the settings with the lowest log loss on all earlier series are picked from the shipped set and one-step moves on K, K decay, map K, lower-tier K, region K, span and new-player start, then scored once on that month against the shipped settings.",
+ "data": "Valve VRS series + bo3.gg maps, Aug 2024 to 2026-10, 21,038 walk-forward series.",
+ "n": 21038,
+ "robust": true,
+ "interest": 3,
+ "split_check": "13/16 months better; top-50 t -2.01.",
+ "chart": {
+  "type": "bar",
+  "title": "Log loss, monthly retune minus fixed",
+  "x_label": "month",
+  "y_label": "log loss gap x1000",
+  "y_fmt": "signed",
+  "ref": {
+   "y": 0,
+   "label": "fixed"
+  },
+  "mark": null,
+  "series": [
+   {
+    "name": "retune",
+    "points": [
+     {
+      "x": "25-07",
+      "y": -3.47,
+      "n": 867
+     },
+     {
+      "x": "25-08",
+      "y": -2.99,
+      "n": 1177
+     },
+     {
+      "x": "25-09",
+      "y": -1.09,
+      "n": 1392
+     },
+     {
+      "x": "25-10",
+      "y": -1.35,
+      "n": 1540
+     },
+     {
+      "x": "25-11",
+      "y": -2.2,
+      "n": 1276
+     },
+     {
+      "x": "25-12",
+      "y": -3.54,
+      "n": 581
+     },
+     {
+      "x": "26-01",
+      "y": 0.61,
+      "n": 985
+     },
+     {
+      "x": "26-02",
+      "y": -0.52,
+      "n": 1714
+     },
+     {
+      "x": "26-03",
+      "y": -1.96,
+      "n": 2341
+     },
+     {
+      "x": "26-04",
+      "y": -2.57,
+      "n": 1662
+     },
+     {
+      "x": "26-05",
+      "y": -0.96,
+      "n": 1565
+     },
+     {
+      "x": "26-06",
+      "y": -4.58,
+      "n": 889
+     },
+     {
+      "x": "26-07",
+      "y": -2.09,
+      "n": 1011
+     },
+     {
+      "x": "26-08",
+      "y": -1.14,
+      "n": 1223
+     },
+     {
+      "x": "26-09",
+      "y": 0.51,
+      "n": 1559
+     },
+     {
+      "x": "26-10",
+      "y": 2.45,
+      "n": 1256
+     }
+    ]
+   }
+  ]
+ },
+ "auto": "scripts/cs2_ark_loop.py"
+}

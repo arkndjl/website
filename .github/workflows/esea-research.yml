@@ -58,6 +58,10 @@ jobs:
         run: node scripts/esea_div_backfill.mjs   # esea.yml rebuilds data/esea_milestones.json from it
         env:
           FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
+      # the ESEA-division board test on the newest sealed month (a new look; promoted divisions join the ARK board)
+      - name: ESEA board test
+        if: github.event_name == 'schedule' || (inputs.regions == '1' && inputs.probe != '1')
+        run: python3 scripts/esea_board_research.py || echo "board test failed; keeping the committed result"
       - name: World ranks and ESEA tiers
         if: github.event_name == 'schedule' || (inputs.regions == '1' && inputs.probe != '1')
         run: python3 scripts/esea_world.py
@@ -66,7 +70,7 @@ jobs:
           git config user.name "arkboard-bot"
           git config user.email "actions@users.noreply.github.com"
           git add -f research/esea_matches.json.gz research/esea_regions.json.gz 2>/dev/null || git add -f research/esea_regions.json.gz || git add -f research/esea_matches.json.gz
-          git add data/esea_world.json 2>/dev/null || true
+          git add data/esea_world.json data/esea_board_research.json 2>/dev/null || true
           git add -f research/esea_div_backfill.json.gz 2>/dev/null || true
           git commit -m "ESEA research data ($(date -u +%Y-%m-%dT%H:%MZ))" || exit 0
           git pull --rebase -q origin "${GITHUB_REF_NAME}"

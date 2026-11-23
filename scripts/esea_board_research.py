@@ -8,13 +8,17 @@ to rank them? Pre-registered before any held number was read:
   - a region x division is placed on the board if its held log loss beats a coin (.6931) with t by month <= -2 AND its
     calibration slope (logit fit on held) is within .7 - 1.3 (a placement ordered right but on the wrong scale fails).
     -> data/esea_board_research.json
+  - rerun as data accrues (Nov 23 2026, scripts/cs2_ark_loop.py's rolling monthly seal): held runs Jul 2025 to the last
+    complete month; each new sealed month is a new look, and look k needs t by month <= Phi^-1(.0228 / k) (look 1 = -2.0).
+    A division that passes is listed in "promoted" and scripts/esea_world.py puts its teams on the ARK Ranking board.
 
-    python3 scripts/esea_board_research.py   # ~2 min
+    python3 scripts/esea_board_research.py   # ~2 min; weekly in esea-research.yml (exits early with no new sealed month)
 """
 import datetime as dt
 import gzip
 import json
 import math
+import statistics
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -31,6 +35,8 @@ OUT = ROOT / "data" / "esea_board_research.json"
 
 
 def main():
+    prev = json.loads(OUT.read_text()) if OUT.exists() else {}
+    prev_meta = prev.get("_loop") or {"looks": 1 if prev else 0, "sealed": "2026-10" if prev else None}
     H = json.load(gzip.open(M.HIST))
     series = [r for r in H["series"] if r[6] == "vrs"]
     raw = cs2_bo3.load()
@@ -43,6 +49,13 @@ def main():
         if not m.get("at") and st_at.get((m["season"], m["region"], m["div"], m["stage"])):
             m["at"] = int(np.median(st_at[(m["season"], m["region"], m["div"], m["stage"])]))
     E["matches"] = [m for m in E["matches"] if m.get("at")]
+    lastm = max(dt.datetime.utcfromtimestamp(m["at"]).strftime("%Y-%m") for m in E["matches"])
+    sealed = (dt.date.fromisoformat(lastm + "-01") - dt.timedelta(days=1)).strftime("%Y-%m")
+    if sealed == prev_meta.get("sealed") and "--force" not in sys.argv:
+        print("no new sealed month since", sealed)
+        return
+    look = prev_meta["looks"] + (1 if sealed != prev_meta.get("sealed") else 0)
+    crit = -2.0 if look <= 1 else statistics.NormalDist().inv_cdf(.0228 / look)
     pro = R.pro_nicks(series)
     p = dict(json.loads(M.FIT.read_text())["params"])
     today = dt.date.today()
@@ -60,7 +73,7 @@ def main():
             dstart = {k: float(np.median(v)) for k, v in lv.items()}
     res = {}
     for key in sorted({(o["region"], o["div"]) for o in out}):
-        he = [o for o in out if (o["region"], o["div"]) == key and o["d"] >= M.HELD[0]]
+        he = [o for o in out if (o["region"], o["div"]) == key and M.HELD[0] <= o["d"] and o["d"][:7] <= sealed]
         if len(he) < 200:
             continue
         q = np.clip(np.array([o["e"] for o in he]), 1e-6, 1 - 1e-6)
@@ -76,10 +89,12 @@ def main():
         for _ in range(50):   # calibration slope: P(win) = logistic(b x logit(q))
             pr = 1 / (1 + np.exp(-b * z))
             b -= np.sum((pr - y) * z) / (np.sum(pr * (1 - pr) * z * z) + 1e-9)
-        ok = bool(l.mean() < math.log(2) and t <= -2 and .7 <= b <= 1.3)
+        ok = bool(l.mean() < math.log(2) and t <= crit and .7 <= b <= 1.3)
         res[f"{key[0]} {key[1]}"] = {"n": len(he), "ll": round(float(l.mean()), 4), "coin": .6931, "tMonth": round(t, 2),
                                      "months": [int((mm < 0).sum()), len(mm)], "acc": round(float(((q > .5) == (y == 1)).mean()), 3),
                                      "slope": round(b, 3), "pass": ok}
+    res["promoted"] = sorted(k for k, v in res.items() if isinstance(v, dict) and v.get("pass"))
+    res["_loop"] = {"looks": look, "sealed": sealed, "crit": round(crit, 2)}
     OUT.write_text(json.dumps(res, indent=1))
     print(json.dumps(res, indent=1))
 
