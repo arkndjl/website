@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-23T00:37:19Z",
+ "asof": "2026-11-23T00:42:15Z",
  "recenter": {
   "2026-11-22": 1.51,
   "2026-11-23": 1.46
@@ -329,29 +329,13 @@
  },
  "model": {
   "asof": "2026-11-23T00:06:07Z",
-  "ageH": 0.5,
+  "ageH": 0.6,
   "stale": false
  },
  "picks": [],
  "paperPicks": [],
  "withdrawn": [],
  "board": [
-  {
-   "id": "401910037",
-   "sport": "nba",
-   "kick": "2026-11-24T00:00:00Z",
-   "home": "PHI",
-   "away": "POR",
-   "mk": "spread",
-   "side": "away",
-   "line": 3.5,
-   "price": -124.0,
-   "edge": 3.8,
-   "x": 4.0,
-   "why": "edge under 4 (line: <4)",
-   "m": -0.3,
-   "tm": 229.1
-  },
   {
    "id": "401910043",
    "sport": "nba",
@@ -367,6 +351,22 @@
    "why": "edge under 5 (role: dog)",
    "m": 13.3,
    "tm": 224.7
+  },
+  {
+   "id": "401910037",
+   "sport": "nba",
+   "kick": "2026-11-24T00:00:00Z",
+   "home": "PHI",
+   "away": "POR",
+   "mk": "spread",
+   "side": "away",
+   "line": 2.5,
+   "price": -114.0,
+   "edge": 2.8,
+   "x": 4.0,
+   "why": "edge under 4 (line: <4)",
+   "m": -0.3,
+   "tm": 229.1
   },
   {
    "id": "401910034",
@@ -429,9 +429,9 @@
   "401910037": {
    "mk": "spread",
    "side": "away",
-   "line": 3.5,
-   "price": -124.0,
-   "edge": 3.8,
+   "line": 2.5,
+   "price": -114.0,
+   "edge": 2.8,
    "ev": null,
    "units": 0.0,
    "home": "PHI",
@@ -503,7 +503,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 5356,
+  "snapshots": 5358,
   "buckets": [
    {
     "when": "24h+",
@@ -516,12 +516,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 1175,
-    "clvRet": -0.0192,
-    "clvT": -5.24,
+    "clvN": 1176,
+    "clvRet": -0.019,
+    "clvT": -5.19,
     "clv": 0.43,
-    "beat": 0.446,
-    "still": 0.382
+    "beat": 0.449,
+    "still": 0.379
    },
    {
     "when": "1-6h",
@@ -534,12 +534,12 @@
    },
    {
     "when": "<1h",
-    "clvN": 68,
+    "clvN": 69,
     "clvRet": -0.0443,
-    "clvT": -9.36,
+    "clvT": -9.51,
     "clv": 0.06,
-    "beat": 0.103,
-    "still": 0.809
+    "beat": 0.101,
+    "still": 0.812
    }
   ]
  },
@@ -7178,7 +7178,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-23T00:37:19Z",
+ "checked": "2026-11-23T00:42:15Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
