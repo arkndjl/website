@@ -11,14 +11,16 @@ cover = "/og/soccer.png"
 
 {{< winpane title="soccer.exe :: 2026-27" icon="soccer" sprite="px/hero-soccer" status="ESPN · FotMob · Understat xG · football-data.co.uk" class="winpane--art" />}}
 
-{{< wintabs groups="players:leaders,rookies,next up,awards,all-time players,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,units,all-time,managers|leagues:big five,more leagues,MLS,UEFA cups,national teams" side="true" label="Soccer views" >}}
+{{< wintabs groups="players:leaders,rookies,awards,all-time players,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,units,all-time,managers|leagues:big five,more leagues,MLS,UEFA cups,national teams" side="true" label="Soccer views" >}}
 {{< soccergames title="games" tab="games" >}}
 {{< soccergametable title="game table" tab="game table" >}}
 {{< lazytab tab="ARK Ranking" >}}{{< soccerpower title="ARK Ranking" tab="ARK Ranking" >}}{{< /lazytab >}}
+{{< wintabs tab="rookies" tabs="rookies,next up" sub="true" label="rookies views" >}}
 {{< rookies sport="soccer" icon="soccer" title="rookies" tab="rookies" >}}
 {{< lazytab tab="next up" >}}
 {{< rookies sport="soccer" src="data/next-up/soccer-tab.json" icon="soccer" title="next up" tab="next up" >}}
 {{< /lazytab >}}
+{{< /wintabs >}}
 {{< wintabs tab="awards" tabs="predictive awards,conviction awards" sub="true" label="awards views" >}}
 {{< lazytab tab="predictive awards" >}}{{< awards sport="soccer" tab="predictive awards" >}}{{< /lazytab >}}
 {{< lazytab tab="conviction awards" >}}{{< awards sport="soccer" tab="conviction awards" view="conv" >}}{{< /lazytab >}}

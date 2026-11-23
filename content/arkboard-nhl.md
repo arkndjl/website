@@ -11,16 +11,17 @@ cover = "/og/nhl.png"
 
 {{< winpane title="nhl.exe :: 2026-27" icon="hockey" sprite="px/hero-hockey" status="NHL API · MoneyPuck xG · ESPN · Daily Faceoff" class="winpane--art" />}}
 
-{{< wintabs groups="players:leaders,projections,rookies,next up,awards,all-time players,ARKLIST|rosters:depth chart,lines,transactions|games:games,game table|teams:ARK Ranking,season odds,units,all-time|market:contract value" side="true" label="NHL views" >}}
+{{< wintabs groups="players:leaders,projections,rookies,awards,all-time players,ARKLIST|rosters:depth chart,lines,transactions|games:games,game table|teams:ARK Ranking,units,all-time|market:contract value" side="true" label="NHL views" >}}
 {{< nhlgames title="games" tab="games" >}}
 {{< nhlgametable title="game table" tab="game table" >}}
-{{< nhlpower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< pctl sport="nhl" icon="hockey" title="projections" tab="projections" >}}
 {{< xaav sport="nhl" title="contract value" tab="contract value" >}}
+{{< wintabs tab="rookies" tabs="rookies,next up" sub="true" label="rookies views" >}}
 {{< rookies sport="nhl" icon="hockey" title="rookies" tab="rookies" >}}
 {{< lazytab tab="next up" >}}
 {{< rookies sport="nhl" src="data/next-up/nhl-tab.json" icon="hockey" title="next up" tab="next up" >}}
 {{< /lazytab >}}
+{{< /wintabs >}}
 {{< wintabs tab="awards" tabs="predictive awards,conviction awards" sub="true" label="awards views" >}}
 {{< awards sport="nhl" tab="predictive awards" >}}
 {{< awards sport="nhl" tab="conviction awards" view="conv" >}}
@@ -38,7 +39,8 @@ cover = "/og/nhl.png"
 {{< depthchart sport="nhl" title="depth chart" tab="depth chart" >}}
 {{< backupwatch sport="nhl" title="backup watch" tab="backup watch" >}}
 {{< /wintabs >}}
-{{< wintabs tab="season odds" tabs="season odds,bracket" sub="true" label="season odds views" >}}
+{{< wintabs tab="ARK Ranking" tabs="ARK Ranking,season odds,bracket" sub="true" label="ARK Ranking views" >}}
+{{< nhlpower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< nhlsim title="season odds" tab="season odds" >}}
 {{< lazytab tab="bracket" >}}{{< bracket k="nhl" title="projected bracket" tab="bracket" icon="hockey" >}}{{< /lazytab >}}
 {{< /wintabs >}}

@@ -11,11 +11,11 @@ cover = "/og/nfl.png"
 
 {{< winpane title="nfl.exe :: 2026" icon="football" sprite="px/hero-football" status="nflverse · PFR AV" class="winpane--art" />}}
 
-{{< wintabs groups="players:leaders,projections,rookies,standouts,awards,all-time players,ARKLIST|rosters:depth chart,personnel,transactions|games:games,game table|teams:ARK Ranking,season odds,units,all-time|market:contract value" side="true" label="NFL views" >}}
+{{< wintabs groups="players:leaders,projections,standouts,awards,all-time players,ARKLIST|rosters:depth chart,personnel,transactions|games:games,game table|teams:ARK Ranking,units,all-time|market:contract value" side="true" label="NFL views" >}}
 {{< pctl sport="nfl" icon="football" title="projections" tab="projections" >}}
 {{< xaav sport="nfl" title="contract value" tab="contract value" >}}
+{{< wintabs tab="standouts" tabs="standouts,next up,rookies" sub="true" label="standouts views" >}}
 {{< rookies sport="nfl" icon="football" title="rookies" tab="rookies" >}}
-{{< wintabs tab="standouts" tabs="standouts,next up" sub="true" label="standouts views" >}}
 {{< nflbreakouts title="standouts" tab="standouts" >}}
 {{< lazytab tab="next up" >}}
 {{< rookies sport="nfl" src="data/next-up/nfl-tab.json" icon="football" title="next up" tab="next up" >}}
@@ -28,7 +28,6 @@ cover = "/og/nfl.png"
 {{< arklist sport="nfl" title="ARKLIST" tab="ARKLIST" >}}
 {{< nflgames title="games" tab="games" >}}
 {{< nflgametable title="game table" tab="game table" >}}
-{{< nflpower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< nflpersonnel title="personnel" tab="personnel" >}}
 {{< lazytab tab="transactions" >}}
 {{< transactions sport="nfl" title="transactions" tab="transactions" >}}
@@ -44,7 +43,8 @@ cover = "/og/nfl.png"
 {{< depthchart sport="nfl" title="depth chart" tab="depth chart" >}}
 {{< backupwatch sport="nfl" title="backup watch" tab="backup watch" >}}
 {{< /wintabs >}}
-{{< wintabs tab="season odds" tabs="season odds,bracket" sub="true" label="season odds views" >}}
+{{< wintabs tab="ARK Ranking" tabs="ARK Ranking,season odds,bracket" sub="true" label="ARK Ranking views" >}}
+{{< nflpower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< nflsim title="season odds" tab="season odds" >}}
 {{< lazytab tab="bracket" >}}{{< bracket k="nfl" title="projected bracket" tab="bracket" icon="football" >}}{{< /lazytab >}}
 {{< /wintabs >}}

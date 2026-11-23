@@ -11,8 +11,8 @@ cover = "/og/nba.png"
 
 {{< winpane title="nba.exe :: 2026-27" icon="basketball" sprite="px/hero-basketball" status="databallr DPM · Basketball-Reference BPM · LUMA ARC (CC BY 4.0) · ESPN · NBA injury report" class="winpane--art" />}}
 
-{{< wintabs groups="players:VORX/XPM leaders,projections,rookies,next up,G League,awards,all-time players,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,season odds,units,all-time|market:contract value" side="true" label="NBA views" >}}
-{{< wintabs tab="VORX/XPM leaders" tabs="VORX/XPM leaders,matchups" sub="true" label="XPM views" >}}
+{{< wintabs groups="players:leaders,projections,rookies,awards,all-time players,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,units,all-time|market:contract value" side="true" label="NBA views" >}}
+{{< wintabs tab="leaders" tabs="VORX/XPM leaders,matchups" sub="true" label="leaders views" >}}
 {{< nbaxpm title="NBA XPM" tab="VORX/XPM leaders" >}}
 {{< lazytab tab="matchups" >}}
 {{< nbamatchups title="matchups" tab="matchups" >}}
@@ -20,11 +20,13 @@ cover = "/og/nba.png"
 {{< /wintabs >}}
 {{< pctl sport="nba" icon="basketball" title="projections" tab="projections" >}}
 {{< nbasurplus title="contract value" tab="contract value" >}}
+{{< wintabs tab="rookies" tabs="rookies,next up,G League" sub="true" label="rookies views" >}}
 {{< rookies sport="nba" icon="basketball" title="rookies" tab="rookies" >}}
 {{< lazytab tab="next up" >}}
 {{< rookies sport="nba" src="data/next-up/nba-tab.json" icon="basketball" title="next up" tab="next up" >}}
 {{< /lazytab >}}
 {{< gleague title="G League" tab="G League" >}}
+{{< /wintabs >}}
 {{< wintabs tab="awards" tabs="predictive awards,conviction awards" sub="true" label="awards views" >}}
 {{< awards sport="nba" tab="predictive awards" >}}
 {{< awards sport="nba" tab="conviction awards" view="conv" >}}
@@ -32,7 +34,6 @@ cover = "/og/nba.png"
 {{< arklist sport="nba" title="ARKLIST" tab="ARKLIST" >}}
 {{< nbagames title="games" tab="games" >}}
 {{< nbagametable title="game table" tab="game table" >}}
-{{< nbapower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< lazytab tab="transactions" >}}
 {{< transactions sport="nba" title="transactions" tab="transactions" >}}
 {{< /lazytab >}}
@@ -45,7 +46,8 @@ cover = "/og/nba.png"
 {{< nbalineups title="on/off" tab="on/off" view="onoff" >}}
 {{< lineupleaders sport="nba" title="lineup leaders" tab="lineup leaders" >}}
 {{< /wintabs >}}
-{{< wintabs tab="season odds" tabs="season odds,bracket" sub="true" label="season odds views" >}}
+{{< wintabs tab="ARK Ranking" tabs="ARK Ranking,season odds,bracket" sub="true" label="ARK Ranking views" >}}
+{{< nbapower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< nbasim title="season odds" tab="season odds" >}}
 {{< lazytab tab="bracket" >}}{{< bracket k="nba" title="projected bracket" tab="bracket" icon="basketball" >}}{{< /lazytab >}}
 {{< /wintabs >}}
