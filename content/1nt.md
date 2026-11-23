@@ -26,6 +26,9 @@ draft = false
 {{< /desk >}}
 {{< desk tab="milestones" >}}
 {{< esea part="world" class="desk__wide" >}}
+{{< n1miles part="finishes" class="desk__wide" >}}
+{{< n1miles part="ranks" class="desk__wide" >}}
+{{< n1miles part="log" class="desk__wide" >}}
 {{< /desk >}}
 {{< desk tab="watch" >}}
 {{< vods title="1nt_vods.exe" only="nt" class="desk__wide" >}}

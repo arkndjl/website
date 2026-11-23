@@ -68,10 +68,10 @@ ARK_STAB = {'kpr': 145, 'dpr': 279, 'adr': 118, 'mks': 171, 'entry': 535, 'clutc
 ARK_STAB_TEAM = 486
 
 
-def season_lines(M, c, th, p, es, center, cn):
+def season_lines(M, c, th, p, es, center, cn, who=None):
     """1NT members' league seasons: season RWA (that season's lines, opponents at their current RWA, shrunk k rounds
     toward the division prior) and season ARK Rating (the page's stabilised ARK on the season's totals)
-    -> {nick: {season: [rwa, ark, rounds]}}"""
+    -> {nick: {season: [rwa, ark, rounds]}}. who: other players ([{id, nick}], scripts/esea_milestones.py)"""
     import re
     cur = int((re.search(r'S(\d{2})', cn) or [0, 0])[1] or 0)
     seas = np.where(M.gseason[M.g] == 99, cur, M.gseason[M.g])
@@ -85,7 +85,7 @@ def season_lines(M, c, th, p, es, center, cn):
     mu = (F[main_rows] * M.R[main_rows, None]).sum(0) / M.R[main_rows].sum()
     stab = np.array([ARK_STAB[f] for f in R.ARK.FEATS])
     out = {}
-    for x in es.get('members') or []:
+    for x in (es.get('members') or []) if who is None else who:
         i = M.pid.get(x.get('id'))
         if i is None:
             continue
@@ -128,7 +128,8 @@ def team_rwa(ms, th, M, center, cn, new_v):
     return out
 
 
-def main():
+def state():
+    """the fitted ratings on the archive + this season's cached maps: what main() writes and esea_milestones.py reads"""
     fit = json.load(open(FIT))
     p = fit['params']
     now = time.time()
@@ -149,6 +150,19 @@ def main():
     else:
         c = R.ark_values(M, tune_g)
     th, ws = R.ratings(M, c, now + 1, p)
+    rounds = np.bincount(M.p, M.R, len(M.pid))
+    # display scale: 0 = the average recent Main player (rounds-weighted); a shift only, gaps are unchanged
+    w = M.R * (M.d >= now - RECENT_DAYS * 86400) * (M.dv == 0)
+    wp = np.bincount(M.p, w, len(M.pid))
+    center = float((th * wp).sum() / max(wp.sum(), 1e-9))
+    return dict(fit=fit, p=p, now=now, ms=ms, live=live, nick=nick, es=es, cn=cn, div=div, M=M, c=c, th=th,
+                rounds=rounds, center=center)
+
+
+def main():
+    S = state()
+    fit, p, now, ms, live, nick, es, cn, div, M, c, th, rounds, center = (S[k] for k in (
+        'fit', 'p', 'now', 'ms', 'live', 'nick', 'es', 'cn', 'div', 'M', 'c', 'th', 'rounds', 'center'))
     last = np.zeros(len(M.pid))
     np.maximum.at(last, M.p, M.d)
     for x in es.get('members') or []:
@@ -156,12 +170,7 @@ def main():
     for x in (es.get('rankings') or {}).get('players') or []:
         nick.setdefault(x.get('id'), x.get('name'))
     inv = {i: q for q, i in M.pid.items()}
-    rounds = np.bincount(M.p, M.R, len(M.pid))
     keep = (last >= now - RECENT_DAYS * 86400) | np.isin(np.arange(len(M.pid)), [M.pid[x['id']] for x in es.get('members') or [] if x.get('id') in M.pid])
-    # display scale: 0 = the average recent Main player (rounds-weighted); a shift only, gaps are unchanged
-    w = M.R * (M.d >= now - RECENT_DAYS * 86400) * (M.dv == 0)
-    wp = np.bincount(M.p, w, len(M.pid))
-    center = float((th * wp).sum() / max(wp.sum(), 1e-9))
     # a player with no league maps: the mean of this division's recent low-sample players (under 300 rounds); the
     # fit's own prior sat above the average Main player, and new players were too rare in the test to tune it
     dl = np.bincount(M.p, M.R * M.dv, len(M.pid)) / np.maximum(rounds, 1)

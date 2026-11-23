@@ -79,6 +79,12 @@ jobs:
         continue-on-error: true
         run: python3 scripts/esea_season_log.py
       # league-wide forward log of the preview model (lines written by fetch_esea.mjs), scored
+      # milestones tab: season finishes, playoff series, division ranks, world-rank firsts
+      - name: 1NT milestones
+        continue-on-error: true
+        run: python3 scripts/esea_milestones.py
+        env:
+          FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
       - name: League log score
         continue-on-error: true
         run: python3 scripts/esea_league_score.py
@@ -86,4 +92,4 @@ jobs:
         # the build gate, then the push; on a rejection this run's files are taken whole onto the new main (scripts/data_push.py)
         run: |
           python3 scripts/data_push.py -m "Update 1NT's ESEA season ($(date -u +%Y-%m-%dT%H:%MZ))" \
-            -- data/esea.json data/laursen_socials.json data/arkndjl_socials.json data/esea_lab.json data/esea_rwa.json data/esea_seasons.json data/esea_league_log.json scripts/data/esea_league_log.jsonl static/img/1nt/opp
+            -- data/esea.json data/laursen_socials.json data/arkndjl_socials.json data/esea_lab.json data/esea_rwa.json data/esea_seasons.json data/esea_milestones.json data/esea_league_log.json scripts/data/esea_league_log.jsonl static/img/1nt/opp
