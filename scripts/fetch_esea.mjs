@@ -438,6 +438,49 @@ try {
 } catch {}
 console.log('regular-season groups:', [...regular.values()].map(c => c.name).join(' | '));
 for (const c of regular.values()) if (!champs.has(c.id)) for (const m of await pages(`/championships/${c.id}/matches?type=all`, 2000)) allM.push(m);
+// ---- playoffs: the division's double-elimination bracket ----------------------------------------
+// FACEIT's playoff championship is its own competition ("S59 NA Main A - Playoffs") that neither search nor the
+// organizer list returns, and a player's history only lists finished matches. Found, in order: data/cs.json
+// "eseaPlayoffs" (championship id or link), 1NT's own history (champs above), and once the regular season is over the
+// histories of the group's top teams (one player each, until one has a finished playoff match). Remembered between runs.
+// Matches carry group (1 upper, 2 lower, 3 grand final) and round; no seed or slot, so a column is a (group, round).
+const isPo = nm => isSeason(nm) && /playoff/i.test(nm || '') && /\bNA\b/i.test(nm || '') && /\bmain\b/i.test(nm || '');
+const poC = new Map((prev.season === SEASON ? prev.bracket?.champs || [] : []).map(c => [c.id, c]));
+for (const c of champs.values()) if (isPo(c.name)) poC.set(c.id, { id: c.id, name: c.name });
+try {
+  const cs = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cs.json'), 'utf8'));
+  for (const g of [].concat(cs.eseaPlayoffs || [], process.env.ESEA_PLAYOFFS || [])) {
+    const id = (/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i.exec(g) || [])[1];
+    if (id && !poC.has(id)) poC.set(id, { id, name: null });
+  }
+} catch {}
+const regDone = allM.length && allM.filter(m => regular.has(m.competition_id)).every(m => ['FINISHED', 'CANCELLED', 'ABORTED'].includes(m.status));
+if (!poC.size && regDone) {
+  const tops = Object.entries(standingsSeed()).sort((a, b) => a[1] - b[1]).slice(0, 24).map(x => x[0]);
+  const pid = {};
+  for (const m of allM) for (const f of ['faction1', 'faction2']) { const t = m.teams?.[f]; const r = (t?.roster || [])[0]; if (t?.faction_id && r && !pid[t.faction_id]) pid[t.faction_id] = r.player_id || r; }
+  for (const tid of tops) {
+    if (!pid[tid]) continue;
+    const h = await api(`/players/${pid[tid]}/history?game=cs2&limit=20`).catch(() => null);
+    for (const x of h?.items || []) if (x.competition_type === 'championship' && isPo(x.competition_name)) poC.set(x.competition_id, { id: x.competition_id, name: x.competition_name });
+    if (poC.size) break;
+  }
+}
+function standingsSeed() {   // regular-season order before the leaderboards are read: wins in the group's finished matches
+  const w = {};
+  for (const m of allM) if (regular.has(m.competition_id) && m.status === 'FINISHED') {
+    for (const f of ['faction1', 'faction2']) { const id = m.teams?.[f]?.faction_id; if (id) w[id] = (w[id] || 0) + (m.results?.winner === f ? 1 : 0); }
+  }
+  return Object.fromEntries(Object.entries(w).map(([k, v]) => [k, -v]));
+}
+const poM = [];
+for (const c of poC.values()) {
+  const ms = await pages(`/championships/${c.id}/matches?type=all`, 1000).catch(() => []);
+  if (!c.name) c.name = ms.find(m => m.competition_name)?.competition_name || null;
+  c.n = ms.length; c.mine = ms.some(m => [m.teams?.faction1?.faction_id, m.teams?.faction2?.faction_id].includes(TEAM_ID));
+  for (const m of ms) poM.push(m);
+}
+console.log('playoffs:', [...poC.values()].map(c => `${c.name} (${c.n} matches)`).join(' | ') || 'none found');
 const RCACHE = path.join(ROOT, '.cache', 'esea', 'rounds.json');
 const rcache = (() => { try { return JSON.parse(fs.readFileSync(RCACHE, 'utf8')); } catch { return {}; } })();
 rcache.m ||= {}; rcache.elo ||= {}; rcache.P ||= {}; delete rcache.L;   // P: match -> team -> per-map player lines (rankings)
@@ -1737,6 +1780,7 @@ async function advancedFeed() {
   console.log(`league log: advanced ${A.champs.length} championship(s), ${A.list.length} matches, ${games.length} boxed, ${ADV.calls - left} calls`);
   return { list: A.list, games };
 }
+const LOGP = new Map();   // league log: match id -> faction1's win chance (frozen at start)
 async function leagueLog() {
   const now = Math.floor(Date.now() / 1000), P = playerElo();
   const adv = await advancedFeed().catch(e => (console.log('league log advanced:', e.message), { list: [], games: [] }));
@@ -1755,6 +1799,7 @@ async function leagueLog() {
   };
   for (const m of allM) if (regular.has(m.competition_id)) row(m, 'main');
   for (const m of adv.list) row(m, 'advanced');
+  for (const m of poM) row(m, 'main');
   const quote = m => {
     const dr = m.div === 'advanced' ? 1 : mainDr, sides = [];
     for (const [i, tid] of [m.t1, m.t2].entries()) {
@@ -1774,6 +1819,7 @@ async function leagueLog() {
   };
   const before = readLog(), { lines, stats } = mergeLog(before, feed, quote, now);
   writeLog(settle(before, lines));
+  for (const l of lines) if (l.p != null) LOGP.set(l.id, l.p);
   console.log(`league log: ${lines.length} lines (${stats.priced} priced, ${stats.frozen} frozen, ${stats.filled} filled, ${stats.dropped} dropped)`);
 }
 await leagueLog().catch(e => console.log('league log:', e.message));
@@ -1813,6 +1859,26 @@ const calib = scored.length ? { n: scored.length, brier: Math.round(scored.reduc
   ...(() => { const o = scored.filter(c => c.wentOver != null && c.over != null); return o.length ? { ouN: o.length, overs: o.filter(c => c.wentOver).length,
     ouBrier: Math.round(o.reduce((a, c) => a + (c.over / 100 - (c.wentOver ? 1 : 0)) ** 2, 0) / o.length * 1000) / 1000 } : {}; })() } : null;
 
+// the bracket: the playoff championship with 1NT in it, else the one sharing most teams with 1NT's group
+function bracket() {
+  if (!poC.size) return null;
+  const grp = new Set(Object.keys(standings));
+  const score = c => (c.mine ? 1e6 : 0) + poM.filter(m => m.competition_id === c.id).reduce((a, m) => a + [m.teams?.faction1?.faction_id, m.teams?.faction2?.faction_id].filter(x => grp.has(x)).length, 0);
+  const c = [...poC.values()].sort((a, b) => score(b) - score(a))[0];
+  const side = t => (!t || !t.faction_id || /^bye$/i.test(t.faction_id) ? { id: null, name: /^bye$/i.test(t?.faction_id || '') ? 'BYE' : 'TBD' }
+    : { id: t.faction_id, name: t.name || t.nickname || 'TBD', avatar: t.avatar || null, seed: standings[t.faction_id]?.rank ?? null });
+  const ms = poM.filter(m => m.competition_id === c.id && !['CANCELLED', 'ABORTED'].includes(m.status)).map(m => {
+    const a = side(m.teams?.faction1), b = side(m.teams?.faction2), w = m.results?.winner;
+    return { id: m.match_id, g: m.group ?? 1, r: m.round ?? 1, at: (m.scheduled_at || m.started_at || 0) * 1000 || null, st: m.status, bo: m.best_of ?? null,
+      a, b, w: w === 'faction1' ? 1 : w === 'faction2' ? 2 : null, s: m.results?.score ? [m.results.score.faction1 ?? 0, m.results.score.faction2 ?? 0] : null,
+      p: LOGP.has(m.match_id) ? Math.round(LOGP.get(m.match_id) * 1000) / 1000 : null, url: (m.faceit_url || '').replace('{lang}', 'en') || null };
+  }).sort((x, y) => x.g - y.g || x.r - y.r || (x.at || 0) - (y.at || 0) || (x.id < y.id ? -1 : 1));
+  const groups = [...new Set(ms.map(m => m.g))].sort((a, b) => a - b);
+  const label = g => (groups.length >= 2 ? { 1: 'upper', 2: 'lower', 3: 'grand final' }[g] || `group ${g}` : 'bracket');
+  return { id: c.id, name: c.name, url: `https://www.faceit.com/en/championship/${c.id}`, champs: [...poC.values()].map(x => ({ id: x.id, name: x.name })),
+    groups: groups.map(g => ({ g, label: label(g), rounds: [...new Set(ms.filter(m => m.g === g).map(m => m.r))].sort((a, b) => a - b).map(r => ({ r, m: ms.filter(m => m.g === g && m.r === r) })) })) };
+}
+
 const out = {
   season: SEASON, asof: new Date().toISOString(),
   championship: { id: champId, name: champ?.name || champs.get(champId)?.name || null,
@@ -1824,6 +1890,7 @@ const out = {
     rf: maps.reduce((a, x) => a + x.rf, 0), ra: maps.reduce((a, x) => a + x.ra, 0),
     streak, form: done.slice(-5).map(m => m.result).join('') },
   next: next && { id: next.id, at: next.at, opp: next.opp, url: next.url, status: next.status },
+  bracket: safe(bracket),
   standing: standings[TEAM_ID] || null, leaderboards: lbSeen, format: FORMAT, stakes: safe(stakes), sim: safe(simulate), calibration, calib, ou: safe(() => totals(0.5)), combos: combo, plusBase: { players: PLUS.players, awpers: PLUS.awpers, entry: PLUS.lgEntry, clutch: PLUS.lgClutch }, preview: prev_, countries, allTime: allT, members, memberLog,
   statKeys: [...statKeys].sort(), rankings: RANKINGS, arkModel: { fitted: ARK_MODEL.fitted, maps: ARK_MODEL.n, r2: ARK_MODEL.r2, beta: Object.fromEntries(Object.entries(ARK_MODEL.beta).map(([k, v]) => [k, Math.round(v * 1000) / 1000])), centre: Math.round(ARK_MU * 10000) / 10000, stretch: Math.round(ARK_K * 100) / 100 }, matches, pool: Object.values(pool).sort((a, b) => (b.w + b.l) - (a.w + a.l) || b.w - a.w), players, seasons: pastSeasons, profile: prof,
 };

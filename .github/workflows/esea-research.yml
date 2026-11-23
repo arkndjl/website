@@ -45,7 +45,9 @@ jobs:
           ESEA_FROM: 53
       - name: Bracket probe
         if: inputs.probe == '2'
-        run: node scripts/esea_bracket_probe.mjs
+        run: |
+          ESEA_PLAYOFFS="$PO_ID" node scripts/fetch_esea.mjs | grep -iE "playoff|league log|error" || true
+          node -e 'const b=require("./data/esea.json").bracket; console.log(JSON.stringify(b && {name:b.name, groups:b.groups.map(g=>({g:g.g,label:g.label,rounds:g.rounds.map(r=>[r.r,r.m.length,r.m[0]])}))}).slice(0,6000))'
         env:
           FACEIT_API_KEY: ${{ secrets.FACEIT_API_KEY }}
           PO_ID: ${{ inputs.regions }}
