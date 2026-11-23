@@ -728,9 +728,10 @@ def _fit():
 
 
 def staleness(S):
-    """big-five leagues whose Understat match files trail the results: 18+ finished league matches (about two rounds)
-    on ESPN's scoreboard after the league's newest Understat match. [] when every league is in step; the player tabs
-    show it in the status bar and keep the last Understat numbers (no second source is mixed in)"""
+    """big-five leagues whose Understat match files trail the results: 9+ finished league matches (about a round)
+    on ESPN's scoreboard after the league's newest Understat match. [] when every league is in step. The GAR view
+    keeps the last Understat numbers and shows the lag in the status bar; the stats view shows that league's FotMob
+    stats instead (static/data/soccer-more/b<S>.json, scripts/soccer_more.py; Noah Nov 23 2026)"""
     today = dt.date.today().isoformat()
     out = []
     for lg in D.BIG5:
@@ -742,7 +743,7 @@ def staleness(S):
             cut = (dt.date.fromisoformat(us) + dt.timedelta(days=1)).isoformat()
             n = sum(1 for y in sorted({int(us[:4]), int(today[:4])}) for r in (D.espn_year(lg, y) or [])
                     if r.get('hs') is not None and cut < r['day'] <= today)
-            if n >= 18:
+            if n >= 9:
                 out.append({'lg': lg, 'last': us, 'missing': n})
         except Exception as e:                           # a freshness check never stops the build
             print(f'staleness {lg}: {e!r}', file=sys.stderr)

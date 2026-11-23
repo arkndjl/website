@@ -11,6 +11,8 @@ scripts/names.py's rules).
 
     python3 scripts/soccer_more.py          # this season (finished seasons are cached in scripts/.cache/soccer/fms)
     python3 scripts/soccer_more.py --all    # every season FotMob lists (up to 12)
+Each run also writes the big five's FotMob stats for this season (soccer-more/b<S>.json): the player stats view shows
+them in place of Understat's for a league Understat trails (soccer_players.py staleness).
 """
 import json
 import os
@@ -30,6 +32,9 @@ PROS = os.path.join(ROOT, 'data', 'soccer_prospects.json')
 FMMAP = os.path.join(HERE, 'data', 'soccer_fm_map.json')
 FMLG = {'ned.1': 57, 'por.1': 61, 'bel.1': 40, 'tur.1': 71, 'cze.1': 122, 'gre.1': 135, 'pol.1': 196, 'den.1': 46,
         'sui.1': 69, 'nor.1': 59, 'aut.1': 38, 'sco.1': 64, 'swe.1': 67}
+# the big five on FotMob: the backup for the player stats view when Understat trails the results (soccer_players.py
+# staleness: the season file's "stale"); static/data/soccer-more/b<S>.json, this season only. GAR never reads it.
+FMB5 = {'eng.1': 47, 'esp.1': 87, 'ger.1': 54, 'ita.1': 55, 'fra.1': 53}
 STATS = {'mins_played': None, 'goals': 'g', 'goal_assist': 'a', 'expected_goals': 'xg', 'expected_assists': 'xa',
          'total_scoring_att': 'sh', 'total_att_assist': 'kp', 'rating': 'rt'}
 
@@ -49,7 +54,7 @@ def pos_of(code):
 
 
 def season_files(lg):
-    d = D.get(f'https://www.fotmob.com/api/data/leagues?id={FMLG[lg]}')
+    d = D.get(f'https://www.fotmob.com/api/data/leagues?id={FMLG.get(lg) or FMB5[lg]}')
     out = {}
     for L in ((d or {}).get('stats') or {}).get('seasonStatLinks') or []:
         n = L['Name']
@@ -100,13 +105,13 @@ def club_like(a, b):
     return NM.same_team(a, b) or G.name_sim(a, b) >= 0.5
 
 
-def build(seasons=None):
+def build(seasons=None, big5=False):
     cur = D.current_season()
     mp = json.load(open(FMMAP)) if os.path.exists(FMMAP) else {}
     C = SF.ctry()
     pros = prospects()
     by = {}
-    for lg in FMLG:
+    for lg in (FMB5 if big5 else FMLG):
         for S, base in season_files(lg).items():
             if seasons and S not in seasons:
                 continue
@@ -114,7 +119,8 @@ def build(seasons=None):
                 if r['min'] < 90:
                     continue
                 o = {k: r.get(k) for k in ('p', 'n', 'team', 'min', 'mp', 'g', 'a', 'xg', 'xa', 'sh', 'kp', 'rt')}
-                for k in ('g', 'a', 'sh', 'kp'):
+                o['sh'] = round(float(o['sh'] or 0) * o['min'] / 90)   # FotMob lists shots a 90
+                for k in ('g', 'a', 'kp'):
                     o[k] = int(o[k] or 0)
                 for k in ('xg', 'xa'):
                     o[k] = round(float(o[k]), 2) if o[k] is not None else None
@@ -142,10 +148,14 @@ def build(seasons=None):
         for o in ps:
             games[o['lg']] = max(games.get(o['lg'], 0), o['mp'])
         J = {'asof': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), 'season': S, 'games': games, 'players': ps}
-        open(os.path.join(OUT, f'{S}.json'), 'w').write(json.dumps(J, separators=(',', ':'), allow_nan=False))
+        open(os.path.join(OUT, f'{"b" if big5 else ""}{S}.json'), 'w').write(json.dumps(J, separators=(',', ':'), allow_nan=False))
         print('wrote', S, len(ps), flush=True)
     SF.fetch_flags({o.get('nat') for ps in by.values() for o in ps} - {None})
 
 
 if __name__ == '__main__':
     build(None if '--all' in sys.argv else {D.current_season()})
+    try:                                                 # the big five's backup never stops the run
+        build({D.current_season()}, big5=True)
+    except Exception as e:
+        print(f'big five (FotMob backup) skipped: {e!r}', file=sys.stderr)
