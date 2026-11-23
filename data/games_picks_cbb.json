@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-23T05:52:36Z",
+ "asof": "2026-11-23T05:55:16Z",
  "recenter": {
   "2026-11-23": 1.93
  },
@@ -1958,10 +1958,10 @@
    "mk": "spread",
    "side": "home",
    "line": -7.5,
-   "price": -119.0,
+   "price": -124.0,
    "edge": 6.4,
    "x": 4.0,
-   "why": "no edge at -119",
+   "why": "no edge at -124",
    "m": -1.1,
    "tm": 165.7
   },
@@ -1996,22 +1996,6 @@
    "why": "no edge at -129",
    "m": 0.9,
    "tm": 155.4
-  },
-  {
-   "id": "401927397",
-   "sport": "cbb",
-   "kick": "2026-11-23T16:00:00Z",
-   "home": "App State",
-   "away": "St. Bonaventure",
-   "mk": "spread",
-   "side": "home",
-   "line": -5.5,
-   "price": -124.0,
-   "edge": 4.5,
-   "x": 4.0,
-   "why": "no edge at -124",
-   "m": -1.0,
-   "tm": 137.2
   },
   {
    "id": "401921209",
@@ -2124,6 +2108,22 @@
    "why": "edge under 5 (line: <4)",
    "m": 1.5,
    "tm": 146.4
+  },
+  {
+   "id": "401927397",
+   "sport": "cbb",
+   "kick": "2026-11-23T16:00:00Z",
+   "home": "App State",
+   "away": "St. Bonaventure",
+   "mk": "total",
+   "side": "over",
+   "line": 133.5,
+   "price": -124.0,
+   "edge": 3.7,
+   "x": 5.0,
+   "why": "edge under 5 (total: low)",
+   "m": -1.0,
+   "tm": 137.2
   },
   {
    "id": "401909788",
@@ -2409,11 +2409,11 @@
    "state": "under"
   },
   "401927397": {
-   "mk": "spread",
-   "side": "home",
-   "line": -5.5,
+   "mk": "total",
+   "side": "over",
+   "line": 133.5,
    "price": -124.0,
-   "edge": 4.5,
+   "edge": 3.7,
    "ev": null,
    "units": 0.0,
    "home": "App State",
@@ -2604,7 +2604,7 @@
    "mk": "spread",
    "side": "home",
    "line": -7.5,
-   "price": -119.0,
+   "price": -124.0,
    "edge": 6.4,
    "ev": null,
    "units": 0.0,
@@ -2676,7 +2676,7 @@
    "mk": "total",
    "side": "over",
    "line": 133.5,
-   "price": -140.0,
+   "price": -134.0,
    "edge": 1.0,
    "ev": null,
    "units": 0.0,
@@ -2749,7 +2749,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 23508,
+  "snapshots": 23518,
   "buckets": [
    {
     "when": "24h+",
@@ -2762,11 +2762,11 @@
    },
    {
     "when": "6-24h",
-    "clvN": 4678,
+    "clvN": 4683,
     "clvRet": -0.0012,
-    "clvT": -0.56,
+    "clvT": -0.55,
     "clv": 0.7,
-    "beat": 0.414,
+    "beat": 0.415,
     "still": 0.403
    },
    {
@@ -20989,7 +20989,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-23T05:52:36Z",
+ "checked": "2026-11-23T05:55:16Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
