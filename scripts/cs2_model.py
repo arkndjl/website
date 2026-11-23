@@ -42,6 +42,8 @@ Lower-tier matches (Nov 23 2026, scripts/cs2_lowtier_research.py): bo3.gg tier B
 /counterstrike/api.php for every agent and LiquipediaDB is Enterprise-only.
 The map pool and veto chances use c fit on Polymarket Map 1 prices instead (data/cs2_map_scale.json, c 1.82),
 which held out beat the outcome fit's 2.43 on Map 1 results (t -2.51 by day).
+Settings retune (Nov 23 2026, scripts/cs2_ark_loop.py, weekly): monthly walk-forward pick vs the shipped settings, each
+sealed month scored once; passed look 1 (-.0016, t by month -3.5, 13/16, top 50 -2.0, slope .97): Kmin 144 -> 180.
 """
 import bisect
 import datetime as dt
@@ -656,6 +658,28 @@ def build():
             teams[at]["tierE"] = ew.get("tier")
     except (OSError, ValueError, KeyError) as ex:
         print("1NT placement skipped:", ex)
+    # ESEA divisions that passed the board test (scripts/esea_board_research.py, rerun monthly): their teams are placed
+    # the same way, at their world rank (data/esea_world.json "board"), ARK and Elo off the neighbours
+    try:
+        ewj = json.loads((ROOT / "data" / "esea_world.json").read_text())
+        placed = [ewj["now"]["s"]] if any(t["k"] == "1nt" for t in teams) else []
+        for b in ewj.get("board") or []:
+            if b["w"] > ARK_N:
+                continue
+            at = min(len(teams), b["w"] - 1 + sum(s > b["s"] for s in placed))
+            placed.append(b["s"])
+            teams.insert(at, {"rk": at + 1, "k": "esea-" + b["id"][:8], "n": b["n"], "ros": b.get("ros") or [],
+                              "rg": "Europe" if b["rg"] == "EU" else "Americas" if b["rg"] == "NA" else "Asia",
+                              "ark": None, "elo": None, "pl": round(b["s"]), "d30": None, "vrk": None, "vpts": None,
+                              "w90": 0, "l90": 0, "form": "", "last": today, "logo": False, "esea": b["div"],
+                              "tierE": b["t"]})
+            nb = [teams[j] for j in (at - 1, at + 1) if 0 <= j < len(teams) and teams[j].get("ark") is not None]
+            teams[at]["ark"] = round(float(np.mean([t["ark"] for t in nb])), 4) if nb else None
+            teams[at]["elo"] = round(float(np.mean([t["elo"] for t in nb]))) if nb else None
+        for i, t in enumerate(teams):
+            t["rk"] = i + 1
+    except (OSError, ValueError, KeyError) as ex:
+        print("ESEA board placement skipped:", ex)
     fetch_logos([t["k"] for t in teams], H.get("logos", {}))
     # event-access tiers (Tier 1-4) on the ranked teams' Elo
     tier_fit = cs2_players.tiers(teams, bo3)

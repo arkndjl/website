@@ -1,0 +1,48 @@
+# CS2 ARK Ranking self-retune loop (scripts/cs2_ark_loop.py): when a new month of Valve series has sealed, the walk-forward
+# record of "retune every month" vs the shipped settings is rescored; a retune ships to data/cs2_fit.json only once
+# that record passes (the gate is in the script's docstring). Weekly; most runs exit early. The cs2 workflow rebuilds the
+# board on its next run from the new settings; process-refresh redraws the Process card.
+name: cs2 ark loop
+
+on:
+  schedule:
+    - cron: "40 11 * * 2"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "1 = rerun the walk-forward even with no new sealed month (not a new look)"
+        default: "0"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cs2
+  cancel-in-progress: false
+
+jobs:
+  loop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q numpy
+      # Valve's repo (the 2022-23 sample season seeds the player ratings), saved by the cs2 workflow
+      - uses: actions/cache/restore@v4
+        with:
+          path: scripts/.cache/cs
+          key: cs2-vrs-v1
+      - name: Walk-forward retune
+        run: python3 scripts/cs2_ark_loop.py ${{ inputs.force == '1' && '--force' || '' }}
+      - name: Commit if anything changed
+        run: |
+          git add data/cs2_ark_loop.json data/cs2_fit.json research/studies/cs2/cs2-ark-loop.json 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          python3 scripts/check_build.py || exit 1
+          git commit -m "CS2 ARK Ranking retune loop ($(date -u +%Y-%m-%d))"
+          for i in 1 2 3 4 5; do git pull --rebase -q origin main && git push && exit 0; sleep $((i * 5)); done
+          exit 1

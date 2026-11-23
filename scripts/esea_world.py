@@ -203,9 +203,21 @@ def main():
                 if x[g].get("id") and x[g]["id"] != "bye" and len(x[g]["roster"]) >= 4:
                     latest[x[g]["id"]] = (x["region"], x["div"], x[g]["roster"])
     teams = {}
+    # divisions that passed the board test (scripts/esea_board_research.py "promoted"): their teams go on the ARK board
+    try:
+        promo = set(json.loads((ROOT / "data" / "esea_board_research.json").read_text()).get("promoted") or [])
+    except (OSError, ValueError):
+        promo = set()
+    board, names = [], {}
+    for x in E["matches"]:
+        for g in ("f1", "f2"):
+            if x[g].get("id"):
+                names[x[g]["id"]] = x[g].get("name")
     for tid, (rg, dv, ros) in latest.items():
         s = five(ros, rt, sn1, rg, dv)
         teams[tid] = {"w": 1 + sum(v > arkz(s) for v in lad1), "t": tier(s, rg), "s": round(s, 1)}
+        if f"{rg} {dv}" in promo and tid != ME:
+            board.append(dict(teams[tid], id=tid, n=names.get(tid) or tid, rg=rg, div=dv, ros=[q[1] for q in ros]))
     pts = [x for x in (point(w, keep[w]) for w in weeks) if x]
     now = point((today + dt.timedelta(days=1)).isoformat(), rt)
     # the weekly world rank on today's ladder: the raw rank against each week's own VRS ladder is not comparable over time
@@ -230,9 +242,10 @@ def main():
         if x is not now:
             x.pop("ros", None)
     res = {"asof": today.isoformat(), "data": E.get("asof"), "levels": levels, "now": now, "weekly": pts,
-           "seasons": [min(m["season"] for m in E["matches"]), last], "nMatches": len(E["matches"]), "teams": teams}
+           "seasons": [min(m["season"] for m in E["matches"]), last], "nMatches": len(E["matches"]), "teams": teams,
+           "board": sorted(board, key=lambda b: -b["s"])}
     OUT.write_text(json.dumps(res, indent=1, default=float))
-    print(json.dumps({k: v for k, v in res.items() if k not in ("weekly", "teams")}, indent=1, default=float), len(pts), "weeks")
+    print(json.dumps({k: v for k, v in res.items() if k not in ("weekly", "teams", "board")}, indent=1, default=float), len(pts), "weeks")
 
 
 if __name__ == "__main__":
