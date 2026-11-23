@@ -4526,6 +4526,16 @@ a.tick__g:hover .tick__when, a.tick__g:hover .tick__note { color: #fff; }
 .tick__score[hidden], .tick__p[hidden] { display: none; }
 .tick__live { padding: 0 4px; background: var(--foreground); color: var(--win-dark); font-size: 0.875em; text-transform: uppercase; }
 .tick__g--off { justify-content: center; }
+/* LAURSEN_111 live: pixel broadcast icon, 2px pixels, dot then inner then outer wave */
+.tick__g--lz .tick__live { display: inline-flex; align-items: center; gap: 4px; }
+.tick__cast { position: relative; display: inline-block; width: 22px; height: 10px; flex: none; }
+.tick__cast::before, .tick__cast::after, .tick__cast b { content: ""; position: absolute; left: 0; top: 0; width: 2px; height: 2px; background: transparent; }
+.tick__cast::before { box-shadow: 10px 4px #57068c; }
+.tick__cast::after { box-shadow: 6px 2px #57068c, 6px 4px #57068c, 6px 6px #57068c, 14px 2px #57068c, 14px 4px #57068c, 14px 6px #57068c; animation: tickcast1 1.6s steps(1) infinite; }
+.tick__cast b { box-shadow: 2px 0px #57068c, 0px 2px #57068c, 0px 4px #57068c, 0px 6px #57068c, 2px 8px #57068c, 18px 0px #57068c, 20px 2px #57068c, 20px 4px #57068c, 20px 6px #57068c, 18px 8px #57068c; animation: tickcast2 1.6s steps(1) infinite; }
+@keyframes tickcast1 { 0%, 25% { opacity: 0; } 25.01%, 100% { opacity: 1; } }
+@keyframes tickcast2 { 0%, 50% { opacity: 0; } 50.01%, 100% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .tick__cast::after, .tick__cast b { animation: none; } }
 @media (max-width: 684px) {
   .tick { margin: 0 -4px 10px; }
   .tick__g { padding: 2px 6px; }
