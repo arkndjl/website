@@ -298,7 +298,7 @@ def lowtier(bo3, series, tiers):
             side[t] = [vkey.get(names.key(n), n) for n in sorted(c, key=lambda n: -c[n])[:5]]
         if len(side[m[2]]) < 4 or len(side[m[3]]) < 4:
             continue
-        out.append([m[1][:10], m[4], m[5], 0 if m[6] == m[2] else 1, side[m[2]], side[m[3]], "bo3", None])
+        out.append([m[1][:10], m[4], m[5], 0 if m[6] == m[2] else 1, side[m[2]], side[m[3]], "bo3", m[10]])
     return out
 
 

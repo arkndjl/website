@@ -225,8 +225,8 @@ def tiers(teams, bo3, days=180):
         w = logfit(E, (Y <= j).astype(float))
         cuts.append(round(1400 - 100 * w[0] / w[1]) if w[1] > 0 else None)
     # Tiers 5 and 6 (Nov 23 2026): below Tier 3, a team rated (player Elo + region offset, teams[].pl) under its
-    # region's ESEA Advanced median is Tier 5, under ESEA Main's Tier 6 (data/esea_world.json, scripts/esea_world.py;
-    # Americas and Asia use NA's levels, Europe EU's)
+    # ESEA Advanced median is Tier 5, under ESEA Main's Tier 6 (data/esea_world.json, scripts/esea_world.py). NA's
+    # levels for every region, so tiers stay in rating order: EU's Advanced and Main rate well above NA Advanced (Tier 4)
     lv = {}
     try:
         lv = json.loads((ROOT / "data" / "esea_world.json").read_text()).get("levels") or {}
@@ -234,7 +234,7 @@ def tiers(teams, bo3, days=180):
         pass
     for t in teams:
         t["tier"] = next((i + 1 for i, c in enumerate(cuts) if c is not None and t["elo"] >= c), 4)
-        r = lv.get("EU" if t.get("rg") == "Europe" else "NA") or {}
+        r = lv.get("NA") or {}   # one ladder for every region: EU's ESEA divisions rate above NA Advanced (Tier 4)
         if t["tier"] == 4 and t.get("pl") is not None and r.get("Advanced") is not None and t["pl"] < r["Advanced"]:
             t["tier"] = 6 if r.get("Main") is not None and t["pl"] < r["Main"] else 5
     return {"cuts": cuts, "n": int(len(Y)), "days": days,

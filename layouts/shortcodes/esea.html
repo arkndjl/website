@@ -240,7 +240,7 @@
     <summary>
       <span class="esea-m__wk">{{ with .round }}wk {{ . }}{{ else }}{{ add $i 1 }}{{ end }}</span>
       <span class="esea-m__res">{{ .result }}</span>
-      <span class="esea-m__opp">{{ with .opp.avatar }}<img class="esea-m__av" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span class="cfb__dim">vs</span> {{ .opp.name }}{{ with .opp.prank }} <span class="esea-rk" title="ARK Ranking">#{{ . }}</span>{{ else }}{{ with .opp.rank }} <span class="esea-rk" title="standing">{{ if $m.opp.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}{{ end }}{{ with site.Data.esea_world }}{{ with index .teams $m.opp.id }} <span class="esea-rk" title="world rank (VRS-equivalent) · tier {{ .t }}">W#{{ .w }}</span>{{ end }}{{ end }}</span>
+      <span class="esea-m__opp">{{ with .opp.avatar }}<img class="esea-m__av" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span class="cfb__dim">vs</span> {{ .opp.name }}{{ with .opp.prank }} <span class="esea-rk" title="ARK Ranking">#{{ . }}</span>{{ else }}{{ with .opp.rank }} <span class="esea-rk" title="standing">{{ if $m.opp.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}{{ end }}{{ with site.Data.esea_world }}{{ with index .teams $m.opp.id }} <span class="esea-rk" title="world rank: CS2 ARK Ranking equivalent · tier {{ .t }}">W#{{ .w }}</span>{{ end }}{{ end }}</span>
       <span class="esea-m__maps">{{ range .maps }}<span class="esea-map" data-map="{{ .map }}">{{ .map }}</span>{{ end }}</span>
       <span class="esea-m__score">{{ range $j, $x := .maps }}{{ if $j }} · {{ end }}{{ $x.rf }}–{{ $x.ra }}{{ end }}</span>
       <span class="esea-m__me">{{ with $mine.name }}<span class="cfb__dim">{{ $me }}</span> {{ $mine.k }}-{{ $mine.d }} · {{ $mine.adr }} ADR{{ end }}</span>
@@ -253,7 +253,7 @@
       <p class="esea-m__head"><span class="esea-map" data-map="{{ .map }}">{{ .map }}</span>
         <b>1NT</b>{{ with $m.prank }} <span class="esea-rk" title="ARK Ranking">#{{ . }}</span>{{ else }}{{ with $st }} <span class="esea-rk">{{ if .tied }}T-#{{ else }}#{{ end }}{{ .rank }}</span>{{ end }}{{ end }}
         <b class="esea-m__sc">{{ .rf }}–{{ .ra }}</b>
-        <b>{{ $m.opp.name }}</b>{{ with $m.opp.prank }} <span class="esea-rk" title="ARK Ranking">#{{ . }}</span>{{ else }}{{ with $m.opp.rank }} <span class="esea-rk">{{ if $m.opp.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}{{ end }}{{ with site.Data.esea_world }}{{ with index .teams $m.opp.id }} <span class="esea-rk" title="world rank (VRS-equivalent) · tier {{ .t }}">W#{{ .w }}</span>{{ end }}{{ end }}
+        <b>{{ $m.opp.name }}</b>{{ with $m.opp.prank }} <span class="esea-rk" title="ARK Ranking">#{{ . }}</span>{{ else }}{{ with $m.opp.rank }} <span class="esea-rk">{{ if $m.opp.tied }}T-#{{ else }}#{{ end }}{{ . }}</span>{{ end }}{{ end }}{{ with site.Data.esea_world }}{{ with index .teams $m.opp.id }} <span class="esea-rk" title="world rank: CS2 ARK Ranking equivalent · tier {{ .t }}">W#{{ .w }}</span>{{ end }}{{ end }}
         <span class="cfb__dim">· {{ $rounds }} rounds{{ with $st }} · current ARK Ranking{{ end }}</span>
         <button type="button" class="cfb__btn cfb__gfx esea-m__gfx" data-gfx data-gfx-mode="esea-box" data-gfx-date="{{ with $m.at }}{{ (time.In "America/New_York" (time (int (div . 1000)))).Format "Jan 2, 2006" }}{{ end }}" data-gfx-title="1NT {{ with $st }}{{ if .tied }}T-#{{ else }}#{{ end }}{{ .rank }} {{ end }}{{ with site.Data.esea_world }}{{ with .now }}W#{{ .vrs }} {{ end }}{{ end }}{{ .rf }}–{{ .ra }} {{ $m.opp.name }}{{ with $m.opp.rank }} {{ if $m.opp.tied }}T-#{{ else }}#{{ end }}{{ . }}{{ end }}{{ with site.Data.esea_world }}{{ with index .teams $m.opp.id }} W#{{ .w }}{{ end }}{{ end }} :: {{ .map }}" title="box score graphic (16:9)">GFX</button></p>
       {{- range $side := slice (slice "1NT" .players) (slice $m.opp.name .opp) }}{{ $ps := index $side 1 }}{{ if $ps }}
@@ -1036,7 +1036,7 @@
         {{- range $k, $t := slice .a .b }}{{ $n := add $k 1 }}{{ $won := eq $m.w $n }}
         <a class="esea-br__t{{ if $won }} is-w{{ else if $m.w }} is-l{{ end }}{{ if eq $t.id "a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a" }} is-1nt{{ end }}"{{ with $m.url }} href="{{ . }}" rel="noopener"{{ end }}>
           <span class="esea-br__sd">{{ with $t.seed }}{{ . }}{{ end }}</span>
-          <span class="esea-br__n">{{ $t.name }}</span>{{ with $t.id }}{{ with index $wt . }}<span class="esea-br__wr" title="world rank (VRS-equivalent)">W#{{ .w }}</span>{{ end }}{{ end }}
+          <span class="esea-br__n">{{ $t.name }}</span>{{ with $t.id }}{{ with index $wt . }}<span class="esea-br__wr" title="world rank: CS2 ARK Ranking equivalent">W#{{ .w }}</span>{{ end }}{{ end }}
           <b class="esea-br__v">{{ if $m.s }}{{ index $m.s $k }}{{ else if $m.p }}{{ $q := cond (eq $k 0) (float $m.p) (sub 1.0 (float $m.p)) }}{{ partial "num.html" (slice "%.0f" (mul $q 100)) }}%{{ end }}</b>
         </a>
         {{- end }}
@@ -1052,7 +1052,7 @@
 {{- end }}
 
 {{- else if eq $part "world" }}
-{{- /* 1NT worldwide: the VRS rank its five's rating would hold, NA ESEA rank, tier, weekly (data/esea_world.json, scripts/esea_world.py) */ -}}
+{{- /* 1NT worldwide: the CS2 ARK Ranking spot its five would hold, NA ESEA rank, tier, weekly (data/esea_world.json, scripts/esea_world.py) */ -}}
 {{- with site.Data.esea_world }}{{ $w := . }}{{ with .now }}{{ $now := . }}
 <div class="win lzf esea-wr{{ with $.Get "class" }} {{ . }}{{ end }}">
   <div class="win__title">
@@ -1061,7 +1061,7 @@
   </div>
   <div class="lzf__body">
     <ul class="esea__tiles lzf__tiles">
-      <li><span class="esea__v">#{{ $now.vrs }}</span><span class="esea__k" title="the Valve Regional Standings rank a team with 1NT's five's rating would hold, of {{ $now.of }} ranked teams">world</span></li>
+      <li><span class="esea__v">#{{ $now.vrs }}</span><span class="esea__k" title="the CS2 ARK Ranking spot 1NT's five would hold, of {{ $now.of }} ARK-rated teams">world</span></li>
       <li><span class="esea__v"><span class="cs__t cs__t--{{ $now.tier }}">T{{ $now.tier }}</span></span><span class="esea__k" title="Tier 5 = ESEA Advanced level, Tier 6 = ESEA Main level (region medians on the pro scale)">tier</span></li>
       <li><span class="esea__v">#{{ $now.na }}</span><span class="esea__k" title="among {{ $now.naOf }} NA ESEA teams this season (Advanced, Main, Intermediate)">NA ESEA</span></li>
       <li><span class="esea__v">{{ partial "num.html" (slice "%+.0f" (float $now.s)) }}</span><span class="esea__k" title="the five's mean player Elo plus Valve's Americas offset, pro scale">rating</span></li>
@@ -1085,7 +1085,7 @@
     </div>
     {{- end }}{{ end }}
   </div>
-  <div class="win__status"><span>VRS-equivalent rank · ESEA S{{ index $w.seasons 0 }}–S{{ index $w.seasons 1 }} (FACEIT) on the pro scale · {{ (time $w.asof).Format "Jan 2" }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span>CS2 ARK Ranking equivalent · ESEA S{{ index $w.seasons 0 }}–S{{ index $w.seasons 1 }} (FACEIT) on the pro scale · {{ (time $w.asof).Format "Jan 2" }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end }}{{ end }}
 

@@ -71,6 +71,7 @@ TUNE = ("2024-08-07", "2025-06-30")
 HELD = ("2025-07-01", "2099-12-31")
 BURN = "2024-03-15"
 TOP = 50
+ARK_N = 300  # ARK Ranking depth (was 100 before the lower-tier teams joined the pool, Nov 23 2026)
 # rebrands: the new name plays on the old name's five until the new key has a roster of its own in the data
 # (ratings follow the players; the new name keeps its display name and logo). Betting sponsors lost their names at
 # the Singapore Major (Nov 2026): BC.Game -> GOSH, BetBoom -> BB, 1win -> THEONE. Unlisted rebrands are caught by
@@ -168,7 +169,7 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
         tview = tm.play(ask=ask)
     pl, pn, lastros, roff, team = {}, defaultdict(int), {}, defaultdict(float), {}
     hist = defaultdict(list)  # team key -> [(date, rating after)]
-    rows = []
+    rows, xrows = [], ([] if p.get("xrows") else None)
     want, kept = sorted(snaps or []), {}
     for i, r in enumerate(series):
         d, a, b, y, ra, rb = r[:6]
@@ -214,6 +215,10 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
                          "top": bool(va and vb and va[0] <= TOP and vb[0] <= TOP), "s": s, "r": r,
                          "bo": (jm[9] if jm else 0) or 0, "tier": jm[10] if jm else None,
                          "u": sum(math.exp(-pn[q] / p["n0"]) for q in both) / len(both) if both else 1.0})
+        elif xrows is not None:  # a lower-tier match: its pre-match gap, for scripts/cs2_ark_lowtier_research.py
+            xrows.append({"d": d, "a": ka, "b": kb, "na": a, "nb": b, "x": (sa - sb) / 400, "s": s,
+                          "tier": r[7] if len(r) > 7 else None,
+                          "u": sum(math.exp(-pn[q] / p["n0"]) for q in both) / len(both) if both else 1.0})
         kt = p.get("ktier", 1.0) if jm and jm[10] in ("s", "a") else 1.0
         if r[6] == "bo3":  # a bo3.gg-only match (no Valve series): updates only, K x kx
             kt *= p.get("kx", 1.0)
@@ -248,7 +253,7 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
     for w in want:
         kept[w] = {"pl": dict(pl), "pn": dict(pn), "lastros": dict(lastros), "roff": dict(roff), "team": dict(team)}
     return rows, {"pl": pl, "pn": pn, "lastros": lastros, "roff": dict(roff), "team": team, "hist": hist, "tm": tm,
-                  "snaps": kept}
+                  "snaps": kept, "xrows": xrows}
 
 
 def fitlog(X, s, l2=1e-3):
@@ -490,7 +495,7 @@ def build():
     W = {k: np.array(v) for k, v in fitj["weights"].items()}
     vrs = Vrs(H["vrs"])
     bo3 = cs2_bo3.Bo3()
-    rows, st = replay(H["series"], vrs, p, bo3=bo3)
+    rows, st = replay(H["series"], vrs, dict(p, xrows=True), bo3=bo3)
     tm = st["tm"]
     today = dt.date.today().isoformat()
     last = vrs.dates[-1]
@@ -571,6 +576,16 @@ def build():
             if r["r"][6] == "vrs" or k in vt:
                 names[k] = nm if r["r"][6] == "vrs" else names[k]
             form[k].append((r["d"], won))
+    # lower-tier bo3.gg matches count toward the 15 series and the 120 days too (Nov 23 2026: the ratings call those
+    # matches at .6025 held vs .6931 for a coin, 17 of 17 months, data/cs2_ark_lowtier_research.json), so B-D teams rank
+    for r in st.get("xrows") or []:
+        for k, nm, won in ((r["a"], r["na"], r["s"] == 1), (r["b"], r["nb"], r["s"] == 0)):
+            lastd[k] = max(lastd.get(k, ""), r["d"])
+            n[k] += 1
+            names.setdefault(k, nm)
+            form[k].append((r["d"], won))
+    for k in form:
+        form[k].sort()
     for k, v in vt.items():
         names[k] = v[2]
     cands = [k for k in lastd if lastd[k] >= cut and n[k] >= 15 and st["lastros"].get(k)]
@@ -584,9 +599,9 @@ def build():
     vs = {}
     for _ in range(2):
         ref = order[:20]
-        for k in order[:150]:
+        for k in order[:ARK_N]:
             vs[k] = [logit_ab(k, j, 3, wt) for j in ref if j != k]
-        order = sorted(order[:150], key=lambda k: -np.mean([1 / (1 + math.exp(-x)) for x in vs[k]])) + order[150:]
+        order = sorted(order[:ARK_N], key=lambda k: -np.mean([1 / (1 + math.exp(-x)) for x in vs[k]])) + order[ARK_N:]
     ref = order[:20]
     d30 = (dt.date.today() - dt.timedelta(days=30)).isoformat()
 
@@ -596,7 +611,8 @@ def build():
     # against the top 20's own move, so a pool-wide drift (new players entering low, region offsets) nets out
     drift = float(np.mean([m for m in map(moved, ref) if m is not None] or [0]))
     teams = []
-    for i, k in enumerate(order[:100]):
+    print("ARK pool", len(order), "teams; listed", min(len(order), ARK_N))
+    for i, k in enumerate(order[:ARK_N]):
         ark = float(np.mean([1 / (1 + math.exp(-x)) for x in vs[k]]))
         h = st["hist"][k]
         m30 = moved(k)
@@ -803,6 +819,8 @@ def build():
            "nSeries": len(rows), "nLp": nlp, "first": rows[0]["d"], "teams": teams,
            "matches": sorted(matches, key=lambda m: m["ts"]), "results": res, "lower": lower,
            "roff": {k: round(v) for k, v in st["roff"].items()}, "tp": tp, "tpw": tpw, "tiers": tier_fit,
+           # ARK's sort key for the whole pool (scripts/esea_world.py places ESEA fives on it): key = w . (x, v)
+           "arkPool": {"w": [round(float(wt[0]), 4), round(float(wt[1]), 4)], "z": sorted((round(float(v), 4) for v in z.values()), reverse=True)},
            "fit": {k: fitj.get(k) for k in ("score", "calibration", "failed", "weights", "params", "tune", "held",
                                              "nTune", "nJoined", "nSeriesFit", "teamMaps", "monthsBeatOld")}}
     try:                                       # ARK Ranking movement over the week (scripts/rank_moves.py)
