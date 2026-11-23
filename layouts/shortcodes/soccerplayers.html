@@ -12,7 +12,8 @@
        view="stats": Understat's counting stats and per-90 rates (goals, assists, xG, npxG, xA, npxG+xA a 90, xGChain,
        xGBuildup, shots, key passes); the league picker also reaches the 13 other leagues on the page, from FotMob's
        season stats (static/data/soccer-more/<season>.json, scripts/soccer_more.py: xG with penalties in, chances
-       created for key passes, no npxG / xGChain / xGBuildup). FV = the soccer prospects board's grade for players under
+       created for key passes, no npxG / xGChain / xGBuildup). A big-five league Understat trails (the season file's
+       "stale") shows FotMob's rows instead (soccer-more/b<S>.json); the GAR view keeps Understat's. FV = the soccer prospects board's grade for players under
        22 on it. Flags (nationality) and headshots: scripts/soccer_faces.py (Transfermarkt; FotMob for the other
        leagues); a missing photo drops its frame. Filters: season, league, team, nation, position, minutes, search; they ride in the
        address (#season=2026&lg=eng.1&pos=F). */ -}}
@@ -132,14 +133,31 @@
       return d;
     });
     if (!more) return cache[s];
-    if (!cache['m' + s]) cache['m' + s] = Promise.all([cache[s], fetch(more + s + '.json').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })]).then(function (x) {
-      var d = x[0], m = x[1];
-      if (!m) return d;
-      m.players.forEach(function (p) {
-        var n = Math.max(p.min, 1) / 90; p.more = 1; p.st = p.st == null ? '' : p.st;
+    function fm(u) { return fetch(u).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); }
+    if (!cache['m' + s]) cache['m' + s] = cache[s].then(function (d) {
+      // a big-five league Understat trails (d.stale): FotMob's rows for it instead (soccer-more/b<S>.json, scripts/soccer_more.py)
+      var lag = {}; (d.stale || []).forEach(function (x) { lag[x.lg] = 1; });
+      return Promise.all([d, fm(more + s + '.json'), Object.keys(lag).length ? fm(more + 'b' + s + '.json') : null, lag]);
+    }).then(function (x) {
+      var d = x[0], m = x[1], b = x[2], lag = x[3];
+      function fmrow(p) {
+        var n = Math.max(p.min, 1) / 90; p.st = p.st == null ? '' : p.st;
         p.npxg = null; p.ch = null; p.bu = null; p.nx90 = p.xg == null ? null : (p.xg + (p.xa || 0)) / n; p.gx = p.xg == null ? null : p.g - p.xg;
-      });
-      return Object.assign({}, d, { players: d.players.concat(m.players), mgames: m.games });
+      }
+      var ps = d.players, mg = Object.assign({}, m ? m.games : {});
+      if (b) {
+        var bl = b.players.filter(function (p) { return lag[p.lg]; });
+        if (bl.length) {
+          // age, portrait and flag from the player's Understat row (same league, same name)
+          var nk = function (p) { return p.lg + '|' + String(p.n).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z]/g, ''); }, us = {};
+          ps.forEach(function (p) { if (lag[p.lg]) us[nk(p)] = p; });
+          bl.forEach(function (p) { fmrow(p); p.fmb = 1; var u = us[nk(p)]; if (u) { p.age = u.age; if (u.ph) p.ph = u.ph; p.nat = p.nat || u.nat; } });
+          ps = ps.filter(function (p) { return !lag[p.lg]; }).concat(bl);
+          Object.keys(lag).forEach(function (k) { if (b.games[k]) mg[k] = b.games[k]; });
+        } else b = null;
+      }
+      if (m) m.players.forEach(function (p) { fmrow(p); p.more = 1; });
+      return Object.assign({}, d, { players: m ? ps.concat(m.players) : ps, mgames: mg, fmb: b ? Object.keys(lag) : null });
     });
     return cache['m' + s];
   }
@@ -189,7 +207,7 @@
       if (!data) return;
       var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, nat = e.nat.value, lg = e.lg.value,
           qual = Math.round(900 * data.games / 38), mg = data.mgames || {};
-      function need(p) { return e.mp.value !== '' ? +e.mp.value : p.more ? Math.round(900 * (mg[p.lg] || 0) / 38) : qual; }
+      function need(p) { return e.mp.value !== '' ? +e.mp.value : p.more || p.fmb ? Math.round(900 * (mg[p.lg] || 0) / 38) : qual; }
       var list = data.players.filter(function (p) {
         return p.min >= need(p) && (!pos || p.pos === pos) && (!team || p.team === team) && (!nat || p.nat === nat) && (lg === 'all' || (lg ? p.lg === lg : !p.more));
       }).sort(function (a, b) { return (b[KEY] == null ? -1e9 : b[KEY]) - (a[KEY] == null ? -1e9 : a[KEY]) || b.min - a.min; });
@@ -230,7 +248,7 @@
       count.textContent = (q ? list.length + ' of ' : '') + shown + ' players' + (e.mp.value === '' ? ' · ' + qual + '+ min' : '');
       pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
       var t = new Date(data.asof);
-      asof.textContent = data.label + ' · updated ' + MON[t.getUTCMonth()] + ' ' + t.getUTCDate() + ', ' + t.getUTCFullYear(); if (data.stale && data.stale.length) asof.textContent += ' · Understat behind: ' + data.stale.map(function (x) { return x.lg + ' ' + x.missing + ' matches'; }).join(', '); if (window.__arkFreshSet) window.__arkFreshSet(asof, data.asof, 'soccer', bar.elements.season.value === win.dataset.cur);
+      asof.textContent = data.label + ' · updated ' + MON[t.getUTCMonth()] + ' ' + t.getUTCDate() + ', ' + t.getUTCFullYear(); if (data.stale && data.stale.length) asof.textContent += (data.fmb ? ' · FotMob: ' + data.fmb.map(function (k) { return LG[k]; }).join(', ') : ' · Understat behind: ' + data.stale.map(function (x) { return x.lg + ' ' + x.missing + ' matches'; }).join(', ')); if (window.__arkFreshSet) window.__arkFreshSet(asof, data.asof, 'soccer', bar.elements.season.value === win.dataset.cur);
       ths.forEach(function (th) { th.removeAttribute('aria-sort'); if (th.dataset.sort === sortKey) th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending'); });
     }
     function teams() {
