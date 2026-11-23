@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-23T16:48Z",
+ "asof": "2026-11-23T18:12Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -59,7 +59,7 @@
     }
    ],
    "joined": 0,
-   "players": 2613,
+   "players": 2615,
    "rows": 16742
   },
   "nba": {
@@ -4329,13 +4329,13 @@
     }
    ],
    "joined": 0,
-   "players": 2311,
+   "players": 2312,
    "rows": 8101
   },
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 0,
+     "flags": 2,
      "rows": 637
     },
     "static/data/lines/nhl.json": {
@@ -4356,6 +4356,42 @@
     }
    },
    "flags": [
+    {
+     "d": "2026-11-23",
+     "field": "depth",
+     "file": "static/data/depth/nhl.json",
+     "flag": "minors",
+     "head": "Dropped to minors",
+     "kind": "down",
+     "move": {
+      "d": "2026-11-23",
+      "head": "Dropped to minors",
+      "kind": "down"
+     },
+     "pid": "4787",
+     "player": "Jansen Harkins",
+     "pos": "C",
+     "rotowire": "TBL",
+     "site": "TBL"
+    },
+    {
+     "d": "2026-11-23",
+     "field": "depth",
+     "file": "static/data/depth/nhl.json",
+     "flag": "minors",
+     "head": "Dropped to AHL",
+     "kind": "down",
+     "move": {
+      "d": "2026-11-23",
+      "head": "Dropped to AHL",
+      "kind": "down"
+     },
+     "pid": "6888",
+     "player": "Nikita Tolopilo",
+     "pos": "G",
+     "rotowire": "VAN",
+     "site": "VAN"
+    },
     {
      "d": "2026-11-13",
      "field": "tm",
