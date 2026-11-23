@@ -1,0 +1,37 @@
+{{- /* Counter-Strike transactions (data/cs2_value.json "tx", scripts/cs2_value.py transactions()): player moves and
+       org changes in the last 183 days, read from bo3.gg map lineups. Values: xTV / RWA at the move and now. */ -}}
+{{- with site.Data.cs2_value -}}
+{{- $d := . -}}
+{{- $date := lower ((time .asof).Format "Jan 2") -}}
+{{- $kt := dict "join" "joined: first map of a new stint (5+ maps; shorter runs are stand-ins)" "out" "last map for the team 45+ days ago while the team kept playing (benched, released or inactive)" "core" "3+ players from one team joined one team within 30 days" "drop" "the org let the roster go (now listed as ex-org)" "rebrand" "same team, new name" "exit" "a team with 50+ maps in its last year and none in 60 days" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "transactions") "icon" "cs" "filter" "Move,Tier,From,To" "tab" ($.Get "tab") "gfxCols" "Date,Player,Move,From,To,xTV" "gfxDate" $date "gfxMax" "30") -}}
+<table class="cfb__table tx cs__table">
+  <thead><tr>
+    <th>Date</th><th>Player</th><th>Move</th><th>From</th><th>To</th>
+    <th title="best event-access tier of the two teams (ARK Ranking)">Tier</th>
+    <th class="cfb__g" title="transfer value now (USD; summed for a group)">xTV</th>
+    <th title="transfer value at the move">At move</th>
+    <th title="RWA now (0 = average tier-1 starter; group mean)">RWA</th>
+    <th class="hk__x" title="RWA at the move">RWA0</th>
+    <th class="hk__x" title="publicly reported buyout (unconfirmed)">Fee</th>
+  </tr></thead>
+  <tbody>
+  {{- range .tx }}
+  <tr{{ with .id }} data-pk="{{ . }}"{{ end }}>
+    <td class="cfb__num" data-v="{{ .d }}">{{ lower ((time .d).Format "Jan 2") }}</td>
+    <td class="cfb__name">{{ with .n }}<b>{{ . }}</b>{{ else }}-{{ end }}</td>
+    <td title="{{ index $kt .k }}" data-filter="{{ .k }}"><span class="tx__k tx__k--{{ .k }}">{{ .k }}</span></td>
+    <td style="white-space: nowrap" data-filter="{{ .fr | default "-" }}">{{ if .frkl }}<img class="cs__logo" src="/img/cs2/{{ .frk }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}{{ .fr | default "-" }}</td>
+    <td style="white-space: nowrap" data-filter="{{ .to | default "-" }}">{{ if .tokl }}<img class="cs__logo" src="/img/cs2/{{ .tok }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}{{ .to | default "-" }}</td>
+    <td class="cs__tier" data-v="{{ .tier }}" data-filter="Tier {{ .tier }}"><span class="cs__t cs__t--{{ .tier }}">T{{ .tier }}</span></td>
+    <td class="cfb__num" data-v="{{ .v | default 0 }}">{{ with .v }}<b>{{ partial "cs2money.html" . }}</b>{{ else }}-{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .v0 | default 0 }}">{{ with .v0 }}{{ partial "cs2money.html" . }}{{ else }}-{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .rwa | default 0 }}">{{ if isset . "rwa" }}{{ partial "num.html" (slice "%+.2f" (float .rwa)) }}{{ else }}-{{ end }}</td>
+    <td class="cfb__num hk__x" data-v="{{ .rwa0 | default 0 }}">{{ if isset . "rwa0" }}{{ partial "num.html" (slice "%+.2f" (float .rwa0)) }}{{ else }}-{{ end }}</td>
+    <td class="cfb__num hk__x" data-v="{{ .fee | default 0 }}">{{ with .fee }}{{ partial "cs2money.html" . }}{{ else }}-{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .tx) "fresh" "cs2" "note" (printf "bo3.gg lineups · updated %s" $date) "about" "Read from who played each map (bo3.gg), last 183 days, moves touching a team that plays mostly B-tier events or better. A move dates from the first map for the new team. Loans, contracts and fees are not in the lineups; reported fees from data/cs2_fees.json.") -}}
+{{- end -}}

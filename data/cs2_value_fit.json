@@ -32,67 +32,89 @@
   "xmax": 1.92
  },
  "fees": {
-  "A": 1.656,
+  "A": 1.489,
   "q": 4.0,
-  "n": 5,
-  "rmseLog": 0.325,
+  "n": 7,
+  "rmseLog": 0.402,
   "loo": [
    {
     "name": "prize MRP, replacement level tuned on the fees (live)",
-    "log": 0.406,
-    "fx": 1.5
+    "log": 0.469,
+    "fx": 1.6
    },
    {
     "name": "prize MRP, replacement = VRS 51-100 starters",
-    "log": 0.894,
-    "fx": 2.44
+    "log": 0.846,
+    "fx": 2.33
    },
    {
     "name": "flat price per player",
-    "log": 0.497,
-    "fx": 1.64
+    "log": 0.528,
+    "fx": 1.7
+   },
+   {
+    "name": "price = A x xMV^g, g fit (blend toward flat)",
+    "log": 0.522,
+    "fx": 1.69
    }
   ],
+  "gFit": 0.65,
   "pts": [
    {
     "nick": "m0NESY",
     "to": "Falcons",
     "date": "2025-04-21",
     "usd": 2500000,
-    "xtv": 2607000,
-    "loo": 2635000
+    "xtv": 2343000,
+    "loo": 2318000
    },
    {
     "nick": "kyousuke",
     "to": "Falcons",
     "date": "2025-07-26",
-    "usd": 2000000,
-    "xtv": 1409000,
-    "loo": 1290000
+    "usd": 1500000,
+    "xtv": 1266000,
+    "loo": 1231000
    },
    {
     "nick": "electroNic",
     "to": "Virtus.pro",
     "date": "2024-04-23",
     "usd": 1600000,
-    "xtv": 1599000,
-    "loo": 1599000
+    "xtv": 1437000,
+    "loo": 1412000
    },
    {
     "nick": "NiKo",
     "to": "Falcons",
     "date": "2025-01-15",
     "usd": 1100000,
-    "xtv": 1957000,
-    "loo": 2261000
+    "xtv": 1759000,
+    "loo": 1903000
    },
    {
     "nick": "MUTiRiS, krazy, aragornN",
     "to": "BC.Game",
     "date": "2026-01-21",
     "usd": 2500000,
-    "xtv": 1914000,
-    "loo": 1790000
+    "xtv": 1720000,
+    "loo": 1616000
+   },
+   {
+    "nick": "TeSeS, degster, kyxsan",
+    "to": "Falcons",
+    "date": "2025-01-15",
+    "usd": 5500000,
+    "xtv": 3445000,
+    "loo": 3186000
+   },
+   {
+    "nick": "jambo",
+    "to": "fnatic",
+    "date": "2025-03-26",
+    "usd": 600000,
+    "xtv": 1225000,
+    "loo": 1379000
    }
   ],
   "checks": [
@@ -102,7 +124,7 @@
     "date": "2025-04-06",
     "bound": "max",
     "usd": 2500000,
-    "xtv": 7097000,
+    "xtv": 6379000,
     "ok": false
    }
   ]
