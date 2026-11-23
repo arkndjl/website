@@ -7,8 +7,9 @@
     python3 scripts/alltime.py --snap       # rebuild from the snapshot only (no cache needed)
 
 Era adjustment (every sport, teams and players): a season's value is set against the spread of that league in that era.
-  Teams    Rtg+ / Off+ / Def+ = 100 + 25 z, z = (rating - season mean) / SD, SD pooled over the season and the two either
-           side (team ratings demeaned by season). 100 = an average team that season, 125 = one SD better. Same scale as Stat+.
+  Teams    Rtg+ / Off+ / Def+ = 100 + 25 z, z = (rating - season mean) / s, s = the upper semi-deviation x sqrt 2 (spread(),
+           Nov 23; the SD before), pooled over the season and the two either side (team ratings demeaned by season).
+           100 = an average team that season, 125 = one s better. Same scale as Stat+.
            Ratings: CFB ridge SRS on capped margin + offense / defense on capped points (scripts/coach_alltime_pull.py, jhowell
            scores 1900-); NFL the same ridge on every NFL / AFL / AAFC game (FiveThirtyEight 1920-98, nflverse 1999-); CBB
            Sports Reference SRS / OSRS / DSRS 1950-; NBA SRS + ORtg / DRtg against the league (Basketball Reference 1947-;
@@ -20,8 +21,9 @@ Era adjustment (every sport, teams and players): a season's value is set against
            NHL point shares (Hockey Reference), per 82 games; CBB Barttorvik BPM x minutes share over replacement (2008-);
            tennis Elo (own fit on the Sackmann archive 1968-), peak and career weeks above the top-20 line;
            soccer GAR seasons where the site has them; CS2 HLTV-style rating where the site has it.
-  Era check (about in each table): decade share of the top 100 against the decade's share of team-seasons; KL divergence
-  of the adjusted list vs the raw one (lower = no era favoured).
+  Era check (about in each table): decade share of the top 100 against the decade's share of rows; KL divergence
+  of the adjusted list vs the raw one (lower = no era favoured) and the era-blind 95% line (null95); every list passes
+  (Nov 23 2026). Players: each player's best season once.
 """
 import gzip, json, math, os, sys, csv, re, glob
 from collections import defaultdict, Counter
@@ -31,7 +33,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 CACHE = os.path.join(HERE, '.cache', 'alltime')
-OUT = os.path.join(ROOT, 'data', 'alltime.json')
+OUT = os.environ.get('ALLTIME_OUT') or os.path.join(ROOT, 'data', 'alltime.json')
 SNAP = os.path.join(HERE, 'data', 'alltime_src.json.gz')
 TOP, PER_DEC = 250, 25           # list: the top TOP plus the top PER_DEC of every decade
 WIN = 2                          # SD pooled over the season +- WIN
@@ -39,6 +41,17 @@ CAP = 35
 
 
 def plus(z): return round(100 + 25 * z, 1)
+
+
+def spread(dev, upper=True):
+    """a season's scale from deviations about its mean. upper (team lists, Nov 23): the upper semi-deviation x sqrt 2,
+    sqrt(2 mean(max(d, 0)^2)), which equals the SD for a normal season but is not stretched by a long bottom tail (a
+    0-points-allowed floor in low-scoring eras, blowout losers, a wide spread of weak programs), so the best teams of
+    each era are measured against how far good teams spread above average that era. upper=False: the SD (player pools,
+    already cut to regulars, Nov 20)"""
+    d = np.asarray(dev, float)
+    if not len(d): return 0.0
+    return float(np.sqrt(2 * np.mean(np.square(np.maximum(d, 0))))) if upper else float(np.sqrt(np.mean(np.square(d))))
 
 
 def era_z(rows, keys, group=lambda r: r['y']):
@@ -50,19 +63,38 @@ def era_z(rows, keys, group=lambda r: r['y']):
         dev = {s: [r[k] - mu[s] for r in L if r.get(k) is not None] for s, L in by.items()}
         for s, L in by.items():
             pool = [d for t in range(s - WIN, s + WIN + 1) for d in dev.get(t, [])]
-            sd = float(np.sqrt(np.mean(np.square(pool)))) if len(pool) > 3 else None
+            sd = spread(pool) if len(pool) > 3 else None
             for r in L:
                 r['z' + k] = (r[k] - mu[s]) / sd if (sd and r.get(k) is not None) else None
 
 
+def null95(base, n, sims=4000, seed=7):
+    """95th percentile of the KL below when the top n are drawn era-blind (multinomial on the decades' shares of rows)"""
+    ds = sorted(base); p = np.array([base[d] for d in ds], float); p /= p.sum()
+    C = np.random.default_rng(seed).multinomial(n, p, sims) / n
+    with np.errstate(divide='ignore', invalid='ignore'):
+        k = np.where(C > 0, C * np.log(C / p), 0).sum(1)
+    return float(np.quantile(k, .95))
+
+
 def era_check(rows, zk, rk, n=100):
-    """KL(top-n decade share || all team-season decade share), adjusted (z) vs raw"""
-    base = Counter(r['y'] // 10 * 10 for r in rows); tot = sum(base.values())
+    """KL(top-n decade share || all-row decade share), adjusted (z) vs raw, and the era-blind 95% line (null95). Player
+    rows (with an id) count each player's best season once, rows with an eb are binned by it instead of the decade, so one player's run of seasons (Gretzky's eight 1980s
+    seasons) is not read as an era effect; pass = adjusted under the line (Nov 23)"""
+    def best(key):
+        R = sorted([r for r in rows if r.get(key) is not None], key=lambda r: -r[key])
+        if not R or 'id' not in R[0]: return R
+        seen, out = set(), []
+        for r in R:
+            if r['id'] not in seen: seen.add(r['id']); out.append(r)
+        return out
     def kl(key):
-        top = sorted([r for r in rows if r.get(key) is not None], key=lambda r: -r[key])[:n]
-        c = Counter(r['y'] // 10 * 10 for r in top)
-        return sum((c[d] / n) * math.log((c[d] / n) / (base[d] / tot)) for d in c)
-    return round(kl(zk), 3), round(kl(rk), 3)
+        eb = lambda r: r['eb'] if 'eb' in r else r['y'] // 10 * 10     # era bin: the decade (hockey prospects: the draft class, 5 years)
+        R = best(key); base = Counter(eb(r) for r in R); tot = sum(base.values())
+        c = Counter(eb(r) for r in R[:n])
+        return sum((c[d] / n) * math.log((c[d] / n) / (base[d] / tot)) for d in c), base
+    a, base = kl(zk)
+    return round(a, 3), round(kl(rk)[0], 3), round(null95(base, n), 3)
 
 
 def pick(rows, key, top=TOP, per=PER_DEC):
@@ -303,6 +335,24 @@ def nfl_players():
     return peak, car[:TOP]
 
 
+def nfl_era(S, starters=704, ref=10):
+    """NFL season WAR in today's units (Nov 23): rosters grew (1,734 WAR rows in 2013, 2,055 in 2021) and the top thinned
+    (mean of the top 50 .79 -> .73 a season), so each season's WAR is set against that season's starters at the position
+    (the top k by WAR, k = the position's share of the season's rows x 704 = 32 teams x 22 starters):
+    v = mu_ref + sd_ref x (WAR - season mean) / season SD, ref = the position's last `ref` seasons. Keeps v0 (on 17 games)"""
+    by, n_y = defaultdict(list), Counter()
+    for x in S: by[(x['y'], x.get('pos'))].append(x['v']); n_y[x['y']] += 1
+    st = {}
+    for k, v in by.items():
+        t = np.array(sorted(v, reverse=True)[:max(5, int(starters * len(v) / n_y[k[0]]))])
+        st[k] = (float(t.mean()), float(t.std()) or 1.0)
+    ys = sorted(n_y)
+    for x in S:
+        k = (x['y'], x.get('pos')); R = [st[(y, k[1])] for y in ys[-ref:] if (y, k[1]) in st]
+        x['v0'] = x['v']; x['v'] = float(np.mean([a for a, _ in R])) + float(np.mean([b for _, b in R])) * (x['v'] - st[k][0]) / st[k][1]
+    return S
+
+
 def nfl_wav():
     """draft picks: pfr id -> (name, drafted, last season, pos, team, weighted career AV)"""
     out = {}
@@ -440,6 +490,19 @@ def cfb_qb_pull(y0=2004, y1=2025, per=150, workers=8):
         return [r for r in ex.map(line, who) if r]
 
 
+def era_factor(dev, ref=10):
+    """dev: {(season, group): [deviations from that season's baseline]} -> {(season, group): spread_ref / spread_season}, the
+    spread (the SD about the baseline, as the player pools) pooled over the season +- WIN and ref = the mean over the group's last `ref` seasons:
+    multiplies a season's over-baseline value into today's units (CFB QB / skill lists, Nov 23)"""
+    out = {}
+    for g in {k[1] for k in dev}:
+        ys = sorted(y for y, h in dev if h == g)
+        sp = {y: spread([d for t in range(y - WIN, y + WIN + 1) for d in dev.get((t, g), [])], upper=False) or 1.0 for y in ys}
+        s0 = float(np.mean([sp[y] for y in ys[-ref:]]))
+        for y in ys: out[(y, g)] = s0 / sp[y]
+    return out
+
+
 def cfb_qb_lists(rows, minq=150):
     """CFB all-time QB lists (peak seasons, careers), FBS regular seasons from 2004. Each season's plays = pass att + rush
     att (college counts sacks as runs, sack yards in rushing). TAY/P = (pass yds + 20 pass TD - 45 INT + rush yds + 20 rush
@@ -456,13 +519,15 @@ def cfb_qb_lists(rows, minq=150):
     by = defaultdict(list)
     for s in S:
         if s['att'] >= minq: by[s['y']].append(s)
+    M = {y: sum(q['tay'] * q['pl'] for q in Q) / sum(q['pl'] for q in Q) for y, Q in by.items()}
+    F = era_factor({(y, ''): [q['tay'] - M[y] for q in Q] for y, Q in by.items()})
     for s in S:
-        Q = by[s['y']]; w = sum(q['pl'] for q in Q)
-        m = sum(q['tay'] * q['pl'] for q in Q) / w
+        Q = by[s['y']]; m = M[s['y']]
         sd = (sum((q['tay'] - m) ** 2 for q in Q) / len(Q)) ** .5
-        s['v'] = (s['tay'] - m) * s['pl']; s['ix'] = 100 + 25 * (s['tay'] - m) / sd
+        s['v0'] = (s['tay'] - m) * s['pl']; s['v'] = s['v0'] * F[(s['y'], '')]; s['ix'] = 100 + 25 * (s['tay'] - m) / sd
     # era (Nov 20 2026): plays per qualified QB run flat 2004-25 (355-422 a season, no upward trend), so volume is not
-    # rescaled; scaling to it mostly inflated 2020's short schedules. The rate is already measured against each season.
+    # rescaled; scaling to it mostly inflated 2020's short schedules. Nov 23: the rate over average is also put in today's
+    # spread (era_factor: the season's upper semi-RMS of TAY/P about the average, pooled +- 2, vs the last 10 seasons).
     lo = lambda tid: f'/img/cfb/logos/{tid}.png' if tid and os.path.exists(os.path.join(IMG, 'cfb', 'logos', f'{tid}.png')) else (f'https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/{tid}.png&w=40&h=40' if tid else None)
     def q_of(L):
         att = sum(s['att'] for s in L); sk = sum(s['sk'] for s in L); yd = sum(s['yd'] for s in L); td = sum(s['td'] for s in L); it = sum(s['it'] for s in L)
@@ -473,14 +538,15 @@ def cfb_qb_lists(rows, minq=150):
     peak = []
     for s in S:
         if s['att'] < minq: continue
-        peak.append(dict(id=s['id'], n=s['n'], y=s['y'], tm=s['tm'], lo=lo(s['tid']), pos='QB', v=round(s['v']), raw=round(s['tay'], 2),
+        peak.append(dict(id=s['id'], n=s['n'], y=s['y'], tm=s['tm'], lo=lo(s['tid']), pos='QB', v=round(s['v']), v0=s['v0'], raw=round(s['tay'], 2),
                          q=dict(q_of([s]), ix=round(s['ix'])), est=None, ph=None))
     svm = {(str(r['id']), r['y']): r for r in sv_hist('cfb') if r['g'] == 'QB'}
     for r in peak:
         m_ = svm.get((str(r['id']), r['y'])) or {}
         r['sv'], r['svar'] = m_.get('sv'), svar(m_, 'cfb') if m_ else None
+    chk = era_check(peak, 'v', 'v0')
     pk = pick_sv([dict(r) for r in peak]) if svm else pick([dict(r) for r in peak], 'v')      # every player-season on its own
-    for r in pk: r.pop('id', None)
+    for r in pk: r.pop('id', None); r.pop('v0', None)
     C = defaultdict(list)
     for s in S: C[s['id']].append(s)
     car = []
@@ -490,8 +556,8 @@ def cfb_qb_lists(rows, minq=150):
         car.append(dict(n=L[0]['n'], y0=min(s['y'] for s in L), y1=max(s['y'] for s in L), tm=tm, lo=lo(next(s['tid'] for s in L if s['tm'] == tm)),
                         pos='QB', v=round(sum(s['v'] for s in L)), s=len(L), pk=round(max(s['v'] for s in L)), est=None, ph=None, q=q_of(L)))
     car.sort(key=lambda r: -r['v'])
-    return dict(peak=pk, career=car[:TOP], n=len(S), **{'from': min(s['y'] for s in S)}, to=max(s['y'] for s in S),
-                pk=dict(l='Yds+', t='adjusted yards over an average FBS QB that season: (TAY/P - season average) x plays; TAY/P = (pass yds + 20 x pass TD - 45 x INT + rush yds + 20 x rush TD) / (attempts + rushes), sacks count as rushes. no opponent adjustment', f='%+.0f', rl='TAY/P', rt='total adjusted yards a play', rf='%.2f'),
+    return dict(peak=pk, career=car[:TOP], peak_check=chk, n=len(S), **{'from': min(s['y'] for s in S)}, to=max(s['y'] for s in S),
+                pk=dict(l='Yds+', t='adjusted yards over an average FBS QB that season, in today\'s spread: (TAY/P - season average) x plays; TAY/P = (pass yds + 20 x pass TD - 45 x INT + rush yds + 20 x rush TD) / (attempts + rushes), sacks count as rushes. no opponent adjustment', f='%+.0f', rl='TAY/P', rt='total adjusted yards a play', rf='%.2f'),
                 car=dict(l='Yds+', t='career Yds+: each season\'s adjusted yards over an average FBS QB, summed (seasons among the top 150 passers)', f='%+.0f', s=1, pl='Peak', pt='best season Yds+', pf='%+.0f'),
                 src='ESPN', pos=True, tm=True, estT='', qb=True, ph=False,
                 peak_about=f'FBS regular seasons {min(s["y"] for s in S)}-{max(s["y"] for s in S)}, QBs with {minq}+ attempts; the season average and SD over the same QBs; every player-season ranks on its own.',
@@ -566,8 +632,11 @@ def cfb_skill_lists(rows, qbrows=()):
     for k, v in by.items():
         v = sorted(v, reverse=True)[:SKILL_K[k[1]]]; m = sum(v) / len(v)
         base[k] = (m, (sum((x - m) ** 2 for x in v) / len(v)) ** .5 or 1.0)
+    top = defaultdict(list)
+    for (y, pos), v in by.items(): top[(y, pos)] = [x - base[(y, pos)][0] for x in sorted(v, reverse=True)[:SKILL_K[pos]]]
+    F = era_factor(top)      # Nov 23: Yds+ in today's spread of the position's starters (pooled +- 2, last 10 seasons)
     for s in S:
-        m, sd = base[(s['y'], s['pos'])]; s['v'] = s['ay'] - m; s['ix'] = 100 + 25 * (s['ay'] - m) / sd
+        m, sd = base[(s['y'], s['pos'])]; s['v0'] = s['ay'] - m; s['v'] = s['v0'] * F[(s['y'], s['pos'])]; s['ix'] = 100 + 25 * (s['ay'] - m) / sd
     lo = lambda tid: f'/img/cfb/logos/{tid}.png' if tid and os.path.exists(os.path.join(IMG, 'cfb', 'logos', f'{tid}.png')) else (f'https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/{tid}.png&w=40&h=40' if tid else None)
     def q_of(L):
         ra, ry, rc, cy = (sum(s[k] for s in L) for k in ('ra', 'ry', 'rc', 'cy'))
@@ -577,6 +646,7 @@ def cfb_skill_lists(rows, qbrows=()):
     for s in S:    # every player-season on its own
         P.append(dict(n=s['n'], y=s['y'], tm=s['tm'], lo=lo(s['tid']), pos=s['pos'], v=round(s['v']), raw=round(s['ay']), est=None, ph=None, q=dict(q_of([s]), ix=round(s['ix'])),
                       sv=(SVM.get((str(s['id']), s['y'])) or {}).get('sv'), svar=svar(SVM[(str(s['id']), s['y'])], 'cfb') if (str(s['id']), s['y']) in SVM else None))
+    chk = era_check([dict(id=s['id'], y=s['y'], v=s['v'], v0=s['v0']) for s in S], 'v', 'v0')
     pk = pick_sv([dict(r) for r in P]) if SVM else pick([dict(r) for r in P], 'v')
     C = defaultdict(list)
     for s in S: C[s['id']].append(s)
@@ -587,8 +657,8 @@ def cfb_skill_lists(rows, qbrows=()):
         car.append(dict(n=L[0]['n'], y0=min(s['y'] for s in L), y1=max(s['y'] for s in L), tm=tm, lo=lo(next(s['tid'] for s in L if s['tm'] == tm)),
                         pos=pos, v=round(sum(s['v'] for s in L)), s=len(L), pk=round(max(s['v'] for s in L)), est=None, ph=None, q=q_of(L)))
     car.sort(key=lambda r: -r['v'])
-    return dict(peak=pk, career=car[:TOP], n=len(S), **{'from': min(s['y'] for s in S)}, to=max(s['y'] for s in S),
-                pk=dict(l='Yds+', t='adjusted scrimmage yards over the season\'s average starter at the position: AY = rush + rec yds + 20 x TD - 45 x fumbles lost, minus the mean AY of that season\'s top RB 100 / WR 200 / TE 40. volume, not per target (no targets in the college history)', f='%+.0f', rl='AY', rt='adjusted scrimmage yards', rf='%.0f'),
+    return dict(peak=pk, career=car[:TOP], peak_check=chk, n=len(S), **{'from': min(s['y'] for s in S)}, to=max(s['y'] for s in S),
+                pk=dict(l='Yds+', t='adjusted scrimmage yards over the season\'s average starter at the position, in today\'s spread: AY = rush + rec yds + 20 x TD - 45 x fumbles lost, minus the mean AY of that season\'s top RB 100 / WR 200 / TE 40. volume, not per target (no targets in the college history)', f='%+.0f', rl='AY', rt='adjusted scrimmage yards', rf='%.0f'),
                 car=dict(l='Yds+', t='career Yds+: each season\'s adjusted yards over the average starter at his position, summed (seasons among the top 150 rushers / 450 receivers)', f='%+.0f', s=1, pl='Peak', pt='best season Yds+', pf='%+.0f'),
                 src='ESPN', pos=True, tm=True, estT='', skill=True, ph=False,
                 peak_about='FBS regular seasons 2004-25: RB, WR, TE (ESPN position; FB as RB); every player-season ranks on its own. QBs on their own lists; defense, OL and specialists left out (no usable per-player history).',
@@ -817,7 +887,7 @@ def player_era(S, ref=(2012, 2026)):
     sd = {}
     for y in reg:
         pool = [v - mu[t] for t in range(y - WIN, y + WIN + 1) for v in reg.get(t, [])]
-        sd[y] = float(np.sqrt(np.mean(np.square(pool))))
+        sd[y] = spread(pool, upper=False)
     R = [y for y in reg if ref[0] <= y <= ref[1]]
     m0 = float(np.mean([mu[y] for y in R])); s0 = float(np.mean([sd[y] for y in R]))
     for s in S:
@@ -845,7 +915,7 @@ def era_scale(S, rate, vol, value, reg, grp=lambda s: '', ref=10, vq=.9):
         sd = {}
         for y in mu:
             pool = [v - mu[t] for t in range(y - WIN, y + WIN + 1) if t in mu for v in R[t]]
-            sd[y] = float(np.sqrt(np.mean(np.square(pool)))) or 1.0
+            sd[y] = spread(pool, upper=False) or 1.0
         q = {y: float(np.quantile(V[y], vq)) for y in mu} if vol else {}
         ys = sorted(mu)[-ref:]
         m0 = float(np.mean([mu[y] for y in ys])); s0 = float(np.mean([sd[y] for y in ys]))
@@ -920,7 +990,9 @@ def hockey_prospect_seasons():
             age = int((dt.date(y - 1, 12, 31) - b).days / 365.25)
             if age > 21: continue
             out.append(dict(id=r['id'], n=r['name'], y=y, tm=q['lg'], pos=pos, age=max(age, 16), rate=math.log(max(q['nhle'], 0) + 5), w=q['gp'], v=q['nhle'],
-                            raw=round(q['nhle'], 1), reg=True, pick=r.get('pick'), dy=r['year']))
+                            raw=round(q['nhle'], 1), reg=True, pick=r.get('pick'), dy=r['year'], eb=2008 + (r['year'] - 2008) // 5 * 5))
+    # eb (Nov 23): the era check bins prospects by draft class (2008-12, 13-17, ...): the 2007-09 seasons hold only the first
+    # classes' youngest seasons, so a season-decade bin reads cohort coverage as era
     return out
 
 
@@ -1133,10 +1205,10 @@ def main():
     # player-season on its own (a player can appear more than once).
     for s_ in src['nflpk']: s_['v17'] = s_['v'] * 17 / (16 if s_['y'] <= 2020 else 17)
     if src.get('nflqb'):
-        pk17 = [dict(s_, v=s_['v17']) for s_ in src['nflpk']]
+        pk17 = nfl_era([dict(s_, v=s_['v17']) for s_ in src['nflpk']])
         allc, nfit = nfl_career(pk17, src['nflwav'], top=None)
         base = res['nfl']['players']
-        pkm = dict(base['pk'], t='NFL WAR (AV WAR, no special teams), 2012 on (snap counts), on 17 games (2012-20 x 17 / 16)')
+        pkm = dict(base['pk'], t="NFL WAR (AV WAR, no special teams), 2012 on (snap counts), on 17 games (2012-20 x 17 / 16), in today's units (vs the season's starters at the position)")
         SVN = sv_hist('nfl')
         for g, keep in (('qbs', lambda p: p == 'QB'), ('players', lambda p: p != 'QB')):
             S_ = [s_ for s_ in pk17 if keep(s_.get('pos'))]
@@ -1153,7 +1225,8 @@ def main():
             extra = [dict(n=r['n'], y=r['y'], tm=r.get('t'), pos=r['g'], v=None, raw=None, sv=r['sv'], svar=svar(r, 'nfl'))
                      for r in svm.values() if r.get('n')]
             P['peak'] = [dict(n=fixenc(x['n']), y=x['y'], tm=x.get('tm'), pos=x.get('pos'), v=None if x['v'] is None else round(x['v'], 2), raw=x.get('raw'),
-                              sv=x.get('sv'), svar=x.get('svar'), est=None, ph=None, ox=None, dx=None)
+                              sv=x.get('sv'), svar=x.get('svar'), est=None, ph=None, ox=None, dx=None,
+                              u=None if x.get('v0') is None else round(x['v0'], 2))
                          for x in (pick_sv([dict(x) for x in S_ + extra]) if SVN else pick([dict(x) for x in S_], 'v'))]
             if SVN:
                 P['sv'], P['svT'] = True, SV_T + '; NFL 1999 on (defenders 2013 on, snap counts); WAR 2012 on'
