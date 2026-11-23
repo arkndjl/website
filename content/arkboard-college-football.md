@@ -11,22 +11,23 @@ cover = "/og/college-football.png"
 
 {{< winpane title="football_prospects.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:board,leaders,true freshmen,standouts,awards,all-time players,ARKLIST|rosters:depth chart,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,season odds,units,talent,all-time|market:portal,NIL,team builder,coaches|recruits:classes,class rankings,recruit transactions|draft:draft board,mock draft|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
+{{< wintabs groups="players:board,leaders,standouts,awards,all-time players,ARKLIST|rosters:depth chart,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,units,talent,all-time|market:portal,NIL,coaches|recruits:classes,class rankings,recruit transactions|draft:draft board,mock draft|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: 2027 draft board" tab="draft board" preset="d27" >}}
-{{< rookies sport="cfb" icon="football" title="true freshmen" tab="true freshmen" >}}
 {{< cfbboard title="ARKLIST :: starred players" tab="ARKLIST" preset="star" >}}
 {{< wintabs tab="awards" tabs="predictive awards,conviction awards" sub="true" label="awards views" >}}
 {{< awards sport="cfb" tab="predictive awards" >}}
 {{< awards sport="cfb" tab="conviction awards" view="conv" >}}
 {{< /wintabs >}}
 {{< arklist sport="college-football" only="prospects" title="ARKLIST :: prospects (recruits) and coaches" tab="ARKLIST" >}}
-{{< wintabs tab="standouts" tabs="standouts,next up" sub="true" label="standouts views" >}}
+{{< wintabs tab="standouts" tabs="standouts,next up,true freshmen" sub="true" label="standouts views" >}}
+{{< rookies sport="cfb" icon="football" title="true freshmen" tab="true freshmen" >}}
 {{< cfbbreakout title="standouts" tab="standouts" >}}
 {{< lazytab tab="next up" >}}
 {{< rookies sport="cfb" src="data/next-up/cfb-tab.json" icon="football" title="next up" tab="next up" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
-{{< wintabs tab="portal" tabs="portal,re-signed" sub="true" label="portal views" >}}
+{{< wintabs tab="portal" tabs="portal,re-signed,team builder" sub="true" label="portal views" >}}
+{{< cfbbuilder title="team builder" tab="team builder" >}}
 {{< lazytab tab="portal" >}}
 {{< xferwatch sport="cfb" view="players" tab="portal" >}}
 {{< cfbportal title="transfer portal :: 2026 moves" tab="portal" unless="cfb" >}}
@@ -42,10 +43,6 @@ cover = "/og/college-football.png"
 {{< lazytab tab="top performers" >}}
 {{< cfbtop title="top performers" tab="top performers" >}}
 {{< /lazytab >}}
-{{< lazytab tab="ARK Ranking" >}}
-{{< cfbrank title="ARK Ranking" tab="ARK Ranking" >}}
-{{< /lazytab >}}
-{{< cfbbuilder title="team builder" tab="team builder" >}}
 {{< lazytab tab="recruit transactions" >}}
 {{< recruitnews sport="cfb" title="recruit transactions" tab="recruit transactions" >}}
 {{< /lazytab >}}
@@ -127,7 +124,10 @@ cover = "/og/college-football.png"
 {{< backupwatch sport="cfb" title="backup watch" tab="backup watch" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
-{{< wintabs tab="season odds" tabs="season odds,bracket" sub="true" label="season odds views" >}}
+{{< wintabs tab="ARK Ranking" tabs="ARK Ranking,season odds,bracket" sub="true" label="ARK Ranking views" >}}
+{{< lazytab tab="ARK Ranking" >}}
+{{< cfbrank title="ARK Ranking" tab="ARK Ranking" >}}
+{{< /lazytab >}}
 {{< lazytab tab="season odds" >}}
 {{< cfbsim title="season odds :: 10,000 simulated seasons" tab="season odds" >}}
 {{< /lazytab >}}
