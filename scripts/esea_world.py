@@ -129,14 +129,14 @@ def main():
         lad = ladder(d, sn)
         sea = m["season"]
         latest = {}
-        for x in E["matches"]:
-            if x["season"] == sea and x["region"] == "NA" and ts(x) < d:
+        for x in sorted(E["matches"], key=lambda m: (m["season"], m["at"])):   # this season's teams over last season's
+            if x["season"] in (sea - 1, sea) and x["region"] == "NA" and ts(x) < d:
                 for g in ("f1", "f2"):
                     if x[g].get("id") and x[g]["id"] != "bye" and len(x[g]["roster"]) >= 4:
                         latest[x[g]["id"]] = (x["div"], x[g]["roster"])
         na = {tid: five(ros, rts, sn, "NA", dv) for tid, (dv, ros) in latest.items()}
         na[ME] = s1
-        return {"d": d, "s": round(s1, 1), "vrs": 1 + sum(v > s1 for v in lad), "of": len(lad),
+        return {"d": d, "s": round(s1, 1), "vrs": 1 + sum(v > s1 for v in lad), "of": len(lad), "q": sum(v > s1 for k, v in na.items() if k != ME) / max(1, len(na) - 1), "field": sorted(na.values()),
                 "na": 1 + sum(v > s1 for k, v in na.items() if k != ME), "naOf": len(na), "season": sea, "div": m["div"],
                 "tier": tier(s1)}
 
@@ -155,6 +155,24 @@ def main():
         teams[tid] = {"w": 1 + sum(v > s for v in lad1), "t": tier(s, rg), "s": round(s, 1)}
     pts = [x for x in (point(w, keep[w]) for w in weeks) if x]
     now = point((today + dt.timedelta(days=1)).isoformat(), rt)
+    # the weekly world rank on today's ladder: the raw rank against each week's own VRS ladder is not comparable over time
+    # (Valve's ranked field grew from ~225 to ~350 teams, mostly near ESEA's level, and the pro scale drifts against the
+    # ESEA ratings). Each week keeps only 1NT's place in that week's NA ESEA field (share of teams rated above it, all
+    # divisions, opponent-adjusted, point in time); that share is read off today's NA field and placed on today's ladder.
+    field = now["field"]
+
+    def on_today(q):
+        if not field:
+            return None
+        i = min(len(field) - 1, max(0, int(round((1 - q) * (len(field) - 1)))))
+        return 1 + sum(v > field[i] for v in lad1)
+    for x in pts:
+        x["raw"] = x["vrs"]
+        x["vrs"] = on_today(x["q"])
+        x["of"] = len(lad1)
+    for x in pts + [now]:
+        x["q"] = round(x["q"], 3)
+        x.pop("field", None)
     res = {"asof": today.isoformat(), "data": E.get("asof"), "levels": levels, "now": now, "weekly": pts,
            "seasons": [min(m["season"] for m in E["matches"]), last], "nMatches": len(E["matches"]), "teams": teams}
     OUT.write_text(json.dumps(res, indent=1, default=float))

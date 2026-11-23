@@ -10,7 +10,8 @@
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-cs"/></svg>{{ $.Get "title" | default (cond (eq $view "results") "results" "matches") }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
-  {{- if not $list }}<div class="cfbm__body"><p class="cfb__dim">{{ if eq $view "results" }}no finished series yet.{{ else }}no pro series on Liquipedia's ticker right now.{{ end }}</p></div>{{ end }}
+  {{- $low := cond (eq $view "results") slice (.lower | default slice) }}
+  {{- if and (not $list) (not $low) }}<div class="cfbm__body"><p class="cfb__dim">{{ if eq $view "results" }}no finished series yet.{{ else }}no series in the next 3 days.{{ end }}</p></div>{{ end }}
   {{- if eq $view "results" }}{{ with $list }}
   {{- $hit := 0 }}{{ range . }}{{ if or (and (gt .sa .sb) (ge .pa 0.5)) (and (lt .sa .sb) (lt .pa 0.5)) }}{{ $hit = add $hit 1 }}{{ end }}{{ end }}
   <div class="cfbm__body"><p class="cfb__dim">model favourite won {{ $hit }} of {{ len . }} ({{ partial "num.html" (slice "%.0f" (mul (div (float $hit) (len .)) 100)) }}%)</p></div>
@@ -39,6 +40,26 @@
   </article>
   {{- end }}
   </div>
-  <div class="win__status"><span>{{ len $list }} {{ cond (eq $view "results") "results" "series" }} · schedule: Liquipedia (CC BY-SA)</span><span {{ partial "fresh-attrs.html" "cs2" | safeHTMLAttr }}>updated {{ lower ((time .asof).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  {{- with $low }}{{ $now := now.Unix }}
+  {{- /* lower tiers: bo3.gg (event tier B-D) and NA ESEA Advanced / Main (Tier 5 / 6 level), last 48 h and next 72 h */}}
+  <div class="wintable__scroll cs-lo">
+  <table class="esea-box cs-lo__t">
+    <thead><tr><th title="ET">When</th><th title="event tier: bo3.gg S/A/B/C/D · T5 = ESEA Advanced, T6 = ESEA Main">Lvl</th><th class="cs-lo__ev">Event</th><th class="cs-lo__a" title="team tier (T1-T6) · ARK rank, or world rank (W#) for ESEA teams">Team</th><th title="series score, or the model's win chance where both sides are rated">Score / %</th><th class="cs-lo__b" title="team tier (T1-T6) · ARK rank, or world rank (W#) for ESEA teams">Team</th></tr></thead>
+    <tbody>
+    {{- range . }}{{ $r := . }}{{ $done := and (ne .sa nil) (not .live) }}
+      <tr class="{{ if $done }}n1-row-off{{ end }}" data-src="{{ .src }}">
+        <td>{{ if .live }}<span class="lzd__tag">LIVE</span>{{ else }}{{ (time.In "America/New_York" (time (int .ts))).Format "Mon 3:04 PM" }}{{ end }}</td>
+        <td><span class="cs-lo__lv cs-lo__lv--{{ lower .lv }}">{{ .lv }}</span></td>
+        <td class="cs-lo__ev cfb__dim">{{ .ev }}{{ with .bo }}{{ if $r.ev }} · {{ end }}Bo{{ . }}{{ end }}</td>
+        <td class="cs-lo__a">{{ with .rka }}<span class="cfb__dim">#{{ . }}</span> {{ end }}{{ with .wa }}<span class="cfb__dim">W#{{ . }}</span> {{ end }}{{ with .ta }}<span class="cs__t cs__t--{{ . }}">T{{ . }}</span> {{ end }}<span{{ if and $done (gt .sa .sb) }} class="cs-lo__w"{{ end }}>{{ .a }}</span></td>
+        <td class="cs-lo__s">{{ if ne .sa nil }}<b>{{ .sa }}–{{ .sb }}</b>{{ else }}{{ with .pa }}{{ partial "num.html" (slice "%.0f" (mul . 100)) }}–{{ partial "num.html" (slice "%.0f" (sub 100 (mul . 100))) }}{{ else }}<span class="cfb__dim">v</span>{{ end }}{{ end }}</td>
+        <td class="cs-lo__b"><span{{ if and $done (gt .sb .sa) }} class="cs-lo__w"{{ end }}>{{ .b }}</span>{{ with .tb }} <span class="cs__t cs__t--{{ . }}">T{{ . }}</span>{{ end }}{{ with .wb }} <span class="cfb__dim">W#{{ . }}</span>{{ end }}{{ with .rkb }} <span class="cfb__dim">#{{ . }}</span>{{ end }}</td>
+      </tr>
+    {{- end }}
+    </tbody>
+  </table>
+  </div>
+  {{- end }}
+  <div class="win__status"><span>{{ len $list }} {{ cond (eq $view "results") "results" "series" }}{{ with $low }} · {{ len . }} lower-tier{{ end }} · schedule: Liquipedia (CC BY-SA){{ with $low }}, bo3.gg, FACEIT (ESEA){{ end }}</span><span {{ partial "fresh-attrs.html" "cs2" | safeHTMLAttr }}>updated {{ lower ((time .asof).Format "Jan 2, 2006") }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- end -}}

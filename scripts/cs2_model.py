@@ -419,6 +419,70 @@ def fetch_logos(keys, logos):
             print("logo", k, e, file=sys.stderr)
 
 
+def lower_tier(bo3, names, rank, teams, matches, mchance, back=48, ahead=72):
+    """The games tab's lower-tier rows: bo3.gg matches Liquipedia's ticker does not list, and NA ESEA league matches."""
+    now = time.time()
+    tier = {t["k"]: t.get("tier") for t in teams}
+    have = {frozenset((m["ka"], m["kb"])) for m in matches}
+    iso = lambda x: dt.datetime.fromisoformat(x.replace("Z", "+00:00")).timestamp()  # noqa: E731
+    out = []
+
+    def side(tid, nm):
+        k = bo3.k(tid) or key(nm or "")
+        return k, (names.get(k) or nm or "TBD")
+
+    def add(src, ts, a, b, ev, lv, bo, sa=None, sb=None, live=False, pa=None, extra=None):
+        (ka, na), (kb, nb) = a, b
+        if pa is None and ka in names and kb in names:
+            pa = mchance(ka, kb, bo or 3)
+        row = {"src": src, "ts": int(ts), "a": na, "b": nb, "ev": ev or "", "lv": lv, "bo": bo or None,
+               "ta": tier.get(ka), "tb": tier.get(kb), "rka": rank.get(ka), "rkb": rank.get(kb)}
+        if pa is not None:
+            row["pa"] = round(float(pa), 3)
+        if sa is not None:
+            row["sa"], row["sb"] = sa, sb
+        if live:
+            row["live"] = True
+        out.append(row | (extra or {}))
+    up = cs2_bo3.upcoming(ahead)
+    seen = set()
+    for r in up:
+        a, b = side(r[2], r[4]), side(r[3], r[5])
+        if frozenset((a[0], b[0])) in have:
+            continue
+        seen.add(r[0])
+        live = r[9] == "current"
+        add("bo3", iso(r[1]), a, b, r[8], (r[7] or "").upper(), r[6], *((r[10], r[11]) if live else (None, None)), live=live)
+    for m in cs2_bo3.load()["matches"]:
+        if m[0] in seen or m[6] is None or not m[1]:
+            continue
+        ts = iso(m[1])
+        if ts < now - back * 3600 or (m[10] or "") in ("s", "a"):
+            continue
+        add("bo3", ts, side(m[2], m[4]), side(m[3], m[5]), "", (m[10] or "").upper(), m[9], m[7], m[8])
+    # ESEA (NA): the league log's lines inside the window, with each side's world rank (data/esea_world.json)
+    wt = {}
+    try:
+        wt = json.loads((ROOT / "data" / "esea_world.json").read_text()).get("teams", {})
+    except (OSError, ValueError):
+        pass
+    try:
+        lines = [json.loads(x) for x in (ROOT / "scripts" / "data" / "esea_league_log.jsonl").read_text().splitlines() if x.strip()]
+    except OSError:
+        lines = []
+    for x in lines:
+        if x.get("void") or not x.get("at") or not (now - back * 3600 <= x["at"] <= now + ahead * 3600):
+            continue
+        res = x.get("res") or {}
+        sc = res.get("score") or [None, None]
+        lv = "T5" if x.get("div") == "advanced" else "T6"
+        w1, w2 = wt.get(x.get("t1")) or {}, wt.get(x.get("t2")) or {}
+        add("esea", x["at"], (None, x.get("n1") or "TBD"), (None, x.get("n2") or "TBD"),
+            "ESEA NA " + ("Advanced" if x.get("div") == "advanced" else "Main"), lv, None, *(sc if res else (None, None)),
+            pa=x.get("p"), extra={"wa": w1.get("w"), "wb": w2.get("w"), "ta": w1.get("t"), "tb": w2.get("t")})
+    return sorted(out, key=lambda r: (r["ts"] < now - 3 * 3600, r["ts"] if r["ts"] >= now - 3 * 3600 else -r["ts"]))[:240]
+
+
 def build():
     H = json.load(gzip.open(HIST))
     fitj = json.loads(FIT.read_text())
@@ -699,6 +763,14 @@ def build():
         nv = novig.h2h_price(nvg, m["a"], m["b"], team=True) if nvg else None
         if nv:
             m["nv"] = nv
+    # lower tiers (Nov 23 2026): bo3.gg's upcoming / live / last-48h matches outside Liquipedia's ticker (any tier, mostly
+    # B-D) and NA ESEA Advanced / Main (Tier 5 / 6 level) from the 1NT league log (scripts/data/esea_league_log.jsonl,
+    # priced by the ESEA preview model). Model chance only where both sides are rated.
+    lower = []
+    try:
+        lower = lower_tier(bo3, names, rank, teams, matches, mchance)
+    except Exception as ex:  # noqa: BLE001
+        print("cs2 lower tiers skipped:", ex)
     # results: Liquipedia's finished series (the archive, last 30 days) with the chance the model gave before each.
     # The pre-series row is found by date (+-1 day) and team keys whichever source it came from: once Valve's next
     # snapshot lists a series, its row is tagged "vrs" and the Liquipedia copy is dropped from the series list
@@ -729,7 +801,7 @@ def build():
     nlp = len(res)
     out = {"asof": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "vrsDate": last, "lastVrs": H["lastVrs"],
            "nSeries": len(rows), "nLp": nlp, "first": rows[0]["d"], "teams": teams,
-           "matches": sorted(matches, key=lambda m: m["ts"]), "results": res,
+           "matches": sorted(matches, key=lambda m: m["ts"]), "results": res, "lower": lower,
            "roff": {k: round(v) for k, v in st["roff"].items()}, "tp": tp, "tpw": tpw, "tiers": tier_fit,
            "fit": {k: fitj.get(k) for k in ("score", "calibration", "failed", "weights", "params", "tune", "held",
                                              "nTune", "nJoined", "nSeriesFit", "teamMaps", "monthsBeatOld")}}
