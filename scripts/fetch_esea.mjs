@@ -1146,6 +1146,29 @@ function veto(pool, edge, weStart, fixedBans = []) {
   const decider = pool.find(m => !r.seq.some(x => x.map === m));
   return { weStart, bans: r.seq, decider, edge: Math.round(r.v * 10) / 10 };
 }
+// Bo3 (playoffs): ban, ban, pick, pick, then bans until one map is left (the decider); minimax on the series
+// win chance with each map at its own win chance pm(m). Map 1 = the first pick, map 2 = the second, map 3 = decider.
+const series3 = (a, b, c) => a * b + (a * (1 - b) + (1 - a) * b) * c;
+function veto3(pool, pm, weStart, fixedBans = []) {
+  const n = pool.length, acts = [];
+  for (let i = 0; i < n - 1; i++) acts.push({ act: i === 2 || i === 3 ? 'pick' : 'ban', by: (i % 2 === 0) === weStart ? 'us' : 'them' });
+  const best = (left, turn, fx, picks) => {
+    if (left.length === 1) { const ps = [...picks.map(x => pm(x.map)), pm(left[0])]; return { v: ps.length >= 3 ? series3(ps[0], ps[1], ps[2]) : ps[ps.length - 1], seq: [] }; }
+    const { act, by } = acts[turn];
+    const go = m => { const r = best(left.filter(x => x !== m), turn + 1, act === 'ban' && by === 'us' && fx[0] === m ? fx.slice(1) : fx, act === 'pick' ? [...picks, { map: m, by }] : picks);
+      return { v: r.v, seq: [{ act, by, map: m, ...(act === 'ban' && by === 'us' && fx[0] === m ? { fixed: true } : {}) }, ...r.seq] }; };
+    if (act === 'ban' && by === 'us' && fx.length && left.includes(fx[0])) return go(fx[0]);
+    let out = null;
+    for (const m of left) { if (by === 'them' && act === 'ban' && fx.includes(m)) continue; const r = go(m); if (!out || (by === 'us' ? r.v > out.v : r.v < out.v)) out = r; }
+    return out || go(left[0]);
+  };
+  const r = best(pool, 0, fixedBans.filter(m => pool.includes(m)), []);
+  const decider = pool.find(m => !r.seq.some(x => x.map === m));
+  const maps = [...r.seq.filter(x => x.act === 'pick').map(x => ({ map: x.map, by: x.by })), { map: decider, by: 'decider' }].map(x => ({ ...x, p: Math.round(pm(x.map) * 100) }));
+  const [p1, p2, p3] = maps.map(x => pm(x.map));
+  const score = { '2-0': p1 * p2, '2-1': (p1 * (1 - p2) + (1 - p1) * p2) * p3, '1-2': (p1 * (1 - p2) + (1 - p1) * p2) * (1 - p3), '0-2': (1 - p1) * (1 - p2) };
+  return { weStart, seq: r.seq, decider, maps, p: r.v, score };
+}
 // ---- round spread: a CS2 map is a race to 13 (MR12), 12-12 goes to MR3 overtime (first to 4 of 6,
 // repeated). race(q) gives, for a per-round win chance q, the chance of winning the map, the expected
 // round differential and the most likely final score; spread() inverts it from a map win chance.
@@ -1457,6 +1480,20 @@ async function preview(nx) {
   const fixedBans = (Array.isArray(cs.fixedBans) ? cs.fixedBans : []).map(x => String(x).toLowerCase()).filter(m => pool.includes(m));
   const vetoes = [veto(pool, m => E[m] ?? 0, true, fixedBans), veto(pool, m => E[m] ?? 0, false, fixedBans)];
   const dec = maps.find(x => x.map === vetoes[0].decider), pMap = dec ? dec.p / 100 : pAll;
+  // Bo3: the series chance over both pick orders (who bans first is not known in advance)
+  const boN = matches.find(m => m.id === nx.id)?.best_of ?? 1;
+  let ser = null;
+  if (boN >= 3 && pool.length >= 5) {
+    const pmOf = m => (maps.find(x => x.map === m)?.p ?? Math.round(pAll * 100)) / 100;
+    const orders = [veto3(pool, pmOf, true, fixedBans), veto3(pool, pmOf, false, fixedBans)];
+    for (const o of orders) for (const x of o.maps) { const sp = spread(pmOf(x.map)); x.score = sp.score; x.fav = sp.line >= 0 ? 'us' : 'them'; }   // each map's projected score
+    const avg = k => (orders[0].score[k] + orders[1].score[k]) / 2, sc = Object.fromEntries(['2-0', '2-1', '1-2', '0-2'].map(k => [k, Math.round(avg(k) * 100)]));
+    const likely = Object.entries(sc).sort((x, y) => y[1] - x[1])[0][0];
+    ser = { bo: boN, p: (orders[0].p + orders[1].p) / 2, mapP: Math.round(pAll * 100), score: sc, likely, three: Math.round((avg('2-1') + avg('1-2')) * 100),
+      maps: (avg('2-0') + avg('0-2')) * 2 + (avg('2-1') + avg('1-2')) * 3,
+      orders: orders.map(o => ({ weStart: o.weStart, seq: o.seq, decider: o.decider, maps: o.maps, p: Math.round(o.p * 100) })) };
+    ser.maps = Math.round(ser.maps * 100) / 100;
+  }
   const sp = spread(pAll), tot = totals(pAll);
   // ---- game plan: plain notes from the numbers above (no round-level data here, see the demo probe)
   const plan = [];
@@ -1481,7 +1518,8 @@ async function preview(nx) {
   return { id: nx.id, at: nx.at, url: nx.url, bestOf: room?.best_of ?? 1, stage: room?.stage || null, opp: { ...nx.opp, prank: standings[oid]?.power ?? null, avatar: ot?.avatar || nx.opp.avatar, matches: n(pick(ts, 'Matches')), winRate: n(pick(ts, 'Win Rate %')),
       streak: standings[oid]?.streak ?? null, points: standings[oid]?.points ?? null, roster, elo: theirElo, elo5: theirElo5, results: res.sort((a, b) => b.at - a.at), watch },
     us: { elo: ourElo, elo5: ourElo5, prank: standings[TEAM_ID]?.power ?? null, rank: standings[TEAM_ID]?.rank ?? null, tied: standings[TEAM_ID]?.tied ?? false, rec: standings[TEAM_ID] ? `${standings[TEAM_ID].w}-${standings[TEAM_ID].l}` : null },
-    pool, fixedBans, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), pelo: pPelo != null ? Math.round(pPelo * 100) : null, rwa: pRwa != null ? Math.round(pRwa * 100) : null, rating: parts.find(x => x.k === 'rating') ? Math.round(parts.find(x => x.k === 'rating').p * 100) : null, matchup: parts.find(x => x.k === 'matchup') ? Math.round(parts.find(x => x.k === 'matchup').p * 100) : null, win: Math.round(pAll * 100) },
+    pool, fixedBans, maps, vetoes, p: { elo: Math.round(pElo * 100), map: Math.round(pMap * 100), pelo: pPelo != null ? Math.round(pPelo * 100) : null, rwa: pRwa != null ? Math.round(pRwa * 100) : null, rating: parts.find(x => x.k === 'rating') ? Math.round(parts.find(x => x.k === 'rating').p * 100) : null, matchup: parts.find(x => x.k === 'matchup') ? Math.round(parts.find(x => x.k === 'matchup').p * 100) : null, win: Math.round((ser ? ser.p : pAll) * 100), ...(ser ? { mapWin: ser.mapP } : {}) },
+    series: ser,
     w: { ...Object.fromEntries(Object.entries(PREVIEW_W).map(([k, v]) => [k, Math.round(v * 100 * wA)])), pelo: pRwa == null && pPelo != null ? 100 : 0, rwa: pRwa != null ? 100 : 0 },
     rwa: rwGap != null ? { us: Math.round(rwUs.sum * 10) / 10, them: Math.round(rwThem.sum * 10) / 10, five: five.map(r => [r.nickname, rwUs.each[r.id]?.rwa ?? null, rwUs.each[r.id]?.rounds ?? 0]),
       theirFive: theirW.map(([q, w]) => [byId.get(q).nickname, rwThem.each[q]?.rwa ?? null, rwThem.each[q]?.rounds ?? 0, Math.round(w * 1000) / 1000]) } : null,
@@ -1804,7 +1842,7 @@ async function leagueLog() {
     const box = div === 'main' ? rcache.P?.[m.match_id] : null;
     const maps = m.status !== 'FINISHED' ? null : div === 'main' ? (box ? Math.min(box[a.faction_id]?.length || 0, box[b.faction_id]?.length || 0) : null) : (rcache.adv?.box?.[m.match_id] ? rcache.adv.box[m.match_id].maps.length : null);
     feed.push({ id: m.match_id, div, status: m.status, at: m.scheduled_at || null, started: m.started_at || null, t1: a.faction_id, t2: b.faction_id, n1: a.name || null, n2: b.name || null,
-      winner: m.results?.winner || null, score: m.results?.score ? [m.results.score.faction1 ?? null, m.results.score.faction2 ?? null] : null, maps,
+      bo: m.best_of || 1, winner: m.results?.winner || null, score: m.results?.score ? [m.results.score.faction1 ?? null, m.results.score.faction2 ?? null] : null, maps,
       ros: [a, b].map(t => new Set((t.roster || []).map(p => (typeof p === 'string' ? p : p.player_id)).filter(Boolean))) });
   };
   for (const m of allM) if (regular.has(m.competition_id)) row(m, 'main');
@@ -1823,7 +1861,9 @@ async function leagueLog() {
     }
     const q = price(sides[0], sides[1], LEAGUE_W); if (!q) return null;
     const r2 = x => (x == null ? null : Math.round(x * 100) / 100);
-    return { f1: sides[0].ws, f2: sides[1].ws, p: q.p, v: LEAGUE_V + (m.div === 'advanced' ? '/adv' : '') + (q.face ? '' : '/noelo'),
+    // a Bo3 (playoffs) is priced as the series: per-map p, maps independent, p^2 (3 - 2p)
+    const pS = m.bo >= 3 ? q.p * q.p * (3 - 2 * q.p) : q.p;
+    return { f1: sides[0].ws, f2: sides[1].ws, p: pS, ...(m.bo >= 3 ? { bo: m.bo, pMap: q.p } : {}), v: LEAGUE_V + (m.div === 'advanced' ? '/adv' : '') + (q.face ? '' : '/noelo'),
       in: { elo: sides.map(x => x.elo), tal: sides.map(x => x.tal), rwa: sides.map(x => r2(x.rwa)), known: sides.map(x => r2(x.known)), pelo: sides.map(x => (x.pelo == null ? null : Math.round(x.pelo))),
         lf: Math.round(q.lf * 1e4) / 1e4, rw: Math.round(q.rw * 1e5) / 1e5 } };
   };

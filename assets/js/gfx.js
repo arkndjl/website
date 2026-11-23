@@ -2585,40 +2585,69 @@
     var F = await frame(2160, 2700, '1NT vs ' + d.opp + ' :: match day', btn.getAttribute('data-gfx-date'));
     var g = F.g, x = F.x, y = F.y, w = F.w;
     well(g, x, y, w, F.h);
-    // header: the two teams
-    var hy = y + 120, half = (w - 200) / 2;
+    // header: logos, names, VS with the time and event under it (names stop short of the centre column)
+    var hy = y + 120, cw = 560;
     var LS = 240, logos = await Promise.all([d.us, d.them].map(function (t) { return t.logo ? loadImg(t.logo) : null; }));
     for (var k = 0; k < 2; k++) teamLogo(g, logos[k], k ? x + w - 60 - LS : x + 60, hy - 60, LS);
     [[d.us, 'left'], [d.them, 'right']].forEach(function (t, k) {
       var tx = k ? x + w - 60 - (logos[k] ? LS + 36 : 0) : x + 60 + (logos[k] ? LS + 36 : 0), al = k ? 'right' : 'left';
-      var nw = half - 90 - (logos[k] ? LS + 36 : 0), fs = 120, tn = (t[0].ark ? t[0].ark + ' ' : '') + t[0].name;   // a long name steps the size down before it's cut
-      g.textAlign = al; g.font = fs + 'px ' + FONT; while (fs > 56 && g.measureText(tn).width > nw) { fs -= 8; g.font = fs + 'px ' + FONT; }
-      g.fillStyle = C.white; g.fillText(fit(g, tn, nw), tx, hy);
-      g.font = '44px ' + FONT; g.fillStyle = C.teal; g.fillText([t[0].std ? 'STANDINGS ' + t[0].std : '', t[0].world ? 'WORLD ' + t[0].world : '', t[0].rec].filter(Boolean).join(' · '), tx, hy + 110);
-      if (t[0].talent != null) {   // team talent: the five's mean, drawn as stars (half steps)
-        var st = Math.round(t[0].talent * 2) / 2, sw = 5 * (40 + 6) - 6, sx = k ? tx - sw : tx;
-        drawStars(g, sx, hy + 180, st, 40);
-        g.font = '36px ' + FONT; g.fillStyle = C.lilac; var lab = t[0].talent.toFixed(2); g.fillText(lab, k ? sx - 16 : sx + sw + 16, hy + 182);
-      }
+      var nw = w / 2 - cw / 2 - 60 - (logos[k] ? LS + 36 : 0), fs = 120, tn = (t[0].rank ? t[0].rank + ' ' : '') + t[0].name;   // headline rank = ARK Ranking; a long name steps down before it's cut
+      g.textAlign = al; g.font = fs + 'px ' + FONT; while (fs > 48 && g.measureText(tn).width > nw) { fs -= 8; g.font = fs + 'px ' + FONT; }
+      g.fillStyle = C.white; g.fillText(fit(g, tn, nw), tx, hy + 40);
+      if (t[0].rank) { g.font = '40px ' + FONT; g.fillStyle = C.teal; g.fillText(fit(g, 'ARK RANKING' + (t[0].tier ? ' · ' + t[0].tier : ''), nw), tx, hy + 140); }
     });
-    g.textAlign = 'center'; g.font = '96px ' + FONT; g.fillStyle = C.lilac; g.fillText('VS', x + w / 2, hy);
-    g.font = '40px ' + FONT; g.fillText(d.when, x + w / 2, hy + 110); g.fillText(d.event, x + w / 2, hy + 170);
+    g.textAlign = 'center'; g.font = '96px ' + FONT; g.fillStyle = C.lilac; g.fillText('VS', x + w / 2, hy + 20);
+    g.font = '38px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, d.when, cw), x + w / 2, hy + 110);
+    g.fillStyle = C.lilac; g.fillText(fit(g, d.event, cw), x + w / 2, hy + 160);
+    // tale of the tape: one labelled row per number, 1NT left of the label, the opponent right of it
+    var rows = [['STANDINGS', d.us.std, d.them.std], ['RECORD', d.us.rec, d.them.rec], ['TALENT', d.us.talent, d.them.talent]]
+      .filter(function (r) { return r[1] != null && r[1] !== '' || r[2] != null && r[2] !== ''; });
+    var ry = hy + 260, RR = 58, lx = x + w / 2 - 250, rx = x + w / 2 + 250, bx = x + 60, bw = w - 120;
+    rows.forEach(function (r, i) {
+      var cy = ry + i * RR; if (i % 2 === 0) { g.fillStyle = 'rgba(36,26,58,0.35)'; g.fillRect(bx, cy - RR / 2 + 3, bw, RR - 6); }
+      g.textAlign = 'center'; g.font = '34px ' + FONT; g.fillStyle = C.lilac; g.fillText(r[0], x + w / 2, cy);
+      [1, 2].forEach(function (s) {
+        var v = r[s]; if (v == null || v === '') return;
+        if (r[0] === 'TALENT') {   // the five's mean, drawn as stars (half steps) with the number outside them
+          var sw = 5 * (40 + 6) - 6, sx = s === 1 ? lx - sw : rx; drawStars(g, sx, cy, Math.round(v * 2) / 2, 40);
+          g.font = '36px ' + FONT; g.fillStyle = C.white; g.textAlign = s === 1 ? 'right' : 'left'; g.fillText(Number(v).toFixed(2), s === 1 ? sx - 18 : sx + sw + 18, cy); return;
+        }
+        g.font = '48px ' + FONT; g.fillStyle = C.white; g.textAlign = s === 1 ? 'right' : 'left'; g.fillText(String(v), s === 1 ? lx : rx, cy);
+      });
+    });
     g.textAlign = 'left';
     // prediction band
-    var by = hy + 290, bh = 90, bx = x + 60, bw = w - 120;
+    var by = ry + rows.length * RR + 20, bh = 90;
     g.fillStyle = C.down; g.fillRect(bx, by, bw, bh); g.fillStyle = C.teal; g.fillRect(bx, by, bw * d.win / 100, bh);
     g.font = '52px ' + FONT; g.fillStyle = C.dark; g.fillText('1NT ' + d.win + '%', bx + 24, by + bh / 2);
     var r = (100 - d.win) + '% ' + d.opp; g.fillText(r, bx + bw - 24 - g.measureText(r).width, by + bh / 2);
-    var ty = by + bh + 120, tw = (bw - 48) / 3, tiles = [['SPREAD', d.line], ['PROJECTED', d.score], ['FORMAT', d.bo]];
+    // tiles: a Bo3 is called as a series (spread in maps, series score), a Bo1 in rounds
+    var ty = by + bh + 110, tw = (bw - 48) / 3, TH = 190;
+    var tiles = d.series ? [['SERIES SPREAD', d.series.line, d.series.lineSub], ['PROJECTED SERIES', d.series.score, d.series.scoreSub], ['FORMAT', d.bo, d.series.mapsSub]]
+      : [['SPREAD', d.line, ''], ['PROJECTED', d.score, ''], ['FORMAT', d.bo, '']];
     tiles.forEach(function (t, i) {
-      var tx = bx + i * (tw + 24); g.fillStyle = C.face; g.fillRect(tx, ty - 60, tw, 170); bevel(g, tx, ty - 60, tw, 170, true, 3);
-      g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(t[0], tx + 24, ty - 10);
-      var tf = 72; g.font = tf + 'px ' + FONT; while (tf > 44 && g.measureText(t[1]).width > tw - 48) { tf -= 4; g.font = tf + 'px ' + FONT; }
-      g.fillStyle = C.white; g.fillText(fit(g, t[1], tw - 48), tx + 24, ty + 62);
+      var tx = bx + i * (tw + 24); g.fillStyle = C.face; g.fillRect(tx, ty - 60, tw, TH); bevel(g, tx, ty - 60, tw, TH, true, 3);
+      g.font = '34px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, t[0], tw - 48), tx + 24, ty - 18);
+      var tf = 68; g.font = tf + 'px ' + FONT; while (tf > 40 && g.measureText(t[1]).width > tw - 48) { tf -= 4; g.font = tf + 'px ' + FONT; }
+      g.fillStyle = C.white; g.fillText(fit(g, t[1], tw - 48), tx + 24, ty + 48);
+      if (t[2]) { g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, t[2], tw - 48), tx + 24, ty + 104); }
     });
+    ty += TH - 60;
+    // Bo3: the three maps the veto leads to, each with 1NT's map win chance
+    if (d.series && d.series.maps && d.series.maps.length) {
+      var my = ty + 120, mw = (bw - 48) / 3, MH = 160;
+      d.series.maps.forEach(function (m, i) {
+        var mx = bx + i * (mw + 24); g.fillStyle = C.well; g.fillRect(mx, my - MH / 2, mw, MH); bevel(g, mx, my - MH / 2, mw, MH, false, 3);
+        g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, 'MAP ' + (i + 1) + ' · ' + m.by, mw - 40), mx + 20, my - 46);
+        g.font = '50px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, m.map, mw - 200), mx + 20, my + 2);
+        g.textAlign = 'right'; g.fillStyle = m.p >= 50 ? C.teal : C.down; g.fillText(m.p + '%', mx + mw - 20, my + 2); g.textAlign = 'left';
+        if (m.score) { g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, 'proj. ' + m.score, mw - 40), mx + 20, my + 50); }
+      });
+      ty = my + MH / 2;
+    }
     // lineups
-    var ly = ty + 220, nL = (d.five || []).length + (d.theirFive || []).length, room = (F.y + F.h - 200) - ly - 2 * 160 - (d.lineupNote ? 30 : 0);
-    var RH = Math.max(88, Math.min(128, Math.floor(room / Math.max(1, nL)))), RS = Math.min(60, Math.round(RH * 0.59));
+    var ly = ty + 100, nL = (d.five || []).length + (d.theirFive || []).length, room = (F.y + F.h - 130) - ly - 2 * 160 - (d.lineupNote ? 30 : 0);
+    var RH = Math.max(64, Math.min(128, Math.floor(room / Math.max(1, nL)))), RS = Math.min(60, Math.round(RH * 0.62));
     for (var k = 0; k < 2; k++) {
       var L = k ? d.theirFive : d.five, label = (k ? d.opp : '1NT').toUpperCase() + ' · PROJECTED FIVE';
       g.font = '48px ' + FONT; g.fillStyle = k ? C.down : C.teal; g.fillText(label, bx, ly);
