@@ -185,6 +185,16 @@ def preseason_ou(season):
     return out
 
 
+def coaches(season):
+    """{team: head coach now} (Basketball-Reference's coaches page; the last listed for a team that changed)"""
+    h = fetch(f'nba_coaches_{season}.html', f'https://www.basketball-reference.com/leagues/NBA_{season}_coaches.html',
+              fresh=True)
+    out = {}
+    for r in table(h, 'NBA_coaches'):
+        if r.get('_tm') and r.get('coach'): out[r['_tm']] = r['coach']
+    return out
+
+
 def _order(pool, ids):
     at = {r['id']: i for i, r in enumerate(pool)}
     return [at[i] for i in ids if i in at]

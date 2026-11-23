@@ -423,6 +423,7 @@ def show_line(L, season_label, seasons):
             'tp': round((L['tp'] or 0) * 100, 1), 'tpa': int(L['tpa'] or 0), 'ft': round((L['ft'] or 0) * 100, 1),
             'ast': round(L['ast'] or 0, 1), 'stl': round(L['stl'] or 0, 1), 'blk': round(L['blk'] or 0, 1), 'role': L.get('role'),
             'to': round(L['to'] or 0, 1), 'ftr': round(L['ftr'] or 0, 1), 'orb': round(L['orb'] or 0, 1),
+            'drb': round(L['drb'] or 0, 1) if L.get('drb') is not None else None,
             'prpg': round((L['porpag'] or 0) * (L['min_per'] or 0) / 100, 1), 'conf': L.get('conf'), 'seasons': seasons,
             'yr': L.get('yr') if L.get('yr') in NEXT_YR else None}
 
