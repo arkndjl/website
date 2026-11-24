@@ -47,8 +47,8 @@ def specs():
     import awards_nba as NB
     import awards_nhl as NH
     import awards_cbb as CB
-    out['nba'] = lambda: (lambda R: [('mvp', 'MVP', R['mvp'], NB.MVP_COLS, ['vorx'], 3),
-                                     ('dpoy', 'DPOY', R['dpoy'], NB.DPOY_COLS, ['dxpm'], 3),
+    out['nba'] = lambda: (lambda R: [('mvp', 'MVP', R['mvp'], NB.MVP_COLS, ['rvorx'], 3),
+                                     ('dpoy', 'DPOY', R['dpoy'], NB.DPOY_COLS, ['rdxpm'], 3),
                                      ('roy', 'ROY', R['roy'], NB.ROY_COLS, ['vorx'], 3)])(NB.seasons_data())
     out['nhl'] = lambda: (lambda R: [('hart', 'Hart', R['hart'], NH.HART_COLS, ['war'], 3),
                                      ('norris', 'Norris', R['norris'], NH.NORRIS_COLS, ['war'], 3),

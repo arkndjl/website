@@ -102,8 +102,8 @@ def xpm(season):
 
 
 # feature columns per award; every race keeps the full row (dict) so research can try subsets
-MVP_COLS = ['vorx', 'xpm', 'ppg', 'wp', 'seed1', 'gfrac', 'prev_mvp']
-DPOY_COLS = ['dxpm', 'stocks', 'rpg', 'big', 'wp', 'mpg', 'prev_dpoy']
+MVP_COLS = ['rvorx', 'rxpm', 'ppg', 'wp', 'seed1', 'gfrac', 'prev_mvp']
+DPOY_COLS = ['rdxpm', 'stocks', 'rpg', 'big', 'wp', 'mpg', 'prev_dpoy']
 ROY_COLS = ['vorx', 'xpm', 'ppg', 'mpg', 'gfrac', 'wp']
 
 
@@ -135,6 +135,8 @@ def seasons_data():
             row = {'id': pid, 'n': r['n'], 'tm': r['tm'], 'pos': r.get('pos', ''), 'g': p['games'], 'mp': r['mp'],
                    'gs': p.get('games_started', 0), 'age': r.get('age') or 0, 'sxpm': r.get('sx0', r.get('xpm', 0)) or 0,
                    'vorx': r.get('vorx0', r.get('vorx', 0)) or 0, 'xpm': r.get('xpm', 0) or 0, 'dxpm': r.get('dxpm', 0) or 0,
+                   # team-adjusted XPM / VORX (Nov 24 2026: MVP and DPOY pass on them held out; the other races stay on the box blend)
+                   'rvorx': r.get('vorx', 0) or 0, 'rxpm': r.get('txpm', r.get('xpm', 0)) or 0, 'rdxpm': r.get('tdxpm', r.get('dxpm', 0)) or 0,
                    'ppg': p['pts_per_g'], 'rpg': p['trb_per_g'], 'apg': p['ast_per_g'],
                    'stocks': p['stl_per_g'] + p['blk_per_g'], 'mpg': p['mp_per_g'],
                    'big': 1.0 if r.get('pos', '') in ('C', 'PF') else 0.0,
