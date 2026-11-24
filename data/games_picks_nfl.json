@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-24T09:36:43Z",
+ "asof": "2026-11-24T10:13:21Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -51,8 +51,8 @@
   }
  },
  "model": {
-  "asof": "2026-11-24T07:09:01Z",
-  "ageH": 2.5,
+  "asof": "2026-11-24T10:13:14Z",
+  "ageH": 0.0,
   "stale": false
  },
  "picks": [],
@@ -69,11 +69,11 @@
    "side": "over",
    "line": 36.5,
    "price": 101.0,
-   "edge": 8.4,
+   "edge": 8.3,
    "x": null,
    "why": "total market off",
    "m": 3.3,
-   "tm": 44.9
+   "tm": 44.8
   },
   {
    "id": "2026_12_NYG_IND",
@@ -164,12 +164,12 @@
    "mk": "total",
    "side": "under",
    "line": 46.5,
-   "price": -119.0,
-   "edge": 2.9,
+   "price": -114.0,
+   "edge": 3.0,
    "x": null,
    "why": "total market off",
    "m": 5.9,
-   "tm": 43.6
+   "tm": 43.5
   },
   {
    "id": "2026_12_CHI_DET",
@@ -202,22 +202,6 @@
    "why": "spread market off",
    "m": 12.1,
    "tm": 50.2
-  },
-  {
-   "id": "2026_12_NYJ_MIA",
-   "sport": "nfl",
-   "kick": "2026-11-29T18:00:00Z",
-   "home": "MIA",
-   "away": "NYJ",
-   "mk": "total",
-   "side": "over",
-   "line": 40.5,
-   "price": -119.0,
-   "edge": 2.2,
-   "x": null,
-   "why": "total market off",
-   "m": -3.3,
-   "tm": 42.7
   },
   {
    "id": "2026_12_KC_BUF",
@@ -265,7 +249,39 @@
    "x": null,
    "why": "spread market off",
    "m": 5.9,
-   "tm": 41.6
+   "tm": 41.5
+  },
+  {
+   "id": "2026_12_NYJ_MIA",
+   "sport": "nfl",
+   "kick": "2026-11-29T18:00:00Z",
+   "home": "MIA",
+   "away": "NYJ",
+   "mk": "total",
+   "side": "over",
+   "line": 41.5,
+   "price": -101.0,
+   "edge": 1.2,
+   "x": null,
+   "why": "total market off",
+   "m": -3.3,
+   "tm": 42.7
+  },
+  {
+   "id": "2026_12_SEA_SF",
+   "sport": "nfl",
+   "kick": "2026-11-29T21:25:00Z",
+   "home": "SF",
+   "away": "SEA",
+   "mk": "total",
+   "side": "under",
+   "line": 46.5,
+   "price": -119.0,
+   "edge": 1.1,
+   "x": null,
+   "why": "total market off",
+   "m": 2.9,
+   "tm": 45.4
   },
   {
    "id": "2026_12_CAR_TB",
@@ -282,22 +298,6 @@
    "why": "spread market off",
    "m": 3.6,
    "tm": 44.0
-  },
-  {
-   "id": "2026_12_SEA_SF",
-   "sport": "nfl",
-   "kick": "2026-11-29T21:25:00Z",
-   "home": "SF",
-   "away": "SEA",
-   "mk": "total",
-   "side": "under",
-   "line": 46.5,
-   "price": -119.0,
-   "edge": 1.0,
-   "x": null,
-   "why": "total market off",
-   "m": 2.9,
-   "tm": 45.5
   },
   {
    "id": "2026_12_TEN_JAX",
@@ -393,8 +393,8 @@
    "mk": "total",
    "side": "under",
    "line": 46.5,
-   "price": -119.0,
-   "edge": 2.9,
+   "price": -114.0,
+   "edge": 3.0,
    "ev": null,
    "units": 0.0,
    "home": "HOU",
@@ -428,9 +428,9 @@
   "2026_12_NYJ_MIA": {
    "mk": "total",
    "side": "over",
-   "line": 40.5,
-   "price": -119.0,
-   "edge": 2.2,
+   "line": 41.5,
+   "price": -101.0,
+   "edge": 1.2,
    "ev": null,
    "units": 0.0,
    "home": "MIA",
@@ -454,7 +454,7 @@
    "side": "over",
    "line": 36.5,
    "price": 101.0,
-   "edge": 8.4,
+   "edge": 8.3,
    "ev": null,
    "units": 0.0,
    "home": "LAC",
@@ -466,7 +466,7 @@
    "side": "under",
    "line": 46.5,
    "price": -119.0,
-   "edge": 1.0,
+   "edge": 1.1,
    "ev": null,
    "units": 0.0,
    "home": "SF",
@@ -562,7 +562,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 5956,
+  "snapshots": 5965,
   "buckets": [
    {
     "when": "24h+",
@@ -2978,7 +2978,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-24T09:36:43Z",
+ "checked": "2026-11-24T10:13:21Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
