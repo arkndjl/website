@@ -5,7 +5,7 @@ author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["nba", "statistics"]
 keywords = ["xpm", "rxpm", "pxpm", "stabilization", "plus-minus", "nba", "basketball", "statistics"]
-description = "How XPM is built from BPM and DPM, how fast it stabilizes, and how rXPM (descriptive) and pXPM (predictive) compare with BPM, DPM, LEBRON, RAPM, HAPM and on/off."
+description = "How XPM is built from BPM and DPM, how fast it stabilizes, and how rXPM (descriptive) and pXPM (predictive) compare with BPM, DPM, xRAPM, LEBRON, RAPM, HAPM and on/off."
 showFullContent = false
 readingTime = false
 hideComments = true
@@ -16,7 +16,7 @@ Toc = true
 
 XPM (Cross Plus-Minus) is an all-in-one NBA impact metric, measured in points per 100 possessions above an average player. There are two versions of it. rXPM is the descriptive version, and it measures what a player did in a given season. pXPM is the predictive version, and it is a projection of what a player will do the following season.
 
-In this article I will go through how XPM is built, how many games it takes to stabilize, and how it compares to the other public metrics at describing a season and predicting the next one. Out of the metrics I tested (BPM, DPM, LEBRON, one-year RAPM, HAPM, on-court +/- and on/off), rXPM had the closest fit to a team's net rating in the same season, and pXPM was the best at predicting the next season, at both the team level and the player level.
+In this article I will go through how XPM is built, how many games it takes to stabilize, and how it compares to the other public metrics at describing a season and predicting the next one. Out of the metrics I tested (BPM, DPM, xRAPM, LEBRON, one-year RAPM, HAPM, on-court +/- and on/off), rXPM had the closest fit to a team's net rating in the same season. pXPM was the best at predicting the next season out of the metrics with no look-ahead in their historical values, and second overall behind xRAPM, whose historical values were fit with later seasons available. EPM is not included, since its historical values are behind a paywall and its terms don't allow scraping.
 
 ## Formulation
 ### Inputs
@@ -149,7 +149,8 @@ Every metric is scored on the same nine season pairs (2013-14 to 2014-15 through
 
 | Metric | Describe R² | Predict R² (90% CI) | P(better than rXPM) |
 | :--- | :---: | :---: | :---: |
-| **pXPM** | .922 | **.657 (.63 to .70)** | .75 |
+| xRAPM | .958 | **.663 (.63 to .70)** | .83 |
+| **pXPM** | .922 | .657 (.63 to .70) | .75 |
 | **rXPM** | **.999** | .647 (.60 to .70) | |
 | BPM | .988 | .644 (.61 to .69) | .38 |
 | DPM | .875 | .623 (.58 to .67) | .03 |
@@ -167,11 +168,11 @@ rXPM has the highest describe R² of the metrics tested at .999, ahead of on-cou
 
 The team adjustment also improves prediction. It raises rXPM's next-season R² from .640 to .647, and the adjusted version is better in 97% of resamples. This puts rXPM above BPM (.644) and DPM (.623), although rXPM and BPM are close (BPM is better in 38% of resamples).
 
-pXPM has the highest predict R² at .657, ahead of rXPM, BPM, DPM, LEBRON, RAPM, HAPM and both on/off measures. At the team level the margin is small (pXPM is better than rXPM in 75% of resamples), but at the player level, which is what pXPM is fit to, the gap is much larger (see the next section).
+xRAPM has the highest predict R² at .663, with pXPM second at .657, ahead of rXPM, BPM, DPM, LEBRON, RAPM, HAPM and both on/off measures. The gap between xRAPM and pXPM is small (pXPM is better in 37% of resamples and in 3 of the 9 season pairs), and xRAPM's historical values were fit with later seasons available (see below), so its score is likely a little high. Out of the metrics with no look-ahead, pXPM is first. At the team level its margin over rXPM is small (better in 75% of resamples), but at the player level, which is what pXPM is fit to, the gap is much larger (see the next section).
 
 On-court +/- describes its own season almost perfectly (.994), since team net rating is the minutes-weighted sum of its players' on-court numbers, but it drops to .48 when predicting the next season, below every box score-based metric. The metrics that take the longest to stabilize (on/off, on-court +/- and one-year RAPM) are also the worst at predicting, which matches the conclusion of the LumaHoops paper with a different test and data set.
 
-It is also worth noting that the LEBRON and HAPM histories were fit with later seasons available, so their past values have some look-ahead built in. XPM, BPM and DPM do not.
+It is also worth noting that the xRAPM, LEBRON and HAPM histories were fit with later seasons available (for xRAPM, the box score prior's weights were fit on the full history of APM), so their past values have some look-ahead built in. XPM, BPM and DPM do not. xRAPM values come from the season pages on xrapm.com, matched to Basketball Reference ids (99.6% to 100% of minutes matched).
 
 ## From Padding To pXPM
 pXPM uses a 200-minute shrink because that matches the stabilization point.
@@ -226,7 +227,7 @@ A separate shrink for offense and defense didn't help, because both sides of XPM
 - XPM is **provisionally stable after about 14 games** (230 minutes, 490 possessions), twice as fast as on-court +/- (28 games) and close to BPM in the LumaHoops paper. Within a single season it reaches a split-half reliability of **.71**.
 - **Role stats** (shot selection, assists, rebounding, scoring volume) stabilize within a week. **TS%** (31 games) and **steals** (18 games) take the longest.
 - **rXPM** had the highest same-season team R² of the metrics tested (.999), and it predicted the next season better than BPM, DPM, LEBRON, RAPM and HAPM.
-- **pXPM** was the most predictive metric tested: next-season team R² of .657 (.654 held out) and next-season player error of 1.19, compared to 1.38 for DPM, 1.58 for the unshrunk blend and 1.95 for BPM.
+- **pXPM** was the most predictive metric tested with no look-ahead: next-season team R² of .657 (.654 held out), second to xRAPM (.663) overall, and next-season player error of 1.19, compared to 1.38 for DPM, 1.58 for the unshrunk blend and 1.95 for BPM.
 - pXPM's **200-minute shrink matches the 230-minute stabilization point**, with aging and the two previous seasons accounting for the year-to-year change.
 
 **Works Cited**
@@ -238,4 +239,4 @@ Blackport, D. (2014). Shot metric reliability. *Hockey-Graphs*.
 
 Medvedovsky, K. (2020). On-court plus-minus padding (as cited in Awoyemi, 2026).
 
-Data: ESPN box scores; Basketball Reference (BPM, on-court and on/off); DPM; LEBRON (BBall Index via nbarapm.com); one-year RAPM (gabriel1200); HAPM (LumaHoops, CC BY 4.0). Code ([github.com/arkndjl/website](https://github.com/arkndjl/website)): `scripts/nba_xpm_stability_research.py`, `scripts/nba_xpm_predictive_research.py`, `scripts/nba_rxpm_research.py`, `scripts/nba_pxpm_research.py`.
+Data: ESPN box scores; Basketball Reference (BPM, on-court and on/off); DPM; xRAPM (xrapm.com); LEBRON (BBall Index via nbarapm.com); one-year RAPM (gabriel1200); HAPM (LumaHoops, CC BY 4.0). Code ([github.com/arkndjl/website](https://github.com/arkndjl/website)): `scripts/nba_xpm_stability_research.py`, `scripts/nba_xpm_predictive_research.py`, `scripts/nba_rxpm_research.py`, `scripts/nba_pxpm_research.py`.
