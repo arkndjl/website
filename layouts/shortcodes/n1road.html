@@ -1,0 +1,271 @@
+{{- /* 1NT Road to Pro (content/1nt.md tab "road to pro").
+       Model numbers: data/n1_road.json (scripts/n1_road.py, the 1NT Path to Pro plan's model + inputs, seed 111).
+       Live numbers: data/esea.json (record, bracket), data/esea_world.json (ARK Ranking), data/esea_milestones.json
+       (1NT's divisions by season), data/laursen_socials.json (Twitch followers).
+       part="ladder" | "climb" | "now" | "money" | "major" | "checkpoints". Buttons use data-n1r, not data-wintab. */ -}}
+{{- $R := site.Data.n1_road -}}
+{{- $E := site.Data.esea -}}
+{{- $W := site.Data.esea_world -}}
+{{- $M := site.Data.esea_milestones -}}
+{{- $part := .Get "part" | default "ladder" -}}
+{{- if $R }}
+{{- if not ($.Page.Store.Get "n1road-css") }}{{ $.Page.Store.Set "n1road-css" true }}
+<style>
+.n1r{--r-purple:#8a5cf6;--r-teal:#5fd4c4;--r-lilac:#c8aaf0;--r-line:#2c2c33;--r-mute:#8d8d96}
+.n1r__body{padding:12px 14px}
+.n1r__lad{display:flex;flex-direction:column;gap:6px}
+.n1r__rung,.n1r__lh{display:grid;grid-template-columns:minmax(0,9.5em) minmax(0,1fr) 5.5em 6em 7.5em;gap:10px;align-items:center}
+.n1r__lh{font-size:.75em;color:var(--r-mute);letter-spacing:.1em;text-transform:uppercase}
+.n1r__lh span{cursor:help}
+.n1r__lh span:nth-child(n+3),.n1r__rung .n1r__v{text-align:right;font-variant-numeric:tabular-nums}
+.n1r__rung{background:var(--win-well);border:2px solid var(--r-line);padding:7px 10px;min-height:38px}
+.n1r__rung.is-now{border-color:var(--r-lilac);box-shadow:4px 4px 0 var(--r-purple)}
+.n1r__rung.is-been{border-color:color-mix(in srgb,var(--r-lilac) 40%,var(--r-line))}
+.n1r__nm{display:flex;align-items:center;gap:8px;letter-spacing:.08em;min-width:0}
+.n1r .n1r__nm img{width:24px;height:24px;flex:0 0 24px;border:0;padding:0;margin:0;background:none;box-shadow:none;max-width:none;border-radius:50%}
+.n1r__nm b{font-weight:normal}
+.n1r__rung.is-now .n1r__nm b{color:var(--r-lilac)}
+.n1r__ss{display:block;font-size:.72em;color:var(--r-mute);letter-spacing:.04em}
+.n1r__bar{position:relative;height:10px;background:repeating-linear-gradient(90deg,var(--r-line) 0 6px,transparent 6px 8px);min-width:0}
+.n1r__bar i{position:absolute;inset:0 auto 0 0;display:block}
+.n1r__bar .is-c{background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--r-teal) 45%,transparent) 0 6px,transparent 6px 8px)}
+.n1r__bar .is-b{background:repeating-linear-gradient(90deg,var(--r-purple) 0 6px,transparent 6px 8px)}
+.n1r__bar .is-s{background:repeating-linear-gradient(90deg,var(--r-lilac) 0 6px,transparent 6px 8px)}
+.n1r__v.is-hi{color:var(--r-teal)}
+.n1r__key{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78em;color:var(--r-mute);margin-top:10px}
+.n1r__key i{display:inline-block;width:10px;height:10px;margin-right:6px;vertical-align:-1px}
+.n1r__key .k-b{background:var(--r-purple)} .n1r__key .k-c{background:var(--r-teal)} .n1r__key .k-a{background:var(--r-mute)} .n1r__key .k-s{background:var(--r-lilac)}
+.n1r__sw{display:flex;gap:4px;padding:10px 14px 0}
+.n1r__sw button{font:inherit;font-size:.8em;letter-spacing:.08em;color:var(--foreground);background:var(--win-well);border:2px solid var(--r-line);padding:2px 10px;cursor:pointer}
+.n1r__sw button[aria-pressed="true"]{border-color:var(--r-lilac);color:var(--r-lilac)}
+.n1r__hm{display:grid;grid-template-columns:3.6em repeat(17,minmax(0,1fr));gap:2px;font-size:.72em}
+.n1r__hm span{display:block;min-width:0}
+.n1r__hm .h-l{color:var(--r-mute);letter-spacing:.06em;align-self:center;white-space:nowrap}
+.n1r__hm .h-x{color:var(--r-mute);text-align:center;font-size:.92em;white-space:nowrap;overflow:hidden}
+.n1r__hm .h-x.is-now{color:var(--r-lilac)}
+.n1r__hm .h-c{height:22px;background:var(--win-well);position:relative}
+.n1r__hm .h-c.is-h{background:var(--r-lilac)}
+.n1r__hm .h-c.is-sep{box-shadow:inset 2px 0 0 var(--r-lilac)}
+.n1r__hm .h-c i{position:absolute;inset:0;display:block}
+.n1r__hm .h-c.is-out i{background:var(--r-mute)}
+.n1r__hm[data-sc="base"] .h-c i{background:var(--r-purple)}
+.n1r__hm[data-sc="climb"] .h-c i{background:var(--r-teal)}
+.n1r__hm[data-sc="amateur"] .h-c i{background:var(--r-lilac)}
+.n1r__hm .h-c.is-out i{background:var(--r-mute)}
+.n1r__panel[hidden]{display:none}
+.n1r__bars{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px;align-items:end;height:150px;border-bottom:2px solid var(--r-line)}
+.n1r__col{display:flex;gap:2px;align-items:end;height:100%;min-width:0}
+.n1r__col i{flex:1;display:block;min-height:2px}
+.n1r__col .a{background:var(--r-mute)} .n1r__col .b{background:var(--r-purple)} .n1r__col .c{background:var(--r-teal)}
+.n1r__xl{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px;font-size:.72em;color:var(--r-mute);text-align:center;margin-top:6px}
+.n1r__tbl{margin:12px 0 0;overflow-x:auto}
+.n1r__tbl td{white-space:nowrap !important}
+.n1r__tbl tr.is-hi td{color:var(--r-lilac)}
+.n1r__path{display:grid;grid-template-columns:2.4em repeat(9,minmax(0,1fr));gap:3px;font-size:.75em;margin-top:12px}
+.n1r__path .p-l{color:var(--r-mute);align-self:center}
+.n1r__path .p-x{color:var(--r-mute);text-align:center}
+.n1r__path .p-c{height:30px;background:var(--win-well);position:relative;display:flex;align-items:flex-end;justify-content:center}
+.n1r__path .p-c i{position:absolute;inset:auto 0 0 0;background:var(--r-purple)}
+.n1r__path .p-c b{position:relative;font-weight:normal;font-size:.9em;padding-bottom:2px}
+.n1r__path .p-c.is-next{box-shadow:inset 0 0 0 2px var(--r-lilac)}
+.n1r__path .p-c.is-cut{box-shadow:inset 0 -2px 0 var(--r-teal)}
+.n1r__ck{display:inline-block;width:10px;height:10px;border:2px solid var(--r-mute);vertical-align:-1px}
+.n1r__ck.is-on{background:var(--r-teal);border-color:var(--r-teal)}
+@media (max-width:684px){
+  .n1r__rung,.n1r__lh{grid-template-columns:minmax(0,8.2em) minmax(0,1fr) 4.2em 5.4em;gap:6px}
+  .n1r__rung>:nth-child(5),.n1r__lh>:nth-child(5){display:none}
+  .n1r__rung{padding:6px 8px;font-size:.9em}
+  .n1r .n1r__nm img{width:20px;height:20px;flex-basis:20px}
+  .n1r__nm{letter-spacing:0;font-size:.88em;gap:5px}
+  .n1r__hm{grid-template-columns:2.6em repeat(17,minmax(0,1fr));gap:1px;font-size:.6em}
+  .n1r__hm .h-c{height:18px}
+  .n1r__bars{height:120px;gap:3px} .n1r__xl{gap:3px;font-size:.6em}
+  .n1r__path{font-size:.65em}
+}
+@media (prefers-reduced-motion:no-preference){.n1r__rung.is-now{animation:n1r-blink 1.6s steps(2) infinite}}
+@keyframes n1r-blink{50%{box-shadow:4px 4px 0 var(--r-teal)}}
+</style>
+<script>
+document.addEventListener('click',function(e){var b=e.target.closest('[data-n1r]');if(!b)return;var w=b.closest('.n1r');
+  w.querySelectorAll('[data-n1r]').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
+  w.querySelectorAll('[data-n1r-panel]').forEach(function(p){p.hidden=p.getAttribute('data-n1r-panel')!==b.getAttribute('data-n1r')});});
+</script>
+{{- end }}
+{{- $logo := "img/1nt/1nt-logo.webp" | relURL -}}
+{{- $b := $R.scenarios.base -}}{{ $c := $R.scenarios.climb -}}{{ $a := $R.scenarios.amateur -}}
+{{- $nowDiv := "Main" }}{{ with $W }}{{ with .now }}{{ $nowDiv = .div }}{{ end }}{{ end -}}
+{{- /* 1NT's seasons by division, from the milestones file */ -}}
+{{- $been := dict }}{{ with $M }}{{ range .seasons }}{{ $d := index (split .div " ") 0 }}{{ if hasPrefix $d "Open" }}{{ $d = "Open" }}{{ end }}{{ if eq $d "Intermediate" }}{{ $d = "Int" }}{{ end }}{{ if eq $d "Advanced" }}{{ $d = "Adv" }}{{ end }}
+  {{- $been = merge $been (dict $d ((index $been $d | default slice) | append (printf "S%d" (int .season)))) }}{{ end }}{{ end -}}
+{{- $nowK := cond (eq $nowDiv "Intermediate") "Int" (cond (eq $nowDiv "Advanced") "Adv" $nowDiv) -}}
+
+{{- if eq $part "ladder" }}
+{{- $rows := slice
+  (dict "k" "Major" "nm" "MAJOR" "ev" $R.major.perPlayer "evt" (printf "one Major per player: sticker share + autographs + Stage 1 prize, median · p10 $%s · p90 $%s" (lang.FormatNumber 0 $R.major.p10) (lang.FormatNumber 0 $R.major.p90)) "up" nil "ra" $a.reach.Major "rb" $b.reach.Major "rc" $c.reach.Major)
+  (dict "k" "Pro" "nm" "T3 PRO" "ev" $R.ladder.ev.Pro "evt" "CCT / ESL Challenger / closed qualifiers: 60% any cash, ~$2,000 team median, plus the Major odds" "up" $R.ladder.up.Pro "upt" "Major (Stage 1 invite via VRS) per T3 season" "ra" $a.reach.Pro "rb" $b.reach.Pro "rc" $c.reach.Pro)
+  (dict "k" "Adv" "nm" "ADVANCED" "ev" $R.ladder.ev.Adv "evt" "15% Season Finals entry + 3 open qualifiers + cups" "up" $R.ladder.up.Adv "upt" "Advanced to T3 pro" "ra" $a.reach.Adv "rb" $b.reach.Adv "rc" $c.reach.Adv)
+  (dict "k" "Main" "nm" "MAIN" "ev" $R.ladder.ev.Main "evt" "2% Season Finals entry (top 2 of the playoff group) + 3 open qualifiers + cups; Main playoffs pay $0" "up" $R.ladder.up.Main "upt" "Main to Advanced: top 4 of the playoff group or an Advanced pickup; climb = NA population rate")
+  (dict "k" "Int" "nm" "INTERMEDIATE" "ev" $R.ladder.ev.Int "evt" "2% podium ($750 team, S50 3rd) + cups" "up" (slice $R.ladder.up.Int $R.ladder.up.Int) "upt" "Intermediate to Main, NA population")
+  (dict "k" "Open" "nm" "OPEN" "ev" $R.ladder.ev.Open "evt" "no prize pool" "up" nil)
+}}
+<div class="win n1r{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>road_to_pro.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="n1r__body">
+    <div class="n1r__lad">
+      <div class="n1r__lh"><span>tier</span><span title="chance to move up each ESEA season: base (purple) and climb (teal)">up</span><span title="expected prize money per player per season at this tier (Major: one Major's money per player)">EV</span><span title="chance to reach this tier within 10 years: base / climb">10 yr</span><span title="1NT's ESEA seasons at this tier">1NT</span></div>
+      {{- range $rows }}{{ $row := . }}{{ $k := .k }}{{ $isNow := eq $k $nowK }}{{ $bn := index $been $k }}
+      <div class="n1r__rung{{ if $isNow }} is-now{{ else if $bn }} is-been{{ end }}">
+        <span class="n1r__nm">{{ if $isNow }}<img src="{{ $logo }}" alt="1NT" width="22" height="22">{{ end }}<b>{{ .nm }}</b></span>
+        {{- with .up }}{{ $ub := index . 0 }}{{ $uc := index . 1 }}
+        <span class="n1r__bar" title="{{ $row.upt }}: {{ printf "%.1f" (mul $ub 100) }}% base · {{ printf "%.1f" (mul $uc 100) }}% climb"><i class="is-c" style="width:{{ math.Min 100 (mul (div $uc 0.4) 100) }}%"></i><i class="{{ if eq $k "Int" }}is-s{{ else }}is-b{{ end }}" style="width:{{ math.Min 100 (mul (div $ub 0.4) 100) }}%"></i></span>
+        {{- else }}<span class="n1r__bar"></span>{{ end }}
+        <span class="n1r__v{{ if eq $k "Major" }} is-hi{{ end }}" title="{{ .evt }}">{{ if ge .ev 1000.0 }}${{ printf "%.1f" (div .ev 1000.0) }}k{{ else }}${{ math.Round .ev }}{{ end }}</span>
+        <span class="n1r__v">{{ if $isNow }}now{{ else if isset . "rb" }}{{ if lt .rb 0.01 }}{{ printf "%.1f" (mul .rb 100) }}{{ else }}{{ printf "%.0f" (mul .rb 100) }}{{ end }} / {{ if lt .rc 0.1 }}{{ printf "%.1f" (mul .rc 100) }}{{ else }}{{ printf "%.0f" (mul .rc 100) }}{{ end }}%{{ else if $bn }}done{{ else }}–{{ end }}</span>
+        <span class="n1r__v" title="{{ delimit ($bn | default (slice "–")) ", " }}">{{ with $bn }}{{ len . }} · {{ index . (sub (len .) 1) }}{{ else }}–{{ end }}</span>
+      </div>
+      {{- end }}
+    </div>
+    <div class="n1r__key"><span><i class="k-b"></i>base</span><span><i class="k-c"></i>climb</span><span><i class="k-s"></i>NA population</span></div>
+  </div>
+  <div class="win__status"><span title="Markov chain, one step per ESEA season, 3 seasons a year, 10 years, {{ lang.FormatNumber 0 $R.runs }} runs. Move-up rates: NA player-level ESEA transitions S46–S59 (14k Int, 12k Main, 5.5k Adv player-seasons); base halves Main to Advanced (team route ~3% + pickups ~2%); climb = population rates. Exit hazard 3.5% a season. Prizes: FACEIT S59 Season Finals table, 5-way split, no org cut.">path model · {{ (time $R.asof).Format "Jan 2" }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "climb" }}
+{{- $tiers := slice (dict "k" "Pro" "l" "T3") (dict "k" "Adv" "l" "ADV") (dict "k" "Main" "l" "MAIN") (dict "k" "Int" "l" "INT") (dict "k" "Open" "l" "OPEN") (dict "k" "Out" "l" "OUT") -}}
+{{- $hist := slice }}{{ with $M }}{{ range sort .seasons "season" }}{{ $d := index (split .div " ") 0 }}{{ if hasPrefix $d "Open" }}{{ $d = "Open" }}{{ end }}{{ if eq $d "Intermediate" }}{{ $d = "Int" }}{{ end }}{{ if eq $d "Advanced" }}{{ $d = "Adv" }}{{ end }}{{ $hist = $hist | append (dict "s" (int .season) "d" $d "div" .div "w" .w "l" .l "mv" .move) }}{{ end }}{{ end -}}
+{{- $nh := len $hist }}
+<div class="win n1r{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>climb.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="n1r__sw" role="group" aria-label="scenario"><button type="button" data-n1r="base" aria-pressed="true">base</button><button type="button" data-n1r="climb" aria-pressed="false">climb</button><button type="button" data-n1r="amateur" aria-pressed="false">stays amateur</button></div>
+  <div class="n1r__body">
+  {{- range $sc := slice "base" "climb" "amateur" }}{{ $st := (index $R.scenarios $sc).states }}
+  <div class="n1r__hm n1r__panel" data-sc="{{ $sc }}" data-n1r-panel="{{ $sc }}"{{ if ne $sc "base" }} hidden{{ end }} role="img" aria-label="1NT division by season, then the share of {{ $sc }} model runs at each tier by year">
+    {{- range $tiers }}{{ $t := . }}
+    <span class="h-l">{{ .l }}</span>
+    {{- range $i, $h := $hist }}<span class="h-c{{ if eq $h.d $t.k }} is-h{{ end }}" title="S{{ $h.s }} · {{ $h.div }} · {{ $h.w }}–{{ $h.l }}{{ with $h.mv }} · {{ if eq . "up" }}promoted{{ else }}relegated{{ end }}{{ end }}"></span>{{ end }}
+    {{- range $y := seq 1 10 }}{{ $sh := index (index $st $y) $t.k | default 0 }}<span class="h-c{{ if eq $y 1 }} is-sep{{ end }}{{ if eq $t.k "Out" }} is-out{{ end }}" title="{{ add 2026 $y }} start · {{ $t.l }} {{ printf "%.1f" (mul $sh 100) }}%">{{ if gt $sh 0.0 }}<i style="opacity:{{ printf "%.2f" (add 0.08 (mul $sh 0.92)) }}"></i>{{ end }}</span>{{ end }}
+    {{- end }}
+    <span class="h-l"></span>
+    {{- range $i, $h := $hist }}<span class="h-x{{ if eq $i (sub $nh 1) }} is-now{{ end }}">{{ $h.s }}</span>{{ end }}
+    {{- range $y := seq 1 10 }}<span class="h-x">'{{ printf "%02d" (mod (add 26 $y) 100) }}</span>{{ end }}
+  </div>
+  {{- end }}
+    <div class="n1r__key"><span><i class="k-s"></i>1NT by ESEA season</span><span><i class="k-b"></i>share of runs, by year</span><span><i class="k-a"></i>out</span></div>
+  </div>
+  <div class="win__status"><span title="left: 1NT's division each ESEA season (FACEIT); right: share of {{ lang.FormatNumber 0 $R.runs }} model runs at each tier at the start of each year, darker = more">ESEA S{{ (index $hist 0).s }}–S{{ (index $hist (sub $nh 1)).s }} · model 2027–2036</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "now" }}
+{{- $now := dict }}{{ with $W }}{{ with .now }}{{ $now = . }}{{ end }}{{ end -}}
+{{- $st := $E.stakes -}}{{ $br := $E.bracket -}}
+<div class="win n1r{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>now.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="n1r__body">
+    <ul class="esea__tiles">
+      {{- with $now }}<li><span class="esea__v">#{{ .vrs }}</span><span class="esea__k" title="CS2 ARK Ranking spot 1NT's five would hold, of {{ .of }}; #{{ .na }} of {{ .naOf }} NA ESEA">ARK world</span></li>{{ end }}
+      <li><span class="esea__v">{{ $st.w }}–{{ $st.l }}</span><span class="esea__k" title="S{{ $E.season }} {{ $nowDiv }} regular season, #{{ $st.rank }} of {{ $st.teams }}">S{{ $E.season }} {{ $nowDiv }}</span></li>
+      {{- with $br.next }}<li><span class="esea__v">{{ printf "%.0f" (mul .p 100) }}%</span><span class="esea__k" title="series win % vs {{ .opp.name }} (seed {{ .opp.seed }})">vs {{ .opp.name }}</span></li>{{ end }}
+      {{- if eq (int $E.season) 59 }}
+      <li><span class="esea__v">{{ printf "%.0f" (mul $R.s59.top4 100) }}%</span><span class="esea__k" title="top 4 of the playoff group = promotion to Advanced (bracket Monte Carlo, Nov 24)">promotion</span></li>
+      <li><span class="esea__v">{{ printf "%.1f" (mul $R.s59.top2 100) }}%</span><span class="esea__k" title="top 2 of the playoff group = Season Finals, the only Main prize pool (bracket Monte Carlo, Nov 24)">Season Finals</span></li>
+      {{- end }}
+    </ul>
+    {{- with $br.odds }}{{ with .path }}{{ $path := . }}{{ $nx := "" }}{{ $mr := 1 }}{{ range $path }}{{ if gt (int .r) $mr }}{{ $mr = int .r }}{{ end }}{{ end }}{{ with $br.next }}{{ $nx = .n }}{{ end }}
+    <div class="n1r__path" style="grid-template-columns:2.4em repeat({{ $mr }},minmax(0,1fr))" role="img" aria-label="chance 1NT reaches each playoff round">
+      <span class="p-l"></span>{{ range seq 1 $mr }}<span class="p-x">r{{ . }}</span>{{ end }}
+      {{- range $g := slice 1 2 }}
+      <span class="p-l">{{ if eq $g 1 }}UB{{ else }}LB{{ end }}</span>
+      {{- range $r := seq 1 $mr }}{{ $cell := dict }}{{ range $path }}{{ if and (eq (int .g) $g) (eq (int .r) $r) }}{{ $cell = . }}{{ end }}{{ end }}
+      <span class="p-c{{ if and $cell (eq $cell.n $nx) }} is-next{{ end }}"{{ with $cell }} title="{{ .n }} · reach {{ printf "%.1f" (mul .p 100) }}%"{{ end }}>{{ with $cell }}<i style="height:{{ printf "%.0f" (mul .p 100) }}%"></i><b>{{ if lt .p 0.1 }}{{ printf "%.1f" (mul .p 100) }}{{ else }}{{ printf "%.0f" (mul .p 100) }}{{ end }}</b>{{ end }}</span>
+      {{- end }}{{ end }}
+    </div>
+    {{- end }}{{ end }}
+  </div>
+  <div class="win__status"><span title="playoff reach % from the bracket simulation (series odds from the ESEA game model); outlined = next series">{{ with $br }}{{ .name }}{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "money" }}
+{{- $mx := 1.0 }}{{ range $c.years }}{{ if gt .ev $mx }}{{ $mx = .ev }}{{ end }}{{ end -}}
+<div class="win n1r{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>prize_money.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="n1r__body">
+    <div class="n1r__bars" role="img" aria-label="expected prize money per player by year, three scenarios">
+      {{- range $i, $y := $b.years }}{{ $ya := index $a.years $i }}{{ $yc := index $c.years $i }}
+      <div class="n1r__col"><i class="a" style="height:{{ printf "%.1f" (mul (div $ya.ev $mx) 100) }}%" title="{{ $y.year }} · stays amateur ${{ printf "%.0f" $ya.ev }}"></i><i class="b" style="height:{{ printf "%.1f" (mul (div $y.ev $mx) 100) }}%" title="{{ $y.year }} · base ${{ printf "%.0f" $y.ev }} · p90 ${{ $y.p90 }} · p99 ${{ lang.FormatNumber 0 $y.p99 }} · any cash {{ printf "%.0f" (mul $y.pCash 100) }}%"></i><i class="c" style="height:{{ printf "%.1f" (mul (div $yc.ev $mx) 100) }}%" title="{{ $y.year }} · climb ${{ printf "%.0f" $yc.ev }} · p90 ${{ $yc.p90 }} · p99 ${{ lang.FormatNumber 0 $yc.p99 }}"></i></div>
+      {{- end }}
+    </div>
+    <div class="n1r__xl">{{ range $b.years }}<span>{{ if eq (printf "%v" .year) "2026-27" }}'26-27{{ else }}'{{ printf "%02d" (mod (int .year) 100) }}{{ end }}</span>{{ end }}</div>
+    <div class="n1r__key"><span><i class="k-a"></i>stays amateur</span><span><i class="k-b"></i>base</span><span><i class="k-c"></i>climb</span></div>
+    <div class="n1r__tbl">
+    <table class="cfb__table">
+      <thead><tr><th>10 yr</th><th title="expected prize money per player, 10 years">EV</th><th title="median">p50</th><th>p90</th><th>p99</th><th title="reach Advanced within 10 years">Adv</th><th title="reach T3 pro within 10 years">T3</th><th title="play a Major within 10 years">Major</th></tr></thead>
+      <tbody>
+      {{- range $sc := slice (dict "k" "amateur" "l" "stays amateur") (dict "k" "base" "l" "base") (dict "k" "climb" "l" "climb") }}{{ $s := index $R.scenarios $sc.k }}{{ $z := index $s.years 9 }}
+      <tr{{ if eq $sc.k "base" }} class="is-hi"{{ end }}><td>{{ $sc.l }}</td><td>${{ lang.FormatNumber 0 $z.cum }}</td><td>${{ lang.FormatNumber 0 $z.cumP50 }}</td><td>${{ lang.FormatNumber 0 $z.cumP90 }}</td><td>${{ lang.FormatNumber 0 $z.cumP99 }}</td><td>{{ printf "%.0f" (mul $s.reach.Adv 100) }}%</td><td>{{ printf "%.0f" (mul $s.reach.Pro 100) }}%</td><td>{{ printf "%.1f" (mul $s.reach.Major 100) }}%</td></tr>
+      {{- end }}
+      </tbody>
+    </table>
+    </div>
+  </div>
+  <div class="win__status"><span title="USD, gross, nominal, per player (team prize ÷ {{ $R.split }}, no org cut). Salary, stream income and league fees not in it.">per player · ${{ printf "%.0f" (index $b.years 9).cum }} base · 10 yr</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "major" }}
+<div class="win n1r{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>sticker_money.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="n1r__body">
+    <ul class="esea__tiles">
+      <li><span class="esea__v">${{ printf "%.1f" (div $R.major.perPlayer 1000.0) }}k</span><span class="esea__k" title="median per player if 1NT plays a Major: sticker capsule share + autographs + ${{ lang.FormatNumber 0 $R.major.prizeTeam }} Stage 1 prize, ÷ {{ $R.split }}">per player</span></li>
+      <li><span class="esea__v">${{ printf "%.0f" (div $R.major.p10 1000.0) }}–{{ printf "%.0f" (div $R.major.p90 1000.0) }}k</span><span class="esea__k" title="p10 to p90 per player">range</span></li>
+      <li><span class="esea__v">${{ printf "%.0f" (div $R.major.team 1000.0) }}k</span><span class="esea__k">roster</span></li>
+      <li><span class="esea__v">{{ printf "%.1f" (mul $b.reach.Major 100) }}%</span><span class="esea__k" title="plays a Major within 10 years, base; climb {{ printf "%.1f" (mul $c.reach.Major 100) }}%">10 yr odds</span></li>
+      <li><span class="esea__v">{{ printf "%.0f" (mul $R.orgCut 100) }}%</span><span class="esea__k" title="player owned: {{ $R.split }} × {{ printf "%.0f" (div 100.0 $R.split) }}%">org cut</span></li>
+    </ul>
+  </div>
+  <div class="win__status"><span title="Stage 1 invites by Valve Regional Standings; per T3 season {{ printf "%.1f" (mul (index $R.ladder.up.Pro 0) 100) }}% base, {{ printf "%.0f" (mul (index $R.ladder.up.Pro 1) 100) }}% climb">Major · Stage 1 via VRS</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+
+{{- else if eq $part "checkpoints" }}
+{{- $now := dict }}{{ with $W }}{{ with .now }}{{ $now = . }}{{ end }}{{ end -}}
+{{- $tw := 0 }}{{ with site.Data.laursen_socials }}{{ range .series }}{{ with .twitch }}{{ $tw = . }}{{ end }}{{ end }}{{ end -}}
+{{- $st := $E.stakes }}{{ $br := $E.bracket -}}
+<div class="win n1r{{ with .Get "class" }} {{ . }}{{ end }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-crosshair"/></svg>checkpoints.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="n1r__body"><div class="n1r__tbl" style="margin:0">
+  <table class="cfb__table">
+    <thead><tr><th>by</th><th>target</th><th>now</th><th></th></tr></thead>
+    <tbody>
+    {{- range $R.checkpoints }}{{ $v := "–" }}{{ $on := false }}
+      {{- if eq .k "top4" }}{{ with $br.next }}{{ $r := 0 }}{{ $n := .n }}{{ range $br.odds.path }}{{ if eq .n $n }}{{ $r = .r }}{{ end }}{{ end }}{{ $v = printf "%s r%d" (substr $n 0 2) (int $r) }}{{ end }}{{ if ne (int $E.season) 59 }}{{ $v = "done" }}{{ end }}
+      {{- else if eq .k "seed" }}{{ $v = printf "#%d · %d–%d" (int $st.rank) (int $st.w) (int $st.l) }}{{ $on = and (ge (int $E.season) 60) (le (int $st.rank) 16) }}
+      {{- else if eq .k "div" }}{{ $v = $nowDiv }}{{ $on = eq $nowDiv "Advanced" }}
+      {{- else if eq .k "world" }}{{ with $now.vrs }}{{ $v = printf "#%d" (int .) }}{{ $on = le (int .) 200 }}{{ end }}
+      {{- else if eq .k "twitch" }}{{ if $tw }}{{ $v = printf "%d" (int $tw) }}{{ $on = ge (int $tw) 500 }}{{ end }}
+      {{- else if .now }}{{ $v = .now }}{{ with .v }}{{ $on = ge (int $v) (int .) }}{{ end }}{{ end }}
+      <tr><td>{{ .by }}</td><td>{{ .target }}</td><td>{{ $v }}</td><td><span class="n1r__ck{{ if $on }} is-on{{ end }}" aria-label="{{ if $on }}met{{ else }}open{{ end }}"></span></td></tr>
+    {{- end }}
+    </tbody>
+  </table>
+  </div></div>
+  <div class="win__status"><span>1NT Path to Pro</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end }}
+{{- end }}
