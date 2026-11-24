@@ -92,13 +92,13 @@ def nba():
         'use': 'Small-sample read and next-season level. Separates a hot 300 minutes from a level.',
         'f': [f'({k} × role mean + Σ w MP × XPM)', f'/ ({k} + Σ w MP)  · w 1 / {px["ship"][1]:g} / {px["ship"][2]:g}', '+ aging to next season'],
         'test': {'t': 'next-season XPM · RMSE', 'lo': True, 'unit': '',
-                 'rows': [['pXPM', px['loo']['player'], 1], ['Nov 4 shrink', px['base']['pXPM (live)']['player'], 0],
+                 'rows': [['pXPM', px['loo']['player'], 1], ['k 600 shrink', px['base']['pXPM (live)']['player'], 0],
                           ['DPM', px['base']['DPM']['player'], 0], ['raw XPM', px['base']['rXPM']['player'], 0],
                           ['BPM', px['base']['BPM']['player'], 0]],
                  'n': 'leave one season out · 2011-26'},
         'viz': {'kind': 'bars', 't': 'next-season team net · R²', 'unit': '',
                 'rows': [['pXPM', px['loo']['team']], ['BPM', px['base']['BPM']['team']], ['rXPM', px['base']['rXPM']['team']],
-                         ['DPM', px['base']['DPM']['team']], ['Nov 4 shrink', px['base']['pXPM (live)']['team']]]},
+                         ['DPM', px['base']['DPM']['team']], ['k 600 shrink', px['base']['pXPM (live)']['team']]]},
         'top': {'t': f'best qualified season per player · {yrs}', 'rows': top('sxpm'), 'dec': 1, 'sign': True},
     }
     return xpm, vorx, pxpm
