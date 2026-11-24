@@ -5,7 +5,7 @@ author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["nba", "statistics", "arkboard"]
 keywords = ["xpm", "pxpm", "stabilization", "nba", "basketball", "statistics", "arkboard"]
-description = "How many games it takes for XPM, on-court plus-minus and every box score rate to stabilize, and how that sets the shrink behind pXPM."
+description = "How many games it takes for XPM, on-court plus-minus and every box score rate to stabilize, how XPM predicts next season against other metrics, and how that sets the shrink behind pXPM."
 showFullContent = false
 readingTime = false
 hideComments = true
@@ -18,10 +18,11 @@ Every number on a stat sheet is part signal and part noise. A player's true tale
 
 Baseball has had an answer to this for over a decade. Russell Carleton's work on stat reliability showed that strikeout rate tells you something real after about 60 plate appearances, while BABIP needs closer to 800 balls in play. Hockey followed with Blackport's work on shot metrics. Basketball has lagged behind, and the plus-minus family of metrics has lagged the most. LumaHoops just put out a [working paper on the stabilization of NBA plus-minus metrics](https://lumahoops.org/research/stabilization-of-nba-plus-minus-metrics) that measures this for on-court +/-, WOWY, RAPM, BPM and their own models. It is a great read, and it made me want to run the same test on XPM, the all-in-one metric behind ARKBOARD NBA.
 
-In this article, I wanted to answer three questions:
+In this article, I wanted to answer four questions:
 1. How many games does XPM need before it is stable?
 2. Which parts of the box score stabilize fast, and which parts are mostly noise?
-3. Does the answer change how we shrink XPM into pXPM?
+3. How does XPM compare to other metrics at predicting next season?
+4. Does the answer change how we shrink XPM into pXPM?
 
 ## The Method
 I used the same split-half approach as Carleton and LumaHoops. For each team, take its first 2k games of the season. Split them into odd games and even games, so each half has k games. Compute a player's value on the odd half and on the even half, and correlate the two across every player in the league. If a stat is mostly talent, a player who is good on odd nights will also be good on even nights, and the correlation is high. If a stat is mostly noise, the two halves won't agree.
@@ -61,6 +62,9 @@ Here is the split-half correlation by window:
 | **Box XPM** | .30 | .46 | .54 | .60 | .64 | .68 | .71 |
 | On-court +/- | .20 | .31 | .37 | .43 | .46 | .50 | .56 |
 
+{{< postchart "xpm-splithalf" >}}
+
+
 One thing jumps out. Spearman-Brown says XPM should reach .75 at 41 games per half, which is a full 82-game season, but it actually tops out at .71. The implied padding creeps up as the window grows (12 games at k = 10, 17 at k = 41). That is not noise; that is real change. Players get hurt, change roles, get traded and get better inside a single season, so the halves drift apart a little faster than pure sampling would predict. Within one season, XPM never quite reaches "stable." It gets to "mostly signal."
 
 ## The Box Score, Stat By Stat
@@ -81,6 +85,9 @@ XPM is a weighted sum of box score rates, so the next question is, which of thos
 | On-court +/- | 28 | 480 | 84 |
 | TS% | 31 | 540 | 93 |
 
+{{< postchart "xpm-stats" >}}
+
+
 The box score splits cleanly into two groups.
 
 **Role stats stabilize almost immediately.** Shot diet (3PA rate), assists, scoring volume and rebounding are mostly decided by what a coach asks a player to do, so they are stable inside a week. A center rebounds like a center from game one.
@@ -88,6 +95,43 @@ The box score splits cleanly into two groups.
 **Skill-in-outcome stats take months.** Steals need 18 games, and shooting efficiency (TS%) needs 31, more than raw on-court +/-. That is the basketball version of BABIP: whether the ball goes in is a real skill, but it is buried under a lot of variance in a small sample.
 
 XPM sits in between, at 14 games, because it combines both groups. It gets its early stability from the role stats and its value from the efficiency stats. That is also why one hot shooting month can move a player's rXPM a lot, and why pXPM exists.
+
+## How Predictive Is XPM?
+Stability is only half of the question. A stat can be perfectly stable and still not matter (a player's height is very stable), so the other half is whether the number actually predicts winning. I copied the setup of the LumaHoops paper's describe/predict test:
+
+**Describe**: a player's season value × his share of his team's minutes (× 5), summed over the roster, against the team's net rating that same season.
+
+**Predict**: the same thing, but with this season's values and next season's minutes, against next season's net rating. That is the real test: who you have, valued by what they did last year, against how good the team is next year. Players with no value from the year before (rookies, players coming back) get the metric's average for low-minute players.
+
+Every metric gets the same nine season pairs (2013-14 to 2014-15 through 2024-25 to 2025-26, skipping the shortened 2019-20 and 2020-21), with raw values and no refitting. RAPM's public history stops in 2022-23, so it only has seven pairs.
+
+| Metric | Describe R² | Predict R² (90% CI) | vs rXPM | P(better than rXPM) |
+| :--- | :---: | :---: | :---: | :---: |
+| BPM | .988 | .644 (.61 to .69) | +.004 | .63 |
+| **rXPM** | **.963** | **.640 (.59 to .69)** | | |
+| DPM | .875 | .623 (.58 to .67) | −.018 | .08 |
+| pXPM | .929 | .619 (.59 to .66) | −.021 | .13 |
+| LEBRON | .898 | .599 (.56 to .64) | −.039 | .07 |
+| RAPM (1-yr) | .987 | .569 (.53 to .62) | | |
+| HAPM (1-yr) | .767 | .563 (.52 to .61) | −.076 | .01 |
+| On-court +/- | .994 | .481 (.42 to .55) | −.160 | .00 |
+| On/off | .239 | .373 (.32 to .43) | −.268 | .00 |
+
+*90% intervals and P(better) come from 2,000 resamples of season pairs, with every metric scored on the same resamples.*
+
+{{< postchart "xpm-predict" >}}
+
+A few things to note here:
+
+**Describing is easy, predicting is not.** On-court +/- describes its own season almost perfectly (.994) because team net rating is literally the minutes-weighted sum of its players' on-court numbers. BPM is near-perfect for a similar reason: it is adjusted to add up to the team's rating. Neither of those tells you much. The predict column is the one that matters, and there on-court +/- drops to .48, behind every box-based metric.
+
+**XPM is at the top of the board.** rXPM predicts next season's team net rating at R² .64, ahead of LEBRON, one-year RAPM, HAPM and every on/off measure. BPM ties it (+.004, better in 63% of resamples, which is a coin flip), so XPM's blend of BPM and DPM isn't buying anything at the team level.
+
+**pXPM is slightly behind rXPM here**, and that is expected. pXPM is built to predict one player's next season, and it cuts that error by about a fifth (below). In a team sum, the low-minute players that pXPM fixes already carry almost no weight, and pulling everyone toward a role mean blurs the gaps between good and bad starters a little. So rXPM is the number to sum up; pXPM is the number to quote for one player.
+
+**Plus-minus metrics stabilize slowly and predict worse.** The ranking from the stabilization section carries straight through: the stats that need the most games to stabilize (on/off, on-court +/-, one-year RAPM) are also the worst at predicting. That is the same conclusion as the LumaHoops paper, from a different test and a different data set.
+
+One caveat in XPM's favor: the LEBRON and HAPM histories were fit with later seasons available, so their past values have some hindsight baked in. XPM, BPM and DPM have none, and they still come out on top.
 
 ## From Padding To pXPM
 pXPM is XPM shrunk by minutes:
@@ -102,6 +146,9 @@ Because pXPM isn't predicting the other half of the same season; it predicts nex
 
 For a full-season player at 2,000 minutes, that comes to a weight of .78, the same weight k = 600 gives (2,000 / 2,600 = .77). So the two fits agree. The 600 that the year-to-year fit picked, on its own and in all 15 leave-one-season-out folds, is the 230-minute stabilization point plus the drift of a year.
 
+{{< postchart "xpm-shrink" >}}
+
+
 The payoff of shrinking is large. On next season's XPM (2011-26, held out one season at a time):
 
 | | Next-season RMSE |
@@ -109,6 +156,9 @@ The payoff of shrinking is large. On next season's XPM (2011-26, held out one se
 | rXPM (raw) | 1.59 |
 | pXPM, k = 300, role mean (Oct 31) | 1.26 |
 | **pXPM, k = 600, role + history mean (live)** | **1.24** |
+
+{{< postchart "xpm-rmse" >}}
+
 
 The gap is biggest for small samples. A player under 100 minutes has a raw next-season error of 7.3 points, against 1.7 for his pXPM.
 
@@ -126,6 +176,7 @@ A separate shrink for O and D doesn't hold up, because both sides of XPM are alr
 - XPM is **provisionally stable after about 14 games** (230 minutes, 490 possessions), twice as fast as on-court +/- (28 games) and in line with BPM in the LumaHoops paper.
 - Inside one season, XPM tops out at **.71** split-half reliability: mostly signal, never fully stable, because players really do change in-season.
 - **Role stats** (shot diet, assists, rebounding, scoring volume) stabilize in under a week. **Efficiency** (TS%, 31 games) and **steals** (18) are where the noise lives.
+- On next season's team net rating, **rXPM (R² .64) ties BPM and beats DPM, LEBRON, RAPM, HAPM, on-court +/- and on/off**. Describing a season is easy; predicting the next one is where plus-minus falls off.
 - pXPM's **k = 600** is not arbitrary. It is the 230-minute stabilization point plus a year of real talent change (true-talent year-to-year r about .87), and it cuts next-season error from 1.59 to 1.24.
 - A separate shrink for offense and defense failed out of sample, so pXPM keeps one shrink.
 
@@ -140,4 +191,4 @@ Blackport, D. (2014). Shot metric reliability. *Hockey-Graphs*.
 
 Medvedovsky, K. (2020). On-court plus-minus padding (as cited in Awoyemi, 2026).
 
-Data: ESPN box scores; Basketball Reference (BPM); DPM. Study script: `scripts/nba_xpm_stability_research.py`.
+Data: ESPN box scores; Basketball Reference (BPM, on-court and on/off); DPM; LEBRON (BBall Index via nbarapm.com); one-year RAPM (gabriel1200); HAPM (LumaHoops, CC BY 4.0). Study scripts: `scripts/nba_xpm_stability_research.py`, `scripts/nba_xpm_predictive_research.py`.
