@@ -1,7 +1,7 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Weekly movement on the player and prospect boards: each row gets its board metric as of the sport's last weekly
-post day (scripts/rank_moves.py POST: soccer Mon, NFL Tue, CFB Wed, CBB Thu, NBA Fri, tennis Sat, CS2 Sun, as posted; on the post day
-itself, the one a week back), or 7 days back for a sport with no post day (NHL, hockey prospects).
+post day (scripts/rank_moves.py POST: soccer Mon, NFL Tue, CFB Wed, CBB Thu, NBA Fri, tennis + NHL Sat, CS2 Sun, as posted; on the post day
+itself, the one a week back), or 7 days back for a board with no post day.
 
 Run after a board's builders, before the commit. Each board keeps its history in scripts/data/moves/<board>.json
 ({season, model, hist: {date: {id: value}}}), stored only when it changes and pruned to the week window plus the snapshot
@@ -486,7 +486,7 @@ def test():
     assert POST_HOUR == 10
     assert board_day(dt.datetime(2026, 11, 24, 14, tzinfo=utc), 'nfl') == dt.date(2026, 11, 24)
     assert board_day(dt.datetime(2026, 11, 24, 16, tzinfo=utc), 'nfl') == dt.date(2026, 11, 25)
-    assert board_day(dt.datetime(2026, 11, 24, 16, tzinfo=utc), 'nhl') == dt.date(2026, 11, 24)      # no post day
+    assert board_day(dt.datetime(2026, 11, 24, 16, tzinfo=utc), 'nhl') == dt.date(2026, 11, 24)      # not its post day
     assert board_day(dt.datetime(2026, 11, 25, 3, tzinfo=utc), 'nba') == dt.date(2026, 11, 24)       # 10 PM ET Tue
     assert cutoff(dt.date(2026, 11, 25), 'nfl') == dt.date(2026, 11, 24) and cutoff(dt.date(2026, 11, 24), 'nfl') == dt.date(2026, 11, 17)
     hp = {}
