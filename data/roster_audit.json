@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-24T03:45Z",
+ "asof": "2026-11-24T05:23Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -10,7 +10,7 @@
    },
    "flags": [],
    "joined": 0,
-   "players": 980,
+   "players": 981,
    "rows": 5293
   },
   "cfb": {
@@ -73,11 +73,11 @@
      "rows": 507
     },
     "static/data/nba-xpm/2027.json": {
-     "flags": 4,
+     "flags": 3,
      "rows": 474
     },
     "static/data/pctl-nba.json": {
-     "flags": 4,
+     "flags": 3,
      "rows": 474
     },
     "static/data/xaav-nba.json": {
@@ -91,18 +91,18 @@
      "field": "depth",
      "file": "static/data/depth/nba.json",
      "flag": "released",
-     "head": "Departs to locker room",
-     "kind": "exit",
+     "head": "Waived by Chicago",
+     "kind": "waived",
      "move": {
       "d": "2026-11-23",
-      "head": "Departs to locker room",
-      "kind": "exit"
+      "head": "Waived by Chicago",
+      "kind": "waived"
      },
-     "pid": "5732",
-     "player": "Collin Gillespie",
-     "pos": "PG",
-     "rotowire": "PHO",
-     "site": "PHO"
+     "pid": "5779",
+     "player": "Orlando Robinson",
+     "pos": "C",
+     "rotowire": "FA",
+     "site": "CHI"
     },
     {
      "d": "2026-11-06",
@@ -121,24 +121,6 @@
      "pos": "C",
      "rotowire": "GSW",
      "site": "FA"
-    },
-    {
-     "d": "2026-11-23",
-     "field": "tm",
-     "file": "static/data/nba-proj.json",
-     "flag": "released",
-     "head": "Departs to locker room",
-     "kind": "exit",
-     "move": {
-      "d": "2026-11-23",
-      "head": "Departs to locker room",
-      "kind": "exit"
-     },
-     "pid": "5732",
-     "player": "Collin Gillespie",
-     "pos": "PG",
-     "rotowire": "PHO",
-     "site": "PHO"
     },
     {
      "d": "2026-10-22",
@@ -195,6 +177,24 @@
      "site": "FA"
     },
     {
+     "d": "2026-11-23",
+     "field": "tm",
+     "file": "static/data/nba-proj.json",
+     "flag": "released",
+     "head": "Waived by Chicago",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-23",
+      "head": "Waived by Chicago",
+      "kind": "waived"
+     },
+     "pid": "5779",
+     "player": "Orlando Robinson",
+     "pos": "C",
+     "rotowire": "FA",
+     "site": "CHI"
+    },
+    {
      "d": "2026-09-14",
      "field": "tm",
      "file": "static/data/nba-proj.json",
@@ -211,24 +211,6 @@
      "pos": "C",
      "rotowire": "FA",
      "site": "FA"
-    },
-    {
-     "d": "2026-11-23",
-     "field": "tm",
-     "file": "static/data/nba-xpm/2027.json",
-     "flag": "released",
-     "head": "Departs to locker room",
-     "kind": "exit",
-     "move": {
-      "d": "2026-11-23",
-      "head": "Departs to locker room",
-      "kind": "exit"
-     },
-     "pid": "5732",
-     "player": "Collin Gillespie",
-     "pos": "PG",
-     "rotowire": "PHO",
-     "site": "PHO"
     },
     {
      "d": "2026-10-17",
@@ -283,24 +265,6 @@
      "pos": "SF",
      "rotowire": "FA",
      "site": "CLE"
-    },
-    {
-     "d": "2026-11-23",
-     "field": "tm",
-     "file": "static/data/pctl-nba.json",
-     "flag": "released",
-     "head": "Departs to locker room",
-     "kind": "exit",
-     "move": {
-      "d": "2026-11-23",
-      "head": "Departs to locker room",
-      "kind": "exit"
-     },
-     "pid": "5732",
-     "player": "Collin Gillespie",
-     "pos": "G",
-     "rotowire": "PHO",
-     "site": "PHO"
     },
     {
      "d": "2026-11-08",
@@ -4528,11 +4492,11 @@
     },
     "static/data/nhl-war/2027.json": {
      "flags": 2,
-     "rows": 865
+     "rows": 867
     },
     "static/data/pctl-nhl.json": {
-     "flags": 0,
-     "rows": 352
+     "flags": 1,
+     "rows": 356
     },
     "static/data/xaav-nhl.json": {
      "flags": 12,
@@ -4791,11 +4755,29 @@
      "pos": "C",
      "rotowire": "FA",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-13",
+     "field": "tm",
+     "file": "static/data/pctl-nhl.json",
+     "flag": "released",
+     "head": "Two-point effort in Finland",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-13",
+      "head": "Two-point effort in Finland",
+      "kind": "exit"
+     },
+     "pid": "5744",
+     "player": "K'Andre Miller",
+     "pos": "D",
+     "rotowire": "CAR",
+     "site": "CAR"
     }
    ],
    "joined": 0,
    "players": 1432,
-   "rows": 2736
+   "rows": 2742
   }
  }
 }
