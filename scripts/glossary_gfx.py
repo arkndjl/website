@@ -85,16 +85,20 @@ def nba():
         'top': {'t': f'best season per player · {yrs}', 'rows': top('vorx'), 'dec': 1},
         'foot': 'constants fit to team wins, 480 team seasons 2011-26',
     }
+    px = J('data/nba_pxpm_research.json'); k = px['ship'][0]
     pxpm = {
         'stands': 'predictive XPM · NBA',
-        'what': 'XPM shrunk by minutes toward what the player is expected to be.',
-        'use': 'Small-sample read. Separates a hot 300 minutes from a level.',
-        'f': ['raw × MP / (MP + 600)', '+ mean × 600 / (MP + 600)', 'mean = role mean + prior pull'],
+        'what': 'Projected XPM next season: three seasons by minutes, shrunk to a role mean, aged.',
+        'use': 'Small-sample read and next-season level. Separates a hot 300 minutes from a level.',
+        'f': [f'({k} × role mean + Σ w MP × XPM)', f'/ ({k} + Σ w MP)  · w 1 / {px["ship"][1]:g} / {px["ship"][2]:g}', '+ aging to next season'],
         'test': {'t': 'next-season XPM · RMSE', 'lo': True, 'unit': '',
-                 'rows': [['pXPM', 1.235, 1], ['role mean only', 1.259, 0], ['raw XPM', 1.59, 0]],
+                 'rows': [['pXPM', px['loo']['player'], 1], ['Nov 4 shrink', px['base']['pXPM (live)']['player'], 0],
+                          ['DPM', px['base']['DPM']['player'], 0], ['raw XPM', px['base']['rXPM']['player'], 0],
+                          ['BPM', px['base']['BPM']['player'], 0]],
                  'n': 'leave one season out · 2011-26'},
-        'viz': {'kind': 'bars', 't': 'weight on raw XPM', 'unit': '%',
-                'rows': [['300 MP', 33], ['600 MP', 50], ['1,200 MP', 67], ['2,400 MP', 80]]},
+        'viz': {'kind': 'bars', 't': 'next-season team net · R²', 'unit': '',
+                'rows': [['pXPM', px['loo']['team']], ['BPM', px['base']['BPM']['team']], ['rXPM', px['base']['rXPM']['team']],
+                         ['DPM', px['base']['DPM']['team']], ['Nov 4 shrink', px['base']['pXPM (live)']['team']]]},
         'top': {'t': f'best qualified season per player · {yrs}', 'rows': top('sxpm'), 'dec': 1, 'sign': True},
     }
     return xpm, vorx, pxpm
@@ -143,7 +147,7 @@ def soccer():
         'what': 'Goals a season a player adds over a replacement regular, one scale for every league.',
         'use': 'Player value on the soccer board. Base of xMV, 1Y / 3Y and backup watch.',
         'f': ['shrunk per-90 rates × weights', 'on-ice xGA, npxG, xA, xGBuildup, GK saves', 'PAR = GAR × .626 points a goal'],
-        'parts': [['xA', fit['w']['xas']], ['npxG', fit['w']['npxg']], ['xGBuildup', fit['w']['bup']], ['on-ice xGA', fit['w']['ona']]],
+        'parts': [[n, fit['w'][k]] for n, k in (('xA', 'xas'), ('npxG', 'npxg'), ('xGBuildup', 'bup'), ('on-ice xGA', 'ona')) if k in fit['w']],
         'test': {'t': 'next-season team goal diff · R²', 'lo': False, 'unit': '',
                  'rows': [['GAR + priors', fit['r2Held'], 1], ['GAR, no priors', fit['r2HeldNoPriors'], 0]],
                  'n': 'held out seasons'},

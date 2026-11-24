@@ -3,8 +3,8 @@
        {{< nbaxpm title="..." >}}
        XPM = .5 DPM (databallr) + .5 BPM (Basketball-Reference), O-XPM and D-XPM the same blend of each side; BPM
        alone where a player has no DPM row (marked). XPM, O-XPM and D-XPM are raw (xpm / oxpm / dxpm); pXPM is the
-       predictive one, shrunk by minutes (sxpm: w = MP / (MP + 600) toward a role mean moved to the Marcel prior by prior minutes,
-       scripts/nba_xpm.py shrink()), shrunk O / D under it. VORX = .030 x (XPM + 1.4) x MP / 48: wins over replacement, both constants fit to NBA wins (scripts/nba_xpm.py).
+       predictive one, next season's XPM (sxpm: this season and the two before weighted 1 / .35 / .1 by minutes, 200 MP of
+       role mean, plus the aging curve; scripts/nba_xpm.py pxpm()), O / D under it. VORX = .030 x (XPM + 1.4) x MP / 48: wins over replacement, both constants fit to NBA wins (scripts/nba_xpm.py).
        Views: VORX (the default), XPM, pXPM, offense or defense ranks the board by that number. Filters: season, minutes (qualified = 1,000 MP
        per 82 team games), position, team, search. RK and the position rank count within the filters and the view;
        headers sort. Filters ride in the address (#season=2025&mp=500&pos=C&side=d; side=x for XPM, s for pXPM).
@@ -38,7 +38,7 @@
       <button type="button" class="cfb__chip" data-side="p" aria-pressed="false" hidden title="XPM (proj): XPM to date blended with his preseason prior by minutes (k = 509 minutes for veterans, 809 for newcomers), with an 80% range for his true level; this season only, display only">proj</button>
       <button type="button" class="cfb__chip" data-side="3" aria-pressed="false" hidden title="3Y: projected XPM over the next three seasons x the chance he plays in them, the rest at replacement (-2). Next season below; this season only, display only">3Y</button>
       <button type="button" class="cfb__chip" data-side="x" aria-pressed="false" title="XPM: Cross Plus-Minus, points per 100 possessions over an average player">XPM</button>
-      <button type="button" class="cfb__chip" data-side="s" aria-pressed="false" title="pXPM: predictive XPM, XPM shrunk by minutes toward a role mean and his prior">pXPM</button>
+      <button type="button" class="cfb__chip" data-side="s" aria-pressed="false" title="pXPM: predictive XPM, projected XPM next season from this season and the two before, aged">pXPM</button>
       <button type="button" class="cfb__chip" data-side="o" aria-pressed="false" title="O-XPM: offense, .5 ODPM + .5 OBPM">offense</button>
       <button type="button" class="cfb__chip" data-side="d" aria-pressed="false" title="D-XPM: defense, .5 DDPM + .5 DBPM">defense</button>
       <span class="cfb__chipsep" aria-hidden="true"></span>
@@ -60,7 +60,7 @@
         <th data-sort="xpm" data-num class="cfb__g" title="XPM = .5 DPM + .5 BPM: points per 100 possessions over an average player, as played. * = BPM only (no DPM row)">XPM</th>
         <th data-sort="oxpm" data-num class="c-oxpm" title="O-XPM = .5 ODPM + .5 OBPM, raw">O-XPM</th>
         <th data-sort="dxpm" data-num class="c-dxpm" title="D-XPM = .5 DDPM + .5 DBPM, raw">D-XPM</th>
-        <th data-sort="sxpm" data-num class="c-sxpm" title="pXPM: XPM shrunk by minutes: raw x MP / (MP + 600) + mean x 600 / (MP + 600), mean = role mean + r (Marcel prior - role mean), r = H / (H + 1000), H = MP last season + .5 MP the season before; role mean -1 + .5 ln(1 + MP82 / 100) (MP82: minutes on an 82-game pace). Fit on next-season XPM 2011-26. Below: O / D, shrunk">pXPM</th>
+        <th data-sort="sxpm" data-num class="c-sxpm" title="pXPM: projected XPM next season = (200 x role mean + MP x XPM + .35 x MP and XPM last season + .1 x the season before) / (200 + the weighted MP) + the aging curve to next season's age; role mean -2 + ln(1 + MP82 / 100) (MP82: minutes on an 82-game pace). Fit on next-season XPM 2011-26, held out. Below: O / D">pXPM</th>
         <th data-sort="pxpm" data-num class="c-pxpm" title="Proj: XPM to date blended with his preseason prior (his two seasons before, aged and shrunk) by minutes, k = 509 minutes for veterans and 809 for newcomers, fit on 2012-26 season-end XPM. Below: the 80% range for his true level. Display only">Proj</th>
         <th data-sort="p3" data-num class="c-p3" title="3Y: projected XPM over the next three seasons x the chance he plays in them, the rest at replacement (-2). Below: next season (1Y), given he plays. Display only">3Y</th>
         <th data-sort="dpm" data-num class="cfb__g nbaxpm__src c-dpm" title="databallr DPM (O / D below)">DPM</th>

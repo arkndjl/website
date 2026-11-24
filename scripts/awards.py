@@ -386,7 +386,7 @@ def nba(fit, rng):
         w, g, _, _, _ = teams[tm]
         q = pg0.get(pid, {})
         cands.append({'id': pid, 'n': r['n'], 'tm': tm, 'ph': r.get('ph'), 'g': p['games'], 'tg': g, 'mp': r['mp'],
-                      'xpm': r['xpm'], 'dxpm': r['dxpm'], 'sx': r.get('sxpm', r['xpm']), 'sdx': r.get('sdxpm', r['dxpm']),
+                      'xpm': r['xpm'], 'dxpm': r['dxpm'], 'sx': r.get('sx0', r['xpm']), 'sdx': r.get('sdx0', r['dxpm']),
                       'ppg': p['pts_per_g'], 'ppg0': q.get('pts_per_g'), 'rpg': p['trb_per_g'], 'rpg0': q.get('trb_per_g'),
                       'apg': p['ast_per_g'], 'apg0': q.get('ast_per_g'), 'st': p['stl_per_g'] + p['blk_per_g'],
                       'st0': (q.get('stl_per_g', 0) + q.get('blk_per_g', 0)) if q else None,

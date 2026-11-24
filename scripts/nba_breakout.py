@@ -338,7 +338,7 @@ def main():
     XS = {}
     for y in (bs, cur):
         try:
-            XS[y] = {r['id']: r.get('sxpm') for r in json.load(open(os.path.join(ROOT, 'static', 'data', 'nba-xpm', f'{y}.json')))['players']}
+            XS[y] = {r['id']: r.get('sx0') for r in json.load(open(os.path.join(ROOT, 'static', 'data', 'nba-xpm', f'{y}.json')))['players']}
         except (OSError, ValueError):
             XS[y] = {}
     rows = []

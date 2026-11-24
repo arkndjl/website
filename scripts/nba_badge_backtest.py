@@ -99,9 +99,9 @@ def rows_for(stats, board, zs, keys):
         for pid, st in stats[s].items():
             z = zs.get((pid, s), {})
             p, q = board[s].get(pid), board[s + 1].get(pid)
-            if not any(k in z for k in keys) or not p or not q or p.get('sxpm') is None or q.get('xpm') is None or q['mp'] < 250 or q.get('pr'):
+            if not any(k in z for k in keys) or not p or not q or p.get('sx0') is None or q.get('xpm') is None or q['mp'] < 250 or q.get('pr'):
                 continue
-            R.append({'y': s, 'pid': pid, 'grp': st['grp'], 'age': p.get('age'), 'mp': max(p['mp'], 1), 'sx': p['sxpm'],
+            R.append({'y': s, 'pid': pid, 'grp': st['grp'], 'age': p.get('age'), 'mp': max(p['mp'], 1), 'sx': p['sx0'],
                       'next': q['xpm'], 'w': q['mp'], 'z': z})
     return R
 

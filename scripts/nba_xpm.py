@@ -12,7 +12,7 @@ value on held-out seasons.
 
   python3 scripts/nba_xpm.py 2010 2026     # seasons from..to (end year: 2026 = 2025-26)
   python3 scripts/nba_xpm.py --current     # the season in progress, for the daily refresh
-  python3 scripts/nba_xpm.py --shrink      # recompute shrunk XPM (sxpm, SHRINK_K) in every published file
+  python3 scripts/nba_xpm.py --shrink      # recompute pXPM (sxpm, PXPM_*) and the Nov 4 shrink (sx0) in every published file
   python3 scripts/nba_xpm.py --badges      # recompute the predictive badges (bdg, scripts/nba_badges.py) in every published file
 
 Inputs: bbref's advanced and totals tables, fetched into scripts/.cache/nba/adv_<season>.html and tot_<season>.html (refetched for the current
@@ -36,9 +36,16 @@ VORX_K, VORX_REP = 0.030, -1.4                   # win% per point of team net; r
 # Nov 4 2026 (scripts/nba_xpm_wave2_research.py): the mean moves toward the player's Marcel prior (prior_xpm) by
 # r = H / (H + SHRINK_H0), H = MP the season before + .5 x MP two before; k 600. Every fold picks (1000, 600): held-out
 # RMSE 1.235 vs 1.259 (t -4.6, 12/15 seasons), better at every minutes band and on the top 25.
-SHRINK_K = 600
+SHRINK_K = 600                                  # the Nov 4 shrink (shrink()): awards and breakout read it as sx0 / sdx0
 SHRINK_H0 = 1000
 SHRINK_MU = {'o': (-0.75, 0.375), 'd': (-0.25, 0.125)}
+# pXPM (Nov 24 2026, scripts/nba_pxpm_research.py -> data/nba_pxpm_research.json): next season's XPM, per side
+#   (PXPM_K x role mean + sum_j w_j MP_j x XPM_j) / (PXPM_K + sum_j w_j MP_j) + aging curve to next season's age,
+#   j = this season and the two before, w = 1 / .35 / .1; role mean = a + b ln(1 + MP82 / 100) (-2 + 1 x ln, split 3:1 O/D).
+#   Picked by next-season player RMSE, leave one season out (2011-26): 1.187 vs 1.238 for the Nov 4 shrink (t -7.3,
+#   14/15); team net n+1 R2 .654 held out vs .619 (rXPM .640, BPM .644).
+PXPM_K, PXPM_W, PXPM_AGE = 200, (1.0, 0.35, 0.1), 1.0
+PXPM_MU = {'o': (-1.5, 0.75), 'd': (-0.5, 0.25)}
 UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36'
 
 
@@ -205,12 +212,48 @@ def shrink(p, games, pri=None):
     return p
 
 
+def pxpm_hist(season):
+    """pid -> [(mp, oxpm, dxpm) the season before, two before] from the published files, and the aging curve to next
+    season (nba_games.aging_curve, pairs ending <= this season; the season in progress uses completed pairs only)"""
+    import nba_games as N
+    H = {}
+    for j in (1, 2):
+        fn = os.path.join(OUT, f'{season - j}.json')
+        if not os.path.exists(fn): continue
+        for p in json.load(open(fn))['players']:
+            if p.get('pr') or p.get('oxpm') is None: continue
+            H.setdefault(p['id'], [None, None])[j - 1] = (p['mp'], p['oxpm'], p['dxpm'])
+    return H, N.aging_curve(min(season + 1, current_season()))
+
+
+def pxpm(p, games, hist):
+    """sets sxpm / soxpm / sdxpm (pXPM, next season's XPM) and sx0 / sdx0 (the Nov 4 shrink, what the award and
+    breakout fits were trained on) on a player row. hist: (pxpm_hist(season), shrink_prior(season))"""
+    (H, cv), pri = hist
+    if p.get('pr') or p.get('xpm') is None or p.get('oxpm') is None:
+        p['sxpm'], p['soxpm'], p['sdxpm'] = p.get('xpm'), p.get('oxpm'), p.get('dxpm'); p['sx0'], p['sdx0'] = p.get('xpm'), p.get('dxpm')
+        return p
+    q = shrink(dict(p), games, pri); p['sx0'], p['sdx0'] = q['sxpm'], q['sdxpm']
+    m = p['mp']; lm = math.log(1 + m * 82 / max(games, 1) / 100)
+    rows = [(PXPM_W[0], (m, p['oxpm'], p['dxpm']))] + [(w, r) for w, r in zip(PXPM_W[1:], H.get(p['id'], [None, None])) if r]
+    out = []
+    for i, side in ((1, 'o'), (2, 'd')):
+        a, b = PXPM_MU[side]
+        num, den = PXPM_K * (a + b * lm), PXPM_K
+        for w, r in rows: num += w * r[0] * r[i]; den += w * r[0]
+        out.append(num / den)
+    ag = PXPM_AGE * cv(p['age'] + 1) if cv and p.get('age') else 0.0
+    so, sd = out[0] + ag * .75, out[1] + ag * .25           # the research added aging to the total; split as the role mean
+    p['soxpm'], p['sdxpm'] = r1(so), r1(sd); p['sxpm'] = r1(so + sd)
+    return p
+
+
 def reshrink():
     """recompute the shrunk columns in every published season file (no refetch)"""
     for f in sorted(os.listdir(OUT)):
         if not f.endswith('.json'): continue
-        fn = os.path.join(OUT, f); d = json.load(open(fn)); pri = shrink_prior(d['season'])
-        for p in d['players']: shrink(p, d['games'], pri)
+        fn = os.path.join(OUT, f); d = json.load(open(fn)); hist = (pxpm_hist(d['season']), shrink_prior(d['season']))
+        for p in d['players']: pxpm(p, d['games'], hist)
         json.dump(d, open(fn, 'w'), separators=(',', ':'))
         print(f, len(d['players']))
 
@@ -246,8 +289,8 @@ def build(season, fresh=False):
     except Exception as e:
         print(season, 'faces skipped', e)
     gmax = min(82, max(p['g'] for p in players))    # a traded player's TOT can pass 82
-    pri = shrink_prior(season)
-    for p in players: shrink(p, gmax, pri)
+    hist = (pxpm_hist(season), shrink_prior(season))
+    for p in players: pxpm(p, gmax, hist)
     badges(players, h, fetch(season, fresh, 'totals'), gmax)
     if fresh:
         try:   # the season in progress: today's club from RotoWire's transaction news (Nov 5 2026)

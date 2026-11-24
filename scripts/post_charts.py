@@ -6,7 +6,7 @@ data/post_charts.json {id: {svg, legend}} and placed with {{< postchart "<id>" >
     python3 scripts/post_charts.py
 
 xpm-*: the XPM stabilization post, from data/nba_xpm_stability_research.json and the pXPM shrink fits
-(nba_xpm.SHRINK_K; next-season RMSEs from scripts/nba_xpm_shrink_research.py and nba_xpm_wave2_research.py)."""
+(old k 600 = nba_xpm.SHRINK_K; next-season RMSEs and the new pXPM from scripts/nba_pxpm_research.py)."""
 import json, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
 import library_build as LB
@@ -31,13 +31,18 @@ def xpm_charts():
     LB.W = w0
     rho, pad, k = 0.87, 230, 600
     mps = list(range(0, 3001, 250))
-    out['xpm-shrink'] = {'legend': ['pXPM weight, k 600', f'{rho} x MP / (MP + {pad})', f'MP / (MP + {pad})'], 'svg': LB.chart_svg({
+    px = json.load(open(os.path.join(ROOT, 'data', 'nba_pxpm_research.json')))    # scripts/nba_pxpm_research.py
+    k2 = px['ship'][0]
+    out['xpm-shrink'] = {'legend': ['old pXPM, k 600', f'{rho} x MP / (MP + {pad})', f'MP / (MP + {pad})', f'new pXPM, k {k2} (one season)'], 'svg': LB.chart_svg({
         'title': 'Shrink weight on rXPM by minutes', 'x_label': 'minutes', 'y_label': 'weight on rXPM', 'y_fmt': 'pct',
         'series': [{'points': [{'x': m, 'y': round(f(m), 3)} for m in mps]} for f in
-                   (lambda m: m / (m + k), lambda m: rho * m / (m + pad), lambda m: m / (m + pad))]})}
+                   (lambda m: m / (m + k), lambda m: rho * m / (m + pad), lambda m: m / (m + pad), lambda m: m / (m + k2))]})}
+    b = px['base']
     out['xpm-rmse'] = {'legend': ['next-season RMSE'], 'svg': LB.chart_svg({
         'title': 'Next-season XPM error', 'type': 'bar', 'x_label': '', 'y_label': 'RMSE',
-        'series': [{'points': [{'x': 'rXPM', 'y': 1.593}, {'x': 'k 300', 'y': 1.259}, {'x': 'k 600 live', 'y': 1.235}]}]})}
+        'series': [{'points': [{'x': 'BPM', 'y': b['BPM']['player']}, {'x': 'rXPM', 'y': b['rXPM']['player']},
+                               {'x': 'DPM', 'y': b['DPM']['player']}, {'x': 'old pXPM', 'y': b['pXPM (live)']['player']},
+                               {'x': 'pXPM', 'y': px['loo']['player']}]}]})}
     pr = json.load(open(os.path.join(ROOT, 'data', 'nba_xpm_predictive_research.json')))['all']
     order = sorted(pr.items(), key=lambda t: -t[1]['predict'])
     lab = {'on-court +/-': '+/-', 'RAPM (1-yr)': 'RAPM', 'HAPM (1-yr)': 'HAPM', 'LEBRON': 'LEBR'}
