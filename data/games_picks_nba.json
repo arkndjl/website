@@ -1,10 +1,10 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-24T06:37:20Z",
+ "asof": "2026-11-24T07:12:08Z",
  "recenter": {
   "2026-11-24": 1.39,
-  "2026-11-25": 1.35
+  "2026-11-25": 1.36
  },
  "monitor": {
   "clocks": {
@@ -328,8 +328,8 @@
   }
  },
  "model": {
-  "asof": "2026-11-24T06:22:11Z",
-  "ageH": 0.3,
+  "asof": "2026-11-24T07:08:48Z",
+  "ageH": 0.1,
   "stale": false
  },
  "picks": [],
@@ -422,13 +422,13 @@
    "kick": "2026-11-25T22:00:00Z",
    "home": "PHI",
    "away": "MIA",
-   "mk": "spread",
-   "side": "away",
-   "line": 3.5,
+   "mk": "total",
+   "side": "over",
+   "line": 237.5,
    "price": -119.0,
-   "edge": 1.0,
-   "x": 4.0,
-   "why": "edge under 4 (line: <4)",
+   "edge": 1.2,
+   "x": 6.0,
+   "why": "edge under 6 (total: high)",
    "m": 2.5,
    "tm": 238.7
   },
@@ -487,11 +487,11 @@
    "state": "under"
   },
   "401909317": {
-   "mk": "spread",
-   "side": "away",
-   "line": 3.5,
+   "mk": "total",
+   "side": "over",
+   "line": 237.5,
    "price": -119.0,
-   "edge": 1.0,
+   "edge": 1.2,
    "ev": null,
    "units": 0.0,
    "home": "PHI",
@@ -587,16 +587,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 5580,
+  "snapshots": 5584,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 305,
-    "clvRet": 0.0486,
-    "clvT": 5.62,
+    "clvN": 306,
+    "clvRet": 0.0483,
+    "clvT": 5.6,
     "clv": 1.55,
-    "beat": 0.777,
-    "still": 0.105
+    "beat": 0.775,
+    "still": 0.108
    },
    {
     "when": "6-24h",
@@ -7262,7 +7262,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-24T06:37:20Z",
+ "checked": "2026-11-24T07:12:08Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
