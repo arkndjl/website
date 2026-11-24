@@ -29,6 +29,12 @@ oq_cash_team,500,USD team,typical open/closed qualifier cash
 amateur_major_p,0,per season,scenario A
 base_major_p,0.007,per T3 season,~1% per Major x 2 Majors/yr over 3 seasons; NA gets ~3-4 Stage 1 slots via VRS invites
 climb_major_p,0.02,per T3 season,optimistic
-sticker_ln_mu,11.9,ln USD team,median ~$150k Stage-1 sticker capsule share + autographs for a whole roster; wide uncertainty
-sticker_ln_sd,0.8,ln,p10 ~$54k p90 ~$420k team
 major_prize_team,10000,USD team,Stage 1 exit prize; assumption
+sticker_s1_team,120000,USD team (org + players),Stage 1 exit under the Major Shop token system (IEM Cologne 2026 on): ~$60k org + ~$60k players; 0.72% of the 45% team pool (dust2.us / Dot Esports / Esports Insider)
+sticker_s2_team,180000,USD team,Stage 2 exit; placement-based shares after Cologne 2026; interpolated
+sticker_s3_team,350000,USD team,Stage 3 / playoffs; top share 2.85% of pool (~4x Stage 1)
+major_mix_s1,0.85,share,first-time NA T3 qualifier exits Stage 1
+major_mix_s2,0.12,share,
+major_mix_s3,0.03,share,
+sticker_sd,0.4,ln,Major-to-Major sales swing
+sticker_regime,1,multiplier,1 = current token shop; 5 = old capsule system (Budapest 2025 ~$600k per Stage 1 team; Paris 2023 avg $4.5M)

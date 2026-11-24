@@ -101,7 +101,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('[data-n1r]
 
 {{- if eq $part "ladder" }}
 {{- $rows := slice
-  (dict "k" "Major" "nm" "MAJOR" "ev" $R.major.perPlayer "evt" (printf "one Major per player: sticker share + autographs + Stage 1 prize, median · p10 $%s · p90 $%s" (lang.FormatNumber 0 $R.major.p10) (lang.FormatNumber 0 $R.major.p90)) "up" nil "ra" $a.reach.Major "rb" $b.reach.Major "rc" $c.reach.Major)
+  (dict "k" "Major" "nm" "MAJOR" "ev" $R.major.perPlayer "evt" (printf "one Major per player, expected: Major Shop sticker share by stage exit + Stage 1 prize · p10 $%s · p90 $%s" (lang.FormatNumber 0 $R.major.p10) (lang.FormatNumber 0 $R.major.p90)) "up" nil "ra" $a.reach.Major "rb" $b.reach.Major "rc" $c.reach.Major)
   (dict "k" "Pro" "nm" "T3 PRO" "ev" $R.ladder.ev.Pro "evt" "CCT / ESL Challenger / closed qualifiers: 60% any cash, ~$2,000 team median, plus the Major odds" "up" $R.ladder.up.Pro "upt" "Major (Stage 1 invite via VRS) per T3 season" "ra" $a.reach.Pro "rb" $b.reach.Pro "rc" $c.reach.Pro)
   (dict "k" "Adv" "nm" "ADVANCED" "ev" $R.ladder.ev.Adv "evt" "15% Season Finals entry + 3 open qualifiers + cups" "up" $R.ladder.up.Adv "upt" "Advanced to T3 pro" "ra" $a.reach.Adv "rb" $b.reach.Adv "rc" $c.reach.Adv)
   (dict "k" "Main" "nm" "MAIN" "ev" $R.ladder.ev.Main "evt" "2% Season Finals entry (top 2 of the playoff group) + 3 open qualifiers + cups; Main playoffs pay $0" "up" $R.ladder.up.Main "upt" "Main to Advanced: top 4 of the playoff group or an Advanced pickup; climb = NA population rate")
@@ -122,7 +122,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('[data-n1r]
         {{- with .up }}{{ $ub := index . 0 }}{{ $uc := index . 1 }}
         <span class="n1r__bar" title="{{ $row.upt }}: {{ printf "%.1f" (mul $ub 100) }}% base · {{ printf "%.1f" (mul $uc 100) }}% climb"><i class="is-c" style="width:{{ math.Min 100 (mul (div $uc 0.4) 100) }}%"></i><i class="{{ if eq $k "Int" }}is-s{{ else }}is-b{{ end }}" style="width:{{ math.Min 100 (mul (div $ub 0.4) 100) }}%"></i></span>
         {{- else }}<span class="n1r__bar"></span>{{ end }}
-        <span class="n1r__v{{ if eq $k "Major" }} is-hi{{ end }}" title="{{ .evt }}">{{ if ge .ev 1000.0 }}${{ printf "%.1f" (div .ev 1000.0) }}k{{ else }}${{ math.Round .ev }}{{ end }}</span>
+        <span class="n1r__v{{ if eq $k "Major" }} is-hi{{ end }}" title="{{ .evt }}">{{ if ge .ev 1000.0 }}${{ printf "%.0f" (div .ev 1000.0) }}k{{ else }}${{ math.Round .ev }}{{ end }}</span>
         <span class="n1r__v">{{ if $isNow }}now{{ else if isset . "rb" }}{{ if lt .rb 0.01 }}{{ printf "%.1f" (mul .rb 100) }}{{ else }}{{ printf "%.0f" (mul .rb 100) }}{{ end }} / {{ if lt .rc 0.1 }}{{ printf "%.1f" (mul .rc 100) }}{{ else }}{{ printf "%.0f" (mul .rc 100) }}{{ end }}%{{ else if $bn }}done{{ else }}–{{ end }}</span>
         <span class="n1r__v" title="{{ delimit ($bn | default (slice "–")) ", " }}">{{ with $bn }}{{ len . }} · {{ index . (sub (len .) 1) }}{{ else }}–{{ end }}</span>
       </div>
@@ -174,9 +174,12 @@ document.addEventListener('click',function(e){var b=e.target.closest('[data-n1r]
       {{- with $now }}<li><span class="esea__v">#{{ .vrs }}</span><span class="esea__k" title="CS2 ARK Ranking spot 1NT's five would hold, of {{ .of }}; #{{ .na }} of {{ .naOf }} NA ESEA">ARK world</span></li>{{ end }}
       <li><span class="esea__v">{{ $st.w }}–{{ $st.l }}</span><span class="esea__k" title="S{{ $E.season }} {{ $nowDiv }} regular season, #{{ $st.rank }} of {{ $st.teams }}">S{{ $E.season }} {{ $nowDiv }}</span></li>
       {{- with $br.next }}<li><span class="esea__v">{{ printf "%.0f" (mul .p 100) }}%</span><span class="esea__k" title="series win % vs {{ .opp.name }} (seed {{ .opp.seed }})">vs {{ .opp.name }}</span></li>{{ end }}
-      {{- if eq (int $E.season) 59 }}
-      <li><span class="esea__v">{{ printf "%.0f" (mul $R.s59.top4 100) }}%</span><span class="esea__k" title="top 4 of the playoff group = promotion to Advanced (bracket Monte Carlo, Nov 24)">promotion</span></li>
-      <li><span class="esea__v">{{ printf "%.1f" (mul $R.s59.top2 100) }}%</span><span class="esea__k" title="top 2 of the playoff group = Season Finals, the only Main prize pool (bracket Monte Carlo, Nov 24)">Season Finals</span></li>
+      {{- $t4 := -1.0 }}{{ $t2 := -1.0 }}{{ $live := false }}
+      {{- with $br.odds }}{{ if isset . "top4" }}{{ $t4 = float .top4 }}{{ $t2 = float .top2 }}{{ $live = true }}{{ end }}{{ end }}
+      {{- if and (not $live) (eq (int $E.season) 59) }}{{ $t4 = float $R.s59.top4 }}{{ $t2 = float $R.s59.top2 }}{{ end }}
+      {{- if ge $t4 0.0 }}
+      <li><span class="esea__v">{{ if and (lt $t4 0.1) (gt $t4 0.0) }}{{ printf "%.1f" (mul $t4 100) }}{{ else }}{{ printf "%.0f" (mul $t4 100) }}{{ end }}%</span><span class="esea__k" title="top 4 of the playoff group = promotion to Advanced ({{ if $live }}bracket simulation, 20,000 runs, every refresh{{ else }}bracket estimate, Nov 24{{ end }})">promotion</span></li>
+      <li><span class="esea__v">{{ if and (lt $t2 0.1) (gt $t2 0.0) }}{{ printf "%.1f" (mul $t2 100) }}{{ else }}{{ printf "%.0f" (mul $t2 100) }}{{ end }}%</span><span class="esea__k" title="top 2 of the playoff group = Season Finals, the only Main prize pool ({{ if $live }}bracket simulation, 20,000 runs, every refresh{{ else }}bracket estimate, Nov 24{{ end }})">Season Finals</span></li>
       {{- end }}
     </ul>
     {{- with $br.odds }}{{ with .path }}{{ $path := . }}{{ $nx := "" }}{{ $mr := 1 }}{{ range $path }}{{ if gt (int .r) $mr }}{{ $mr = int .r }}{{ end }}{{ end }}{{ with $br.next }}{{ $nx = .n }}{{ end }}
@@ -230,14 +233,16 @@ document.addEventListener('click',function(e){var b=e.target.closest('[data-n1r]
   </div>
   <div class="n1r__body">
     <ul class="esea__tiles">
-      <li><span class="esea__v">${{ printf "%.1f" (div $R.major.perPlayer 1000.0) }}k</span><span class="esea__k" title="median per player if 1NT plays a Major: sticker capsule share + autographs + ${{ lang.FormatNumber 0 $R.major.prizeTeam }} Stage 1 prize, ÷ {{ $R.split }}">per player</span></li>
-      <li><span class="esea__v">${{ printf "%.0f" (div $R.major.p10 1000.0) }}–{{ printf "%.0f" (div $R.major.p90 1000.0) }}k</span><span class="esea__k" title="p10 to p90 per player">range</span></li>
-      <li><span class="esea__v">${{ printf "%.0f" (div $R.major.team 1000.0) }}k</span><span class="esea__k">roster</span></li>
+      <li><span class="esea__v">${{ printf "%.0f" (div $R.major.perPlayer 1000.0) }}k</span><span class="esea__k" title="expected per player if 1NT plays a Major: Major Shop sticker share by stage exit + ${{ lang.FormatNumber 0 $R.major.prizeTeam }} Stage 1 prize, ÷ {{ $R.split }} · p10 ${{ lang.FormatNumber 0 $R.major.p10 }} · p90 ${{ lang.FormatNumber 0 $R.major.p90 }}">per player</span></li>
+      {{- range $R.major.stages }}
+      <li><span class="esea__v">${{ printf "%.0f" (div (float .pp) 1000.0) }}k</span><span class="esea__k" title="per player, Stage {{ .s }}{{ if eq (int .s) 3 }}+{{ end }} exit · {{ printf "%.0f" (mul .mix 100) }}% of first-time NA qualifiers">stage {{ .s }}{{ if eq (int .s) 3 }}+{{ end }}</span></li>
+      {{- end }}
+      <li><span class="esea__v">${{ printf "%.0f" (div $R.major.team 1000.0) }}k</span><span class="esea__k" title="whole roster, expected">roster</span></li>
       <li><span class="esea__v">{{ printf "%.1f" (mul $b.reach.Major 100) }}%</span><span class="esea__k" title="plays a Major within 10 years, base; climb {{ printf "%.1f" (mul $c.reach.Major 100) }}%">10 yr odds</span></li>
       <li><span class="esea__v">{{ printf "%.0f" (mul $R.orgCut 100) }}%</span><span class="esea__k" title="player owned: {{ $R.split }} × {{ printf "%.0f" (div 100.0 $R.split) }}%">org cut</span></li>
     </ul>
   </div>
-  <div class="win__status"><span title="Stage 1 invites by Valve Regional Standings; per T3 season {{ printf "%.1f" (mul (index $R.ladder.up.Pro 0) 100) }}% base, {{ printf "%.0f" (mul (index $R.ladder.up.Pro 1) 100) }}% climb">Major · Stage 1 via VRS</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span title="Major Shop token system (IEM Cologne 2026 on); Stage 1 invites by Valve Regional Standings; per T3 season {{ printf "%.1f" (mul (index $R.ladder.up.Pro 0) 100) }}% base, {{ printf "%.0f" (mul (index $R.ladder.up.Pro 1) 100) }}% climb">Major · Stage 1 via VRS</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 
 {{- else if eq $part "checkpoints" }}
@@ -254,7 +259,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('[data-n1r]
     <thead><tr><th>by</th><th>target</th><th>now</th><th></th></tr></thead>
     <tbody>
     {{- range $R.checkpoints }}{{ $v := "–" }}{{ $on := false }}
-      {{- if eq .k "top4" }}{{ with $br.next }}{{ $r := 0 }}{{ $n := .n }}{{ range $br.odds.path }}{{ if eq .n $n }}{{ $r = .r }}{{ end }}{{ end }}{{ $v = printf "%s r%d" (substr $n 0 2) (int $r) }}{{ end }}{{ if ne (int $E.season) 59 }}{{ $v = "done" }}{{ end }}
+      {{- if eq .k "top4" }}{{ with $br.next }}{{ $r := 0 }}{{ $n := .n }}{{ range $br.odds.path }}{{ if eq .n $n }}{{ $r = .r }}{{ end }}{{ end }}{{ $v = printf "%s r%d" (substr $n 0 2) (int $r) }}{{ end }}{{ with $br.odds }}{{ if isset . "top4" }}{{ $v = printf "%s · %.1f%%" $v (mul (float .top4) 100) }}{{ $on = ge (float .top4) 1.0 }}{{ end }}{{ end }}{{ if ne (int $E.season) 59 }}{{ $v = "done" }}{{ end }}
       {{- else if eq .k "seed" }}{{ $v = printf "#%d · %d–%d" (int $st.rank) (int $st.w) (int $st.l) }}{{ $on = and (ge (int $E.season) 60) (le (int $st.rank) 16) }}
       {{- else if eq .k "div" }}{{ $v = $nowDiv }}{{ $on = eq $nowDiv "Advanced" }}
       {{- else if eq .k "world" }}{{ with $now.vrs }}{{ $v = printf "#%d" (int .) }}{{ $on = le (int .) 200 }}{{ end }}

@@ -2011,9 +2011,9 @@ function bracket() {
     };
     const order = []; for (let r = 1; r <= R; r++) { for (let k = 1; k <= cntU(r); k++) order.push([1, r, k]); if (r >= 2) { const l1 = 2 * (r - 1) - 1; for (const l of [l1, l1 + 1]) for (let k = 1; k <= cntL(l); k++) order.push([2, l, k]); } }
     order.push([3, 1, 1]);
-    const N = 20000, reach = new Map(), titles = { n: 0 };
+    const N = 20000, reach = new Map(), titles = { n: 0 }, top = { 4: 0, 2: 0 };   // top 4 = plays the UB final or LB round LR-1+ (promotion); top 2 = plays the GF (Season Finals)
     for (let it = 0; it < N; it++) {
-      const W = new Map(), L = new Map();
+      const W = new Map(), L = new Map(); let t4 = false, t2 = false;
       const side = (g, r, k, lose) => (lose ? L : W).get(key(g, r, k));
       for (const [g, r, k] of order) {
         const m = slots.get(key(g, r, k)); let a, b;
@@ -2023,7 +2023,11 @@ function bracket() {
         else if (r === 1) { a = side(1, 1, 2 * k - 1, true); b = side(1, 1, 2 * k, true); }
         else if (r % 2 === 0) { a = side(2, r - 1, k); b = side(1, r / 2 + 1, k, true); }
         else { a = side(2, r - 1, 2 * k - 1); b = side(2, r - 1, 2 * k); }
-        if ((a === TEAM_ID || b === TEAM_ID) && a !== 'BYE' && b !== 'BYE') reach.set(m.n, (reach.get(m.n) || 0) + 1);
+        if ((a === TEAM_ID || b === TEAM_ID) && a !== 'BYE' && b !== 'BYE') {
+          reach.set(m.n, (reach.get(m.n) || 0) + 1);
+          if ((g === 1 && r === R) || (g === 2 && r >= LR - 1) || g === 3) t4 = true;
+          if (g === 3) t2 = true;
+        }
         let w;
         if (a === 'BYE' || b === 'BYE') w = a === 'BYE' ? b : a;
         else if (m.w && m.a.id && m.b.id) w = m.w === 1 ? m.a.id : m.b.id;
@@ -2031,9 +2035,10 @@ function bracket() {
         W.set(key(g, r, k), w); L.set(key(g, r, k), w === a ? b : a);
         if (g === 3 && w === TEAM_ID) titles.n++;
       }
+      if (t4) top[4]++; if (t2) top[2]++;
     }
     const nOf = new Map([...slots.values()].map(m => [m.n, m])), seq = new Map(order.map(([g, r, k], i) => [lab(g, r, k), i]));
-    odds = { title: Math.round(titles.n / N * 10000) / 10000, path: [...reach.entries()].map(([n, c]) => ({ n, p: Math.round(c / N * 1000) / 1000, g: nOf.get(n)?.g, r: nOf.get(n)?.r }))
+    odds = { title: Math.round(titles.n / N * 10000) / 10000, top4: Math.round(top[4] / N * 10000) / 10000, top2: Math.round(top[2] / N * 10000) / 10000, path: [...reach.entries()].map(([n, c]) => ({ n, p: Math.round(c / N * 1000) / 1000, g: nOf.get(n)?.g, r: nOf.get(n)?.r }))
       .filter(x => x.p >= 0.005).sort((a, b) => seq.get(a.n) - seq.get(b.n)) };
     // rewards: the worst finish a slot's winner is sure of (its earliest possible exit afterwards), against the tiers in
     // data/cs.json eseaRewards (S59 move-up table: Main 1st-2nd -> Season Finals, 1st-4th -> Advanced). Shown only on the
