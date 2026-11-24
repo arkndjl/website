@@ -97,7 +97,7 @@ def pro_values():
     o = {}
     for r in tx['nba']:
         h = lookup(m, r)
-        if h: o[f"{r['d']}|{r['n']}|{r['k']}"] = [rnd(h.get('xpm'), 1), rnd(h.get('vorx'))]
+        if h: o[f"{r['d']}|{r['n']}|{r['k']}"] = [rnd(h.get('txpm', h.get('xpm')), 1), rnd(h.get('vorx'))]
     out['nba'] = o
 
     p = latest('static/data/nhl-war/*.json')

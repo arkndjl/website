@@ -257,8 +257,8 @@ def nba():
             c = cbb.get((dr[0], dr[1])) if dr else None
             if c and not NM.same(c['name'], p['n']):
                 c = None
-            row = {'n': p['n'], 'tm': p['tm'], 'pos': p['pos'], 'age': p.get('ax', p.get('age')), 'vorx': p['vorx'], 'xpm': p['xpm'],
-                   'sx': p.get('sxpm', p['xpm']), 'oxpm': p['oxpm'], 'dxpm': p['dxpm'], 'mp': p['mp'], 'g': p['g'],
+            row = {'n': p['n'], 'tm': p['tm'], 'pos': p['pos'], 'age': p.get('ax', p.get('age')), 'vorx': p['vorx'], 'xpm': p.get('txpm', p['xpm']),
+                   'sx': p.get('sxpm', p['xpm']), 'oxpm': p.get('toxpm', p['oxpm']), 'dxpm': p.get('tdxpm', p['dxpm']), 'mp': p['mp'], 'g': p['g'],
                    'r3': round(cf[0] + cf[1] * XP.role_sxpm(p, gms) + cf[2] * (p['age'] - a0) + cf[3] * math.log1p(p['mp'] * 82 / gms), 1)
                    if p.get('age') and p.get('xpm') is not None else None,
                    'axpm': round(XP.role_sxpm(p, gms) + ak * (p['age'] - a0), 1) if p.get('age') and p.get('xpm') is not None else None,
