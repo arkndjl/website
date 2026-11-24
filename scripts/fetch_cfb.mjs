@@ -2541,12 +2541,20 @@ await teamLogos(outFcs);
 const MODEL_VERSION = 'mean-2026-10';   // the headline FV at the mean outcome: no movers against the old grades
 const key = r => `${r.name}|${r.team}|${r.pos}`;
 const hist = fs.existsSync(HISTORY) ? JSON.parse(fs.readFileSync(HISTORY, 'utf8')) : { snapshots: [] };
-// the weekly CFB post is Wednesday (scripts/rank_moves.py POST): moves count from the last Wednesday before today,
-// a week back on a Wednesday
-const WEEK_AGO = (() => { const t = new Date(`${out.asof}T12:00:00Z`), back = ((t.getUTCDay() - 3 + 7) % 7) || 7;
+// the weekly CFB post is Wednesday morning (scripts/rank_moves.py POST, POST_HOUR 10 New York): moves count from the
+// board as last posted. Snapshots are dated on that post clock: the New York date, the next day once Wednesday's post
+// has gone out, so later Wednesday runs never overwrite the posted snapshot
+const POST_WD = 3, POST_HOUR = 10;
+const BOARD_DAY = (() => {
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit',
+    day: '2-digit', hour: '2-digit', hourCycle: 'h23' }).formatToParts(new Date()).map(x => [x.type, x.value]));
+  const t = new Date(`${p.year}-${p.month}-${p.day}T12:00:00Z`);
+  return (t.getUTCDay() === POST_WD && +p.hour >= POST_HOUR ? new Date(+t + 86400e3) : t).toISOString().slice(0, 10);
+})();
+const WEEK_AGO = (() => { const t = new Date(`${BOARD_DAY}T12:00:00Z`), back = ((t.getUTCDay() - POST_WD + 7) % 7) || 7;
   return new Date(t - back * 86400e3).toISOString().slice(0, 10); })();
 const base = hist.snapshots.filter(h => h.date <= WEEK_AGO && h.v === MODEL_VERSION).at(-1)
-  ?? hist.snapshots.filter(h => h.date < out.asof && h.v === MODEL_VERSION)[0];   // a history under a week old: its oldest
+  ?? hist.snapshots.filter(h => h.date < BOARD_DAY && h.v === MODEL_VERSION)[0];   // a history under a week old: its oldest
 out.since = base?.date ?? null;
 // FBS and FCS in one list, ranked together (ovr): the holistic board
 const merged = () => {
@@ -2560,8 +2568,8 @@ for (const r of everyone) {
   // FCS players are new to the snapshots: no movers for them until a snapshot carries them
   r.delta = base && r.fv != null && (r.div !== 'FCS' || base.fcs) ? (was == null ? 'new' : r.fv - was) : null;
 }
-hist.snapshots = hist.snapshots.filter(h => h.date !== out.asof);
-hist.snapshots.push({ date: out.asof, v: MODEL_VERSION, fcs: true, fv: Object.fromEntries(everyone.filter(r => r.fv != null).map(r => [key(r), r.fv])) });
+hist.snapshots = hist.snapshots.filter(h => h.date !== BOARD_DAY);
+hist.snapshots.push({ date: BOARD_DAY, v: MODEL_VERSION, fcs: true, fv: Object.fromEntries(everyone.filter(r => r.fv != null).map(r => [key(r), r.fv])) });
 {
   const keep = hist.snapshots.filter(h => h.date <= WEEK_AGO).at(-1)?.date ?? '';
   hist.snapshots = hist.snapshots.filter(h => h.date >= keep);
