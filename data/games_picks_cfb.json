@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-24T00:12:19Z",
+ "asof": "2026-11-24T00:15:44Z",
  "recenter": {
-  "week": 0.45
+  "week": 0.46
  },
  "monitor": {
   "clocks": {
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-23",
-  "ageH": 0.2,
+  "ageH": 0.3,
   "stale": false
  },
  "picks": [],
@@ -285,28 +285,12 @@
    "mk": "total",
    "side": "over",
    "line": 48.5,
-   "price": -124.0,
+   "price": -110.0,
    "edge": 11.3,
    "x": 7.5,
-   "why": "no edge at -124",
+   "why": "no edge at -110",
    "m": 2.6,
    "tm": 59.8
-  },
-  {
-   "id": "401858543",
-   "sport": "cfb",
-   "kick": "2026-11-28T20:30:00.000Z",
-   "home": "UCLA",
-   "away": "USC",
-   "mk": "total",
-   "side": "over",
-   "line": 45.5,
-   "price": -119.0,
-   "edge": 7.4,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": 0.5,
-   "tm": 52.9
   },
   {
    "id": "401864547",
@@ -325,20 +309,20 @@
    "tm": 46.9
   },
   {
-   "id": "401861969",
+   "id": "401858543",
    "sport": "cfb",
-   "kick": "2026-11-28T17:00:00.000Z",
-   "home": "Wyoming",
-   "away": "UConn",
+   "kick": "2026-11-28T20:30:00.000Z",
+   "home": "UCLA",
+   "away": "USC",
    "mk": "total",
-   "side": "under",
-   "line": 47.5,
-   "price": -119.0,
-   "edge": 6.9,
-   "x": 8.0,
-   "why": "edge under 8 (game: non-conference)",
-   "m": -4.3,
-   "tm": 40.6
+   "side": "over",
+   "line": 46.5,
+   "price": -114.0,
+   "edge": 6.4,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": 0.5,
+   "tm": 52.9
   },
   {
    "id": "401856765",
@@ -355,6 +339,22 @@
    "why": "edge under 7.5 (side: over)",
    "m": -12.4,
    "tm": 48.5
+  },
+  {
+   "id": "401861969",
+   "sport": "cfb",
+   "kick": "2026-11-28T17:00:00.000Z",
+   "home": "Wyoming",
+   "away": "UConn",
+   "mk": "total",
+   "side": "under",
+   "line": 46.5,
+   "price": -106.0,
+   "edge": 5.9,
+   "x": 8.0,
+   "why": "edge under 8 (game: non-conference)",
+   "m": -4.3,
+   "tm": 40.6
   },
   {
    "id": "401856764",
@@ -717,9 +717,9 @@
   "401858543": {
    "mk": "total",
    "side": "over",
-   "line": 45.5,
-   "price": -119.0,
-   "edge": 7.4,
+   "line": 46.5,
+   "price": -114.0,
+   "edge": 6.4,
    "ev": null,
    "units": 0.0,
    "home": "UCLA",
@@ -1078,7 +1078,7 @@
    "mk": "total",
    "side": "over",
    "line": 48.5,
-   "price": -124.0,
+   "price": -110.0,
    "edge": 11.3,
    "ev": null,
    "units": 0.0,
@@ -1185,9 +1185,9 @@
   "401861969": {
    "mk": "total",
    "side": "under",
-   "line": 47.5,
-   "price": -119.0,
-   "edge": 6.9,
+   "line": 46.5,
+   "price": -106.0,
+   "edge": 5.9,
    "ev": null,
    "units": 0.0,
    "home": "Wyoming",
@@ -1547,11 +1547,11 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 28699,
+  "snapshots": 28709,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 5871,
+    "clvN": 5872,
     "clvRet": -0.0193,
     "clvT": -10.9,
     "clv": 0.88,
@@ -6330,7 +6330,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-24T00:12:19Z",
+ "checked": "2026-11-24T00:15:44Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
