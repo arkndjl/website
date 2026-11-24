@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-24T05:24:43Z",
+ "asof": "2026-11-24T05:41:01Z",
  "recenter": {
-  "week": 0.48
+  "week": 0.47
  },
  "monitor": {
   "clocks": {
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-23",
-  "ageH": 5.4,
+  "ageH": 5.7,
   "stale": false
  },
  "picks": [],
@@ -341,22 +341,6 @@
    "tm": 40.6
   },
   {
-   "id": "401862837",
-   "sport": "cfb",
-   "kick": "2026-11-28T18:00:00.000Z",
-   "home": "East Carolina",
-   "away": "Florida Atlantic",
-   "mk": "total",
-   "side": "over",
-   "line": 55.5,
-   "price": -124.0,
-   "edge": 5.3,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": 1.8,
-   "tm": 60.8
-  },
-  {
    "id": "401856764",
    "sport": "cfb",
    "kick": "2026-11-28T20:00:00.000Z",
@@ -387,6 +371,22 @@
    "why": "edge under 7.5 (side: over)",
    "m": -5.8,
    "tm": 57.0
+  },
+  {
+   "id": "401862837",
+   "sport": "cfb",
+   "kick": "2026-11-28T18:00:00.000Z",
+   "home": "East Carolina",
+   "away": "Florida Atlantic",
+   "mk": "total",
+   "side": "over",
+   "line": 56.5,
+   "price": -114.0,
+   "edge": 4.3,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": 1.8,
+   "tm": 60.8
   },
   {
    "id": "401856762",
@@ -597,22 +597,6 @@
    "tm": 50.6
   },
   {
-   "id": "401856757",
-   "sport": "cfb",
-   "kick": "2026-11-29T00:30:00.000Z",
-   "home": "Alabama",
-   "away": "Auburn",
-   "mk": "spread",
-   "side": "away",
-   "line": 16.5,
-   "price": -114.0,
-   "edge": 8.1,
-   "x": null,
-   "why": "spread market off",
-   "m": 8.4,
-   "tm": 52.7
-  },
-  {
    "id": "401860926",
    "sport": "cfb",
    "kick": "2026-11-28T23:00:00.000Z",
@@ -653,7 +637,7 @@
    "mk": "spread",
    "side": "home",
    "line": -6.5,
-   "price": 103.0,
+   "price": 105.0,
    "edge": 7.0,
    "x": null,
    "why": "spread market off",
@@ -675,6 +659,22 @@
    "why": "spread market off",
    "m": 17.1,
    "tm": 44.1
+  },
+  {
+   "id": "401856757",
+   "sport": "cfb",
+   "kick": "2026-11-29T00:30:00.000Z",
+   "home": "Alabama",
+   "away": "Auburn",
+   "mk": "spread",
+   "side": "away",
+   "line": 14.5,
+   "price": -106.0,
+   "edge": 6.1,
+   "x": null,
+   "why": "spread market off",
+   "m": 8.4,
+   "tm": 52.7
   }
  ],
  "games": {
@@ -705,9 +705,9 @@
   "401856757": {
    "mk": "spread",
    "side": "away",
-   "line": 16.5,
-   "price": -114.0,
-   "edge": 8.1,
+   "line": 14.5,
+   "price": -106.0,
+   "edge": 6.1,
    "ev": null,
    "units": 0.0,
    "home": "Alabama",
@@ -718,7 +718,7 @@
    "mk": "spread",
    "side": "home",
    "line": -6.5,
-   "price": 103.0,
+   "price": 105.0,
    "edge": 7.0,
    "ev": null,
    "units": 0.0,
@@ -826,7 +826,7 @@
    "mk": "spread",
    "side": "away",
    "line": 35.5,
-   "price": -117.0,
+   "price": -114.0,
    "edge": 0.8,
    "ev": null,
    "units": 0.0,
@@ -981,9 +981,9 @@
   "401862840": {
    "mk": "total",
    "side": "under",
-   "line": 56.5,
-   "price": -106.0,
-   "edge": 1.9,
+   "line": 57.5,
+   "price": -110.0,
+   "edge": 2.9,
    "ev": null,
    "units": 0.0,
    "home": "UTSA",
@@ -1053,9 +1053,9 @@
   "401862837": {
    "mk": "total",
    "side": "over",
-   "line": 55.5,
-   "price": -124.0,
-   "edge": 5.3,
+   "line": 56.5,
+   "price": -114.0,
+   "edge": 4.3,
    "ev": null,
    "units": 0.0,
    "home": "East Carolina",
@@ -1547,16 +1547,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 28826,
+  "snapshots": 28840,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 5892,
-    "clvRet": -0.0185,
-    "clvT": -10.38,
-    "clv": 0.9,
-    "beat": 0.437,
-    "still": 0.283
+    "clvN": 5894,
+    "clvRet": -0.0175,
+    "clvT": -9.88,
+    "clv": 0.92,
+    "beat": 0.441,
+    "still": 0.282
    },
    {
     "when": "6-24h",
@@ -6330,7 +6330,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-24T05:24:43Z",
+ "checked": "2026-11-24T05:41:01Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
