@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-24T20:17:42Z",
+ "asof": "2026-11-24T20:57:28Z",
  "recenter": {
   "2026-11-24": 1.37,
   "2026-11-25": 1.37
@@ -328,14 +328,30 @@
   }
  },
  "model": {
-  "asof": "2026-11-24T10:57:29Z",
-  "ageH": 9.3,
+  "asof": "2026-11-24T20:53:58Z",
+  "ageH": 0.1,
   "stale": false
  },
  "picks": [],
  "paperPicks": [],
  "withdrawn": [],
  "board": [
+  {
+   "id": "401909319",
+   "sport": "nba",
+   "kick": "2026-11-26T00:30:00Z",
+   "home": "NY",
+   "away": "CLE",
+   "mk": "spread",
+   "side": "home",
+   "line": 4.5,
+   "price": -110.0,
+   "edge": 3.2,
+   "x": 5.0,
+   "why": "edge under 5 (venue: home)",
+   "m": 7.7,
+   "tm": 221.3
+  },
   {
    "id": "401909315",
    "sport": "nba",
@@ -369,20 +385,36 @@
    "tm": 220.9
   },
   {
-   "id": "401909319",
+   "id": "401909314",
    "sport": "nba",
-   "kick": "2026-11-26T00:30:00Z",
-   "home": "NY",
-   "away": "CLE",
+   "kick": "2026-11-25T00:00:00Z",
+   "home": "ORL",
+   "away": "DET",
    "mk": "spread",
-   "side": "home",
-   "line": 5.5,
-   "price": -110.0,
-   "edge": 2.2,
-   "x": 5.0,
-   "why": "edge under 5 (venue: home)",
-   "m": 7.7,
-   "tm": 221.2
+   "side": "away",
+   "line": -1.5,
+   "price": -124.0,
+   "edge": 1.5,
+   "x": 4.0,
+   "why": "edge under 4 (line: <4)",
+   "m": -3.0,
+   "tm": 213.1
+  },
+  {
+   "id": "401909317",
+   "sport": "nba",
+   "kick": "2026-11-25T22:00:00Z",
+   "home": "PHI",
+   "away": "MIA",
+   "mk": "spread",
+   "side": "away",
+   "line": 3.5,
+   "price": -124.0,
+   "edge": 1.0,
+   "x": 4.0,
+   "why": "edge under 4 (line: <4)",
+   "m": 2.5,
+   "tm": 238.7
   },
   {
    "id": "401909323",
@@ -410,52 +442,20 @@
    "side": "over",
    "line": 233.5,
    "price": -114.0,
-   "edge": 0.7,
+   "edge": 0.8,
    "x": 6.0,
    "why": "edge under 6 (total: high)",
    "m": 8.6,
-   "tm": 234.2
-  },
-  {
-   "id": "401909314",
-   "sport": "nba",
-   "kick": "2026-11-25T00:00:00Z",
-   "home": "ORL",
-   "away": "DET",
-   "mk": "total",
-   "side": "over",
-   "line": 212.5,
-   "price": -110.0,
-   "edge": 0.6,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: over)",
-   "m": -3.0,
-   "tm": 213.1
-  },
-  {
-   "id": "401909317",
-   "sport": "nba",
-   "kick": "2026-11-25T22:00:00Z",
-   "home": "PHI",
-   "away": "MIA",
-   "mk": "total",
-   "side": "over",
-   "line": 238.5,
-   "price": -119.0,
-   "edge": 0.2,
-   "x": 6.0,
-   "why": "edge under 6 (total: high)",
-   "m": 2.5,
-   "tm": 238.7
+   "tm": 234.3
   }
  ],
  "games": {
   "401909314": {
-   "mk": "total",
-   "side": "over",
-   "line": 212.5,
-   "price": -110.0,
-   "edge": 0.6,
+   "mk": "spread",
+   "side": "away",
+   "line": -1.5,
+   "price": -124.0,
+   "edge": 1.5,
    "ev": null,
    "units": 0.0,
    "home": "ORL",
@@ -479,7 +479,7 @@
    "side": "over",
    "line": 233.5,
    "price": -114.0,
-   "edge": 0.7,
+   "edge": 0.8,
    "ev": null,
    "units": 0.0,
    "home": "DEN",
@@ -487,11 +487,11 @@
    "state": "under"
   },
   "401909317": {
-   "mk": "total",
-   "side": "over",
-   "line": 238.5,
-   "price": -119.0,
-   "edge": 0.2,
+   "mk": "spread",
+   "side": "away",
+   "line": 3.5,
+   "price": -124.0,
+   "edge": 1.0,
    "ev": null,
    "units": 0.0,
    "home": "PHI",
@@ -501,9 +501,9 @@
   "401909319": {
    "mk": "spread",
    "side": "home",
-   "line": 5.5,
+   "line": 4.5,
    "price": -110.0,
-   "edge": 2.2,
+   "edge": 3.2,
    "ev": null,
    "units": 0.0,
    "home": "NY",
@@ -587,16 +587,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 5645,
+  "snapshots": 5651,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 324,
-    "clvRet": 0.0445,
-    "clvT": 5.43,
-    "clv": 1.48,
-    "beat": 0.753,
-    "still": 0.136
+    "clvN": 325,
+    "clvRet": 0.0416,
+    "clvT": 5.01,
+    "clv": 1.44,
+    "beat": 0.751,
+    "still": 0.098
    },
    {
     "when": "6-24h",
@@ -7262,7 +7262,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-24T20:17:42Z",
+ "checked": "2026-11-24T20:57:28Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
