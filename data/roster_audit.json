@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-24T00:45Z",
+ "asof": "2026-11-24T03:03Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -59,25 +59,25 @@
     }
    ],
    "joined": 0,
-   "players": 2618,
+   "players": 2619,
    "rows": 16742
   },
   "nba": {
    "by_file": {
     "static/data/depth/nba.json": {
-     "flags": 0,
+     "flags": 1,
      "rows": 596
     },
     "static/data/nba-proj.json": {
-     "flags": 5,
+     "flags": 6,
      "rows": 507
     },
     "static/data/nba-xpm/2027.json": {
-     "flags": 3,
+     "flags": 4,
      "rows": 474
     },
     "static/data/pctl-nba.json": {
-     "flags": 3,
+     "flags": 4,
      "rows": 474
     },
     "static/data/xaav-nba.json": {
@@ -86,6 +86,24 @@
     }
    },
    "flags": [
+    {
+     "d": "2026-11-23",
+     "field": "depth",
+     "file": "static/data/depth/nba.json",
+     "flag": "released",
+     "head": "Departs to locker room",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-23",
+      "head": "Departs to locker room",
+      "kind": "exit"
+     },
+     "pid": "5732",
+     "player": "Collin Gillespie",
+     "pos": "PG",
+     "rotowire": "PHO",
+     "site": "PHO"
+    },
     {
      "d": "2026-11-06",
      "field": "tm",
@@ -103,6 +121,24 @@
      "pos": "C",
      "rotowire": "GSW",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-23",
+     "field": "tm",
+     "file": "static/data/nba-proj.json",
+     "flag": "released",
+     "head": "Departs to locker room",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-23",
+      "head": "Departs to locker room",
+      "kind": "exit"
+     },
+     "pid": "5732",
+     "player": "Collin Gillespie",
+     "pos": "PG",
+     "rotowire": "PHO",
+     "site": "PHO"
     },
     {
      "d": "2026-10-22",
@@ -177,6 +213,24 @@
      "site": "FA"
     },
     {
+     "d": "2026-11-23",
+     "field": "tm",
+     "file": "static/data/nba-xpm/2027.json",
+     "flag": "released",
+     "head": "Departs to locker room",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-23",
+      "head": "Departs to locker room",
+      "kind": "exit"
+     },
+     "pid": "5732",
+     "player": "Collin Gillespie",
+     "pos": "PG",
+     "rotowire": "PHO",
+     "site": "PHO"
+    },
+    {
      "d": "2026-10-17",
      "field": "tm",
      "file": "static/data/nba-xpm/2027.json",
@@ -229,6 +283,24 @@
      "pos": "SF",
      "rotowire": "FA",
      "site": "CLE"
+    },
+    {
+     "d": "2026-11-23",
+     "field": "tm",
+     "file": "static/data/pctl-nba.json",
+     "flag": "released",
+     "head": "Departs to locker room",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-23",
+      "head": "Departs to locker room",
+      "kind": "exit"
+     },
+     "pid": "5732",
+     "player": "Collin Gillespie",
+     "pos": "G",
+     "rotowire": "PHO",
+     "site": "PHO"
     },
     {
      "d": "2026-11-08",
