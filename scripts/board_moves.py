@@ -1,6 +1,6 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Weekly movement on the player and prospect boards: each row gets its board metric as of the sport's last weekly
-post day (scripts/rank_moves.py POST: CBB Mon, NBA Tue, NFL Thu, soccer Fri, tennis Sat, CS2 Sun; on the post day
+post day (scripts/rank_moves.py POST: soccer Mon, NFL Tue, CFB Wed, CBB Thu, NBA Fri, tennis Sat, CS2 Sun, as posted; on the post day
 itself, the one a week back), or 7 days back for a sport with no post day (NHL, hockey prospects).
 
 Run after a board's builders, before the commit. Each board keeps its history in scripts/data/moves/<board>.json
@@ -27,7 +27,7 @@ import sys
 import tokenize
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from rank_moves import POST, cutoff, today as et_today   # noqa: E402  (the weekly post days)
+from rank_moves import POST, board_day, cutoff, today as et_today   # noqa: E402  (the weekly post days)
 
 DAYS = 7
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -315,7 +315,7 @@ def vupdate(board, day=None, d=None, h=None, write=True):
     s = str(S.get('s'))
     if h.get('season') != s:
         h = {'season': s, 'hist': {}}
-    day = day or et_today()
+    day = day or et_today(sport)
     h, since = vstep(h, vsnap(S, views), views, day, sport, model=fingerprint(mb) if mb else None)
     vmark(S, views, h['hist'].get(since) if since else None, cutoff(day, sport).isoformat() if since else None)
     if write:
@@ -349,7 +349,7 @@ def update(board, day=None, d=None, h=None, write=True):
     s = season_of(d, path)
     if h.get('season') != s:                # a new season (or a first run) starts the history over
         h = {'season': s, 'hist': {}}
-    day = day or et_today()
+    day = day or et_today(board)
     h, since = step(h, snap(d, spec), day, fv=graded(spec), sport=board, model=fingerprint(board))
     # wkFrom names the post day the moves count from (the values are the last snapshot on or before it)
     mark(d, spec, h['hist'].get(since) if since else None, cutoff(day, board).isoformat() if since else None)
@@ -362,13 +362,13 @@ def update(board, day=None, d=None, h=None, write=True):
     return d, h
 
 
-def _git_versions(path, since):
+def _git_versions(path, since, sport=None):
     revs = subprocess.run(['git', 'log', '--format=%H %cI', f'--since={since}', '--', path], cwd=ROOT,
                           capture_output=True, text=True, check=True).stdout.split('\n')
     by_day = {}
     for line in reversed([x for x in revs if x]):          # oldest first; the day's last version wins
         hsh, when = line.split()
-        by_day[when[:10]] = hsh
+        by_day[board_day(dt.datetime.fromisoformat(when), sport).isoformat()] = hsh   # the post clock (rank_moves)
     for day, hsh in sorted(by_day.items()):
         try:
             yield day, hsh, json.loads(subprocess.run(['git', 'show', f'{hsh}:{path}'], cwd=ROOT, capture_output=True,
@@ -378,15 +378,15 @@ def _git_versions(path, since):
 
 
 def seed(boards):
-    today = et_today()
-    since = (today - dt.timedelta(days=DAYS + 3)).isoformat()
+    since = (et_today() - dt.timedelta(days=DAYS + 3)).isoformat()
     for board in boards:
+        today = et_today(board)
         pat, spec = BOARDS[board]
         path = latest(pat) if '*' in pat else pat
         if not path:
             continue
         h = {}
-        for day, rev, d in _git_versions(path, since):
+        for day, rev, d in _git_versions(path, since, board):
             if dt.date.fromisoformat(day) >= today:
                 continue
             s = season_of(d, path)
@@ -398,12 +398,12 @@ def seed(boards):
 
 
 def vseed(boards):
-    today = et_today()
-    since = (today - dt.timedelta(days=DAYS + 3)).isoformat()
+    since = (et_today() - dt.timedelta(days=DAYS + 3)).isoformat()
     for board in boards:
         path, sport, mb = VIEWS[board]
+        today = et_today(sport)
         h = {}
-        for day, rev, d in _git_versions(path, since):
+        for day, rev, d in _git_versions(path, since, sport):
             day = dt.date.fromisoformat(day)
             S = (d.get('seasons') or [None])[0]
             if day >= today or not S:
@@ -471,14 +471,29 @@ def test():
     V = ['fv', 'war']
     S = vt['seasons'][0]
     hv = {}
-    for i in range(10):                     # Nov 1 2026 is a Sunday; cbb posts Monday
+    for i in range(10):                     # Nov 1 2026 is a Sunday; soccer posts Monday
         S['rows'][1]['war'] = 2.0 + i
         if i == 6:
             S['rows'][0]['tm'] = 'Z'
-        hv, since = vstep(hv, vsnap(S, V), V, dt.date(2026, 11, 1) + dt.timedelta(days=i), 'cbb')
+        hv, since = vstep(hv, vsnap(S, V), V, dt.date(2026, 11, 1) + dt.timedelta(days=i), 'soccer')
     vmark(S, V, hv['hist'][since], since)
     assert since == '2026-11-09' and len(hv['hist']) == 2, (since, list(hv['hist']))
     assert S['rows'][1]['w0'] == [40, 10.0] and S['rows'][0]['w0'] == [50, 1.0] and S['wkV'] == V, S
+    # the post clock: a post-day run before POST_HOUR New York is the posted snapshot; from then on it belongs to the next
+    # day, so the posted one stays the base (Tue Nov 24 2026 = NFL post day; 14:00Z = 9 AM ET, 16:00Z = 11 AM ET)
+    from rank_moves import POST_HOUR
+    utc = dt.timezone.utc
+    assert POST_HOUR == 10
+    assert board_day(dt.datetime(2026, 11, 24, 14, tzinfo=utc), 'nfl') == dt.date(2026, 11, 24)
+    assert board_day(dt.datetime(2026, 11, 24, 16, tzinfo=utc), 'nfl') == dt.date(2026, 11, 25)
+    assert board_day(dt.datetime(2026, 11, 24, 16, tzinfo=utc), 'nhl') == dt.date(2026, 11, 24)      # no post day
+    assert board_day(dt.datetime(2026, 11, 25, 3, tzinfo=utc), 'nba') == dt.date(2026, 11, 24)       # 10 PM ET Tue
+    assert cutoff(dt.date(2026, 11, 25), 'nfl') == dt.date(2026, 11, 24) and cutoff(dt.date(2026, 11, 24), 'nfl') == dt.date(2026, 11, 17)
+    hp = {}
+    for when, v in ((dt.datetime(2026, 11, 24, 13, tzinfo=utc), 1.0), (dt.datetime(2026, 11, 24, 22, tzinfo=utc), 2.0)):
+        hp, _ = step(hp, {'a': v}, board_day(when, 'nfl'), sport='nfl')
+    hp, since = step(hp, {'a': 3.0}, dt.date(2026, 11, 26), sport='nfl')
+    assert since == '2026-11-24' and hp['hist'][since] == {'a': 1.0}, hp
     print('board_moves ok')
 
 

@@ -921,15 +921,16 @@ def build():
         old = json.load(open(C.OUT))
     except (OSError, ValueError):
         pass
-    # rank movement, the CFB board's window (a week): the ARK ranking kept on each change; the move is against the
-    # ranking as of 7 days ago, or the preseason prior rank before the season is a week old
-    import datetime as _dt
-    day = now.date()
+    # rank movement since the last CBB post (scripts/rank_moves.py POST, Thursday, the ranking as posted): the ARK
+    # ranking kept on each change; the move is against the ranking as of that post, or the preseason prior rank before
+    # the season has one
+    import rank_moves
+    day = rank_moves.board_day(now, 'cbb')
     hist = {k: v for k, v in ((old or {}).get('rkHist') or {}).items() if k >= f'{SEASON - 1}-08-01'}
     cur = {r['id']: r['rk'] for r in power}
     if not hist or hist[max(hist)] != cur:          # stored only on change, so a quiet day writes nothing
         hist[day.isoformat()] = cur
-    cut = (day - _dt.timedelta(days=7)).isoformat()
+    cut = rank_moves.cutoff(day, 'cbb').isoformat()
     back = [k for k in sorted(hist) if k <= cut]
     hist = {k: hist[k] for k in sorted(hist) if k > cut or (back and k == back[-1])}
     snap = hist[back[-1]] if back else None

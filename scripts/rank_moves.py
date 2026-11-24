@@ -15,9 +15,13 @@ import subprocess
 import sys
 
 DAYS = 7
-# the weekly post day per sport (Noah, Nov 10 2026; Monday = 0): moves count from the last post day before today (on a
-# post day, the one a week back), so each post shows the week since the last one. Not listed: a rolling 7 days.
-POST = {'cbb': 0, 'nba': 1, 'cfb': 2, 'nfl': 3, 'soccer': 4, 'soccerp': 4, 'tennis': 5, 'tennisp': 5, 'cs2': 6}
+# the weekly post day per sport (Noah, Nov 23 2026; Monday = 0): Mon soccer, Tue NFL, Wed CFB + NFL Draft, Thu CBB +
+# NBA Draft, Fri NBA, Sat tennis, Sun CS2. Moves count from the last post (the board as the post went out), so each post
+# shows the week since the one before. Not listed (NHL, hockey prospects): a rolling 7 days.
+POST = {'soccer': 0, 'soccerp': 0, 'nfl': 1, 'cfb': 2, 'cbb': 3, 'nba': 4, 'tennis': 5, 'tennisp': 5, 'cs2': 6}
+# the posts go out in the morning, New York time: from this hour on a post day the board belongs to the next week, so the
+# post's base is the board as posted (the last snapshot before this hour) and the moves restart from it
+POST_HOUR = 10
 ET = None
 try:
     from zoneinfo import ZoneInfo
@@ -26,9 +30,19 @@ except Exception:
     pass
 
 
-def today():
-    """the day in New York (the posts' clock)"""
-    return dt.datetime.now(ET or dt.timezone.utc).date()
+def board_day(when, sport=None):
+    """the snapshot day for a run at `when` (aware datetime): the New York date, moved to the next day once a post day's
+    post has gone out (POST_HOUR), so later runs on a post day never overwrite the posted snapshot"""
+    t = when.astimezone(ET or dt.timezone.utc)
+    d = t.date()
+    if POST.get(sport) == d.weekday() and t.hour >= POST_HOUR:
+        d += dt.timedelta(days=1)
+    return d
+
+
+def today(sport=None):
+    """the snapshot day now (the posts' clock, scripts board_day)"""
+    return board_day(dt.datetime.now(dt.timezone.utc), sport)
 
 
 def cutoff(day, sport=None, days=DAYS):
@@ -52,7 +66,7 @@ def snap(rows, key, rating):
 
 def apply(out, rows, old, key, rating, day=None, days=DAYS, sport=None):
     """Adds prev / dR to rows and mvHist / mvFrom to out. old = last run's output dict (or None)."""
-    day = day or today()
+    day = day or today(sport)
     hist = dict(sorted(((old or {}).get('mvHist') or {}).items()))
     cur = snap(rows, key, rating)
     if not hist or hist[max(hist)] != cur:        # only on change, so a quiet day writes nothing new
@@ -92,26 +106,26 @@ def tennis_apply(out, old, day=None, sport='tennis'):
     return out
 
 
-def _git_versions(path, since):
+def _git_versions(path, since, sport=None):
     revs = subprocess.run(['git', 'log', '--format=%H %cI', f'--since={since}', '--', path], cwd=ROOT,
                           capture_output=True, text=True, check=True).stdout.split('\n')
     for line in reversed([x for x in revs if x]):
         h, when = line.split()
         try:
-            yield when[:10], json.loads(subprocess.run(['git', 'show', f'{h}:{path}'], cwd=ROOT, capture_output=True,
+            yield board_day(dt.datetime.fromisoformat(when), sport).isoformat(), json.loads(subprocess.run(['git', 'show', f'{h}:{path}'], cwd=ROOT, capture_output=True,
                                                        text=True, check=True).stdout)
         except (subprocess.CalledProcessError, ValueError):
             continue
 
 
 def seed():
-    today = dt.datetime.now(dt.timezone.utc).date()
-    since = (today - dt.timedelta(days=DAYS + 3)).isoformat()
+    since = (today() - dt.timedelta(days=DAYS + 3)).isoformat()
     jobs = dict(SPORTS)
     jobs['tennis'] = ('data/tennis.json', None, None, None)
     for sport, (path, get, key, rating) in jobs.items():
         fake = None
-        for day, d in _git_versions(path, since):
+        now = today(sport)
+        for day, d in _git_versions(path, since, sport):
             day = dt.date.fromisoformat(day)
             if sport == 'tennis':
                 if 'tours' not in d:
@@ -127,9 +141,9 @@ def seed():
         p = os.path.join(ROOT, path)
         cur = json.load(open(p))
         if sport == 'tennis':
-            tennis_apply(cur, fake, today)
+            tennis_apply(cur, fake, now)
         else:
-            apply(cur, get(cur)[0], fake, key, rating, today, sport=sport)
+            apply(cur, get(cur)[0], fake, key, rating, now, sport=sport)
         open(p, 'w').write(json.dumps(cur, separators=(',', ':'), allow_nan=False))
         n = cur['tours']['atp'] if sport == 'tennis' else cur
         print(sport, 'from', n.get('mvFrom'), 'snapshots', len(n['mvHist']))
