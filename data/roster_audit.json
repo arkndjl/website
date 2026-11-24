@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-24T06:30Z",
+ "asof": "2026-11-24T06:36Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -310,12 +310,12 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 8,
+     "flags": 10,
      "rows": 2173
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 10,
-     "rows": 632
+     "flags": 3,
+     "rows": 629
     },
     "static/data/nfl-war.json": {
      "flags": 79,
@@ -335,6 +335,24 @@
     }
    },
    "flags": [
+    {
+     "d": "2026-10-24",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "released",
+     "head": "Cut loose by Arizona",
+     "kind": "waived",
+     "move": {
+      "d": "2026-10-24",
+      "head": "Cut loose by Arizona",
+      "kind": "waived"
+     },
+     "pid": "19765",
+     "player": "Wydett Williams Jr.",
+     "pos": "FS",
+     "rotowire": "FA",
+     "site": "ARI"
+    },
     {
      "d": "2026-08-29",
      "field": "depth",
@@ -460,6 +478,24 @@
      "pos": "WLB",
      "rotowire": "FA",
      "site": "PIT"
+    },
+    {
+     "d": "2026-08-30",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "released",
+     "head": "Released by Seattle",
+     "kind": "waived",
+     "move": {
+      "d": "2026-08-30",
+      "head": "Released by Seattle",
+      "kind": "waived"
+     },
+     "pid": "14389",
+     "player": "Trevon Diggs",
+     "pos": "CB",
+     "rotowire": "FA",
+     "site": "SEA"
     },
     {
      "d": "2026-08-31",
@@ -4278,24 +4314,6 @@
      "site": "IND"
     },
     {
-     "d": "2026-11-23",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "released",
-     "head": "Clears waivers, and now a free agent",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-23",
-      "head": "Clears waivers, and now a free agent",
-      "kind": "waived"
-     },
-     "pid": "13491",
-     "player": "Daniel Jones",
-     "pos": "QB",
-     "rotowire": "FA",
-     "site": "IND"
-    },
-    {
      "d": "2026-11-16",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -4312,78 +4330,6 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "ARI"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
-     "head": "Reverts to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Reverts to practice squad",
-      "kind": "practice"
-     },
-     "pid": "15262",
-     "player": "Shane Buechele",
-     "pos": "QB",
-     "rotowire": "FA",
-     "site": "BUF"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
-     "head": "Reverts to Miami's practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Reverts to Miami's practice squad",
-      "kind": "practice"
-     },
-     "pid": "14421",
-     "player": "Jalen Reagor",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "MIA"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
-     "head": "Set to join Tampa Bay practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Set to join Tampa Bay practice squad",
-      "kind": "practice"
-     },
-     "pid": "11841",
-     "player": "Cooper Rush",
-     "pos": "QB",
-     "rotowire": "FA",
-     "site": "ATL"
-    },
-    {
-     "d": "2026-11-17",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
-     "head": "Back with practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-17",
-      "head": "Back with practice squad",
-      "kind": "practice"
-     },
-     "pid": "10994",
-     "player": "Chris Moore",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "BAL"
     },
     {
      "d": "2026-11-16",
@@ -4408,42 +4354,6 @@
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
      "flag": "practice",
-     "head": "Back on Buccaneers' practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Back on Buccaneers' practice squad",
-      "kind": "practice"
-     },
-     "pid": "13634",
-     "player": "David Sills",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "TB"
-    },
-    {
-     "d": "2026-11-17",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
-     "head": "Let go by Chiefs",
-     "kind": null,
-     "move": {
-      "d": "2026-11-16",
-      "head": "Reverts to practice squad",
-      "kind": "practice"
-     },
-     "pid": "19996",
-     "player": "Jacob De Jesus",
-     "pos": "WR",
-     "rotowire": "FA",
-     "site": "KC"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "practice",
      "head": "Reverts to Cleveland's practice squad",
      "kind": "practice",
      "move": {
@@ -4460,7 +4370,7 @@
    ],
    "joined": 0,
    "players": 2312,
-   "rows": 8163
+   "rows": 8160
   },
   "nhl": {
    "by_file": {
