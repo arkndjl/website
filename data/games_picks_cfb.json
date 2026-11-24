@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-24T09:36:38Z",
+ "asof": "2026-11-24T10:13:43Z",
  "recenter": {
-  "week": 0.47
+  "week": 0.46
  },
  "monitor": {
   "clocks": {
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-24",
-  "ageH": -14.4,
+  "ageH": -13.8,
   "stale": false
  },
  "picks": [],
@@ -549,6 +549,22 @@
    "tm": 50.6
   },
   {
+   "id": "401858314",
+   "sport": "cfb",
+   "kick": "2026-11-28T17:00:00.000Z",
+   "home": "Syracuse",
+   "away": "Notre Dame",
+   "mk": "total",
+   "side": "over",
+   "line": 52.5,
+   "price": -124.0,
+   "edge": 0.7,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": -23.6,
+   "tm": 53.2
+  },
+  {
    "id": "401856757",
    "sport": "cfb",
    "kick": "2026-11-29T00:30:00.000Z",
@@ -659,22 +675,6 @@
    "why": "total market off",
    "m": -7.8,
    "tm": 56.1
-  },
-  {
-   "id": "401871062",
-   "sport": "cfb",
-   "kick": "2026-11-28T20:30:00.000Z",
-   "home": "Delaware",
-   "away": "Jacksonville State",
-   "mk": "total",
-   "side": "under",
-   "line": 58.5,
-   "price": -114.0,
-   "edge": 4.9,
-   "x": null,
-   "why": "total market off",
-   "m": 1.1,
-   "tm": 53.6
   }
  ],
  "games": {
@@ -862,7 +862,7 @@
    "mk": "spread",
    "side": "away",
    "line": 3.5,
-   "price": -134.0,
+   "price": -127.0,
    "edge": 2.4,
    "ev": null,
    "units": 0.0,
@@ -919,16 +919,16 @@
    "state": "under"
   },
   "401858314": {
-   "mk": "spread",
-   "side": "home",
-   "line": -27.5,
-   "price": -155.0,
-   "edge": 3.9,
+   "mk": "total",
+   "side": "over",
+   "line": 52.5,
+   "price": -124.0,
+   "edge": 0.7,
    "ev": null,
    "units": 0.0,
    "home": "Syracuse",
    "away": "Notre Dame",
-   "state": "off"
+   "state": "under"
   },
   "401856880": {
    "mk": "total",
@@ -970,7 +970,7 @@
    "mk": "spread",
    "side": "away",
    "line": 2.5,
-   "price": -112.0,
+   "price": -114.0,
    "edge": 2.0,
    "ev": null,
    "units": 0.0,
@@ -1102,7 +1102,7 @@
    "mk": "total",
    "side": "under",
    "line": 54.5,
-   "price": -124.0,
+   "price": -114.0,
    "edge": 3.4,
    "ev": null,
    "units": 0.0,
@@ -1318,7 +1318,7 @@
    "mk": "total",
    "side": "under",
    "line": 52.5,
-   "price": -110.0,
+   "price": -114.0,
    "edge": 3.0,
    "ev": null,
    "units": 0.0,
@@ -1547,16 +1547,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 28959,
+  "snapshots": 28970,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 5909,
-    "clvRet": -0.019,
-    "clvT": -10.69,
-    "clv": 0.89,
-    "beat": 0.432,
-    "still": 0.293
+    "clvN": 5911,
+    "clvRet": -0.0193,
+    "clvT": -10.97,
+    "clv": 0.87,
+    "beat": 0.433,
+    "still": 0.292
    },
    {
     "when": "6-24h",
@@ -6330,7 +6330,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-24T09:36:38Z",
+ "checked": "2026-11-24T10:13:43Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
