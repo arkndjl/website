@@ -753,12 +753,7 @@ def nba():
     # blend) as they are; before them XPM = BPM (the XPM rule for a player with no DPM row), and before 1973-74 BPM from
     # WS / 48 and PER
     import nba_xpm
-    pub = {}
-    for f in glob.glob(os.path.join(ROOT, 'static', 'data', 'nba-xpm', '*.json')):
-        d = json.load(open(f))
-        if d['season'] >= nba_xpm.current_season(): continue
-        for q in d['players']:
-            if q.get('vorx') is not None: pub[(q['id'], d['season'])] = (q['vorx'], q.get('xpm'), q.get('oxpm'), q.get('dxpm'))
+    pub = nba_published()
     S = []
     for p in P:
         if not p['mp'] or not p['gs']: continue
@@ -776,6 +771,31 @@ def nba():
                       ox=None if ox is None else round(ox, 1), dx=None if dx is None else round(dx, 1), mp=p['mp'], ph=FACES_NBA.get(p['id']),
                       reg=(p['g'] or 0) >= p['gs'] / 2 and (p['mp'] or 0) >= 12 * p['gs'], pub=(p['id'], p['y']) in pub))
     return T, S, dict(b=[round(float(x), 3) for x in b], r=round(r, 3), n=len(fit))
+
+
+def nba_published():
+    """{(bbref id, season): (VORX, XPM, O-XPM, D-XPM)} from the published XPM files (rXPM: team-adjusted), past seasons"""
+    import nba_xpm
+    pub = {}
+    for f in glob.glob(os.path.join(ROOT, 'static', 'data', 'nba-xpm', '*.json')):
+        d = json.load(open(f))
+        if d['season'] >= nba_xpm.current_season(): continue
+        for q in d['players']:
+            if q.get('vorx') is not None: pub[(q['id'], d['season'])] = (q['vorx'], q.get('txpm', q.get('xpm')), q.get('toxpm', q.get('oxpm')), q.get('tdxpm', q.get('dxpm')))
+    return pub
+
+
+def nba_pub(src):
+    """snapshot rows -> the published files' values (VORX per 82 games, as nba() writes them)"""
+    pub = nba_published()
+    gsn = defaultdict(int)
+    for r in src['nbaT']: gsn[r['y']] = max(gsn[r['y']], sum(r['wl'][:2]))
+    for x in src['nbaS']:
+        q = pub.get((x['id'], x['y']))
+        if not q or not gsn.get(x['y']): continue
+        x['v'] = q[0] * 82 / gsn[x['y']]
+        if q[1] is not None: x['raw'] = round(q[1], 1)
+        if q[2] is not None: x['ox'], x['dx'] = round(q[2], 1), round(q[3], 1)
 
 
 def nhl():
@@ -1128,6 +1148,7 @@ def main():
             src['cfbsk'] = cfb_skill_pull()
             json.dump(src, gzip.open(SNAP, 'wt'), separators=(',', ':'))
         src['soccerS'] = soccer_players()      # local season files: SV / SVAR (scripts/soccer_sv.py) without a re-pull
+        nba_pub(src)                   # the published XPM files (rXPM, VORX on rXPM) over the snapshot's 2010-26 rows
     else:
         nT, nS, nfit = nba(); hT, hS = nhl()
         nflpk, nflcar = nfl_players()

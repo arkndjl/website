@@ -75,7 +75,7 @@ def board(sport):
     if sport == 'nba':          # rate: XPM this season (raw, points per 100 over average); usage: minutes a game
         fs = sorted(f for f in os.listdir(os.path.join(ROOT, 'static', 'data', 'nba-xpm')) if f[:4].isdigit())
         d = json.load(open(os.path.join(ROOT, 'static', 'data', 'nba-xpm', fs[-1])))
-        return NM.Matcher([{'name': p['n'], 'team': p.get('tm'), 'pos': p.get('pos'), 'xpm': p.get('xpm'),
+        return NM.Matcher([{'name': p['n'], 'team': p.get('tm'), 'pos': p.get('pos'), 'xpm': p.get('txpm', p.get('xpm')),
                             'mpg': round(p['mp'] / p['g'], 1) if p.get('g') else None} for p in d['players']], sport='basketball')
     if sport == 'soccer':       # usage: league minutes an appearance
         fs = sorted(f for f in os.listdir(os.path.join(ROOT, 'static', 'data', 'soccer-war')) if f[:4].isdigit())

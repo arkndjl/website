@@ -53,7 +53,7 @@ def rows_cbb():
 # sport: source rows, name/team fields, team match (pro codes exact), stats [label, fmt, getter, tip]
 SPORTS = {
     'nba': (lambda: load(latest('nba-xpm'))['players'], 'n', 'tm', 'code',
-            [['XPM', 's1', 'xpm', 'XPM this season: points a 100 possessions over average'],
+            [['XPM', 's1', lambda p: p.get('txpm', p.get('xpm')), 'XPM this season: points a 100 possessions over average'],
              ['VORX', 's1', 'vorx', 'value over replacement on XPM, this season']]),
     'nfl': (lambda: load(os.path.join(DATA, 'nfl-war.json'))['players'], 'n', 't', 'code',
             [['WAR', 's2', 'war', 'wins above replacement this season'],
