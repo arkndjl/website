@@ -1,0 +1,4 @@
+{{- /* {{< postchart "<id>" >}}: a pixel chart for a post, from data/post_charts.json (scripts/post_charts.py) */ -}}
+{{- with index site.Data.post_charts (.Get 0) -}}
+<figure class="postchart">{{ .svg | safeHTML }}{{ with .legend }}<p class="libstudy__legend">{{ range $i, $n := . }}<span class="lc-key lc-k{{ $i }}">{{ $n }}</span>{{ end }}</p>{{ end }}</figure>
+{{- end -}}
