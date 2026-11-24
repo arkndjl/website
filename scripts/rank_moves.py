@@ -16,9 +16,9 @@ import sys
 
 DAYS = 7
 # the weekly post day per sport (Noah, Nov 23 2026; Monday = 0): Mon soccer, Tue NFL, Wed CFB + NFL Draft, Thu CBB +
-# NBA Draft, Fri NBA, Sat tennis, Sun CS2. Moves count from the last post (the board as the post went out), so each post
-# shows the week since the one before. Not listed (NHL, hockey prospects): a rolling 7 days.
-POST = {'soccer': 0, 'soccerp': 0, 'nfl': 1, 'cfb': 2, 'cbb': 3, 'nba': 4, 'tennis': 5, 'tennisp': 5, 'cs2': 6}
+# NBA Draft, Fri NBA, Sat tennis + NHL (Noah, Nov 24), Sun CS2. Moves count from the last post (the board as the post went out), so each post
+# shows the week since the one before. Not listed: a rolling 7 days.
+POST = {'soccer': 0, 'soccerp': 0, 'nfl': 1, 'cfb': 2, 'cbb': 3, 'nba': 4, 'tennis': 5, 'tennisp': 5, 'nhl': 5, 'hockey': 5, 'cs2': 6}
 # the posts go out in the morning, New York time: from this hour on a post day the board belongs to the next week, so the
 # post's base is the board as posted (the last snapshot before this hour) and the moves restart from it
 POST_HOUR = 10
