@@ -8,8 +8,9 @@ Predict:  season-n value x season-(n+1) share of team minutes (x5) -> team seaso
 Pairs: 2013-14 -> 14-15 .. 2025-26, skipping 2019-20 and 2020-21 (the paper's nine pairs). RAPM (gabriel1200) ends
 2022-23, so a common window 2014-23 (five pairs) is also scored. 90% intervals: 2,000 resamples of season pairs.
 Inputs outside the repo (project files): cbb/xpm/players.csv + teams.csv (bbref minutes, on-court, on/off, team net),
-nba-metrics/raw (LEBRON, RAPM), nba-metrics/hapm-nov18/hapm_bbref.csv (HAPM 1/3 = one season). XPM files from the repo.
-LEBRON/HAPM history were fit with later seasons available (look-ahead in priors/weights); XPM/BPM/DPM have none.
+nba-metrics/raw (LEBRON, RAPM), nba-metrics/hapm-nov18/hapm_bbref.csv (HAPM 1/3 = one season), nba-metrics/xrapm-nov05/xrapm_bbref.csv (xRAPM).
+EPM (Dunks & Threes) is not included: its history is behind a paywall and its terms bar scraping. XPM files from the repo.
+LEBRON/HAPM/xRAPM history were fit with later seasons available (look-ahead in priors/weights); XPM/BPM/DPM have none.
 rXPM = the team-adjusted blend (txpm, Nov 24 2026); pXPM is built on the box blend (xpm).
 -> data/nba_xpm_predictive_research.json"""
 import csv, json, os, sys
@@ -47,6 +48,8 @@ for r in json.load(open(f'{PF}/nba-metrics/raw/load_lebron.json')):
 for r in csv.DictReader(open(f'{PF}/nba-metrics/raw/rapm_gab.csv')):
     b = n2b.get(str(r['playerId']))
     if b and r.get('RAPM'): put('RAPM (1-yr)', int(r['season'][:4]) + 1, b, float(r['RAPM']), tot.get((int(r['season'][:4]) + 1, b), 0))
+for r in csv.DictReader(open(f'{PF}/nba-metrics/xrapm-nov05/xrapm_bbref.csv')):   # xrapm.com season pages, bbref ids (net = xn)
+    if r['xn']: put('xRAPM', int(r['year']), r['pid'], float(r['xn']), tot.get((int(r['year']), r['pid']), 0))
 for r in csv.DictReader(open(f'{PF}/nba-metrics/hapm-nov18/hapm_bbref.csv')):
     if r['version'] == '1/3' and r['net']: put('HAPM (1-yr)', int(r['year']), r['pid'], float(r['net']), tot.get((int(r['year']), r['pid']), 0))
 
