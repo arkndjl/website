@@ -1,0 +1,47 @@
+{
+ "metrics": {
+  "XPM box blend": {
+   "same": {
+    "r2": 0.9265,
+    "winsRmse": 3.354,
+    "slope": 0.0299,
+    "n": 390
+   },
+   "next": {
+    "r2": 0.6815,
+    "winsRmse": 7.088,
+    "slope": 0.0232,
+    "n": 360
+   }
+  },
+  "rXPM": {
+   "same": {
+    "r2": 0.9378,
+    "winsRmse": 3.094,
+    "slope": 0.0296,
+    "n": 390
+   },
+   "next": {
+    "r2": 0.679,
+    "winsRmse": 7.118,
+    "slope": 0.023,
+    "n": 360
+   }
+  }
+ },
+ "test": {
+  "same": {
+   "mean": 0.0117,
+   "t": 2.33,
+   "better": 10,
+   "of": 13
+  },
+  "next": {
+   "mean": -0.0016,
+   "t": -0.25,
+   "better": 5,
+   "of": 12
+  }
+ },
+ "ship": "txpm"
+}

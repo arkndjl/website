@@ -244,7 +244,7 @@ class World:
              'lpk': math.log(pk) if pk else 0.0, 'yrs_d': float(y - dy) if dy else 0.0}
         info = {'pk': pk, 'dy': dy, 'cmp': cmp_, 'gs36': f['gs36'], 'b': b}
         mp = lambda z: (self.NB.get(z, {}).get(b, {}).get('mp') or 0) * 82 / self.GAMES.get(z, 82) if b else 0.0
-        vx = lambda z: (self.NB.get(z, {}).get(b, {}).get('vorx') or 0) if b else 0.0
+        vx = lambda z: (self.NB.get(z, {}).get(b, {}).get('vorx0', self.NB.get(z, {}).get(b, {}).get('vorx')) or 0) if b else 0.0
         t = {'nba1': 1.0 if mp(y + 1) > 0 else 0.0, 'stick': 1.0 if mp(y + 1) >= REG_MP else 0.0,
              'any3': 1.0 if b and any(self.NB.get(z, {}).get(b) for z in (y + 1, y + 2, y + 3)) else 0.0,
              'xv3': sum(vx(z) for z in (y + 1, y + 2, y + 3)), 'mp3': 0.0, 'xpm3': 0.0}

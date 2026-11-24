@@ -18,7 +18,8 @@ _HKN = {'ls': 'log slot (board rank as slot)', 'nhle': 'draft-year NHLe', 'D': '
 _HKEPT = ', '.join(dict.fromkeys(_HKN.get(k, k) for k in _HKF['kept'] if k != 'ls2'))
 
 _NX = ld('data/nba_proj3y_fit.json')['exit']['res']['1.0']
-_RX = ld('data/nba_rxpm_research.json')['metrics']             # rXPM team adjustment (scripts/nba_rxpm_research.py)
+_RX = ld('data/nba_rxpm_research.json')['metrics']
+_VX = ld('data/nba_vorx_research.json')                         # VORX on rXPM (scripts/nba_vorx_research.py)             # rXPM team adjustment (scripts/nba_rxpm_research.py)
 _PX = ld('data/nba_pxpm_research.json')                     # pXPM fit + held-out tests (scripts/nba_pxpm_research.py)
 _NBAEX = (f"Held out 2012-23 ({_NX['n']:,} player seasons, {100 * _NX['exitShare']:.0f}% out of the league): RMSE {_NX['exit_vs_cp']['rmse'][1]:.2f} -> "
           f"{_NX['exit_vs_cp']['rmse'][0]:.2f} (t {_NX['exit_vs_cp']['t']:.1f}, {_NX['exit_vs_cp']['won']}/{_NX['exit_vs_cp']['of']} seasons).")
@@ -197,7 +198,7 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
       ['The headline XPM on every NBA board. O-XPM and D-XPM are the same blend of each side.',
        'rXPM on the XPM board adds BPM\'s team adjustment: each team\'s players move by one amount per side so minutes-weighted O-XPM x 5 = ORtg - league, D-XPM x 5 = league - DRtg.',
        f'Same-season team net R2 {_RX["rXPM (team-adjusted)"]["describe"]:.3f} (box blend {_RX["XPM box blend"]["describe"]:.3f}, BPM {_RX["BPM"]["describe"]:.3f}); next season {_RX["rXPM (team-adjusted)"]["predict"]:.3f} (box blend {_RX["XPM box blend"]["predict"]:.3f}, BPM {_RX["BPM"]["predict"]:.3f}).',
-       'The box blend (no team adjustment) feeds VORX, pXPM, the game models (which shrink it themselves) and the CBB board target. BPM only where no DPM row (*).',
+       'The box blend (no team adjustment) feeds pXPM, the game models (which shrink it themselves) and the CBB board target. BPM only where no DPM row (*).',
        'XPM and rookie boards default to qualified: 1,000 MP per 82 team games. Qualified rookies 2010-23: XPM orders next-three-season VORX .607 (VORX .604); all rookies .330.'],
       'NBA VORX/XPM leaders, rookies, team pages, ARKLIST', ['NBA']),
     E('pXPM (predictive XPM)', 'Projected XPM next season: XPM over three seasons by minutes, shrunk toward a role mean, aged. Depth charts and backup watch: toward replacement.',
@@ -208,7 +209,8 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
        'Depth chart and backup watch: XPM over three seasons (minutes weighted 1, .5, .25) x M / (M + 500) + replacement (-1.4) x 500 / (M + 500).'],
       'NBA VORX/XPM leaders (pXPM chip), rookies, depth chart, backup watch', ['NBA']),
     E('VORX', 'Value Over Replacement XPM. NBA wins over replacement: .030 x (XPM + 1.4) x MP / 48.',
-      ['Replacement XPM -1.4; both constants fit to team wins (480 team seasons 2011-26). Default sort of the XPM and rookie boards.',
+      ['XPM here is rXPM (team-adjusted). Replacement XPM -1.4; both constants fit to team wins (480 team seasons 2011-26). Default sort of the XPM and rookie boards.',
+       f'Team W% from minutes-weighted value, 2011-26: same season R2 {_VX["metrics"]["rXPM"]["same"]["r2"]:.3f} on rXPM vs {_VX["metrics"]["XPM box blend"]["same"]["r2"]:.3f} on the box blend (t {_VX["test"]["same"]["t"]}, {_VX["test"]["same"]["better"]}/{_VX["test"]["same"]["of"]} seasons); next season {_VX["metrics"]["rXPM"]["next"]["r2"]:.3f} vs {_VX["metrics"]["XPM box blend"]["next"]["r2"]:.3f} (t {_VX["test"]["next"]["t"]}).',
        'Rookies 2010-23, held out: VORX orders next-three-season VORX best (Spearman .398; pXPM .395, aXPM .379, XPM .330).',
        'Next-three-season XPM: the rookie 3Y orders it best (.481; aXPM .413, XPM .417, VORX .351).'],
       'NBA VORX/XPM leaders, projections, contract value', ['NBA']),

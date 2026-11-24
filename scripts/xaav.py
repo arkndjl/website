@@ -413,7 +413,7 @@ def _role_sxpm(p, games):
 def nba_feats(p, p2, pg, svc, games=82):
     g, mpg, ppg = pg or (p.get('g') or 0, (p.get('mp') or 0) / max(1, p.get('g') or 1), 0.0)
     return {'grp': nba_grp(p.get('pos')), 'age': (p.get('age') or 26) + 1, 'xpm1': p.get('xpm') or 0.0,
-            'sxpm1': _role_sxpm(p, games), 'vorx1': p.get('vorx') or 0.0,
+            'sxpm1': _role_sxpm(p, games), 'vorx1': p.get('vorx0', p.get('vorx')) or 0.0,
             'mp1': p.get('mp') or 0, 'xpm2': (p2 or {}).get('xpm') or 0.0, 'mp2': (p2 or {}).get('mp') or 0,
             'has2': 1.0 if p2 else 0.0, 'g': g, 'mpg': mpg, 'ppg': ppg, 'svc': svc, 'hi': nba_max(svc)}
 

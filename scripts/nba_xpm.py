@@ -178,6 +178,18 @@ def team_adj(players, stints, rat):
         if not w or p.get('oxpm') is None: continue
         ao, ad = (sum(a[i] * m for a, m in st) / w for i in (0, 1))
         p['toxpm'], p['tdxpm'] = r1(p['oxpm'] + ao), r1(p['dxpm'] + ad); p['txpm'] = r1(p['oxpm'] + ao + p['dxpm'] + ad)
+    for p in players: vorx(p)
+
+
+def vorx(p):
+    """VORX on the team-adjusted rXPM (txpm; the box blend where there is none), vorx0 on the box blend (what the award,
+    xAAV and G League call-up fits were trained on). Nov 24 2026 (scripts/nba_vorx_research.py): same-season team W% R2
+    .927 -> .938, next-season W% .682 -> .679 (per season t -.25, 5/12: a tie); slope .0296 a point (K .030 holds),
+    fringe players' adjustment -.05 (replacement -1.4 holds)"""
+    x = p.get('txpm') if p.get('txpm') is not None else p.get('xpm')
+    if p.get('xpm') is None: return
+    p['vorx'] = round(VORX_K * (x - VORX_REP) * p['mp'] / 48, 2)
+    p['vorx0'] = round(VORX_K * (p['xpm'] - VORX_REP) * p['mp'] / 48, 2)
 
 
 def reteam(seasons=None):
