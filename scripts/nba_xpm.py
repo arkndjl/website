@@ -13,6 +13,7 @@ value on held-out seasons.
   python3 scripts/nba_xpm.py 2010 2026     # seasons from..to (end year: 2026 = 2025-26)
   python3 scripts/nba_xpm.py --current     # the season in progress, for the daily refresh
   python3 scripts/nba_xpm.py --shrink      # recompute pXPM (sxpm, PXPM_*) and the Nov 4 shrink (sx0) in every published file
+  python3 scripts/nba_xpm.py --team [season ...] # add the team-adjusted rXPM (txpm) to published files
   python3 scripts/nba_xpm.py --badges      # recompute the predictive badges (bdg, scripts/nba_badges.py) in every published file
 
 Inputs: bbref's advanced and totals tables, fetched into scripts/.cache/nba/adv_<season>.html and tot_<season>.html (refetched for the current
@@ -57,10 +58,10 @@ def current_season(today=None):
 def fetch(season, fresh, table='advanced'):
     """bbref's season table: advanced (XPM's BPM) or totals (the badges' shooting lines)"""
     os.makedirs(CACHE, exist_ok=True)
-    fn = os.path.join(CACHE, f"{'adv' if table == 'advanced' else 'tot'}_{season}.html")
+    fn = os.path.join(CACHE, f"{ {'advanced': 'adv', 'totals': 'tot', '': 'lg'}[table]}_{season}.html")
     if not fresh and os.path.exists(fn) and os.path.getsize(fn) > 50000:
         return open(fn, encoding='utf-8').read()
-    url = f'https://www.basketball-reference.com/leagues/NBA_{season}_{table}.html'
+    url = f"https://www.basketball-reference.com/leagues/NBA_{season}{'_' + table if table else ''}.html"
     for attempt in range(4):
         try:
             req = urllib.request.Request(url, headers={'User-Agent': UA})
@@ -101,13 +102,14 @@ def parse(h):
              'age': num(cell(c.get('age', ''))), 'g': num(cell(c.get('games', c.get('g', '')))),
              'mp': num(cell(c.get('mp', ''))), 'obpm': num(cell(c.get('obpm', ''))),
              'dbpm': num(cell(c.get('dbpm', ''))), 'bpm': num(cell(c.get('bpm', '')))}
-        if pid in by:                                       # a stint after the TOT row: collect its team
+        if pid in by:                                       # a stint after the TOT row: collect its team and minutes
             if re.match(r'^(TOT|\dTM)$', by[pid]['tm']) or by[pid].get('tms'):
-                by[pid].setdefault('tms', []).append(tm)
+                by[pid].setdefault('tms', []).append(tm); by[pid].setdefault('st', []).append((tm, r['mp'] or 0))
             continue
         by[pid] = r; out.append(r)
     for r in out:
         if r.get('tms'): r['tm'] = '/'.join(r.pop('tms'))
+        else: r['st'] = [(r['tm'], r['mp'] or 0)]
     return [r for r in out if r['mp']]                      # BPM is blank in the first games of a season: build() falls back to a prior
 
 
@@ -142,6 +144,53 @@ def load_dpm(season, prev):
         d = {p['id']: (p['dpm'], p['odpm'], p['ddpm']) for p in prev['players'] if p.get('dpm') is not None}
         return (lambda name, tm, pid=None: d.get(pid)), prev.get('dpmSrc')
     return (lambda name, tm, pid=None: None), None
+
+
+def team_ratings(season, fresh=False):
+    """team abbr -> (ORtg, DRtg) from bbref's season page (advanced team table)"""
+    h = fetch(season, fresh, '')
+    i = h.find('id="advanced-team"')
+    if i < 0: return {}
+    out = {}
+    for tr in re.findall(r'<tr[^>]*>(.*?)</tr>', h[i:].split('</table>')[0], re.S):
+        c = dict(re.findall(r'data-stat="([^"]+)"[^>]*>(.*?)</t[dh]>', tr, re.S))
+        t = re.search(r'/teams/(\w+)/', c.get('team', ''))
+        o, d = num(cell(c.get('off_rtg', ''))), num(cell(c.get('def_rtg', '')))
+        if t and o is not None and d is not None: out[t.group(1)] = (o, d)
+    return out
+
+
+def team_adj(players, stints, rat):
+    """rXPM's team adjustment (as BPM's): every player on a team moves by the same amount per side so the team's
+    minutes-weighted O-XPM x 5 equals its ORtg over the league's and D-XPM x 5 the league's DRtg less its own; a
+    mover takes his stints' adjustments weighted by minutes. Adds txpm / toxpm / tdxpm (the board's rXPM). Research:
+    scripts/nba_rxpm_research.py (same-season team net R2 .963 -> 1.000 by construction; next-season .640 -> .648)"""
+    if not rat: return
+    lo = sum(o for o, d in rat.values()) / len(rat); ld = sum(d for o, d in rat.values()) / len(rat)
+    mp, so, sd = {}, {}, {}
+    for p in players:
+        for t, m in stints.get(p['id'], [(p['tm'], p['mp'])]):
+            mp[t] = mp.get(t, 0) + m; so[t] = so.get(t, 0) + m * p['oxpm']; sd[t] = sd.get(t, 0) + m * p['dxpm']
+    adj = {t: ((rat[t][0] - lo) / 5 - so[t] / mp[t], (ld - rat[t][1]) / 5 - sd[t] / mp[t]) for t in mp if t in rat and mp[t]}
+    for p in players:
+        st = [(adj[t], m) for t, m in stints.get(p['id'], [(p['tm'], p['mp'])]) if t in adj and m]
+        w = sum(m for _, m in st)
+        if not w or p.get('oxpm') is None: continue
+        ao, ad = (sum(a[i] * m for a, m in st) / w for i in (0, 1))
+        p['toxpm'], p['tdxpm'] = r1(p['oxpm'] + ao), r1(p['dxpm'] + ad); p['txpm'] = r1(p['oxpm'] + ao + p['dxpm'] + ad)
+
+
+def reteam(seasons=None):
+    """add the team-adjusted rXPM to published season files (refetches bbref's advanced + season pages if not cached)"""
+    for f in sorted(os.listdir(OUT)):
+        if not f.endswith('.json'): continue
+        fn = os.path.join(OUT, f); d = json.load(open(fn))
+        if seasons and d['season'] not in seasons: continue
+        rows = parse(fetch(d['season'], False))
+        st = {r['id']: r['st'] for r in rows}
+        team_adj(d['players'], st, team_ratings(d['season'], False))
+        json.dump(d, open(fn, 'w'), separators=(',', ':'))
+        print(f, sum(1 for p in d['players'] if p.get('txpm') is not None), 'of', len(d['players']), flush=True)
 
 
 def r1(x): return None if x is None else round(x, 1)
@@ -291,6 +340,7 @@ def build(season, fresh=False):
     gmax = min(82, max(p['g'] for p in players))    # a traded player's TOT can pass 82
     hist = (pxpm_hist(season), shrink_prior(season))
     for p in players: pxpm(p, gmax, hist)
+    team_adj(players, {r['id']: r['st'] for r in rows}, team_ratings(season, fresh))
     badges(players, h, fetch(season, fresh, 'totals'), gmax)
     if fresh:
         try:   # the season in progress: today's club from RotoWire's transaction news (Nov 5 2026)
@@ -357,6 +407,8 @@ if __name__ == '__main__':
     a = sys.argv[1:]
     if a and a[0] == '--shrink':
         reshrink()
+    elif a and a[0] == '--team':
+        reteam([int(x) for x in a[1:]] or None)
     elif a and a[0] == '--badges':
         rebadge()
     elif a and a[0] == '--current':

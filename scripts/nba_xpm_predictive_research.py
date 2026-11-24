@@ -10,6 +10,7 @@ Pairs: 2013-14 -> 14-15 .. 2025-26, skipping 2019-20 and 2020-21 (the paper's ni
 Inputs outside the repo (project files): cbb/xpm/players.csv + teams.csv (bbref minutes, on-court, on/off, team net),
 nba-metrics/raw (LEBRON, RAPM), nba-metrics/hapm-nov18/hapm_bbref.csv (HAPM 1/3 = one season). XPM files from the repo.
 LEBRON/HAPM history were fit with later seasons available (look-ahead in priors/weights); XPM/BPM/DPM have none.
+rXPM = the team-adjusted blend (txpm, Nov 24 2026); pXPM is built on the box blend (xpm).
 -> data/nba_xpm_predictive_research.json"""
 import csv, json, os, sys
 import numpy as np, pandas as pd
@@ -33,7 +34,7 @@ for y in range(2010, 2027):
     if not os.path.exists(fn): continue
     for p in json.load(open(fn))['players']:
         if p.get('pr'): continue
-        for m, k in (('rXPM', 'xpm'), ('pXPM', 'sxpm'), ('BPM', 'bpm'), ('DPM', 'dpm')): put(m, y, p['id'], p.get(k), p['mp'])
+        for m, k in (('rXPM', 'txpm'), ('pXPM', 'sxpm'), ('BPM', 'bpm'), ('DPM', 'dpm')): put(m, y, p['id'], p.get(k), p['mp'])
 tot = P.groupby(['year', 'pid']).mp.sum().to_dict()
 g = P.dropna(subset=['plus_minus_on']).assign(w1=lambda d: d.plus_minus_on * d.mp, w2=lambda d: d.plus_minus_net * d.mp)
 for (y, pid), d in g.groupby(['year', 'pid']):

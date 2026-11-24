@@ -33,15 +33,15 @@ def xpm_charts():
     mps = list(range(0, 3001, 250))
     px = json.load(open(os.path.join(ROOT, 'data', 'nba_pxpm_research.json')))    # scripts/nba_pxpm_research.py
     k2 = px['ship'][0]
-    out['xpm-shrink'] = {'legend': ['old pXPM, k 600', f'{rho} x MP / (MP + {pad})', f'MP / (MP + {pad})', f'new pXPM, k {k2} (one season)'], 'svg': LB.chart_svg({
+    out['xpm-shrink'] = {'legend': ['one-dial shrink, k 600', f'{rho} x MP / (MP + {pad})', f'MP / (MP + {pad})', f'pXPM, k {k2} (one season)'], 'svg': LB.chart_svg({
         'title': 'Shrink weight on rXPM by minutes', 'x_label': 'minutes', 'y_label': 'weight on rXPM', 'y_fmt': 'pct',
         'series': [{'points': [{'x': m, 'y': round(f(m), 3)} for m in mps]} for f in
                    (lambda m: m / (m + k), lambda m: rho * m / (m + pad), lambda m: m / (m + pad), lambda m: m / (m + k2))]})}
     b = px['base']
     out['xpm-rmse'] = {'legend': ['next-season RMSE'], 'svg': LB.chart_svg({
         'title': 'Next-season XPM error', 'type': 'bar', 'x_label': '', 'y_label': 'RMSE',
-        'series': [{'points': [{'x': 'BPM', 'y': b['BPM']['player']}, {'x': 'rXPM', 'y': b['rXPM']['player']},
-                               {'x': 'DPM', 'y': b['DPM']['player']}, {'x': 'old pXPM', 'y': b['pXPM (live)']['player']},
+        'series': [{'points': [{'x': 'BPM', 'y': b['BPM']['player']}, {'x': 'box XPM', 'y': b['rXPM']['player']},
+                               {'x': 'DPM', 'y': b['DPM']['player']}, {'x': 'k 600', 'y': b['pXPM (live)']['player']},
                                {'x': 'pXPM', 'y': px['loo']['player']}]}]})}
     pr = json.load(open(os.path.join(ROOT, 'data', 'nba_xpm_predictive_research.json')))['all']
     order = sorted(pr.items(), key=lambda t: -t[1]['predict'])

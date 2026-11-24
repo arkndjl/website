@@ -18,6 +18,7 @@ _HKN = {'ls': 'log slot (board rank as slot)', 'nhle': 'draft-year NHLe', 'D': '
 _HKEPT = ', '.join(dict.fromkeys(_HKN.get(k, k) for k in _HKF['kept'] if k != 'ls2'))
 
 _NX = ld('data/nba_proj3y_fit.json')['exit']['res']['1.0']
+_RX = ld('data/nba_rxpm_research.json')['metrics']             # rXPM team adjustment (scripts/nba_rxpm_research.py)
 _PX = ld('data/nba_pxpm_research.json')                     # pXPM fit + held-out tests (scripts/nba_pxpm_research.py)
 _NBAEX = (f"Held out 2012-23 ({_NX['n']:,} player seasons, {100 * _NX['exitShare']:.0f}% out of the league): RMSE {_NX['exit_vs_cp']['rmse'][1]:.2f} -> "
           f"{_NX['exit_vs_cp']['rmse'][0]:.2f} (t {_NX['exit_vs_cp']['t']:.1f}, {_NX['exit_vs_cp']['won']}/{_NX['exit_vs_cp']['of']} seasons).")
@@ -194,14 +195,16 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
       'CFB team talent (Season AV), fv to war chart', ['CFB']),
     E('XPM', 'Cross Plus-Minus. NBA impact: .5 databallr DPM + .5 Basketball-Reference BPM, points per 100 possessions over average, as played.',
       ['The headline XPM on every NBA board. O-XPM and D-XPM are the same blend of each side.',
-       'Feeds VORX, the game models (which shrink it themselves) and the CBB board target. BPM only where no DPM row (*).',
+       'rXPM on the XPM board adds BPM\'s team adjustment: each team\'s players move by one amount per side so minutes-weighted O-XPM x 5 = ORtg - league, D-XPM x 5 = league - DRtg.',
+       f'Same-season team net R2 {_RX["rXPM (team-adjusted)"]["describe"]:.3f} (box blend {_RX["XPM box blend"]["describe"]:.3f}, BPM {_RX["BPM"]["describe"]:.3f}); next season {_RX["rXPM (team-adjusted)"]["predict"]:.3f} (box blend {_RX["XPM box blend"]["predict"]:.3f}, BPM {_RX["BPM"]["predict"]:.3f}).',
+       'The box blend (no team adjustment) feeds VORX, pXPM, the game models (which shrink it themselves) and the CBB board target. BPM only where no DPM row (*).',
        'XPM and rookie boards default to qualified: 1,000 MP per 82 team games. Qualified rookies 2010-23: XPM orders next-three-season VORX .607 (VORX .604); all rookies .330.'],
       'NBA VORX/XPM leaders, rookies, team pages, ARKLIST', ['NBA']),
     E('pXPM (predictive XPM)', 'Projected XPM next season: XPM over three seasons by minutes, shrunk toward a role mean, aged. Depth charts and backup watch: toward replacement.',
       ['Boards: (k x role mean + MP x XPM + w1 x MP-1 x XPM-1 + w2 x MP-2 x XPM-2) / (k + MP + w1 MP-1 + w2 MP-2) + aging curve to next season.',
        f'k {_PX["ship"][0]} MP, w1 {_PX["ship"][1]}, w2 {_PX["ship"][2]}; role mean = {-2 + _PX["ship"][4]:g} + {_PX["ship"][5] * .5:g} ln(1 + MP82 / 100). Aging: next-season XPM change by age, fit on earlier seasons only.',
-       f'Next-season XPM 2011-26, leave one season out: RMSE {_PX["loo"]["player"]:.3f} vs {_PX["base"]["pXPM (live)"]["player"]:.3f} (Nov 4 shrink), {_PX["base"]["rXPM"]["player"]:.2f} raw (t {_PX["playerTest"]["t"]}, {_PX["playerTest"]["better"]}/{_PX["playerTest"]["of"]} seasons).',
-       f'Next-season team net rating, nine pairs, held out: R2 {_PX["loo"]["team"]:.3f}; rXPM {_PX["base"]["rXPM"]["team"]:.3f}, BPM {_PX["base"]["BPM"]["team"]:.3f}, DPM {_PX["base"]["DPM"]["team"]:.3f}, Nov 4 shrink {_PX["base"]["pXPM (live)"]["team"]:.3f}.',
+       f'Next-season XPM 2011-26, leave one season out: RMSE {_PX["loo"]["player"]:.3f} vs {_PX["base"]["pXPM (live)"]["player"]:.3f} (one-dial k 600 shrink), {_PX["base"]["rXPM"]["player"]:.2f} raw (t {_PX["playerTest"]["t"]}, {_PX["playerTest"]["better"]}/{_PX["playerTest"]["of"]} seasons).',
+       f'Next-season team net rating, nine pairs, held out: R2 {_PX["loo"]["team"]:.3f}; rXPM {_PX["base"]["rXPM"]["team"]:.3f}, BPM {_PX["base"]["BPM"]["team"]:.3f}, DPM {_PX["base"]["DPM"]["team"]:.3f}, k 600 shrink {_PX["base"]["pXPM (live)"]["team"]:.3f}.',
        'Depth chart and backup watch: XPM over three seasons (minutes weighted 1, .5, .25) x M / (M + 500) + replacement (-1.4) x 500 / (M + 500).'],
       'NBA VORX/XPM leaders (pXPM chip), rookies, depth chart, backup watch', ['NBA']),
     E('VORX', 'Value Over Replacement XPM. NBA wins over replacement: .030 x (XPM + 1.4) x MP / 48.',
