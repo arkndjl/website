@@ -1,10 +1,10 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-24T20:55:09Z",
+ "asof": "2026-11-24T21:01:57Z",
  "recenter": {
-  "2026-11-24": 1.78,
-  "2026-11-25": 2.04
+  "2026-11-24": 1.8,
+  "2026-11-25": 2.1
  },
  "monitor": {
   "clocks": {
@@ -1831,7 +1831,7 @@
  },
  "model": {
   "asof": "2026-11-24T19:10:51Z",
-  "ageH": 1.7,
+  "ageH": 1.9,
   "stale": false
  },
  "picks": [],
@@ -1869,7 +1869,7 @@
     "side": "under",
     "line": 146.5,
     "price": -114.0,
-    "ev": 0.107,
+    "ev": 0.108,
     "units": 0.75
    }
   },
@@ -1927,7 +1927,7 @@
    "tmRaw": 174.2,
    "flagged": "2026-11-23T19:01:24Z",
    "paper": true,
-   "betTo": 177.5,
+   "betTo": 177.0,
    "close": 174.5,
    "now": null
   },
@@ -2073,22 +2073,6 @@
    "tm": 127.7
   },
   {
-   "id": "401929035",
-   "sport": "cbb",
-   "kick": "2026-11-24T21:00:00Z",
-   "home": "New Haven",
-   "away": "Lindenwood",
-   "mk": "spread",
-   "side": "away",
-   "line": 1.5,
-   "price": -110.0,
-   "edge": 6.1,
-   "x": 4.0,
-   "why": "no edge at -110",
-   "m": -4.6,
-   "tm": 137.2
-  },
-  {
    "id": "401920976",
    "sport": "cbb",
    "kick": "2026-11-25T00:00:00Z",
@@ -2113,10 +2097,10 @@
    "mk": "spread",
    "side": "away",
    "line": -5.5,
-   "price": -115.0,
+   "price": -110,
    "edge": 5.3,
    "x": 4.0,
-   "why": "no edge at -115",
+   "why": "no edge at -110",
    "m": -10.8,
    "tm": 147.9
   },
@@ -2423,6 +2407,22 @@
    "why": "edge under 5 (line: 4-9)",
    "m": 2.0,
    "tm": 156.5
+  },
+  {
+   "id": "401921666",
+   "sport": "cbb",
+   "kick": "2026-11-24T21:30:00Z",
+   "home": "Illinois State",
+   "away": "Tulsa",
+   "mk": "total",
+   "side": "over",
+   "line": 142.5,
+   "price": -119.0,
+   "edge": 4.7,
+   "x": 7.0,
+   "why": "edge under 7",
+   "m": 3.3,
+   "tm": 147.2
   }
  ],
  "games": {
@@ -2527,7 +2527,7 @@
    "side": "under",
    "line": 157.5,
    "price": -110.0,
-   "edge": 1.7,
+   "edge": 1.8,
    "ev": null,
    "units": 0.0,
    "home": "Kansas State",
@@ -2562,7 +2562,7 @@
    "mk": "total",
    "side": "over",
    "line": 158.5,
-   "price": -119.0,
+   "price": -124.0,
    "edge": 1.4,
    "ev": null,
    "units": 0.0,
@@ -2574,7 +2574,7 @@
    "mk": "spread",
    "side": "away",
    "line": -5.5,
-   "price": -115.0,
+   "price": -110,
    "edge": 5.3,
    "ev": null,
    "units": 0.0,
@@ -2754,7 +2754,7 @@
    "mk": "total",
    "side": "under",
    "line": 161.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 3.1,
    "ev": null,
    "units": 0.0,
@@ -2934,7 +2934,7 @@
    "mk": "total",
    "side": "under",
    "line": 163.5,
-   "price": -110.0,
+   "price": -114.0,
    "edge": 2.7,
    "ev": null,
    "units": 0.0,
@@ -2970,7 +2970,7 @@
    "mk": "spread",
    "side": "home",
    "line": 5.5,
-   "price": -106.0,
+   "price": -114.0,
    "edge": 1.9,
    "ev": null,
    "units": 0.0,
@@ -3087,18 +3087,6 @@
    "away": "Georgia Southern",
    "state": "under"
   },
-  "401929035": {
-   "mk": "spread",
-   "side": "away",
-   "line": 1.5,
-   "price": -110.0,
-   "edge": 6.1,
-   "ev": null,
-   "units": 0.0,
-   "home": "New Haven",
-   "away": "Lindenwood",
-   "state": "under"
-  },
   "401923271": {
    "mk": "spread",
    "side": "home",
@@ -3162,9 +3150,9 @@
   "401923395": {
    "mk": "spread",
    "side": "home",
-   "line": 5.5,
-   "price": -101.0,
-   "edge": 2.3,
+   "line": 4.5,
+   "price": -119.0,
+   "edge": 3.3,
    "ev": null,
    "units": 0.0,
    "home": "VMI",
@@ -3248,7 +3236,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 25345,
+  "snapshots": 25350,
   "buckets": [
    {
     "when": "24h+",
@@ -3261,12 +3249,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 5122,
-    "clvRet": -0.0015,
-    "clvT": -0.75,
+    "clvN": 5123,
+    "clvRet": -0.0016,
+    "clvT": -0.78,
     "clv": 0.7,
-    "beat": 0.421,
-    "still": 0.392
+    "beat": 0.419,
+    "still": 0.393
    },
    {
     "when": "1-6h",
@@ -19494,7 +19482,7 @@
    "tmRaw": 174.2,
    "flagged": "2026-11-23T19:01:24Z",
    "paper": true,
-   "betTo": 177.5,
+   "betTo": 177.0,
    "close": 174.5
   },
   {
@@ -21721,7 +21709,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-24T20:55:09Z",
+ "checked": "2026-11-24T21:01:57Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}

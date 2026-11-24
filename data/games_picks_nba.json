@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-24T20:57:28Z",
+ "asof": "2026-11-24T21:02:10Z",
  "recenter": {
   "2026-11-24": 1.37,
   "2026-11-25": 1.37
@@ -385,22 +385,6 @@
    "tm": 220.9
   },
   {
-   "id": "401909314",
-   "sport": "nba",
-   "kick": "2026-11-25T00:00:00Z",
-   "home": "ORL",
-   "away": "DET",
-   "mk": "spread",
-   "side": "away",
-   "line": -1.5,
-   "price": -124.0,
-   "edge": 1.5,
-   "x": 4.0,
-   "why": "edge under 4 (line: <4)",
-   "m": -3.0,
-   "tm": 213.1
-  },
-  {
    "id": "401909317",
    "sport": "nba",
    "kick": "2026-11-25T22:00:00Z",
@@ -447,15 +431,31 @@
    "why": "edge under 6 (total: high)",
    "m": 8.6,
    "tm": 234.3
+  },
+  {
+   "id": "401909314",
+   "sport": "nba",
+   "kick": "2026-11-25T00:00:00Z",
+   "home": "ORL",
+   "away": "DET",
+   "mk": "total",
+   "side": "over",
+   "line": 212.5,
+   "price": -110.0,
+   "edge": 0.6,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: over)",
+   "m": -3.0,
+   "tm": 213.1
   }
  ],
  "games": {
   "401909314": {
-   "mk": "spread",
-   "side": "away",
-   "line": -1.5,
-   "price": -124.0,
-   "edge": 1.5,
+   "mk": "total",
+   "side": "over",
+   "line": 212.5,
+   "price": -110.0,
+   "edge": 0.6,
    "ev": null,
    "units": 0.0,
    "home": "ORL",
@@ -587,7 +587,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 5651,
+  "snapshots": 5653,
   "buckets": [
    {
     "when": "24h+",
@@ -7262,7 +7262,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-24T20:57:28Z",
+ "checked": "2026-11-24T21:02:10Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
