@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-24T20:17:25Z",
+ "asof": "2026-11-24T20:48:03Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -51,8 +51,8 @@
   }
  },
  "model": {
-  "asof": "2026-11-24T13:37:16Z",
-  "ageH": 6.7,
+  "asof": "2026-11-24T20:47:56Z",
+  "ageH": 0.0,
   "stale": false
  },
  "picks": [],
@@ -136,7 +136,7 @@
    "edge": 3.9,
    "x": null,
    "why": "total market off",
-   "m": 4.0,
+   "m": 3.9,
    "tm": 48.4
   },
   {
@@ -152,7 +152,7 @@
    "edge": 3.2,
    "x": null,
    "why": "total market off",
-   "m": -5.4,
+   "m": -5.8,
    "tm": 44.7
   },
   {
@@ -193,14 +193,14 @@
    "kick": "2026-11-26T18:00:00Z",
    "home": "DET",
    "away": "CHI",
-   "mk": "spread",
-   "side": "home",
-   "line": -2.5,
-   "price": -110.0,
+   "mk": "total",
+   "side": "under",
+   "line": 55.5,
+   "price": -114.0,
    "edge": 2.2,
    "x": null,
-   "why": "spread market off",
-   "m": -0.3,
+   "why": "total market off",
+   "m": -0.4,
    "tm": 53.3
   },
   {
@@ -212,7 +212,7 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -114.0,
+   "price": -112.0,
    "edge": 2.2,
    "x": null,
    "why": "total market off",
@@ -293,10 +293,10 @@
    "side": "away",
    "line": 3.5,
    "price": -127.0,
-   "edge": 1.2,
+   "edge": 1.3,
    "x": null,
    "why": "spread market off",
-   "m": 2.3,
+   "m": 2.2,
    "tm": 45.4
   },
   {
@@ -330,10 +330,10 @@
    "state": "off"
   },
   "2026_12_CHI_DET": {
-   "mk": "spread",
-   "side": "home",
-   "line": -2.5,
-   "price": -110.0,
+   "mk": "total",
+   "side": "under",
+   "line": 55.5,
+   "price": -114.0,
    "edge": 2.2,
    "ev": null,
    "units": 0.0,
@@ -429,7 +429,7 @@
    "mk": "total",
    "side": "over",
    "line": 40.5,
-   "price": -114.0,
+   "price": -112.0,
    "edge": 2.2,
    "ev": null,
    "units": 0.0,
@@ -466,7 +466,7 @@
    "side": "away",
    "line": 3.5,
    "price": -127.0,
-   "edge": 1.2,
+   "edge": 1.3,
    "ev": null,
    "units": 0.0,
    "home": "SF",
@@ -562,16 +562,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 6111,
+  "snapshots": 6120,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 2508,
+    "clvN": 2510,
     "clvRet": -0.0351,
     "clvT": -21.88,
     "clv": 0.26,
     "beat": 0.308,
-    "still": 0.552
+    "still": 0.553
    },
    {
     "when": "6-24h",
@@ -2978,7 +2978,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-24T20:17:25Z",
+ "checked": "2026-11-24T20:48:03Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
