@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-24T20:47Z",
+ "asof": "2026-11-24T20:51Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -310,8 +310,8 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 10,
-     "rows": 2159
+     "flags": 12,
+     "rows": 2161
     },
     "static/data/nfl-fantasy.json": {
      "flags": 3,
@@ -330,7 +330,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 55,
+     "flags": 54,
      "rows": 1650
     }
    },
@@ -388,6 +388,42 @@
      "pos": "SLB",
      "rotowire": "JAX",
      "site": "CIN"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "practice",
+     "head": "Reverts to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Reverts to practice squad",
+      "kind": "practice"
+     },
+     "pid": "15262",
+     "player": "Shane Buechele",
+     "pos": "QB",
+     "rotowire": "FA",
+     "site": "IND"
+    },
+    {
+     "d": "2026-10-07",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "practice",
+     "head": "Joins Indy's practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-10-07",
+      "head": "Joins Indy's practice squad",
+      "kind": "practice"
+     },
+     "pid": "11926",
+     "player": "Carl Lawson",
+     "pos": "DE",
+     "rotowire": "FA",
+     "site": "IND"
     },
     {
      "d": "2026-09-14",
@@ -1923,24 +1959,6 @@
      "d": "2026-11-23",
      "field": "t",
      "file": "static/data/nfl-war.json",
-     "flag": "released",
-     "head": "Clears waivers, and now a free agent",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-23",
-      "head": "Clears waivers, and now a free agent",
-      "kind": "waived"
-     },
-     "pid": "13491",
-     "player": "Daniel Jones",
-     "pos": "QB",
-     "rotowire": "FA",
-     "site": "IND"
-    },
-    {
-     "d": "2026-11-23",
-     "field": "tm",
-     "file": "static/data/xaav-nfl.json",
      "flag": "released",
      "head": "Clears waivers, and now a free agent",
      "kind": "waived",
@@ -4370,7 +4388,7 @@
    ],
    "joined": 0,
    "players": 2312,
-   "rows": 8146
+   "rows": 8148
   },
   "nhl": {
    "by_file": {
