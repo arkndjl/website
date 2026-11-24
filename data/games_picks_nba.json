@@ -1,10 +1,10 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-24T13:46:15Z",
+ "asof": "2026-11-24T13:50:25Z",
  "recenter": {
   "2026-11-24": 1.38,
-  "2026-11-25": 1.37
+  "2026-11-25": 1.38
  },
  "monitor": {
   "clocks": {
@@ -329,29 +329,13 @@
  },
  "model": {
   "asof": "2026-11-24T10:57:29Z",
-  "ageH": 2.8,
+  "ageH": 2.9,
   "stale": false
  },
  "picks": [],
  "paperPicks": [],
  "withdrawn": [],
  "board": [
-  {
-   "id": "401909320",
-   "sport": "nba",
-   "kick": "2026-11-26T00:30:00Z",
-   "home": "OKC",
-   "away": "MIN",
-   "mk": "total",
-   "side": "under",
-   "line": 224.5,
-   "price": -119.0,
-   "edge": 3.6,
-   "x": 6.5,
-   "why": "edge under 6.5 (total: mid)",
-   "m": 3.1,
-   "tm": 220.9
-  },
   {
    "id": "401909319",
    "sport": "nba",
@@ -383,6 +367,22 @@
    "why": "edge under 6.5 (total: mid)",
    "m": -12.2,
    "tm": 214.9
+  },
+  {
+   "id": "401909320",
+   "sport": "nba",
+   "kick": "2026-11-26T00:30:00Z",
+   "home": "OKC",
+   "away": "MIN",
+   "mk": "total",
+   "side": "under",
+   "line": 223.5,
+   "price": -120.0,
+   "edge": 2.6,
+   "x": 6.5,
+   "why": "edge under 6.5 (total: mid)",
+   "m": 3.1,
+   "tm": 220.9
   },
   {
    "id": "401909323",
@@ -513,9 +513,9 @@
   "401909320": {
    "mk": "total",
    "side": "under",
-   "line": 224.5,
-   "price": -119.0,
-   "edge": 3.6,
+   "line": 223.5,
+   "price": -120.0,
+   "edge": 2.6,
    "ev": null,
    "units": 0.0,
    "home": "OKC",
@@ -587,16 +587,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 5611,
+  "snapshots": 5614,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 315,
-    "clvRet": 0.0456,
-    "clvT": 5.42,
-    "clv": 1.5,
-    "beat": 0.752,
-    "still": 0.133
+    "clvN": 317,
+    "clvRet": 0.0451,
+    "clvT": 5.38,
+    "clv": 1.49,
+    "beat": 0.748,
+    "still": 0.139
    },
    {
     "when": "6-24h",
@@ -7262,7 +7262,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-24T13:46:15Z",
+ "checked": "2026-11-24T13:50:25Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
