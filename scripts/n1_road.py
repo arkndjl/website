@@ -65,7 +65,8 @@ def prize(s, rng, first):
         if rng.random() < P["pro_cash_p"]:
             team += rng.lognormvariate(P["pro_ln_mu"], P["pro_ln_sd"])
         if rng.random() < P[f"{SC}_major_p"]:
-            team += rng.lognormvariate(P["sticker_ln_mu"], P["sticker_ln_sd"]) + P["major_prize_team"]
+            stage = rng.choices([1, 2, 3], [P["major_mix_s1"], P["major_mix_s2"], P["major_mix_s3"]])[0]
+            team += P[f"sticker_s{stage}_team"] * rng.lognormvariate(0, P["sticker_sd"]) * P["sticker_regime"] + P["major_prize_team"]
             MAJ[0] += 1
     return team / SPLIT * (1 - P["org_cut"])
 
@@ -120,7 +121,8 @@ def season_ev():
     oq = lambda s: P["oq_entries"] * P[f"oq_cash_p_{s}"] * P["oq_cash_team"]
     from math import exp
     pro_cash = P["pro_cash_p"] * exp(P["pro_ln_mu"] + P["pro_ln_sd"] ** 2 / 2)
-    sticker = exp(P["sticker_ln_mu"] + P["sticker_ln_sd"] ** 2 / 2) + P["major_prize_team"]
+    mix = [(P[f"major_mix_s{i}"], P[f"sticker_s{i}_team"]) for i in (1, 2, 3)]   # Major stage exit mix
+    sticker = sum(w * v for w, v in mix) * exp(P["sticker_sd"] ** 2 / 2) * P["sticker_regime"] + P["major_prize_team"]
     team = {
         "Open": 0.0,
         "Int": cup + P["int_cash_p"] * P["int_cash_team"],
@@ -138,18 +140,24 @@ def main():
         rows, reach, st = run(sc)
         out["scenarios"][sc] = {"years": rows, "reach": reach, "states": st}
     ev, major_pp, major_team = season_ev()
-    rng = random.Random(111)  # one Major's money per player: sticker share + autographs + Stage 1 prize, 20,000 draws
-    mj = sorted((rng.lognormvariate(P["sticker_ln_mu"], P["sticker_ln_sd"]) + P["major_prize_team"]) / SPLIT
-                for _ in range(20000))
+    rng = random.Random(111)  # one Major's money per player: sticker share by stage exit + Stage 1 prize, 20,000 draws
+    mj = []
+    for _ in range(20000):
+        st = rng.choices([1, 2, 3], [P["major_mix_s1"], P["major_mix_s2"], P["major_mix_s3"]])[0]
+        mj.append((P[f"sticker_s{st}_team"] * rng.lognormvariate(0, P["sticker_sd"]) * P["sticker_regime"] + P["major_prize_team"]) / SPLIT)
+    mj.sort()
     q = lambda p: round(mj[int(p * len(mj))])
+    out["major"] = {"perPlayer": major_pp, "team": major_team, "p10": q(.1), "p50": q(.5), "p90": q(.9),
+                    "prizeTeam": P["major_prize_team"], "regime": P["sticker_regime"],
+                    "stages": [{"s": i, "mix": P[f"major_mix_s{i}"],
+                                "pp": round((P[f"sticker_s{i}_team"] * P["sticker_regime"] + P["major_prize_team"]) / SPLIT)}
+                               for i in (1, 2, 3)]}
     out["ladder"] = {
         "ev": ev,
         "up": {"Open": None, "Int": P["int_to_main"], "Main": [P["base_main_to_adv"], P["climb_main_to_adv"]],
                "Adv": [P["base_adv_to_pro"], P["climb_adv_to_pro"]], "Pro": [P["base_major_p"], P["climb_major_p"]]},
         "down": {"Main": P["main_to_int"], "Adv": P["adv_to_main"], "Pro": P["pro_to_adv"]},
     }
-    out["major"] = {"perPlayer": q(.5), "team": q(.5) * int(SPLIT), "mean": major_pp, "p10": q(.1), "p90": q(.9),
-                    "prizeTeam": P["major_prize_team"]}
     out["s59"] = {"top2": P["s59_sf_p"], "top4": 0.02}
     out["prizes"] = [[a, b] for a, b in zip(["13-16", "9-12", "5-8", "3-4", "2nd", "1st"], SF_PRIZE)]
     out["sfMix"] = SF_MIX
