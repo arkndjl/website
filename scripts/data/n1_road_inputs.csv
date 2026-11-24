@@ -1,0 +1,34 @@
+key,value,unit,source_or_basis
+split_players,5,players,equal 5-way team split (1NT has no org cut)
+org_cut,0,share,1NT stays player owned (Noah Nov 24): no org take
+quit,0.035,per season,~10%/yr career exit hazard; assumption (7 straight ESEA seasons S53-S59 argues low)
+int_to_main,0.36,per season,NA player-level ESEA S46-S59 (research/esea_regions*.json.gz) conditional on continuing: Int->Main .355
+main_to_int,0.08,per season,population Main->Int .158 halved: 1NT safe (made playoffs S58+S59)
+adv_to_main,0.12,per season,population Adv->Main .103; promoted teams fall back a bit more
+pro_to_adv,0.25,per season,assumption: T3 rosters churn fast
+amateur_main_to_adv,0,per season,scenario A: never promotes
+amateur_adv_to_pro,0,per season,scenario A
+base_main_to_adv,0.05,per season,team top-4 of group ~3% (4/83-138) + ~2% individual pickup by an Advanced team
+base_adv_to_pro,0.04,per season,NA Advanced players linked to bo3.gg pro play 18.6% (S59); ~4%/season move up for non-pro
+climb_main_to_adv,0.113,per season,NA population Main->Adv .113 (incl. pickups)
+climb_adv_to_pro,0.10,per season,scenario C: optimistic
+s59_sf_p,0.006,per season,S59 bracket Monte Carlo (data/esea.json bracket.odds): top-2 of Main A ~0.6%; top-4 ~2%
+main_sf_p,0.02,per season,top-2 of a ~83-team Main group for a ~top-25% Main side (ARK div rank 39/152)
+adv_sf_p,0.15,per season,assumption: ~6-8 of ~41 NA Advanced teams reach the 16-team Season Finals; newly promoted side below average
+int_cash_p,0.02,per season,Intermediate podium cash (S50: 3rd = $750 team)
+int_cash_team,750,USD team,S50 Intermediate 3rd place (data/cs.json)
+cup_cash_p,0.05,per season,online cups (NSTLGA $500 cup, Trottah, Liquid Lockdown)
+cup_cash_team,150,USD team,small-cup cash
+pro_cash_p,0.6,per season,T3 (CCT/ECL/qualifier) chance of any cash per season; assumption
+pro_ln_mu,7.6,ln USD team,median T3 team cash per season ~ $2000; assumption
+pro_ln_sd,1.0,ln,heavy right tail
+oq_entries,3,per season,open qualifiers entered per ESEA season (CCT opens; 1NT/LAURSEN history: CCT S3 Series 3+4 opens, Liquid Tidal Clash, Lockdown)
+oq_cash_p_main,0.02,per entry,Main side reaching a paid closed stage; assumption
+oq_cash_p_adv,0.06,per entry,Advanced side; assumption
+oq_cash_team,500,USD team,typical open/closed qualifier cash
+amateur_major_p,0,per season,scenario A
+base_major_p,0.007,per T3 season,~1% per Major x 2 Majors/yr over 3 seasons; NA gets ~3-4 Stage 1 slots via VRS invites
+climb_major_p,0.02,per T3 season,optimistic
+sticker_ln_mu,11.9,ln USD team,median ~$150k Stage-1 sticker capsule share + autographs for a whole roster; wide uncertainty
+sticker_ln_sd,0.8,ln,p10 ~$54k p90 ~$420k team
+major_prize_team,10000,USD team,Stage 1 exit prize; assumption
