@@ -386,7 +386,8 @@ def nba(fit, rng):
         w, g, _, _, _ = teams[tm]
         q = pg0.get(pid, {})
         cands.append({'id': pid, 'n': r['n'], 'tm': tm, 'ph': r.get('ph'), 'g': p['games'], 'tg': g, 'mp': r['mp'],
-                      'xpm': r['xpm'], 'dxpm': r['dxpm'], 'sx': r.get('sx0', r['xpm']), 'sdx': r.get('sdx0', r['dxpm']),
+                      'xpm': r['xpm'], 'dxpm': r['dxpm'], 'ta': r.get('txpm', r['xpm']) - r['xpm'], 'tad': r.get('tdxpm', r['dxpm']) - r['dxpm'],
+                      'pre_rvorx': (X0.get(pid) or {}).get('vorx') or 0.0, 'sx': r.get('sx0', r['xpm']), 'sdx': r.get('sdx0', r['dxpm']),
                       'ppg': p['pts_per_g'], 'ppg0': q.get('pts_per_g'), 'rpg': p['trb_per_g'], 'rpg0': q.get('trb_per_g'),
                       'apg': p['ast_per_g'], 'apg0': q.get('ast_per_g'), 'st': p['stl_per_g'] + p['blk_per_g'],
                       'st0': (q.get('stl_per_g', 0) + q.get('blk_per_g', 0)) if q else None,
@@ -409,6 +410,9 @@ def nba_coy_teams(S, teams):
     names = A.coaches(S)
     return [{'id': t, 'n': names.get(t, t), 'tm': t, 'wp0': st0.get(t, {}).get('wp', .5),
              'ou': ou[t] / 82 if t in ou else st0.get(t, {}).get('wp', .5)} for t in teams]
+
+
+SHOWN = {'vorx': 'rvorx', 'dxpm': 'rdxpm', 'd_vorx': 'rd_vorx'}   # conviction + shown stats: the team-adjusted XPM the site shows
 
 
 def nba_races(fit, rng, cands, teams, conf, G=82, min_g=65, sims=SIMS, coy=()):
@@ -449,7 +453,12 @@ def nba_races(fit, rng, cands, teams, conf, G=82, min_g=65, sims=SIMS, coy=()):
         rp = (c['rpg'] * c['g'] + gauss(rng, blend(c['rpg'], c['g'], c['rpg0']), .8) * gr) / max(gf, 1)
         st = (c['st'] * c['g'] + gauss(rng, blend(c['st'], c['g'], c['st0']), .3) * gr) / max(gf, 1)
         ap = (c['apg'] * c['g'] + blend(c['apg'], c['g'], c.get('apg0')) * gr) / max(gf, 1) if 'apg' in c else 0.0
-        return {'apg': ap, 'prev_allnba': prev.get('allnba', {}).get(c['id'], 0),
+        # rxpm / rdxpm / rvorx: the team-adjusted XPM (the to-date team adjustment carried over the rest) the site shows;
+        # MVP and DPOY are fit on them, the other races on the box blend (xpm / dxpm / vorx)
+        rx, rdx = xpm + c.get('ta', 0.0), dx + c.get('tad', 0.0)
+        rv = .030 * (rx + 1.4) * mp / 48
+        return {'apg': ap, 'prev_allnba': prev.get('allnba', {}).get(c['id'], 0), 'rxpm': rx, 'rdxpm': rdx, 'rvorx': rv,
+                'rd_vorx': rv - c.get('pre_rvorx', c.get('pre_vorx', 0)),
                 'vorx': .030 * (xpm + 1.4) * mp / 48, 'xpm': xpm, 'dxpm': dx, 'ppg': ppg, 'rpg': rp, 'stocks': st,
                 'mpg': mp / max(gf, 1), 'big': 1.0 if c['pos'] in ('C', 'PF') else 0.0, 'wp': td[c['tm']],
                 'seed1': 1.0 if c['tm'] in td['_seed1'] else 0.0, 'gfrac': gf / G,
@@ -459,15 +468,16 @@ def nba_races(fit, rng, cands, teams, conf, G=82, min_g=65, sims=SIMS, coy=()):
                 'd_mpg': mp / max(gf, 1) - c.get('mpg0', 0)}
 
     for aw, pool_f, elig, show in (
-            ('mvp', lambda c: c['mpg'] >= 20, True, [('vorx', 'VORX', '%.1f'), ('ppg', 'PPG', '%.1f'), ('wp', 'W%', 'pct'), ('gfrac', 'G', 'g82')]),
-            ('dpoy', lambda c: c['mpg'] >= 20, True, [('dxpm', 'D-XPM', '%+.1f'), ('stocks', 'STL+BLK', '%.1f'), ('rpg', 'RPG', '%.1f'), ('wp', 'W%', 'pct')]),
-            ('roy', lambda c: c['rookie'] and c['mpg'] >= 10, False, [('vorx', 'VORX', '%.1f'), ('ppg', 'PPG', '%.1f'), ('mpg', 'MPG', '%.1f'), ('wp', 'W%', 'pct')])):
+            ('mvp', lambda c: c['mpg'] >= 20, True, [('rvorx', 'VORX', '%.1f'), ('ppg', 'PPG', '%.1f'), ('wp', 'W%', 'pct'), ('gfrac', 'G', 'g82')]),
+            ('dpoy', lambda c: c['mpg'] >= 20, True, [('rdxpm', 'D-XPM', '%+.1f'), ('stocks', 'STL+BLK', '%.1f'), ('rpg', 'RPG', '%.1f'), ('wp', 'W%', 'pct')]),
+            ('roy', lambda c: c['rookie'] and c['mpg'] >= 10, False, [('rvorx', 'VORX', '%.1f'), ('ppg', 'PPG', '%.1f'), ('mpg', 'MPG', '%.1f'), ('wp', 'W%', 'pct')])):
         spec = fit.get(aw)
         if not spec or not spec['test'].get('pass'): continue
         pool = [c for c in cands if pool_f(c)]
         dr = lambda c, td, rng, e=elig: draw(c, td, rng, e)
         dr.teams = teams_draw
-        lead(aw, pool, dr, spec['null'][0], first(show, spec['null'][0]), rng)
+        m = SHOWN.get(spec['null'][0], spec['null'][0])
+        lead(aw, pool, dr, m, first(show, m), rng)
         pool = prune(pool, spec, dr, rng)
         p = race(pool, spec, dr, rng, sims)
         dm = lambda c, td, rng: draw(c, td, rng, False)
@@ -477,8 +487,8 @@ def nba_races(fit, rng, cands, teams, conf, G=82, min_g=65, sims=SIMS, coy=()):
     if spec and spec['test'].get('pass'):
         dr = lambda c, td, rng: draw(c, td, rng, True)
         dr.teams = teams_draw
-        show = [('vorx', 'VORX', '%.1f'), ('ppg', 'PPG', '%.1f'), ('wp', 'W%', 'pct'), ('gfrac', 'G', 'g82')]
-        lead('allnba', [c for c in cands if c['mpg'] >= 20], dr, spec['null'][0], show, rng, k=spec.get('k', 15))
+        show = [('rvorx', 'VORX', '%.1f'), ('ppg', 'PPG', '%.1f'), ('wp', 'W%', 'pct'), ('gfrac', 'G', 'g82')]
+        lead('allnba', [c for c in cands if c['mpg'] >= 20], dr, SHOWN.get(spec['null'][0], spec['null'][0]), show, rng, k=spec.get('k', 15))
         pool = prune([c for c in cands if c['mpg'] >= 20], spec, dr, rng, keep=60)
         dm = lambda c, td, rng: draw(c, td, rng, False)
         dm.teams = teams_draw
@@ -486,14 +496,14 @@ def nba_races(fit, rng, cands, teams, conf, G=82, min_g=65, sims=SIMS, coy=()):
     # Nov 23 2026: Sixth Man (bench: started under half his games, bbref's rule), Most Improved (VORX gain on last
     # season's published VORX), All-Defensive and All-Rookie (10 named), Coach of the Year (a team's coach)
     for aw, pool_f, elig, metric, show in (
-            ('smoy', lambda c: c['gs'] < c['g'] / 2 and c['mpg'] >= 12, False, 'vorx',
-             [('vorx', 'VORX', '%.1f'), ('ppg', 'PPG', '%.1f'), ('mpg', 'MPG', '%.1f'), ('wp', 'W%', 'pct')]),
-            ('mip', lambda c: c['has_pre'] and c['mpg'] >= 20, False, 'd_vorx',
-             [('d_vorx', '+VORX', '%+.1f'), ('vorx', 'VORX', '%.1f'), ('d_ppg', '+PPG', '%+.1f'), ('ppg', 'PPG', '%.1f')]),
-            ('alldef', lambda c: c['mpg'] >= 20, True, 'dxpm',
-             [('dxpm', 'D-XPM', '%+.1f'), ('stocks', 'STL+BLK', '%.1f'), ('rpg', 'RPG', '%.1f'), ('gfrac', 'G', 'g82')]),
-            ('allrookie', lambda c: c['rookie'] and c['mpg'] >= 10, False, 'vorx',
-             [('vorx', 'VORX', '%.1f'), ('ppg', 'PPG', '%.1f'), ('mpg', 'MPG', '%.1f'), ('wp', 'W%', 'pct')])):
+            ('smoy', lambda c: c['gs'] < c['g'] / 2 and c['mpg'] >= 12, False, 'rvorx',
+             [('rvorx', 'VORX', '%.1f'), ('ppg', 'PPG', '%.1f'), ('mpg', 'MPG', '%.1f'), ('wp', 'W%', 'pct')]),
+            ('mip', lambda c: c['has_pre'] and c['mpg'] >= 20, False, 'rd_vorx',
+             [('rd_vorx', '+VORX', '%+.1f'), ('rvorx', 'VORX', '%.1f'), ('d_ppg', '+PPG', '%+.1f'), ('ppg', 'PPG', '%.1f')]),
+            ('alldef', lambda c: c['mpg'] >= 20, True, 'rdxpm',
+             [('rdxpm', 'D-XPM', '%+.1f'), ('stocks', 'STL+BLK', '%.1f'), ('rpg', 'RPG', '%.1f'), ('gfrac', 'G', 'g82')]),
+            ('allrookie', lambda c: c['rookie'] and c['mpg'] >= 10, False, 'rvorx',
+             [('rvorx', 'VORX', '%.1f'), ('ppg', 'PPG', '%.1f'), ('mpg', 'MPG', '%.1f'), ('wp', 'W%', 'pct')])):
         spec = fit.get(aw)
         if not spec or not spec['test'].get('pass'): continue
         pool = [c for c in cands if pool_f(c)]
@@ -1381,7 +1391,7 @@ NULL_LABEL = {'svar': 'SVAR', 'vorx': 'VORX', 'dxpm': 'D-XPM', 'war': 'WAR', 'gs
               'td': 'TDs', 'sacks': 'sacks', 'dint': 'INTs', 'pass_y': 'pass yards', 'ptd': 'pass TDs', 'gross': 'gross average',
               'rush_y': 'rush yards', 'rtd': 'rush TDs', 'rec_y': 'receiving yards', 'ctd': 'receiving TDs', 'tackles': 'tackles',
               'fgm': 'FGs', 'fgpct': 'FG%', 'pd': 'PDs', 'gar': 'GAR', 'pts': 'points', 'g': 'goals', 'gd': 'defensive goals (WAR)'}
-NULL_LABEL.update({'d_vorx': 'VORX gain', 'dbpm': 'DBPM'})     # NBA / CBB races added Nov 23 2026
+NULL_LABEL.update({'d_vorx': 'VORX gain', 'dbpm': 'DBPM', 'rvorx': 'VORX', 'rdxpm': 'D-XPM', 'rd_vorx': 'VORX gain'})     # NBA / CBB races added Nov 23 2026
 POLY[('cbb', 'naismith')] = POLY[('cbb', 'wooden')]              # the market is on the Naismith
 BUILD = {'nba': nba, 'nhl': nhl, 'cbb': cbb, 'cfb': cfb, 'nfl': nfl, 'soccer': soccer}
 
