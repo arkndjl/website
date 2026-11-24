@@ -392,7 +392,7 @@ def nba(fit, rng):
                       'st0': (q.get('stl_per_g', 0) + q.get('blk_per_g', 0)) if q else None,
                       'mpg': p['mp_per_g'], 'pos': r.get('pos', ''), 'rookie': pid not in seen,
                       'gs': p.get('games_started', 0), 'has_pre': pid in X0 and bool(q),
-                      'pre_vorx': (X0.get(pid) or {}).get('vorx') or 0.0, 'mpg0': q.get('mp_per_g') or 0.0})
+                      'pre_vorx': (X0.get(pid) or {}).get('vorx0', (X0.get(pid) or {}).get('vorx')) or 0.0, 'mpg0': q.get('mp_per_g') or 0.0})
     ROSTER['nba'] = cands
     out = []
     T = season_T('nba', sum(v[1] for v in teams.values()) / max(82 * len(teams), 1))

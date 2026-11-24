@@ -2,7 +2,7 @@
        scripts/nba_xpm.py), fetched and rendered by the browser 50 to a page.
        {{< nbaxpm title="..." >}}
        XPM = .5 DPM (databallr) + .5 BPM (Basketball-Reference), O-XPM and D-XPM the same blend of each side; BPM
-       alone where a player has no DPM row (marked). XPM, O-XPM and D-XPM show the team-adjusted rXPM (txpm / toxpm / tdxpm; the box blend xpm feeds VORX, pXPM and the models); pXPM is the
+       alone where a player has no DPM row (marked). XPM, O-XPM and D-XPM show the team-adjusted rXPM (txpm / toxpm / tdxpm; VORX uses rXPM; the box blend xpm feeds pXPM and the models); pXPM is the
        predictive one, next season's XPM (sxpm: this season and the two before weighted 1 / .35 / .1 by minutes, 200 MP of
        role mean, plus the aging curve; scripts/nba_xpm.py pxpm()), O / D under it. VORX = .030 x (XPM + 1.4) x MP / 48: wins over replacement, both constants fit to NBA wins (scripts/nba_xpm.py).
        Views: VORX (the default), XPM, pXPM, offense or defense ranks the board by that number. Filters: season, minutes (qualified = 1,000 MP
