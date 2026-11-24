@@ -5,7 +5,7 @@ author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["nba", "statistics", "arkboard"]
 keywords = ["xpm", "pxpm", "stabilization", "nba", "basketball", "statistics", "arkboard"]
-description = "How many games it takes for XPM, on-court plus-minus and every box score rate to stabilize, how XPM predicts next season against other metrics, and how that sets the shrink behind pXPM."
+description = "How many games it takes for XPM, on-court plus-minus and every box score rate to stabilize, how XPM predicts next season against other metrics, and how a rebuilt pXPM became the best predictor on the board."
 showFullContent = false
 readingTime = false
 hideComments = true
@@ -22,7 +22,7 @@ In this article, I wanted to answer four questions:
 1. How many games does XPM need before it is stable?
 2. Which parts of the box score stabilize fast, and which parts are mostly noise?
 3. How does XPM compare to other metrics at predicting next season?
-4. Does the answer change how we shrink XPM into pXPM?
+4. Does the answer change how we shrink XPM into pXPM, and can pXPM be made the most predictive metric of all?
 
 ## The Method
 I used the same split-half approach as Carleton and LumaHoops. For each team, take its first 2k games of the season. Split them into odd games and even games, so each half has k games. Compute a player's value on the odd half and on the even half, and correlate the two across every player in the league. If a stat is mostly talent, a player who is good on odd nights will also be good on even nights, and the correlation is high. If a stat is mostly noise, the two halves won't agree.
@@ -107,17 +107,17 @@ Every metric gets the same nine season pairs (2013-14 to 2014-15 through 2024-25
 
 | Metric | Describe R² | Predict R² (90% CI) | vs rXPM | P(better than rXPM) |
 | :--- | :---: | :---: | :---: | :---: |
+| **pXPM** | **.922** | **.657 (.63 to .70)** | **+.017** | **.88** |
 | BPM | .988 | .644 (.61 to .69) | +.004 | .63 |
-| **rXPM** | **.963** | **.640 (.59 to .69)** | | |
+| rXPM | .963 | .640 (.59 to .69) | | |
 | DPM | .875 | .623 (.58 to .67) | −.018 | .08 |
-| pXPM | .929 | .619 (.59 to .66) | −.021 | .13 |
 | LEBRON | .898 | .599 (.56 to .64) | −.039 | .07 |
 | RAPM (1-yr) | .987 | .569 (.53 to .62) | | |
 | HAPM (1-yr) | .767 | .563 (.52 to .61) | −.076 | .01 |
 | On-court +/- | .994 | .481 (.42 to .55) | −.160 | .00 |
 | On/off | .239 | .373 (.32 to .43) | −.268 | .00 |
 
-*90% intervals and P(better) come from 2,000 resamples of season pairs, with every metric scored on the same resamples.*
+*90% intervals and P(better) come from 2,000 resamples of season pairs, with every metric scored on the same resamples. pXPM is the rebuilt version (below); held out one season at a time, it scores .654. The old pXPM scored .619.*
 
 {{< postchart "xpm-predict" >}}
 
@@ -127,60 +127,82 @@ A few things to note here:
 
 **XPM is at the top of the board.** rXPM predicts next season's team net rating at R² .64, ahead of LEBRON, one-year RAPM, HAPM and every on/off measure. BPM ties it (+.004, better in 63% of resamples, which is a coin flip), so XPM's blend of BPM and DPM isn't buying anything at the team level.
 
-**pXPM is slightly behind rXPM here**, and that is expected. pXPM is built to predict one player's next season, and it cuts that error by about a fifth (below). In a team sum, the low-minute players that pXPM fixes already carry almost no weight, and pulling everyone toward a role mean blurs the gaps between good and bad starters a little. So rXPM is the number to sum up; pXPM is the number to quote for one player.
+**pXPM is now first.** The first time I ran this, the old pXPM came in at .619, behind rXPM, BPM and DPM. That bothered me, because pXPM is the one that is supposed to predict. So I rebuilt it (next section), and the new pXPM predicts next season's team net rating at **.657**, ahead of BPM and rXPM. To be honest about the size of the win: it beats rXPM in 88% of resamples and BPM in 90%, so it is the best number here, but not by a mile.
 
 **Plus-minus metrics stabilize slowly and predict worse.** The ranking from the stabilization section carries straight through: the stats that need the most games to stabilize (on/off, on-court +/-, one-year RAPM) are also the worst at predicting. That is the same conclusion as the LumaHoops paper, from a different test and a different data set.
 
 One caveat in XPM's favor: the LEBRON and HAPM histories were fit with later seasons available, so their past values have some hindsight baked in. XPM, BPM and DPM have none, and they still come out on top.
 
 ## From Padding To pXPM
-pXPM is XPM shrunk by minutes:
+The old pXPM was XPM shrunk by minutes:
 
-**pXPM** = μ + (rXPM − μ) × MP / (MP + k)
+**old pXPM** = μ + (rXPM − μ) × MP / (MP + 600)
 
-where μ is a role mean (moving toward the player's own history when he has one) and k is the shrink. The live k is **600 minutes**. The within-season padding above is **about 230 minutes**. So why is the shrink more than twice the padding?
+where μ is a role mean, moving toward the player's own history when he has one. The within-season padding above is **about 230 minutes**, so why was the shrink more than twice the padding?
 
 Because pXPM isn't predicting the other half of the same season; it predicts next season. The 230 minutes only covers sampling noise. Going from one season to the next adds real change on top: aging, role changes, new teammates, injuries. You can measure that directly. Season box XPM correlates at **r = .75** from one year to the next (2,427 player pairs, 500+ minutes in both seasons). Strip out the sampling noise, using the 230-minute padding, and the true-talent year-to-year correlation is about **.87**. Combining the two:
 
 **shrink weight** = .87 × MP / (MP + 230)
 
-For a full-season player at 2,000 minutes, that comes to a weight of .78, the same weight k = 600 gives (2,000 / 2,600 = .77). So the two fits agree. The 600 that the year-to-year fit picked, on its own and in all 15 leave-one-season-out folds, is the 230-minute stabilization point plus the drift of a year.
+For a full-season player at 2,000 minutes, that comes to a weight of .78, the same weight k = 600 gives (2,000 / 2,600 = .77). So the old k of 600 was the 230-minute stabilization point plus the drift of a year, all folded into one dial.
 
 {{< postchart "xpm-shrink" >}}
 
 
-The payoff of shrinking is large. On next season's XPM (2011-26, held out one season at a time):
+## Making pXPM The Most Predictive
+That last line is also the problem. One dial was doing two jobs: cleaning up sampling noise and guessing at a year of change. The year of change isn't random, though. Most of it is age, and some of it is the seasons before this one. So the new pXPM splits the jobs up:
 
-| | Next-season RMSE |
-| :--- | :---: |
-| rXPM (raw) | 1.59 |
-| pXPM, k = 300, role mean (Oct 31) | 1.26 |
-| **pXPM, k = 600, role + history mean (live)** | **1.24** |
+**pXPM** = (200 × μ + MP × XPM + .35 × MP₋₁ × XPM₋₁ + .1 × MP₋₂ × XPM₋₂) / (200 + MP + .35 × MP₋₁ + .1 × MP₋₂) + aging
+
+- **This season and the two before**, weighted by minutes at 1 / .35 / .1 (Marcel-style).
+- **A shrink of 200 minutes** toward the role mean. That is right at the 230-minute padding from the split-half study: once aging and history are handled on their own, the shrink only has to cover sampling noise, which is exactly what stabilization measures.
+- **Aging**: the average change in XPM from one season to the next at the player's next age, fit only on seasons before the one being projected.
+- **A steeper role mean**: μ = −2 + ln(1 + MP82 / 100), so a 300-minute player starts lower than before and a 2,500-minute player a little higher.
+
+Every setting was picked on next season's XPM with one season held out at a time (2011-26), and the team test above was never used to pick anything. Nine of 15 folds picked exactly the shipped settings, and all 15 picked k = 200 and the full aging curve.
+
+| | Next-season RMSE | Team net R² |
+| :--- | :---: | :---: |
+| BPM | 1.95 | .644 |
+| rXPM (raw) | 1.58 | .640 |
+| DPM | 1.38 | .623 |
+| old pXPM (k 600) | 1.24 | .619 |
+| **new pXPM (held out)** | **1.19** | **.654** |
 
 {{< postchart "xpm-rmse" >}}
 
 
-The gap is biggest for small samples. A player under 100 minutes has a raw next-season error of 7.3 points, against 1.7 for his pXPM.
+The new pXPM beats the old one in 14 of 15 seasons (paired t = −7.3) and wins on both tests at once. Which piece is doing the work? Turning each one off:
+
+| Without | Next-season RMSE | Team net R² |
+| :--- | :---: | :---: |
+| nothing (new pXPM) | 1.185 | .657 |
+| aging | 1.250 | .633 |
+| the two seasons before | 1.238 | .661 |
+| the steeper role mean | 1.187 | .648 |
+| the 200-minute shrink (k 600 instead) | 1.223 | .654 |
+
+Aging is the biggest piece by far, on both tests. History is the piece that helps one player's projection but not the team sum (probably because the team test already knows next season's minutes, which carry a lot of the same information). The steeper role mean mostly matters for the team test, where it stops low-minute players from looking like average ones.
 
 ## What I Tested And What Failed
-The LumaHoops paper and the stat-by-stat table above both point at an obvious idea: if different stats stabilize at different speeds, maybe offense and defense deserve their own shrink. I tested it, along with a wider grid for k, out of sample (leave one season out, 2011-26, next-season XPM as the target):
-
 | Test | Result |
 | :--- | :--- |
-| k grid extended to 2,000 | Every fold still picks **600**. It is a true optimum, not the edge of the grid. |
+| Old pXPM: k grid extended to 2,000 | Every fold still picked **600**. A true optimum for a one-dial shrink. |
 | Separate k for offense and defense | No gain: RMSE 1.2357 vs 1.2357, better in 6 of 15 seasons. **Fail.** |
+| Weighting BPM above DPM inside pXPM (.4 to .7 BPM) | At most +.001 team R², with a worse player error. **Fail.** |
+| Aging in hockey's projection (NHL pWAR) | Better at one player's next season, worse at next season's team goal differential. **Fail**, not shipped. |
 
-A separate shrink for O and D doesn't hold up, because both sides of XPM are already built from a mix of fast and slow stats. The steals and TS% noise is already averaged in before the shrink happens. pXPM stays as it is.
+A separate shrink for O and D doesn't hold up, because both sides of XPM are already built from a mix of fast and slow stats. The steals and TS% noise is already averaged in before the shrink happens. And the aging fix didn't carry over to hockey: NHL pWAR is fit to team goal differential, and adding an aging curve made that worse at every weight I tried.
 
 ## So, To Summarize
 - XPM is **provisionally stable after about 14 games** (230 minutes, 490 possessions), twice as fast as on-court +/- (28 games) and in line with BPM in the LumaHoops paper.
 - Inside one season, XPM tops out at **.71** split-half reliability: mostly signal, never fully stable, because players really do change in-season.
 - **Role stats** (shot diet, assists, rebounding, scoring volume) stabilize in under a week. **Efficiency** (TS%, 31 games) and **steals** (18) are where the noise lives.
 - On next season's team net rating, **rXPM (R² .64) ties BPM and beats DPM, LEBRON, RAPM, HAPM, on-court +/- and on/off**. Describing a season is easy; predicting the next one is where plus-minus falls off.
-- pXPM's **k = 600** is not arbitrary. It is the 230-minute stabilization point plus a year of real talent change (true-talent year-to-year r about .87), and it cuts next-season error from 1.59 to 1.24.
-- A separate shrink for offense and defense failed out of sample, so pXPM keeps one shrink.
+- The old pXPM's k = 600 was the 230-minute stabilization point plus a year of real change. Splitting that year out into **aging and the two seasons before** lets the shrink drop to **200 minutes**, right at the padding.
+- The rebuilt **pXPM is now the most predictive metric here on both tests**: next-season player error 1.19 (old 1.24, raw 1.58) and next-season team net R² .654 held out (BPM .644, rXPM .640).
 
-The practical rule: before about 14 games, read pXPM, not rXPM. After a full season, rXPM is mostly real, but pXPM is still the better bet on next year.
+The practical rule: rXPM is what a player did. pXPM is the best guess at what he does next.
 
 **Works Cited**
 Awoyemi, A. (2026). Stabilization of NBA Plus-Minus Metrics (Working paper v1). LUMA Basketball Research. [https://lumahoops.org/research/stabilization-of-nba-plus-minus-metrics](https://lumahoops.org/research/stabilization-of-nba-plus-minus-metrics)
@@ -191,4 +213,4 @@ Blackport, D. (2014). Shot metric reliability. *Hockey-Graphs*.
 
 Medvedovsky, K. (2020). On-court plus-minus padding (as cited in Awoyemi, 2026).
 
-Data: ESPN box scores; Basketball Reference (BPM, on-court and on/off); DPM; LEBRON (BBall Index via nbarapm.com); one-year RAPM (gabriel1200); HAPM (LumaHoops, CC BY 4.0). Study scripts: `scripts/nba_xpm_stability_research.py`, `scripts/nba_xpm_predictive_research.py`.
+Data: ESPN box scores; Basketball Reference (BPM, on-court and on/off); DPM; LEBRON (BBall Index via nbarapm.com); one-year RAPM (gabriel1200); HAPM (LumaHoops, CC BY 4.0). Study scripts: `scripts/nba_xpm_stability_research.py`, `scripts/nba_xpm_predictive_research.py`, `scripts/nba_pxpm_research.py`.

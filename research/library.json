@@ -460,11 +460,12 @@
     },
     {
      "term": "pXPM (predictive XPM)",
-     "short": "XPM shrunk by minutes: toward his expected XPM on the boards, toward replacement in depth charts and backup watch.",
+     "short": "Projected XPM next season: XPM over three seasons by minutes, shrunk toward a role mean, aged. Depth charts and backup watch: toward replacement.",
      "body": [
-      "Boards: raw x MP / (MP + 600) + mean x 600 / (MP + 600).",
-      "Mean = role mean + r x (Marcel prior - role mean), r = H / (H + 1,000), H = MP last season + .5 x MP the season before.",
-      "Role mean = -1 + .5 ln(1 + MP82 / 100). Fit on next-season XPM 2011-26, leave one season out: RMSE 1.235 vs 1.259 role mean only, 1.59 raw.",
+      "Boards: (k x role mean + MP x XPM + w1 x MP-1 x XPM-1 + w2 x MP-2 x XPM-2) / (k + MP + w1 MP-1 + w2 MP-2) + aging curve to next season.",
+      "k 200 MP, w1 0.35, w2 0.1; role mean = -3 + 1 ln(1 + MP82 / 100). Aging: next-season XPM change by age, fit on earlier seasons only.",
+      "Next-season XPM 2011-26, leave one season out: RMSE 1.187 vs 1.238 (Nov 4 shrink), 1.58 raw (t -7.28, 14/15 seasons).",
+      "Next-season team net rating, nine pairs, held out: R2 0.654; rXPM 0.640, BPM 0.644, DPM 0.623, Nov 4 shrink 0.619.",
       "Depth chart and backup watch: XPM over three seasons (minutes weighted 1, .5, .25) x M / (M + 500) + replacement (-1.4) x 500 / (M + 500)."
      ],
      "where": "NBA VORX/XPM leaders (pXPM chip), rookies, depth chart, backup watch",

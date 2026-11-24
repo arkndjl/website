@@ -18,6 +18,7 @@ _HKN = {'ls': 'log slot (board rank as slot)', 'nhle': 'draft-year NHLe', 'D': '
 _HKEPT = ', '.join(dict.fromkeys(_HKN.get(k, k) for k in _HKF['kept'] if k != 'ls2'))
 
 _NX = ld('data/nba_proj3y_fit.json')['exit']['res']['1.0']
+_PX = ld('data/nba_pxpm_research.json')                     # pXPM fit + held-out tests (scripts/nba_pxpm_research.py)
 _NBAEX = (f"Held out 2012-23 ({_NX['n']:,} player seasons, {100 * _NX['exitShare']:.0f}% out of the league): RMSE {_NX['exit_vs_cp']['rmse'][1]:.2f} -> "
           f"{_NX['exit_vs_cp']['rmse'][0]:.2f} (t {_NX['exit_vs_cp']['t']:.1f}, {_NX['exit_vs_cp']['won']}/{_NX['exit_vs_cp']['of']} seasons).")
 
@@ -196,10 +197,11 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
        'Feeds VORX, the game models (which shrink it themselves) and the CBB board target. BPM only where no DPM row (*).',
        'XPM and rookie boards default to qualified: 1,000 MP per 82 team games. Qualified rookies 2010-23: XPM orders next-three-season VORX .607 (VORX .604); all rookies .330.'],
       'NBA VORX/XPM leaders, rookies, team pages, ARKLIST', ['NBA']),
-    E('pXPM (predictive XPM)', 'XPM shrunk by minutes: toward his expected XPM on the boards, toward replacement in depth charts and backup watch.',
-      ['Boards: raw x MP / (MP + 600) + mean x 600 / (MP + 600).',
-       'Mean = role mean + r x (Marcel prior - role mean), r = H / (H + 1,000), H = MP last season + .5 x MP the season before.',
-       'Role mean = -1 + .5 ln(1 + MP82 / 100). Fit on next-season XPM 2011-26, leave one season out: RMSE 1.235 vs 1.259 role mean only, 1.59 raw.',
+    E('pXPM (predictive XPM)', 'Projected XPM next season: XPM over three seasons by minutes, shrunk toward a role mean, aged. Depth charts and backup watch: toward replacement.',
+      ['Boards: (k x role mean + MP x XPM + w1 x MP-1 x XPM-1 + w2 x MP-2 x XPM-2) / (k + MP + w1 MP-1 + w2 MP-2) + aging curve to next season.',
+       f'k {_PX["ship"][0]} MP, w1 {_PX["ship"][1]}, w2 {_PX["ship"][2]}; role mean = {-2 + _PX["ship"][4]:g} + {_PX["ship"][5] * .5:g} ln(1 + MP82 / 100). Aging: next-season XPM change by age, fit on earlier seasons only.',
+       f'Next-season XPM 2011-26, leave one season out: RMSE {_PX["loo"]["player"]:.3f} vs {_PX["base"]["pXPM (live)"]["player"]:.3f} (Nov 4 shrink), {_PX["base"]["rXPM"]["player"]:.2f} raw (t {_PX["playerTest"]["t"]}, {_PX["playerTest"]["better"]}/{_PX["playerTest"]["of"]} seasons).',
+       f'Next-season team net rating, nine pairs, held out: R2 {_PX["loo"]["team"]:.3f}; rXPM {_PX["base"]["rXPM"]["team"]:.3f}, BPM {_PX["base"]["BPM"]["team"]:.3f}, DPM {_PX["base"]["DPM"]["team"]:.3f}, Nov 4 shrink {_PX["base"]["pXPM (live)"]["team"]:.3f}.',
        'Depth chart and backup watch: XPM over three seasons (minutes weighted 1, .5, .25) x M / (M + 500) + replacement (-1.4) x 500 / (M + 500).'],
       'NBA VORX/XPM leaders (pXPM chip), rookies, depth chart, backup watch', ['NBA']),
     E('VORX', 'Value Over Replacement XPM. NBA wins over replacement: .030 x (XPM + 1.4) x MP / 48.',

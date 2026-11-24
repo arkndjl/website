@@ -490,12 +490,12 @@
  "pXPM (predictive XPM)": {
   "ab": "pXPM",
   "stands": "predictive XPM · NBA",
-  "what": "XPM shrunk by minutes toward what the player is expected to be.",
-  "use": "Small-sample read. Separates a hot 300 minutes from a level.",
+  "what": "Projected XPM next season: three seasons by minutes, shrunk to a role mean, aged.",
+  "use": "Small-sample read and next-season level. Separates a hot 300 minutes from a level.",
   "f": [
-   "raw × MP / (MP + 600)",
-   "+ mean × 600 / (MP + 600)",
-   "mean = role mean + prior pull"
+   "(200 × role mean + Σ w MP × XPM)",
+   "/ (200 + Σ w MP)  · w 1 / 0.35 / 0.1",
+   "+ aging to next season"
   ],
   "test": {
    "t": "next-season XPM · RMSE",
@@ -504,17 +504,27 @@
    "rows": [
     [
      "pXPM",
-     1.235,
+     1.1873,
      1
     ],
     [
-     "role mean only",
-     1.259,
+     "Nov 4 shrink",
+     1.2383,
+     0
+    ],
+    [
+     "DPM",
+     1.3788,
      0
     ],
     [
      "raw XPM",
-     1.59,
+     1.5778,
+     0
+    ],
+    [
+     "BPM",
+     1.9498,
      0
     ]
    ],
@@ -522,24 +532,28 @@
   },
   "viz": {
    "kind": "bars",
-   "t": "weight on raw XPM",
-   "unit": "%",
+   "t": "next-season team net · R²",
+   "unit": "",
    "rows": [
     [
-     "300 MP",
-     33
+     "pXPM",
+     0.6543
     ],
     [
-     "600 MP",
-     50
+     "BPM",
+     0.6438
     ],
     [
-     "1,200 MP",
-     67
+     "rXPM",
+     0.6399
     ],
     [
-     "2,400 MP",
-     80
+     "DPM",
+     0.623
+    ],
+    [
+     "Nov 4 shrink",
+     0.6193
     ]
    ]
   },
@@ -547,22 +561,22 @@
    "t": "best qualified season per player · 2009-10 to 2025-26",
    "rows": [
     [
-     "Nikola Jokić",
-     "2025-26",
-     "DEN",
+     "LeBron James",
+     "2009-10",
+     "CLE",
      9.8
     ],
     [
-     "LeBron James",
-     "2012-13",
-     "MIA",
-     9.5
+     "Nikola Jokić",
+     "2023-24",
+     "DEN",
+     9.6
     ],
     [
      "Stephen Curry",
      "2015-16",
      "GSW",
-     9.0
+     8.7
     ],
     [
      "Giannis Antetokounmpo",
@@ -571,22 +585,22 @@
      8.3
     ],
     [
+     "Shai Gilgeous-Alexander",
+     "2025-26",
+     "OKC",
+     8.0
+    ],
+    [
      "Russell Westbrook",
      "2016-17",
      "OKC",
-     8.2
-    ],
-    [
-     "Shai Gilgeous-Alexander",
-     "2024-25",
-     "OKC",
-     7.9
-    ],
-    [
-     "Chris Paul",
-     "2016-17",
-     "LAC",
      7.8
+    ],
+    [
+     "Dwyane Wade",
+     "2009-10",
+     "MIA",
+     7.7
     ],
     [
      "Kevin Durant",
@@ -595,16 +609,16 @@
      7.7
     ],
     [
-     "James Harden",
-     "2018-19",
-     "HOU",
-     7.7
+     "Victor Wembanyama",
+     "2025-26",
+     "SAS",
+     7.6
     ],
     [
-     "Joel Embiid",
-     "2023-24",
-     "PHI",
-     7.6
+     "Kawhi Leonard",
+     "2016-17",
+     "SAS",
+     7.5
     ]
    ],
    "dec": 1,
@@ -961,36 +975,36 @@
   },
   "viz": {
    "kind": "dist",
-   "t": "200+ snaps · 2026 through week 10",
+   "t": "200+ snaps · 2026 through week 11",
    "unit": "",
    "bins": [
     [
      -0.25,
-     3
+     9
     ],
     [
      -0.125,
-     133
+     134
     ],
     [
      0.0,
-     482
+     490
     ],
     [
      0.125,
-     187
+     192
     ],
     [
      0.25,
-     57
+     70
     ],
     [
      0.375,
-     18
+     21
     ],
     [
      0.5,
-     5
+     7
     ],
     [
      0.625,
@@ -998,7 +1012,7 @@
     ],
     [
      0.75,
-     1
+     2
     ],
     [
      0.875,
@@ -1006,7 +1020,7 @@
     ],
     [
      1.0,
-     2
+     3
     ],
     [
      1.125,
@@ -1028,37 +1042,49 @@
      "Brock Purdy",
      "QB",
      "SF",
-     1.16
-    ],
-    [
-     "Josh Allen",
-     "QB",
-     "BUF",
-     1.03
-    ],
-    [
-     "Joe Burrow",
-     "QB",
-     "CIN",
-     1.01
-    ],
-    [
-     "Trevor Lawrence",
-     "QB",
-     "JAX",
-     0.93
+     1.37
     ],
     [
      "Dak Prescott",
      "QB",
      "DAL",
-     0.87
+     1.12
+    ],
+    [
+     "Joe Burrow",
+     "QB",
+     "CIN",
+     1.09
+    ],
+    [
+     "Josh Allen",
+     "QB",
+     "BUF",
+     1.08
+    ],
+    [
+     "Trevor Lawrence",
+     "QB",
+     "JAX",
+     0.9
+    ],
+    [
+     "Patrick Mahomes",
+     "QB",
+     "KC",
+     0.85
     ],
     [
      "C.J. Stroud",
      "QB",
      "HOU",
-     0.74
+     0.81
+    ],
+    [
+     "Jared Goff",
+     "QB",
+     "DET",
+     0.73
     ],
     [
      "Jaxon Smith-Njigba",
@@ -1067,22 +1093,10 @@
      0.7
     ],
     [
-     "Patrick Mahomes",
-     "QB",
-     "KC",
-     0.69
-    ],
-    [
      "Drake Maye",
      "QB",
      "NE",
-     0.69
-    ],
-    [
-     "Kirk Cousins",
-     "QB",
-     "LV/MIN",
-     0.66
+     0.7
     ]
    ],
    "dec": 2
@@ -1515,20 +1529,16 @@
   ],
   "parts": [
    [
-    "xA",
-    0.4238
-   ],
-   [
     "npxG",
-    0.2778
+    -0.2719
    ],
    [
     "xGBuildup",
-    0.2582
+    0.168
    ],
    [
     "on-ice xGA",
-    0.116
+    0.0717
    ]
   ],
   "test": {
@@ -1538,12 +1548,12 @@
    "rows": [
     [
      "GAR + priors",
-     0.673,
+     0.686,
      1
     ],
     [
      "GAR, no priors",
-     0.609,
+     0.63,
      0
     ]
    ],
@@ -1556,55 +1566,55 @@
    "bins": [
     [
      -4,
-     1
+     4
     ],
     [
      -3,
-     6
+     11
     ],
     [
      -2,
-     42
+     64
     ],
     [
      -1,
-     258
+     270
     ],
     [
      0,
-     421
+     410
     ],
     [
      1,
-     351
+     336
     ],
     [
      2,
-     219
+     202
     ],
     [
      3,
-     126
+     108
     ],
     [
      4,
-     80
+     86
     ],
     [
      5,
-     33
+     37
     ],
     [
      6,
-     18
+     19
     ],
     [
      7,
-     10
+     11
     ],
     [
      8,
-     3
+     8
     ],
     [
      9,
@@ -1612,7 +1622,7 @@
     ],
     [
      10,
-     1
+     3
     ],
     [
      11,
@@ -1634,61 +1644,61 @@
      "Lionel Messi",
      "2014-15",
      "Barcelona",
-     18.89
+     21.16
     ],
     [
      "Neymar",
      "2015-16",
      "Barcelona",
-     17.56
-    ],
-    [
-     "Kevin De Bruyne",
-     "2019-20",
-     "Manchester City",
-     14.84
+     19.15
     ],
     [
      "Robert Lewandowski",
      "2018-19",
      "Bayern Munich",
-     13.75
+     16.79
+    ],
+    [
+     "Kevin De Bruyne",
+     "2017-18",
+     "Manchester City",
+     16.23
     ],
     [
      "Luis Suárez",
      "2015-16",
      "Barcelona",
-     13.73
+     16.22
     ],
     [
      "Cristiano Ronaldo",
      "2014-15",
      "Real Madrid",
-     13.47
+     16.12
+    ],
+    [
+     "Kylian Mbappe-Lottin",
+     "2021-22",
+     "Paris Saint Germain",
+     15.0
     ],
     [
      "Mohamed Salah",
      "2024-25",
      "Liverpool",
-     13.05
+     14.15
     ],
     [
-     "Mesut Özil",
-     "2015-16",
-     "Arsenal",
-     12.56
-    ],
-    [
-     "Joshua Kimmich",
-     "2018-19",
+     "Thomas Müller",
+     "2020-21",
      "Bayern Munich",
-     11.96
+     13.02
     ],
     [
      "Michael Olise",
      "2025-26",
      "Bayern Munich",
-     11.64
+     12.57
     ]
    ],
    "dec": 1
@@ -1761,21 +1771,21 @@
    "rows": [
     [
      "RWA",
-     0.1338,
+     0.1329,
      1
     ],
     [
      "Nov 2 RWA",
-     0.1199,
+     0.1191,
      0
     ],
     [
      "K-D per round",
-     0.1127,
+     0.1119,
      0
     ]
    ],
-   "n": "held out 2025-07 on · 31,848 player-maps"
+   "n": "held out 2025-07 on · 32,290 player-maps"
   },
   "viz": {
    "kind": "dist",
@@ -1796,11 +1806,11 @@
     ],
     [
      -2.5,
-     89
+     91
     ],
     [
      -2.0,
-     101
+     99
     ],
     [
      -1.5,
@@ -1808,7 +1818,7 @@
     ],
     [
      -1.0,
-     60
+     62
     ],
     [
      -0.5,
@@ -1816,15 +1826,15 @@
     ],
     [
      0.0,
-     18
+     17
     ],
     [
      0.5,
-     11
+     12
     ],
     [
      1.0,
-     8
+     6
     ],
     [
      1.5,
@@ -1862,61 +1872,61 @@
      "donk",
      "179 maps",
      "Spirit",
-     3.48
+     3.46
     ],
     [
      "ZywOo",
      "191 maps",
      "Vitality",
-     3.44
+     3.41
     ],
     [
      "m0NESY",
      "183 maps",
      "Falcons",
-     2.89
+     2.87
     ],
     [
      "sh1ro",
      "179 maps",
      "Spirit",
-     1.95
+     1.93
     ],
     [
      "molodoy",
      "235 maps",
      "FURIA",
-     1.91
+     1.89
     ],
     [
      "w0nderful",
      "194 maps",
      "Natus Vincere",
-     1.76
+     1.74
     ],
     [
      "KSCERATO",
      "235 maps",
      "FURIA",
-     1.58
+     1.55
     ],
     [
      "ropz",
      "191 maps",
      "Vitality",
-     1.48
+     1.46
     ],
     [
      "torzsi",
      "208 maps",
      "MOUZ",
-     1.31
+     1.29
     ],
     [
      "xertioN",
      "208 maps",
      "MOUZ",
-     1.31
+     1.29
     ]
    ],
    "dec": 2,
@@ -2074,12 +2084,6 @@
      44
     ],
     [
-     "Cameron Boozer",
-     "PF",
-     "MEM",
-     40
-    ],
-    [
      "Josh Minott",
      "SF",
      "BKN",
@@ -2098,18 +2102,6 @@
      33
     ],
     [
-     "Yaxel Lendeborg",
-     "SF",
-     "GSW",
-     32
-    ],
-    [
-     "Darryn Peterson",
-     "SG",
-     "UTA",
-     31
-    ],
-    [
      "Brandon Miller",
      "SF",
      "CHA",
@@ -2120,6 +2112,24 @@
      "PF",
      "TOR",
      28
+    ],
+    [
+     "Naz Reid",
+     "C",
+     "CHA",
+     26
+    ],
+    [
+     "Bennett Stirtz",
+     "PG",
+     "OKC",
+     24
+    ],
+    [
+     "Darryn Peterson",
+     "SG",
+     "UTA",
+     23
     ]
    ],
    "dec": 0,

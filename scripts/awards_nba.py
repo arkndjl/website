@@ -133,7 +133,7 @@ def seasons_data():
             wp = sum(st.get(t, {'wp': .5})['wp'] * g for t, g in tms) / gt
             seed1 = max((1.0 if st.get(t, {}).get('seed') == 1 else 0.0) for t, _ in tms)
             row = {'id': pid, 'n': r['n'], 'tm': r['tm'], 'pos': r.get('pos', ''), 'g': p['games'], 'mp': r['mp'],
-                   'gs': p.get('games_started', 0), 'age': r.get('age') or 0, 'sxpm': r.get('sxpm', r.get('xpm', 0)) or 0,
+                   'gs': p.get('games_started', 0), 'age': r.get('age') or 0, 'sxpm': r.get('sx0', r.get('xpm', 0)) or 0,
                    'vorx': r.get('vorx', 0) or 0, 'xpm': r.get('xpm', 0) or 0, 'dxpm': r.get('dxpm', 0) or 0,
                    'ppg': p['pts_per_g'], 'rpg': p['trb_per_g'], 'apg': p['ast_per_g'],
                    'stocks': p['stl_per_g'] + p['blk_per_g'], 'mpg': p['mp_per_g'],
@@ -210,7 +210,7 @@ def annotate(s, rows):
         q, p0 = last.get(r['id']), pg0.get(r['id'])
         r['has_pre'] = q is not None and p0 is not None
         r['pre_vorx'] = (q or {}).get('vorx', 0) or 0
-        r['pre_sxpm'] = (q.get('sxpm', q.get('xpm', -2)) or 0) if q else -2.0
+        r['pre_sxpm'] = (q.get('sx0', q.get('xpm', -2)) or 0) if q else -2.0
         r['pre_dxpm'] = (q or {}).get('dxpm', 0) or 0
         r['d_vorx'] = r['vorx'] - r['pre_vorx']
         r['d_ppg'] = r['ppg'] - (p0 or {}).get('pts_per_g', 0)
