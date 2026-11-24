@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-24T21:00Z",
+ "asof": "2026-11-24T21:35Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -292,8 +292,8 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 12,
-     "rows": 2161
+     "flags": 13,
+     "rows": 2160
     },
     "static/data/nfl-fantasy.json": {
      "flags": 3,
@@ -476,6 +476,24 @@
      "pid": "17142",
      "player": "John Ojukwu",
      "pos": "RT",
+     "rotowire": "FA",
+     "site": "PHI"
+    },
+    {
+     "d": "2026-11-16",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "practice",
+     "head": "Signs with Philly's practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-16",
+      "head": "Signs with Philly's practice squad",
+      "kind": "practice"
+     },
+     "pid": "16260",
+     "player": "Chance Campbell",
+     "pos": "ILB",
      "rotowire": "FA",
      "site": "PHI"
     },
@@ -4369,8 +4387,8 @@
     }
    ],
    "joined": 0,
-   "players": 2312,
-   "rows": 8148
+   "players": 2313,
+   "rows": 8147
   },
   "nhl": {
    "by_file": {
@@ -4388,7 +4406,7 @@
     },
     "static/data/pctl-nhl.json": {
      "flags": 0,
-     "rows": 359
+     "rows": 352
     },
     "static/data/xaav-nhl.json": {
      "flags": 11,
@@ -4633,7 +4651,7 @@
    ],
    "joined": 0,
    "players": 1435,
-   "rows": 2747
+   "rows": 2740
   }
  }
 }
