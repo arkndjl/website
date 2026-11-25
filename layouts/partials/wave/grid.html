@@ -1,0 +1,4 @@
+{{- /* A WAVE card grid: dict "items" (product rows) "names" "lg" "chip" "max" (cards drawn; default all). */ -}}
+<div class="wv-grid">
+{{- range first (.max | default 999) .items }}{{ partial "wave/card.html" (dict "p" . "names" $.names "lg" $.lg "chip" $.chip) }}{{ end }}
+</div>

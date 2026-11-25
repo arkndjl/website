@@ -1,20 +1,70 @@
 {{- /* One WAVE panel (content/arkndjl-wave.md, inside {{< arkndjlwave >}}'s tabs), from data/wave.json:
-       {{< wavepanel p="drops|merch|shows|promos|tickets|collabs|brands|collections" tab="<tab name>" >}}.
-       Rows carry data-who so the frequency wall can filter them. Table notes live in th titles / the status bar hover. */ -}}
+       {{< wavepanel p="collections|new in|headlines|sales|knicks|mets|collabs|staples|merch|shows|screen|tickets|promos|brands" tab="<tab name>" >}}.
+       Cards and rows carry data-who so the logo strip can filter them. Table notes live in th titles / the status bar hover. */ -}}
 {{- $lg := printf "/img/px/wave-logos.svg?v=%s#px-wv-" (substr (readFile "static/img/px/wave-logos.svg" | md5) 0 8) -}}
 {{- $w := site.Data.wave | default dict -}}
 {{- $p := .Get "p" -}}
 {{- $tab := .Get "tab" | default $p -}}
-{{- if in (slice "drops" "merch") $p }}
-{{- $items := cond (eq $p "drops") ($w.drops | default slice) ($w.merch | default slice) -}}
-{{- $feed := cond (eq $p "drops") ($w.news | default slice) ($w.bandnews | default slice) -}}
+{{- $names := dict -}}{{ range $w.wall }}{{ $names = merge $names (dict .id .name) }}{{ end -}}
+{{- range $w.suggested }}{{ $names = merge $names (dict .id .name) }}{{ end -}}
+{{- $btn := `<span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>` | safeHTML -}}
+{{- $blocks := `<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span>` | safeHTML -}}
+{{- if eq $p "collections" }}
+{{- $rows := $w.showcases | default slice -}}
 <div class="win" data-tab="{{ $tab }}">
-  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ cond (eq $p "drops") "entity" "note" }}"/></svg>{{ $p }}.exe<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-brush"/></svg>collections.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btn }}</div>
   <div class="wv-body">
-    {{ partial "wave/drops.html" (dict "items" $items) }}
-    {{ partial "wave/feed.html" (dict "items" (first 25 $feed)) }}
+  {{- range $rows }}
+  {{- $sep := cond (in .img "?") "&" "?" }}
+  <article class="wv-show" data-who="{{ .who }}">
+    <a class="wv-show__hero" href="{{ .u }}" target="_blank" rel="noopener">
+      <img src="{{ .img }}{{ $sep }}width=900" srcset="{{ .img }}{{ $sep }}width=600 600w, {{ .img }}{{ $sep }}width=1200 1200w, {{ .img }}{{ $sep }}width=1800 1800w" sizes="(max-width:900px) 100vw, 1100px" alt="{{ .name }} {{ .t }}" width="1200" height="675" loading="lazy" decoding="async">
+      <span class="wv-show__cap"><svg class="lg" aria-hidden="true"><use href="{{ $lg }}{{ .who }}"/></svg><span><i>{{ .name }}</i><b>{{ .t }}</b><em>{{ (time .d).Format "Jan 2" }} · {{ .n }} pieces{{ if .co }} · collab{{ end }}</em></span></span>
+    </a>
+    {{ partial "wave/grid.html" (dict "items" .items "names" $names "lg" $lg) }}
+    {{- if gt .n (len .items) }}<a class="wv-more" href="{{ .u }}" target="_blank" rel="noopener">+{{ sub .n (len .items) }}</a>{{ end }}
+  </article>
+  {{- else }}<p class="wv-empty">--</p>{{ end }}
   </div>
-  <div class="win__status" title="{{ $w.about }}"><span>{{ len $items }} {{ $p }}</span><span>{{ len $feed }} headlines</span>{{ partial "fresh.html" (dict "feed" "wave") }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status" title="{{ $w.about }} · a showcase = a collection a brand's own store published in the last 45 days (lookbook image or a season / drop / collab title), pieces in the store's order"><span>{{ len $rows }} collections</span>{{ partial "fresh.html" (dict "feed" "wave") }}{{ $blocks }}</div>
+</div>
+{{- else if in (slice "new in" "merch") $p }}
+{{- $items := cond (eq $p "merch") ($w.merch | default slice) ($w.drops | default slice) -}}
+<div class="win" data-tab="{{ $tab }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ cond (eq $p "merch") "note" "entity" }}"/></svg>{{ cond (eq $p "merch") "merch" "new_in" }}.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btn }}</div>
+  <div class="wv-body">
+    {{ partial "wave/drops.html" (dict "items" $items "names" $names "lg" $lg) }}
+    {{- if eq $p "merch" }}{{ partial "wave/feed.html" (dict "items" (first 25 ($w.bandnews | default slice))) }}{{ end }}
+  </div>
+  <div class="win__status" title="{{ $w.about }}"><span>{{ len $items }} drops</span>{{ partial "fresh.html" (dict "feed" "wave") }}{{ $blocks }}</div>
+</div>
+{{- else if eq $p "headlines" }}
+{{- $a := $w.news | default slice -}}{{ $b := $w.collections | default slice -}}
+<div class="win" data-tab="{{ $tab }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-entity"/></svg>headlines.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btn }}</div>
+  <div class="wv-body">{{ partial "wave/feed.html" (dict "items" (first 40 (sort ($a | append $b) "at" "desc"))) }}</div>
+  <div class="win__status" title="fashion headlines naming a tracked or suggested brand, last 45 days"><span>{{ add (len $a) (len $b) }} headlines</span>{{ partial "fresh.html" (dict "feed" "wave") }}{{ $blocks }}</div>
+</div>
+{{- else if eq $p "sales" }}
+{{- $rows := $w.sales | default slice -}}
+<div class="win" data-tab="{{ $tab }}" data-wv-shop>
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-coin"/></svg>sales.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btn }}</div>
+  <div class="wv-body">
+    <div class="wv-bar" role="group" aria-label="sort and filter">
+      <span class="wv-chips" data-wv-sort><button type="button" aria-pressed="true" data-k="val" title="100 x expected / price; expected = compare-at x (1 - the store's base markdown rate). 120+ = deal">VAL</button><button type="button" aria-pressed="false" data-k="off">% off</button><button type="button" aria-pressed="false" data-k="price">price</button></span>
+      <span class="wv-chips" data-wv-type><button type="button" aria-pressed="true" data-k="">all</button><button type="button" aria-pressed="false" data-k="top">tops</button><button type="button" aria-pressed="false" data-k="bottom">bottoms</button><button type="button" aria-pressed="false" data-k="outer">jackets</button><button type="button" aria-pressed="false" data-k="shoes">shoes</button><button type="button" aria-pressed="false" data-k="cap">caps</button><button type="button" aria-pressed="false" data-k="acc">acc</button></span>
+      <span class="wv-chips" data-wv-cut><button type="button" aria-pressed="true" data-k="">all cuts</button><button type="button" aria-pressed="false" data-k="m" title="hides pieces a store lists as women's">men's</button><button type="button" aria-pressed="false" data-k="w" title="hides pieces a store lists as men's">women's</button></span>
+    </div>
+    {{ partial "wave/grid.html" (dict "items" $rows "names" $names "lg" $lg) }}
+  </div>
+  <div class="win__status" title="{{ $w.about }} · in stock, 10%+ off, at most 14 per brand, best VAL first"><span data-wv-count>{{ len $rows }} on sale</span><span>{{ len (where $rows "val" "ge" 120) }} VAL 120+</span>{{ partial "fresh.html" (dict "feed" "wave") }}{{ $blocks }}</div>
+</div>
+{{- else if in (slice "knicks" "mets" "staples") $p }}
+{{- $rows := index ($w.picks | default dict) $p | default slice -}}
+<div class="win" data-tab="{{ $tab }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ cond (eq $p "knicks") "basketball" (cond (eq $p "mets") "baseball" "brush") }}"/></svg>{{ $p }}.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btn }}</div>
+  <div class="wv-body">{{ partial "wave/grid.html" (dict "items" $rows "names" $names "lg" $lg "chip" "pick") }}</div>
+  <div class="win__status" title="in stock, not new. PICK = TEAM 30 + COLLAB 20 + BRAND (.3 x WAVE; a named brand 30) + FIT (8 per taste hit, max 24) + TYPE (jacket 12, top / cap 10, bottom / shoes 8) + SIZES 4 (3+ in stock); {{ if eq $p "staples" }}3 per brand{{ else }}9 per brand or store, best sellers first on ties{{ end }}"><span>{{ len $rows }} picks</span>{{ partial "fresh.html" (dict "feed" "wave") }}{{ $blocks }}</div>
 </div>
 {{- else if eq $p "shows" }}
 {{- $rows := $w.shows | default slice -}}
@@ -77,28 +127,25 @@
   <div class="win__status" title="Timothée Chalamet and Robert Pattinson headlines from Deadline, Variety, IndieWire, The Hollywood Reporter (their actor feeds), /Film and Collider, last 120 days. NEW = the headline reads as a film announcement (casting, joins, to star, trailer, release date, first look, greenlit, filming)"><span>{{ len $ann }} announcements</span><span>{{ len $rows }} headlines</span>{{ partial "fresh.html" (dict "feed" "wave") }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{- else if eq $p "collabs" }}
-{{- $rows := $w.collabs | default slice -}}
+{{- $rows := $w.picks.collabs | default slice -}}
+{{- $news := $w.collabs | default slice -}}
 <div class="win" data-tab="{{ $tab }}">
-  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>collabs.exe<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
-  <div class="wv-body">{{ partial "wave/feed.html" (dict "items" $rows) }}</div>
-  <div class="win__status" title="fashion headlines naming the Mets or Knicks with a collab word, and new '47 Mets / Knicks pieces"><span>{{ len $rows }} items</span>{{ partial "fresh.html" (dict "feed" "wave") }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-entity"/></svg>collabs.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btn }}</div>
+  <div class="wv-body">
+    {{ partial "wave/grid.html" (dict "items" $rows "names" $names "lg" $lg "chip" "pick") }}
+    {{- with $news }}{{ partial "wave/feed.html" (dict "items" .) }}{{ end }}
+  </div>
+  <div class="win__status" title="in stock, not new: a tracked brand's piece whose title or vendor joins two names (A x B, A + B, Kith for ...), 5 per brand, by PICK. Below: fashion headlines naming the Mets or Knicks with a collab word"><span>{{ len $rows }} picks</span><span>{{ len $news }} headlines</span>{{ partial "fresh.html" (dict "feed" "wave") }}{{ $blocks }}</div>
 </div>
 {{- else if eq $p "brands" }}
 {{- $rows := $w.suggested | default slice -}}
 {{ partial "wintable-open.html" (dict "title" "suggested.exe" "icon" "entity" "tab" $tab "class" "wv-t") }}
 <table>
-<thead><tr><th>RK</th><th></th><th>brand</th><th title="streetwear · gothic · oversized top · slim bottom">tags</th><th title="15 per taste tag matched (max 60)">TAG</th><th title="12.5 per tie on record to a tracked brand, band or team (max 25)">LINK</th><th title="15 if based in New York">NYC</th><th title="TAG + LINK + NYC">WAVE</th><th>ties</th><th title="headlines naming the brand, last 45 days">news</th></tr></thead>
+<thead><tr><th>RK</th><th></th><th>brand</th><th title="TAG + FIT + LINK + NYC">WAVE</th><th title="15 per taste tag matched (max 60)">TAG</th><th title="25 x the brand's measured taste share, shrunk to the pooled rate ({{ mul 100 ($w.pooled | default 0) | math.Round }}%) with 40 phantom rows">FIT</th><th title="12.5 per tie to a tracked brand, band or team: on record, or 2+ catalog pieces naming it (max 25)">LINK</th><th title="15 if based in New York">NYC</th><th title="streetwear · gothic · oversized top · slim bottom">tags</th><th title="share of the brand's catalog rows (those naming a colour or cut) that hit a taste word: black / leather / skull, an oversized top, a slim bottom">fit%</th><th title="live catalog rows read for the brand">rows</th><th title="published in the last 21 days">new</th><th title="in stock under compare-at">sale</th><th>ties</th><th title="stores read">at</th><th title="headlines naming the brand, last 45 days">news</th></tr></thead>
 <tbody>
 {{- range $i, $r := $rows }}
-<tr data-who="{{ .id }}"><td>{{ add $i 1 }}</td><td class="lgc"><svg class="lg lg--xs" aria-hidden="true"><use href="{{ $lg }}{{ .id }}"/></svg></td><td><a href="{{ .u }}" target="_blank" rel="noopener">{{ .name }}</a></td><td>{{ range .tags }}<span class="wv-tag on">{{ . }}</span>{{ end }}</td><td>{{ .tag }}</td><td>{{ .link }}</td><td>{{ .nyc }}</td><td><b>{{ .total }}</b></td><td>{{ delimit (.ties | default slice) " · " }}</td><td>{{ .n }}</td></tr>
+<tr data-who="{{ .id }}"><td>{{ add $i 1 }}</td><td class="lgc"><svg class="lg lg--xs" aria-hidden="true"><use href="{{ $lg }}{{ .id }}"/></svg></td><td><a href="{{ .u }}" target="_blank" rel="noopener">{{ .name }}</a></td><td><b>{{ .total }}</b></td><td>{{ .tag }}</td><td>{{ .fit }}</td><td>{{ .link }}</td><td>{{ .nyc }}</td><td>{{ range .tags }}<span class="wv-tag on">{{ . }}</span>{{ end }}</td><td>{{ with .share }}{{ . }}{{ else }}{{ if .rows }}0{{ else }}--{{ end }}{{ end }}</td><td>{{ .rows | default 0 }}</td><td>{{ .new | default 0 }}</td><td>{{ .sale | default 0 }}</td><td>{{ delimit (.ties | default slice) " · " }}</td><td>{{ len (.stores | default slice) }}</td><td>{{ .n }}</td></tr>
 {{- end }}
 </tbody></table>
-{{ partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "wave" "about" "WAVE = TAG (15 per taste tag: streetwear, gothic, oversized top, slim bottom) + LINK (12.5 per tie on record to a tracked brand, band or team, max 25) + NYC (15)") }}
-{{- else if eq $p "collections" }}
-{{- $rows := $w.collections | default slice -}}
-<div class="win" data-tab="{{ $tab }}">
-  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-brush"/></svg>collections.exe<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
-  <div class="wv-body">{{ partial "wave/feed.html" (dict "items" $rows) }}</div>
-  <div class="win__status" title="headlines naming a suggested brand, ranked WAVE score x recency (half-life ~10 days) x taste words in the title"><span>{{ len $rows }} items</span>{{ partial "fresh.html" (dict "feed" "wave") }}<span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
-</div>
+{{ partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "wave" "about" "WAVE = TAG (15 per taste tag: streetwear, gothic, oversized top, slim bottom) + FIT (25 x measured taste share of the live catalog, shrunk) + LINK (12.5 per tie on record or shown by 2+ catalog pieces, max 25) + NYC (15)") }}
 {{- end }}

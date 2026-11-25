@@ -16,18 +16,22 @@ Ticketmaster show for the bands (arenas and the venues the keyless venue pages m
 the file's `keys` and on the page's status bar.
 
 Rules, all explicit:
-  drop      a store product first seen in the last NEW_DAYS days (the first run seeds by created_at instead), grouped
-            per brand per ET day; a drop = 1+ products
+  catalog   drops, collection showcases, sales (VAL), picks (PICK) and each brand's measured FIT: rules in
+            scripts/wave_catalog.py, which reads every brand, retailer and team store
+  merch     a band-store product first seen in the last NEW_DAYS days (the first run seeds by created_at instead),
+            grouped per band per ET day
   news      a feed item whose title names a tracked brand or band (word match; GENERIC names need a music word too)
   show      a venue-page or Ticketmaster event in NYC whose title names a band (GENERIC names must lead the title)
   promo     a Mets home game promotion from the MLB Stats API (giveaway, theme night, ticket offer, highlight)
   deal      VAL = 100 x expected / listed get-in price for a home game (ESPN's ticket listing). Expected =
             exp(mean log price + weekday + month + opponent effects), each effect a mean residual shrunk by
             n / (n + SHRINK) over 8 backfitting passes. VAL 120+ = deal. d = change since the first price we saw.
-  collab    a feed item naming the Mets or Knicks with a collab word, or a new '47 Mets/Knicks product
+  collab    a feed item naming the Mets or Knicks with a collab word (the pieces themselves are picks > collabs)
   suggested WAVE score = TAG (15 per taste tag matched: streetwear, gothic, oversized top, slim bottom; max 60)
-            + LINK (12.5 per verified tie to a tracked brand, band or team; max 25) + NYC (15 if based in NYC);
-            collections = feed items naming a suggested brand in the last 45 days, ranked score x recency
+            + FIT (25 x the brand's measured taste share in its live catalog, shrunk to the pooled rate)
+            + LINK (12.5 per tie to a tracked brand, band or team, on record or shown by 2+ catalog pieces; max 25)
+            + NYC (15 if based in NYC); brand headlines = feed items naming a suggested brand in the last 45 days,
+            ranked score x recency
 """
 import datetime as dt
 import email.utils
@@ -60,18 +64,16 @@ DEAL = 120
 PAUSE = 1.0         # seconds between requests to one host
 
 # ------------------------------------------------------------------ what is tracked
-# Fashion brands Noah named. logo = pixel sprite id (scripts/pixelart.py wave_logos).
+# Fashion brands Noah named. logo = pixel sprite id (scripts/wave_logos.py). Their stores: wave_catalog.SHOPS.
 BRANDS = [
     {'id': 'studioseven', 'name': 'STUDIO SEVEN', 'kind': 'brand',
-     'terms': [r'Studio Seven', r'STUDIO SEVEN', r'スタジオ\s?セブン'],
-     'stores': [{'base': 'https://nubiantokyo.com', 'coll': 'studio-seven', 'path': '/en'}]},
+     'terms': [r'Studio Seven', r'STUDIO SEVEN', r'スタジオ\s?セブン'], 'stores': []},
     {'id': 'ysl', 'name': 'SAINT LAURENT', 'kind': 'brand',
      'terms': [r'Saint Laurent', r'\bYSL\b', r'Yves Saint Laurent', r'サンローラン'], 'stores': []},
     {'id': '47', 'name': "'47", 'kind': 'brand',
      'terms': [r"['’]47 Brand", r"\b47 Brand\b", r"['’]47\b"],
-     # the whole catalogue is every league's team: keep '47's own pieces and Noah's teams (news.py's list + the Mets)
-     'stores': [{'base': 'https://www.47brand.com', 'pages': 12,
-                 'keep': r"^\s*['’]47\b|\b(Mets|Knicks|Rangers|Ravens|Barcelona|New York)\b"}]},
+     # '47's catalogue is every league's team: keep '47's own pieces and Noah's teams (news.py's list + the Mets)
+     'keep': r"^\s*['’]47\b|\b(Mets|Knicks|New York Rangers|Ravens|Barcelona)\b", 'stores': []},
     {'id': 'newbalance', 'name': 'NEW BALANCE', 'kind': 'brand',
      'terms': [r'New Balance', r'ニューバランス'], 'stores': []},
 ]
@@ -143,6 +145,21 @@ SUGGEST = [
     {'name': 'Hysteric Glamour', 'tags': ['streetwear', 'slim bottom'], 'ties': [], 'nyc': False, 'u': 'https://www.hystericglamour.jp/', 'terms': [r'Hysteric Glamour', r'HYSTERIC GLAMOUR']},
     {'name': 'Boris Bidjan Saberi', 'tags': ['gothic', 'slim bottom'], 'ties': [], 'nyc': False, 'u': 'https://www.borisbidjansaberi.com/', 'terms': [r'Boris Bidjan Saberi']},
     {'name': 'Kidill', 'tags': ['gothic', 'streetwear', 'oversized top'], 'ties': [], 'nyc': False, 'u': 'https://kidill.com/', 'terms': [r'\bKIDILL\b', r'\bKidill\b']},
+    # Nov 25 2026: the wider catalog. Brands the tracked retailers stock, plus New York labels with their own feeds.
+    {'name': 'Raf Simons', 'tags': ['gothic', 'oversized top', 'slim bottom', 'streetwear'], 'ties': [], 'nyc': False, 'u': 'https://rafsimons.com/', 'terms': [r'Raf Simons']},
+    {'name': 'Maison Margiela', 'tags': ['gothic', 'oversized top'], 'ties': [], 'nyc': False, 'u': 'https://www.maisonmargiela.com/', 'terms': [r'Maison Margiela', r'\bMM6\b']},
+    {'name': 'Balenciaga', 'tags': ['streetwear', 'gothic', 'oversized top'], 'ties': [], 'nyc': False, 'u': 'https://www.balenciaga.com/', 'terms': [r'Balenciaga']},
+    {'name': 'Comme des Garçons Homme Plus', 'tags': ['gothic', 'oversized top'], 'ties': [], 'nyc': False, 'u': 'https://www.comme-des-garcons.com/', 'terms': [r'Comme des Gar[cç]ons Homme Plus', r'CDG Homme Plus']},
+    {'name': 'Guidi', 'tags': ['gothic', 'slim bottom'], 'ties': [], 'nyc': False, 'u': 'https://www.guidi.it/', 'terms': [r'\bGuidi\b']},
+    {'name': 'Who Decides War', 'tags': ['streetwear', 'gothic'], 'ties': [], 'nyc': True, 'u': 'https://whodecideswar.com/', 'terms': [r'Who Decides War']},
+    {'name': 'Noah', 'tags': ['streetwear'], 'ties': [], 'nyc': True, 'u': 'https://noahny.com/', 'terms': [r'\bNoah NY\w*', r'^Noah$', r'\bNoah x\b', r'\bx Noah\b']},
+    {'name': 'Only NY', 'tags': ['streetwear'], 'ties': [], 'nyc': True, 'u': 'https://onlyny.com/', 'terms': [r'Only NY']},
+    {'name': 'Stüssy', 'tags': ['streetwear', 'oversized top'], 'ties': [], 'nyc': False, 'u': 'https://www.stussy.com/', 'terms': [r'St[uü]ssy']},
+    {'name': 'Eric Emanuel', 'tags': ['streetwear'], 'ties': [], 'nyc': True, 'u': 'https://www.ericemanuel.com/', 'terms': [r'Eric Emanuel']},
+    {'name': 'Hellstar', 'tags': ['streetwear', 'gothic', 'oversized top'], 'ties': [], 'nyc': False, 'u': 'https://hellstar.com/', 'terms': [r'Hellstar']},
+    {'name': 'Neighborhood', 'tags': ['streetwear', 'gothic'], 'ties': [], 'nyc': False, 'u': 'https://www.neighborhood.jp/', 'terms': [r'^Neighborhood$', r'NEIGHBORHOOD']},
+    {'name': 'Carhartt WIP', 'tags': ['streetwear', 'oversized top'], 'ties': [], 'nyc': False, 'u': 'https://www.carhartt-wip.com/', 'terms': [r'Carhartt WIP']},
+    {'name': 'Willy Chavarria', 'tags': ['streetwear', 'oversized top'], 'ties': [], 'nyc': True, 'u': 'https://willychavarria.com/', 'terms': [r'Willy Chavarria']},
 ]
 TAG_WORDS = r'\b(goth\w*|dark|black|leather|grunge|punk|oversized|boxy|baggy|skinny|slim|flare\w*|denim|distressed|archive|runway|capsule|collection|collab\w*|drop|FW\d\d|SS\d\d|fall|winter|spring|summer)\b'
 
@@ -577,11 +594,14 @@ def price_model(games):
 
 
 # ------------------------------------------------------------------ suggested
-def score(s):
+def score(s, m=None):
+    """m = wave_catalog.measure()'s row for the brand (None: no catalog, FIT 0 and only the ties on record)."""
     tag = 15 * sum(1 for t in TASTE if t in s['tags'])
-    link = min(25, 12.5 * len(s['ties']))
+    ties = list(s['ties']) + [t for t in ((m or {}).get('ties') or []) if t.lower() not in {x.lower() for x in s['ties']}]
+    link = min(25, 12.5 * len(ties))
     nyc = 15 if s['nyc'] else 0
-    return {'tag': tag, 'link': link, 'nyc': nyc, 'total': round(tag + link + nyc)}
+    fit = round(25 * m['share']) if m and m.get('share') is not None else 0
+    return {'tag': tag, 'fit': fit, 'link': link, 'nyc': nyc, 'total': round(tag + fit + link + nyc), 'ties': ties[:4]}
 
 
 def per_brand(ds, cap=4):
@@ -626,13 +646,30 @@ def run():
             got = state.get('keep_store', {}).get(key, [])
             status(label, 'store', False, 0, e, u=store['base'])
         return got
-    for br in BRANDS:
-        for st in br['stores']:
-            drops += do_store(br, st, 'drop', f"{br['name']} store")
     for b in bands:
         for st in STORES.get(b['name'], []):
             merch += do_store(b, st, 'merch', f"{b['name']} store")
     state['seeded'] = sorted(seeded)
+    band_hosts = {urllib.parse.urlsplit(st['base']).netloc for sts in STORES.values() for st in sts}
+    state['seen'] = {k: v for k, v in state.get('seen', {}).items() if k.split(':')[0] in band_hosts}   # brand stores moved to the catalog
+    state['keep_store'] = {k: v for k, v in state.get('keep_store', {}).items()
+                           if any(k.startswith(st['base']) for sts in STORES.values() for st in sts)}
+
+    # 1b. the catalog: brand, retailer and team stores (wave_catalog.py)
+    import wave_catalog as wc
+    sugg_ents = [{'id': slug(x['name']), 'name': x['name'], 'terms': x['terms']} for x in SUGGEST]
+    ents = [{'id': b['id'], 'name': b['name'], 'terms': b['terms'], 'keep': b.get('keep')} for b in BRANDS] + sugg_ents
+    tie_names = [(e['id'], e['name'].title() if e['name'].isupper() else e['name'], word_rx(e['terms'])) for e in ents]
+    tie_names += [(t['id'], t['name'].title(), word_rx(t['terms'], case=True)) for t in TEAMS]
+    tie_names += [(b['id'], b['name'], b['rx']) for b in bands if not b['generic'] and len(b['name']) > 4]
+
+    def wave_of(measured):
+        by = {b['id']: 100 for b in BRANDS}
+        for x in SUGGEST:
+            by[slug(x['name'])] = score(x, measured.get(slug(x['name'])))['total']
+        return by
+    cat = wc.build(sys.modules[__name__], ents, tie_names, old, state, NOW, wave_of)
+    drops = cat['drops']
 
     # 2. feeds
     feed_items = []
@@ -675,14 +712,6 @@ def run():
     collabs = merge('collabs', collabs)
     sugg_news = merge('sugg', sugg_news)
 
-    # '47 Mets / Knicks products count as collabs (the brand x the team)
-    for d in drops:
-        if d['who'] != '47':
-            continue
-        for it in d['items']:
-            for t in TEAMS:
-                if re.search(t['terms'][0], it['t'], re.I):
-                    collabs.append({'t': it['t'].title(), 'u': it['u'], 'img': it['img'], 'at': d['d'] + 'T12:00Z', 'src': "'47", 'who': [t['id']], 'k': 'f', 'price': it.get('price')})
     collabs.sort(key=lambda x: x.get('at') or '', reverse=True)
 
     # 2b. actors: film announcements
@@ -796,11 +825,13 @@ def run():
     # 5. suggested
     sugg = []
     for s in SUGGEST:
-        sc = score(s)
         sid = slug(s['name'])
-        recent = [x for x in sugg_news if sid in x['who']][:3]
-        sugg.append({'id': sid, 'name': s['name'], 'tags': s['tags'], 'ties': s['ties'], 'nyc': s['nyc'], 'u': s['u'], **sc,
-                     'n': len([x for x in sugg_news if sid in x['who']])})
+        m = cat['measured'].get(sid) or {}
+        sc = score(s, m)
+        sugg.append({'id': sid, 'name': s['name'], 'tags': s['tags'], 'ties': sc.pop('ties'), 'nyc': s['nyc'], 'u': s['u'], **sc,
+                     'n': len([x for x in sugg_news if sid in x['who']]), 'rows': m.get('n', 0),
+                     'share': round(100 * m['raw']) if m.get('raw') is not None else None,
+                     'new': m.get('new', 0), 'sale': m.get('sale', 0), 'stores': m.get('stores', [])})
     sugg.sort(key=lambda x: (-x['total'], -x['n'], x['name']))
     by_score = {x['id']: x['total'] for x in sugg}
     colls = []
@@ -813,27 +844,37 @@ def run():
 
     # 6. the logo wall: every tracked name, with counts and the last time it moved
     def last_of(wid):
-        ts = [d['d'] + 'T12:00Z' for d in drops + merch if d['who'] == wid] + [x['at'] for x in news if wid in x['who'] and x.get('at')]
+        ts = [d['d'] + 'T12:00Z' for d in drops + merch + cat['showcases'] if d['who'] == wid] + [x['at'] for x in news if wid in x['who'] and x.get('at')]
         ts += [s['at'] for s in shows if s['who'] == wid]
         ts += [x['at'] for x in film if wid in x['who'] and x.get('at')]
         return max(ts) if ts else None
     wall = []
-    for o in BRANDS + TEAMS + ACTORS + bands:
+    with_rows = [dict(e, kind='brand') for e in sugg_ents if (cat['measured'].get(e['id']) or {}).get('n')]
+    with_rows.sort(key=lambda e: -cat['wave_by'].get(e['id'], 0))
+    for o in BRANDS + with_rows + TEAMS + ACTORS + bands:
         wid = o['id']
-        n_items = sum(d['n'] for d in drops + merch if d['who'] == wid)
+        n_items = sum(d['n'] for d in merch if d['who'] == wid) + (cat['counts'].get(wid) or {}).get('items', 0)
+        if o['kind'] == 'team':
+            n_items += len(cat['picks'].get(wid) or [])
         n_news = sum(1 for x in news + collabs + film if wid in x['who'])
         n_shows = sum(1 for s in shows if s['who'] == wid)
         n_promo = len(promos) if wid == 'mets' else 0
         wall.append({'id': wid, 'name': o['name'], 'kind': o['kind'], 'items': n_items, 'news': n_news, 'shows': n_shows,
-                     'promos': n_promo, 'last': last_of(wid), 'store': bool(o.get('stores') or STORES.get(o['name']))})
+                     'promos': n_promo, 'last': last_of(wid), 'sale': (cat['counts'].get(wid) or {}).get('sale', 0),
+                     'store': bool((cat['measured'].get(wid) or {}).get('n') or STORES.get(o['name']))})
 
     def trim(xs, n, keys):
         return [{k: x[k] for k in keys if x.get(k) not in (None, '', [])} for x in xs[:n]]
     nk = ('t', 'u', 'img', 'at', 'src', 'who', 's', 'price')
     out = {
-        'about': 'scripts/wave.py: drops = store products first seen in the last %d days; deal VAL = 100 x expected / listed get-in price (weekday + month + opponent model); WAVE score = TAG + LINK + NYC' % NEW_DAYS,
+        'about': 'scripts/wave.py + wave_catalog.py: new = published in the store in the last %d days; sale VAL = 100 x expected / price, expected = compare-at x (1 - the store\'s base markdown rate); ticket VAL = 100 x expected / listed get-in price (weekday + month + opponent model); WAVE = TAG + FIT + LINK + NYC; PICK = TEAM + COLLAB + BRAND + FIT + TYPE + SIZES' % wc.NEW_DAYS,
         'wall': wall,
-        'drops': per_brand(drops),
+        'drops': drops,
+        'showcases': cat['showcases'],
+        'sales': cat['sales'],
+        'picks': cat['picks'],
+        'bases': cat['bases'],
+        'pooled': cat['pooled'],
         'merch': per_brand(merch),
         'news': trim([x for x in news if any(w in {b['id'] for b in BRANDS} for w in x['who'])], 40, nk),
         'bandnews': trim([x for x in news if any(w in {b['id'] for b in bands} for w in x['who'])], 40, nk),
@@ -870,7 +911,7 @@ def write(out, old, state):
     with open(OUT, 'w', encoding='utf-8') as f:
         f.write(txt + '\n')
     ok = sum(1 for s in STATUS if s['ok'])
-    print(f'wave: {len(out["drops"])} drops, {len(out["merch"])} merch drops, {len(out["shows"])} shows, '
+    print(f'wave: {len(out["drops"])} drops, {len(out["showcases"])} showcases, {len(out["sales"])} sale items, {len(out["merch"])} merch drops, {len(out["shows"])} shows, '
           f'{len(out["mets"]["promos"])} promos, {len(out["deals"])} games, {ok}/{len(STATUS)} sources ok')
 
 
@@ -905,7 +946,16 @@ def test():
     assert g[-1]['val'] > DEAL, g[-1]
     assert all(60 < x['val'] < 160 for x in g[:-1]), [x['val'] for x in g[:-1]]
     s = score({'tags': ['gothic', 'streetwear'], 'ties': ['New Balance'], 'nyc': True})
-    assert s['total'] == 30 + 12.5 + 15 or s['total'] == round(57.5)
+    assert s['total'] == round(57.5) and s['fit'] == 0
+    s = score({'tags': ['gothic'], 'ties': ['Knicks'], 'nyc': False}, {'share': .6, 'ties': ['knicks', 'New Balance', 'Mets']})
+    assert s == {'tag': 15, 'fit': 15, 'link': 25, 'nyc': 0, 'total': 55, 'ties': ['Knicks', 'New Balance', 'Mets']}, s
+    import wave_catalog as wc
+    ids = {b['id'] for b in BRANDS} | {slug(x['name']) for x in SUGGEST}
+    for sh in wc.SHOPS:
+        assert not sh.get('own') or sh['own'] in ids, sh['id']
+        assert all(k in ids for k in (sh.get('brands') or {})), sh['id']
+    assert len({slug(x['name']) for x in SUGGEST}) == len(SUGGEST)
+    wc.test(sys.modules[__name__])
     assert kind_of({'title': 'Tour Tee', 'product_type': ''}) == 'top'
     assert kind_of({'title': 'Getting Killed LP', 'product_type': 'Vinyl'}) == 'music'
     lb = library_bands()
