@@ -1,0 +1,25 @@
+--- a/scripts/cs2_players.py
++++ b/scripts/cs2_players.py
+@@ -71,6 +71,7 @@
+                 by_g[r[0]].append(r)
+         G, P, S, X, D, TR, TM, NICK = [], [], [], [], [], [], [], {}
+         games = []
++        seen_maps = set()
+         for g, rs in by_g.items():
+             gg = gm[g]
+             sides = defaultdict(list)
+@@ -81,6 +82,14 @@
+             w, lo, rw, rl = gg[5], gg[6], gg[7], gg[8]
+             if {w, lo} != set(sides) or rw + rl < 13:
+                 continue
++            # one map listed twice (two game ids, often under an alias team id or a second match id): same ten players,
++            # same map, same rounds, same day. 90 of 62,134 maps in the Nov 24 2026 files (port round Nov 24 2026,
++            # scripts/research/metric_audit_nov24/port/tennis_cs2_cbb/dups2.py); the first listing stays
++            dk = (frozenset((frozenset(r[1] for r in sides[w]), frozenset(r[1] for r in sides[lo]))),
++                  (gg[3] or "").lower().removeprefix("de_"), rw, rl, gg[2][:10])
++            if dk in seen_maps:
++                continue
++            seen_maps.add(dk)
+             m = mt.get(gg[1])
+             tier = TIER.get(m[10], 5) if m else 5
+             gi = len(games)

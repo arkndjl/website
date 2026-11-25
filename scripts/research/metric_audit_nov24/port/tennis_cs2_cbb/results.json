@@ -1,0 +1,379 @@
+{
+ "prereg": "prereg.md (sha256 in prereg.sha256)",
+ "candidates": {
+  "T-P1 tennis player x surface offsets (idea 7, predict)": {
+   "held_base_ll": 0.5874,
+   "held_cand_ll": 0.587699,
+   "d_ll_1e4": 2.994,
+   "t_by_tournament": 2.95,
+   "seasons_better": "1/7",
+   "chosen": {
+    "k": 10,
+    "h": 365,
+    "c": -0.2949,
+    "tune_d_1e4": -1.143
+   },
+   "pass": false
+  },
+  "T-D1 tennis rPA per-match mean (idea 2, describe held)": {
+   "before": 0.1353,
+   "after": 0.1268,
+   "t": 13.01,
+   "seasons_better": "0/15",
+   "player_r": {
+    "base": 0.8291,
+    "cand": 0.8107
+   },
+   "pass": false
+  },
+  "C-P1 tier weighting (B/C/D maps x0.7)": {
+   "name": "C-P1 tier weighting (B/C/D maps x0.7)",
+   "tuneGrid": {
+    "0.85": 0.02762153359611651,
+    "0.7": 0.027619579490580717,
+    "0.5": 0.027627196958339078,
+    "1.0": 0.02762621426113436
+   },
+   "base": 0.027826,
+   "cand": 0.027843,
+   "t": 1.65,
+   "p": 0.9405154147029561,
+   "monthsBetter": "8/16",
+   "tTune": -1.27,
+   "playerR": [
+    0.4956,
+    0.495
+   ],
+   "pHolm": 0.9405154147029561,
+   "pass": false
+  },
+  "C-D1 season RWA shrunk toward 0 (k 50 rounds)": {
+   "name": "C-D1 season RWA shrunk toward 0 (k 50 rounds)",
+   "base": 0.0961,
+   "cand": 0.0869,
+   "t": -3.22,
+   "p": 0.9971311314541593,
+   "monthsBetter": "4/16",
+   "tTune": 0.51,
+   "pHolm": 1.0,
+   "pass": false
+  },
+  "C-D2 season RWA as per-map mean": {
+   "name": "C-D2 season RWA as per-map mean",
+   "base": 0.0961,
+   "cand": 0.0914,
+   "t": -7.46,
+   "p": 0.9999989859880201,
+   "monthsBetter": "0/16",
+   "tTune": -4.89,
+   "pHolm": 0.9999989859880201,
+   "pass": false
+  },
+  "C-D3 K-D per round shrunk to the mean (k 50)": {
+   "name": "C-D3 K-D per round shrunk to the mean (k 50)",
+   "base": 0.0433,
+   "cand": 0.0324,
+   "t": -4.66,
+   "p": 0.9998474074456606,
+   "monthsBetter": "1/16",
+   "tTune": -2.24,
+   "pHolm": 1.0,
+   "pass": false
+  },
+  "C-D4 ADR shrunk to the mean (k 50)": {
+   "name": "C-D4 ADR shrunk to the mean (k 50)",
+   "base": 0.0261,
+   "cand": 0.0177,
+   "t": -4.82,
+   "p": 0.9998881922569184,
+   "monthsBetter": "0/16",
+   "tTune": -2.53,
+   "pHolm": 1.0,
+   "pass": false
+  },
+  "B-P1 CBB opponent-level weighting (idea 5, predict)": {
+   "target": "next-season team adjEM R2",
+   "pairs": [
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+   ],
+   "before": 0.6078,
+   "after": 0.6075,
+   "gridR2": {
+    "1.0": 0.6078,
+    "0.85": 0.6075,
+    "0.7": 0.6069,
+    "0.5": 0.6051
+   },
+   "chosen": {
+    "2017": 1.0,
+    "2018": 1.0,
+    "2019": 1.0,
+    "2020": 1.0,
+    "2021": 1.0,
+    "2022": 0.85,
+    "2023": 1.0,
+    "2024": 1.0,
+    "2025": 1.0
+   },
+   "pairsBetter": 0,
+   "t": -1.0,
+   "p": 0.8267032274890339,
+   "seasonBPM_sameYears": 0.644,
+   "playerR_vsBPM": [
+    0.6013,
+    0.601
+   ],
+   "pHolm": 0.8267,
+   "pass": false
+  },
+  "B-D1 CBB GBPM shrunk 100 min toward season mean (idea 5, describe)": {
+   "target": "half-B GBPM, minutes-weighted MSE of the half-A rate",
+   "before": 16.211,
+   "after": 11.446,
+   "chosen": {
+    "2017": 100,
+    "2018": 100,
+    "2019": 100,
+    "2020": 100,
+    "2021": 100,
+    "2022": 100,
+    "2023": 100,
+    "2024": 100,
+    "2025": 100,
+    "2026": 100
+   },
+   "byK": {
+    "0": 16.211,
+    "50": 11.842,
+    "100": 11.446,
+    "200": 11.571,
+    "400": 12.479
+   },
+   "seasonsBetter": 10,
+   "t": 8.47,
+   "p": 6.995139934541037e-06,
+   "pHolm": 0.0,
+   "pass": true,
+   "warGuard": {
+    "gbpm": {
+     "repl": -2.683,
+     "heldRMSE": 3.3478
+    },
+    "gbpm_k": {
+     "repl": -1.859,
+     "heldRMSE": 3.3308
+    },
+    "t": 8.2,
+    "seasonsBetter": 14,
+    "of": 14
+   }
+  },
+  "B-C1 CBB home-court player offsets (idea 7, gate)": {
+   "splitHalf_r_homeMinusAway": 0.0115,
+   "players": 17837,
+   "gate": 0.1,
+   "tested": false,
+   "meanHomeMinusAway": 1.225
+  }
+ },
+ "duplicates": {
+  "dups": {
+   "nhl": {
+    "games": 20591,
+    "a_repeatId": 0,
+    "b_sameDatePair": 0,
+    "c_aliasSuspect": 205,
+    "d_samePlayerSet": 0
+   },
+   "nba": {
+    "games": 18112,
+    "a_repeatId": 0,
+    "b_sameDatePair": 2,
+    "c_aliasSuspect": 5,
+    "d_samePlayerSet": 99
+   },
+   "cbb": {
+    "games": 76938,
+    "a_repeatId": 0,
+    "b_sameDatePair": 126,
+    "c_aliasSuspect": 23,
+    "d_samePlayerSet": 0
+   },
+   "cbb_players": {
+    "bySeason": {
+     "2017": {
+      "rows": 111928,
+      "repeat_pid_date": 0,
+      "exact_repeat": 0,
+      "pid_two_teams_same_day": 0
+     },
+     "2018": {
+      "rows": 109978,
+      "repeat_pid_date": 0,
+      "exact_repeat": 0,
+      "pid_two_teams_same_day": 0
+     },
+     "2019": {
+      "rows": 110874,
+      "repeat_pid_date": 0,
+      "exact_repeat": 0,
+      "pid_two_teams_same_day": 0
+     },
+     "2020": {
+      "rows": 104964,
+      "repeat_pid_date": 0,
+      "exact_repeat": 0,
+      "pid_two_teams_same_day": 0
+     },
+     "2021": {
+      "rows": 78877,
+      "repeat_pid_date": 0,
+      "exact_repeat": 0,
+      "pid_two_teams_same_day": 0
+     },
+     "2022": {
+      "rows": 108177,
+      "repeat_pid_date": 0,
+      "exact_repeat": 0,
+      "pid_two_teams_same_day": 0
+     },
+     "2023": {
+      "rows": 112744,
+      "repeat_pid_date": 0,
+      "exact_repeat": 0,
+      "pid_two_teams_same_day": 0
+     },
+     "2024": {
+      "rows": 113103,
+      "repeat_pid_date": 0,
+      "exact_repeat": 0,
+      "pid_two_teams_same_day": 0
+     },
+     "2025": {
+      "rows": 114218,
+      "repeat_pid_date": 0,
+      "exact_repeat": 0,
+      "pid_two_teams_same_day": 0
+     },
+     "2026": {
+      "rows": 113882,
+      "repeat_pid_date": 0,
+      "exact_repeat": 0,
+      "pid_two_teams_same_day": 0
+     },
+     "2027": {
+      "rows": 21404,
+      "repeat_pid_date": 0,
+      "exact_repeat": 0,
+      "pid_two_teams_same_day": 0
+     }
+    },
+    "total": {
+     "rows": 1100149,
+     "repeat_pid_date": 0,
+     "exact_repeat": 0,
+     "pid_two_teams_same_day": 0
+    }
+   },
+   "cfb": {
+    "games": 16498,
+    "a_repeatId": 0,
+    "b_sameDatePair": 0,
+    "c_aliasSuspect": 0,
+    "d_samePlayerSet": 0
+   },
+   "nfl": {
+    "games": 7439,
+    "a_repeatId": 0,
+    "b_sameDatePair": 0,
+    "c_aliasSuspect": 0,
+    "d_samePlayerSet": 0
+   },
+   "soccer": {
+    "games": 182980,
+    "a_repeatId": 0,
+    "b_sameDatePair": 0,
+    "c_aliasSuspect": 16,
+    "d_samePlayerSet": 0
+   },
+   "tennis": {
+    "games": 1078400,
+    "a_repeatId": 0,
+    "b_sameDatePair": 2139,
+    "c_aliasSuspect": 47,
+    "d_samePlayerSet": 0,
+    "e_samePairScoreOtherEvent7d": 383
+   },
+   "esea": {
+    "games": 18217,
+    "a_repeatId": 0,
+    "b_sameDatePair": 0,
+    "c_aliasSuspect": 950,
+    "d_samePlayerSet": 300
+   },
+   "cs2_maps": {
+    "games": 62134,
+    "a_repeatId": 0,
+    "b_sameDatePair": 32239,
+    "c_aliasSuspect": 8491,
+    "d_samePlayerSet": 74106,
+    "f_sameTenSameMapSameRounds": 90
+   },
+   "cs2_series": {
+    "rows": 37482,
+    "note": "owned by the CS2 dedupe worker (cs2_model / cs2_ark_loop); see their report"
+   }
+  },
+  "followup": {
+   "nhl": {
+    "teamTwiceSameDate": 0
+   },
+   "nba": {
+    "teamTwiceSameDate": 1
+   },
+   "cbb": {
+    "teamTwiceSameDate": 3
+   },
+   "cfb": {
+    "teamTwiceSameDate": 0
+   },
+   "nfl": {
+    "teamTwiceSameDate": 0
+   },
+   "soccer": {
+    "teamTwiceSameDate": 15,
+    "aliasSameLeagueDayScoreOneSide": 15
+   },
+   "esea": {
+    "sameTenSameScoreSameDay": 0
+   },
+   "cs2_maps": {
+    "groups": 90,
+    "extraRows": 90,
+    "groupsWithinOneMatch": 35,
+    "maps": 62134
+   },
+   "tennis": {
+    "aliasNonRR": 4,
+    "remeet7d": [
+     17940,
+     336
+    ],
+    "remeet7d_sameScoreRate": 0.018729096989966554,
+    "remeetYear": [
+     45833,
+     388
+    ],
+    "remeetYear_sameScoreRate": 0.008465516112844457
+   }
+  }
+ }
+}

@@ -1,0 +1,22 @@
+loaded
+desc done
+metrics
+candidates
+WAR (descriptive) {'describe': 0.9783, 'describeHeld': 0.9782, 'predictTeam': 0.2502, 'playerR': 0.3088, 'ownR': 0.3088, 'nPlayers': 10314, 'teamSeasonsPredict': 524, 'from2015': {'predictTeam': 0.2639, 'playerR': 0.2972}, 'ci90': {'describe': [0.974, 0.982], 'predictTeam': [0.187, 0.317], 'playerR': [0.286, 0.328]}}
+pWAR / HPM (nested weights) {'describe': 0.6494, 'describeHeld': 0.6471, 'predictTeam': 0.3842, 'playerR': 0.347, 'ownR': 0.9249, 'nPlayers': 10314, 'teamSeasonsPredict': 524, 'from2015': {'predictTeam': 0.4394, 'playerR': 0.3457}, 'ci90': {'describe': [0.598, 0.703], 'predictTeam': [0.289, 0.477], 'playerR': [0.336, 0.357]}}
+pWAR / HPM (board weights) {'describe': 0.6532, 'describeHeld': 0.6523, 'predictTeam': 0.3842, 'playerR': 0.3583, 'ownR': 0.9212, 'nPlayers': 10314, 'teamSeasonsPredict': 524, 'from2015': {'predictTeam': 0.4467, 'playerR': 0.3546}, 'ci90': {'describe': [0.592, 0.708], 'predictTeam': [0.289, 0.475], 'playerR': [0.346, 0.368]}}
+Marcel WAR (projections tab) {'describe': 0.7904, 'describeHeld': 0.7887, 'predictTeam': 0.3455, 'playerR': 0.4461, 'ownR': 0.8096, 'nPlayers': 10314, 'teamSeasonsPredict': 524, 'from2015': {'predictTeam': 0.3786, 'playerR': 0.4441}, 'ci90': {'describe': [0.759, 0.83], 'predictTeam': [0.278, 0.416], 'playerR': [0.43, 0.461]}}
+GSAx a 60 (goalies) {'describe': 0.2846, 'describeHeld': 0.2819, 'predictTeam': 0.0319, 'playerR': 0.0313, 'ownR': 0.1095, 'nPlayers': 10314, 'teamSeasonsPredict': 524, 'from2015': {'predictTeam': 0.0355, 'playerR': 0.027}, 'ci90': {'describe': [0.247, 0.331], 'predictTeam': [0.014, 0.055], 'playerR': [0.019, 0.045]}}
+points a 60 {'describe': 0.644, 'describeHeld': 0.6416, 'predictTeam': 0.26, 'playerR': 0.3802, 'ownR': 0.7921, 'nPlayers': 9252, 'teamSeasonsPredict': 524, 'from2015': {'predictTeam': 0.3173, 'playerR': 0.38}, 'ci90': {'describe': [0.592, 0.684], 'predictTeam': [0.186, 0.338], 'playerR': [0.363, 0.395]}}
+MoneyPuck game score a 60 {'describe': 0.6373, 'describeHeld': 0.6359, 'predictTeam': 0.3547, 'playerR': 0.4235, 'ownR': 0.7444, 'nPlayers': 9252, 'teamSeasonsPredict': 524, 'from2015': {'predictTeam': 0.3808, 'playerR': 0.4164}, 'ci90': {'describe': [0.593, 0.675], 'predictTeam': [0.302, 0.408], 'playerR': [0.405, 0.439]}}
+5v5 on-ice relative xG {'describe': 0.0758, 'describeHeld': 0.0689, 'predictTeam': 0.0623, 'playerR': 0.2719, 'ownR': 0.2774, 'nPlayers': 9252, 'teamSeasonsPredict': 524, 'from2015': {'predictTeam': 0.0743, 'playerR': 0.2515}, 'ci90': {'describe': [0.032, 0.129], 'predictTeam': [0.024, 0.109], 'playerR': [0.247, 0.293]}}
+P1 pWAR + PP xG at .2 {'describe': 0.6164, 'describeHeld': 0.6143, 'predictTeam': 0.3736, 'playerR': 0.3517, 'ownR': 0.9245, 'nPlayers': 10314, 'teamSeasonsPredict': 524, 'from2015': {'predictTeam': 0.4297, 'playerR': 0.3495}, 'ci90': {'describe': [0.556, 0.678], 'predictTeam': [0.283, 0.465], 'playerR': [0.34, 0.362]}}
+P2 pWAR, score-venue adj 5v5 xG {'describe': 0.6487, 'describeHeld': 0.6465, 'predictTeam': 0.3842, 'playerR': 0.3467, 'ownR': 0.9246, 'nPlayers': 10314, 'teamSeasonsPredict': 524, 'from2015': {'predictTeam': 0.4393, 'playerR': 0.3455}, 'ci90': {'describe': [0.597, 0.702], 'predictTeam': [0.289, 0.477], 'playerR': [0.335, 0.357]}}
+P3 pWAR, flurry+score-venue adj xG {'describe': 0.6606, 'describeHeld': 0.6585, 'predictTeam': 0.3874, 'playerR': 0.3468, 'ownR': 0.9244, 'nPlayers': 10314, 'teamSeasonsPredict': 524, 'from2015': {'predictTeam': 0.4426, 'playerR': 0.3461}, 'ci90': {'describe': [0.61, 0.712], 'predictTeam': [0.292, 0.48], 'playerR': [0.336, 0.357]}}
+P3 pWAR, flurry+score-venue adj xG {'predictTeam': [0.3842, 0.3874], 'playerR': [0.347, 0.3468], 't': 2.88, 'p': 0.002, 'pHolm': 0.006, 'pairsBetter': 13, 'pass': True}
+P2 pWAR, score-venue adj 5v5 xG {'predictTeam': [0.3842, 0.3842], 'playerR': [0.347, 0.3467], 't': 0.32, 'p': 0.3733, 'pHolm': 0.7467, 'pairsBetter': 11, 'pass': False}
+P1 pWAR + PP xG at .2 {'predictTeam': [0.3842, 0.3736], 'playerR': [0.347, 0.3517], 't': -1.19, 'p': 0.883, 'pHolm': 0.883, 'pairsBetter': 7, 'pass': False}
+team xGD a game (MoneyPuck) {'describe': 0.5959, 'predict': 0.2945, 'predictCi90': [0.249, 0.341], 'n': 522}
+team score-venue adj xGD a game {'describe': 0.634, 'predict': 0.3031, 'predictCi90': [0.259, 0.349], 'n': 522}
+team GD a game {'describe': 1.0, 'predict': 0.3057, 'predictCi90': [0.243, 0.369], 'n': 522}
+wrote results.json

@@ -180,7 +180,7 @@
   function rowCells(r, rk, opt, prk, fv, tier, yx, ynote, delta) {
     var td = function (c, h, a) { return [c, h, a || '']; }, key = opt.cols[2];
     var C = {
-      rk: td('cfb__rk', rk || r.ovr, opt.rankBy === 'war' ? ' title="WAA rank among the players in view · #' + r.ovr + ' overall by FV"' : opt.rankBy === 'nil' ? ' title="xNIL rank among the players in view · #' + r.ovr + ' overall by FV"' : rk && rk !== r.ovr ? ' title="#' + r.ovr + ' overall"' : ''),
+      rk: td('cfb__rk', rk || r.ovr, opt.rankBy === 'war' ? ' title="XV rank among the players in view · #' + r.ovr + ' overall by FV"' : opt.rankBy === 'nil' ? ' title="xNIL rank among the players in view · #' + r.ovr + ' overall by FV"' : rk && rk !== r.ovr ? ' title="#' + r.ovr + ' overall"' : ''),
       name: td('cfb__name', faceHtml(r.photo, 'pxframe--row', 96) +
         '<button type="button" class="cfb__who" aria-expanded="false">' + esc(r.name) + '</button>' +
         (r.star ? '<span class="cfb__star" title="ARKLIST">★</span>' : '') + (r.carried ? ' <span class="cfb__carried" title="PFN stopped listing him after ' + esc(r.carried) + ': his last grade is kept">carried</span>' : '') + (r.src === 'espn' ? ' ' + prov('on the ESPN roster, not on PFN: graded up from the 20 floor on position, size, NFL frame and BMI, class, age for class, division and recruiting') : '') +
@@ -191,7 +191,7 @@
         (multiOf(r).length ? '<span class="cfb__multichip" title="multi-position: ' + esc(multiLine(r)) + '">+' + esc(multiOf(r).map(function (m) { return m.pos; }).join('/')) + '</span>' : '')),
       waa: td('cfb__num', waaCell(r)), war: td('cfb__num cfb__now', warCell(r)), waafs: td('cfb__num', fsCell(r)), xv: td('cfb__num', xvCell(r)),
       pos: yx ? td('cfb__pos-cell', yx[2] + (prk ? '<span title="rank at position in ' + opt.yr + ', players in view">' + prk + '</span>' : ''), ' title="' + opt.yr + ' position (graded on PFN\'s ' + yx[2] + ' board)' + (yx[2] !== r.pos ? ' · now ' + r.pos : '') + '"') :
-        td('cfb__pos-cell', r.pos + (prk ? '<span title="rank at position, players in view, by ' + (opt.rankBy === 'war' ? 'WAA' : opt.rankBy === 'nil' ? 'xNIL' : 'FV') + (prk !== r.posRank && r.posRank ? ' · ' + r.pos + r.posRank + ' overall' : '') + '">' + prk + '</span>' : '') + (r.spot ? '<span class="cfb__dim">·' + esc(r.pos === 'OL' && OL_SPOT[r.spot] && OL_SPOT[r.spot] !== 'IOL' ? OL_SPOT[r.spot] : r.spot) + '</span>' : '') + (ROLES[r.rbRole] ? '<span class="cfb__rbrole" title="' + esc(roleTitle(r)) + '">' + ROLES[r.rbRole][0] + '</span>' : '') + medals(r), r.arch ? ' title="' + esc(r.arch) + (ROLES[r.rbRole] ? ' · ' + ROLES[r.rbRole][1] : '') + '"' : ''),
+        td('cfb__pos-cell', r.pos + (prk ? '<span title="rank at position, players in view, by ' + (opt.rankBy === 'war' ? 'XV' : opt.rankBy === 'nil' ? 'xNIL' : 'FV') + (prk !== r.posRank && r.posRank ? ' · ' + r.pos + r.posRank + ' overall' : '') + '">' + prk + '</span>' : '') + (r.spot ? '<span class="cfb__dim">·' + esc(r.pos === 'OL' && OL_SPOT[r.spot] && OL_SPOT[r.spot] !== 'IOL' ? OL_SPOT[r.spot] : r.spot) + '</span>' : '') + (ROLES[r.rbRole] ? '<span class="cfb__rbrole" title="' + esc(roleTitle(r)) + '">' + ROLES[r.rbRole][0] + '</span>' : '') + medals(r), r.arch ? ' title="' + esc(r.arch) + (ROLES[r.rbRole] ? ' · ' + ROLES[r.rbRole][1] : '') + '"' : ''),
       team: td('cfb__team', (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + (opt.div && r.div === 'FCS' ? '<span class="cfb__divtag" title="FCS: graded vs FCS players, translated to the FBS scale">FCS</span>' : '') + (ynote ? '<span class="cfb__pastnote">' + opt.yr + ': ' + esc(ynote) + '</span>' : '') + '</span>'),
       fv: td('fv', yx ? chipOf(yx[1], opt.yr + ' FV ' + yx[1] + ' (backtest model: production, pedigree, age, team; no On3 or consensus) · FV now ' + (r.fv == null ? '—' : fv)) :
         fv ? '<span class="fv-chip" data-fv="' + tier + '"' + (r.fvx != null ? ' title="mean outcome ' + (+r.fvx).toFixed(2) + '"' : '') + '>' + fv + '</span>' : dim),
@@ -310,11 +310,11 @@
       yr: 0, cols: [].map.call(w.querySelectorAll('thead th'), function (h) { return h.getAttribute('data-sort'); }), g: {} };
     [].forEach.call(w.querySelectorAll('thead th.cfb__g'), function (h) { opt.g[h.getAttribute('data-sort')] = 1; });
     var gfxCols = w.getAttribute('data-gfx-cols') || '';
-    // the WAR leaderboard: ranks (and the default order) by WAA, wins over an average starter at the position, so the
-    // ranking is position-neutral (WAR's QB line is real value, but an average QB's 0.6 wins over replacement filled the top
-    // with average QBs); WAR, then FV, break ties; a row with WAR and no WAA ranks on WAR
-    var wa = function (r) { return r.waa != null ? r.waa : r.war != null ? r.war : -99; };
-    var byWar = function (a, b) { return wa(b) - wa(a) || (b.war == null ? -99 : b.war) - (a.war == null ? -99 : a.war) || a.ovr - b.ovr; };
+    // the WAR leaderboard (a season, descriptive): ranks (and the default order) by XV, the WAR whose quality comes from the
+    // stat-line parts that track winning (held out it tracks team margin better than WAR's quality, Nov 24 2026); QBs live on
+    // their own tab. WAA, then FV, break ties; a row with no XV ranks on WAA, then WAR
+    var wa = function (r) { return r.xv != null ? r.xv : r.waa != null ? r.waa : r.war != null ? r.war : -99; };
+    var byWar = function (a, b) { return wa(b) - wa(a) || (b.waa == null ? -99 : b.waa) - (a.waa == null ? -99 : a.waa) || a.ovr - b.ovr; };
     // the NIL board (Nov 5 2026, as CBB's NIL tab): ranks by xNIL, FV breaks ties
     var byNil = function (a, b) { return (b.xnil || 0) - (a.xnil || 0) || a.ovr - b.ovr; };
     if (opt.rankBy === 'war') recs.sort(byWar);
@@ -437,7 +437,7 @@
       }
       var who = tr.querySelector('.cfb__who'); if (who) who.setAttribute('aria-expanded', 'true');
     });
-    var ths = [].slice.call(w.querySelectorAll('th[data-sort]')), cur = opt.rankBy === 'war' ? 'waa' : opt.rankBy === 'nil' ? 'xnil' : 'rk', dir = opt.rankBy === 'war' || opt.rankBy === 'nil' ? -1 : 1, sort0 = [cur, dir];
+    var ths = [].slice.call(w.querySelectorAll('th[data-sort]')), cur = opt.rankBy === 'war' ? 'xv' : opt.rankBy === 'nil' ? 'xnil' : 'rk', dir = opt.rankBy === 'war' || opt.rankBy === 'nil' ? -1 : 1, sort0 = [cur, dir];
     ths.forEach(function (th) {
       th.tabIndex = 0;
       function go() {

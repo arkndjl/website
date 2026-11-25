@@ -351,9 +351,32 @@ def make_hist():
     print('wrote', HIST, len(rows))
 
 
+def drop_alias_dups(rows):
+    """Rows that repeat a match under another id for one club (same league, day and score, one side the same club, the
+    other side a second id): 15 in the frozen history (swe.1 2016 lists one club as 18211 and 5043 for 12 rounds; 3 in
+    2011). Port round Nov 24 2026 (scripts/research/metric_audit_nov24/port/tennis_cs2_cbb/dups2.py). The row whose
+    odd-side id plays more of that league-year's games stays."""
+    n = Counter()
+    for r in rows:
+        n[(r['lg'], r['day'][:4], r['h'])] += 1; n[(r['lg'], r['day'][:4], r['a'])] += 1
+    seen, drop = {}, set()
+    for r in rows:
+        if r.get('hs') is None:
+            continue
+        for side, k in (('h', 'a'), ('a', 'h')):
+            key = (r['lg'], r['day'], r['hs'], r['as'], side, r[side])
+            o = seen.get(key)
+            if o is not None and o[k] != r[k]:
+                c = lambda x: n[(x['lg'], x['day'][:4], x[k])]
+                drop.add(id(o) if c(o) < c(r) else id(r))
+            else:
+                seen[key] = r
+    return [r for r in rows if id(r) not in drop]
+
+
 def load_rows(live=True, fresh=False):
     """frozen history plus this season so far (and its fixtures) from ESPN"""
-    rows = D.load(HIST)
+    rows = drop_alias_dups(D.load(HIST))
     if not live:
         return rows
     have = {r['id'] for r in rows}
@@ -1152,7 +1175,7 @@ def totals_test(rows, P):
 
 
 def fit():
-    rows = add_inj(add_mv(add_market(D.load(HIST))))
+    rows = add_inj(add_mv(add_market(drop_alias_dups(D.load(HIST)))))
     P = params()
     print('tune', flush=True)
     P, best = tune(rows, P, ['wm', 'km', 'wx', 'kx', 'k', 'kl', 'kh', 'rho', 'boost', 'nb', 'cup', 'mv', 'av'])
@@ -2094,11 +2117,11 @@ if __name__ == '__main__':
         fit()
     elif '--totals' in sys.argv:           # the totals ratings' backtest alone, into the stored fit
         F = json.load(open(FIT))
-        F['totals'] = totals_test(add_inj(add_mv(add_market(D.load(HIST)))), params())
+        F['totals'] = totals_test(add_inj(add_mv(add_market(drop_alias_dups(D.load(HIST))))), params())
         json.dump(F, open(FIT, 'w'), indent=1, allow_nan=False)
         print(json.dumps(F['totals'], indent=1))
     elif '--eval' in sys.argv:
-        rows = add_mv(add_market(D.load(HIST)))
+        rows = add_mv(add_market(drop_alias_dups(D.load(HIST))))
         print(evaluate(rows, params()), evaluate(rows, params(), lo=HOLD_FROM, hi=2100))
     else:
         # Nov 2 2026: four CI runs in a row hit the 30-minute limit with no output; print the stack every 8 minutes

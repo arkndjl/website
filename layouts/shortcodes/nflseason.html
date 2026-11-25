@@ -1,10 +1,13 @@
 {{- /* NFL non-QB season value (data/nfl_season_value.json, scripts/nfl_season_value.py): group="skill" (RB, WR, TE: EPA a
        run / target, opponent-adjusted, RBs also for weather) or group="defense" (DL, LB, DB: credited EPA, offense-adjusted
-       for DL and DB), ranked by this season's points over replacement a game. */ -}}
+       for DL and DB), ranked by this season's points over replacement a game. SV stays the key (the award conviction
+       number, Noah Nov 20); XV, the season's most descriptive number (metric audit Nov 24), comes second, first after the
+       sample, once the rows carry it (xv: scripts/nfl_season_value.py copies it from the WAR row it already matches). */ -}}
 {{- $sk := eq ($.Get "group") "skill" -}}
 {{- with site.Data.nfl_season_value -}}
 {{- $rows := cond $sk .skill .defense -}}
-{{- $gfx := cond $sk "RK,Player,SV,Pos,Team,G,aEPA,Rush,Rec Yds" "RK,Player,SV,Pos,Team,G,SV/100,Sk,INT,PD" -}}
+{{- $xv := false }}{{ range $rows }}{{ if isset . "xv" }}{{ $xv = true }}{{ end }}{{ end -}}
+{{- $gfx := cond $sk (cond $xv "RK,Player,SV,XV,Pos,Team,G,aEPA,Rush,Rec Yds" "RK,Player,SV,Pos,Team,G,aEPA,Rush,Rec Yds") (cond $xv "RK,Player,SV,XV,Pos,Team,G,SV/100,Sk,INT,PD" "RK,Player,SV,Pos,Team,G,SV/100,Sk,INT,PD") -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (cond $sk "skill players" "defenders")) "filter" "Pos" "rerank" true "tab" ($.Get "tab") "gfxCols" $gfx "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
 <table class="cfb__table">
   <thead><tr>
@@ -24,6 +27,9 @@
     <th title="games with a defensive snap">G</th>
     <th title="defensive snaps">Snaps</th>
     <th title="points over replacement a 100 defensive snaps">SV/100</th>
+  {{- end }}
+  {{- if $xv }}
+    <th title="XV = WAR from the parts of the stat line that track team margin (EPA, sacks, pressures, stops, coverage allowed, ...), z within the sub-position, weights fit on 2018-25 team margin, season to date (WAR leaders board). Held out, the season number that tracks team margin best (vs WAR, SV)">XV</th>
   {{- end }}
     <th title="this season's points over replacement, total">Pts</th>
     <th title="SVAR = SV over replacement, season total, in wins: points / 36 a win (the game model's points a win). this season only">SVAR</th>
@@ -52,6 +58,9 @@
   {{- else }}
     <td class="cfb__num">{{ .g }}</td><td class="cfb__num">{{ .sn }}</td>
     <td class="cfb__num">{{ partial "num.html" (slice "%+.2f" (float .p100)) }}</td>
+  {{- end }}
+  {{- if $xv }}
+    <td class="cfb__num">{{ with .xv }}{{ printf "%.2f" (float .) }}{{ end }}</td>
   {{- end }}
     <td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float .tot)) }}</td>
     <td class="cfb__num">{{ with .svar }}{{ partial "num.html" (slice "%+.2f" (float .)) }}{{ end }}</td>

@@ -188,7 +188,7 @@ def main():
                           'ta': r1(X['a1'] / X['n1'], 3) if X.get('n1') else None,
                           'car': int(S.get('carries', 0)), 'ry': int(S.get('rushing_yards', 0)), 'rtd': int(S.get('rushing_tds', 0)),
                           'tgt': int(S.get('targets', 0)), 'rec': int(S.get('receptions', 0)), 'recy': int(S.get('receiving_yards', 0)),
-                          'rectd': int(S.get('receiving_tds', 0)), 'war': w.get('war')})
+                          'rectd': int(S.get('receiving_tds', 0)), 'war': w.get('war'), 'xv': w.get('xv')})
         elif g in ('DL', 'LB', 'DB'):
             gs, sn = dsn.get(pid, (set(), 0))
             if sn < MIN_SNAPS:
@@ -200,7 +200,7 @@ def main():
                         'tfl': r1(S.get('def_tackles_for_loss', 0.0)), 'ff': int(S.get('def_fumbles_forced', 0)),
                         'qbh': int(S.get('def_qb_hits', 0)),
                         'tk': int(S.get('def_tackles_solo', 0) + S.get('def_tackle_assists', 0) + S.get('def_tackles_with_assist', 0)),
-                        'war': w.get('war')})
+                        'war': w.get('war'), 'xv': w.get('xv')})
     for L in (skill, dfn):
         L.sort(key=lambda r: -r['pts'])
     out = {'season': y, 'week': G.get('week'), 'asof': G.get('asof'), 'skill': skill, 'defense': dfn}

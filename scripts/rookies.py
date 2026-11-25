@@ -189,15 +189,17 @@ def nfl():
                      'sub': p.get('col') or '', 'line': p.get('line') or '',
                      'ph': NFL_FACE.format(p['ph']) if p.get('ph') else None, 'lo': logo(f"/img/nfl/{p['tm'].lower()}.png")})
     write('nfl', {
-        'asof': b.get('last'), 'title': f'{y} rookies', 'key': 'waa',
+        'asof': b.get('last'), 'title': f'{y} rookies', 'key': 'xv',      # a season board: XV, the most descriptive (metric audit Nov 24)
         'def': 'rookies: first NFL season (nflverse rookie flag). slot = overall pick. pre-draft FV fills from the draft ledger from the 2027 class on.',
-        'views': [['waa', 'WAA', 'WAA this season: wins over an average regular at the sub-position, same snaps'],
+        'views': [['xv', 'XV', 'XV: WAR on the stat-line parts that track team margin'],
+                  ['waa', 'WAA', 'WAA this season: wins over an average regular at the sub-position, same snaps'],
                   ['war', 'WAR', 'WAR this season: .6 x AV WAR + .4 x XV'],
-                  ['pxp', 'pXP/60', 'pXP/60: predictive points over an average regular per 60 snaps (a rookie has no past seasons, so this season alone, shrunk by K snaps to the sub-position mean moved by his draft slot)'], ['xv', 'XV', 'XV: WAR on the stat-line parts that track team margin'],
+                  ['pxp', 'pXP/60', 'pXP/60: predictive points over an average regular per 60 snaps (a rookie has no past seasons, so this season alone, shrunk by K snaps to the sub-position mean moved by his draft slot)'], 
                   ['pace', 'WAR/17', 'WAR on a 17-game pace'], ['waaP', 'WAA/17', 'WAA on a 17-game pace'], ['spts', 'SV', SPTS_T], ['svar', 'SVAR', SVAR_T + ' / 36 a win']],
-        'cols': [col('waa', 'WAA', 'wins over an average regular at the sub-position, same snaps', 's2'), col('war', 'WAR', 'wins above replacement this season', '2'),
+        'cols': [col('xv', 'XV', 'expected value: WAR from the stat line', '2'),
+                 col('waa', 'WAA', 'wins over an average regular at the sub-position, same snaps', 's2'), col('war', 'WAR', 'wins above replacement this season', '2'),
                  col('pxp', 'pXP/60', 'predictive points over an average regular at the sub-position per 60 snaps: this season shrunk by K snaps (QB 900, RB 450, WR 900, TE 300, DL 900, LB 1300, OL 2600, DB 3600) to the sub-position mean moved by his draft slot', 's2'),
-                 col('xp', 'rXP/60', 'points over an average regular at the sub-position per 60 snaps, this season (100+ snaps)', 's2', 1), col('xv', 'XV', 'expected value: WAR from the stat line', '2'),
+                 col('xp', 'rXP/60', 'points over an average regular at the sub-position per 60 snaps, this season (100+ snaps)', 's2', 1),
                  col('wav', 'AV WAR', 'WAR from approximate value', '2', 1), col('pace', 'WAR/17', 'WAR on a 17-game pace', '2', 1), col('waaP', 'WAA/17', 'WAA on a 17-game pace', 's2', 1),
                  col('spts', 'SV', SPTS_T + ' (QB, RB, WR, TE, DL, LB, DB)', 's1', 1), col('svar', 'SVAR', SVAR_T + ' / 36 a win', 's2', 1),
                  col('g', 'G', 'games', 'i', 1), col('sn', 'Snaps', 'snaps', 'i', 1), col('line', 'Line', 'season line', 's', 1, 0)],
@@ -401,11 +403,11 @@ def soccer():
             seasons.append({'s': S, 'l': d['label'], 'rows': rows, 'games': d.get('games')})
     seasons.reverse()
     write('soccer', {
-        'asof': json.load(open(os.path.join(SD, 'soccer-war', f'{cur}.json'))).get('asof'), 'title': 'rookies', 'key': 'gar',
+        'asof': json.load(open(os.path.join(SD, 'soccer-war', f'{cur}.json'))).get('asof'), 'title': 'rookies', 'key': 'svar',      # a season board: SVAR, the most descriptive (metric audit Nov 24)
         'def': 'rookies: first big-five league season (Understat, 2015-16 on). prospect FV = the soccer prospects board (U22) where the player was graded.',
-        'views': [['gar', 'GAR', 'goals above replacement this season'], ['gar90', 'GAR/90', 'GAR per 90 minutes'],
-                  ['xmv', 'xMV', 'estimated market value, EUR M'], ['svar', 'SVAR', SO_SVAR_T], ['sv', 'SV', SO_SV_T]],
-        'cols': [col('gar', 'GAR', 'goals above replacement', 's1'), col('svar', 'SVAR', SO_SVAR_T, 's1', 1),
+        'views': [['svar', 'SVAR', SO_SVAR_T], ['gar', 'GAR', 'goals above replacement this season'], ['gar90', 'GAR/90', 'GAR per 90 minutes'],
+                  ['xmv', 'xMV', 'estimated market value, EUR M'], ['sv', 'SV', SO_SV_T]],
+        'cols': [col('svar', 'SVAR', SO_SVAR_T, 's1'), col('gar', 'GAR', 'goals above replacement', 's1', 1),
                  col('sv', 'SV', SO_SV_T, 's2', 1), col('xmv', 'xMV', 'estimated market value, EUR M', 'e'),
                  col('mv', 'TM', 'Transfermarkt market value, EUR M', 'e', 1), col('gar90', 'GAR/90', 'GAR per 90', 's2', 1),
                  col('agar90', 'aGAR/90', SO_AGAR_T, 's2', 1),

@@ -63,7 +63,7 @@ SPORTS = {
              ['GAR/60', 's2', g60, 'goals above replacement a 60 this season, 100+ minutes']]),
     'soccer': (lambda: load(latest('soccer-war'))['players'], 'n', 'team', 'club',
                [['GAR', 's1', 'gar', 'goals above replacement this season'],
-                ['p/90', 's2', 'pg90', 'predictive GAR a 90']]),
+                ['p/90', 's2', 'pg90', 'predictive value a 90: SV over three seasons, age over 29']]),
     'cbb': (rows_cbb, 'name', 'team', 'club',
             [['FV', 'i', 'fv', 'FV now'],
              ['WAR', 's2', 'war', 'wins above replacement this season'],

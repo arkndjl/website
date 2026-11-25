@@ -1,9 +1,9 @@
 {
- "updated": "2026-11-23",
+ "updated": "2026-11-24",
  "params": {
   "K": 4,
   "reg": 0.2,
-  "hl": 60,
+  "hl": 120,
   "car": 0.7,
   "ghl": 30,
   "gcar": 0.5,
@@ -29,154 +29,154 @@
   "one"
  ],
  "coef": {
-  "elo": 0.3595,
-  "xg": 0.2883,
-  "b2b": -0.2886,
-  "home": 0.131,
-  "rv": 0.3064
+  "elo": 0.3267,
+  "xg": 0.3479,
+  "b2b": -0.2887,
+  "home": 0.1308,
+  "rv": 0.375
  },
  "mcoef": {
-  "elo": 0.4202,
-  "xg": 0.4463,
-  "b2b": -0.3195,
-  "home": 0.2122,
-  "rv": 0.4549
+  "elo": 0.3725,
+  "xg": 0.5175,
+  "b2b": -0.32,
+  "home": 0.212,
+  "rv": 0.5925
  },
  "tcoef": {
-  "xgT": 0.3018,
-  "gT": 0.0822,
-  "mtot": 0.2485,
-  "gkT": 0.668,
-  "one": 2.3583
+  "xgT": 0.3625,
+  "gT": 0.09,
+  "mtot": 0.1775,
+  "gkT": 0.7347,
+  "one": 2.375
  },
  "pl": {
   "home2": [
-   -1.2476,
-   0.6632,
-   0.0525
+   -1.2724,
+   0.6589,
+   0.0569
   ],
   "away2": [
-   -2.5041,
-   -0.7036,
-   0.2622
+   -2.4326,
+   -0.7003,
+   0.2505
   ]
  },
  "ot": [
-  -0.0838,
-  -0.0923,
-  -0.1802
+  -0.0719,
+  -0.0859,
+  -0.1826
  ],
  "otWin": [
-  -0.0,
-  0.3747
+  0.004,
+  0.3506
  ],
  "otWinGames": 2760,
- "sdMargin": 2.48,
+ "sdMargin": 2.481,
  "sdTotal": 2.299,
- "seasonSd": 0.1,
+ "seasonSd": 0.11,
  "evidence": {
   "elo": {
    "kept": true,
-   "tTune": 2.14,
-   "tHeld": -0.55,
-   "dTune": 3.483,
-   "dHeld": -0.665,
+   "tTune": 1.99,
+   "tHeld": -0.72,
+   "dTune": 2.499,
+   "dHeld": -0.686,
    "split": "2021-23 / 2024-26 lined"
   },
   "xg": {
    "kept": true,
-   "tTune": 2.42,
-   "tHeld": 3.12,
-   "dTune": 2.055,
-   "dHeld": 2.321,
+   "tTune": 2.15,
+   "tHeld": 2.03,
+   "dTune": 2.398,
+   "dHeld": 1.629,
    "split": "2021-23 / 2024-26 lined"
   },
   "g": {
    "kept": true,
-   "tTune": -0.57,
-   "tHeld": -0.57,
-   "dTune": -0.082,
-   "dHeld": -0.11,
+   "tTune": -1.1,
+   "tHeld": -1.11,
+   "dTune": -0.112,
+   "dHeld": -0.088,
    "split": "2017-23 / 2024-26"
   },
   "gk": {
    "kept": true,
-   "tTune": 0.28,
-   "tHeld": -0.12,
-   "dTune": 0.089,
-   "dHeld": -0.035,
+   "tTune": 0.45,
+   "tHeld": -0.22,
+   "dTune": 0.156,
+   "dHeld": -0.07,
    "split": "2017-23 / 2024-26"
   },
   "rest": {
    "kept": true,
-   "tTune": -1.0,
-   "tHeld": -1.63,
+   "tTune": -0.96,
+   "tHeld": -1.66,
    "dTune": -0.144,
-   "dHeld": -0.109,
+   "dHeld": -0.116,
    "split": "2017-23 / 2024-26"
   },
   "b2b": {
    "kept": true,
-   "tTune": 3.4,
+   "tTune": 3.38,
    "tHeld": 1.86,
-   "dTune": 2.783,
-   "dHeld": 2.176,
+   "dTune": 2.767,
+   "dHeld": 2.182,
    "split": "2021-23 / 2024-26 lined"
   },
   "home": {
    "kept": true,
-   "tTune": 1.2,
-   "tHeld": 2.46,
-   "dTune": 0.987,
-   "dHeld": 1.987,
+   "tTune": 1.17,
+   "tHeld": 2.47,
+   "dTune": 0.963,
+   "dHeld": 1.997,
    "split": "2021-23 / 2024-26 lined"
   },
   "x5": {
    "kept": false,
-   "tTune": 0.67,
-   "tHeld": 1.79,
-   "dTune": 0.248,
-   "dHeld": 0.83,
+   "tTune": -0.39,
+   "tHeld": 1.14,
+   "dTune": -0.13,
+   "dHeld": 0.359,
    "split": "2017-23 / 2024-26"
   },
   "st": {
    "kept": false,
-   "tTune": -0.5,
-   "tHeld": 1.59,
-   "dTune": -0.052,
-   "dHeld": 0.256,
+   "tTune": -0.87,
+   "tHeld": 1.72,
+   "dTune": -0.101,
+   "dHeld": 0.284,
    "split": "2017-23 / 2024-26"
   },
   "rv": {
    "kept": true,
-   "tTune": 2.44,
-   "tHeld": 1.14,
-   "dTune": 1.678,
-   "dHeld": 1.148,
+   "tTune": 2.05,
+   "tHeld": 1.51,
+   "dTune": 1.55,
+   "dHeld": 1.636,
    "split": "2021-23 / 2024-26 lined"
   },
   "bk": {
    "kept": false,
-   "tTune": -0.25,
-   "tHeld": -1.06,
-   "dTune": -0.017,
-   "dHeld": -0.087,
+   "tTune": -0.27,
+   "tHeld": -1.05,
+   "dTune": -0.02,
+   "dHeld": -0.08,
    "split": "2017-23 / 2024-26"
   },
   "gkd": {
    "kept": false,
-   "tTune": -1.15,
-   "tHeld": -0.81,
-   "dTune": -0.152,
-   "dHeld": -0.024,
+   "tTune": -1.11,
+   "tHeld": -0.68,
+   "dTune": -0.145,
+   "dHeld": -0.023,
    "split": "2017-23 / 2024-26"
   },
   "mkt": {
    "kept": false,
-   "tTune": 0.22,
-   "tHeld": 0.19,
-   "dTune": 0.139,
-   "dHeld": 0.07,
+   "tTune": 0.24,
+   "tHeld": 0.53,
+   "dTune": 0.118,
+   "dHeld": 0.172,
    "split": "2021-23 / 2024-26 lined"
   }
  },
@@ -184,78 +184,78 @@
   "2021-23 (tuning)": {
    "games": 3753,
    "logLossModel": 0.6517,
-   "brierModel": 0.2299,
+   "brierModel": 0.2298,
    "lined": 3752,
-   "logLossLinedModel": 0.6518,
+   "logLossLinedModel": 0.6517,
    "logLossMarket": 0.6516,
-   "tVsMarket": 0.12,
-   "rModelVsMarket": 0.946,
+   "tVsMarket": 0.1,
+   "rModelVsMarket": 0.945,
    "hitModel": 0.619,
    "hitMarket": 0.628,
    "totalGames": 3752,
    "totalMaeModel": 1.838,
    "totalMaeLine": 1.834,
-   "maeMargin": 2.082
+   "maeMargin": 2.08
   },
   "2024-26 (held out)": {
    "games": 4192,
-   "logLossModel": 0.6673,
-   "brierModel": 0.2375,
+   "logLossModel": 0.6681,
+   "brierModel": 0.2379,
    "lined": 4190,
-   "logLossLinedModel": 0.6674,
+   "logLossLinedModel": 0.6682,
    "logLossMarket": 0.6645,
-   "tVsMarket": 1.78,
-   "rModelVsMarket": 0.937,
-   "hitModel": 0.587,
+   "tVsMarket": 2.24,
+   "rModelVsMarket": 0.936,
+   "hitModel": 0.582,
    "hitMarket": 0.593,
    "totalGames": 4190,
    "totalMaeModel": 1.857,
    "totalMaeLine": 1.862,
-   "maeMargin": 2.111
+   "maeMargin": 2.114
   }
  },
  "calib": [
   {
    "bin": 0.5,
-   "n": 1120,
+   "n": 1105,
    "model": 0.525,
-   "won": 0.514
+   "won": 0.494
   },
   {
    "bin": 0.55,
-   "n": 1047,
-   "model": 0.575,
-   "won": 0.541
+   "n": 1062,
+   "model": 0.574,
+   "won": 0.544
   },
   {
    "bin": 0.6,
    "n": 803,
    "model": 0.624,
-   "won": 0.592
+   "won": 0.589
   },
   {
    "bin": 0.65,
-   "n": 589,
+   "n": 574,
    "model": 0.673,
    "won": 0.66
   },
   {
    "bin": 0.7,
-   "n": 339,
+   "n": 346,
    "model": 0.723,
-   "won": 0.681
+   "won": 0.676
   },
   {
    "bin": 0.75,
-   "n": 203,
+   "n": 205,
    "model": 0.772,
-   "won": 0.719
+   "won": 0.722
   },
   {
    "bin": 0.8,
-   "n": 77,
-   "model": 0.821,
-   "won": 0.831
+   "n": 80,
+   "model": 0.82,
+   "won": 0.812
   }
  ],
  "plCheck": {

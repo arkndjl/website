@@ -419,6 +419,7 @@ def show_line(L, season_label, seasons):
             'ppg': round(L['pts_g'] or 0, 1) if L.get('pts_g') is not None else None, 'rpg': round(L['treb_g'] or 0, 1) if L.get('treb_g') is not None else None,
             'apg': round(L['ast_g'] or 0, 1) if L.get('ast_g') is not None else None,
             'bpm': round(L['bpm'] or 0, 1), 'obpm': round(L['obpm'] or 0, 1), 'dbpm': round(L['dbpm'] or 0, 1),
+            'gbpm': round(L['gbpm'], 1) if L.get('gbpm') is not None else None,
             'ortg': round(L['ortg'] or 0, 1), 'usg': round(L['usg'] or 0, 1), 'ts': round(L['ts'] or 0, 1) if L.get('ts') is not None else None,
             'tp': round((L['tp'] or 0) * 100, 1), 'tpa': int(L['tpa'] or 0), 'ft': round((L['ft'] or 0) * 100, 1),
             'ast': round(L['ast'] or 0, 1), 'stl': round(L['stl'] or 0, 1), 'blk': round(L['blk'] or 0, 1), 'role': L.get('role'),

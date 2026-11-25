@@ -9,7 +9,7 @@
 {{- $k := site.Data.cfb_war_backtest.constants.cwarPerAv -}}
 {{- $b := site.Data.cfb_war_backtest.constants.teamReplWar -}}
 {{- with site.Data.cfb_teams -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "team talent") "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Talent,Elo,TvE,xNIL,zNIL" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "team talent") "filter" "Conf" "tab" ($.Get "tab") "gfxCols" "RK,Team,Talent,WAR,Elo,TvE,xNIL,zNIL" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "26") -}}
 <table class="cfb__table cfbt">
   <thead><tr>
     <th>RK</th><th>Team</th><th title="conference">Conf</th>
