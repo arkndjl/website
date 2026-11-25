@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-25T08:08:29Z",
+ "asof": "2026-11-25T09:57:58Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -52,7 +52,7 @@
  },
  "model": {
   "asof": "2026-11-25T05:05:00Z",
-  "ageH": 3.1,
+  "ageH": 4.9,
   "stale": false
  },
  "picks": [],
@@ -188,6 +188,22 @@
    "tm": 49.2
   },
   {
+   "id": "2026_12_TEN_JAX",
+   "sport": "nfl",
+   "kick": "2026-11-29T18:00:00Z",
+   "home": "JAX",
+   "away": "TEN",
+   "mk": "total",
+   "side": "under",
+   "line": 49.5,
+   "price": -122.0,
+   "edge": 2.6,
+   "x": null,
+   "why": "total market off",
+   "m": 15.7,
+   "tm": 46.9
+  },
+  {
    "id": "2026_12_CHI_DET",
    "sport": "nfl",
    "kick": "2026-11-26T18:00:00Z",
@@ -228,28 +244,12 @@
    "mk": "spread",
    "side": "home",
    "line": 9.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 1.9,
    "x": null,
    "why": "spread market off",
    "m": 11.4,
    "tm": 50.2
-  },
-  {
-   "id": "2026_12_TEN_JAX",
-   "sport": "nfl",
-   "kick": "2026-11-29T18:00:00Z",
-   "home": "JAX",
-   "away": "TEN",
-   "mk": "total",
-   "side": "under",
-   "line": 48.5,
-   "price": -104.0,
-   "edge": 1.6,
-   "x": null,
-   "why": "total market off",
-   "m": 15.7,
-   "tm": 46.9
   },
   {
    "id": "2026_12_LV_CLE",
@@ -292,7 +292,7 @@
    "mk": "spread",
    "side": "home",
    "line": 2.5,
-   "price": -137.0,
+   "price": -134.0,
    "edge": 1.0,
    "x": null,
    "why": "spread market off",
@@ -308,7 +308,7 @@
    "mk": "total",
    "side": "under",
    "line": 48.5,
-   "price": -119.0,
+   "price": -117.0,
    "edge": 0.7,
    "x": null,
    "why": "total market off",
@@ -345,7 +345,7 @@
    "mk": "total",
    "side": "under",
    "line": 48.5,
-   "price": -119.0,
+   "price": -117.0,
    "edge": 0.7,
    "ev": null,
    "units": 0.0,
@@ -405,7 +405,7 @@
    "mk": "spread",
    "side": "home",
    "line": 9.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 1.9,
    "ev": null,
    "units": 0.0,
@@ -440,9 +440,9 @@
   "2026_12_TEN_JAX": {
    "mk": "total",
    "side": "under",
-   "line": 48.5,
-   "price": -104.0,
-   "edge": 1.6,
+   "line": 49.5,
+   "price": -122.0,
+   "edge": 2.6,
    "ev": null,
    "units": 0.0,
    "home": "JAX",
@@ -501,7 +501,7 @@
    "mk": "spread",
    "side": "home",
    "line": 2.5,
-   "price": -137.0,
+   "price": -134.0,
    "edge": 1.0,
    "ev": null,
    "units": 0.0,
@@ -562,13 +562,13 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 6271,
+  "snapshots": 6279,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 2538,
+    "clvN": 2540,
     "clvRet": -0.0343,
-    "clvT": -21.61,
+    "clvT": -21.63,
     "clv": 0.28,
     "beat": 0.32,
     "still": 0.545
@@ -2978,7 +2978,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-25T08:08:29Z",
+ "checked": "2026-11-25T09:57:58Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
