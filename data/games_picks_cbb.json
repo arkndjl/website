@@ -1,10 +1,10 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-25T00:25:32Z",
+ "asof": "2026-11-25T00:31:06Z",
  "recenter": {
-  "2026-11-24": 1.7,
-  "2026-11-25": 1.93
+  "2026-11-24": 1.69,
+  "2026-11-25": 1.92
  },
  "monitor": {
   "clocks": {
@@ -1831,7 +1831,7 @@
  },
  "model": {
   "asof": "2026-11-24T19:10:51Z",
-  "ageH": 5.2,
+  "ageH": 5.3,
   "stale": false
  },
  "picks": [],
@@ -1862,9 +1862,10 @@
    "tmRaw": 141.7,
    "flagged": "2026-11-24T16:32:03Z",
    "paper": true,
-   "betTo": 140.5,
+   "betTo": 141.0,
    "close": 145.5,
-   "now": null
+   "now": null,
+   "pass": true
   },
   {
    "id": "401921711",
@@ -2018,22 +2019,6 @@
  "withdrawn": [],
  "board": [
   {
-   "id": "401920414",
-   "sport": "cbb",
-   "kick": "2026-11-25T00:30:00Z",
-   "home": "Duquesne",
-   "away": "High Point",
-   "mk": "spread",
-   "side": "away",
-   "line": 10.5,
-   "price": -110.0,
-   "edge": 24.4,
-   "x": 4.0,
-   "why": "gap too big: a bad line",
-   "m": -13.9,
-   "tm": 139.5
-  },
-  {
    "id": "401911338",
    "sport": "cbb",
    "kick": "2026-11-25T01:00:00Z",
@@ -2130,22 +2115,6 @@
    "tm": 153.7
   },
   {
-   "id": "401917983",
-   "sport": "cbb",
-   "kick": "2026-11-25T00:30:00Z",
-   "home": "UL Monroe",
-   "away": "Houston Christian",
-   "mk": "total",
-   "side": "over",
-   "line": 148.5,
-   "price": -119.0,
-   "edge": 6.5,
-   "x": 7.0,
-   "why": "edge under 7",
-   "m": 0.4,
-   "tm": 155.0
-  },
-  {
    "id": "401921008",
    "sport": "cbb",
    "kick": "2026-11-25T01:00:00Z",
@@ -2208,22 +2177,6 @@
    "why": "edge under 6.5 (side: under)",
    "m": 7.8,
    "tm": 145.4
-  },
-  {
-   "id": "401925687",
-   "sport": "cbb",
-   "kick": "2026-11-25T00:30:00Z",
-   "home": "Louisiana Tech",
-   "away": "Alcorn State",
-   "mk": "spread",
-   "side": "home",
-   "line": 15.5,
-   "price": -119.0,
-   "edge": 4.0,
-   "x": 5.5,
-   "why": "edge under 5.5 (inj: none)",
-   "m": 19.5,
-   "tm": 142.4
   },
   {
    "id": "401928796",
@@ -2338,22 +2291,6 @@
    "tm": 139.9
   },
   {
-   "id": "401917904",
-   "sport": "cbb",
-   "kick": "2026-11-25T00:30:00Z",
-   "home": "Tennessee Tech",
-   "away": "West Georgia",
-   "mk": "total",
-   "side": "under",
-   "line": 163.5,
-   "price": -114.0,
-   "edge": 2.6,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": 14.5,
-   "tm": 160.9
-  },
-  {
    "id": "401925642",
    "sport": "cbb",
    "kick": "2026-11-25T01:00:00Z",
@@ -2416,6 +2353,38 @@
    "why": "edge under 7",
    "m": -0.6,
    "tm": 165.8
+  },
+  {
+   "id": "401909800",
+   "sport": "cbb",
+   "kick": "2026-11-25T05:30:00Z",
+   "home": "Kansas State",
+   "away": "Gonzaga",
+   "mk": "total",
+   "side": "under",
+   "line": 157.5,
+   "price": -106.0,
+   "edge": 1.6,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: under)",
+   "m": -13.6,
+   "tm": 155.9
+  },
+  {
+   "id": "401922023",
+   "sport": "cbb",
+   "kick": "2026-11-25T02:00:00Z",
+   "home": "Boise State",
+   "away": "Idaho State",
+   "mk": "total",
+   "side": "over",
+   "line": 162.5,
+   "price": -119.0,
+   "edge": 1.6,
+   "x": 7.0,
+   "why": "edge under 7",
+   "m": 20.2,
+   "tm": 164.1
   }
  ],
  "games": {
@@ -2513,18 +2482,6 @@
    "units": 0.0,
    "home": "Colorado",
    "away": "Stanford",
-   "state": "under"
-  },
-  "401920414": {
-   "mk": "spread",
-   "side": "away",
-   "line": 10.5,
-   "price": -110.0,
-   "edge": 24.4,
-   "ev": null,
-   "units": 0.0,
-   "home": "Duquesne",
-   "away": "High Point",
    "state": "under"
   },
   "401920709": {
@@ -2647,30 +2604,6 @@
    "away": "Oral Roberts",
    "state": "under"
   },
-  "401917904": {
-   "mk": "total",
-   "side": "under",
-   "line": 163.5,
-   "price": -114.0,
-   "edge": 2.6,
-   "ev": null,
-   "units": 0.0,
-   "home": "Tennessee Tech",
-   "away": "West Georgia",
-   "state": "under"
-  },
-  "401926154": {
-   "mk": "total",
-   "side": "over",
-   "line": 149.5,
-   "price": -110.0,
-   "edge": 1.7,
-   "ev": null,
-   "units": 0.0,
-   "home": "Southeast Missouri State",
-   "away": "Purdue Fort Wayne",
-   "state": "under"
-  },
   "401921008": {
    "mk": "total",
    "side": "under",
@@ -2683,18 +2616,6 @@
    "away": "Green Bay",
    "state": "under"
   },
-  "401917983": {
-   "mk": "total",
-   "side": "over",
-   "line": 148.5,
-   "price": -119.0,
-   "edge": 6.5,
-   "ev": null,
-   "units": 0.0,
-   "home": "UL Monroe",
-   "away": "Houston Christian",
-   "state": "under"
-  },
   "401929421": {
    "mk": "spread",
    "side": "home",
@@ -2705,18 +2626,6 @@
    "units": 0.0,
    "home": "South Alabama",
    "away": "Florida A&M",
-   "state": "under"
-  },
-  "401925687": {
-   "mk": "spread",
-   "side": "home",
-   "line": 15.5,
-   "price": -119.0,
-   "edge": 4.0,
-   "ev": null,
-   "units": 0.0,
-   "home": "Louisiana Tech",
-   "away": "Alcorn State",
    "state": "under"
   },
   "401924723": {
@@ -2808,7 +2717,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 25424,
+  "snapshots": 25425,
   "buckets": [
    {
     "when": "24h+",
@@ -2830,9 +2739,9 @@
    },
    {
     "when": "1-6h",
-    "clvN": 2244,
+    "clvN": 2245,
     "clvRet": -0.0401,
-    "clvT": -32.78,
+    "clvT": -32.8,
     "clv": 0.08,
     "beat": 0.169,
     "still": 0.703
@@ -19236,8 +19145,9 @@
    "tmRaw": 141.7,
    "flagged": "2026-11-24T16:32:03Z",
    "paper": true,
-   "betTo": 140.5,
-   "close": 145.5
+   "betTo": 141.0,
+   "close": 145.5,
+   "pass": true
   }
  ],
  "withdrawnLog": [
@@ -21281,7 +21191,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-25T00:25:32Z",
+ "checked": "2026-11-25T00:31:06Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
