@@ -1,6 +1,8 @@
-{{- /* Home page video.exe: newest long-form YouTube uploads (no Shorts) from LAURSEN_111 and ARKNDJL, newest in the
-       player. Data: data/laursen_socials.json + data/arkndjl_socials.json `yt` (channel RSS every 20 min in esea.yml;
-       short = the feed's /shorts/ link, or the API check in scripts/laursen_social_plan.mjs). */ -}}
+{{- /* Home page video.exe as a small desktop media player skin: screen, LCD, seek bar, transport, channel modes and a
+       track list. Newest long-form YouTube uploads (no Shorts) from LAURSEN_111 and ARKNDJL, newest loaded first.
+       Data: data/laursen_socials.json + data/arkndjl_socials.json `yt` (channel RSS every 20 min in esea.yml; short =
+       the feed's /shorts/ link, or the API check in scripts/laursen_social_plan.mjs). The transport drives the embed
+       through the YouTube iframe postMessage API (enablejsapi=1), no API script; a finished video plays the next. */ -}}
 {{- $chs := slice (dict "k" "laursen" "n" "LAURSEN_111" "h" "LAURSEN_111" "yt" site.Data.laursen_socials.yt) (dict "k" "arkndjl" "n" "ARKNDJL" "h" "ARKNDJL" "yt" site.Data.arkndjl_socials.yt) -}}
 {{- $v := slice -}}
 {{- range $chs }}{{ $c := . }}
@@ -10,56 +12,187 @@
     {{- end }}
   {{- end }}
 {{- end -}}
-{{- $v = sort $v "pub" "desc" -}}
-{{- $show := 8 -}}
+{{- $v = first 16 (sort $v "pub" "desc") -}}
 {{- with $v }}
-<div class="win vods hvid" id="video">
+{{- $f := index . 0 }}
+<div class="win hvid" id="video">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-youtube"/></svg>video.exe<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
-  <div class="hvid__chips" role="group" aria-label="channel">
-    <button type="button" data-ch="" aria-pressed="true">all</button>
-    {{- range $chs }}<button type="button" data-ch="{{ .k }}" aria-pressed="false">{{ .n }}</button>{{ end }}
+  <div class="hvid__skin">
+    <div class="hvid__deck">
+      <div class="hvid__bezel"><div class="hvid__screen"><iframe src="https://www.youtube-nocookie.com/embed/{{ $f.id }}?enablejsapi=1&playsinline=1&rel=0" title="{{ $f.t }}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; fullscreen" allowfullscreen></iframe></div></div>
+      <div class="hvid__seek" role="slider" tabindex="0" aria-label="seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i class="hvid__fill"></i><i class="hvid__head" aria-hidden="true"></i></div>
+      <div class="hvid__ctl">
+        <button type="button" class="hvid__btn" data-hv="prev" aria-label="previous"><svg><use href="#icon-prev"/></svg></button>
+        <button type="button" class="hvid__btn hvid__btn--main" data-hv="play" aria-label="play"><svg><use href="#icon-play"/></svg></button>
+        <button type="button" class="hvid__btn" data-hv="stop" aria-label="stop"><svg><use href="#icon-stop"/></svg></button>
+        <button type="button" class="hvid__btn" data-hv="next" aria-label="next"><svg><use href="#icon-next"/></svg></button>
+        <span class="hvid__grille" aria-hidden="true"></span>
+        <span class="hvid__led" aria-hidden="true"></span>
+      </div>
+    </div>
+    <div class="hvid__side">
+      <div class="hvid__lcd">
+        <div class="hvid__lcd-top"><span class="hvid__time">0:00</span><span class="hvid__eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="hvid__dur">-:--</span></div>
+        <div class="hvid__marq"><span>{{ $f.t }}</span></div>
+        <div class="hvid__lcd-bot"><b class="hvid__ch hvid__ch--{{ $f.k }}">{{ $f.n }}</b><i class="hvid__date">{{ (time.AsTime (int (div $f.pub 1000))).Format "Jan 2 2006" }}</i></div>
+      </div>
+      <div class="hvid__modes" role="group" aria-label="channel">
+        <button type="button" data-ch="" aria-pressed="true">all</button>
+        {{- range $chs }}<button type="button" data-ch="{{ .k }}" aria-pressed="false">{{ .n }}</button>{{ end }}
+      </div>
+      <ol class="hvid__list">
+        {{- range $i, $x := . }}
+        <li data-ch="{{ .k }}"><a href="https://www.youtube.com/watch?v={{ .id }}" data-vid="{{ .id }}" data-n="{{ .n }}" data-k="{{ .k }}" data-d="{{ (time.AsTime (int (div .pub 1000))).Format "Jan 2 2006" }}"{{ if eq $i 0 }} class="is-on"{{ end }} rel="noopener"><span class="hvid__no"></span><span class="hvid__t">{{ .t }}</span><b class="hvid__ch hvid__ch--{{ .k }}">{{ if eq .k "laursen" }}L111{{ else }}ARK{{ end }}</b></a></li>
+        {{- end }}
+      </ol>
+    </div>
   </div>
-  {{- $f := index . 0 }}
-  <div class="vods__player"><iframe src="https://www.youtube-nocookie.com/embed/{{ $f.id }}" title="{{ $f.t }}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; fullscreen" allowfullscreen></iframe></div>
-  <ol class="vods__grid" data-show="{{ $show }}">
-    {{- range $i, $x := . }}
-    <li data-ch="{{ .k }}"{{ if ge $i $show }} hidden{{ end }}><a href="https://www.youtube.com/watch?v={{ .id }}" data-vid="{{ .id }}"{{ if eq $i 0 }} class="is-on"{{ end }} rel="noopener">
-      <span class="vods__th"><img src="https://i.ytimg.com/vi/{{ .id }}/mqdefault.jpg" alt="" width="320" height="180" loading="lazy"></span>
-      <span class="vods__t">{{ .t }}</span>
-      <span class="vods__d"><b class="hvid__ch hvid__ch--{{ .k }}">{{ .n }}</b><i>{{ (time.AsTime (int (div .pub 1000))).Format "Jan 2 2006" }}</i></span>
-    </a></li>
-    {{- end }}
-  </ol>
   <div class="win__status"><span>{{ range $i, $c := $chs }}{{ if $i }} · {{ end }}<a href="https://www.youtube.com/@{{ .h }}/videos" target="_blank" rel="noopener">@{{ .h }} ↗</a>{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
-{{ partial "vods-assets.html" . }}
 <style>
-.hvid{margin:0 0 40px}
-.hvid__chips{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px 0}
-.hvid__chips button{font:inherit;font-size:.8em;letter-spacing:.06em;padding:3px 10px;cursor:pointer;color:var(--foreground);background:var(--win-well);border:0;box-shadow:inset -2px -2px 0 var(--win-dark),inset 2px 2px 0 var(--win-light)}
-.hvid__chips button[aria-pressed="true"]{color:#000;background:#c8c7ff;box-shadow:inset 2px 2px 0 var(--win-dark),inset -2px -2px 0 var(--win-light)}
-.hvid .vods__player{margin:10px auto 0;max-width:860px}
-.hvid .vods__d{display:flex;flex-wrap:wrap;align-items:center;gap:2px 6px}
-.hvid .vods__d i{font-style:normal;white-space:nowrap}
-.hvid__ch{font-weight:normal;padding:0 3px;color:#000}
+.hvid{margin:0 auto 40px;max-width:760px}
+.hvid__skin{--hv-lil:#c8c7ff;--hv-teal:#7fffd4;--hv-hi:#e9e6ff;--hv-mid:#8f84d6;--hv-lo:#4a3a86;--hv-ink:#120c22;
+  display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:10px;margin:8px;padding:10px;
+  background:repeating-linear-gradient(180deg,#5a4a9a 0 2px,#54448f 2px 4px);
+  box-shadow:inset 2px 2px 0 var(--hv-hi),inset -2px -2px 0 var(--hv-ink),inset 4px 4px 0 var(--hv-mid),inset -4px -4px 0 var(--hv-lo);
+  clip-path:polygon(0 6px,2px 6px,2px 4px,4px 4px,4px 2px,6px 2px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 2px,calc(100% - 4px) 2px,calc(100% - 4px) 4px,calc(100% - 2px) 4px,calc(100% - 2px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 2px) calc(100% - 6px),calc(100% - 2px) calc(100% - 4px),calc(100% - 4px) calc(100% - 4px),calc(100% - 4px) calc(100% - 2px),calc(100% - 6px) calc(100% - 2px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 2px),4px calc(100% - 2px),4px calc(100% - 4px),2px calc(100% - 4px),2px calc(100% - 6px),0 calc(100% - 6px))}
+.hvid__deck,.hvid__side{display:flex;flex-direction:column;gap:8px;min-width:0}
+.hvid__bezel{padding:6px;background:var(--hv-ink);box-shadow:inset 2px 2px 0 var(--hv-lo),inset -2px -2px 0 var(--hv-hi),0 0 0 2px var(--hv-ink)}
+.hvid__screen{aspect-ratio:16/9;background:#000;box-shadow:0 0 0 2px var(--hv-lo)}
+.hvid__screen iframe{display:block;width:100%;height:100%;border:0}
+.hvid__seek{position:relative;height:12px;cursor:pointer;background:var(--hv-ink);box-shadow:inset 2px 2px 0 #000,inset -2px -2px 0 var(--hv-mid)}
+.hvid__seek:focus-visible{outline:2px solid var(--hv-teal)}
+.hvid__fill{position:absolute;left:2px;top:2px;bottom:2px;width:0;max-width:calc(100% - 4px);background:repeating-linear-gradient(90deg,var(--hv-teal) 0 4px,transparent 4px 6px)}
+.hvid__head{position:absolute;top:-2px;left:0;width:10px;height:16px;margin-left:-5px;background:var(--hv-lil);box-shadow:inset -2px -2px 0 var(--hv-lo),inset 2px 2px 0 #fff}
+.hvid__ctl{display:flex;align-items:center;gap:6px}
+.hvid__btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:26px;padding:0;cursor:pointer;color:var(--hv-ink);
+  background:repeating-linear-gradient(180deg,var(--hv-hi) 0 6px,var(--hv-lil) 6px 12px,#ada9ec 12px 26px);border:0;
+  box-shadow:inset 2px 2px 0 #fff,inset -2px -2px 0 var(--hv-lo),0 0 0 2px var(--hv-ink)}
+.hvid__btn svg{width:14px;height:14px;fill:currentColor}
+.hvid__btn--main{width:46px;color:#1a5c4a}
+.hvid__btn:hover,.hvid__btn:focus-visible{color:#57068c;outline:none}
+.hvid__btn:active,.hvid__btn.is-on{box-shadow:inset 2px 2px 0 var(--hv-lo),inset -2px -2px 0 #fff,0 0 0 2px var(--hv-ink)}
+.hvid__grille{flex:1;height:18px;margin-left:6px;background:radial-gradient(var(--hv-ink) 1px,transparent 1.5px) 0 0/4px 4px}
+.hvid__led{width:8px;height:8px;background:#2a2050;box-shadow:0 0 0 2px var(--hv-ink)}
+.hvid.is-play .hvid__led{background:var(--hv-teal);animation:hvled 1s steps(2) infinite}
+@keyframes hvled{50%{background:#2f8f74}}
+.hvid__lcd{display:flex;flex-direction:column;gap:4px;padding:8px 10px;color:var(--hv-teal);
+  background:repeating-linear-gradient(180deg,#07130f 0 2px,#0b1d17 2px 4px);box-shadow:inset 2px 2px 0 #000,inset -2px -2px 0 var(--hv-mid),0 0 0 2px var(--hv-ink)}
+.hvid__lcd-top{display:flex;align-items:flex-end;gap:10px}
+.hvid__time{font-size:1.9em;line-height:1;letter-spacing:.04em;text-shadow:2px 2px 0 #134a3b}
+.hvid__dur{margin-left:auto;font-size:.78em;color:#4fbf9c}
+.hvid__eq{display:flex;align-items:flex-end;gap:2px;height:18px}
+.hvid__eq i{width:4px;height:4px;background:var(--hv-lil)}
+.hvid.is-play .hvid__eq i{animation:hveq .9s steps(4) infinite}
+.hvid__eq i:nth-child(2){animation-delay:-.3s!important}.hvid__eq i:nth-child(3){animation-delay:-.6s!important}.hvid__eq i:nth-child(4){animation-delay:-.15s!important}.hvid__eq i:nth-child(5){animation-delay:-.45s!important}.hvid__eq i:nth-child(6){animation-delay:-.75s!important}.hvid__eq i:nth-child(7){animation-delay:-.2s!important}
+@keyframes hveq{0%{height:4px}25%{height:16px}50%{height:8px}75%{height:12px}100%{height:4px}}
+.hvid__marq{overflow:hidden;white-space:nowrap;font-size:.85em}
+.hvid__marq span{display:inline-block;padding-left:100%;animation:hvmq 14s steps(140) infinite}
+@keyframes hvmq{to{transform:translateX(-100%)}}
+.hvid__lcd-bot{display:flex;align-items:center;gap:8px;font-size:.72em;letter-spacing:.06em}
+.hvid__date{font-style:normal;color:#4fbf9c}
+.hvid__ch{font-weight:normal;padding:0 3px;color:#000;white-space:nowrap}
 .hvid__ch--laursen{background:#7fffd4}
 .hvid__ch--arkndjl{background:#c8c7ff}
-@media (max-width:684px){.hvid .vods__player,.hvid__chips{margin-left:8px;margin-right:8px;padding-left:0;padding-right:0}}
+.hvid__modes{display:flex;gap:4px}
+.hvid__modes button{flex:1 1 auto;font:inherit;font-size:.7em;letter-spacing:.04em;padding:2px 4px;cursor:pointer;color:var(--hv-ink);background:#ada9ec;border:0;
+  box-shadow:inset 2px 2px 0 var(--hv-hi),inset -2px -2px 0 var(--hv-lo),0 0 0 2px var(--hv-ink)}
+.hvid__modes button[aria-pressed="true"]{color:var(--hv-teal);background:var(--hv-ink);box-shadow:inset 2px 2px 0 #000,inset -2px -2px 0 var(--hv-mid),0 0 0 2px var(--hv-ink)}
+.hvid__list{flex:1;min-height:0;max-height:178px;overflow-y:auto;list-style:none;margin:0;padding:2px;font-size:.78em;
+  background:var(--hv-ink);box-shadow:inset 2px 2px 0 #000,inset -2px -2px 0 var(--hv-mid),0 0 0 2px var(--hv-ink);scrollbar-width:thin;scrollbar-color:var(--hv-mid) var(--hv-ink)}
+.hvid__list li{margin:0;padding:0}
+.hvid__list li::before{content:none!important}
+.hvid__list a{display:flex;align-items:center;gap:6px;padding:2px 4px;color:var(--hv-lil);text-decoration:none;white-space:nowrap}
+.hvid__list a:hover,.hvid__list a:focus-visible{background:#2a2050;outline:none}
+.hvid__list a.is-on{color:var(--hv-ink);background:var(--hv-teal)}
+.hvid__list a.is-on .hvid__ch{box-shadow:0 0 0 1px var(--hv-ink)}
+.hvid__no{flex:none;width:2ch;color:var(--hv-mid)}
+.hvid__list a.is-on .hvid__no{color:var(--hv-ink)}
+.hvid__t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.hvid__list .hvid__ch{font-size:.85em}
+@media (max-width:684px){
+  .hvid{margin-bottom:28px}
+  .hvid__skin{grid-template-columns:minmax(0,1fr);gap:8px;margin:6px;padding:8px}
+  .hvid__side{display:contents}
+  .hvid__lcd{order:-1}
+  .hvid__deck{order:0}
+  .hvid__modes{order:1}.hvid__list{order:2;max-height:114px}
+  .hvid__time{font-size:1.5em}
+  .hvid__btn{width:40px;height:30px}.hvid__btn--main{width:52px}
+  .hvid__modes button{padding:4px}
+}
+@media (prefers-reduced-motion:reduce){.hvid__marq span{animation:none;padding-left:0}.hvid.is-play .hvid__eq i,.hvid.is-play .hvid__led{animation:none}}
 </style>
 <script>
 (function () {
   var w = document.getElementById('video'); if (!w) return;
-  var n = matchMedia('(max-width:684px)').matches ? 4 : +w.querySelector('.vods__grid').getAttribute('data-show');
-  function pick(b) {
-    var ch = b.getAttribute('data-ch'), i = 0;
-    w.querySelectorAll('.hvid__chips button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-    w.querySelectorAll('.vods__grid li').forEach(function (li) { var ok = !ch || li.getAttribute('data-ch') === ch; li.hidden = !ok || i++ >= n; });
+  var f = w.querySelector('iframe'), seek = w.querySelector('.hvid__seek'), fill = w.querySelector('.hvid__fill'), head = w.querySelector('.hvid__head');
+  var tEl = w.querySelector('.hvid__time'), dEl = w.querySelector('.hvid__dur'), play = w.querySelector('[data-hv="play"]');
+  var st = { t: 0, d: 0, s: -1 }, ch = '';
+  function fmt(s) { if (!isFinite(s) || s <= 0) return s === 0 ? '0:00' : '-:--'; s = Math.floor(s); var h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, x = ('0' + s % 60).slice(-2); return h ? h + ':' + ('0' + m).slice(-2) + ':' + x : m + ':' + x; }
+  function cmd(fn, args) { if (f.contentWindow) f.contentWindow.postMessage(JSON.stringify({ event: 'command', func: fn, args: args || [] }), '*'); }
+  function listen() { if (f.contentWindow) f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 'hvid', channel: 'widget' }), '*'); }
+  f.addEventListener('load', function () { listen(); setTimeout(listen, 600); });
+  function draw() {
+    var p = st.d ? Math.min(1, st.t / st.d) : 0;
+    fill.style.width = 'calc(' + (p * 100) + '% - ' + (p * 4) + 'px)'; head.style.left = 'calc(' + (p * 100) + '% + ' + (5 - p * 10) + 'px)';
+    seek.setAttribute('aria-valuenow', Math.round(p * 100));
+    tEl.textContent = fmt(st.t || 0); dEl.textContent = fmt(st.d);
+    var on = st.s === 1 || st.s === 3; w.classList.toggle('is-play', on);
+    play.setAttribute('aria-label', on ? 'pause' : 'play'); play.querySelector('use').setAttribute('href', on ? '#icon-pause' : '#icon-play');
   }
-  w.querySelector('.hvid__chips').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) pick(b); });
-  pick(w.querySelector('.hvid__chips button'));
+  window.addEventListener('message', function (e) {
+    if (e.source !== f.contentWindow) return;
+    var m; try { m = typeof e.data === 'string' ? JSON.parse(e.data) : e.data; } catch (x) { return; }
+    if (!m) return;
+    var i = m.info;
+    if (m.event === 'onStateChange') i = { playerState: m.info };
+    if (!i || typeof i !== 'object') return;
+    if (i.currentTime != null) st.t = i.currentTime;
+    if (i.duration) st.d = i.duration;
+    if (i.playerState != null) { if (i.playerState === 0 && st.s !== 0) { st.s = 0; step(1, true); } st.s = i.playerState; }
+    draw();
+  });
+  function rows() { return Array.prototype.filter.call(w.querySelectorAll('.hvid__list li'), function (li) { return !li.hidden; }); }
+  function load(a, auto) {
+    w.querySelectorAll('.hvid__list a.is-on').forEach(function (x) { x.classList.remove('is-on'); }); a.classList.add('is-on');
+    var t = a.querySelector('.hvid__t').textContent;
+    f.src = 'https://www.youtube-nocookie.com/embed/' + a.getAttribute('data-vid') + '?enablejsapi=1&playsinline=1&rel=0' + (auto ? '&autoplay=1' : '');
+    f.title = t; w.querySelector('.hvid__marq span').textContent = t;
+    var c = w.querySelector('.hvid__lcd-bot .hvid__ch'); c.textContent = a.getAttribute('data-n'); c.className = 'hvid__ch hvid__ch--' + a.getAttribute('data-k');
+    w.querySelector('.hvid__date').textContent = a.getAttribute('data-d');
+    st = { t: 0, d: 0, s: -1 }; draw();
+    var l = w.querySelector('.hvid__list'), li = a.parentNode; if (li.offsetTop < l.scrollTop || li.offsetTop + li.offsetHeight > l.scrollTop + l.clientHeight) l.scrollTop = li.offsetTop - 2;
+  }
+  function step(d, auto) {
+    var r = rows(); if (!r.length) return;
+    var i = r.findIndex(function (li) { return li.querySelector('a.is-on'); });
+    if (auto && d > 0 && i === r.length - 1) return;
+    load(r[(i + d + r.length) % r.length].querySelector('a'), true);
+  }
+  w.querySelector('.hvid__ctl').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-hv]'); if (!b) return;
+    var k = b.getAttribute('data-hv');
+    if (k === 'play') { if (st.s === 1 || st.s === 3) cmd('pauseVideo'); else if (st.s === -1 && !st.d) load(w.querySelector('.hvid__list a.is-on') || rows()[0].querySelector('a'), true); else cmd('playVideo'); }
+    else if (k === 'stop') { cmd('pauseVideo'); cmd('seekTo', [0, true]); st.t = 0; st.s = 2; draw(); }
+    else step(k === 'next' ? 1 : -1);
+  });
+  function seekTo(x) { if (!st.d) return; var r = seek.getBoundingClientRect(), p = Math.max(0, Math.min(1, (x - r.left) / r.width)); st.t = p * st.d; cmd('seekTo', [st.t, true]); draw(); }
+  seek.addEventListener('click', function (e) { seekTo(e.clientX); });
+  seek.addEventListener('keydown', function (e) { if (!st.d) return; var k = e.key === 'ArrowRight' ? 10 : e.key === 'ArrowLeft' ? -10 : 0; if (!k) return; e.preventDefault(); st.t = Math.max(0, Math.min(st.d, st.t + k)); cmd('seekTo', [st.t, true]); draw(); });
+  w.querySelector('.hvid__list').addEventListener('click', function (e) {
+    var a = e.target.closest('a[data-vid]'); if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return; e.preventDefault(); load(a, true);
+  });
+  function pick(b) {
+    ch = b.getAttribute('data-ch'); var n = 0;
+    w.querySelectorAll('.hvid__modes button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    w.querySelectorAll('.hvid__list li').forEach(function (li) { var ok = !ch || li.getAttribute('data-ch') === ch; li.hidden = !ok; if (ok) li.querySelector('.hvid__no').textContent = ('0' + (++n)).slice(-2); });
+  }
+  w.querySelector('.hvid__modes').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) pick(b); });
+  pick(w.querySelector('.hvid__modes button'));
 })();
 </script>
 {{- end }}
