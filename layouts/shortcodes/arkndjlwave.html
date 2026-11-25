@@ -86,7 +86,7 @@
 .wv-c__s i{font-style:normal;font-size:.58rem;line-height:1.5;padding:0 3px;border:1px solid var(--wv-m2);color:var(--wv-g)}
 .wv-c.is-cut,.wv-c.is-out{display:none!important}
 .wv-show,.wv-drop{display:grid;gap:.75rem;min-width:0}
-.wv-show+.wv-show,.wv-drop+.wv-drop{margin-top:1.5rem;padding-top:1.5rem;border-top:2px solid var(--wv-m)}
+.wv-show+.wv-show,.wv-drop+.wv-drop,.wv-drop+.wv-shelf,.wv-empty+.wv-shelf{margin-top:1.5rem;padding-top:1.5rem;border-top:2px solid var(--wv-m)}
 .wv-show__hero{position:relative;display:block;aspect-ratio:16/9;max-height:620px;width:100%;overflow:hidden;background:var(--wv-d);border:2px solid;border-color:var(--wv-l) var(--wv-d) var(--wv-d) var(--wv-l);text-decoration:none}
 .wv-show__hero img{display:block;width:100%;height:100%;object-fit:cover}
 .wv-show__hero:hover{border-color:var(--wv-a)}
@@ -217,7 +217,7 @@
   var clr = root.querySelector('[data-wv-clear]'); if (clr) clr.addEventListener('click', function () { set(''); });
   // sales: sort chips reorder the cards, type and cut chips hide them
   root.querySelectorAll('[data-wv-shop]').forEach(function (shop) {
-    var grid = shop.querySelector('.wv-grid'), count = shop.querySelector('[data-wv-count]'), st = { sort: 'val', type: '', cut: '' };
+    var grid = shop.querySelector('.wv-grid'), count = shop.querySelector('[data-wv-count]'), st = { sort: 'val', type: '', cut: 'm' };   // men's cuts by default (Noah, Nov 25); the chip switches
     function apply() {
       var cards = [].slice.call(grid.children), dir = st.sort === 'price' ? 1 : -1, n = 0;
       cards.sort(function (a, b) { return dir * ((+a.dataset[st.sort] || 0) - (+b.dataset[st.sort] || 0)); });
@@ -236,6 +236,7 @@
         st[g[0]] = b.dataset.k; apply();
       });
     });
+    apply();
   });
   // a card's second photo on hover (pointer devices only)
   if (window.matchMedia && matchMedia('(hover: hover)').matches) {
