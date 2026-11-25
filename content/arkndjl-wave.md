@@ -19,9 +19,10 @@ draft = false
 {{< wavepanel p="headlines" >}}
 {{< /wintabs >}}
 {{< wavepanel p="sales" >}}
-{{< wintabs tab="picks" tabs="knicks,mets,collabs,staples" sub="true" >}}
+{{< wintabs tab="picks" tabs="knicks,mets,bands,collabs,staples" sub="true" >}}
 {{< wavepanel p="knicks" >}}
 {{< wavepanel p="mets" >}}
+{{< wavepanel p="bands" >}}
 {{< wavepanel p="collabs" >}}
 {{< wavepanel p="staples" >}}
 {{< /wintabs >}}

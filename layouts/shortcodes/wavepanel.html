@@ -1,5 +1,5 @@
 {{- /* One WAVE panel (content/arkndjl-wave.md, inside {{< arkndjlwave >}}'s tabs), from data/wave.json:
-       {{< wavepanel p="collections|new in|headlines|sales|knicks|mets|collabs|staples|merch|shows|screen|tickets|promos|brands" tab="<tab name>" >}}.
+       {{< wavepanel p="collections|new in|headlines|sales|knicks|mets|bands|collabs|staples|merch|shows|screen|tickets|promos|brands" tab="<tab name>" >}}.
        Cards and rows carry data-who so the logo strip can filter them. Table notes live in th titles / the status bar hover. */ -}}
 {{- $lg := printf "/img/px/wave-logos.svg?v=%s#px-wv-" (substr (readFile "static/img/px/wave-logos.svg" | md5) 0 8) -}}
 {{- $w := site.Data.wave | default dict -}}
@@ -67,6 +67,21 @@
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ cond (eq $p "knicks") "basketball" (cond (eq $p "mets") "baseball" "brush") }}"/></svg>{{ $p }}.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btn }}</div>
   <div class="wv-body">{{ partial "wave/grid.html" (dict "items" $rows "names" $names "lg" $lg "chip" "pick") }}</div>
   <div class="win__status" title="in stock, not new. PICK = TEAM 30 + COLLAB 20 + BRAND (.3 x WAVE; a named brand 30) + FIT (8 per taste hit, max 24) + TYPE (jacket 12, top / cap 10, bottom / shoes 8) + SIZES 4 (3+ in stock); {{ if eq $p "staples" }}3 per brand{{ else }}9 per brand or store, best sellers first on ties{{ end }}"><span>{{ len $rows }} picks</span>{{ partial "fresh.html" (dict "feed" "wave") }}{{ $blocks }}</div>
+</div>
+{{- else if eq $p "bands" }}
+{{- /* three clothes per band store, dealt one band at a time (the store's own order) */ -}}
+{{- $shelves := slice }}
+{{- range $w.bandshop }}
+  {{- $d := . }}{{ $its := slice }}
+  {{- range .items }}{{ if in (slice "top" "bottom") .type }}{{ $its = $its | append (merge . (dict "who" $d.who "stn" $d.name "price" (float (.price | default 0)))) }}{{ end }}{{ end }}
+  {{- with $its }}{{ $shelves = $shelves | append (dict "items" (first 3 .)) }}{{ end }}
+{{- end }}
+{{- $rows := slice }}
+{{- range $i := seq 0 2 }}{{ range $shelves }}{{ with index .items $i }}{{ $rows = $rows | append . }}{{ end }}{{ end }}{{ end }}
+<div class="win" data-tab="{{ $tab }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-note"/></svg>bands.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btn }}</div>
+  <div class="wv-body">{{ partial "wave/grid.html" (dict "items" $rows "names" $names "lg" $lg) }}</div>
+  <div class="win__status" title="in stock at each ARKLIBRARY band's store: its first three tops or bottoms in the store's own order, one band at a time. The whole shelf is on the merch tab"><span>{{ len $rows }} picks</span><span>{{ len $shelves }} bands</span>{{ partial "fresh.html" (dict "feed" "wave") }}{{ $blocks }}</div>
 </div>
 {{- else if eq $p "shows" }}
 {{- $rows := $w.shows | default slice -}}
