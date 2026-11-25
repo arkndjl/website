@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-25T01:41:47Z",
+ "asof": "2026-11-25T02:33:06Z",
  "recenter": {
   "2026-11-24": 1.37,
   "2026-11-25": 1.38
@@ -329,7 +329,7 @@
  },
  "model": {
   "asof": "2026-11-24T21:25:27Z",
-  "ageH": 4.3,
+  "ageH": 5.1,
   "stale": false
  },
  "picks": [],
@@ -360,13 +360,29 @@
    "away": "MIN",
    "mk": "total",
    "side": "under",
-   "line": 223.5,
-   "price": -114.0,
-   "edge": 2.6,
+   "line": 224.5,
+   "price": -119.0,
+   "edge": 3.6,
    "x": 6.5,
    "why": "edge under 6.5 (total: mid)",
    "m": 3.1,
    "tm": 220.9
+  },
+  {
+   "id": "401909316",
+   "sport": "nba",
+   "kick": "2026-11-25T03:00:00Z",
+   "home": "DEN",
+   "away": "DAL",
+   "mk": "spread",
+   "side": "home",
+   "line": 7.5,
+   "price": -114.0,
+   "edge": 1.1,
+   "x": 5.0,
+   "why": "edge under 5 (venue: home)",
+   "m": 8.6,
+   "tm": 234.3
   },
   {
    "id": "401909323",
@@ -399,31 +415,15 @@
    "why": "edge under 6 (total: high)",
    "m": 2.5,
    "tm": 238.7
-  },
-  {
-   "id": "401909316",
-   "sport": "nba",
-   "kick": "2026-11-25T03:00:00Z",
-   "home": "DEN",
-   "away": "DAL",
-   "mk": "total",
-   "side": "under",
-   "line": 234.5,
-   "price": -114.0,
-   "edge": 0.2,
-   "x": 6.0,
-   "why": "edge under 6 (total: high)",
-   "m": 8.6,
-   "tm": 234.3
   }
  ],
  "games": {
   "401909316": {
-   "mk": "total",
-   "side": "under",
-   "line": 234.5,
+   "mk": "spread",
+   "side": "home",
+   "line": 7.5,
    "price": -114.0,
-   "edge": 0.2,
+   "edge": 1.1,
    "ev": null,
    "units": 0.0,
    "home": "DEN",
@@ -457,9 +457,9 @@
   "401909320": {
    "mk": "total",
    "side": "under",
-   "line": 223.5,
-   "price": -114.0,
-   "edge": 2.6,
+   "line": 224.5,
+   "price": -119.0,
+   "edge": 3.6,
    "ev": null,
    "units": 0.0,
    "home": "OKC",
@@ -531,7 +531,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 5682,
+  "snapshots": 5686,
   "buckets": [
    {
     "when": "24h+",
@@ -544,11 +544,11 @@
    },
    {
     "when": "6-24h",
-    "clvN": 1266,
+    "clvN": 1267,
     "clvRet": -0.0164,
-    "clvT": -4.77,
+    "clvT": -4.78,
     "clv": 0.47,
-    "beat": 0.461,
+    "beat": 0.46,
     "still": 0.38
    },
    {
@@ -7206,7 +7206,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-25T01:41:47Z",
+ "checked": "2026-11-25T02:33:06Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
