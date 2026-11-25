@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-25T20:51Z",
+ "asof": "2026-11-25T22:26Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -296,15 +296,15 @@
      "rows": 2163
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 3,
+     "flags": 5,
      "rows": 629
     },
     "static/data/nfl-war.json": {
-     "flags": 81,
+     "flags": 82,
      "rows": 1858
     },
     "static/data/pctl-nfl.json": {
-     "flags": 79,
+     "flags": 80,
      "rows": 1786
     },
     "static/data/personnel/nfl.json": {
@@ -312,7 +312,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 55,
+     "flags": 56,
      "rows": 1650
     }
    },
@@ -514,6 +514,24 @@
      "pos": "WLB",
      "rotowire": "FA",
      "site": "TEN"
+    },
+    {
+     "d": "2026-11-25",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "released",
+     "head": "Cut loose by Pittsburgh",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-25",
+      "head": "Set to be waived",
+      "kind": "waived"
+     },
+     "pid": "4307",
+     "player": "Aaron Rodgers",
+     "pos": "QB",
+     "rotowire": "FA",
+     "site": "PIT"
     },
     {
      "d": "2026-11-11",
@@ -1974,6 +1992,24 @@
      "site": "PHI"
     },
     {
+     "d": "2026-11-25",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "released",
+     "head": "Cut loose by Pittsburgh",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-25",
+      "head": "Set to be waived",
+      "kind": "waived"
+     },
+     "pid": "4307",
+     "player": "Aaron Rodgers",
+     "pos": "QB",
+     "rotowire": "FA",
+     "site": "PIT"
+    },
+    {
      "d": "2026-09-09",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -2962,6 +2998,24 @@
      "pos": "EDGE",
      "rotowire": "CAR",
      "site": "FA"
+    },
+    {
+     "d": "2026-11-25",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "released",
+     "head": "Cut loose by Pittsburgh",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-25",
+      "head": "Set to be waived",
+      "kind": "waived"
+     },
+     "pid": "4307",
+     "player": "Aaron Rodgers",
+     "pos": "QB",
+     "rotowire": "FA",
+     "site": "PIT"
     },
     {
      "d": "2026-11-11",
@@ -4386,6 +4440,24 @@
      "site": "PHI"
     },
     {
+     "d": "2026-11-25",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "released",
+     "head": "Cut loose by Pittsburgh",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-25",
+      "head": "Set to be waived",
+      "kind": "waived"
+     },
+     "pid": "4307",
+     "player": "Aaron Rodgers",
+     "pos": "QB",
+     "rotowire": "FA",
+     "site": "PIT"
+    },
+    {
      "d": "2026-11-16",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -4402,6 +4474,24 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "ARI"
+    },
+    {
+     "d": "2026-11-25",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "moved",
+     "head": "Claimed off waivers",
+     "kind": "claim",
+     "move": {
+      "d": "2026-11-25",
+      "head": "Claimed off waivers",
+      "kind": "claim"
+     },
+     "pid": "17979",
+     "player": "Kedon Slovis",
+     "pos": "QB",
+     "rotowire": "ARI",
+     "site": "FA"
     },
     {
      "d": "2026-11-16",
@@ -4463,7 +4553,7 @@
      "rows": 375
     },
     "static/data/xaav-nhl.json": {
-     "flags": 10,
+     "flags": 11,
      "rows": 850
     }
    },
@@ -4631,6 +4721,24 @@
      "site": "FA"
     },
     {
+     "d": "2026-11-25",
+     "field": "tm",
+     "file": "static/data/xaav-nhl.json",
+     "flag": "released",
+     "head": "Heading overseas",
+     "kind": "exit",
+     "move": {
+      "d": "2026-11-25",
+      "head": "Heading overseas",
+      "kind": "exit"
+     },
+     "pid": "4153",
+     "player": "Adam Erne",
+     "pos": "L",
+     "rotowire": "FA",
+     "site": "DAL"
+    },
+    {
      "d": "2026-09-16",
      "field": "tm",
      "file": "static/data/xaav-nhl.json",
@@ -4668,7 +4776,7 @@
     }
    ],
    "joined": 0,
-   "players": 1438,
+   "players": 1439,
    "rows": 2765
   }
  }
