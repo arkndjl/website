@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-24T23:00Z",
+ "asof": "2026-11-25T00:23Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -10,7 +10,7 @@
    },
    "flags": [],
    "joined": 0,
-   "players": 985,
+   "players": 986,
    "rows": 5293
   },
   "cfb": {
@@ -59,7 +59,7 @@
     }
    ],
    "joined": 0,
-   "players": 2621,
+   "players": 2622,
    "rows": 16742
   },
   "nba": {
@@ -588,6 +588,24 @@
      "site": "NE"
     },
     {
+     "d": "2026-11-24",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "practice",
+     "head": "Let go by Tampa Bay",
+     "kind": null,
+     "move": {
+      "d": "2026-11-16",
+      "head": "Set to join Tampa Bay practice squad",
+      "kind": "practice"
+     },
+     "pid": "11841",
+     "player": "Cooper Rush",
+     "pos": "QB",
+     "rotowire": "FA",
+     "site": "TB"
+    },
+    {
      "d": "2026-11-17",
      "field": "t",
      "file": "static/data/nfl-war.json",
@@ -694,24 +712,6 @@
      "pos": "RB",
      "rotowire": "FA",
      "site": "HOU"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "practice",
-     "head": "Set to join Tampa Bay practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Set to join Tampa Bay practice squad",
-      "kind": "practice"
-     },
-     "pid": "11841",
-     "player": "Cooper Rush",
-     "pos": "QB",
-     "rotowire": "FA",
-     "site": "TB"
     },
     {
      "d": "2026-11-03",
@@ -984,22 +984,22 @@
      "site": "TEN"
     },
     {
-     "d": "2026-09-28",
+     "d": "2026-10-17",
      "field": "t",
      "file": "static/data/nfl-war.json",
-     "flag": "practice",
-     "head": "Reverts to Houston's practice squad",
-     "kind": "practice",
+     "flag": "released",
+     "head": "Cut by Chicago",
+     "kind": "waived",
      "move": {
-      "d": "2026-09-28",
-      "head": "Reverts to Houston's practice squad",
-      "kind": "practice"
+      "d": "2026-10-17",
+      "head": "Cut by Chicago",
+      "kind": "waived"
      },
-     "pid": "19326",
-     "player": "Lewis Bond",
-     "pos": "WR",
+     "pid": "12007",
+     "player": "Xavier Woods",
+     "pos": "S",
      "rotowire": "FA",
-     "site": "HOU"
+     "site": "CHI"
     },
     {
      "d": "2026-10-20",
@@ -1632,22 +1632,22 @@
      "site": "NE"
     },
     {
-     "d": "2026-10-17",
+     "d": "2026-09-28",
      "field": "t",
      "file": "static/data/nfl-war.json",
-     "flag": "released",
-     "head": "Cut by Chicago",
-     "kind": "waived",
+     "flag": "practice",
+     "head": "Reverts to Houston's practice squad",
+     "kind": "practice",
      "move": {
-      "d": "2026-10-17",
-      "head": "Cut by Chicago",
-      "kind": "waived"
+      "d": "2026-09-28",
+      "head": "Reverts to Houston's practice squad",
+      "kind": "practice"
      },
-     "pid": "12007",
-     "player": "Xavier Woods",
-     "pos": "S",
+     "pid": "19326",
+     "player": "Lewis Bond",
+     "pos": "WR",
      "rotowire": "FA",
-     "site": "CHI"
+     "site": "HOU"
     },
     {
      "d": "2026-10-16",
@@ -1756,6 +1756,24 @@
      "pos": "K",
      "rotowire": "FA",
      "site": "MIA"
+    },
+    {
+     "d": "2026-11-23",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "released",
+     "head": "Clears waivers, and now a free agent",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-23",
+      "head": "Clears waivers, and now a free agent",
+      "kind": "waived"
+     },
+     "pid": "13491",
+     "player": "Daniel Jones",
+     "pos": "QB",
+     "rotowire": "FA",
+     "site": "IND"
     },
     {
      "d": "2026-11-24",
@@ -1956,24 +1974,6 @@
      "site": "PHI"
     },
     {
-     "d": "2026-11-23",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "released",
-     "head": "Clears waivers, and now a free agent",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-23",
-      "head": "Clears waivers, and now a free agent",
-      "kind": "waived"
-     },
-     "pid": "13491",
-     "player": "Daniel Jones",
-     "pos": "QB",
-     "rotowire": "FA",
-     "site": "IND"
-    },
-    {
      "d": "2026-09-09",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -2082,12 +2082,12 @@
      "site": "FA"
     },
     {
-     "d": "2026-11-16",
+     "d": "2026-11-24",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
      "flag": "practice",
-     "head": "Set to join Tampa Bay practice squad",
-     "kind": "practice",
+     "head": "Let go by Tampa Bay",
+     "kind": null,
      "move": {
       "d": "2026-11-16",
       "head": "Set to join Tampa Bay practice squad",
@@ -3036,6 +3036,24 @@
      "site": "NYG"
     },
     {
+     "d": "2026-11-24",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "practice",
+     "head": "Let go by Tampa Bay",
+     "kind": null,
+     "move": {
+      "d": "2026-11-16",
+      "head": "Set to join Tampa Bay practice squad",
+      "kind": "practice"
+     },
+     "pid": "11841",
+     "player": "Cooper Rush",
+     "pos": "QB",
+     "rotowire": "FA",
+     "site": "TB"
+    },
+    {
      "d": "2026-11-17",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -3160,24 +3178,6 @@
      "pos": "RB",
      "rotowire": "FA",
      "site": "HOU"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "practice",
-     "head": "Set to join Tampa Bay practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Set to join Tampa Bay practice squad",
-      "kind": "practice"
-     },
-     "pid": "11841",
-     "player": "Cooper Rush",
-     "pos": "QB",
-     "rotowire": "FA",
-     "site": "TB"
     },
     {
      "d": "2026-11-03",
@@ -3468,22 +3468,22 @@
      "site": "TEN"
     },
     {
-     "d": "2026-09-28",
+     "d": "2026-10-17",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
-     "flag": "practice",
-     "head": "Reverts to Houston's practice squad",
-     "kind": "practice",
+     "flag": "released",
+     "head": "Cut by Chicago",
+     "kind": "waived",
      "move": {
-      "d": "2026-09-28",
-      "head": "Reverts to Houston's practice squad",
-      "kind": "practice"
+      "d": "2026-10-17",
+      "head": "Cut by Chicago",
+      "kind": "waived"
      },
-     "pid": "19326",
-     "player": "Lewis Bond",
-     "pos": "WR",
+     "pid": "12007",
+     "player": "Xavier Woods",
+     "pos": "S",
      "rotowire": "FA",
-     "site": "HOU"
+     "site": "CHI"
     },
     {
      "d": "2026-10-20",
@@ -4116,22 +4116,22 @@
      "site": "NE"
     },
     {
-     "d": "2026-10-17",
+     "d": "2026-09-28",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
-     "flag": "released",
-     "head": "Cut by Chicago",
-     "kind": "waived",
+     "flag": "practice",
+     "head": "Reverts to Houston's practice squad",
+     "kind": "practice",
      "move": {
-      "d": "2026-10-17",
-      "head": "Cut by Chicago",
-      "kind": "waived"
+      "d": "2026-09-28",
+      "head": "Reverts to Houston's practice squad",
+      "kind": "practice"
      },
-     "pid": "12007",
-     "player": "Xavier Woods",
-     "pos": "S",
+     "pid": "19326",
+     "player": "Lewis Bond",
+     "pos": "WR",
      "rotowire": "FA",
-     "site": "CHI"
+     "site": "HOU"
     },
     {
      "d": "2026-10-16",
@@ -4184,6 +4184,24 @@
      "pid": "19078",
      "player": "Johnathan Edwards",
      "pos": "CB",
+     "rotowire": "FA",
+     "site": "IND"
+    },
+    {
+     "d": "2026-11-23",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "released",
+     "head": "Clears waivers, and now a free agent",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-23",
+      "head": "Clears waivers, and now a free agent",
+      "kind": "waived"
+     },
+     "pid": "13491",
+     "player": "Daniel Jones",
+     "pos": "QB",
      "rotowire": "FA",
      "site": "IND"
     },
@@ -4350,24 +4368,6 @@
      "site": "PHI"
     },
     {
-     "d": "2026-11-23",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "released",
-     "head": "Clears waivers, and now a free agent",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-23",
-      "head": "Clears waivers, and now a free agent",
-      "kind": "waived"
-     },
-     "pid": "13491",
-     "player": "Daniel Jones",
-     "pos": "QB",
-     "rotowire": "FA",
-     "site": "IND"
-    },
-    {
      "d": "2026-11-16",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -4441,7 +4441,7 @@
     }
    ],
    "joined": 0,
-   "players": 2313,
+   "players": 2314,
    "rows": 8147
   },
   "nhl": {
