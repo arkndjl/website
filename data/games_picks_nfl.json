@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-25T19:20:08Z",
+ "asof": "2026-11-25T19:23:45Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -268,22 +268,6 @@
    "tm": 41.5
   },
   {
-   "id": "2026_12_SEA_SF",
-   "sport": "nfl",
-   "kick": "2026-11-29T21:25:00Z",
-   "home": "SF",
-   "away": "SEA",
-   "mk": "spread",
-   "side": "away",
-   "line": 3.5,
-   "price": -132.0,
-   "edge": 1.3,
-   "x": null,
-   "why": "spread market off",
-   "m": 2.2,
-   "tm": 45.4
-  },
-  {
    "id": "2026_12_CAR_TB",
    "sport": "nfl",
    "kick": "2026-12-01T01:15:00Z",
@@ -298,6 +282,22 @@
    "why": "spread market off",
    "m": 3.5,
    "tm": 44.0
+  },
+  {
+   "id": "2026_12_SEA_SF",
+   "sport": "nfl",
+   "kick": "2026-11-29T21:25:00Z",
+   "home": "SF",
+   "away": "SEA",
+   "mk": "total",
+   "side": "over",
+   "line": 44.5,
+   "price": -112.0,
+   "edge": 0.9,
+   "x": null,
+   "why": "total market off",
+   "m": 2.2,
+   "tm": 45.4
   },
   {
    "id": "2026_12_PHI_DAL",
@@ -462,11 +462,11 @@
    "state": "off"
   },
   "2026_12_SEA_SF": {
-   "mk": "spread",
-   "side": "away",
-   "line": 3.5,
-   "price": -132.0,
-   "edge": 1.3,
+   "mk": "total",
+   "side": "over",
+   "line": 44.5,
+   "price": -112.0,
+   "edge": 0.9,
    "ev": null,
    "units": 0.0,
    "home": "SF",
@@ -562,7 +562,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 6398,
+  "snapshots": 6399,
   "buckets": [
    {
     "when": "24h+",
@@ -2978,7 +2978,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-25T19:20:08Z",
+ "checked": "2026-11-25T19:23:45Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
