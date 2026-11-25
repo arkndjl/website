@@ -34,9 +34,11 @@
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ cond (eq $p "merch") "note" "entity" }}"/></svg>{{ cond (eq $p "merch") "merch" "new_in" }}.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btn }}</div>
   <div class="wv-body">
     {{ partial "wave/drops.html" (dict "items" $items "names" $names "lg" $lg) }}
-    {{- if eq $p "merch" }}{{ partial "wave/feed.html" (dict "items" (first 25 ($w.bandnews | default slice))) }}{{ end }}
+    {{- if eq $p "merch" }}
+    {{- with $w.bandshop }}<div class="wv-shelf">{{ partial "wave/drops.html" (dict "items" . "names" $names "lg" $lg "max" 12 "label" "in stock") }}</div>{{ end }}
+    {{ partial "wave/feed.html" (dict "items" (first 25 ($w.bandnews | default slice))) }}{{ end }}
   </div>
-  <div class="win__status" title="{{ $w.about }}"><span>{{ len $items }} drops</span>{{ partial "fresh.html" (dict "feed" "wave") }}{{ $blocks }}</div>
+  <div class="win__status" title="{{ $w.about }}"><span>{{ len $items }} drops</span>{{ if eq $p "merch" }}<span>{{ len ($w.bandshop | default slice) }} stores</span>{{ end }}{{ partial "fresh.html" (dict "feed" "wave") }}{{ $blocks }}</div>
 </div>
 {{- else if eq $p "headlines" }}
 {{- $a := $w.news | default slice -}}{{ $b := $w.collections | default slice -}}
@@ -53,7 +55,7 @@
     <div class="wv-bar" role="group" aria-label="sort and filter">
       <span class="wv-chips" data-wv-sort><button type="button" aria-pressed="true" data-k="val" title="100 x expected / price; expected = compare-at x (1 - the store's base markdown rate). 120+ = deal">VAL</button><button type="button" aria-pressed="false" data-k="off">% off</button><button type="button" aria-pressed="false" data-k="price">price</button></span>
       <span class="wv-chips" data-wv-type><button type="button" aria-pressed="true" data-k="">all</button><button type="button" aria-pressed="false" data-k="top">tops</button><button type="button" aria-pressed="false" data-k="bottom">bottoms</button><button type="button" aria-pressed="false" data-k="outer">jackets</button><button type="button" aria-pressed="false" data-k="shoes">shoes</button><button type="button" aria-pressed="false" data-k="cap">caps</button><button type="button" aria-pressed="false" data-k="acc">acc</button></span>
-      <span class="wv-chips" data-wv-cut><button type="button" aria-pressed="true" data-k="">all cuts</button><button type="button" aria-pressed="false" data-k="m" title="hides pieces a store lists as women's">men's</button><button type="button" aria-pressed="false" data-k="w" title="hides pieces a store lists as men's">women's</button></span>
+      <span class="wv-chips" data-wv-cut><button type="button" aria-pressed="false" data-k="">all cuts</button><button type="button" aria-pressed="true" data-k="m" title="hides pieces a store lists as women's">men's</button><button type="button" aria-pressed="false" data-k="w" title="hides pieces a store lists as men's">women's</button></span>
     </div>
     {{ partial "wave/grid.html" (dict "items" $rows "names" $names "lg" $lg) }}
   </div>

@@ -18,6 +18,7 @@ the file's `keys` and on the page's status bar.
 Rules, all explicit:
   catalog   drops, collection showcases, sales (VAL), picks (PICK) and each brand's measured FIT: rules in
             scripts/wave_catalog.py, which reads every brand, retailer and team store
+  shelf     a band store's in-stock pieces, clothes first, then the store's own order; SHELF per band
   merch     a band-store product first seen in the last NEW_DAYS days (the first run seeds by created_at instead),
             grouped per band per ET day
   news      a feed item whose title names a tracked brand or band (word match; GENERIC names need a music word too)
@@ -59,6 +60,7 @@ AGENT = 'arkndjl-wave'
 NEW_DAYS = 21       # a product counts as part of a drop this long after we first see it
 NEWS_DAYS = 45
 KEEP_DROPS = 40
+SHELF = 12          # pieces shown per band on the merch tab (in stock, clothes first, then the store's order)
 SHRINK = 4
 DEAL = 120
 PAUSE = 1.0         # seconds between requests to one host
@@ -631,7 +633,7 @@ def run():
                       'generic': b['name'] in GENERIC, 'rx': word_rx(band_terms(b['name']), case=b['name'] in GENERIC)})
 
     # 1. stores
-    drops, merch, store_counts = [], [], {}
+    drops, merch, store_counts, shelf = [], [], {}, {}
     seeded = set(state.get('seeded', []))
     def do_store(owner, store, kind, label):
         key = store['base'] + (store.get('coll') or '') + (store.get('keep') or '')
@@ -641,9 +643,20 @@ def run():
             seeded.add(key)
             got = drops_for(owner, items, kind)
             state.setdefault('keep_store', {})[key] = got
+            if kind == 'merch':   # the band's whole shelf (Noah, Nov 25: merch shows even when nothing is new)
+                live = [it for it in items if it.get('avail') and it.get('img')]
+                live.sort(key=lambda it: {'top': 0, 'bottom': 1, 'acc': 2, 'other': 3, 'music': 4}.get(it['type'], 3))   # stable: the store's order within a kind
+                if live:
+                    shelf[owner['id']] = {'id': owner['id'] + '-shelf', 'who': owner['id'], 'name': owner['name'], 'kind': 'shelf',
+                                          'd': iso(NOW)[:10], 'n': len(live), 'u': store['base'], 'st': key,
+                                          'items': [{k: v for k, v in it.items() if k in ('t', 'u', 'img', 'price', 'type', 'avail')} for it in live[:SHELF]]}
             status(label, 'store', True, len(items), u=store['base'])
         except Exception as e:
             got = state.get('keep_store', {}).get(key, [])
+            if kind == 'merch':
+                for x in old.get('bandshop') or []:
+                    if x.get('st') == key:
+                        shelf[owner['id']] = x
             status(label, 'store', False, 0, e, u=store['base'])
         return got
     for b in bands:
@@ -876,6 +889,7 @@ def run():
         'bases': cat['bases'],
         'pooled': cat['pooled'],
         'merch': per_brand(merch),
+        'bandshop': list(shelf.values()),
         'news': trim([x for x in news if any(w in {b['id'] for b in BRANDS} for w in x['who'])], 40, nk),
         'bandnews': trim([x for x in news if any(w in {b['id'] for b in bands} for w in x['who'])], 40, nk),
         'shows': shows[:60],

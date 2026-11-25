@@ -1,19 +1,20 @@
 {{- /* WAVE drop blocks: dict "items" (wave.json drops / merch: who name d n items stores) "names" "lg" "max" (cards per
-       drop, default 8; +N links to the first piece's store). Band-merch rows (price as text, no store name) are filled in
+       drop, default 8; +N links to the drop's u, else the first piece) "label" (count word, default "new"; set = a shelf,
+       cards carry no NEW chip). Band-merch rows (price as text, no store name) are filled in
        from their drop. Used by layouts/shortcodes/wavepanel.html. */ -}}
 {{- $max := .max | default 8 -}}
 {{- range .items }}
 {{- $d := . -}}
 <article class="wv-drop" data-who="{{ .who }}">
-  <header class="wv-drop__h"><svg class="lg lg--s" aria-hidden="true"><use href="{{ $.lg }}{{ .who }}"/></svg><h3>{{ .name }}</h3><time datetime="{{ .d }}">{{ (time .d).Format "Mon Jan 2" }}</time><span class="wv-drop__n">{{ .n }} new</span>{{ with .stores }}<span class="wv-drop__s">{{ delimit . " · " }}</span>{{ end }}</header>
+  <header class="wv-drop__h"><svg class="lg lg--s" aria-hidden="true"><use href="{{ $.lg }}{{ .who }}"/></svg><h3>{{ .name }}</h3><time datetime="{{ .d }}">{{ (time .d).Format "Mon Jan 2" }}</time><span class="wv-drop__n">{{ .n }} {{ $.label | default "new" }}</span>{{ with .stores }}<span class="wv-drop__s">{{ delimit . " · " }}</span>{{ end }}</header>
   {{- $rows := slice }}
   {{- range .items }}
-    {{- $r := merge (dict "who" $d.who "stn" $d.name "new" true) . -}}
+    {{- $r := merge (dict "who" $d.who "stn" $d.name "new" (not $.label)) . -}}
     {{- $r = merge $r (dict "price" (float (.price | default 0))) -}}
     {{- if and (isset . "avail") (not .avail) }}{{ $r = merge $r (dict "out" true) }}{{ end -}}
     {{- $rows = $rows | append $r -}}
   {{- end }}
   {{ partial "wave/grid.html" (dict "items" $rows "names" $.names "lg" $.lg "max" $max) }}
-  {{- if gt $d.n $max }}{{ with index $d.items 0 }}<a class="wv-more" href="{{ .u }}" target="_blank" rel="noopener">+{{ sub $d.n $max }}</a>{{ end }}{{ end }}
+  {{- if gt $d.n $max }}{{ with ($d.u | default (index $d.items 0).u) }}<a class="wv-more" href="{{ . }}" target="_blank" rel="noopener">+{{ sub $d.n $max }}</a>{{ end }}{{ end }}
 </article>
 {{- else }}<p class="wv-empty">--</p>{{ end }}
