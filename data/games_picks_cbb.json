@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-25T18:16:23Z",
+ "asof": "2026-11-25T18:19:59Z",
  "recenter": {
   "2026-11-25": 2.21,
   "2026-11-26": 1.59
@@ -1831,7 +1831,7 @@
  },
  "model": {
   "asof": "2026-11-25T18:14:19Z",
-  "ageH": 0.0,
+  "ageH": 0.1,
   "stale": false
  },
  "picks": [],
@@ -1899,8 +1899,8 @@
    "paper": true,
    "betTo": 161.0,
    "close": 160.5,
-   "now": null,
-   "pass": true
+   "pass": true,
+   "now": null
   }
  ],
  "withdrawn": [],
@@ -2274,6 +2274,22 @@
    "tm": 142.8
   },
   {
+   "id": "401919007",
+   "sport": "cbb",
+   "kick": "2026-11-25T18:30:00Z",
+   "home": "Davidson",
+   "away": "Tulane",
+   "mk": "spread",
+   "side": "away",
+   "line": 10.5,
+   "price": -124.0,
+   "edge": 2.3,
+   "x": 4.0,
+   "why": "edge under 4 (venue: neutral)",
+   "m": 8.2,
+   "tm": 138.2
+  },
+  {
    "id": "401918971",
    "sport": "cbb",
    "kick": "2026-11-26T00:00:00Z",
@@ -2288,22 +2304,6 @@
    "why": "edge under 6.5 (tier: mixed)",
    "m": 4.2,
    "tm": 166.2
-  },
-  {
-   "id": "401920868",
-   "sport": "cbb",
-   "kick": "2026-11-25T19:00:00Z",
-   "home": "NJIT",
-   "away": "Manhattan",
-   "mk": "spread",
-   "side": "home",
-   "line": 1.5,
-   "price": -110.0,
-   "edge": 2.8,
-   "x": 5.0,
-   "why": "edge under 5 (line: <4)",
-   "m": 4.3,
-   "tm": 143.0
   }
  ],
  "games": {
@@ -2408,7 +2408,7 @@
    "side": "home",
    "line": 4.5,
    "price": -110.0,
-   "edge": 1.0,
+   "edge": 1.1,
    "ev": null,
    "units": 0.0,
    "home": "VCU",
@@ -2586,9 +2586,9 @@
   "401919007": {
    "mk": "spread",
    "side": "away",
-   "line": 9.5,
-   "price": -110.0,
-   "edge": 1.3,
+   "line": 10.5,
+   "price": -124.0,
+   "edge": 2.3,
    "ev": null,
    "units": 0.0,
    "home": "Davidson",
@@ -2839,7 +2839,7 @@
    "mk": "total",
    "side": "over",
    "line": 142.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 2.7,
    "ev": null,
    "units": 0.0,
@@ -2896,10 +2896,10 @@
    "state": "under"
   },
   "401920537": {
-   "mk": "spread",
-   "side": "away",
-   "line": -2.5,
-   "price": 103.0,
+   "mk": "total",
+   "side": "over",
+   "line": 163.5,
+   "price": -110,
    "edge": 0.6,
    "ev": null,
    "units": 0.0,
@@ -3045,22 +3045,22 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 26295,
+  "snapshots": 26302,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 706,
-    "clvRet": 0.0166,
-    "clvT": 1.79,
+    "clvN": 707,
+    "clvRet": 0.0165,
+    "clvT": 1.78,
     "clv": 1.23,
-    "beat": 0.425,
-    "still": 0.245
+    "beat": 0.424,
+    "still": 0.246
    },
    {
     "when": "6-24h",
     "clvN": 5310,
-    "clvRet": -0.004,
-    "clvT": -1.94,
+    "clvRet": -0.0041,
+    "clvT": -1.99,
     "clv": 0.64,
     "beat": 0.419,
     "still": 0.39
@@ -3068,7 +3068,7 @@
    {
     "when": "1-6h",
     "clvN": 2286,
-    "clvRet": -0.0401,
+    "clvRet": -0.0402,
     "clvT": -33.22,
     "clv": 0.08,
     "beat": 0.169,
@@ -21627,7 +21627,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-25T18:16:23Z",
+ "checked": "2026-11-25T18:19:59Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
