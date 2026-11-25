@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-25T05:24:14Z",
+ "asof": "2026-11-25T05:47:35Z",
  "recenter": {
   "week": 0.46
  },
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-25",
-  "ageH": -18.6,
+  "ageH": -18.2,
   "stale": false
  },
  "picks": [],
@@ -341,22 +341,6 @@
    "tm": 48.5
   },
   {
-   "id": "401861969",
-   "sport": "cfb",
-   "kick": "2026-11-28T17:00:00.000Z",
-   "home": "Wyoming",
-   "away": "UConn",
-   "mk": "total",
-   "side": "under",
-   "line": 46.5,
-   "price": -114.0,
-   "edge": 5.5,
-   "x": 8.0,
-   "why": "edge under 8 (game: non-conference)",
-   "m": -4.3,
-   "tm": 41.0
-  },
-  {
    "id": "401866473",
    "sport": "cfb",
    "kick": "2026-11-27T17:00:00.000Z",
@@ -387,6 +371,22 @@
    "why": "edge under 7.5 (side: over)",
    "m": -8.6,
    "tm": 51.2
+  },
+  {
+   "id": "401861969",
+   "sport": "cfb",
+   "kick": "2026-11-28T17:00:00.000Z",
+   "home": "Wyoming",
+   "away": "UConn",
+   "mk": "total",
+   "side": "under",
+   "line": 45.5,
+   "price": -110.0,
+   "edge": 4.5,
+   "x": 8.0,
+   "why": "edge under 8 (game: non-conference)",
+   "m": -4.3,
+   "tm": 41.0
   },
   {
    "id": "401864549",
@@ -469,6 +469,22 @@
    "tm": 51.0
   },
   {
+   "id": "401862837",
+   "sport": "cfb",
+   "kick": "2026-11-28T18:00:00.000Z",
+   "home": "East Carolina",
+   "away": "Florida Atlantic",
+   "mk": "total",
+   "side": "over",
+   "line": 57.5,
+   "price": -124.0,
+   "edge": 3.3,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": 1.8,
+   "tm": 60.8
+  },
+  {
    "id": "401856762",
    "sport": "cfb",
    "kick": "2026-11-27T17:00:00.000Z",
@@ -499,38 +515,6 @@
    "why": "edge under 7.5 (side: over)",
    "m": -9.3,
    "tm": 55.3
-  },
-  {
-   "id": "401856879",
-   "sport": "cfb",
-   "kick": "2026-11-27T01:00:00.000Z",
-   "home": "Texas Tech",
-   "away": "TCU",
-   "mk": "total",
-   "side": "over",
-   "line": 46.5,
-   "price": -114.0,
-   "edge": 2.5,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": 18.2,
-   "tm": 49.0
-  },
-  {
-   "id": "401862837",
-   "sport": "cfb",
-   "kick": "2026-11-28T18:00:00.000Z",
-   "home": "East Carolina",
-   "away": "Florida Atlantic",
-   "mk": "total",
-   "side": "over",
-   "line": 58.5,
-   "price": -110.0,
-   "edge": 2.3,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": 1.8,
-   "tm": 60.8
   },
   {
    "id": "401869939",
@@ -637,7 +621,7 @@
    "mk": "total",
    "side": "under",
    "line": 76.5,
-   "price": -110.0,
+   "price": -114.0,
    "edge": 7.5,
    "x": null,
    "why": "total market off",
@@ -675,6 +659,22 @@
    "why": "spread market off",
    "m": 8.4,
    "tm": 52.7
+  },
+  {
+   "id": "401856877",
+   "sport": "cfb",
+   "kick": "2026-11-28T23:15:00.000Z",
+   "home": "Oklahoma State",
+   "away": "Kansas",
+   "mk": "spread",
+   "side": "home",
+   "line": 5.5,
+   "price": -112.0,
+   "edge": 6.1,
+   "x": null,
+   "why": "spread market off",
+   "m": 11.6,
+   "tm": 61.4
   }
  ],
  "games": {
@@ -729,9 +729,9 @@
   "401858536": {
    "mk": "spread",
    "side": "home",
-   "line": 5.5,
-   "price": -106.0,
-   "edge": 1.1,
+   "line": 4.5,
+   "price": -117.0,
+   "edge": 2.1,
    "ev": null,
    "units": 0.0,
    "home": "Iowa",
@@ -787,16 +787,16 @@
    "state": "under"
   },
   "401856879": {
-   "mk": "total",
-   "side": "over",
-   "line": 46.5,
-   "price": -114.0,
-   "edge": 2.5,
+   "mk": "spread",
+   "side": "home",
+   "line": 16.5,
+   "price": -106.0,
+   "edge": 1.7,
    "ev": null,
    "units": 0.0,
    "home": "Texas Tech",
    "away": "TCU",
-   "state": "under"
+   "state": "off"
   },
   "401856761": {
    "mk": "spread",
@@ -1053,9 +1053,9 @@
   "401862837": {
    "mk": "total",
    "side": "over",
-   "line": 58.5,
-   "price": -110.0,
-   "edge": 2.3,
+   "line": 57.5,
+   "price": -124.0,
+   "edge": 3.3,
    "ev": null,
    "units": 0.0,
    "home": "East Carolina",
@@ -1173,9 +1173,9 @@
   "401861969": {
    "mk": "total",
    "side": "under",
-   "line": 46.5,
-   "price": -114.0,
-   "edge": 5.5,
+   "line": 45.5,
+   "price": -110.0,
+   "edge": 4.5,
    "ev": null,
    "units": 0.0,
    "home": "Wyoming",
@@ -1282,7 +1282,7 @@
    "mk": "total",
    "side": "under",
    "line": 76.5,
-   "price": -110.0,
+   "price": -114.0,
    "edge": 7.5,
    "ev": null,
    "units": 0.0,
@@ -1523,11 +1523,11 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 29685,
+  "snapshots": 29696,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 6040,
+    "clvN": 6041,
     "clvRet": -0.0184,
     "clvT": -10.51,
     "clv": 0.91,
@@ -6306,7 +6306,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-25T05:24:14Z",
+ "checked": "2026-11-25T05:47:35Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
