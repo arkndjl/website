@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-25T20:49:31Z",
+ "asof": "2026-11-25T20:53:02Z",
  "recenter": {
-  "2026-11-25": 2.18,
+  "2026-11-25": 2.19,
   "2026-11-26": 1.7
  },
  "monitor": {
@@ -1925,9 +1925,9 @@
     "mk": "total",
     "side": "over",
     "line": 148.5,
-    "price": -114.0,
-    "ev": 0.091,
-    "units": 0.75
+    "price": -110.0,
+    "ev": 0.105,
+    "units": 1.0
    }
   }
  ],
@@ -1942,10 +1942,10 @@
    "mk": "spread",
    "side": "home",
    "line": 28.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 6.7,
    "x": 5.0,
-   "why": "no edge at -106",
+   "why": "no edge at -110",
    "m": 35.2,
    "tm": 148.4
   },
@@ -1990,10 +1990,10 @@
    "mk": "spread",
    "side": "home",
    "line": 10.5,
-   "price": -106.0,
+   "price": -101.0,
    "edge": 4.2,
    "x": 4.0,
-   "why": "no edge at -106",
+   "why": "no edge at -101",
    "m": 14.7,
    "tm": 148.2
   },
@@ -2076,22 +2076,6 @@
    "why": "edge under 4.5 (line: 9-15)",
    "m": 16.3,
    "tm": 149.7
-  },
-  {
-   "id": "401925688",
-   "sport": "cbb",
-   "kick": "2026-11-25T22:00:00Z",
-   "home": "Texas State",
-   "away": "Alcorn State",
-   "mk": "spread",
-   "side": "home",
-   "line": 26.5,
-   "price": -129.0,
-   "edge": 2.9,
-   "x": 3.5,
-   "why": "edge under 3.5 (inj: with)",
-   "m": 29.4,
-   "tm": 146.4
   },
   {
    "id": "401922285",
@@ -2238,6 +2222,22 @@
    "tm": 145.5
   },
   {
+   "id": "401925688",
+   "sport": "cbb",
+   "kick": "2026-11-25T22:00:00Z",
+   "home": "Texas State",
+   "away": "Alcorn State",
+   "mk": "spread",
+   "side": "home",
+   "line": 27.5,
+   "price": -114.0,
+   "edge": 1.9,
+   "x": 3.5,
+   "why": "edge under 3.5 (inj: with)",
+   "m": 29.4,
+   "tm": 146.4
+  },
+  {
    "id": "401921108",
    "sport": "cbb",
    "kick": "2026-11-26T00:00:00Z",
@@ -2375,7 +2375,7 @@
    "mk": "spread",
    "side": "home",
    "line": 10.5,
-   "price": -106.0,
+   "price": -101.0,
    "edge": 4.2,
    "ev": null,
    "units": 0.0,
@@ -2576,11 +2576,11 @@
    "state": "under"
   },
   "401924737": {
-   "mk": "total",
-   "side": "under",
-   "line": 140.5,
-   "price": -119.0,
-   "edge": 1.9,
+   "mk": "spread",
+   "side": "away",
+   "line": 3.5,
+   "price": -114.0,
+   "edge": 0.9,
    "ev": null,
    "units": 0.0,
    "home": "Liberty",
@@ -2590,9 +2590,9 @@
   "401909720": {
    "mk": "spread",
    "side": "home",
-   "line": 25.5,
-   "price": -101.0,
-   "edge": 1.1,
+   "line": 24.5,
+   "price": -119.0,
+   "edge": 2.1,
    "ev": null,
    "units": 0.0,
    "home": "Syracuse",
@@ -2615,7 +2615,7 @@
    "mk": "spread",
    "side": "home",
    "line": 28.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 6.7,
    "ev": null,
    "units": 0.0,
@@ -2662,9 +2662,9 @@
   "401925688": {
    "mk": "spread",
    "side": "home",
-   "line": 26.5,
-   "price": -129.0,
-   "edge": 2.9,
+   "line": 27.5,
+   "price": -114.0,
+   "edge": 1.9,
    "ev": null,
    "units": 0.0,
    "home": "Texas State",
@@ -2865,11 +2865,11 @@
    "state": "under"
   },
   "401920539": {
-   "mk": "total",
-   "side": "under",
-   "line": 169.5,
-   "price": -110.0,
-   "edge": 1.1,
+   "mk": "spread",
+   "side": "home",
+   "line": -14.5,
+   "price": -124.0,
+   "edge": 0.1,
    "ev": null,
    "units": 0.0,
    "home": "Kansas State",
@@ -2929,7 +2929,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 26414,
+  "snapshots": 26425,
   "buckets": [
    {
     "when": "24h+",
@@ -2942,18 +2942,18 @@
    },
    {
     "when": "6-24h",
-    "clvN": 5312,
+    "clvN": 5314,
     "clvRet": -0.0043,
     "clvT": -2.1,
     "clv": 0.64,
-    "beat": 0.418,
+    "beat": 0.417,
     "still": 0.391
    },
    {
     "when": "1-6h",
-    "clvN": 2294,
+    "clvN": 2296,
     "clvRet": -0.0403,
-    "clvT": -33.37,
+    "clvT": -33.4,
     "clv": 0.08,
     "beat": 0.169,
     "still": 0.703
@@ -21538,7 +21538,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-25T20:49:31Z",
+ "checked": "2026-11-25T20:53:02Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
