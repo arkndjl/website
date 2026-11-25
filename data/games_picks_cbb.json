@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-25T05:19:02Z",
+ "asof": "2026-11-25T05:24:21Z",
  "recenter": {
   "2026-11-25": 2.0
  },
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-25T04:39:01Z",
-  "ageH": 0.7,
+  "ageH": 0.8,
   "stale": false
  },
  "picks": [],
@@ -2186,6 +2186,22 @@
    "tm": 143.7
   },
   {
+   "id": "401920858",
+   "sport": "cbb",
+   "kick": "2026-11-25T21:00:00Z",
+   "home": "Marshall",
+   "away": "Prairie View A&M",
+   "mk": "spread",
+   "side": "home",
+   "line": 16.5,
+   "price": 103.0,
+   "edge": 2.6,
+   "x": 3.5,
+   "why": "edge under 3.5 (inj: with)",
+   "m": 19.1,
+   "tm": 153.4
+  },
+  {
    "id": "401928359",
    "sport": "cbb",
    "kick": "2026-11-25T20:30:00Z",
@@ -2210,7 +2226,7 @@
    "mk": "total",
    "side": "over",
    "line": 135.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 3.6,
    "x": 5.0,
    "why": "edge under 5 (total: low)",
@@ -2258,7 +2274,7 @@
    "mk": "total",
    "side": "over",
    "line": 137.5,
-   "price": -124.0,
+   "price": -134.0,
    "edge": 4.1,
    "x": 7.0,
    "why": "edge under 7",
@@ -2280,22 +2296,6 @@
    "why": "edge under 7",
    "m": 3.8,
    "tm": 155.6
-  },
-  {
-   "id": "401920809",
-   "sport": "cbb",
-   "kick": "2026-11-25T19:30:00Z",
-   "home": "Xavier",
-   "away": "Texas A&M",
-   "mk": "total",
-   "side": "under",
-   "line": 168.5,
-   "price": -114.0,
-   "edge": 2.6,
-   "x": 5.0,
-   "why": "edge under 5 (tier: power)",
-   "m": -6.2,
-   "tm": 165.9
   }
  ],
  "games": {
@@ -2339,7 +2339,7 @@
    "mk": "total",
    "side": "under",
    "line": 153.5,
-   "price": -114.0,
+   "price": -119.0,
    "edge": 2.2,
    "ev": null,
    "units": 0.0,
@@ -2615,7 +2615,7 @@
    "mk": "total",
    "side": "over",
    "line": 135.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 3.6,
    "ev": null,
    "units": 0.0,
@@ -2795,7 +2795,7 @@
    "mk": "total",
    "side": "over",
    "line": 137.5,
-   "price": -124.0,
+   "price": -134.0,
    "edge": 4.1,
    "ev": null,
    "units": 0.0,
@@ -2804,11 +2804,11 @@
    "state": "under"
   },
   "401920858": {
-   "mk": "total",
-   "side": "over",
-   "line": 151.5,
-   "price": -129.0,
-   "edge": 1.9,
+   "mk": "spread",
+   "side": "home",
+   "line": 16.5,
+   "price": 103.0,
+   "edge": 2.6,
    "ev": null,
    "units": 0.0,
    "home": "Marshall",
@@ -2988,7 +2988,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 25769,
+  "snapshots": 25779,
   "buckets": [
    {
     "when": "24h+",
@@ -3001,9 +3001,9 @@
    },
    {
     "when": "6-24h",
-    "clvN": 5204,
-    "clvRet": -0.0041,
-    "clvT": -1.98,
+    "clvN": 5206,
+    "clvRet": -0.004,
+    "clvT": -1.93,
     "clv": 0.64,
     "beat": 0.416,
     "still": 0.394
@@ -21496,7 +21496,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-25T05:19:02Z",
+ "checked": "2026-11-25T05:24:21Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
