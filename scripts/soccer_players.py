@@ -804,9 +804,9 @@ def write(rows, F, ts, all_seasons=False):
         import soccer_mv as MV                           # estimated market value next to GAR (scripts/soccer_mv.py)
         MV.attach(S, out)
         proj_attach(S, out, league_share(S, out) if S == cur else None)   # pj / p3: data/soccer_proj_fit.json
-        rate_attach(S, out)
         import soccer_sv as SV                           # SV / SVAR: the season-only value (scripts/soccer_sv.py)
         SV.attach(S, rows, out, LS)
+        rate_attach(S, out)                              # pg90 reads SVAR (above) and age (proj_attach)
         txt = json.dumps({'season': S, 'label': f'{S - 1}-{S % 100:02d}', 'games': games,
                           'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'players': out,
                           'mv': MV.meta(S), 'stale': staleness(S) if S == cur else []}, separators=(',', ':'), allow_nan=False)
@@ -1122,23 +1122,27 @@ def inject_badges():
         print(S, sum(1 for o in d['players'] if o.get('bdg')), 'players with badges', flush=True)
 
 
-# predictive GAR a 90 (pg90): Marcel over this season and the two before (weights RATE_W, minutes / 90 as exposure),
-# shrunk toward the position's mean by RATE_K 90s. scripts/rate_metrics_research.py soccer: next season's GAR a 90
-# (900+ min), held out by season 2016-26, MSE .00302 vs raw .00324 (t -10.2, 11/11), one-season shrink t -8.5, movers
-# t -5.2. Keepers' GAR a 90 does not repeat (K at the grid top): their pg90 sits at the keeper mean
-RATE_W, RATE_K = (1, .5, .25), {'F': 5, 'M': 5, 'D': 10, 'GK': 640}
-RATE_MU = {'F': .0813, 'M': .0652, 'D': .0544, 'GK': .0617}
+# predictive value a 90 (pg90, the board's p/90): Marcel over this season and the two before (weights RATE_W, minutes / 90
+# as exposure) of SV (season-only value, soccer_sv.py, GAR scale) rather than GAR (GAR's xG plus-minus already spans
+# S-2..S, so pooling GAR counted old seasons twice), shrunk toward the position's SV mean of regulars by RATE_K 90s, less
+# RATE_AGE a year over 29. Metric audit Nov 24 2026 (scripts/research/metric_audit_nov24/soccer/audit.py, P4): season n
+# value x n+1 minutes -> n+1 team GD a match, every grid value chosen leave-one-pair-out (11 pairs 2015-26, same pick in
+# every fold), pooled R2 .634 -> .650 (t 5.7, 11/11 pairs), player r vs next season's SV a 90 .690 -> .718.
+# Before: GAR, K F5 M5 D10 GK640, no age term (scripts/rate_metrics_research.py)
+RATE_W, RATE_K = (1, .5, .25), {'F': 2.5, 'M': 2.5, 'D': 5, 'GK': 320}
+RATE_MU = {'F': .0944, 'M': .063, 'D': .0462, 'GK': .0379}     # SV a 90 of regulars (900+ min), 2014-15 .. 2025-26
+RATE_AGE, RATE_AGE0 = .008, 29
 _RATE_PRIOR = {}
 
 
 def _season_rate(S):
-    """{player: [GAR, 90s]} from a written season file (both clubs pooled)"""
+    """{player: [SVAR, 90s]} from a written season file (both clubs pooled)"""
     if S not in _RATE_PRIOR:
         acc = {}
         try:
             for o in json.load(open(os.path.join(SDIR, f'{S}.json')))['players']:
-                if o.get('min') and o.get('gar') is not None:
-                    a = acc.setdefault(o['p'], [0.0, 0.0]); a[0] += o['gar']; a[1] += o['min'] / 90
+                if o.get('min') and o.get('svar') is not None:
+                    a = acc.setdefault(o['p'], [0.0, 0.0]); a[0] += o['svar']; a[1] += o['min'] / 90
         except OSError:
             pass
         _RATE_PRIOR[S] = acc
@@ -1146,21 +1150,22 @@ def _season_rate(S):
 
 
 def rate_attach(S, out):
-    """pg90 on a season's players: this season (as written in out) plus the S-1 and S-2 files"""
+    """pg90 on a season's players: this season (as written in out, SV attached) plus the S-1 and S-2 files"""
     cur = {}
     for o in out:
-        if o.get('min') and o.get('gar') is not None:
-            a = cur.setdefault(o['p'], [0.0, 0.0]); a[0] += o['gar']; a[1] += o['min'] / 90
+        if o.get('min') and o.get('svar') is not None:
+            a = cur.setdefault(o['p'], [0.0, 0.0]); a[0] += o['svar']; a[1] += o['min'] / 90
     prev = [_season_rate(S - 1), _season_rate(S - 2)]
     for o in out:
         pos = o.get('pos') or 'M'
-        K = RATE_K.get(pos, 5)
-        num, den = K * RATE_MU.get(pos, .065), K
+        K = RATE_K.get(pos, 2.5)
+        num, den = K * RATE_MU.get(pos, .063), K
         for w, src in zip(RATE_W, [cur] + prev):
             h = src.get(o['p'])
             if h:
                 num += w * h[0]; den += w * h[1]
-        o['pg90'] = round(num / den, 3)
+        age = o.get('age')
+        o['pg90'] = round(num / den - (RATE_AGE * max(age - RATE_AGE0, 0) if age is not None else 0.0), 3)
 
 
 def inject_rate():

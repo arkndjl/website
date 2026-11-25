@@ -1,0 +1,340 @@
+{
+ "asof": "2026-11-24",
+ "seasons": [
+  2009,
+  2026
+ ],
+ "pairs": 17,
+ "candidates": {
+  "N4 Marcel season-only WAR (pos mean, no age)": {
+   "target": "predict team R2 (n+1 GD a game)",
+   "before": {
+    "predictTeam": 0.4026,
+    "playerR": 0.3701
+   },
+   "after": {
+    "predictTeam": 0.3616,
+    "playerR": 0.4422
+   },
+   "t": -0.71,
+   "p": 0.76,
+   "pairsBetter": 7,
+   "guard": true,
+   "picks": {
+    "2009": [
+     0.75,
+     400
+    ],
+    "2010": [
+     0.75,
+     400
+    ],
+    "2011": [
+     0.75,
+     400
+    ],
+    "2012": [
+     0.75,
+     400
+    ],
+    "2013": [
+     0.75,
+     400
+    ],
+    "2014": [
+     0.75,
+     400
+    ],
+    "2015": [
+     0.75,
+     400
+    ],
+    "2016": [
+     0.75,
+     400
+    ],
+    "2017": [
+     0.75,
+     400
+    ],
+    "2018": [
+     0.75,
+     400
+    ],
+    "2019": [
+     0.75,
+     400
+    ],
+    "2020": [
+     0.75,
+     400
+    ],
+    "2021": [
+     0.75,
+     400
+    ],
+    "2022": [
+     0.75,
+     400
+    ],
+    "2023": [
+     0.75,
+     400
+    ],
+    "2024": [
+     0.75,
+     400
+    ],
+    "2025": [
+     0.75,
+     400
+    ]
+   },
+   "fullFitPick": [
+    0.75,
+    400
+   ],
+   "grid": {
+    "(0.25, 400)": {
+     "predictTeam": 0.3275,
+     "playerR": 0.4206
+    },
+    "(0.25, 800)": {
+     "predictTeam": 0.3195,
+     "playerR": 0.4218
+    },
+    "(0.25, 1600)": {
+     "predictTeam": 0.3095,
+     "playerR": 0.4162
+    },
+    "(0.25, 3200)": {
+     "predictTeam": 0.2985,
+     "playerR": 0.3964
+    },
+    "(0.25, 6400)": {
+     "predictTeam": 0.2868,
+     "playerR": 0.3499
+    },
+    "(0.5, 400)": {
+     "predictTeam": 0.3563,
+     "playerR": 0.4383
+    },
+    "(0.5, 800)": {
+     "predictTeam": 0.3504,
+     "playerR": 0.4409
+    },
+    "(0.5, 1600)": {
+     "predictTeam": 0.3418,
+     "playerR": 0.4367
+    },
+    "(0.5, 3200)": {
+     "predictTeam": 0.3314,
+     "playerR": 0.4192
+    },
+    "(0.5, 6400)": {
+     "predictTeam": 0.3198,
+     "playerR": 0.3767
+    },
+    "(0.75, 400)": {
+     "predictTeam": 0.3616,
+     "playerR": 0.4422
+    },
+    "(0.75, 800)": {
+     "predictTeam": 0.3575,
+     "playerR": 0.4459
+    },
+    "(0.75, 1600)": {
+     "predictTeam": 0.3505,
+     "playerR": 0.4434
+    },
+    "(0.75, 3200)": {
+     "predictTeam": 0.3413,
+     "playerR": 0.4296
+    },
+    "(0.75, 6400)": {
+     "predictTeam": 0.3306,
+     "playerR": 0.3943
+    }
+   }
+  },
+  "N6 pWAR rate + position value over replacement (F/D/G)": {
+   "target": "predict team R2 (n+1 GD a game)",
+   "before": {
+    "predictTeam": 0.4026,
+    "playerR": 0.3701
+   },
+   "after": {
+    "predictTeam": 0.4853,
+    "playerR": 0.3441
+   },
+   "t": 7.59,
+   "p": 0.0,
+   "pairsBetter": 17,
+   "guard": false,
+   "replHPM": {
+    "2010": {
+     "F": -0.156,
+     "D": -0.209,
+     "G": -0.044
+    },
+    "2018": {
+     "F": -0.155,
+     "D": -0.2,
+     "G": -0.081
+    },
+    "2026": {
+     "F": -0.256,
+     "D": -0.351,
+     "G": -0.073
+    }
+   }
+  },
+  "N3 WAR + uncovered skater time at c": {
+   "target": "held-out describe R2 (same season GD a game)",
+   "before": 0.97819,
+   "after": 0.97819,
+   "t": NaN,
+   "p": NaN,
+   "pairsBetter": 0,
+   "guard": true,
+   "cPicks": {
+    "2009": 0.0,
+    "2010": 0.0,
+    "2011": 0.0,
+    "2012": 0.0,
+    "2013": 0.0,
+    "2014": 0.0,
+    "2015": 0.0,
+    "2016": 0.0,
+    "2017": 0.0,
+    "2018": 0.0,
+    "2019": 0.0,
+    "2020": 0.0,
+    "2021": 0.0,
+    "2022": 0.0,
+    "2023": 0.0,
+    "2024": 0.0,
+    "2025": 0.0,
+    "2026": 0.0
+   },
+   "uncoveredSkaterHoursAGame": {
+    "mean": 0.067,
+    "sd": 0.551
+   }
+  }
+ },
+ "base_pWAR": {
+  "predictTeam": 0.4026,
+  "playerR": 0.3701
+ },
+ "duplicates": {
+  "2009": {
+   "games": 1317,
+   "sameDayTeams": 0,
+   "sameId": 0,
+   "skaterLogDupRows": 0
+  },
+  "2010": {
+   "games": 1319,
+   "sameDayTeams": 0,
+   "sameId": 0,
+   "skaterLogDupRows": 0
+  },
+  "2011": {
+   "games": 1319,
+   "sameDayTeams": 0,
+   "sameId": 0,
+   "skaterLogDupRows": 0
+  },
+  "2012": {
+   "games": 1316,
+   "sameDayTeams": 0,
+   "sameId": 0,
+   "skaterLogDupRows": 0
+  },
+  "2013": {
+   "games": 806,
+   "sameDayTeams": 0,
+   "sameId": 0,
+   "skaterLogDupRows": 0
+  },
+  "2014": {
+   "games": 1323,
+   "sameDayTeams": 0,
+   "sameId": 0,
+   "skaterLogDupRows": 0
+  },
+  "2015": {
+   "games": 1319,
+   "sameDayTeams": 0,
+   "sameId": 0,
+   "skaterLogDupRows": 0
+  },
+  "2016": {
+   "games": 1321,
+   "sameDayTeams": 0,
+   "sameId": 0,
+   "skaterLogDupRows": 0
+  },
+  "2017": {
+   "games": 1317,
+   "sameDayTeams": 0,
+   "sameId": 0,
+   "skaterLogDupRows": 0
+  },
+  "2018": {
+   "games": 1355,
+   "sameDayTeams": 0,
+   "sameId": 0,
+   "skaterLogDupRows": 0
+  },
+  "2019": {
+   "games": 1358,
+   "sameDayTeams": 0,
+   "sameId": 0,
+   "skaterLogDupRows": 0
+  },
+  "2020": {
+   "games": 1216,
+   "sameDayTeams": 0,
+   "sameId": 0,
+   "skaterLogDupRows": 0
+  },
+  "2021": {
+   "games": 973,
+   "sameDayTeams": 0,
+   "sameId": 0,
+   "skaterLogDupRows": 0
+  },
+  "2022": {
+   "games": 1417,
+   "sameDayTeams": 0,
+   "sameId": 0,
+   "skaterLogDupRows": 0
+  },
+  "2023": {
+   "games": 1417,
+   "sameDayTeams": 0,
+   "sameId": 0,
+   "skaterLogDupRows": 0
+  },
+  "2024": {
+   "games": 1417,
+   "sameDayTeams": 0,
+   "sameId": 0,
+   "skaterLogDupRows": 0
+  },
+  "2025": {
+   "games": 1417,
+   "sameDayTeams": 0,
+   "sameId": 0,
+   "skaterLogDupRows": 0
+  },
+  "2026": {
+   "games": 1417,
+   "sameDayTeams": 0,
+   "sameId": 0,
+   "skaterLogDupRows": 0
+  }
+ }
+}

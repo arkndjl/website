@@ -375,6 +375,52 @@
      "CS2"
     ]
    }
+  },
+  {
+   "section": "players",
+   "after": "SV / SVAR (soccer)",
+   "entry": {
+    "term": "p/90 (soccer)",
+    "short": "Predictive SV rate: this season and the two before.",
+    "body": [
+     "SV a 90 at weights 1, .5, .25, shrunk toward the position mean of regulars by 225 minutes (defenders 450, keepers 28,800),",
+     "less .008 a year over age 29. Nov 24 2026, held out: next season team GD R2 .634 to .650, 11 of 11 pairs;",
+     "r with next season's SV a 90 .690 to .718. The most predictive soccer metric on players; display only."
+    ],
+    "where": "Soccer GAR leaders, depth chart, next up",
+    "sports": [
+     "Soccer"
+    ]
+   }
+  },
+  {
+   "section": "players",
+   "after": "SVAR",
+   "entry": {
+    "term": "Most predictive and most descriptive metric (by sport)",
+    "short": "Each sport's metrics scored on one test (Nov 24 2026, held out, no 2026-27 outcomes).",
+    "body": [
+     "Describe: season value x season minutes summed per team, on that season's results, held out. Predict: season n value x",
+     "season n+1 minutes, on n+1 results; and a player's value against his next season. Tennis and CS2: held out matches and maps.",
+     "NBA: describe rXPM (.999), predict pXPM (.657). NFL: describe XV (.604), predict pXP/60 within position, AV for teams (.317).",
+     "CFB: describe XV (.689), predict cWAR (.256, tie XV). CBB: describe WAR on GBPM (.658), predict the roster prior BPM (.783).",
+     "NHL: describe WAR (.978), predict pWAR for teams (.387), Marcel WAR for a player (r .446). Soccer: describe SVAR (.894),",
+     "predict p/90 (.650, r .718). Tennis: describe PA (.141), predict ARK (.107, tie Elo). CS2: describe season RWA, predict RWA rating",
+     "(next month team R2 .124, player r .820), ARK for teams. Public metrics scored: nflverse EPA, PFN impact, Barttorvik PRPG,",
+     "MoneyPuck game score, FotMob rating, Transfermarkt value, official tennis rank, HLTV 2.0 style rating, bo3.gg rating: none leads."
+    ],
+    "where": "Every ARKBOARD: descriptive tabs lead with the describe pick, predictive tabs with the predict pick",
+    "sports": [
+     "NBA",
+     "NFL",
+     "CFB",
+     "CBB",
+     "NHL",
+     "Soccer",
+     "Tennis",
+     "CS2"
+    ]
+   }
   }
  ],
  "append": [
@@ -463,6 +509,51 @@
    "lines": [
     "SV: season WAR, calendar year to date, every level, same per match credit as WAR.",
     "Split half r .81 ATP, .82 WTA (2015 to 2025); next season r .85 ATP, .84 WTA."
+   ]
+  },
+  {
+   "term": "pWAR / HPM",
+   "lines": [
+    "Nov 24 2026: 5 on 5 on ice and individual xG read MoneyPuck's flurry, score and venue adjusted columns; WAR keeps raw xG.",
+    "Next season team GD R2 .384 to .387 (t 2.88, 13 of 17 pairs); weights refit held out .373 to .376, walk forward t 3.59.",
+    "PP on ice xG at weight .2 fails (t 1.19 worse); score and venue alone is flat (t .32)."
+   ]
+  },
+  {
+   "term": "XV",
+   "lines": [
+    "NFL Nov 24 2026: weights fit per side, offense parts on points scored a game, defense parts on points allowed a game.",
+    "XV from weeks 1 to 9 on weeks 10 on margin, R2 .604 to .622 (t 2.19, 7 of 8 seasons); next season team R2 .235 to .258.",
+    "XV is the most descriptive NFL metric held out (.604 vs WAR .401, SV .257) and the most descriptive CFB one (.689 vs cWAR .639)."
+   ]
+  },
+  {
+   "term": "College WAR",
+   "lines": [
+    "Team WAR (Nov 24 2026): starter time no graded player covers counts one SD below an average starter (season AV's line), not at",
+    "the WAR line. Held out by season 2019 to 2025, team WAR tracks SRS at R2 .654 against .639 (t 3.5, 7 of 7 seasons)."
+   ]
+  },
+  {
+   "term": "Tennis ARK",
+   "lines": [
+    "Nov 24 2026: ARK adds the points added term, CP x pPA gap / 10 on the match blend. Next season log loss t -8.7, 14 of 15 seasons.",
+    "rPA is shrunk by 300 points toward 0: held out describe R2 .128 to .135 (15 of 15). WAR counts Futures and ITF at half,",
+    "Challenger, qualifying and team events at .85 (next season R2 .083 to .085, t -7.1); SV keeps every match in full."
+   ]
+  },
+  {
+   "term": "RWA (CS2)",
+   "lines": [
+    "Map offsets (Nov 24 2026): each player's decayed residual on each map, shrunk 1,000 rounds toward 0, added to RWA per map.",
+    "Held Jul 2025 to Oct 2026: next month map error .027816 to .027691, t by month 7.0, 15 of 16 months."
+   ]
+  },
+  {
+   "term": "CS2 ARK",
+   "lines": [
+    "Nov 24 2026: Valve lists one series up to several times under alias team names (9,624 of 37,399 rows). Repeats of a date and",
+    "both fives are dropped before every replay. Held log loss on clean rows: ARK .6105, team RWA .6245, VRS .6640."
    ]
   }
  ],

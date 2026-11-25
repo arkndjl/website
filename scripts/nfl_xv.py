@@ -281,9 +281,42 @@ def nnls(A, b, iters=None):
     return w
 
 
-def fit_w(S, ys, lam):
-    """Weights (points a game per unit of share x z) on team margin a game, sign-constrained ridge."""
+SIDE_FIT = True    # offense parts on points scored, defense parts on points allowed (metric audit Nov 24 2026, C3)
+ALPHA_PIN = 0.4    # the board blend stays .4 XV / .6 AV WAR until its retest after the 2026 season (audit Nov 3 2026)
+
+
+def fit_side(S, ys, lam):
+    """Per side: offense columns on points scored a game, defense columns on points allowed a game (negated), each centred
+    within its season, same ridge and signs. Scripts/research/metric_audit_nov24/nfl (C3): XV from weeks 1-9 on weeks 10+
+    margin, held-out R2 .604 -> .622 (paired t -2.19, Holm p .043, 7 of 8 seasons); next-season team R2 .235 -> .258."""
     import numpy as np
+    w = np.zeros(len(COLS))
+    for side in (0, 1):
+        idx = [j for j, (g, _) in enumerate(COLS) if (g in OFF) == (side == 0)]
+        Xm, Y = [], []
+        for y in ys:
+            d = S[y]
+            T = defaultdict(lambda: np.zeros(len(idx)))
+            for p in d['players']:
+                g = GROUP_OF[p['sub']]
+                for k, j in enumerate(idx):
+                    if COLS[j][0] == g:
+                        T[p['t']][k] += p['share'] * p['z'][COLS[j][1]]
+            ts = list(d['teams'])
+            yy = np.array([(d['teams'][t]['pf'] if side == 0 else -d['teams'][t]['pa']) / d['teams'][t]['g'] for t in ts])
+            Xm += [T[t] for t in ts]; Y += list(yy - yy.mean())
+        Xm, Y = np.array(Xm), np.array(Y)
+        mu, sd = Xm.mean(0), Xm.std(0); sd[sd == 0] = 1
+        A = np.vstack([(Xm - mu) / sd, math.sqrt(lam) * np.eye(len(idx))]); b_ = np.concatenate([Y, np.zeros(len(idx))])
+        w[idx] = nnls(A, b_) / sd
+    return w
+
+
+def fit_w(S, ys, lam):
+    """Weights (points a game per unit of share x z) on team margin a game, sign-constrained ridge (per side: fit_side)."""
+    import numpy as np
+    if SIDE_FIT:
+        return fit_side(S, ys, lam)
     _, X, Y = team_matrix(S, ys)
     mu, sd = X.mean(0), X.std(0); sd[sd == 0] = 1
     Xs = (X - mu) / sd
@@ -524,7 +557,7 @@ def backtest(lams=(5, 20, 50, 150, 400)):
             Tw[(y, p['t'])] += p['war']
     res['meanTeam'] = {'xv': round(sum(T.values()) / len(T), 2), 'war': round(sum(Tw.values()) / len(Tw), 2)}
     # alpha: where a point of blended value lost to an absence costs a point of margin (slope nearest 1)
-    alpha = min(blends, key=lambda a: abs(blends[a]['missed']['coef'] - 1))
+    alpha = ALPHA_PIN if ALPHA_PIN is not None else min(blends, key=lambda a: abs(blends[a]['missed']['coef'] - 1))
     model = {'alpha': alpha, 'lambda': lam, 'ptsPerWin': PTS_PER_WIN, 'K': K, 'parts': PARTS, 'weights': wd,
              'qMean': {s_: round(v, 4) for s_, v in q_means(S, wd).items()}}
     return res, model

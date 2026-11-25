@@ -165,6 +165,10 @@
         order = [key, 'pos', 'tm', 'age', 'g', 'mp'].concat(rest, ['dpm', 'bpm']), grp = { pos: 1, dpm: 1 }; grp[rest[0]] = 1;
     var hr = ths[0].parentNode;
     ['rk', 'n', 'wk'].concat(order).forEach(function (c) { var th = ths.filter(function (t) { return t.dataset.sort === c; })[0]; if (th) { th.classList.toggle('cfb__g', !!grp[c]); hr.appendChild(th); } });
+    // the GFX follows the view (metric audit Nov 24 2026): its key after the player (pXPM view: pXPM leads), then Pos, MP
+    // and the first three of the rest; the default view keeps VORX, XPM, O-XPM, D-XPM
+    var GL = { xpm: 'XPM', oxpm: 'O-XPM', dxpm: 'D-XPM', vorx: 'VORX', sxpm: 'pXPM', pxpm: 'Proj', p3: '3Y' };
+    win.dataset.gfxCols = ['RK', 'Player', GL[key]].concat(rest.slice(0, 3).map(function (c) { return GL[c]; }), ['Pos', 'MP']).join(',');
     function g(c) { return grp[c] ? ' cfb__g' : ''; }
     var CELL = {
       xpm: function (p) { return '<td class="cfb__num nbaxpm__v' + k('xpm') + g('xpm') + '">' + sg(p.xpm) + (p.dpm == null && p.bpm != null ? '<span class="cfb__dim" title="BPM only: no DPM row">*</span>' : '') + '</td>'; },

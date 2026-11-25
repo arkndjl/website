@@ -13,10 +13,20 @@ Outputs
     data/cbb_teamtabs.json                                          team tables (returning, talent), drawn by teamunits.html (feed=)
 
 Definitions
-    WAR    wins over a replacement player = (BPM - R) x minutes / 40 x 68 / 100 x wins a point.
-           R = -2.0: the minutes-weighted BPM of the 9th man in team minutes, 2025-26 (-2.0; 8th -1.2, 10th -2.9).
+    WAR    wins over a replacement player = (GBPM - R) x minutes / 40 x 68 / 100 x wins a point.
+           GBPM = Barttorvik's game BPM, the minutes-weighted mean of his games' BPM (the live line sums the game logs the
+           same way; BPM when a line has none). Nov 24 2026 (scripts/research/metric_audit_nov24/cbb): GBPM in place of
+           season BPM tracks team wins better held out (win% R2 .633 -> .658, 15/15 seasons; WAR form 14/14, t 28.7);
+           season BPM stays the predictive input (next-season team R2 .643 against GBPM's .612), so Next is BPM based.
+           Nov 24 2026 port round (scripts/research/metric_audit_nov24/port/tennis_cs2_cbb, pre-registered): GBPM is
+           shrunk GBPM_K = 100 minutes toward the season's minutes-weighted mean GBPM, (GBPM x min + 100 x mean) / (min
+           + 100). Half-A games' rate vs the same players' half-B GBPM: minutes-weighted MSE 16.2 -> 11.4 (10/10 seasons,
+           t 8.5); WAR form held-out team wins RMSE 3.348 -> 3.331 (14/14, t 8.2). Season-only (no prior-season input).
+           R = -1.6: the minutes-weighted shrunk GBPM of the 9th man in team minutes, 2025-26 (raw GBPM's was -2.3,
+           BPM's -2.0).
            wins a point = fit on 2016-17 to 2025-26 team-seasons (FIT_YEARS): wins = a x games + b x team sum of
-           (BPM - R) x minutes / 40 x .68 (b .0143, a .40, r .86; set by --freeze and kept in the frozen file). The
+           (GBPM - R) x minutes / 40 x .68 (b .0186, a .38, r .87 on shrunk GBPM, Nov 24; raw GBPM .0160, .37; BPM .0143, .40; set by
+           --freeze and kept in the frozen file). The
            textbook N'(0) / game sd (.0347 at sd 11.5) is the slope at an even game; real seasons bend (conference
            schedules pair strong with strong, win odds flatten at the ends), so the fit slope is what sums to wins.
            Barttorvik BPM is per 100 possessions over an average D-I player, and a team's minutes-weighted BPM x 5
@@ -55,7 +65,8 @@ OUT = os.path.join(SD, 'cbb')
 TEAM_OUT = os.path.join(ROOT, 'data', 'cbb_teamtabs.json')
 FROZEN = os.path.join(HERE, 'data', f'cbb_tabs_{LAST}.json.gz')
 PRIOR = os.path.join(HERE, 'cbb_prior.json.gz')
-REPL = -2.0
+REPL = -1.6         # 9th man's shrunk GBPM, 2025-26 (WAR's input; see WAR above)
+GBPM_K = 100.0      # minutes of shrink toward the season's mean GBPM (WAR's input; see WAR above)
 PACE = 68.0        # possessions a 40 for every team (not the team's own pace: see WAR above)
 WPP = 1.0          # wins a point of margin: fit in freeze() and read from the frozen file
 FIT_YEARS = range(2017, LAST + 1)   # team-seasons the wins-a-point slope is fit on (Barttorvik season files + game logs)
@@ -95,6 +106,22 @@ def label(s):
     return f'{s - 1}-{str(s)[2:]}'
 
 
+def wx(L, mins=None, mu=None):
+    """WAR's box input: GBPM, else BPM (a line with no game BPM); with mins and the season's mean mu, shrunk GBPM_K
+    minutes toward mu (see WAR above)"""
+    x = L.get('gbpm') if L.get('gbpm') is not None else L.get('bpm')
+    if x is None or mins is None or mu is None:
+        return x
+    return (x * mins + GBPM_K * mu) / (mins + GBPM_K)
+
+
+def gmu(lines, mins_of=lambda l: (l.get('mp') or 0) * (l.get('gp') or 0)):
+    """the minutes-weighted mean of wx over a season's lines (the shrink target)"""
+    xs = [(wx(l), mins_of(l)) for l in lines if wx(l) is not None and mins_of(l)]
+    w = sum(m for _, m in xs)
+    return sum(x * m for x, m in xs) / w if w else None
+
+
 def war(bpm, minutes, repl=REPL):
     if bpm is None or not minutes: return None
     return (bpm - repl) * minutes / 40 * PACE / 100 * WPP
@@ -109,9 +136,11 @@ def fit_wpp(years=FIT_YEARS):
         games = load_games(y)
         if not games: continue
         X = defaultdict(float)
-        for l in D.load_bt(y):
-            if l['gp'] and l['mp'] and l['bpm'] is not None:
-                X[l['team']] += (l['bpm'] - REPL) * l['mp'] * l['gp'] / 40 * PACE / 100   # points over replacement
+        ls = D.load_bt(y); mu = gmu(ls)
+        for l in ls:
+            if l['gp'] and l['mp'] and wx(l) is not None:
+                mins = l['mp'] * l['gp']
+                X[l['team']] += (wx(l, mins, mu) - REPL) * mins / 40 * PACE / 100   # points over replacement
         rec, seen = defaultdict(lambda: [0, 0]), set()
         for g in games:
             k = (g[GC['team']], g[GC['muid']])
@@ -189,14 +218,14 @@ def pos_norms(lines, key='role'):
     return out
 
 
-def stat_line(L):
-    """a Barttorvik season row -> the stats-tab numbers"""
+def stat_line(L, mu=None):
+    """a Barttorvik season row -> the stats-tab numbers (mu: the season's mean GBPM, WAR's shrink target)"""
     mins = (L['mp'] or 0) * (L['gp'] or 0)
     return {'gp': int(L['gp'] or 0), 'mp': round(mins), 'mpg': r1(L['mp']), 'pts': r1(L['pts_g']), 'reb': r1(L['treb_g']), 'ast_g': r1(L['ast_g']),
-            'bpm': r1(L['bpm']), 'obpm': r1(L['obpm']), 'dbpm': r1(L['dbpm']), 'ortg': r1(L['ortg']), 'usg': r1(L['usg']), 'ts': r1(L['ts']),
+            'bpm': r1(L['bpm']), 'gbpm': r1(L.get('gbpm')), 'obpm': r1(L['obpm']), 'dbpm': r1(L['dbpm']), 'ortg': r1(L['ortg']), 'usg': r1(L['usg']), 'ts': r1(L['ts']),
             'tp': r1((L['tp'] or 0) * 100) if L['tpa'] else None, 'tpa': int(L['tpa'] or 0), 'ft': r1((L['ft'] or 0) * 100) if L['fta'] else None,
             'astp': r1(L['ast']), 'to': r1(L['to']), 'stl': r1(L['stl']), 'blk': r1(L['blk']), 'orb': r1(L['orb']), 'ftr': r1(L['ftr']),
-            'war': r1(war(L['bpm'], mins), 2), 'waa': r1(war(L['bpm'], mins, 0), 2)}
+            'war': r1(war(wx(L, mins, mu), mins), 2), 'waa': r1(war(wx(L, mins, mu), mins, 0), 2)}
 
 
 def freeze():
@@ -210,15 +239,16 @@ def freeze():
     global WPP
     fit = fit_wpp()
     WPP = fit['wpp']
+    mu_last, mu_prev = gmu(lines), gmu(list(prev.values()))
     out = []
     for L in lines:
-        s = stat_line(L)
+        s = stat_line(L, mu_last)
         P = prev.get(str(L['pid']))
         p = None
         if P:
             pm = (P['mp'] or 0) * (P['gp'] or 0)
             p = {'team': P['team'], 'gp': int(P['gp'] or 0), 'mpg': r1(P['mp']), 'bpm': r1(P['bpm']), 'usg': r1(P['usg']), 'mp': round(pm),
-                 'war': r1(war(P['bpm'], pm), 2)}
+                 'war': r1(war(wx(P, pm, mu_prev), pm), 2)}
         out.append({'pid': str(L['pid']), 'n': L['name'], 'bt': L['team'], 'conf': L['conf'], 'yr': L['yr'], 'role': L['role'],
                     'pos': POSMAP.get(L['role'], 'F'), 'ht': L['ht'], 'dob': L['dob'], 'min_per': r1(L['min_per']), 's': s, 'prev': p})
     top = sorted(games, key=lambda g: -game_score(g))[:400]
@@ -226,7 +256,7 @@ def freeze():
            'win': g[GC['win1']], **gline(g)} for g in top]
     os.makedirs(os.path.dirname(FROZEN), exist_ok=True)
     with gzip.open(FROZEN, 'wt') as fh:
-        json.dump({'season': LAST, 'asof': now(), 'norms': norms, 'wfit': fit, 'tempo': {k: round(v, 2) for k, v in tempo.items()}, 'lines': out, 'top': tg},
+        json.dump({'season': LAST, 'asof': now(), 'norms': norms, 'wfit': fit, 'mu': mu_last, 'tempo': {k: round(v, 2) for k, v in tempo.items()}, 'lines': out, 'top': tg},
                   fh, separators=(',', ':'))
     print(f'{FROZEN}: {len(out)} lines, {len(tg)} top games, Stat+ norms {norms}, WAR fit {fit}')
 
@@ -302,12 +332,13 @@ def main():
     def srow(n, tm, pos, ag, sub, ph, lo, s, fv=None, N=None, sp=None):
         return {'n': n, 'tm': tm, 'pos': pos, 'age': ag, 'sub': sub or '', 'ph': ph, 'lo': lo, 'fv': fv, 'splus': splus(s['bpm'], sp or pos, N), **s}
 
+    mu_now = gmu([L for _, L, _ in cur], lambda l: (l.get('mpg') or 0) * (l.get('gp') or 0))
     now_rows = []
     for r, L, mins in cur:
         s = {'gp': L['gp'], 'mp': round(mins), 'mpg': L['mpg'], 'pts': L.get('ppg'), 'reb': L.get('rpg'), 'ast_g': L.get('apg'), 'bpm': L['bpm'],
              'obpm': L['obpm'], 'dbpm': L['dbpm'], 'ortg': L['ortg'], 'usg': L['usg'], 'ts': L.get('ts'), 'tp': L['tp'] if L.get('tpa') else None,
              'tpa': L.get('tpa'), 'ft': L.get('ft'), 'astp': L.get('ast'), 'to': L.get('to'), 'stl': L.get('stl'), 'blk': L.get('blk'),
-             'orb': L.get('orb'), 'ftr': L.get('ftr'), 'war': r1(war(L['bpm'], mins), 2), 'waa': r1(war(L['bpm'], mins, 0), 2),
+             'orb': L.get('orb'), 'ftr': L.get('ftr'), 'war': r1(war(wx(L, mins, mu_now), mins), 2), 'waa': r1(war(wx(L, mins, mu_now), mins, 0), 2),
              'nx': r1(nx_now.get((r['name'], r['team'])), 2)}
         now_rows.append(srow(r['name'], r['team'], r['pos'], age(r), r['conf'], r.get('photo'), r.get('logo'), s, r['fv'], norms_now, spos(r, L)))
     last_rows = []
@@ -337,8 +368,8 @@ def main():
                     {'s': LAST, 'l': label(LAST), 'rows': last_rows, 'mdef': 400}]})
 
     # ---- WAR leaders
-    wcols = [col('war', 'WAR', f"wins over a replacement player: (BPM + {-REPL:.0f}) x minutes / 40 x {PACE / 100:.2f} x {WPP:.4f} wins a point; the slope that makes team WAR + {wf['a']} x games track wins ({wf['teams']:,} team-seasons {label(wf['years'][0])} to {label(wf['years'][1])}, r {wf['r']}); replacement = the 9th man's BPM, so a team of replacement players wins {wf['a'] * 100:.1f}% of its games", 's2'),
-             col('waa', 'WAA', 'wins over an average D-I player: BPM x the same minutes and pace', 's2'),
+    wcols = [col('war', 'WAR', f"wins over a replacement player: (GBPM + {-REPL:.1f}) x minutes / 40 x {PACE / 100:.2f} x {WPP:.4f} wins a point; the slope that makes team WAR + {wf['a']} x games track wins ({wf['teams']:,} team-seasons {label(wf['years'][0])} to {label(wf['years'][1])}, r {wf['r']}); GBPM = the minutes-weighted mean of his games' BPM, shrunk {GBPM_K:.0f} minutes toward the season's mean; replacement = the 9th man's GBPM, so a team of replacement players wins {wf['a'] * 100:.1f}% of its games", 's2'),
+             col('waa', 'WAA', 'wins over an average D-I player: GBPM x the same minutes and pace', 's2'),
              col('bpm', 'BPM', 'Barttorvik box plus-minus', 's1'), col('splus', 'Stat+', 'BPM against his position, 100 + 25 z', '0'),
              col('nx', 'Next', "next season's WAR at 31 games, if he plays D-I: from this line (to date: by share of games played), the 3-year BPM, minutes share, class, age, seasons, recruit rank, usage and height", 's2'),
              col('mpg', 'MPG', 'minutes a game'), col('gp', 'G', 'games', 'i'), col('fv', 'FV', 'FV now', 'i')]
@@ -470,7 +501,7 @@ def main():
         move = 'up' if tc in POWER and fc not in POWER else 'down' if fc in POWER and tc not in POWER else 'across'
         prow.append({'n': r['name'], 'tm': r['team'], 'pos': r['pos'], 'age': age(r), 'ph': r.get('photo'), 'lo': r.get('logo'), 'div': move,
                      'sub': f"from {t2e.get(L['team'], L['team'])}" + (f" ({fc})" if fc else ''),
-                     'war': s['war'] if s else r1(war(L['bpm'], L['gp'] * L['mpg']), 2), 'bpm': L['bpm'], 'mpg': L['mpg'], 'ppg': L.get('ppg'),
+                     'war': s['war'] if s else r1(war(wx(L, L['gp'] * L['mpg'], F.get('mu')), L['gp'] * L['mpg']), 2), 'bpm': L['bpm'], 'mpg': L['mpg'], 'ppg': L.get('ppg'),
                      'splus': splus(L['bpm'], spos(r, L)), 'fv': r['fv'], 'xbpm': r.get('xbpm'), 'bnow': (r.get('now') or {}).get('bpm')})
     write('portal', {
         'title': 'portal', 'key': 'war', 'def': '',

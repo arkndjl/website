@@ -1,0 +1,116 @@
+{
+ "a_xv_per_side": {
+  "target": "describe held out",
+  "base": 0.7137,
+  "cand": 0.7144,
+  "baseIns": 0.7295,
+  "candIns": 0.7243,
+  "bySeasonBase": {
+   "2019": 0.709,
+   "2020": 0.589,
+   "2021": 0.735,
+   "2022": 0.723,
+   "2023": 0.754,
+   "2024": 0.788,
+   "2025": 0.687
+  },
+  "bySeasonCand": {
+   "2019": 0.716,
+   "2020": 0.557,
+   "2021": 0.729,
+   "2022": 0.725,
+   "2023": 0.755,
+   "2024": 0.796,
+   "2025": 0.703
+  },
+  "weightsMargin": [
+   {
+    "QB": 3.321,
+    "RB": 1.024,
+    "WR": 0.219,
+    "TE": 0.29,
+    "EDGE": 0.767,
+    "DL": 0.54,
+    "LB": 0.595
+   },
+   {
+    "QB.cmp": 0.241,
+    "QB.nypa": 0.413,
+    "QB.intr": 0.54,
+    "RB.ypc": 0.254,
+    "WR.ypr": 0.177,
+    "TE.blk": 0.526,
+    "EDGE.sk": 0.534,
+    "EDGE.spl": 0.119,
+    "DL.spl": 0.569,
+    "LB.cov": 0.754,
+    "LB.prs": 0.582
+   }
+  ],
+  "weightsSide": [
+   {
+    "QB": 2.865,
+    "RB": 0.754,
+    "WR": 0.592,
+    "TE": 0.441,
+    "EDGE": 0.663,
+    "DL": 0.505,
+    "LB": 0.555
+   },
+   {
+    "QB.cmp": 0.077,
+    "QB.nypa": 0.433,
+    "QB.intr": 0.291,
+    "RB.ypc": 0.485,
+    "TE.catch": 0.134,
+    "EDGE.prs": 0.072,
+    "EDGE.sk": 0.577,
+    "EDGE.spl": 0.052,
+    "DL.spl": 0.51,
+    "LB.cov": 0.787,
+    "LB.prs": 0.55
+   }
+  ],
+  "t": -0.22,
+  "p": 0.4145,
+  "seasonsBetter": "5/7",
+  "n": 921
+ },
+ "b_pxr_form": {
+  "target": "predict team (held out)",
+  "base": 0.2552,
+  "cand": 0.2108,
+  "baseIns": 0.2564,
+  "candIns": 0.2124,
+  "baseR": 0.5755,
+  "candR": 0.6079,
+  "baseRwithin": 0.461,
+  "candRwithin": 0.467,
+  "t": 3.32,
+  "p": 0.9995,
+  "seasonsBetter": "1/6",
+  "n": 791
+ },
+ "d_g5_weight": {
+  "target": "predict team (held out)",
+  "base": 0.2552,
+  "cand": 0.2839,
+  "c": {
+   "2019": 1,
+   "2020": 0.75,
+   "2021": 0.75,
+   "2022": 0.75,
+   "2023": 0.75,
+   "2024": 0.75
+  },
+  "g5share": 0.483,
+  "baseR": 0.5755,
+  "candR": 0.5226,
+  "baseRwithin": 0.461,
+  "candRwithin": 0.4858,
+  "t": -2.78,
+  "p": 0.0028,
+  "seasonsBetter": "5/6",
+  "n": 791
+ }
+}

@@ -102,6 +102,13 @@ def logit(p):
     return math.log(p / (1 - p))
 
 
+def lvw(lv, rd):
+    """WAR's level weight for a match (Model.war)"""
+    if lv == 'S': return 0.5
+    if lv in ('C', 'D') or is_qual(rd): return 0.85
+    return 1.0
+
+
 def ymd(d):
     return dt.date(d // 10000, d // 100 % 100, d % 100)
 
@@ -288,7 +295,7 @@ class Model:
         self.mres = {}         # pid -> last 8 (day, close minus model in logits, the player's side)
         self.born = {}         # pid -> birth day number, from the bios
         self.pa = {}           # pid -> [decayed points added, decayed points, day] (pPA)
-        self.wq = {}           # pid -> [(day, won - replacement chance, level)] for 52 weeks (WAR)
+        self.wq = {}           # pid -> [(day, won - replacement chance, level weight)] for 52 weeks (WAR)
         self.pq = {}           # pid -> [(day, points added, points)] for 52 weeks (rPA)
         self.set_bios()
 
@@ -338,17 +345,24 @@ class Model:
         if i: del q[:i]
         return q
 
-    def rpa(self, pid, day):
-        """rPA: points added a 100 points, the 52 weeks to day (None without statistics)"""
+    def rpa(self, pid, day, k=PA_K):
+        """rPA: points added a 100 points, the 52 weeks to day, shrunk by k points (None without statistics).
+        Shrunk by PA_K (Nov 24 2026, scripts/research/metric_audit_nov24/tennis, pre-registered): same-season held-out
+        half of tour matches, McFadden R2 .128 -> .135 (log loss -50e-4, t -9.8 by tournament, 15/15 seasons, Holm
+        p < .001); next-season r .72 -> .83. k=0 is the raw rate"""
         q = self.pq.get(pid, [])
         a = [x for x in q if x[0] >= day - 364]
         self.pq[pid] = a
         n = sum(x[2] for x in a)
-        return 100 * sum(x[1] for x in a) / n if n else None
+        return 100 * sum(x[1] for x in a) / (n + k) if n else None
 
     def war(self, pid, day):
-        """wins above replacement, the 52 weeks to day"""
-        return sum(v for _, v, _ in self._wq(pid, day))
+        """wins above replacement, the 52 weeks to day, each match's credit weighted by level (lvw: Futures / ITF x0.5,
+        Challenger / WTA 125, qualifying and team events x0.85). Nov 24 2026 (scripts/research/metric_audit_nov24/tennis,
+        pre-registered): Dec 31 WAR -> next season's tour-level matches, McFadden R2 .083 -> .085 (log loss -14e-4, t -6.9
+        by tournament, 13/15 seasons, Holm p < .001), next-season r .808 -> .814. SV keeps the unweighted credit (the same
+        weights made it less descriptive of the same season held out: t +2.7)"""
+        return sum(v * w for _, v, w in self._wq(pid, day))
 
     def sv(self, pid, day, d0):
         """SV: season WAR, the calendar year to date (d0 = Jan 1's day number). Split-half r .81 ATP / .82 WTA (odd vs
@@ -369,7 +383,7 @@ class Model:
             ro = (1 - sw) * e[0] + sw * e[2][sf][0]
             p = 1 / (1 + 10 ** ((ro - rr) / 400))
             if bo == 5: p = bo5(p)
-            self._wq(pid, day).append((day, won - p, lv))
+            self._wq(pid, day).append((day, won - p, lvw(lv, rd)))
         if not (ws and ls and ws[0] and ls[0]) or games(score)[2]: return
         mu = self.mu_of(tour, sf)
         pw, pl = self.pt.get(w, [0.0, 0, 0.0]), self.pt.get(l, [0.0, 0, 0.0])
@@ -479,10 +493,14 @@ class Model:
         pp = self.pts_p(a, b, tour, sf, day, bo)
         gx = self.games_x(a, b, sf)
         if not match:
-            # ratings alone: their own blend weights (A0 / B0 / G0), not the match blend's with the context terms at 0
-            # (the points-added term CP takes weight off the ratings there)
-            wa, wb, wg = (self.P.get(k + '0', self.P[k]) for k in 'ABG')
-            return sig(wa * logit(pe) + wb * logit(pp) + wg * gx * (1.25 if bo == 5 else 1.0)), pe, pp, gx, [0.0] * len(CTX)
+            # the player's own terms only: the match blend's ratings and its points-added term CP (pPA, a player rating),
+            # the match-context terms left out. Nov 24 2026 (scripts/research/metric_audit_nov24/tennis, pre-registered):
+            # Dec 31 ARK -> next season's tour-level matches, McFadden R2 .105 -> .107 (log loss -14e-4, t -8.7 by
+            # tournament, 14/15 seasons, Holm p < .001), next-season r .880 -> .898. Before: ratings alone at their own
+            # weights A0 / B0 / G0 (kept in the fit file)
+            z = self.P['A'] * logit(pe) + self.P['B'] * logit(pp) + self.P['G'] * gx * (1.25 if bo == 5 else 1.0)
+            z += self.P['CP'] * (self.ppa(a, day) - self.ppa(b, day)) / 10
+            return sig(z), pe, pp, gx, [0.0] * len(CTX)
         z = self.P['A'] * logit(pe) + self.P['B'] * logit(pp) + self.P['G'] * gx * (1.25 if bo == 5 else 1.0)
         cx = self.ctx(a, b, day)
         z += sum(self.P[k] * v for k, v in zip(CTX, cx))
@@ -497,6 +515,8 @@ class Model:
         self.elo[ref] = [sum(self.elo[p][0] for p in top) / n, 999, {s: [sum(self.elo[p][2][s][0] for p in top) / n, 999] for s in SURFS}]
         self.pt[ref] = [sum(self._pt(p, day)[0] for p in top) / n, 0.0, sum(self._pt(p, day)[2] for p in top) / n, 0.0, day]
         self.gr[ref] = [sum(self._g(p)[0] for p in top) / n, 999, {s: [sum(self._g(p)[2][s][0] for p in top) / n, 999] for s in SURFS}]
+        mp = sum(self.ppa(p, day) for p in top) / n       # pPA of the reference: the top 50's mean (decay keeps the ratio)
+        self.pa[ref] = [mp / 100 * 1e9, 1e9 - PA_K, day]
         return ref
 
     def _mres(self, p, day, v):
@@ -841,7 +861,8 @@ def ark_board(m, rows, tour, today):
 def model_sig(P):
     """changes whenever a fit changes the ratings or the ARK weights (the ranking's scale moves with them)"""
     import hashlib
-    return hashlib.sha1(json.dumps({k: P[k] for k in sorted(P)}, sort_keys=True).encode()).hexdigest()[:10]
+    # _ark: the ARK formula's version (Nov 24 2026: the points-added term joined it), so a formula change rebases too
+    return hashlib.sha1(json.dumps(dict({k: P[k] for k in sorted(P)}, _ark='pa'), sort_keys=True).encode()).hexdigest()[:10]
 
 
 def rebase_moves(rows, P, old):

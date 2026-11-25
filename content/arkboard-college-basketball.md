@@ -58,7 +58,7 @@ cover = "/og/college-basketball.png"
 {{< wintabs tab="portal" tabs="portal,team builder" sub="true" label="portal views" >}}
 {{< lazytab tab="portal" >}}
 {{< xferwatch sport="cbb" view="players" tab="portal" >}}
-{{< rookies sport="cbb" src="data/cbb/portal.json" icon="basketball" title="transfer portal" tab="portal" unless="cbb" >}}
+{{< rookies sport="cbb" src="data/cbb/portal.json" icon="basketball" title="transfer portal" tab="portal" unless="cbb" key="xbpm" >}}
 {{< /lazytab >}}
 {{< cbbbuilder title="team builder" tab="team builder" >}}
 {{< /wintabs >}}
@@ -134,7 +134,7 @@ cover = "/og/college-basketball.png"
 {{< rookies sport="cbb" src="data/cbb/war.json" icon="basketball" title="WAR leaders" tab="WAR leaders" >}}
 {{< /lazytab >}}
 {{< lazytab tab="stats" >}}
-{{< rookies sport="cbb" src="data/cbb/stats.json" icon="basketball" title="stats" tab="stats" >}}
+{{< rookies sport="cbb" src="data/cbb/stats.json" icon="basketball" title="stats" tab="stats" key="war" keyfrom="static/data/cbb/war.json" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
 {{< wintabs tab="depth chart" tabs="depth chart,backup watch" sub="true" label="depth chart views" >}}

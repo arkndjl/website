@@ -252,21 +252,27 @@ export const savPoints = p => p.savQ == null ? null : Math.min(1, p.snapShare) *
 
 // a team's season AV: its starters by snap share (STARTERS slots, a part-timer filling what is left), in AV;
 // repl: the replacement line (SD), SAV_REPL for AV, CWAR_REPL for teamWar
-function teamPts(ps, line) {
+// fillQ: quality of starter time no graded player covers (null = counts 0, i.e. at the line)
+function teamPts(ps, line, fillQ = null) {
   let pts = 0;
   for (const [g, n] of Object.entries(STARTERS)) {
     let left = n;
-    ps.filter(p => p.pos === g && p.savQ != null).sort((a, b) => b.snapShare - a.snapShare).forEach((p, i) => {
+    const graded = ps.filter(p => p.pos === g && p.savQ != null).sort((a, b) => b.snapShare - a.snapShare);
+    graded.forEach((p, i) => {
       const s = Math.min(p.snapShare, left); if (s <= 0) return;
       pts += s * (line(g, i, p) + SAV_W[g] * p.savQ); left -= s;
     });
+    if (fillQ != null && left > 1e-9) pts += left * (line(g, graded.length, {}) + SAV_W[g] * fillQ);
   }
   return pts;
 }
 export const teamSeasonAv = (ps, repl = SAV_REPL) => Math.round(teamPts(ps, g => -SAV_W[g] * repl) / SAV_PTS * 10) / 10;
 // a team's college WAR this season: its starters over replacement starters CWAR_V points a game below average (the QB's
 // shared credit stays inside the team, so the team sum uses his full SAV_W)
-export const teamWar = ps => r2(teamPts(ps, (g, i, p) => subV(g, i, p.pfnPos ?? p.spot)) * CWAR_PER_PT);
+// Starter time no graded player covers counts at SAV_REPL (1 SD below an average starter), as season AV already does,
+// not at the WAR line: Nov 24 2026 metric audit (scripts/research/metric_audit_nov24/cfb, D4), team WAR against SRS held out
+// a season at a time, 2019-25 seven positions, R2 .639 -> .654, paired t -3.48, 7 of 7 seasons (fill fit -1 in 6 of 7 folds)
+export const teamWar = ps => r2(teamPts(ps, (g, i, p) => subV(g, i, p.pfnPos ?? p.spot), SAV_REPL) * CWAR_PER_PT);
 // college WAR a full-time starter at pos adds by moving the line from SAV_REPL to the WAR line (CWAR_V below average):
 // AV-at-FV totals of starters (team talent) convert as cwar(AV) + the sum of this over the starters
 export const starterReplWar = pos => (SAV_W[pos] == null ? 0 : (CWAR_V[pos] + SAV_W[pos] * SAV_REPL) * CWAR_PER_PT);

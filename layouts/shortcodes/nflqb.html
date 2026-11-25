@@ -1,8 +1,11 @@
 {{- /* NFL QB leaderboard (data/nfl_qb.json, scripts/nfl_qb.py): the game model's QB list (60+ plays this season or a
        listed start), ranked by SV, this season's points over a replacement QB a game (spts), with the game model's QB term (Proj), WAR from the WAR board and this season's play-by-play line. The WAR leaders tab
-       holds everyone else. */ -}}
+       holds everyone else. SV stays the key (the award conviction number, Noah Nov 20); XV, the season's most descriptive
+       number (metric audit Nov 24), comes second, first after the sample, once the rows carry it (xv: scripts/nfl_qb.py
+       copies it from the WAR board row it already matches). */ -}}
 {{- with site.Data.nfl_qb -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "QBs") "filter" "Role" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,QB,SV,Team,Age,SVAR,aEPA,Proj,EPA/db,CPOE,ANY/A" "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
+{{- $xv := false }}{{ range .rows }}{{ if isset . "xv" }}{{ $xv = true }}{{ end }}{{ end -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "QBs") "filter" "Role" "rerank" true "tab" ($.Get "tab") "gfxCols" (cond $xv "RK,QB,SV,XV,Team,Age,SVAR,aEPA,Proj,EPA/db,CPOE" "RK,QB,SV,Team,Age,SVAR,aEPA,Proj,EPA/db,CPOE,ANY/A") "gfxDate" (printf "week %v · %s" .week (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32") -}}
 <table class="cfb__table">
   <thead><tr>
     <th title="rank by SV within the filter">RK</th><th>QB</th>
@@ -13,6 +16,9 @@
     <th title="games played, 10+ plays">G</th>
     <th title="dropbacks + QB runs">Plays</th>
     <th title="dropbacks: passes, sacks, scrambles">DB</th>
+    {{- if $xv }}
+    <th title="XV = WAR from the parts of the stat line that track team margin (EPA, CPOE, sacks taken, first downs, ...), z within the position, weights fit on 2018-25 team margin, season to date (WAR leaders board). Held out, the season number that tracks team margin best (vs WAR, SV)">XV</th>
+    {{- end }}
     <th title="opponent-adjusted EPA a play, dropbacks + QB runs, this season">aEPA</th>
     <th title="Proj = the game model's QB term: b_qb x (rating - replacement) x 38 plays; rating = EPA/play (passing + rushing), career-weighted (each past season x .7), shrunk toward replacement (-0.12) with 100 plays. a projection, not this season alone">Proj</th>
     <th title="SVAR = SV over replacement, season total, in wins: points / 36 a win (the game model's points a win). this season only">SVAR</th>
@@ -39,6 +45,9 @@
     <td class="cfb__num">{{ .gp }}</td>
     <td class="cfb__num">{{ .plays }}</td>
     <td class="cfb__num">{{ .db }}</td>
+    {{- if $xv }}
+    <td class="cfb__num">{{ with .xv }}{{ printf "%.2f" (float .) }}{{ end }}</td>
+    {{- end }}
     <td class="cfb__num">{{ with .aepa }}{{ partial "num.html" (slice "%+.3f" (float .)) }}{{ end }}</td>
     <td class="cfb__num">{{ with .pts }}{{ partial "num.html" (slice "%+.1f" (float .)) }}{{ end }}</td>
     <td class="cfb__num">{{ with .svar }}{{ partial "num.html" (slice "%+.2f" (float .)) }}{{ end }}</td>

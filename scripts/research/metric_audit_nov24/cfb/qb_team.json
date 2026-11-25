@@ -1,0 +1,133 @@
+{
+ "qb": {
+  "pfn_qb_z": {
+   "label": "pfn_qb_z",
+   "describeIns": 0.6505,
+   "describeOOS": 0.6486,
+   "describeCI": [
+    0.616,
+    0.677
+   ],
+   "predictTeam": 0.1274,
+   "predictOOS": 0.1241,
+   "predictCI": [
+    0.092,
+    0.164
+   ],
+   "playerR": 0.4214,
+   "nPlayers": 455
+  },
+  "xv_qb": {
+   "label": "xv_qb",
+   "describeIns": 0.645,
+   "describeOOS": 0.6434,
+   "describeCI": [
+    0.614,
+    0.668
+   ],
+   "predictTeam": 0.1274,
+   "predictOOS": 0.1229,
+   "predictCI": [
+    0.09,
+    0.17
+   ],
+   "playerR": 0.4554,
+   "nPlayers": 455
+  },
+  "nypa": {
+   "label": "nypa",
+   "describeIns": 0.4857,
+   "describeOOS": 0.4846,
+   "describeCI": [
+    0.445,
+    0.522
+   ],
+   "predictTeam": 0.0529,
+   "predictOOS": 0.0512,
+   "predictCI": [
+    0.034,
+    0.074
+   ],
+   "playerR": 0.3127,
+   "nPlayers": 455
+  },
+  "pass_eff": {
+   "label": "pass_eff",
+   "describeIns": 0.5614,
+   "describeOOS": 0.5604,
+   "describeCI": [
+    0.529,
+    0.582
+   ],
+   "predictTeam": 0.0716,
+   "predictOOS": 0.0674,
+   "predictCI": [
+    0.044,
+    0.104
+   ],
+   "playerR": 0.3407,
+   "nPlayers": 455
+  },
+  "sv60": {
+   "label": "sv60",
+   "describeIns": 0.4536,
+   "describeOOS": 0.4518,
+   "describeCI": [
+    0.403,
+    0.5
+   ],
+   "predictTeam": 0.0646,
+   "predictOOS": 0.062,
+   "predictCI": [
+    0.046,
+    0.086
+   ],
+   "playerR": 0.2434,
+   "nPlayers": 440
+  },
+  "psv60": {
+   "label": "psv60",
+   "describeIns": 0.4611,
+   "describeOOS": 0.4588,
+   "describeCI": [
+    0.414,
+    0.505
+   ],
+   "predictTeam": 0.0739,
+   "predictOOS": 0.0717,
+   "predictCI": [
+    0.056,
+    0.096
+   ],
+   "playerR": 0.2767,
+   "nPlayers": 430
+  }
+ },
+ "teams": {
+  "srs": {
+   "describeIns": 1.0,
+   "describeHeldHalf": 0.4742,
+   "predictNext": 0.4107,
+   "n": 782
+  },
+  "margin": {
+   "describeIns": 0.857,
+   "describeHeldHalf": 0.3512,
+   "predictNext": 0.3323,
+   "n": 782
+  },
+  "win": {
+   "describeIns": 0.7318,
+   "describeHeldHalf": 0.2635,
+   "predictNext": 0.2563,
+   "n": 782
+  },
+  "fpi": {
+   "describeIns": 0.8966,
+   "describeHeldHalf": null,
+   "predictNext": 0.4599,
+   "n": 782,
+   "note": "ESPN FPI keeps a preseason prior all season, so same-season fit is not a held-out read"
+  }
+ }
+}

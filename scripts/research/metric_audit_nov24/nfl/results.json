@@ -1,0 +1,832 @@
+{
+ "metrics": {
+  "board": {
+   "describe": {
+    "R2": 0.9609,
+    "R2ci": [
+     0.951,
+     0.97
+    ],
+    "heldR2": 0.4008,
+    "heldCorr2": 0.4058,
+    "heldCorr2ci": [
+     0.349,
+     0.47
+    ],
+    "seasons": 8
+   },
+   "predict": {
+    "teamR2": 0.2815,
+    "teamR2ci": [
+     0.226,
+     0.35
+    ],
+    "teamHeldR2": 0.273,
+    "playerR": 0.5984,
+    "nPairs": 7,
+    "teamSeasons": 224,
+    "nPlayers": 5335,
+    "playerRci": [
+     0.581,
+     0.616
+    ]
+   }
+  },
+  "avwar": {
+   "describe": {
+    "R2": 0.9858,
+    "R2ci": [
+     0.979,
+     0.992
+    ],
+    "heldR2": 0.2518,
+    "heldCorr2": 0.2579,
+    "heldCorr2ci": [
+     0.212,
+     0.315
+    ],
+    "seasons": 8
+   },
+   "predict": {
+    "teamR2": 0.2815,
+    "teamR2ci": [
+     0.22,
+     0.361
+    ],
+    "teamHeldR2": 0.2726,
+    "playerR": 0.6258,
+    "nPairs": 7,
+    "teamSeasons": 224,
+    "nPlayers": 4743,
+    "playerRci": [
+     0.604,
+     0.645
+    ]
+   }
+  },
+  "xv": {
+   "describe": {
+    "R2": 0.8391,
+    "R2ci": [
+     0.813,
+     0.865
+    ],
+    "heldR2": 0.6039,
+    "heldCorr2": 0.6051,
+    "heldCorr2ci": [
+     0.548,
+     0.657
+    ],
+    "seasons": 8
+   },
+   "predict": {
+    "teamR2": 0.2349,
+    "teamR2ci": [
+     0.193,
+     0.288
+    ],
+    "teamHeldR2": 0.2286,
+    "playerR": 0.4434,
+    "nPairs": 7,
+    "teamSeasons": 224,
+    "nPlayers": 4743,
+    "playerRci": [
+     0.412,
+     0.474
+    ]
+   }
+  },
+  "av": {
+   "describe": {
+    "R2": 0.9726,
+    "R2ci": [
+     0.936,
+     0.995
+    ],
+    "heldR2": 0.2676,
+    "heldCorr2": 0.2739,
+    "heldCorr2ci": [
+     0.225,
+     0.33
+    ],
+    "seasons": 8
+   },
+   "predict": {
+    "teamR2": 0.317,
+    "teamR2ci": [
+     0.242,
+     0.404
+    ],
+    "teamHeldR2": 0.3081,
+    "playerR": 0.5897,
+    "nPairs": 7,
+    "teamSeasons": 224,
+    "nPlayers": 4743,
+    "playerRci": [
+     0.575,
+     0.606
+    ]
+   }
+  },
+  "rxp": {
+   "describe": {
+    "R2": 0.9607,
+    "R2ci": [
+     0.953,
+     0.968
+    ],
+    "heldR2": 0.3734,
+    "heldCorr2": 0.3786,
+    "heldCorr2ci": [
+     0.321,
+     0.446
+    ],
+    "seasons": 8
+   },
+   "predict": {
+    "teamR2": 0.2226,
+    "teamR2ci": [
+     0.186,
+     0.271
+    ],
+    "teamHeldR2": 0.2154,
+    "playerR": 0.413,
+    "nPairs": 7,
+    "teamSeasons": 224,
+    "nPlayers": 4743,
+    "playerRci": [
+     0.389,
+     0.433
+    ]
+   }
+  },
+  "pxp": {
+   "describe": {
+    "R2": 0.7933,
+    "R2ci": [
+     0.76,
+     0.829
+    ],
+    "heldR2": 0.3025,
+    "heldCorr2": 0.3085,
+    "heldCorr2ci": [
+     0.248,
+     0.385
+    ],
+    "seasons": 8
+   },
+   "predict": {
+    "teamR2": 0.2581,
+    "teamR2ci": [
+     0.208,
+     0.323
+    ],
+    "teamHeldR2": 0.248,
+    "playerR": null,
+    "nPairs": 7,
+    "teamSeasons": 224,
+    "nPlayers": 0
+   }
+  },
+  "pwar": {
+   "describe": {
+    "R2": 0.7878,
+    "R2ci": [
+     0.754,
+     0.825
+    ],
+    "heldR2": 0.3654,
+    "heldCorr2": 0.3714,
+    "heldCorr2ci": [
+     0.315,
+     0.443
+    ],
+    "seasons": 8
+   },
+   "predict": {
+    "teamR2": 0.34,
+    "teamR2ci": [
+     0.275,
+     0.421
+    ],
+    "teamHeldR2": 0.3303,
+    "playerR": null,
+    "nPairs": 7,
+    "teamSeasons": 224,
+    "nPlayers": 0
+   }
+  },
+  "sv": {
+   "describe": {
+    "R2": 0.7267,
+    "R2ci": [
+     0.691,
+     0.77
+    ],
+    "heldR2": 0.2572,
+    "heldCorr2": 0.2597,
+    "heldCorr2ci": [
+     0.22,
+     0.298
+    ],
+    "seasons": 8
+   },
+   "predict": {
+    "teamR2": 0.2456,
+    "teamR2ci": [
+     0.204,
+     0.289
+    ],
+    "teamHeldR2": 0.2429,
+    "playerR": 0.7857,
+    "nPairs": 7,
+    "teamSeasons": 224,
+    "nPlayers": 3711,
+    "playerRci": [
+     0.756,
+     0.815
+    ]
+   }
+  },
+  "epa": {
+   "describe": {
+    "R2": 0.6138,
+    "R2ci": [
+     0.546,
+     0.68
+    ],
+    "heldR2": 0.1804,
+    "heldCorr2": 0.1865,
+    "heldCorr2ci": [
+     0.139,
+     0.246
+    ],
+    "seasons": 8
+   },
+   "predict": {
+    "teamR2": 0.1825,
+    "teamR2ci": [
+     0.138,
+     0.235
+    ],
+    "teamHeldR2": 0.1796,
+    "playerR": 0.6037,
+    "nPairs": 7,
+    "teamSeasons": 224,
+    "nPlayers": 2275,
+    "playerRci": [
+     0.564,
+     0.643
+    ]
+   }
+  },
+  "cpoe": {
+   "describe": {
+    "R2": 0.3041,
+    "R2ci": [
+     0.261,
+     0.351
+    ],
+    "heldR2": 0.0674,
+    "heldCorr2": 0.0795,
+    "heldCorr2ci": [
+     0.029,
+     0.154
+    ],
+    "seasons": 8
+   },
+   "predict": {
+    "teamR2": 0.0337,
+    "teamR2ci": [
+     0.007,
+     0.074
+    ],
+    "teamHeldR2": 0.0264,
+    "playerR": 0.3277,
+    "nPairs": 7,
+    "teamSeasons": 224,
+    "nPlayers": 208,
+    "playerRci": [
+     0.27,
+     0.414
+    ]
+   }
+  }
+ },
+ "offense": {
+  "board": {
+   "describe": {
+    "R2": 0.9461,
+    "R2ci": [
+     0.936,
+     0.956
+    ],
+    "heldR2": 0.4109,
+    "heldCorr2": 0.4174,
+    "heldCorr2ci": [
+     0.349,
+     0.488
+    ],
+    "seasons": 8
+   },
+   "predict": {
+    "teamR2": 0.2514,
+    "teamR2ci": [
+     0.197,
+     0.333
+    ],
+    "teamHeldR2": 0.2435,
+    "playerR": 0.7036,
+    "nPairs": 7,
+    "teamSeasons": 224,
+    "nPlayers": 2867,
+    "playerRci": [
+     0.677,
+     0.73
+    ]
+   }
+  },
+  "avwar": {
+   "describe": {
+    "R2": 0.9812,
+    "R2ci": [
+     0.97,
+     0.989
+    ],
+    "heldR2": 0.2377,
+    "heldCorr2": 0.2446,
+    "heldCorr2ci": [
+     0.188,
+     0.311
+    ],
+    "seasons": 8
+   },
+   "predict": {
+    "teamR2": 0.2375,
+    "teamR2ci": [
+     0.193,
+     0.303
+    ],
+    "teamHeldR2": 0.2305,
+    "playerR": 0.7142,
+    "nPairs": 7,
+    "teamSeasons": 224,
+    "nPlayers": 2275,
+    "playerRci": [
+     0.684,
+     0.743
+    ]
+   }
+  },
+  "xv": {
+   "describe": {
+    "R2": 0.7764,
+    "R2ci": [
+     0.743,
+     0.807
+    ],
+    "heldR2": 0.5833,
+    "heldCorr2": 0.5879,
+    "heldCorr2ci": [
+     0.522,
+     0.652
+    ],
+    "seasons": 8
+   },
+   "predict": {
+    "teamR2": 0.2215,
+    "teamR2ci": [
+     0.161,
+     0.306
+    ],
+    "teamHeldR2": 0.214,
+    "playerR": 0.5339,
+    "nPairs": 7,
+    "teamSeasons": 224,
+    "nPlayers": 2275,
+    "playerRci": [
+     0.482,
+     0.582
+    ]
+   }
+  },
+  "pxp": {
+   "describe": {
+    "R2": 0.7974,
+    "R2ci": [
+     0.758,
+     0.837
+    ],
+    "heldR2": 0.2963,
+    "heldCorr2": 0.3033,
+    "heldCorr2ci": [
+     0.22,
+     0.391
+    ],
+    "seasons": 8
+   },
+   "predict": {
+    "teamR2": 0.2084,
+    "teamR2ci": [
+     0.152,
+     0.278
+    ],
+    "teamHeldR2": 0.1987,
+    "playerR": null,
+    "nPairs": 7,
+    "teamSeasons": 224,
+    "nPlayers": 0
+   }
+  },
+  "sv": {
+   "describe": {
+    "R2": 0.8002,
+    "R2ci": [
+     0.772,
+     0.827
+    ],
+    "heldR2": 0.2645,
+    "heldCorr2": 0.2714,
+    "heldCorr2ci": [
+     0.209,
+     0.337
+    ],
+    "seasons": 8
+   },
+   "predict": {
+    "teamR2": 0.2621,
+    "teamR2ci": [
+     0.205,
+     0.326
+    ],
+    "teamHeldR2": 0.2573,
+    "playerR": 0.7525,
+    "nPairs": 7,
+    "teamSeasons": 224,
+    "nPlayers": 1243,
+    "playerRci": [
+     0.724,
+     0.785
+    ]
+   }
+  },
+  "epa": {
+   "describe": {
+    "R2": 0.805,
+    "R2ci": [
+     0.782,
+     0.826
+    ],
+    "heldR2": 0.2196,
+    "heldCorr2": 0.2274,
+    "heldCorr2ci": [
+     0.168,
+     0.299
+    ],
+    "seasons": 8
+   },
+   "predict": {
+    "teamR2": 0.2279,
+    "teamR2ci": [
+     0.171,
+     0.29
+    ],
+    "teamHeldR2": 0.2232,
+    "playerR": 0.6037,
+    "nPairs": 7,
+    "teamSeasons": 224,
+    "nPlayers": 2275,
+    "playerRci": [
+     0.563,
+     0.648
+    ]
+   }
+  },
+  "cpoe": {
+   "describe": {
+    "R2": 0.3792,
+    "R2ci": [
+     0.336,
+     0.417
+    ],
+    "heldR2": 0.1009,
+    "heldCorr2": 0.1068,
+    "heldCorr2ci": [
+     0.061,
+     0.161
+    ],
+    "seasons": 8
+   },
+   "predict": {
+    "teamR2": 0.0852,
+    "teamR2ci": [
+     0.038,
+     0.142
+    ],
+    "teamHeldR2": 0.0807,
+    "playerR": 0.3277,
+    "nPairs": 7,
+    "teamSeasons": 224,
+    "nPlayers": 208,
+    "playerRci": [
+     0.269,
+     0.404
+    ]
+   }
+  }
+ },
+ "candidates": {
+  "C1 pXP/60 + special teams": {
+   "target": "predict team",
+   "before": 0.248,
+   "after": 0.2526,
+   "R2before": 0.2581,
+   "R2after": 0.2618,
+   "stat": {
+    "t": -0.96,
+    "p": 0.1686,
+    "pHolm": 0.3371,
+    "better": 5
+   },
+   "need": 5,
+   "of": 7,
+   "pass": false
+  },
+  "C2 pWAR rate (pXP/60 + position value)": {
+   "target": "predict team",
+   "before": 0.248,
+   "after": 0.3303,
+   "R2before": 0.2581,
+   "R2after": 0.34,
+   "stat": {
+    "t": -3.414,
+    "p": 0.0003,
+    "pHolm": 0.0013,
+    "better": 7
+   },
+   "need": 5,
+   "of": 7,
+   "playerR": [
+    0.4438,
+    0.6293
+   ],
+   "playerRvsRxp": [
+    0.4661,
+    0.3693
+   ],
+   "pass": true
+  },
+  "C3 XV fit per side": {
+   "target": "describe held out",
+   "before": 0.6039,
+   "after": 0.6215,
+   "R2before": 0.8391,
+   "R2after": 0.8439,
+   "stat": {
+    "t": -2.185,
+    "p": 0.0144,
+    "pHolm": 0.0433,
+    "better": 7
+   },
+   "need": 6,
+   "of": 8,
+   "sideEffects": {
+    "xv": {
+     "predictTeam": [
+      0.2349,
+      0.2579
+     ],
+     "playerR": [
+      0.4434,
+      0.462
+     ],
+     "describe": [
+      0.8391,
+      0.8439
+     ],
+     "describeHeld": [
+      0.6039,
+      0.6215
+     ]
+    },
+    "board": {
+     "predictTeam": [
+      0.2815,
+      0.293
+     ],
+     "playerR": [
+      0.5984,
+      0.623
+     ],
+     "describe": [
+      0.9609,
+      0.9661
+     ],
+     "describeHeld": [
+      0.4008,
+      0.3937
+     ]
+    }
+   },
+   "pass": true
+  },
+  "C4 board WAR with special teams (vs without)": {
+   "target": "describe held out",
+   "before": 0.401,
+   "after": 0.4008,
+   "R2before": 0.9589,
+   "R2after": 0.9609,
+   "stat": {
+    "t": 0.247,
+    "p": 0.5975,
+    "pHolm": 0.5975,
+    "better": 3
+   },
+   "need": 6,
+   "of": 8,
+   "pass": false
+  }
+ },
+ "byGroup": {
+  "QB": {
+   "board": {
+    "describe": 0.7695,
+    "describeHeld": 0.5084,
+    "ci": [
+     0.47,
+     0.556
+    ]
+   },
+   "avwar": {
+    "describe": 0.7534,
+    "describeHeld": 0.2471,
+    "ci": [
+     0.216,
+     0.287
+    ]
+   },
+   "xv": {
+    "describe": 0.7079,
+    "describeHeld": 0.5371,
+    "ci": [
+     0.485,
+     0.597
+    ]
+   },
+   "pxp": {
+    "describe": 0.6351,
+    "describeHeld": 0.279,
+    "ci": [
+     0.22,
+     0.363
+    ]
+   },
+   "sv": {
+    "describe": 0.7472,
+    "describeHeld": 0.2842,
+    "ci": [
+     0.25,
+     0.331
+    ]
+   },
+   "epa": {
+    "describe": 0.7715,
+    "describeHeld": 0.2341,
+    "ci": [
+     0.192,
+     0.295
+    ]
+   },
+   "cpoe": {
+    "describe": 0.3792,
+    "describeHeld": 0.1009,
+    "ci": [
+     0.06,
+     0.164
+    ]
+   }
+  },
+  "skill": {
+   "board": {
+    "describe": 0.8888,
+    "describeHeld": 0.3427,
+    "ci": [
+     0.27,
+     0.426
+    ]
+   },
+   "avwar": {
+    "describe": 0.9249,
+    "describeHeld": 0.1909,
+    "ci": [
+     0.136,
+     0.265
+    ]
+   },
+   "xv": {
+    "describe": 0.6594,
+    "describeHeld": 0.4436,
+    "ci": [
+     0.391,
+     0.515
+    ]
+   },
+   "pxp": {
+    "describe": 0.7002,
+    "describeHeld": 0.2067,
+    "ci": [
+     0.137,
+     0.313
+    ]
+   },
+   "sv": {
+    "describe": 0.7415,
+    "describeHeld": 0.0726,
+    "ci": [
+     0.066,
+     0.21
+    ]
+   },
+   "epa": {
+    "describe": 0.7537,
+    "describeHeld": 0.0653,
+    "ci": [
+     0.06,
+     0.193
+    ]
+   }
+  },
+  "defense": {
+   "board": {
+    "describe": 0.9063,
+    "describeHeld": 0.1377,
+    "ci": [
+     0.093,
+     0.193
+    ]
+   },
+   "avwar": {
+    "describe": 0.9875,
+    "describeHeld": 0.0627,
+    "ci": [
+     0.032,
+     0.108
+    ]
+   },
+   "xv": {
+    "describe": 0.5702,
+    "describeHeld": 0.2665,
+    "ci": [
+     0.197,
+     0.35
+    ]
+   },
+   "pxp": {
+    "describe": 0.7207,
+    "describeHeld": 0.1464,
+    "ci": [
+     0.096,
+     0.219
+    ]
+   },
+   "sv": {
+    "describe": 0.2404,
+    "describeHeld": 0.0448,
+    "ci": [
+     0.017,
+     0.123
+    ]
+   },
+   "epa": {
+    "describe": NaN,
+    "describeHeld": 0.0,
+    "ci": [
+     NaN,
+     NaN
+    ]
+   }
+  }
+ },
+ "playerVsBoard": {
+  "board": 0.5984,
+  "avwar": 0.5644,
+  "xv": 0.4802,
+  "av": 0.4663,
+  "rxp": 0.381,
+  "pxp": 0.4438,
+  "pwar": 0.6293,
+  "sv": 0.5606,
+  "epa": 0.5076
+ },
+ "playerVsRxp": {
+  "board": 0.4019,
+  "avwar": 0.3744,
+  "xv": 0.3671,
+  "av": 0.3388,
+  "rxp": 0.413,
+  "pxp": 0.4661,
+  "pwar": 0.3693,
+  "sv": 0.2673,
+  "epa": 0.3429
+ }
+}

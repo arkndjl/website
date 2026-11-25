@@ -1,0 +1,15 @@
+nhl_games_hist {'games': 20591, 'a_repeatId': 0, 'b_sameDatePair': 0, 'c_aliasSuspect': 205, 'd_samePlayerSet': 0}
+nba_games_hist {'games': 18112, 'a_repeatId': 0, 'b_sameDatePair': 2, 'c_aliasSuspect': 5, 'd_samePlayerSet': 99}
+cbb_games_hist {'games': 76938, 'a_repeatId': 0, 'b_sameDatePair': 126, 'c_aliasSuspect': 23, 'd_samePlayerSet': 0}
+cbb barttorvik player logs {'rows': 1100149, 'repeat_pid_date': 0, 'exact_repeat': 0, 'pid_two_teams_same_day': 0}
+cfb_hist_md (cfb_model) {'games': 16498, 'a_repeatId': 0, 'b_sameDatePair': 0, 'c_aliasSuspect': 0, 'd_samePlayerSet': 0}
+nflverse games.csv (nfl_games) {'games': 7439, 'a_repeatId': 0, 'b_sameDatePair': 0, 'c_aliasSuspect': 0, 'd_samePlayerSet': 0}
+soccer_games_hist {'games': 182980, 'a_repeatId': 0, 'b_sameDatePair': 0, 'c_aliasSuspect': 16, 'd_samePlayerSet': 0}
+tennis matches.csv.gz (pair same event start) {'games': 1078400, 'a_repeatId': 0, 'b_sameDatePair': 2139, 'c_aliasSuspect': 0, 'd_samePlayerSet': 0}
+tennis alias 47 cross-event 383
+/home/user/website/scripts/research/metric_audit_nov24/port/tennis_cs2_cbb/dups.py:181: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+  gs.append(G(m['id'], dt.datetime.utcfromtimestamp(m['at']).date().toordinal(), m['f1']['id'], m['f2']['id'],
+ESEA research/esea_matches.json.gz {'games': 18217, 'a_repeatId': 0, 'b_sameDatePair': 0, 'c_aliasSuspect': 950, 'd_samePlayerSet': 300}
+maps 62134, player-maps 621340, players 6102
+bo3.gg CS2 maps (cs2_players Maps) {'games': 62134, 'a_repeatId': 0, 'b_sameDatePair': 32239, 'c_aliasSuspect': 8491, 'd_samePlayerSet': 74106}
+cs2 same ten + map + rounds 90

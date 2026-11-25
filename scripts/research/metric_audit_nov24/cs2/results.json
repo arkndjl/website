@@ -1,0 +1,808 @@
+{
+ "sport": "cs2",
+ "lockbox": "maps and series before 2026-11-11 only; months 2024-07..2026-10",
+ "prereg_sha256": "d3515dc6405a998c0567e5ff8bd0caa0c91872ebe295f8516f5e62ef2050e947",
+ "player": {
+  "RWA rating": {
+   "describeIn": 0.2347,
+   "describeInCI": [
+    0.225,
+    0.244
+   ],
+   "describeHeld": 0.1509,
+   "describeHeldCI": [
+    0.141,
+    0.161
+   ],
+   "predictTeamMonth": 0.1239,
+   "predictTeamBoard": 0.1239,
+   "predictTeamBoardCI": [
+    0.115,
+    0.133
+   ],
+   "playerROwn": 0.8189,
+   "playerROwnCI": [
+    0.809,
+    0.826
+   ],
+   "playerRValue": 0.8201,
+   "playerRValueCI": [
+    0.812,
+    0.828
+   ],
+   "nPlayerPairs": 18560
+  },
+  "season RWA": {
+   "describeIn": 0.3165,
+   "describeInCI": [
+    0.308,
+    0.325
+   ],
+   "describeHeld": 0.0907,
+   "describeHeldCI": [
+    0.08,
+    0.102
+   ],
+   "predictTeamMonth": 0.0689,
+   "predictTeamBoard": 0.0689,
+   "predictTeamBoardCI": [
+    0.061,
+    0.077
+   ],
+   "playerROwn": 0.7298,
+   "playerROwnCI": [
+    0.716,
+    0.742
+   ],
+   "playerRValue": 0.7299,
+   "playerRValueCI": [
+    0.716,
+    0.743
+   ],
+   "nPlayerPairs": 18560
+  },
+  "box RWA (pm 0)": {
+   "describeIn": 0.2998,
+   "describeInCI": [
+    0.291,
+    0.309
+   ],
+   "describeHeld": 0.0909,
+   "describeHeldCI": [
+    0.08,
+    0.102
+   ],
+   "predictTeamMonth": 0.0688,
+   "predictTeamBoard": 0.0688,
+   "predictTeamBoardCI": [
+    0.061,
+    0.077
+   ],
+   "playerROwn": 0.732,
+   "playerROwnCI": [
+    0.718,
+    0.745
+   ],
+   "playerRValue": 0.732,
+   "playerRValueCI": [
+    0.717,
+    0.745
+   ],
+   "nPlayerPairs": 18560
+  },
+  "bo3.gg rating": {
+   "describeIn": 0.2171,
+   "describeInCI": [
+    0.209,
+    0.225
+   ],
+   "describeHeld": 0.0346,
+   "describeHeldCI": [
+    0.029,
+    0.041
+   ],
+   "predictTeamMonth": 0.0268,
+   "predictTeamBoard": 0.0646,
+   "predictTeamBoardCI": [
+    0.056,
+    0.073
+   ],
+   "playerROwn": 0.5644,
+   "playerROwnCI": [
+    0.552,
+    0.576
+   ],
+   "playerRValue": 0.5311,
+   "playerRValueCI": [
+    0.518,
+    0.543
+   ],
+   "nPlayerPairs": 18560
+  },
+  "HLTV 2.0 (approx.)": {
+   "describeIn": 0.1961,
+   "describeInCI": [
+    0.183,
+    0.209
+   ],
+   "describeHeld": 0.0438,
+   "describeHeldCI": [
+    0.036,
+    0.05
+   ],
+   "predictTeamMonth": 0.0337,
+   "predictTeamBoard": 0.0689,
+   "predictTeamBoardCI": [
+    0.061,
+    0.078
+   ],
+   "playerROwn": 0.6384,
+   "playerROwnCI": [
+    0.602,
+    0.664
+   ],
+   "playerRValue": 0.5548,
+   "playerRValueCI": [
+    0.546,
+    0.568
+   ],
+   "nPlayerPairs": 18560
+  },
+  "ADR": {
+   "describeIn": 0.1733,
+   "describeInCI": [
+    0.162,
+    0.185
+   ],
+   "describeHeld": 0.0239,
+   "describeHeldCI": [
+    0.019,
+    0.029
+   ],
+   "predictTeamMonth": 0.0181,
+   "predictTeamBoard": 0.0452,
+   "predictTeamBoardCI": [
+    0.038,
+    0.053
+   ],
+   "playerROwn": 0.5881,
+   "playerROwnCI": [
+    0.575,
+    0.6
+   ],
+   "playerRValue": 0.3678,
+   "playerRValueCI": [
+    0.357,
+    0.377
+   ],
+   "nPlayerPairs": 18560
+  },
+  "KAST": {
+   "describeIn": 0.0596,
+   "describeInCI": [
+    0.051,
+    0.07
+   ],
+   "describeHeld": 0.0209,
+   "describeHeldCI": [
+    0.017,
+    0.025
+   ],
+   "predictTeamMonth": 0.0152,
+   "predictTeamBoard": 0.0318,
+   "predictTeamBoardCI": [
+    0.028,
+    0.037
+   ],
+   "playerROwn": 0.6206,
+   "playerROwnCI": [
+    0.562,
+    0.658
+   ],
+   "playerRValue": 0.3466,
+   "playerRValueCI": [
+    0.331,
+    0.37
+   ],
+   "nPlayerPairs": 18560
+  },
+  "KPR": {
+   "describeIn": 0.1818,
+   "describeInCI": [
+    0.168,
+    0.196
+   ],
+   "describeHeld": 0.0241,
+   "describeHeldCI": [
+    0.018,
+    0.031
+   ],
+   "predictTeamMonth": 0.0185,
+   "predictTeamBoard": 0.0347,
+   "predictTeamBoardCI": [
+    0.022,
+    0.051
+   ],
+   "playerROwn": 0.5739,
+   "playerROwnCI": [
+    0.561,
+    0.584
+   ],
+   "playerRValue": 0.4632,
+   "playerRValueCI": [
+    0.452,
+    0.474
+   ],
+   "nPlayerPairs": 18560
+  },
+  "K-D per round": {
+   "describeIn": 0.2388,
+   "describeInCI": [
+    0.23,
+    0.248
+   ],
+   "describeHeld": 0.0418,
+   "describeHeldCI": [
+    0.035,
+    0.049
+   ],
+   "predictTeamMonth": 0.0316,
+   "predictTeamBoard": 0.0754,
+   "predictTeamBoardCI": [
+    0.065,
+    0.086
+   ],
+   "playerROwn": 0.6214,
+   "playerROwnCI": [
+    0.61,
+    0.632
+   ],
+   "playerRValue": 0.5772,
+   "playerRValueCI": [
+    0.566,
+    0.587
+   ],
+   "nPlayerPairs": 18560
+  }
+ },
+ "playerPairs": 27,
+ "mapsDescribe": 51430,
+ "mapsPredict": 49738,
+ "vsOurs": {
+  "RWA rating": {
+   "describeHeld_vs_seasonRWA_t": 18.03,
+   "predictBoard_vs_RWArating_t": 0.0
+  },
+  "season RWA": {
+   "describeHeld_vs_seasonRWA_t": 0.0,
+   "predictBoard_vs_RWArating_t": -10.02
+  },
+  "box RWA (pm 0)": {
+   "describeHeld_vs_seasonRWA_t": 0.59,
+   "predictBoard_vs_RWArating_t": -10.4
+  },
+  "bo3.gg rating": {
+   "describeHeld_vs_seasonRWA_t": -14.61,
+   "predictBoard_vs_RWArating_t": -14.05
+  },
+  "HLTV 2.0 (approx.)": {
+   "describeHeld_vs_seasonRWA_t": -12.05,
+   "predictBoard_vs_RWArating_t": -12.44
+  },
+  "ADR": {
+   "describeHeld_vs_seasonRWA_t": -13.25,
+   "predictBoard_vs_RWArating_t": -17.15
+  },
+  "KAST": {
+   "describeHeld_vs_seasonRWA_t": -13.36,
+   "predictBoard_vs_RWArating_t": -14.46
+  },
+  "KPR": {
+   "describeHeld_vs_seasonRWA_t": -12.24,
+   "predictBoard_vs_RWArating_t": -18.17
+  },
+  "K-D per round": {
+   "describeHeld_vs_seasonRWA_t": -13.85,
+   "predictBoard_vs_RWArating_t": -11.7
+  }
+ },
+ "team": {
+  "nSeries": 32643,
+  "nDuplicate": 8847,
+  "months": [
+   "2024-09",
+   "2024-10",
+   "2024-11",
+   "2024-12",
+   "2025-01",
+   "2025-02",
+   "2025-03",
+   "2025-04",
+   "2025-05",
+   "2025-06",
+   "2025-07",
+   "2025-08",
+   "2025-09",
+   "2025-10",
+   "2025-11",
+   "2025-12",
+   "2026-01",
+   "2026-02",
+   "2026-03",
+   "2026-04",
+   "2026-05",
+   "2026-06",
+   "2026-07",
+   "2026-08",
+   "2026-09",
+   "2026-10"
+  ],
+  "all rows (as the shipped backtest)": {
+   "predict": {
+    "ARK live (x, VRS, map rating)": {
+     "ll": 0.5492,
+     "llHeld": 0.5538,
+     "r2": 0.247,
+     "tVsArkByMonth": 0.0,
+     "bootLlCI": [
+      0.539,
+      0.5587
+     ]
+    },
+    "ARK live, dedup replay": {
+     "ll": 0.5458,
+     "llHeld": 0.5506,
+     "r2": 0.2521,
+     "tVsArkByMonth": -3.36,
+     "bootLlCI": [
+      0.5349,
+      0.5558
+     ]
+    },
+    "ARK live, dedup replay, day start": {
+     "ll": 0.6249,
+     "llHeld": 0.6222,
+     "r2": 0.1242,
+     "tVsArkByMonth": 11.62,
+     "bootLlCI": [
+      0.6216,
+      0.6302
+     ]
+    },
+    "ARK live, day start (xd, VRS, map rating)": {
+     "ll": 0.6262,
+     "llHeld": 0.6235,
+     "r2": 0.122,
+     "tVsArkByMonth": 11.59,
+     "bootLlCI": [
+      0.623,
+      0.6319
+     ]
+    },
+    "ARK player Elo, live": {
+     "ll": 0.5626,
+     "llHeld": 0.567,
+     "r2": 0.2279,
+     "tVsArkByMonth": 10.49,
+     "bootLlCI": [
+      0.5522,
+      0.5717
+     ]
+    },
+    "ARK player Elo, day start": {
+     "ll": 0.653,
+     "llHeld": 0.6488,
+     "r2": 0.0763,
+     "tVsArkByMonth": 15.0,
+     "bootLlCI": [
+      0.6498,
+      0.6571
+     ]
+    },
+    "VRS points": {
+     "ll": 0.6666,
+     "llHeld": 0.667,
+     "r2": 0.0514,
+     "tVsArkByMonth": 16.63,
+     "bootLlCI": [
+      0.6636,
+      0.6709
+     ]
+    },
+    "bo3 team map rating, live": {
+     "ll": 0.6504,
+     "llHeld": 0.65,
+     "r2": 0.0788,
+     "tVsArkByMonth": 15.09,
+     "bootLlCI": [
+      0.648,
+      0.6546
+     ]
+    },
+    "ARK player Elo, month start": {
+     "ll": 0.6515,
+     "llHeld": 0.648,
+     "r2": 0.0798,
+     "tVsArkByMonth": 15.36,
+     "bootLlCI": [
+      0.6473,
+      0.6571
+     ]
+    },
+    "team-name Elo, month start": {
+     "ll": 0.6786,
+     "llHeld": 0.6806,
+     "r2": 0.0279,
+     "tVsArkByMonth": 21.79,
+     "bootLlCI": [
+      0.6756,
+      0.6812
+     ]
+    },
+    "VRS, month start": {
+     "ll": 0.6722,
+     "llHeld": 0.672,
+     "r2": 0.0443,
+     "tVsArkByMonth": 17.2,
+     "bootLlCI": [
+      0.6684,
+      0.6757
+     ]
+    },
+    "team RWA, month start": {
+     "ll": 0.6267,
+     "llHeld": 0.6262,
+     "r2": 0.1216,
+     "tVsArkByMonth": 12.22,
+     "bootLlCI": [
+      0.6233,
+      0.6333
+     ]
+    }
+   },
+   "describe": {
+    "ARK player Elo, month end": {
+     "r2In": 0.2609,
+     "r2Held": 0.0879,
+     "r2InSameHalf": 0.2519
+    },
+    "team-name Elo, month end": {
+     "r2In": 0.064,
+     "r2Held": 0.0237,
+     "r2InSameHalf": 0.0644
+    },
+    "VRS, month end": {
+     "r2In": 0.0625
+    },
+    "team RWA, month end": {
+     "r2In": 0.1754
+    }
+   }
+  },
+  "duplicates dropped": {
+   "predict": {
+    "ARK live (x, VRS, map rating)": {
+     "ll": 0.6151,
+     "llHeld": 0.6134,
+     "r2": 0.1409,
+     "tVsArkByMonth": 0.0,
+     "bootLlCI": [
+      0.6098,
+      0.6205
+     ]
+    },
+    "ARK live, dedup replay": {
+     "ll": 0.6131,
+     "llHeld": 0.6113,
+     "r2": 0.1442,
+     "tVsArkByMonth": -2.57,
+     "bootLlCI": [
+      0.6077,
+      0.6185
+     ]
+    },
+    "ARK live, dedup replay, day start": {
+     "ll": 0.6197,
+     "llHeld": 0.6159,
+     "r2": 0.1329,
+     "tVsArkByMonth": 5.32,
+     "bootLlCI": [
+      0.6159,
+      0.6256
+     ]
+    },
+    "ARK live, day start (xd, VRS, map rating)": {
+     "ll": 0.6217,
+     "llHeld": 0.6179,
+     "r2": 0.1295,
+     "tVsArkByMonth": 6.22,
+     "bootLlCI": [
+      0.618,
+      0.6278
+     ]
+    },
+    "ARK player Elo, live": {
+     "ll": 0.6408,
+     "llHeld": 0.6384,
+     "r2": 0.0976,
+     "tVsArkByMonth": 13.89,
+     "bootLlCI": [
+      0.6369,
+      0.6446
+     ]
+    },
+    "ARK player Elo, day start": {
+     "ll": 0.6489,
+     "llHeld": 0.6434,
+     "r2": 0.0835,
+     "tVsArkByMonth": 11.9,
+     "bootLlCI": [
+      0.646,
+      0.6539
+     ]
+    },
+    "VRS points": {
+     "ll": 0.6637,
+     "llHeld": 0.6637,
+     "r2": 0.0565,
+     "tVsArkByMonth": 17.41,
+     "bootLlCI": [
+      0.6612,
+      0.6683
+     ]
+    },
+    "bo3 team map rating, live": {
+     "ll": 0.6484,
+     "llHeld": 0.6473,
+     "r2": 0.0822,
+     "tVsArkByMonth": 19.63,
+     "bootLlCI": [
+      0.6446,
+      0.6528
+     ]
+    },
+    "ARK player Elo, month start": {
+     "ll": 0.6473,
+     "llHeld": 0.6429,
+     "r2": 0.0875,
+     "tVsArkByMonth": 12.55,
+     "bootLlCI": [
+      0.6435,
+      0.6537
+     ]
+    },
+    "team-name Elo, month start": {
+     "ll": 0.6794,
+     "llHeld": 0.6803,
+     "r2": 0.0259,
+     "tVsArkByMonth": 24.73,
+     "bootLlCI": [
+      0.6773,
+      0.6821
+     ]
+    },
+    "VRS, month start": {
+     "ll": 0.6697,
+     "llHeld": 0.6693,
+     "r2": 0.0486,
+     "tVsArkByMonth": 16.73,
+     "bootLlCI": [
+      0.6662,
+      0.6736
+     ]
+    },
+    "team RWA, month start": {
+     "ll": 0.6263,
+     "llHeld": 0.6245,
+     "r2": 0.1218,
+     "tVsArkByMonth": 3.23,
+     "bootLlCI": [
+      0.6233,
+      0.6336
+     ]
+    }
+   },
+   "describe": {
+    "ARK player Elo, month end": {
+     "r2In": 0.257,
+     "r2Held": 0.1021,
+     "r2InSameHalf": 0.252
+    },
+    "team-name Elo, month end": {
+     "r2In": 0.0624,
+     "r2Held": 0.0233,
+     "r2InSameHalf": 0.065
+    },
+    "VRS, month end": {
+     "r2In": 0.0683
+    },
+    "team RWA, month end": {
+     "r2In": 0.1712
+    }
+   }
+  }
+ },
+ "candidates": {
+  "predictive": {
+   "grids": {
+    "kmap": [
+     [
+      0.027682242267840863,
+      100
+     ],
+     [
+      0.02752904152622979,
+      300
+     ],
+     [
+      0.02752597209187719,
+      1000
+     ],
+     [
+      0.027578798057921895,
+      3000
+     ]
+    ],
+    "l2": [
+     [
+      0.027640035713741636,
+      0.001
+     ],
+     [
+      0.0276419455878771,
+      0.01
+     ],
+     [
+      0.027650448985056194,
+      0.03
+     ]
+    ],
+    "tuneBase": 0.02764000118666567
+   },
+   "rows": [
+    {
+     "name": "P1 bo3.gg rating as a 14th stat",
+     "base": 0.027816,
+     "cand": 0.027815,
+     "t": -0.18,
+     "p": 0.42948156838614704,
+     "monthsBetter": "7/16",
+     "tTune": 0.96,
+     "playerR": [
+      0.4957,
+      0.5007
+     ],
+     "a": 1.814,
+     "pHolm": 0.42948156838614704,
+     "pass": false
+    },
+    {
+     "name": "P2 player x map offsets (kmap 1000)",
+     "base": 0.027816,
+     "cand": 0.027691,
+     "t": -7.02,
+     "p": 2.0695533120710535e-06,
+     "monthsBetter": "15/16",
+     "tTune": -3.74,
+     "playerR": [
+      0.4957,
+      0.4957
+     ],
+     "a": 1.827,
+     "pHolm": 6.20865993621316e-06,
+     "pass": true
+    },
+    {
+     "name": "P3 stat-weight ridge l2 0.001",
+     "base": 0.027816,
+     "cand": 0.027816,
+     "t": -0.26,
+     "p": 0.40009844724483046,
+     "monthsBetter": "11/16",
+     "tTune": 0.17,
+     "playerR": [
+      0.4957,
+      0.4952
+     ],
+     "a": 1.818,
+     "pHolm": 0.8001968944896609,
+     "pass": false
+    }
+   ]
+  },
+  "descriptive": {
+   "grids": {
+    "kpri": {
+     "50": 0.10540991158391944,
+     "100": 0.11262646611280773,
+     "200": 0.1171555566606635,
+     "400": 0.1175224071178611
+    }
+   },
+   "rows": [
+    {
+     "name": "D1 season RWA pm 1.0",
+     "base": 0.097,
+     "cand": 0.0933,
+     "t": -4.99,
+     "p": 0.9999189298439057,
+     "monthsBetter": "2/16",
+     "tTune": -6.93,
+     "pHolm": 0.9999189298439057,
+     "pass": false
+    },
+    {
+     "name": "D2 season RWA pm 0 (box only)",
+     "base": 0.097,
+     "cand": 0.097,
+     "t": -0.06,
+     "p": 0.5224450459628842,
+     "monthsBetter": "8/16",
+     "tTune": 1.26,
+     "pHolm": 1.0,
+     "pass": false
+    },
+    {
+     "name": "D3 bo3.gg rating as a 14th stat",
+     "base": 0.097,
+     "cand": 0.0971,
+     "t": 0.43,
+     "p": 0.3368715922814105,
+     "monthsBetter": "10/16",
+     "tTune": -0.81,
+     "pHolm": 1.0,
+     "pass": false
+    },
+    {
+     "name": "D4 shrink toward rating at month start (k 400)",
+     "base": 0.097,
+     "cand": 0.147,
+     "t": 10.4,
+     "p": 1.478548250499756e-08,
+     "monthsBetter": "16/16",
+     "tTune": 8.36,
+     "pHolm": 5.914193001999024e-08,
+     "pass": true
+    }
+   ]
+  }
+ },
+ "bestPredictive": {
+  "player": "RWA rating",
+  "team": "ARK Ranking live blend (still best with duplicates dropped)"
+ },
+ "bestDescriptive": {
+  "player in sample": "season RWA",
+  "player held out": "RWA rating .151 vs season RWA with D4 .147 (intervals overlap)",
+  "team": "ARK player Elo at month end"
+ },
+ "passed": [
+  "P2 player x map offsets (kmap 1000): shipped",
+  "D4 season RWA shrink: passed held out, reverted (season-only rule)"
+ ],
+ "esea_existing": "data/esea_rwa_fit.json held S58-S59: ESEA RWA ll .6216 vs player Elo .6317 vs 1NT ARK .6683 (not rescored here)",
+ "dedupFix": {
+  "heldLL_ARKplusVRS": {
+   "before_leaky": 0.554,
+   "after_clean": 0.6105
+  },
+  "loop": {
+   "record_t": -8.66,
+   "won": "16/16",
+   "tTop": -0.06,
+   "slope": 0.964,
+   "pick": "span 0.3",
+   "Kmin": "144 (180 not picked)"
+  },
+  "seriesPlayerTerm": {
+   "before": {
+    "t": -10.99,
+    "top50": -2.4
+   },
+   "after": {
+    "t": -11.41,
+    "top50": -2.06
+   }
+  }
+ }
+}

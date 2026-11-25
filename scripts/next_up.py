@@ -81,7 +81,8 @@ def board(sport):
         fs = sorted(f for f in os.listdir(os.path.join(ROOT, 'static', 'data', 'soccer-war')) if f[:4].isdigit())
         d = json.load(open(os.path.join(ROOT, 'static', 'data', 'soccer-war', fs[-1])))
         return NM.Matcher([{'name': p['n'], 'team': p.get('team'), 'pos': p.get('pos'),
-                            'mpg': round(p['min'] / p['mp']) if p.get('mp') else None} for p in d['players']], sport='soccer')
+                            'mpg': round(p['min'] / p['mp']) if p.get('mp') else None, 'pg90': p.get('pg90')}   # rate: p/90 (metric audit Nov 24)
+                           for p in d['players']], sport='soccer')
     if sport == 'nfl':
         d = json.load(open(os.path.join(ROOT, 'static', 'data', 'nfl-war.json')))
         return NM.Matcher([{'name': p['n'], 'team': p.get('tm'), 'pos': p.get('pos'), 'war': p.get('pace'),
@@ -149,8 +150,10 @@ def convert(sport):
              'cfb': [{'k': 'snp', 'l': 'Snap%', 't': 'share of team snaps this season', 'f': 'p', 'ph': 1, 'num': 1},
                      {'k': 'splus', 'l': 'Stat+', 't': 'Stat+ this season: 100 + 25 z of the position score (PFN), 100 = average at the position', 'f': '0', 'ph': 1, 'num': 1}],
              'nfl': [{'k': 'snpg', 'l': 'Snaps/G', 't': 'snaps a game this season', 'f': '1', 'ph': 1, 'num': 1}],
-             'soccer': [{'k': 'mpg', 'l': 'Min/G', 't': 'league minutes an appearance this season', 'f': 'i', 'ph': 1, 'num': 1}]}.get(sport, [])
-    if any(r.get('best') is not None for r in src.get('rows') or []) and sport in BEST:
+             'soccer': [{'k': 'mpg', 'l': 'Min/G', 't': 'league minutes an appearance this season', 'f': 'i', 'ph': 1, 'num': 1},
+                        {'k': 'pg90', 'l': 'p/90', 't': 'p/90 this season: SV a 90 this season and the two before at weights 1, .5, .25, shrunk to the position mean, less .008 a year over 29 (the soccer board predictive rate)', 'f': 's3', 'ph': 1, 'num': 1}]}.get(sport, [])
+    # soccer: p/90, the predictive rate, stands in for best GAR/90 (metric audit Nov 24 2026); the bar stays in the model
+    if any(r.get('best') is not None for r in src.get('rows') or []) and sport in BEST and sport != 'soccer':
         lb, tt, f = BEST[sport]
         cols.append({'k': 'best', 'l': 'Best', 't': tt, 'f': f, 'ph': 1, 'num': 1})
     views = ([['e', 'EDGE', 'BO% minus the odds his status alone gives']] if SF else []) + [['p', 'BO%', 'breakout odds next season']]
@@ -179,7 +182,7 @@ def convert(sport):
             m, _ = M.find(o['n'], team=o['tm'], pos=o['pos'] or None,
                           id=str(r.get('id') or '') or None if sport == 'cfb' else None)   # CBB rows carry Barttorvik ids
             if m:
-                for k in ('fv', 'war', 'xpm', 'mpg', 'splus', 'snp', 'snpg'):
+                for k in ('fv', 'war', 'xpm', 'mpg', 'splus', 'snp', 'snpg', 'pg90'):
                     if m.get(k) is not None:
                         o[k] = m[k]
                 if m.get('cls'):

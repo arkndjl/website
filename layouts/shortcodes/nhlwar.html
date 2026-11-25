@@ -161,6 +161,9 @@
     // the view's key column sits right after ± (board standard, Nov 23 2026), then Pos, Team, Age, GP, TOI, then the rest
     var ord = ['rk', 'n', 'wk', key, 'pos', 'tm', 'age', 'gp', 'toi'].concat(['war', 'g60', 'pwar', 'p3', 'il', 'hpm', 'o', 'd'].filter(function (c) { return c !== key; }), ['pts']);
     ord.forEach(function (c) { hrow.appendChild(thBy[c]); });
+    // the GFX follows the view: its key after the player (pWAR view: pWAR leads; 3Y view: 3Y), the others after TOI
+    var GL = { war: 'WAR', pwar: 'pWAR', p3: '3Y', hpm: 'HPM', o: 'Off', d: 'Def' };
+    win.dataset.gfxCols = ['RK', 'Player', GL[key], 'Pos', 'TOI'].concat(['war', 'pwar', 'p3', 'hpm', 'o', 'd'].filter(function (c) { return c !== key; }).map(function (c) { return GL[c]; })).join(',');
     var gfxRow = function (p) {
       var c = {
         rk: '<td class="cfb__rk">' + p.rk + '</td>',

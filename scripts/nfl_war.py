@@ -373,6 +373,8 @@ def features(sd, pfr, gsis, t, group, pfr_split=False):
 
 def group_of(pos_counter, fallback):
     pos = pos_counter.most_common(1)[0][0] if pos_counter else fallback
+    if pos not in GROUP and '/' in pos:   # 2020 snap counts list two spots (C/G, G/T, WR/R, FB/D, DE/L): take the first
+        pos = pos.split('/')[0]
     return GROUP.get(pos), pos
 
 

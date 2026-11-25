@@ -1,13 +1,13 @@
 {
  "params": {
   "K": 480,
-  "Kmin": 180.0,
+  "Kmin": 144,
   "n0": 100,
   "mu_new": -100,
   "Kr": 8,
   "warm": 1.0,
   "kmap": 0.6,
-  "span": 0.4,
+  "span": 0.3,
   "valid": 1,
   "kx": 0.5,
   "xt": "bcd"
@@ -23,34 +23,34 @@
    "a": 0.2
   }
  },
- "nJoined": 22820,
+ "nJoined": 17772,
  "nSeriesFit": 37399,
  "monthsBeatOld": [
-  15,
+  9,
   17
  ],
  "weights": {
   "top": [
-   1.1085,
-   0.3987,
-   0.9137
+   0.4385,
+   0.4776,
+   0.9733
   ],
   "rest": [
-   1.7835,
-   0.1535,
-   1.1417
+   1.0693,
+   0.2095,
+   1.3208
   ]
  },
  "weightsTune": {
   "top": [
-   1.0392,
-   0.3794,
-   1.3341
+   0.5186,
+   0.4898,
+   1.2946
   ],
   "rest": [
-   1.8409,
-   0.1806,
-   1.1262
+   1.0625,
+   0.2733,
+   1.4737
   ]
  },
  "tune": [
@@ -61,277 +61,277 @@
   "2025-07-01",
   "2026-11-01"
  ],
- "nTune": 11329,
+ "nTune": 7637,
  "score": {
   "all": {
-   "n": 21056,
+   "n": 15975,
    "models": [
     {
      "name": "VRS points",
-     "ll": 0.6674,
-     "acc": 0.5998,
+     "ll": 0.664,
+     "acc": 0.6063,
      "vsVrs": 0.0,
      "tVrs": 0.0,
-     "vsArk": 0.1133,
-     "tArk": 37.88
+     "vsArk": 0.0535,
+     "tArk": 21.8
     },
     {
      "name": "ARK rating",
-     "ll": 0.5659,
-     "acc": 0.7026,
-     "vsVrs": -0.1014,
-     "tVrs": -31.82,
-     "vsArk": 0.0119,
-     "tArk": 9.89
+     "ll": 0.6333,
+     "acc": 0.6347,
+     "vsVrs": -0.0307,
+     "tVrs": -10.87,
+     "vsArk": 0.0228,
+     "tArk": 11.7
     },
     {
      "name": "ARK + VRS",
-     "ll": 0.554,
-     "acc": 0.7178,
-     "vsVrs": -0.1133,
-     "tVrs": -37.88,
+     "ll": 0.6105,
+     "acc": 0.6585,
+     "vsVrs": -0.0535,
+     "tVrs": -21.8,
      "vsArk": 0.0,
      "tArk": 0.0
     },
     {
      "name": "ARK + VRS without the team map term",
-     "ll": 0.5607,
-     "acc": 0.7107,
-     "vsVrs": -0.1067,
-     "tVrs": -37.22,
-     "vsArk": 0.0067,
-     "tArk": 7.79
+     "ll": 0.6222,
+     "acc": 0.6466,
+     "vsVrs": -0.0418,
+     "tVrs": -20.51,
+     "vsArk": 0.0117,
+     "tArk": 8.84
     },
     {
      "name": "Oct 26 model: series-level player Elo + VRS",
-     "ll": 0.5878,
-     "acc": 0.6856,
-     "vsVrs": -0.0796,
-     "tVrs": -32.42,
-     "vsArk": 0.0338,
-     "tArk": 16.61
+     "ll": 0.6117,
+     "acc": 0.6572,
+     "vsVrs": -0.0523,
+     "tVrs": -25.23,
+     "vsArk": 0.0012,
+     "tArk": 0.72
     },
     {
      "name": "series-level player Elo, K 480-144",
-     "ll": 0.5857,
-     "acc": 0.7042,
-     "vsVrs": -0.0817,
-     "tVrs": -28.6,
-     "vsArk": 0.0316,
-     "tArk": 17.44
+     "ll": 0.6317,
+     "acc": 0.639,
+     "vsVrs": -0.0323,
+     "tVrs": -12.75,
+     "vsArk": 0.0212,
+     "tArk": 10.29
     },
     {
      "name": "team-name Elo",
-     "ll": 0.6211,
-     "acc": 0.6488,
-     "vsVrs": -0.0463,
-     "tVrs": -21.0,
-     "vsArk": 0.067,
-     "tArk": 26.88
+     "ll": 0.6288,
+     "acc": 0.6413,
+     "vsVrs": -0.0352,
+     "tVrs": -14.99,
+     "vsArk": 0.0183,
+     "tArk": 8.8
     }
    ]
   },
   "joined": {
-   "n": 12707,
+   "n": 10029,
    "models": [
     {
      "name": "VRS points",
-     "ll": 0.6479,
-     "acc": 0.6283,
+     "ll": 0.6428,
+     "acc": 0.6366,
      "vsVrs": 0.0,
      "tVrs": 0.0,
-     "vsArk": 0.1051,
-     "tArk": 29.06
+     "vsArk": 0.0438,
+     "tArk": 14.06
     },
     {
      "name": "ARK rating",
-     "ll": 0.5614,
-     "acc": 0.7008,
-     "vsVrs": -0.0865,
-     "tVrs": -24.13,
-     "vsArk": 0.0186,
-     "tArk": 9.94
+     "ll": 0.6346,
+     "acc": 0.6299,
+     "vsVrs": -0.0082,
+     "tVrs": -2.83,
+     "vsArk": 0.0356,
+     "tArk": 12.56
     },
     {
      "name": "ARK + VRS",
-     "ll": 0.5428,
-     "acc": 0.7252,
-     "vsVrs": -0.1051,
-     "tVrs": -29.06,
+     "ll": 0.599,
+     "acc": 0.6724,
+     "vsVrs": -0.0438,
+     "tVrs": -14.06,
      "vsArk": 0.0,
      "tArk": 0.0
     },
     {
      "name": "ARK + VRS without the team map term",
-     "ll": 0.5516,
-     "acc": 0.714,
-     "vsVrs": -0.0963,
-     "tVrs": -29.31,
-     "vsArk": 0.0088,
-     "tArk": 6.5
+     "ll": 0.6139,
+     "acc": 0.6546,
+     "vsVrs": -0.0289,
+     "tVrs": -13.32,
+     "vsArk": 0.0149,
+     "tArk": 7.47
     },
     {
      "name": "Oct 26 model: series-level player Elo + VRS",
-     "ll": 0.5804,
-     "acc": 0.6911,
-     "vsVrs": -0.0675,
-     "tVrs": -24.66,
-     "vsArk": 0.0375,
-     "tArk": 15.22
+     "ll": 0.6041,
+     "acc": 0.6663,
+     "vsVrs": -0.0387,
+     "tVrs": -17.14,
+     "vsArk": 0.0051,
+     "tArk": 2.35
     },
     {
      "name": "series-level player Elo, K 480-144",
-     "ll": 0.5839,
-     "acc": 0.7038,
-     "vsVrs": -0.064,
-     "tVrs": -19.72,
-     "vsArk": 0.0411,
-     "tArk": 17.39
+     "ll": 0.632,
+     "acc": 0.6365,
+     "vsVrs": -0.0108,
+     "tVrs": -4.02,
+     "vsArk": 0.033,
+     "tArk": 11.38
     },
     {
      "name": "team-name Elo",
-     "ll": 0.6161,
-     "acc": 0.6546,
-     "vsVrs": -0.0318,
-     "tVrs": -12.65,
-     "vsArk": 0.0733,
-     "tArk": 24.61
+     "ll": 0.6235,
+     "acc": 0.6472,
+     "vsVrs": -0.0193,
+     "tVrs": -7.51,
+     "vsArk": 0.0245,
+     "tArk": 9.54
     }
    ]
   },
   "top50": {
-   "n": 1959,
+   "n": 1759,
    "models": [
     {
      "name": "VRS points",
-     "ll": 0.6622,
-     "acc": 0.5983,
+     "ll": 0.66,
+     "acc": 0.5981,
      "vsVrs": 0.0,
      "tVrs": 0.0,
-     "vsArk": 0.0201,
-     "tArk": 3.5
+     "vsArk": 0.0059,
+     "tArk": 1.21
     },
     {
      "name": "ARK rating",
-     "ll": 0.6564,
-     "acc": 0.6039,
-     "vsVrs": -0.0058,
-     "tVrs": -0.98,
-     "vsArk": 0.0144,
-     "tArk": 2.34
+     "ll": 0.6788,
+     "acc": 0.5821,
+     "vsVrs": 0.0188,
+     "tVrs": 3.36,
+     "vsArk": 0.0247,
+     "tArk": 3.52
     },
     {
      "name": "ARK + VRS",
-     "ll": 0.6421,
-     "acc": 0.6406,
-     "vsVrs": -0.0201,
-     "tVrs": -3.5,
+     "ll": 0.6541,
+     "acc": 0.6151,
+     "vsVrs": -0.0059,
+     "tVrs": -1.21,
      "vsArk": 0.0,
      "tArk": 0.0
     },
     {
      "name": "ARK + VRS without the team map term",
-     "ll": 0.642,
-     "acc": 0.6355,
-     "vsVrs": -0.0202,
-     "tVrs": -5.4,
-     "vsArk": -0.0001,
-     "tArk": -0.03
+     "ll": 0.6571,
+     "acc": 0.5998,
+     "vsVrs": -0.0029,
+     "tVrs": -1.35,
+     "vsArk": 0.003,
+     "tArk": 0.74
     },
     {
      "name": "Oct 26 model: series-level player Elo + VRS",
-     "ll": 0.6468,
-     "acc": 0.6192,
-     "vsVrs": -0.0154,
-     "tVrs": -4.12,
-     "vsArk": 0.0048,
-     "tArk": 1.09
+     "ll": 0.6521,
+     "acc": 0.6083,
+     "vsVrs": -0.0079,
+     "tVrs": -3.02,
+     "vsArk": -0.002,
+     "tArk": -0.52
     },
     {
      "name": "series-level player Elo, K 480-144",
-     "ll": 0.6539,
-     "acc": 0.632,
-     "vsVrs": -0.0083,
-     "tVrs": -1.62,
-     "vsArk": 0.0118,
-     "tArk": 2.16
+     "ll": 0.6672,
+     "acc": 0.5935,
+     "vsVrs": 0.0072,
+     "tVrs": 1.48,
+     "vsArk": 0.0131,
+     "tArk": 2.13
     },
     {
      "name": "team-name Elo",
-     "ll": 0.6583,
-     "acc": 0.6131,
-     "vsVrs": -0.0039,
-     "tVrs": -0.88,
-     "vsArk": 0.0162,
-     "tArk": 3.11
+     "ll": 0.6594,
+     "acc": 0.6043,
+     "vsVrs": -0.0006,
+     "tVrs": -0.12,
+     "vsArk": 0.0053,
+     "tArk": 1.09
     }
    ]
   },
   "top20": {
-   "n": 659,
+   "n": 636,
    "models": [
     {
      "name": "VRS points",
-     "ll": 0.6623,
-     "acc": 0.6009,
+     "ll": 0.6608,
+     "acc": 0.6053,
      "vsVrs": 0.0,
      "tVrs": 0.0,
-     "vsArk": 0.028,
-     "tArk": 3.15
+     "vsArk": 0.0211,
+     "tArk": 2.83
     },
     {
      "name": "ARK rating",
-     "ll": 0.6621,
-     "acc": 0.5979,
-     "vsVrs": -0.0001,
-     "tVrs": -0.02,
-     "vsArk": 0.0278,
-     "tArk": 2.72
+     "ll": 0.6732,
+     "acc": 0.6006,
+     "vsVrs": 0.0124,
+     "tVrs": 1.57,
+     "vsArk": 0.0335,
+     "tArk": 3.04
     },
     {
      "name": "ARK + VRS",
-     "ll": 0.6343,
-     "acc": 0.6449,
-     "vsVrs": -0.028,
-     "tVrs": -3.15,
+     "ll": 0.6397,
+     "acc": 0.6226,
+     "vsVrs": -0.0211,
+     "tVrs": -2.83,
      "vsArk": 0.0,
      "tArk": 0.0
     },
     {
      "name": "ARK + VRS without the team map term",
-     "ll": 0.6457,
-     "acc": 0.6388,
-     "vsVrs": -0.0166,
-     "tVrs": -3.15,
-     "vsArk": 0.0114,
-     "tArk": 1.77
+     "ll": 0.6533,
+     "acc": 0.6226,
+     "vsVrs": -0.0075,
+     "tVrs": -2.68,
+     "vsArk": 0.0136,
+     "tArk": 2.13
     },
     {
      "name": "Oct 26 model: series-level player Elo + VRS",
-     "ll": 0.6416,
-     "acc": 0.6434,
-     "vsVrs": -0.0206,
-     "tVrs": -3.45,
-     "vsArk": 0.0073,
-     "tArk": 1.19
+     "ll": 0.6481,
+     "acc": 0.6274,
+     "vsVrs": -0.0127,
+     "tVrs": -3.03,
+     "vsArk": 0.0084,
+     "tArk": 1.47
     },
     {
      "name": "series-level player Elo, K 480-144",
-     "ll": 0.655,
-     "acc": 0.6313,
-     "vsVrs": -0.0073,
-     "tVrs": -0.93,
-     "vsArk": 0.0206,
-     "tArk": 2.39
+     "ll": 0.6638,
+     "acc": 0.6069,
+     "vsVrs": 0.003,
+     "tVrs": 0.43,
+     "vsArk": 0.0241,
+     "tArk": 2.58
     },
     {
      "name": "team-name Elo",
-     "ll": 0.6472,
-     "acc": 0.6328,
-     "vsVrs": -0.0151,
-     "tVrs": -2.47,
-     "vsArk": 0.0129,
-     "tArk": 1.74
+     "ll": 0.6491,
+     "acc": 0.6289,
+     "vsVrs": -0.0117,
+     "tVrs": -2.01,
+     "vsArk": 0.0094,
+     "tArk": 1.52
     }
    ]
   }
@@ -339,63 +339,63 @@
  "calibration": [
   {
    "bin": 0.5,
-   "n": 2665,
+   "n": 2869,
    "exp": 0.525,
-   "obs": 0.536
+   "obs": 0.522
   },
   {
    "bin": 0.55,
-   "n": 2627,
+   "n": 2871,
    "exp": 0.575,
-   "obs": 0.589
+   "obs": 0.579
   },
   {
    "bin": 0.6,
-   "n": 2547,
+   "n": 2400,
    "exp": 0.624,
-   "obs": 0.626
+   "obs": 0.608
   },
   {
    "bin": 0.65,
-   "n": 2353,
-   "exp": 0.675,
-   "obs": 0.685
+   "n": 2161,
+   "exp": 0.674,
+   "obs": 0.657
   },
   {
    "bin": 0.7,
-   "n": 2366,
-   "exp": 0.725,
-   "obs": 0.729
+   "n": 1793,
+   "exp": 0.724,
+   "obs": 0.714
   },
   {
    "bin": 0.75,
-   "n": 2309,
-   "exp": 0.775,
-   "obs": 0.78
+   "n": 1373,
+   "exp": 0.773,
+   "obs": 0.757
   },
   {
    "bin": 0.8,
-   "n": 2183,
-   "exp": 0.825,
-   "obs": 0.825
+   "n": 1064,
+   "exp": 0.823,
+   "obs": 0.823
   },
   {
    "bin": 0.85,
-   "n": 1852,
-   "exp": 0.874,
-   "obs": 0.881
+   "n": 776,
+   "exp": 0.872,
+   "obs": 0.86
   },
   {
    "bin": 0.9,
-   "n": 1329,
-   "exp": 0.924,
-   "obs": 0.904
+   "n": 455,
+   "exp": 0.923,
+   "obs": 0.925
   },
   {
    "bin": 0.95,
-   "n": 825,
-   "exp": 0.971,
-   "obs": 0.943
+   "n": 213,
+   "exp": 0.966,
+   "obs": 0.948
   }
  ],
  "failed": [

@@ -1,0 +1,197 @@
+{
+ "tests": {
+  "a CFB XV per side": {
+   "target": "describe held out",
+   "before": 0.7137,
+   "after": 0.7144,
+   "t": -0.22,
+   "p": 0.4145,
+   "seasonsBetter": "5/7",
+   "n": 921,
+   "holmAlpha": 0.0125,
+   "holmSig": false,
+   "pass": false,
+   "playerGuard": true
+  },
+  "b CFB pXR form (cWAR)": {
+   "target": "predict team held out",
+   "before": 0.2552,
+   "after": 0.2108,
+   "playerR": [
+    0.5755,
+    0.6079
+   ],
+   "playerRwithinPos": [
+    0.461,
+    0.467
+   ],
+   "t": 3.32,
+   "p": 0.9995,
+   "seasonsBetter": "1/6",
+   "n": 791,
+   "holmAlpha": 0.05,
+   "holmSig": false,
+   "pass": false,
+   "playerGuard": true
+  },
+  "d CFB G5 level weight": {
+   "target": "predict team held out",
+   "before": 0.2552,
+   "after": 0.2839,
+   "playerR": [
+    0.5755,
+    0.5226
+   ],
+   "playerRwithinPos": [
+    0.461,
+    0.4858
+   ],
+   "t": -2.78,
+   "p": 0.0028,
+   "seasonsBetter": "5/6",
+   "n": 791,
+   "holmAlpha": 0.01,
+   "holmSig": true,
+   "pass": false,
+   "playerGuard": false
+  },
+  "e1 NFL neutral EPA -> pXR/60": {
+   "target": "predict team held out",
+   "before": 0.3303,
+   "after": 0.3262,
+   "playerR": [
+    0.6293,
+    0.6278
+   ],
+   "t": 1.1,
+   "p": 0.8638,
+   "seasonsBetter": "2/7",
+   "n": 224,
+   "beside": {
+    "pxp": [
+     0.248,
+     0.2467,
+     0.28
+    ],
+    "xv": [
+     0.2286,
+     0.2228,
+     0.73
+    ]
+   },
+   "holmAlpha": 0.025,
+   "holmSig": false,
+   "pass": false,
+   "playerGuard": true
+  },
+  "e2 CFB neutral EPA -> pSV/60": {
+   "target": "predict team (QB block) held out",
+   "before": 0.0734,
+   "after": 0.0654,
+   "playerR": [
+    0.2722,
+    0.2599
+   ],
+   "t": 1.02,
+   "p": 0.8452,
+   "seasonsBetter": "2/6",
+   "n": 778,
+   "holmAlpha": 0.0167,
+   "holmSig": false,
+   "pass": false,
+   "playerGuard": false
+  }
+ },
+ "nflCoverage": {
+  "2016": {
+   "min": 10.996,
+   "mean": 11.016,
+   "under": 0
+  },
+  "2017": {
+   "min": 10.997,
+   "mean": 11.019,
+   "under": 0
+  },
+  "2018": {
+   "min": 10.997,
+   "mean": 11.015,
+   "under": 0
+  },
+  "2019": {
+   "min": 10.994,
+   "mean": 11.023,
+   "under": 0
+  },
+  "2020": {
+   "min": 7.504,
+   "mean": 10.68,
+   "under": 16
+  },
+  "2021": {
+   "min": 10.998,
+   "mean": 11.027,
+   "under": 0
+  },
+  "2022": {
+   "min": 10.996,
+   "mean": 11.017,
+   "under": 0
+  },
+  "2023": {
+   "min": 10.996,
+   "mean": 11.033,
+   "under": 0
+  },
+  "2024": {
+   "min": 10.998,
+   "mean": 11.032,
+   "under": 0
+  },
+  "2025": {
+   "min": 10.918,
+   "mean": 11.042,
+   "under": 1
+  }
+ },
+ "c": "void as a change: NFL WAR is over replacement, so time no WAR row covers already counts at replacement (0); the coverage check found a data bug instead: 2020 snap counts list two spots (C/G, G/T, G/C, WR/R, FB/D, DE/L, DT/D), nfl_war.group_of maps none of them, so ~60 player-team seasons (3.1% of 2020 scrimmage snaps; BAL offense 7.5 of 11 slots) have no AV, WAR or XV row. Other seasons (2016-26): only K/P/LS unmapped (by design). Fix: map a two-spot label by its first spot. Team sides below 10.95 slots: 17 (16 in 2020, TEN 2025 D 10.92)",
+ "g5Diag": {
+  "base": {
+   "same tier": {
+    "r": 0.572,
+    "n": 3599
+   },
+   "all": {
+    "r": 0.5594,
+    "n": 3838
+   },
+   "P4->G5": {
+    "r": 0.1482,
+    "n": 48
+   },
+   "G5->P4": {
+    "r": 0.4628,
+    "n": 191
+   }
+  },
+  "g5": {
+   "same tier": {
+    "r": 0.5374,
+    "n": 3599
+   },
+   "all": {
+    "r": 0.5227,
+    "n": 3838
+   },
+   "P4->G5": {
+    "r": 0.1482,
+    "n": 48
+   },
+   "G5->P4": {
+    "r": 0.3315,
+    "n": 191
+   }
+  }
+ },
+ "f": "skipped: pXR = pXP + an age-free sub-position constant, so the player-level age fit that failed Nov 11 is unchanged"
+}

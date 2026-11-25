@@ -1,0 +1,316 @@
+{
+ "nSeries": 32643,
+ "nDuplicate": 8847,
+ "months": [
+  "2024-09",
+  "2024-10",
+  "2024-11",
+  "2024-12",
+  "2025-01",
+  "2025-02",
+  "2025-03",
+  "2025-04",
+  "2025-05",
+  "2025-06",
+  "2025-07",
+  "2025-08",
+  "2025-09",
+  "2025-10",
+  "2025-11",
+  "2025-12",
+  "2026-01",
+  "2026-02",
+  "2026-03",
+  "2026-04",
+  "2026-05",
+  "2026-06",
+  "2026-07",
+  "2026-08",
+  "2026-09",
+  "2026-10"
+ ],
+ "all rows (as the shipped backtest)": {
+  "predict": {
+   "ARK live (x, VRS, map rating)": {
+    "ll": 0.5492,
+    "llHeld": 0.5538,
+    "r2": 0.247,
+    "tVsArkByMonth": 0.0,
+    "bootLlCI": [
+     0.539,
+     0.5587
+    ]
+   },
+   "ARK live, dedup replay": {
+    "ll": 0.5458,
+    "llHeld": 0.5506,
+    "r2": 0.2521,
+    "tVsArkByMonth": -3.36,
+    "bootLlCI": [
+     0.5349,
+     0.5558
+    ]
+   },
+   "ARK live, dedup replay, day start": {
+    "ll": 0.6249,
+    "llHeld": 0.6222,
+    "r2": 0.1242,
+    "tVsArkByMonth": 11.62,
+    "bootLlCI": [
+     0.6216,
+     0.6302
+    ]
+   },
+   "ARK live, day start (xd, VRS, map rating)": {
+    "ll": 0.6262,
+    "llHeld": 0.6235,
+    "r2": 0.122,
+    "tVsArkByMonth": 11.59,
+    "bootLlCI": [
+     0.623,
+     0.6319
+    ]
+   },
+   "ARK player Elo, live": {
+    "ll": 0.5626,
+    "llHeld": 0.567,
+    "r2": 0.2279,
+    "tVsArkByMonth": 10.49,
+    "bootLlCI": [
+     0.5522,
+     0.5717
+    ]
+   },
+   "ARK player Elo, day start": {
+    "ll": 0.653,
+    "llHeld": 0.6488,
+    "r2": 0.0763,
+    "tVsArkByMonth": 15.0,
+    "bootLlCI": [
+     0.6498,
+     0.6571
+    ]
+   },
+   "VRS points": {
+    "ll": 0.6666,
+    "llHeld": 0.667,
+    "r2": 0.0514,
+    "tVsArkByMonth": 16.63,
+    "bootLlCI": [
+     0.6636,
+     0.6709
+    ]
+   },
+   "bo3 team map rating, live": {
+    "ll": 0.6504,
+    "llHeld": 0.65,
+    "r2": 0.0788,
+    "tVsArkByMonth": 15.09,
+    "bootLlCI": [
+     0.648,
+     0.6546
+    ]
+   },
+   "ARK player Elo, month start": {
+    "ll": 0.6515,
+    "llHeld": 0.648,
+    "r2": 0.0798,
+    "tVsArkByMonth": 15.36,
+    "bootLlCI": [
+     0.6473,
+     0.6571
+    ]
+   },
+   "team-name Elo, month start": {
+    "ll": 0.6786,
+    "llHeld": 0.6806,
+    "r2": 0.0279,
+    "tVsArkByMonth": 21.79,
+    "bootLlCI": [
+     0.6756,
+     0.6812
+    ]
+   },
+   "VRS, month start": {
+    "ll": 0.6722,
+    "llHeld": 0.672,
+    "r2": 0.0443,
+    "tVsArkByMonth": 17.2,
+    "bootLlCI": [
+     0.6684,
+     0.6757
+    ]
+   },
+   "team RWA, month start": {
+    "ll": 0.6267,
+    "llHeld": 0.6262,
+    "r2": 0.1216,
+    "tVsArkByMonth": 12.22,
+    "bootLlCI": [
+     0.6233,
+     0.6333
+    ]
+   }
+  },
+  "describe": {
+   "ARK player Elo, month end": {
+    "r2In": 0.2609,
+    "r2Held": 0.0879,
+    "r2InSameHalf": 0.2519
+   },
+   "team-name Elo, month end": {
+    "r2In": 0.064,
+    "r2Held": 0.0237,
+    "r2InSameHalf": 0.0644
+   },
+   "VRS, month end": {
+    "r2In": 0.0625
+   },
+   "team RWA, month end": {
+    "r2In": 0.1754
+   }
+  }
+ },
+ "duplicates dropped": {
+  "predict": {
+   "ARK live (x, VRS, map rating)": {
+    "ll": 0.6151,
+    "llHeld": 0.6134,
+    "r2": 0.1409,
+    "tVsArkByMonth": 0.0,
+    "bootLlCI": [
+     0.6098,
+     0.6205
+    ]
+   },
+   "ARK live, dedup replay": {
+    "ll": 0.6131,
+    "llHeld": 0.6113,
+    "r2": 0.1442,
+    "tVsArkByMonth": -2.57,
+    "bootLlCI": [
+     0.6077,
+     0.6185
+    ]
+   },
+   "ARK live, dedup replay, day start": {
+    "ll": 0.6197,
+    "llHeld": 0.6159,
+    "r2": 0.1329,
+    "tVsArkByMonth": 5.32,
+    "bootLlCI": [
+     0.6159,
+     0.6256
+    ]
+   },
+   "ARK live, day start (xd, VRS, map rating)": {
+    "ll": 0.6217,
+    "llHeld": 0.6179,
+    "r2": 0.1295,
+    "tVsArkByMonth": 6.22,
+    "bootLlCI": [
+     0.618,
+     0.6278
+    ]
+   },
+   "ARK player Elo, live": {
+    "ll": 0.6408,
+    "llHeld": 0.6384,
+    "r2": 0.0976,
+    "tVsArkByMonth": 13.89,
+    "bootLlCI": [
+     0.6369,
+     0.6446
+    ]
+   },
+   "ARK player Elo, day start": {
+    "ll": 0.6489,
+    "llHeld": 0.6434,
+    "r2": 0.0835,
+    "tVsArkByMonth": 11.9,
+    "bootLlCI": [
+     0.646,
+     0.6539
+    ]
+   },
+   "VRS points": {
+    "ll": 0.6637,
+    "llHeld": 0.6637,
+    "r2": 0.0565,
+    "tVsArkByMonth": 17.41,
+    "bootLlCI": [
+     0.6612,
+     0.6683
+    ]
+   },
+   "bo3 team map rating, live": {
+    "ll": 0.6484,
+    "llHeld": 0.6473,
+    "r2": 0.0822,
+    "tVsArkByMonth": 19.63,
+    "bootLlCI": [
+     0.6446,
+     0.6528
+    ]
+   },
+   "ARK player Elo, month start": {
+    "ll": 0.6473,
+    "llHeld": 0.6429,
+    "r2": 0.0875,
+    "tVsArkByMonth": 12.55,
+    "bootLlCI": [
+     0.6435,
+     0.6537
+    ]
+   },
+   "team-name Elo, month start": {
+    "ll": 0.6794,
+    "llHeld": 0.6803,
+    "r2": 0.0259,
+    "tVsArkByMonth": 24.73,
+    "bootLlCI": [
+     0.6773,
+     0.6821
+    ]
+   },
+   "VRS, month start": {
+    "ll": 0.6697,
+    "llHeld": 0.6693,
+    "r2": 0.0486,
+    "tVsArkByMonth": 16.73,
+    "bootLlCI": [
+     0.6662,
+     0.6736
+    ]
+   },
+   "team RWA, month start": {
+    "ll": 0.6263,
+    "llHeld": 0.6245,
+    "r2": 0.1218,
+    "tVsArkByMonth": 3.23,
+    "bootLlCI": [
+     0.6233,
+     0.6336
+    ]
+   }
+  },
+  "describe": {
+   "ARK player Elo, month end": {
+    "r2In": 0.257,
+    "r2Held": 0.1021,
+    "r2InSameHalf": 0.252
+   },
+   "team-name Elo, month end": {
+    "r2In": 0.0624,
+    "r2Held": 0.0233,
+    "r2InSameHalf": 0.065
+   },
+   "VRS, month end": {
+    "r2In": 0.0683
+   },
+   "team RWA, month end": {
+    "r2In": 0.1712
+   }
+  }
+ }
+}

@@ -176,7 +176,7 @@ def main():
         row = {'n': q['n'], 't': t, 'photo': q.get('photo'), 'pts': q.get('pts'), 'val': q.get('val'), 'plays': q.get('plays'),
                'role': q.get('role') or ('starter' if q.get('starter') else 'backup'), 'status': q.get('status')}
         if wr:
-            row.update(war=wr[0].get('war'), waa=wr[0].get('waa'), age=wr[0].get('age'), pxp=wr[0].get('pxp'))
+            row.update(war=wr[0].get('war'), waa=wr[0].get('waa'), age=wr[0].get('age'), pxp=wr[0].get('pxp'), xv=wr[0].get('xv'))
         if ids:
             row.update(line(S[ids[0]]))
         else:

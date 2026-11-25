@@ -145,6 +145,23 @@ class Vrs:
         return m[max(ds)] if ds else m[min(m)]
 
 
+def repeats_dropped(series):
+    """Indices of the series to keep: Valve's detail pages list one series several times under other team names (same
+    day, same two fives, 98.4% the same winner; 9,624 of 37,399 rows, Nov 24 2026). The replay rated each copy after
+    the first had updated the players, which leaked results into the backtest (held ll .5538 with the copies, .6134 on
+    first rows only; scripts/research/metric_audit_nov24/cs2/team.py). The first row of each (date, five, five) stays."""
+    seen, keep = set(), []
+    for j, r in enumerate(series):
+        ra, rb = r[4] or [], r[5] or []
+        if len(ra) == 5 and len(rb) == 5:
+            k = (r[0][:10], frozenset((frozenset(ra), frozenset(rb))))
+            if k in seen:
+                continue
+            seen.add(k)
+        keep.append(j)
+    return keep
+
+
 def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
     """Play every series forward. -> (rows: one per series with the pre-series gap, state at the end).
     With bo3 (cs2_bo3.Bo3): a series that joins a bo3.gg match updates the players once per map on round share (K x
@@ -152,6 +169,8 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
     snaps: ISO dates; the state before the first series on or after each is kept in state["snaps"] (cs2_events)."""
     warm = {} if ignore_warm else warm_start(p)
     tview, tm = {}, None
+    keep = repeats_dropped(series)
+    series = [series[j] for j in keep]
     orig = list(range(len(series)))  # combined index -> index in `series` (None: a bo3.gg-only lower-tier match)
     if bo3 is not None and p.get("kx"):
         bo3.join(series)
@@ -169,6 +188,7 @@ def replay(series, vrs, p, ignore_warm=False, bo3=None, snaps=None):
             ask[m[0]].append(i)
         tm = cs2_bo3.TeamMaps(bo3, p.get("tm") or cs2_bo3.TM)
         tview = tm.play(ask=ask)
+    orig = [keep[o] if o is not None else None for o in orig]  # back to the caller's index (repeats dropped)
     pl, pn, lastros, roff, team = {}, defaultdict(int), {}, defaultdict(float), {}
     hist = defaultdict(list)  # team key -> [(date, rating after)]
     rows, xrows = [], ([] if p.get("xrows") else None)
@@ -375,7 +395,7 @@ def fit():
 
 def team_elo(series, vrs, win):
     t, rows = {}, []
-    for r in series:
+    for r in (series[j] for j in repeats_dropped(series)):
         d, a, b, y = r[:4]
         ka, kb = key(a), key(b)
         xa, xb = t.get(ka, 0.0), t.get(kb, 0.0)

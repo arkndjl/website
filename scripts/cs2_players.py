@@ -71,6 +71,7 @@ class Maps:
                 by_g[r[0]].append(r)
         G, P, S, X, D, TR, TM, NICK = [], [], [], [], [], [], [], {}
         games = []
+        seen_maps = set()
         for g, rs in by_g.items():
             gg = gm[g]
             sides = defaultdict(list)
@@ -81,6 +82,14 @@ class Maps:
             w, lo, rw, rl = gg[5], gg[6], gg[7], gg[8]
             if {w, lo} != set(sides) or rw + rl < 13:
                 continue
+            # one map listed twice (two game ids, often under an alias team id or a second match id): same ten players,
+            # same map, same rounds, same day. 90 of 62,134 maps in the Nov 24 2026 files (port round Nov 24 2026,
+            # scripts/research/metric_audit_nov24/port/tennis_cs2_cbb/dups2.py); the first listing stays
+            dk = (frozenset((frozenset(r[1] for r in sides[w]), frozenset(r[1] for r in sides[lo]))),
+                  (gg[3] or "").lower().removeprefix("de_"), rw, rl, gg[2][:10])
+            if dk in seen_maps:
+                continue
+            seen_maps.add(dk)
             m = mt.get(gg[1])
             tier = TIER.get(m[10], 5) if m else 5
             gi = len(games)
@@ -356,6 +365,8 @@ def fit():
                       "t": round(float(dl.mean() / (dl.std() + 1e-12) * math.sqrt(len(dl))), 2)})
         print(nm, score[-1], file=sys.stderr)
     out["score"] = score
+    out["mapOffsets"] = map_offset_score(M, c, best, tm, hm)
+    print("map offsets", out["mapOffsets"], file=sys.stderr)
     pdir = load_pdir()
     out["prospects"] = prospect_fit(M, c, best, pdir)
     print("prospects", json.dumps(out["prospects"], default=str)[:1500], file=sys.stderr)
@@ -379,6 +390,59 @@ def window_stats(M, c, theta, T0, T1, p):
     w = M.R * m
     r = np.bincount(M.p, w, n)
     return np.bincount(M.p, w * adj, n) / np.maximum(r, 1), r
+
+
+KMAP = 1000      # player x map offsets: rounds of shrink toward 0 (metric audit Nov 24 2026, P2)
+
+
+def map_key(g):
+    """a Maps game's map name, one spelling per map (bo3.gg lists de_mirage, de_Mirage and cache)"""
+    return (g[7] or "").lower().removeprefix("de_")
+
+
+def map_offsets(M, c, theta, T, p, k=KMAP):
+    """Player x map offsets as of day T: each player's opponent-credited contribution minus his rating on each map,
+    decayed like the rating (half-life p['h']) and shrunk k rounds toward 0. Rating + offset predicts that map's round
+    share better than the rating alone: held Jul 2025 - Oct 2026 map MSE .027816 -> .027691 (t by month -7.0, 15/16;
+    tune t -3.7; scripts/research/metric_audit_nov24/cs2/candidates.py P2). -> (offsets [player, map], map names)."""
+    names_ = sorted({map_key(g) for g in M.games})
+    code = {x: j for j, x in enumerate(names_)}
+    mc = np.array([code[map_key(g)] for g in M.games])[M.g]
+    m = M.d < T
+    w = M.R * np.exp(-(T - M.d) * math.log(2) / p["h"]) * m
+    opp = theta[M.p][M.five[M.g, 1 - M.side]].mean(1)
+    res = c + p["opp"] * opp - theta[M.p]
+    key_ = M.p * len(names_) + mc
+    nk = len(M.pids) * len(names_)
+    off = np.bincount(key_, w * res, nk) / (np.bincount(key_, w, nk) + k)
+    return off.reshape(len(M.pids), len(names_)), names_
+
+
+def map_offset_score(M, c, p, tm, hm, k=KMAP):
+    """Walk forward as map_sq: ratings (+ map offsets) at each month start -> that month's map round shares; scale a
+    fit on tune months [::2] for each. -> held MSE with and without the offsets, t by month (negative = offsets better)."""
+    def month(mo, use):
+        T = ordd(mo + "-01")
+        T2 = ordd((dt.date.fromordinal(T) + dt.timedelta(days=32)).replace(day=1).isoformat())
+        th, _ = ratings(M, c, T, p)
+        gi = np.where((M.gd >= T) & (M.gd < T2))[0]
+        va, vb = th[M.p[M.five[gi, 0]]], th[M.p[M.five[gi, 1]]]
+        if use:
+            off, nm = map_offsets(M, c, th, T, p, k)
+            code = {x: j for j, x in enumerate(nm)}
+            mj = np.array([code[map_key(M.games[g])] for g in gi])[:, None]
+            va, vb = va + off[M.p[M.five[gi, 0]], mj], vb + off[M.p[M.five[gi, 1]], mj]
+        return (va.sum(1) - vb.sum(1)) / 200, M.y[M.five[gi, 0, 0]] - 0.5
+    out, per = {}, {}
+    for use in (False, True):
+        xy = [month(mo, use) for mo in tm[::2]]
+        a = sum((x * y).sum() for x, y in xy) / sum((x * x).sum() for x, y in xy)
+        per[use] = [float(((y - a * x) ** 2).mean()) for x, y in (month(mo, use) for mo in hm)]
+        out["mse1" if use else "mse0"] = round(float(np.mean(per[use])), 6)
+    d = np.array(per[True]) - np.array(per[False])
+    out.update(k=k, months=len(hm), t=round(float(d.mean() / (d.std(ddof=1) / math.sqrt(len(d)) + 1e-12)), 2),
+               better=int((d < 0).sum()))
+    return out
 
 
 def s_maps(M, T):
@@ -741,6 +805,12 @@ def build():
     _, r12 = window_stats(M, c, th, T - 365, T, p)
     m12 = np.bincount(M.p, M.d >= T - 365, len(M.pids))
     sm = s_maps(M, T)
+    # per-map RWA offsets (metric audit Nov 24 2026, P2): shown for maps with 100+ rounds in the last year
+    moff, mnames = map_offsets(M, c, th, T, p)
+    mcode = {x: j for j, x in enumerate(mnames)}
+    mrow = np.array([mcode[map_key(g)] for g in M.games])[M.g]
+    mr12 = np.bincount(M.p * len(mnames) + mrow, M.R * (M.d >= T - 365),
+                       len(M.pids) * len(mnames)).reshape(len(M.pids), len(mnames))
     pdir = load_pdir()
     age = ages(M, pdir, T)
     bo3 = cs2_bo3.Bo3()
@@ -810,6 +880,8 @@ def build():
                 "adr": round(float(agg["adr"][i] * 100), 1), "kast": round(float(agg["kast"][i] * 100), 1),
                 "ok": round(float((agg["fk"][i] - agg["fd"][i]) * 100), 1),
                 "xtv": int(round(value(float(th[i]), age[i], repl, ag, v, a), -3)) if v else None,
+                "mp": {mnames[j]: round(float(a / 2 * moff[i, j]), 2) for j in range(len(mnames))
+                       if mnames[j] and mr12[i, j] >= 100},
                 "last": dt.date.fromordinal(int(M.d[lastrow[i]])).isoformat()}
     pool = sorted(np.where(act)[0], key=lambda i: -th[i])
     board = [row(i) for i in pool[:400]]

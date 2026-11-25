@@ -358,7 +358,9 @@
       "WAR = snap share x (line + weight x quality) x .227; 1 pt of margin a game = .0189 win% (928 FBS team seasons).",
       "Line = margin lost when an average starter sits: QB 2.7, RB 1.7, EDGE 1.4, WR 1.35, CB 1.3, S 1.1, DT 1.0, LB 1.0.",
       "Quality from Stat+, badges and FV. QB keeps 1.25 pts per SD; the rest goes to offensive teammates by snaps.",
-      "Replacement lineup wins .18 (2 of 12); an average team's starters total 3.8 WAR."
+      "Replacement lineup wins .18 (2 of 12); an average team's starters total 3.8 WAR.",
+      "Team WAR (Nov 24 2026): starter time no graded player covers counts one SD below an average starter (season AV's line), not at",
+      "the WAR line. Held out by season 2019 to 2025, team WAR tracks SRS at R2 .654 against .639 (t 3.5, 7 of 7 seasons)."
      ],
      "where": "CFB board, WAR leaders tab, team talent",
      "sports": [
@@ -384,7 +386,10 @@
       "CFB: PFN score plus position parts (QB cmp %, yds/att, INT rate; OL pressure rate; DT splash; CB yds/target).",
       "Fit on 2024-25 team margin. Held out team r .88 vs .86 for WAR quality; win% r .73 vs .68.",
       "NFL: same idea fit to team margin per game; on missed games t 4.9 vs 2.1 for AV WAR.",
-      "Next-season forecasts tie with WAR, so projections and game models stay on WAR."
+      "Next-season forecasts tie with WAR, so projections and game models stay on WAR.",
+      "NFL Nov 24 2026: weights fit per side, offense parts on points scored a game, defense parts on points allowed a game.",
+      "XV from weeks 1 to 9 on weeks 10 on margin, R2 .604 to .622 (t 2.19, 7 of 8 seasons); next season team R2 .235 to .258.",
+      "XV is the most descriptive NFL metric held out (.604 vs WAR .401, SV .257) and the most descriptive CFB one (.689 vs cWAR .639)."
      ],
      "where": "CFB and NFL WAR leaders tabs (XV column)",
      "sports": [
@@ -593,10 +598,14 @@
      "term": "CBB WAR / WAA",
      "short": "Wins over a replacement / average D-I player.",
      "body": [
-      "WAR = (BPM + 2) x minutes / 40 x 68 possessions a 40 / 100 x .0143 wins a point; WAA uses BPM.",
-      "Replacement BPM -2.0 = the 9th man in team minutes (2025-26). Wins a point fit on 3,485 team seasons 2017-26:",
-      "wins = .395 x games + team WAR (r .86). The textbook slope (.0347 at margin sd 11.5) overstates: schedules",
-      "pair strong with strong and win odds flatten at the ends. FV test: WAR, WAA, career and 5/4/3 WAR fail."
+      "WAR = (sGBPM + 1.6) x minutes / 40 x 68 possessions a 40 / 100 x .0186 wins a point; WAA uses sGBPM.",
+      "GBPM = Barttorvik game BPM, the minutes weighted mean of his games' BPM. sGBPM = (GBPM x min + 100 x season mean) / (min + 100).",
+      "Replacement 1.6 below average = the 9th man's sGBPM (2025-26). Wins a point fit on 3,485 team seasons 2017-26:",
+      "wins = .38 x games + team WAR (r .87; season BPM gave .86). Season only: no earlier season enters a season's WAR.",
+      "Nov 24 2026: GBPM over season BPM, held out team win% R2 .633 to .658, 15 of 15 seasons; shrink: half B GBPM MSE 16.2 to 11.4",
+      "(10 of 10), held out team wins RMSE 3.348 to 3.331 (14 of 14). Season BPM stays the predictive input (next season .643 vs .612).",
+      "The textbook slope (.0347 at margin sd 11.5) overstates: schedules pair strong with strong and win odds flatten at the ends.",
+      "FV test: WAR, WAA, career and 5/4/3 WAR fail."
      ],
      "where": "CBB WAR leaders, stats, portal, returning",
      "sports": [
@@ -684,7 +693,10 @@
      "body": [
       "HPM = Marcel-weighted (1 / .5 / .25) shrunk rates, components weighted by how well they carry to next season.",
       "pWAR = (HPM - replacement) x TOI / 60 / goals per win. LOSO R2 .37 vs .26 before (t 4.24, 15/17 seasons).",
-      "Goalie GSAx barely repeats (weight .21), so goalie pWAR ~0.4 while goalie WAR runs ~7."
+      "Goalie GSAx barely repeats (weight .21), so goalie pWAR ~0.4 while goalie WAR runs ~7.",
+      "Nov 24 2026: 5 on 5 on ice and individual xG read MoneyPuck's flurry, score and venue adjusted columns; WAR keeps raw xG.",
+      "Next season team GD R2 .384 to .387 (t 2.88, 13 of 17 pairs); weights refit held out .373 to .376, walk forward t 3.59.",
+      "PP on ice xG at weight .2 fails (t 1.19 worse); score and venue alone is flat (t .32)."
      ],
      "where": "NHL WAR leaders, backup watch, rookies; hockey prospect outcome (skaters)",
      "sports": [
@@ -784,7 +796,9 @@
       "multi-kills, clutches, headshots, damage taken). Plus-minus: half the round share the box misses, split across the five.",
       "No utility measure: bo3.gg has no flash or utility damage data; utility $ bought failed (t -2.5), accuracy hurt.",
       "Tier lift: +0.5 x share of last year's rounds at S/A-tier events (low-tier pools link to the top through few maps).",
-      "Opponents credited x1.0, half-life 180 days, 25 rounds of shrink. Held out R2 .131 vs .120 Nov 2, .108 K-D."
+      "Opponents credited x1.0, half-life 180 days, 25 rounds of shrink. Held out R2 .131 vs .120 Nov 2, .108 K-D.",
+      "Map offsets (Nov 24 2026): each player's decayed residual on each map, shrunk 1,000 rounds toward 0, added to RWA per map.",
+      "Held Jul 2025 to Oct 2026: next month map error .027816 to .027691, t by month 7.0, 15 of 16 months."
      ],
      "where": "Counter-Strike players, prospects, player model",
      "sports": [
@@ -1258,6 +1272,44 @@
      ]
     },
     {
+     "term": "p/90 (soccer)",
+     "short": "Predictive SV rate: this season and the two before.",
+     "body": [
+      "SV a 90 at weights 1, .5, .25, shrunk toward the position mean of regulars by 225 minutes (defenders 450, keepers 28,800),",
+      "less .008 a year over age 29. Nov 24 2026, held out: next season team GD R2 .634 to .650, 11 of 11 pairs;",
+      "r with next season's SV a 90 .690 to .718. The most predictive soccer metric on players; display only."
+     ],
+     "where": "Soccer GAR leaders, depth chart, next up",
+     "sports": [
+      "Soccer"
+     ]
+    },
+    {
+     "term": "Most predictive and most descriptive metric (by sport)",
+     "short": "Each sport's metrics scored on one test (Nov 24 2026, held out, no 2026-27 outcomes).",
+     "body": [
+      "Describe: season value x season minutes summed per team, on that season's results, held out. Predict: season n value x",
+      "season n+1 minutes, on n+1 results; and a player's value against his next season. Tennis and CS2: held out matches and maps.",
+      "NBA: describe rXPM (.999), predict pXPM (.657). NFL: describe XV (.604), predict pXP/60 within position, AV for teams (.317).",
+      "CFB: describe XV (.689), predict cWAR (.256, tie XV). CBB: describe WAR on GBPM (.658), predict the roster prior BPM (.783).",
+      "NHL: describe WAR (.978), predict pWAR for teams (.387), Marcel WAR for a player (r .446). Soccer: describe SVAR (.894),",
+      "predict p/90 (.650, r .718). Tennis: describe PA (.141), predict ARK (.107, tie Elo). CS2: describe season RWA, predict RWA rating",
+      "(next month team R2 .124, player r .820), ARK for teams. Public metrics scored: nflverse EPA, PFN impact, Barttorvik PRPG,",
+      "MoneyPuck game score, FotMob rating, Transfermarkt value, official tennis rank, HLTV 2.0 style rating, bo3.gg rating: none leads."
+     ],
+     "where": "Every ARKBOARD: descriptive tabs lead with the describe pick, predictive tabs with the predict pick",
+     "sports": [
+      "NBA",
+      "NFL",
+      "CFB",
+      "CBB",
+      "NHL",
+      "Soccer",
+      "Tennis",
+      "CS2"
+     ]
+    },
+    {
      "term": "ARK lean (recruit commitment)",
      "short": "Chance an uncommitted recruit signs with each school in his recruitment list; the top school is shown in the Team cell.",
      "body": [
@@ -1394,7 +1446,10 @@
       "Surface Elo blended with a games-won rating and opponent-adjusted serve and return point ratings (Markov chain).",
       "Fit on 2012-22 tour main draws; held 2023-26 log loss ~.596 vs Elo .603.",
       "SV: season WAR, calendar year to date, every level, same per match credit as WAR.",
-      "Split half r .81 ATP, .82 WTA (2015 to 2025); next season r .85 ATP, .84 WTA."
+      "Split half r .81 ATP, .82 WTA (2015 to 2025); next season r .85 ATP, .84 WTA.",
+      "Nov 24 2026: ARK adds the points added term, CP x pPA gap / 10 on the match blend. Next season log loss t -8.7, 14 of 15 seasons.",
+      "rPA is shrunk by 300 points toward 0: held out describe R2 .128 to .135 (15 of 15). WAR counts Futures and ITF at half,",
+      "Challenger, qualifying and team events at .85 (next season R2 .083 to .085, t -7.1); SV keeps every match in full."
      ],
      "where": "Tennis ATP / WTA ARK Ranking",
      "sports": [
@@ -1406,7 +1461,9 @@
      "short": "Series win chance vs the average top-20 team.",
      "body": [
       "Player Elo that follows players between rosters (per map, on round share), bo3.gg team map rating with veto,",
-      "region offsets, Valve VRS points and the five players' mean RWA. Held out log loss .553 vs VRS .667. No picks: no free closing odds history."
+      "region offsets, Valve VRS points and the five players' mean RWA. Held out log loss .553 vs VRS .667. No picks: no free closing odds history.",
+      "Nov 24 2026: Valve lists one series up to several times under alias team names (9,624 of 37,399 rows). Repeats of a date and",
+      "both fives are dropped before every replay. Held log loss on clean rows: ARK .6105, team RWA .6245, VRS .6640."
      ],
      "where": "Counter-Strike ARK Ranking, matches, model",
      "sports": [
@@ -2621,7 +2678,7 @@
   },
   {
    "board": "CBB / NBA prospects",
-   "note": "Outcome = peak NBA XPM, careers ending 2008-16; per class = careers per college class in the band; per board = players on a preseason board reaching that FV or better. pct = live D-I board (5,556). Stretch: headline = mean up to 55.3, linear above to 80 at 64.8 (80 about once per 5 seasons).",
+   "note": "Outcome = peak NBA XPM, careers ending 2008-16; per class = careers per college class in the band; per board = players on a preseason board reaching that FV or better. pct = live D-I board (5,555). Stretch: headline = mean up to 55.3, linear above to 80 at 64.8 (80 about once per 5 seasons).",
    "cols": [
     "FV",
     "meaning (rarity anchor; most common role in band)",
@@ -2697,7 +2754,7 @@
      "50",
      "4+ seasons as a starter; most common: 4+ seasons as a starter (31%)",
      "3.56",
-     "3 of 5,556 (0.05%)",
+     "3 of 5,555 (0.05%)",
      "+0.0 to +0.6",
      "28",
      "median pick 17, 84% drafted",
@@ -2707,7 +2764,7 @@
      "45",
      "2+ seasons as a starter; most common: 2+ seasons as a starter (34%)",
      "5.89",
-     "11 of 5,556 (0.20%)",
+     "12 of 5,555 (0.22%)",
      "-0.6 to +0.0",
      "43",
      "median pick 23, 85% drafted",
@@ -2717,7 +2774,7 @@
      "40",
      "rotation, 3+ seasons; most common: rotation, 3+ seasons (35%)",
      "7.33",
-     "20 of 5,556 (0.36%)",
+     "16 of 5,555 (0.29%)",
      "-1.4 to -0.6",
      "64",
      "median pick 19, 83% drafted",
@@ -2727,7 +2784,7 @@
      "35",
      "bench, 100+ games; most common: bench, 100+ games (52%)",
      "12",
-     "40 of 5,556 (0.72%)",
+     "43 of 5,555 (0.77%)",
      "-2.1 to -1.4",
      "104",
      "median pick 29, 66% drafted",
@@ -2737,7 +2794,7 @@
      "30",
      "reached the NBA; most common: reached the NBA (83%)",
      "23",
-     "87 of 5,556 (1.6%)",
+     "91 of 5,555 (1.6%)",
      "-3.5 to -2.1",
      "191",
      "median pick 38, 57% drafted",

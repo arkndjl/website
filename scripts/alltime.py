@@ -301,17 +301,26 @@ def tennis_players(tour):
 
 
 def cbb_players():
-    """site CBB WAR (scripts/cbb_tabs.py: (BPM + 2) x minutes / 40 x .68 x wins a point) on every Barttorvik season 2008-"""
-    import cbb_data
+    """site CBB WAR (scripts/cbb_tabs.py: (shrunk GBPM - REPL) x minutes / 40 x .68 x wins a point; GBPM shrunk GBPM_K
+    minutes toward that season's minutes-weighted mean, Nov 24 2026 port round) on every Barttorvik season 2008-"""
+    import cbb_data, cbb_tabs
     wpp = json.load(gzip.open(os.path.join(HERE, 'data', f'cbb_tabs_2026.json.gz')))['wfit']['wpp']
-    C = cbb_data.BT_COLS; out = []
+    C = cbb_data.BT_COLS; rows = []
     for f in sorted(glob.glob(os.path.join(CACHE, 'cbbp', '*.csv'))):
         for row in csv.reader(open(f, encoding='utf-8', errors='replace')):
             r = dict(zip(C, row))
             try: bpm, gp, mpg, y = float(r['bpm']), float(r['gp']), float(r['mp']), int(float(r['year']))
             except (ValueError, KeyError): continue
-            war = (bpm + 2.0) * gp * mpg / 40 * .68 * wpp
-            out.append(dict(id=r['pid'], n=r['name'], y=y, tm=r['team'], pos=None, v=war, raw=round(bpm, 1), w=gp * mpg))
+            try: gb = float(r['gbpm'])
+            except (ValueError, KeyError): gb = bpm
+            rows.append((r, bpm, gb, gp * mpg, y))
+    num, den = defaultdict(float), defaultdict(float)
+    for _, _, gb, m, y in rows: num[y] += gb * m; den[y] += m
+    out = []
+    for r, bpm, gb, m, y in rows:
+        x = cbb_tabs.wx({'gbpm': gb}, m, num[y] / den[y] if den[y] else None)
+        war = (x - cbb_tabs.REPL) * m / 40 * .68 * wpp
+        out.append(dict(id=r['pid'], n=r['name'], y=y, tm=r['team'], pos=None, v=war, raw=round(bpm, 1), w=m))
     return out
 
 

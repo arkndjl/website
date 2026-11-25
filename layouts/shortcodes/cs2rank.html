@@ -6,7 +6,7 @@
 {{- with site.Data.cs2 -}}
 {{- $mvFrom := .mvFrom -}}
 {{- $top := int ($.Get "top" | default 300) -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: ARK Ranking") "icon" "cs" "filter" "Tier,Region" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Tier,ARK,Elo,RWA,VRS" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "Counter-Strike :: ARK Ranking") "icon" "cs" "filter" "Tier,Region" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Tier,ARK,RWA,Elo,VRS" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "25") -}}
 <table class="cfb__table tstick2 cs__table">
   <thead><tr>
     <th>RK</th><th title="rank change over the last week; hover: rank and rating then">±</th><th>Team</th>

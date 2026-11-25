@@ -2,19 +2,19 @@
  "id": "cs2-ark-loop",
  "sport": "CS2",
  "question": "Does retuning the CS2 ARK rating every month beat keeping its settings fixed?",
- "answer": "Monthly retune passes; retunes ship monthly: -0.0016 log loss per series, t by month -3.49 (bar -2.00), through 2026-10.",
+ "answer": "Monthly retune passes; retunes ship monthly: -0.0018 log loss per series, t by month -8.66 (bar -2.00), through 2026-10.",
  "findings": [
-  "Won 13 of 16 months; top-50 series t -2.01.",
-  "Calibration slope 0.968 on 21,038 scored series.",
-  "Picks: Kmin 180 (16 months).",
-  "Shipped Kmin 180."
+  "Won 16 of 16 months; top-50 series t -0.06.",
+  "Calibration slope 0.964 on 15,957 scored series.",
+  "Picks: span 0.3 (14 months), K 384 (2 months).",
+  "Shipped span 0.3."
  ],
  "method": "Each month, the settings with the lowest log loss on all earlier series are picked from the shipped set and one-step moves on K, K decay, map K, lower-tier K, region K, span and new-player start, then scored once on that month against the shipped settings.",
- "data": "Valve VRS series + bo3.gg maps, Aug 2024 to 2026-10, 21,038 walk-forward series.",
- "n": 21038,
+ "data": "Valve VRS series + bo3.gg maps, Aug 2024 to 2026-10, 15,957 walk-forward series.",
+ "n": 15957,
  "robust": true,
  "interest": 3,
- "split_check": "13/16 months better; top-50 t -2.01.",
+ "split_check": "16/16 months better; top-50 t -0.06.",
  "chart": {
   "type": "bar",
   "title": "Log loss, monthly retune minus fixed",
@@ -32,83 +32,83 @@
     "points": [
      {
       "x": "25-07",
-      "y": -3.47,
-      "n": 867
+      "y": -0.57,
+      "n": 568
      },
      {
       "x": "25-08",
-      "y": -2.99,
-      "n": 1177
+      "y": -2.55,
+      "n": 831
      },
      {
       "x": "25-09",
-      "y": -1.09,
-      "n": 1392
+      "y": -2.43,
+      "n": 1007
      },
      {
       "x": "25-10",
-      "y": -1.35,
-      "n": 1540
+      "y": -2.14,
+      "n": 1122
      },
      {
       "x": "25-11",
-      "y": -2.2,
-      "n": 1276
+      "y": -1.6,
+      "n": 963
      },
      {
       "x": "25-12",
-      "y": -3.54,
-      "n": 581
+      "y": -3.57,
+      "n": 412
      },
      {
       "x": "26-01",
-      "y": 0.61,
-      "n": 985
+      "y": -2.74,
+      "n": 753
      },
      {
       "x": "26-02",
-      "y": -0.52,
-      "n": 1714
+      "y": -2.66,
+      "n": 1277
      },
      {
       "x": "26-03",
-      "y": -1.96,
-      "n": 2341
+      "y": -0.84,
+      "n": 1719
      },
      {
       "x": "26-04",
-      "y": -2.57,
-      "n": 1662
+      "y": -2.04,
+      "n": 1227
      },
      {
       "x": "26-05",
-      "y": -0.96,
-      "n": 1565
+      "y": -2.1,
+      "n": 1084
      },
      {
       "x": "26-06",
-      "y": -4.58,
-      "n": 889
+      "y": -0.94,
+      "n": 601
      },
      {
       "x": "26-07",
-      "y": -2.09,
-      "n": 1011
+      "y": -1.18,
+      "n": 740
      },
      {
       "x": "26-08",
-      "y": -1.14,
-      "n": 1223
+      "y": -1.66,
+      "n": 1012
      },
      {
       "x": "26-09",
-      "y": 0.51,
-      "n": 1559
+      "y": -1.13,
+      "n": 1407
      },
      {
       "x": "26-10",
-      "y": 2.45,
-      "n": 1256
+      "y": -1.02,
+      "n": 1234
      }
     ]
    }

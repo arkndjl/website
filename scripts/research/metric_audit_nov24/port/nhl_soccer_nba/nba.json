@@ -1,0 +1,58 @@
+{
+ "asof": "2026-11-24",
+ "seasons": [
+  2019,
+  2026
+ ],
+ "games": 9522,
+ "metrics": {
+  "rXPM (txpm)": {
+   "describeWin": 0.9313,
+   "describeWinHeld": 0.9303,
+   "describeNet": 0.9991,
+   "teamSeasons": 240
+  },
+  "XPM": {
+   "describeWin": 0.9224,
+   "describeWinHeld": 0.9218,
+   "describeNet": 0.9666,
+   "teamSeasons": 240
+  },
+  "BPM": {
+   "describeWin": 0.9335,
+   "describeWinHeld": 0.9328,
+   "describeNet": 0.991,
+   "teamSeasons": 240
+  },
+  "rXPM-G (per-game mean, game-anchored box)": {
+   "describeWin": 0.9237,
+   "describeWinHeld": 0.9232,
+   "describeNet": 0.9743,
+   "teamSeasons": 240
+  },
+  "same box, season-anchored": {
+   "describeWin": 0.9358,
+   "describeWinHeld": 0.9351,
+   "describeNet": 0.9975,
+   "teamSeasons": 240
+  }
+ },
+ "B2": {
+  "target": "held-out describe R2, team win%",
+  "before": 0.9303,
+  "after": 0.9232,
+  "t": -1.8,
+  "p": 0.9637,
+  "seasonsBetter": 2,
+  "n": 8
+ },
+ "B2_mechanism_vs_season_anchored": {
+  "t": -3.46,
+  "seasonsBetter": 1
+ },
+ "duplicates": {
+  "sameDayTeams": 1,
+  "sameId": 0,
+  "boxPlayerDupRows": 0
+ }
+}

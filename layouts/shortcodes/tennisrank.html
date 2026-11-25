@@ -1,8 +1,8 @@
 {{- /* Tennis ARK Ranking (data/tennis.json tours.<tour>.players, scripts/tennis_model.py): every player with 15+
        matches and one in the last six months, ranked by ARK = the model's win chance against the average top-50
-       player, best of three, averaged over the tour's last-52-week surface mix. The model blends surface Elo on wins
-       with opponent-adjusted serve and return point ratings (through the game / set / match chain), at weights fit
-       on 2012-22 tour-level main draws. tour= atp | wta. */ -}}
+       player from the ratings and points added, best of three, averaged over the tour's last-52-week surface mix. The
+       model blends surface Elo on wins with opponent-adjusted serve and return point ratings (through the game / set /
+       match chain) and points added, at weights fit on 2012-22 tour-level main draws. tour= atp | wta. */ -}}
 {{- with site.Data.tennis -}}
 {{- $tour := $.Get "tour" | default "atp" -}}
 {{- $t := index .tours $tour -}}
@@ -13,7 +13,7 @@
 <table class="cfb__table tstick2 tennis__table">
   <thead><tr>
     <th>RK</th><th>Player</th><th title="rank change over the last week; hover: rank and rating then">±</th>
-    <th data-vz title="ARK: win chance against the average top-50 player, best of three, over the tour's last-52-week surface mix ({{ range $i, $s := slice "H" "C" "G" }}{{ if $i }} / {{ end }}{{ index (dict "H" "hard" "C" "clay" "G" "grass") $s }} {{ partial "num.html" (slice "%.0f" (mul (index $t.mix $s) 100)) }}%{{ end }})">ARK</th>
+    <th data-vz title="ARK: win chance against the average top-50 player from the ratings and points added, best of three, over the surface mix ({{ range $i, $s := slice "H" "C" "G" }}{{ if $i }} / {{ end }}{{ index (dict "H" "hard" "C" "clay" "G" "grass") $s }} {{ partial "num.html" (slice "%.0f" (mul (index $t.mix $s) 100)) }}%{{ end }})">ARK</th>
     <th>Age</th>
     <th title="nationality">Nat</th>
     <th title="plays right- or left-handed">Plays</th>
@@ -22,8 +22,8 @@
     <th title="win chance against the average top-50 player on hard courts (best of three)">Hard</th>
     <th title="win chance against the average top-50 player on clay">Clay</th>
     <th title="win chance against the average top-50 player on grass">Grass</th>
-    <th title="WAR: wins above replacement, last 52 weeks, every level: wins minus the chance a replacement player (Elo of the No. 101-150 ranked) beats the same opponents on the same surfaces">WAR</th>
-    <th title="SV: season WAR, this calendar year to date, every level (same per-match credit as WAR)">SV</th>
+    <th title="WAR: wins above replacement, last 52 weeks; Futures and ITF count half, Challenger, qualifying and team events 0.85">WAR</th>
+    <th title="SV: season WAR, this calendar year, every level, each match counted in full">SV</th>
     <th title="PA: points won a 100 points over the average top-100 player against the same opponents, serve and return, opponent-adjusted; each match weighted by recency (half-life a year), shrunk by 300 points">PA</th>
     <th title="overall Elo on wins and losses, every level (1500 start)">Elo</th>
     <th title="overall Elo change over the last 13 weeks">13wk</th>

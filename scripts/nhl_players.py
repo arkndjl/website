@@ -40,6 +40,9 @@ pWAR (projected, what it is worth going forward): HPM = the weighted components 
     fit (the gap to the split predicts the split's residual, slope 1.13). With the split the fit picks 1/.5/.25,
     K 5 h, KG 200 h, lam 1, a1 + ixg: R2 .371, fully nested .347. Separate K for on-ice vs individual components
     (nested t -.83, 5/17) and goalie GSAx per expected goal faced (next-season GSAx t -.77; team GD t -1.15) fail.
+    Nov 24 2026 (scripts/research/metric_audit_nov24/nhl): pWAR's evf, eva and ixg come from MoneyPuck's flurry +
+    score + venue adjusted xG (WAR keeps raw xG, which adds up to goals): next-season team R2 .384 -> .387 on fixed
+    weights (t 2.88, Holm p .006, 13/17 pairs); refit LOSO .373 -> .376 (t -2.82, 15/17), walk forward t -3.59, 14/15.
     pWAR = (HPM - replacement) x TOI / 60 / goals a win, replacement as above on HPM; goals a win from team points
     against goal differential.
 3Y (p3, display only): projected WAR over the next three seasons, proj3() with data/nhl_proj_fit.json
@@ -100,11 +103,18 @@ def f(r, k):
         return 0.0
 
 
+ADJ = 'flurryScoreVenueAdjustedxGoals'                # pWAR's xG inputs (HPM_IN); WAR keeps raw xG
+HPM_IN = {'evf': 'evf_a', 'eva': 'eva_a', 'ixg': 'ixg_a'}
+
+
 def skaters(S):
-    """one row a skater-season: ice time, team, position, raw component rates (per 60, uncentred)"""
+    """one row a skater-season: ice time, team, position, raw component rates (per 60, uncentred); evf_a, eva_a, ixg_a
+    = the same from MoneyPuck's flurry + score + venue adjusted xG (off-ice scaled by the team's 5-on-5 adjusted / raw
+    ratio), which pWAR reads (HPM_IN)"""
     by = defaultdict(dict)
     for r in mp_file('skaters', S):
         by[r['playerId']][r['situation']] = r
+    t5 = {D.team(r['team']): r for r in mp_file('teams', S) if r['situation'] == '5on5'}
     out = []
     for pid, s in by.items():
         al, e5, pp, pk = s.get('all'), s.get('5on5'), s.get('5on4'), s.get('4on5')
@@ -119,14 +129,19 @@ def skaters(S):
                'g': f(al, 'I_F_goals') / h, 'ixg': f(al, 'I_F_xGoals') / h, 'a1': f(al, 'I_F_primaryAssists') / h,
                'a2': f(al, 'I_F_secondaryAssists') / h, 'pen': (f(al, 'penaltiesDrawn') - f(al, 'penalties')) / h,
                'pts': f(al, 'I_F_points'), 'goals': f(al, 'I_F_goals'),
-               'fin': (f(al, 'I_F_goals') - f(al, 'I_F_xGoals')) / h}
+               'fin': (f(al, 'I_F_goals') - f(al, 'I_F_xGoals')) / h, 'ixg_a': f(al, 'I_F_' + ADJ) / h}
         if e5 and f(e5, 'icetime') > 0 and f(e5, 'timeOnBench') > 0:
             i5, b5 = f(e5, 'icetime') / 3600, f(e5, 'timeOnBench') / 3600
             sh = f(e5, 'icetime') / toi
             row['evf'] = (f(e5, 'OnIce_F_xGoals') / i5 - f(e5, 'OffIce_F_xGoals') / b5) * sh
             row['eva'] = -(f(e5, 'OnIce_A_xGoals') / i5 - f(e5, 'OffIce_A_xGoals') / b5) * sh
+            T = t5.get(D.team(e5['team']), {})
+            rf = f(T, ADJ + 'For') / f(T, 'xGoalsFor') if f(T, 'xGoalsFor') else 1.0
+            ra = f(T, ADJ + 'Against') / f(T, 'xGoalsAgainst') if f(T, 'xGoalsAgainst') else 1.0
+            row['evf_a'] = (f(e5, 'OnIce_F_' + ADJ) / i5 - f(e5, 'OffIce_F_xGoals') * rf / b5) * sh
+            row['eva_a'] = -(f(e5, 'OnIce_A_' + ADJ) / i5 - f(e5, 'OffIce_A_xGoals') * ra / b5) * sh
         else:
-            row['evf'] = row['eva'] = 0.0
+            row['evf'] = row['eva'] = row['evf_a'] = row['eva_a'] = 0.0
         row['_pp'] = (f(pp, 'OnIce_F_xGoals'), f(pp, 'icetime')) if pp else (0, 0)
         row['_pk'] = (f(pk, 'OnIce_A_xGoals'), f(pk, 'icetime')) if pk else (0, 0)
         out.append(row)
@@ -141,7 +156,7 @@ def skaters(S):
         x, t = r.pop('_pk'); r['pk'] = -(x / t * 3600 - lpk) * t / r['toi'] if t > 0 else 0.0
     # centre the individual rates on the league (ice-time weighted)
     tt = sum(r['toi'] for r in out)
-    for k in ('g', 'ixg', 'a1', 'a2', 'pen'):
+    for k in ('g', 'ixg', 'ixg_a', 'a1', 'a2', 'pen'):
         m = sum(r[k] * r['toi'] for r in out) / tt
         for r in out:
             r[k] -= m
@@ -328,10 +343,12 @@ PRIORS = ['pl', 'pD', 'gpl']                                     # the shrink ta
 
 def marcel(hist, k, keys):
     """weighted per-60 rates over the seasons in hist [(weight, row or None)], shrunk toward 0 with k seconds of
-    pseudo ice time; and the shrink share k / (weighted ice time + k), which carries the learned shrink target"""
+    pseudo ice time; and the shrink share k / (weighted ice time + k), which carries the learned shrink target.
+    evf, eva and ixg read the adjusted-xG columns (HPM_IN, Nov 24 2026)"""
     hist = [(w, p) for w, p in hist if p]
     wt = sum(w * p['toi'] for w, p in hist)
-    return {c: sum(w * p['toi'] * p[c] for w, p in hist) / (wt + k) for c in keys}, k / (wt + k)
+    col = lambda p, c: p[HPM_IN[c]] if c in HPM_IN and HPM_IN[c] in p else p[c]
+    return {c: sum(w * p['toi'] * col(p, c) for w, p in hist) / (wt + k) for c in keys}, k / (wt + k)
 
 
 def history(pid, idx, S, wts):
