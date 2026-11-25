@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-25T05:14:58Z",
+ "asof": "2026-11-25T05:19:02Z",
  "recenter": {
-  "2026-11-25": 1.99
+  "2026-11-25": 2.0
  },
  "monitor": {
   "clocks": {
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-25T04:39:01Z",
-  "ageH": 0.6,
+  "ageH": 0.7,
   "stale": false
  },
  "picks": [],
@@ -2066,7 +2066,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 3.7,
    "x": 4.0,
    "why": "edge under 4 (venue: neutral)",
@@ -2114,7 +2114,7 @@
    "mk": "total",
    "side": "over",
    "line": 154.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 4.2,
    "x": 5.0,
    "why": "edge under 5 (tier: power)",
@@ -2186,22 +2186,6 @@
    "tm": 143.7
   },
   {
-   "id": "401920858",
-   "sport": "cbb",
-   "kick": "2026-11-25T21:00:00Z",
-   "home": "Marshall",
-   "away": "Prairie View A&M",
-   "mk": "spread",
-   "side": "home",
-   "line": 16.5,
-   "price": 103.0,
-   "edge": 2.6,
-   "x": 3.5,
-   "why": "edge under 3.5 (inj: with)",
-   "m": 19.1,
-   "tm": 153.4
-  },
-  {
    "id": "401928359",
    "sport": "cbb",
    "kick": "2026-11-25T20:30:00Z",
@@ -2216,6 +2200,22 @@
    "why": "edge under 5 (line: <4)",
    "m": 5.2,
    "tm": 171.7
+  },
+  {
+   "id": "401924737",
+   "sport": "cbb",
+   "kick": "2026-11-25T21:00:00Z",
+   "home": "Liberty",
+   "away": "Princeton",
+   "mk": "total",
+   "side": "over",
+   "line": 135.5,
+   "price": -124.0,
+   "edge": 3.6,
+   "x": 5.0,
+   "why": "edge under 5 (total: low)",
+   "m": 2.7,
+   "tm": 139.1
   },
   {
    "id": "401929287",
@@ -2282,20 +2282,20 @@
    "tm": 155.6
   },
   {
-   "id": "401911029",
+   "id": "401920809",
    "sport": "cbb",
-   "kick": "2026-11-25T18:00:00Z",
-   "home": "Miami (OH)",
-   "away": "Eastern Kentucky",
-   "mk": "spread",
-   "side": "away",
-   "line": 14.5,
+   "kick": "2026-11-25T19:30:00Z",
+   "home": "Xavier",
+   "away": "Texas A&M",
+   "mk": "total",
+   "side": "under",
+   "line": 168.5,
    "price": -114.0,
-   "edge": 2.3,
-   "x": 4.5,
-   "why": "edge under 4.5 (line: 9-15)",
-   "m": 12.2,
-   "tm": 159.4
+   "edge": 2.6,
+   "x": 5.0,
+   "why": "edge under 5 (tier: power)",
+   "m": -6.2,
+   "tm": 165.9
   }
  ],
  "games": {
@@ -2351,7 +2351,7 @@
    "mk": "total",
    "side": "over",
    "line": 154.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 4.2,
    "ev": null,
    "units": 0.0,
@@ -2398,9 +2398,9 @@
   "401920809": {
    "mk": "total",
    "side": "under",
-   "line": 167.5,
-   "price": -119.0,
-   "edge": 1.6,
+   "line": 168.5,
+   "price": -114.0,
+   "edge": 2.6,
    "ev": null,
    "units": 0.0,
    "home": "Xavier",
@@ -2459,7 +2459,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 3.7,
    "ev": null,
    "units": 0.0,
@@ -2614,9 +2614,9 @@
   "401924737": {
    "mk": "total",
    "side": "over",
-   "line": 137.5,
-   "price": -110.0,
-   "edge": 1.6,
+   "line": 135.5,
+   "price": -124.0,
+   "edge": 3.6,
    "ev": null,
    "units": 0.0,
    "home": "Liberty",
@@ -2804,11 +2804,11 @@
    "state": "under"
   },
   "401920858": {
-   "mk": "spread",
-   "side": "home",
-   "line": 16.5,
-   "price": 103.0,
-   "edge": 2.6,
+   "mk": "total",
+   "side": "over",
+   "line": 151.5,
+   "price": -129.0,
+   "edge": 1.9,
    "ev": null,
    "units": 0.0,
    "home": "Marshall",
@@ -2927,7 +2927,7 @@
    "mk": "spread",
    "side": "home",
    "line": 1.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 2.3,
    "ev": null,
    "units": 0.0,
@@ -2988,7 +2988,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 25753,
+  "snapshots": 25769,
   "buckets": [
    {
     "when": "24h+",
@@ -3001,12 +3001,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 5200,
+    "clvN": 5204,
     "clvRet": -0.0041,
-    "clvT": -1.97,
+    "clvT": -1.98,
     "clv": 0.64,
     "beat": 0.416,
-    "still": 0.393
+    "still": 0.394
    },
    {
     "when": "1-6h",
@@ -21496,7 +21496,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-25T05:14:58Z",
+ "checked": "2026-11-25T05:19:02Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
