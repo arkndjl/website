@@ -12,6 +12,8 @@ _SC = ld('data/fv_scale.json')['boards']
 _KT = ', '.join(f"{n} {_SC[b]['K']:.1f} / {_SC[b]['T']:.1f}" for n, b in
                 (('CFB', 'cfb'), ('CBB', 'cbb'), ('hockey', 'hockey'), ('soccer', 'soccer'), ('ATP', 'atp'), ('WTA', 'wta')))
 _CBBK = ld('data/cbb_live_fit.json')['k']
+_CFPM = ld('data/cfb_cfp_memory.json')                       # CFP committee memory (scripts/cfb_cfp_memory.py)
+_CFPMR, _CFPMS = _CFPM['realInputs'], _CFPM['sim']['hold']
 _HKF = ld('data/hockey.json')['fit']
 _HKN = {'ls': 'log slot (board rank as slot)', 'nhle': 'draft-year NHLe', 'D': 'defense', 'G': 'goalie',
         'chl1': 'CHL first-round pick', 'cs': 'class strength', 'agenh': 'age', 'ht': 'height', 'wt': 'weight'}
@@ -499,8 +501,11 @@ sections.append({'id': 'teams', 'title': 'Team ratings', 'entries': [
       'season odds tab on every team sport; ARKRANKING', ['CFB', 'NFL', 'CBB', 'NBA', 'NHL', 'Soccer']),
     E('CFP odds', 'Committee model plus bracket for the 12-team playoff.',
       ['Plackett-Luce fit on CFP releases 2017-25: losses, wins, rating, wins above bubble, P4. Held out field log loss .029 vs .090.',
+       'Committee memory: final score = c x model + a x (26 - CFP rank) / 25 + d x wins above bubble since the release; a, c, d by weeks to Selection Sunday.',
+       f"Fit 2017-21, held 2022-25 ({_CFPMR['pairs']} releases): final-ranking log lik {_CFPMR['old']:.1f} -> {_CFPMR['new']:.1f} (t {_CFPMR['tVsOld']:.1f}); "
+       f"seed log loss {_CFPMS['seedLL']['old']:.3f} -> {_CFPMS['seedLL']['new']:.3f} (t {_CFPMS['tSeedLL']:.1f}).",
        '2026 rules: P4 champions in, best G6 champion, Notre Dame if top 12; top 4 byes.'],
-      'CFB season odds (Bye, Semis, Natl title)', ['CFB']),
+      'CFB season odds (Bye, Semis, Natl title), bracket', ['CFB']),
     E('NCAA tournament odds', 'Committee and bracket sims for bids, seeds and rounds.',
       ['Committee fit on 2015-26 fields from rating and wins above bubble (45th team): 91% of at-large picks.',
        'Conference tournaments and the bracket played with the game model.'],

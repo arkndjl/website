@@ -1536,9 +1536,11 @@
      "short": "Committee model plus bracket for the 12-team playoff.",
      "body": [
       "Plackett-Luce fit on CFP releases 2017-25: losses, wins, rating, wins above bubble, P4. Held out field log loss .029 vs .090.",
+      "Committee memory: final score = c x model + a x (26 - CFP rank) / 25 + d x wins above bubble since the release; a, c, d by weeks to Selection Sunday.",
+      "Fit 2017-21, held 2022-25 (20 releases): final-ranking log lik -865.9 -> -714.2 (t 4.5); seed log loss 2.477 -> 2.422 (t 1.8).",
       "2026 rules: P4 champions in, best G6 champion, Notre Dame if top 12; top 4 byes."
      ],
-     "where": "CFB season odds (Bye, Semis, Natl title)",
+     "where": "CFB season odds (Bye, Semis, Natl title), bracket",
      "sports": [
       "CFB"
      ]

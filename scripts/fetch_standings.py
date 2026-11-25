@@ -334,7 +334,7 @@ def polls(path):
                          'logo': logo(t), 'rec': rec, 'pts': int(num(x.get('points'))) or None,
                          'fpv': x.get('firstPlaceVotes') or None})
         lbl = 'CFP ranking' if 'Playoff' in name else 'AP' if 'AP' in name else 'Coaches'
-        out.append({'name': lbl, 'date': (r.get('headline') or r.get('shortHeadline') or ''), 'rows': rows})
+        out.append({'name': lbl, 'date': (r.get('headline') or r.get('shortHeadline') or ''), 'released': r.get('date') or '', 'rows': rows})
     order = {'CFP ranking': 0, 'AP': 1, 'Coaches': 2}
     return sorted(out, key=lambda p: order.get(p['name'], 9))
 

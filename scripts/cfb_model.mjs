@@ -928,27 +928,36 @@ function gauss(R) { let u = 0, v = 0; while (!u) u = R(); while (!v) v = R(); re
 const CFP_PATH = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'data', 'cfb_cfp.json');
 const CFP = (() => { try { const j = JSON.parse(fs.readFileSync(CFP_PATH, 'utf8')); return { feats: j.feats, beta: j.beta, gsd: j.gsd || 15 }; } catch { return null; } })();
 const CFP_FORMAT = { p4: ['SEC', 'Big Ten', 'ACC', 'Big 12'], nd: '87', size: 12, byes: 4 };
-// Committee memory: the final ranking leans on the committee's latest release. score + gamma x (26 - rank) / 25 (0
-// unranked), gamma by how many weeks are left (scripts/cfb_cfp_seeds.py, data/cfb_cfp_seeds.json gammaLive keyed by the
-// release's week label). From weeks 10 and 12 of 2017-25: the final release's held-out log likelihood 2022-25 -185.2 ->
-// -181.7 (gamma 1, wk 10) and -175.4 (gamma 3.25, wk 12); seed log loss t -3.7 / -2.4; exact seeds right a season at
-// week 10 1.1 -> 2.1 (t 2.9), against 1.25 for the committee's own top 12 that week; level with it at week 12
-const SEEDS_PATH = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'data', 'cfb_cfp_seeds.json');
+// Committee memory: the final ranking is a move from the committee's latest release (scripts/cfb_cfp_memory.py,
+// data/cfb_cfp_memory.json). score = c x (the committee model) + a x (26 - rank) / 25 (0 unranked) + d x (wins above
+// bubble since the release), a / c / d by weeks from the release to the final ranking (Selection Sunday = the Sunday after
+// the first Saturday of December). Held out 2022-25 (fit 2017-21): the final release's log likelihood on real results
+// -865.9 -> -714.2 over 20 releases (t 4.5, 18 of 20) against the old form (c 1, d 0, a by the release's week label, which
+// shifts between seasons); season-sim seed log loss 2.477 -> 2.422 (t 1.8), field log loss level. The final release
+// (no weeks left) is the bracket's order as it stands.
+const MEM_PATH = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'data', 'cfb_cfp_memory.json');
 const STAND_PATH = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'data', 'standings.json');
-function cfpMemory() {
+function selectionDay(y) {
+  const d = new Date(Date.UTC(y, 11, 1)); while (d.getUTCDay() !== 6) d.setUTCDate(d.getUTCDate() + 1);
+  d.setUTCDate(d.getUTCDate() + 1); return d;
+}
+function cfpMemory(S) {
   try {
-    const g = JSON.parse(fs.readFileSync(SEEDS_PATH, 'utf8')).gammaLive || {};
+    const fit = JSON.parse(fs.readFileSync(MEM_PATH, 'utf8')).byWeeksLeft || {};
     const rel = (JSON.parse(fs.readFileSync(STAND_PATH, 'utf8')).polls?.cfb || []).find(p => /playoff|cfp/i.test(p.name || ''));
-    const wk = +(String(rel?.date || '').match(/week (\d+)/i)?.[1]);
-    if (!rel || !wk) return null;
-    const ks = Object.keys(g).map(Number).sort((a, b) => a - b);
+    if (!rel?.rows?.length || !S) return null;
+    // the release: ESPN's date; before standings carried it, the last Tuesday (releases come out Tuesdays)
+    let D = Date.parse(rel.released || '');
+    if (!isFinite(D)) { const t = new Date(); t.setUTCHours(8, 0, 0, 0); while (t.getUTCDay() !== 2) t.setUTCDate(t.getUTCDate() - 1); D = +t; }
+    if (new Date(D).getUTCFullYear() !== S) return null;
+    const wl = Math.round((+selectionDay(S) - D) / 864e5 / 7);
+    const ks = Object.keys(fit).map(Number).sort((a, b) => a - b);
     if (!ks.length) return null;
-    // linear between the fitted labels, held at the ends
-    let gamma = wk <= ks[0] ? g[ks[0]] : wk >= ks.at(-1) ? g[ks.at(-1)] : null;
-    if (gamma == null) for (let i = 1; i < ks.length; i++) if (wk <= ks[i]) { const f = (wk - ks[i - 1]) / (ks[i] - ks[i - 1]); gamma = g[ks[i - 1]] + f * (g[ks[i]] - g[ks[i - 1]]); break; }
+    const k = wl <= 0 ? null : Math.min(ks.at(-1), Math.max(ks[0], wl));
+    const [a, c, d] = k == null ? [1000, 0, 0] : fit[k];
     const mem = {};
-    for (const r of rel.rows || []) { const id = String(r.logo || '').match(/\/(\d+)\.png/)?.[1]; if (id) mem[id] = (26 - r.rk) / 25; }
-    return { gamma, mem, week: wk };
+    for (const r of rel.rows) { const id = String(r.logo || '').match(/\/(\d+)\.png/)?.[1]; if (id) mem[id] = (26 - r.rk) / 25; }
+    return { a, c, d, mem, D, weeksLeft: Math.max(0, wl), week: +(String(rel.date || '').match(/week (\d+)/i)?.[1]) || null };
   } catch { return null; }
 }
 // Hungarian: slots (rows) x candidates (cols, >= rows), maximise the sum -> slot i's column (scripts/bracket.py assign)
@@ -1005,7 +1014,7 @@ export function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, 
   const nLeft = {}; for (const r of left) { nLeft[r.h] = (nLeft[r.h] || 0) + 1; nLeft[r.a] = (nLeft[r.a] || 0) + 1; }
   const tu = Object.fromEntries(teams.map(t => [t, uncert * Math.sqrt(Math.min(1, (nLeft[t] || 0) / 12))]));
   const acc = Object.fromEntries(teams.map(t => [t, { w: 0, ccg: 0, title: 0, cfp: 0, bye: 0, qf: 0, semi: 0, fin: 0, natl: 0, seed: 0, bowl: 0, wins: Array(16).fill(0), sd: Array(CFP_FORMAT.size).fill(0) }]));
-  const MEM = cfpMemory();
+  const MEM = CFP ? cfpMemory(S) : null;
   const confs = {}; for (const t of teams) if (conf[t] && !/independent/i.test(conf[t])) (confs[conf[t]] ||= []).push(t);
   const ix = Object.fromEntries(teams.map((t, i) => [t, i]));
   const p4 = teams.map(t => t === CFP_FORMAT.nd || CFP_FORMAT.p4.includes(conf[t]) ? 1 : 0);
@@ -1051,16 +1060,18 @@ export function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, 
       // the committee: wins above a bubble team (the 12th-best strength) on this season's results, then the score
       const sorted = teams.map(str).sort((x, y) => y - x), bub = sorted[11];
       const pB = (opp, site) => phi((bub - str(opp) + site) / gsd);
-      const wab = Object.fromEntries(teams.map(t => [t, 0]));
+      const wab = Object.fromEntries(teams.map(t => [t, 0])), wabR = Object.fromEntries(teams.map(t => [t, 0]));
       games.forEach((r, i) => {
-        const site = r.n ? 0 : WAB_HFA;
-        if (r.h in wab) wab[r.h] += (hw[i] ? 1 : 0) - pB(r.a, site);
-        if (r.a in wab) wab[r.a] += (hw[i] ? 0 : 1) - pB(r.h, -site);
+        const site = r.n ? 0 : WAB_HFA, pre = MEM && i < done.length && Date.parse(r.date) < MEM.D;
+        const vh = (hw[i] ? 1 : 0) - pB(r.a, site), va = (hw[i] ? 0 : 1) - pB(r.h, -site);
+        if (r.h in wab) { wab[r.h] += vh; if (pre) wabR[r.h] += vh; }
+        if (r.a in wab) { wab[r.a] += va; if (pre) wabR[r.a] += va; }
       });
       for (const [w, l] of ccgG) { wab[w] += 1 - pB(l, 0); wab[l] -= pB(w, 0); }
       const isCh = new Set(champs);
       const x = { L: t => W[t].l, W: t => W[t].w, rating: str, wab: t => wab[t], champ: t => isCh.has(t) ? 1 : 0, p4: t => p4[ix[t]] };
-      const score = teams.map(t => CFP.feats.reduce((a, f) => a + B[f] * x[f](t), 0) + (MEM ? MEM.gamma * (MEM.mem[t] || 0) : 0) + gumbel(R));
+      const model = t => CFP.feats.reduce((a, f) => a + B[f] * x[f](t), 0);
+      const score = teams.map(t => (MEM ? MEM.c * model(t) + MEM.a * (MEM.mem[t] || 0) + MEM.d * (wab[t] - wabR[t]) : model(t)) + gumbel(R));
       const order = teams.map((t, i) => i).sort((i, j) => score[j] - score[i]).map(i => teams[i]);
       const rank = Object.fromEntries(order.map((t, i) => [t, i + 1]));
       const auto = new Set(champs.filter(t => CFP_FORMAT.p4.includes(conf[t])));
@@ -1112,7 +1123,7 @@ export function simulate(rows, predict, fbs, conf, ratingNow, sigma, N = 10000, 
       const ch = adv(sfW[0], sfW[1], 'natl');
       const games = (gs, k, kw) => gs.map(([a, b]) => { const w = adv(a, b, kw); return { a: ent(a, k), b: ent(b, k), w }; });
       bracket = {
-        memory: MEM ? { week: MEM.week, gamma: r3(MEM.gamma) } : null,
+        memory: MEM ? { week: MEM.week, weeksLeft: MEM.weeksLeft, a: r3(MEM.a), c: r3(MEM.c), d: r3(MEM.d) } : null,
         seeds: sd.map((t, i) => ({ t, seed: i + 1, p: r3(acc[t].sd[i] / N), pin: P(t, 'cfp') })),
         sections: [{ name: 'CFP', rounds: [
           { name: 'First round', games: games(fr, 'cfp', 'qf') },
