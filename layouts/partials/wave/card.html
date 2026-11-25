@@ -1,0 +1,19 @@
+{{- /* One WAVE catalog card: dict "p" (a wave.json product row: t u img img2 price was off val cur who st stn type sz tm co
+       new out pick g v) "names" (id -> display name) "lg" (logo sprite prefix) "chip" ("pick" shows the PICK score).
+       Photos load at 360 / 720 px from the store's CDN (Shopify width=). Used by wave/grid.html. */ -}}
+{{- $p := .p -}}
+{{- $cur := $p.cur | default "$" -}}
+{{- $who := $p.who | default (index ($p.tm | default (slice "")) 0) -}}
+{{- $sep := cond (in $p.img "?") "&" "?" -}}
+{{- $brand := index .names ($p.who | default "-") | default $p.stn -}}
+<a class="wv-c{{ if $p.out }} is-sold{{ end }}" href="{{ $p.u }}" target="_blank" rel="noopener" data-who="{{ with $p.who }}{{ . }} {{ end }}{{ delimit ($p.tm | default slice) " " }}" data-type="{{ $p.type }}"{{ with $p.g }} data-g="{{ . }}"{{ end }}{{ with $p.val }} data-val="{{ . }}"{{ end }}{{ with $p.off }} data-off="{{ . }}"{{ end }} data-price="{{ $p.price }}"{{ with $p.pick }} data-pick="{{ . }}"{{ end }} title="{{ $p.t }} · {{ $p.stn }}{{ with $p.val }} · VAL {{ . }}{{ end }}{{ with $p.pick }} · PICK {{ . }}{{ end }}">
+  <span class="wv-c__i"><img src="{{ $p.img }}{{ $sep }}width=360" srcset="{{ $p.img }}{{ $sep }}width=360 360w, {{ $p.img }}{{ $sep }}width=720 720w" sizes="(max-width:560px) 46vw, (max-width:1100px) 30vw, 260px" alt="{{ $p.t }}" width="360" height="450" loading="lazy" decoding="async"{{ with $p.img2 }} data-alt="{{ . }}{{ cond (in . "?") "&" "?" }}width=720"{{ end }}>
+    <span class="wv-c__f">{{ with $p.off }}<b class="off">-{{ . }}%</b>{{ end }}{{ if and $p.val (ge $p.val 120) }}<b class="val">VAL {{ $p.val }}</b>{{ end }}{{ if $p.new }}<b class="new">NEW</b>{{ end }}{{ if $p.co }}<b class="co">COLLAB</b>{{ end }}{{ if and (eq .chip "pick") $p.pick }}<b class="pk">{{ $p.pick }}</b>{{ end }}{{ if $p.out }}<b class="so">SOLD OUT</b>{{ end }}</span>
+  </span>
+  <span class="wv-c__b">
+    <span class="wv-c__w">{{ with $who }}<svg class="lg lg--xs" aria-hidden="true"><use href="{{ $.lg }}{{ . }}"/></svg>{{ end }}<i>{{ $p.v | default $brand }}</i></span>
+    <span class="wv-c__t">{{ $p.t }}</span>
+    <span class="wv-c__p"><b>{{ $cur }}{{ lang.FormatNumber (cond (or (ge $p.price 100) (eq (math.Round $p.price) $p.price)) 0 2) $p.price }}</b>{{ with $p.was }}<s>{{ $cur }}{{ lang.FormatNumber 0 . }}</s>{{ end }}{{ if ne $brand $p.stn }}<em>{{ $p.stn }}</em>{{ end }}</span>
+    {{- with $p.sz }}<span class="wv-c__s">{{ range first 8 . }}<i>{{ . }}</i>{{ end }}</span>{{ end }}
+  </span>
+</a>

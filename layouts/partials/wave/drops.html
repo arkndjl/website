@@ -1,16 +1,19 @@
-{{- /* WAVE drop cards: dict "items" (wave.json drops / merch). Product images load small (Shopify width=96) and draw
-       pixelated; hover shows them smooth. Used by layouts/shortcodes/wavepanel.html. */ -}}
-{{- $lg := printf "/img/px/wave-logos.svg?v=%s#px-wv-" (substr (readFile "static/img/px/wave-logos.svg" | md5) 0 8) -}}
-<div class="wv-drops">
+{{- /* WAVE drop blocks: dict "items" (wave.json drops / merch: who name d n items stores) "names" "lg" "max" (cards per
+       drop, default 8; +N links to the first piece's store). Band-merch rows (price as text, no store name) are filled in
+       from their drop. Used by layouts/shortcodes/wavepanel.html. */ -}}
+{{- $max := .max | default 8 -}}
 {{- range .items }}
+{{- $d := . -}}
 <article class="wv-drop" data-who="{{ .who }}">
-  <div class="wv-drop__h"><svg class="lg lg--s" aria-hidden="true"><use href="{{ $lg }}{{ .who }}"/></svg><span><b>{{ .name }}</b><br><i>{{ (time .d).Format "Mon Jan 2" }}</i></span><span class="wv-drop__n">{{ .n }} new</span></div>
-  <div class="wv-strip">
-  {{- range first 8 .items }}
-    <a class="wv-pr" href="{{ .u }}" target="_blank" rel="noopener" title="{{ .t }}{{ with .price }} · ${{ . }}{{ end }}">{{ with .img }}<img src="{{ . }}{{ if in . "?" }}&{{ else }}?{{ end }}width=96" width="96" height="96" alt="" loading="lazy" decoding="async">{{ end }}{{ with .price }}<em>${{ . | float | int }}</em>{{ end }}<span>{{ .t }}</span></a>
+  <header class="wv-drop__h"><svg class="lg lg--s" aria-hidden="true"><use href="{{ $.lg }}{{ .who }}"/></svg><h3>{{ .name }}</h3><time datetime="{{ .d }}">{{ (time .d).Format "Mon Jan 2" }}</time><span class="wv-drop__n">{{ .n }} new</span>{{ with .stores }}<span class="wv-drop__s">{{ delimit . " · " }}</span>{{ end }}</header>
+  {{- $rows := slice }}
+  {{- range .items }}
+    {{- $r := merge (dict "who" $d.who "stn" $d.name "new" true) . -}}
+    {{- $r = merge $r (dict "price" (float (.price | default 0))) -}}
+    {{- if and (isset . "avail") (not .avail) }}{{ $r = merge $r (dict "out" true) }}{{ end -}}
+    {{- $rows = $rows | append $r -}}
   {{- end }}
-  </div>
-  {{- if gt .n 8 }}<span class="wv-more">+{{ sub .n 8 }}</span>{{ end }}
+  {{ partial "wave/grid.html" (dict "items" $rows "names" $.names "lg" $.lg "max" $max) }}
+  {{- if gt $d.n $max }}{{ with index $d.items 0 }}<a class="wv-more" href="{{ .u }}" target="_blank" rel="noopener">+{{ sub $d.n $max }}</a>{{ end }}{{ end }}
 </article>
 {{- else }}<p class="wv-empty">--</p>{{ end }}
-</div>

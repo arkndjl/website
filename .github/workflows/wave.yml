@@ -1,5 +1,5 @@
-# ST. CLAIRE WAVE (/stclaire/wave/): scripts/wave.py -> data/wave.json (state scripts/data/wave_state.json).
-# Free public sources only (Shopify stores, RSS, NYC venue pages, MLB Stats API, ESPN); robots.txt checked per request.
+# ST. CLAIRE WAVE (/stclaire/wave/): scripts/wave.py + wave_catalog.py -> data/wave.json (state scripts/data/wave_state.json).
+# Free public sources only (Shopify brand / retailer / team stores, RSS, NYC venue pages, MLB Stats API, ESPN); robots.txt checked per request.
 # Optional secret TICKETMASTER_API_KEY (free, developer.ticketmaster.com) adds every NYC Ticketmaster show for the bands.
 # Every 3 hours; data-health.yml watches the run and the file's checked stamp (data/freshness.json "wave").
 name: wave
@@ -19,7 +19,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
