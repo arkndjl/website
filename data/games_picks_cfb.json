@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-25T05:06:11Z",
+ "asof": "2026-11-25T05:09:39Z",
  "recenter": {
-  "week": 0.47
+  "week": 0.46
  },
  "monitor": {
   "clocks": {
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-25",
-  "ageH": -18.9,
+  "ageH": -18.8,
   "stale": false
  },
  "picks": [],
@@ -341,6 +341,22 @@
    "tm": 48.5
   },
   {
+   "id": "401861969",
+   "sport": "cfb",
+   "kick": "2026-11-28T17:00:00.000Z",
+   "home": "Wyoming",
+   "away": "UConn",
+   "mk": "total",
+   "side": "under",
+   "line": 46.5,
+   "price": -114.0,
+   "edge": 5.5,
+   "x": 8.0,
+   "why": "edge under 8 (game: non-conference)",
+   "m": -4.3,
+   "tm": 41.0
+  },
+  {
    "id": "401866473",
    "sport": "cfb",
    "kick": "2026-11-27T17:00:00.000Z",
@@ -371,22 +387,6 @@
    "why": "edge under 7.5 (side: over)",
    "m": -8.6,
    "tm": 51.2
-  },
-  {
-   "id": "401861969",
-   "sport": "cfb",
-   "kick": "2026-11-28T17:00:00.000Z",
-   "home": "Wyoming",
-   "away": "UConn",
-   "mk": "total",
-   "side": "under",
-   "line": 45.5,
-   "price": -110.0,
-   "edge": 4.5,
-   "x": 8.0,
-   "why": "edge under 8 (game: non-conference)",
-   "m": -4.3,
-   "tm": 41.0
   },
   {
    "id": "401864549",
@@ -493,7 +493,7 @@
    "mk": "total",
    "side": "over",
    "line": 52.5,
-   "price": -110.0,
+   "price": -114.0,
    "edge": 2.8,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
@@ -613,22 +613,6 @@
    "tm": 47.5
   },
   {
-   "id": "401858540",
-   "sport": "cfb",
-   "kick": "2026-11-28T17:00:00.000Z",
-   "home": "Ohio State",
-   "away": "Michigan",
-   "mk": "spread",
-   "side": "home",
-   "line": 9.5,
-   "price": -122.0,
-   "edge": 7.6,
-   "x": null,
-   "why": "spread market off",
-   "m": 17.1,
-   "tm": 43.8
-  },
-  {
    "id": "401860926",
    "sport": "cfb",
    "kick": "2026-11-28T23:00:00.000Z",
@@ -659,6 +643,22 @@
    "why": "total market off",
    "m": 19.5,
    "tm": 58.4
+  },
+  {
+   "id": "401858540",
+   "sport": "cfb",
+   "kick": "2026-11-28T17:00:00.000Z",
+   "home": "Ohio State",
+   "away": "Michigan",
+   "mk": "spread",
+   "side": "home",
+   "line": 10.5,
+   "price": -101.0,
+   "edge": 6.6,
+   "x": null,
+   "why": "spread market off",
+   "m": 17.1,
+   "tm": 43.8
   },
   {
    "id": "401856757",
@@ -741,9 +741,9 @@
   "401858540": {
    "mk": "spread",
    "side": "home",
-   "line": 9.5,
-   "price": -122.0,
-   "edge": 7.6,
+   "line": 10.5,
+   "price": -101.0,
+   "edge": 6.6,
    "ev": null,
    "units": 0.0,
    "home": "Ohio State",
@@ -1162,7 +1162,7 @@
    "mk": "total",
    "side": "over",
    "line": 52.5,
-   "price": -110.0,
+   "price": -114.0,
    "edge": 2.8,
    "ev": null,
    "units": 0.0,
@@ -1173,9 +1173,9 @@
   "401861969": {
    "mk": "total",
    "side": "under",
-   "line": 45.5,
-   "price": -110.0,
-   "edge": 4.5,
+   "line": 46.5,
+   "price": -114.0,
+   "edge": 5.5,
    "ev": null,
    "units": 0.0,
    "home": "Wyoming",
@@ -1523,16 +1523,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 29666,
+  "snapshots": 29672,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 6035,
-    "clvRet": -0.0183,
-    "clvT": -10.46,
-    "clv": 0.91,
-    "beat": 0.435,
-    "still": 0.295
+    "clvN": 6038,
+    "clvRet": -0.0177,
+    "clvT": -10.13,
+    "clv": 0.92,
+    "beat": 0.441,
+    "still": 0.294
    },
    {
     "when": "6-24h",
@@ -6306,7 +6306,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-25T05:06:11Z",
+ "checked": "2026-11-25T05:09:39Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
