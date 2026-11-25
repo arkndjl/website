@@ -173,7 +173,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('[data-n1r]
     <ul class="esea__tiles">
       {{- with $now }}<li><span class="esea__v">#{{ .vrs }}</span><span class="esea__k" title="CS2 ARK Ranking spot 1NT's five would hold, of {{ .of }}; #{{ .na }} of {{ .naOf }} NA ESEA">ARK world</span></li>{{ end }}
       <li><span class="esea__v">{{ $st.w }}–{{ $st.l }}</span><span class="esea__k" title="S{{ $E.season }} {{ $nowDiv }} regular season, #{{ $st.rank }} of {{ $st.teams }}">S{{ $E.season }} {{ $nowDiv }}</span></li>
-      {{- with $br.next }}<li><span class="esea__v">{{ printf "%.0f" (mul .p 100) }}%</span><span class="esea__k" title="series win % vs {{ .opp.name }} (seed {{ .opp.seed }})">vs {{ .opp.name }}</span></li>{{ end }}
+      {{- with $br.next }}{{ if ne .p nil }}<li><span class="esea__v">{{ printf "%.0f" (mul .p 100) }}%</span><span class="esea__k" title="series win % vs {{ .opp.name }} (seed {{ .opp.seed }})">vs {{ .opp.name }}</span></li>{{ end }}{{ end }}
       {{- $t4 := -1.0 }}{{ $t2 := -1.0 }}{{ $live := false }}
       {{- with $br.odds }}{{ if isset . "top4" }}{{ $t4 = float .top4 }}{{ $t2 = float .top2 }}{{ $live = true }}{{ end }}{{ end }}
       {{- if and (not $live) (eq (int $E.season) 59) }}{{ $t4 = float $R.s59.top4 }}{{ $t2 = float $R.s59.top2 }}{{ end }}
