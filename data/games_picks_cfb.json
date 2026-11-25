@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-25T02:32:43Z",
+ "asof": "2026-11-25T03:49:58Z",
  "recenter": {
   "week": 0.47
  },
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-25",
-  "ageH": -21.5,
+  "ageH": -20.2,
   "stale": false
  },
  "picks": [],
@@ -421,20 +421,20 @@
    "tm": 46.5
   },
   {
-   "id": "401856879",
+   "id": "401856756",
    "sport": "cfb",
-   "kick": "2026-11-27T01:00:00.000Z",
-   "home": "Texas Tech",
-   "away": "TCU",
+   "kick": "2026-11-28T00:30:00.000Z",
+   "home": "Texas A&M",
+   "away": "Texas",
    "mk": "total",
    "side": "over",
-   "line": 45.5,
-   "price": -124.0,
-   "edge": 3.5,
+   "line": 40.5,
+   "price": -114.0,
+   "edge": 3.6,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
-   "m": 18.2,
-   "tm": 49.0
+   "m": -11.8,
+   "tm": 44.1
   },
   {
    "id": "401856759",
@@ -501,20 +501,20 @@
    "tm": 55.3
   },
   {
-   "id": "401856756",
+   "id": "401856879",
    "sport": "cfb",
-   "kick": "2026-11-28T00:30:00.000Z",
-   "home": "Texas A&M",
-   "away": "Texas",
+   "kick": "2026-11-27T01:00:00.000Z",
+   "home": "Texas Tech",
+   "away": "TCU",
    "mk": "total",
    "side": "over",
-   "line": 41.5,
-   "price": -106.0,
-   "edge": 2.6,
+   "line": 46.5,
+   "price": -124.0,
+   "edge": 2.5,
    "x": 7.5,
    "why": "edge under 7.5 (side: over)",
-   "m": -11.8,
-   "tm": 44.1
+   "m": 18.2,
+   "tm": 49.0
   },
   {
    "id": "401862837",
@@ -613,22 +613,6 @@
    "tm": 47.5
   },
   {
-   "id": "401858314",
-   "sport": "cfb",
-   "kick": "2026-11-28T17:00:00.000Z",
-   "home": "Syracuse",
-   "away": "Notre Dame",
-   "mk": "total",
-   "side": "under",
-   "line": 53.5,
-   "price": -114.0,
-   "edge": 0.3,
-   "x": 8.0,
-   "why": "edge under 8 (game: non-conference)",
-   "m": -23.6,
-   "tm": 53.2
-  },
-  {
    "id": "401860926",
    "sport": "cfb",
    "kick": "2026-11-28T23:00:00.000Z",
@@ -669,12 +653,28 @@
    "mk": "spread",
    "side": "home",
    "line": 10.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 6.6,
    "x": null,
    "why": "spread market off",
    "m": 17.1,
    "tm": 43.7
+  },
+  {
+   "id": "401856757",
+   "sport": "cfb",
+   "kick": "2026-11-29T00:30:00.000Z",
+   "home": "Alabama",
+   "away": "Auburn",
+   "mk": "spread",
+   "side": "away",
+   "line": 14.5,
+   "price": -112.0,
+   "edge": 6.1,
+   "x": null,
+   "why": "spread market off",
+   "m": 8.4,
+   "tm": 52.7
   }
  ],
  "games": {
@@ -742,7 +742,7 @@
    "mk": "spread",
    "side": "home",
    "line": 10.5,
-   "price": -106.0,
+   "price": -104.0,
    "edge": 6.6,
    "ev": null,
    "units": 0.0,
@@ -753,9 +753,9 @@
   "401856756": {
    "mk": "total",
    "side": "over",
-   "line": 41.5,
-   "price": -106.0,
-   "edge": 2.6,
+   "line": 40.5,
+   "price": -114.0,
+   "edge": 3.6,
    "ev": null,
    "units": 0.0,
    "home": "Texas A&M",
@@ -789,9 +789,9 @@
   "401856879": {
    "mk": "total",
    "side": "over",
-   "line": 45.5,
+   "line": 46.5,
    "price": -124.0,
-   "edge": 3.5,
+   "edge": 2.5,
    "ev": null,
    "units": 0.0,
    "home": "Texas Tech",
@@ -886,7 +886,7 @@
    "mk": "spread",
    "side": "home",
    "line": 22.5,
-   "price": -114.0,
+   "price": -110.0,
    "edge": 2.2,
    "ev": null,
    "units": 0.0,
@@ -919,16 +919,16 @@
    "state": "under"
   },
   "401858314": {
-   "mk": "total",
-   "side": "under",
-   "line": 53.5,
-   "price": -114.0,
-   "edge": 0.3,
+   "mk": "spread",
+   "side": "home",
+   "line": -27.5,
+   "price": -140.0,
+   "edge": 3.9,
    "ev": null,
    "units": 0.0,
    "home": "Syracuse",
    "away": "Notre Dame",
-   "state": "under"
+   "state": "off"
   },
   "401856880": {
    "mk": "total",
@@ -979,11 +979,11 @@
    "state": "off"
   },
   "401862840": {
-   "mk": "spread",
-   "side": "home",
-   "line": -1.5,
-   "price": -117.0,
-   "edge": 2.7,
+   "mk": "total",
+   "side": "under",
+   "line": 57.5,
+   "price": -110.0,
+   "edge": 2.9,
    "ev": null,
    "units": 0.0,
    "home": "UTSA",
@@ -1246,7 +1246,7 @@
    "mk": "spread",
    "side": "away",
    "line": 17.5,
-   "price": -119.0,
+   "price": -117.0,
    "edge": 1.5,
    "ev": null,
    "units": 0.0,
@@ -1523,16 +1523,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 29592,
+  "snapshots": 29614,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 6014,
-    "clvRet": -0.0177,
-    "clvT": -10.21,
-    "clv": 0.91,
-    "beat": 0.444,
-    "still": 0.29
+    "clvN": 6021,
+    "clvRet": -0.0176,
+    "clvT": -10.01,
+    "clv": 0.92,
+    "beat": 0.442,
+    "still": 0.292
    },
    {
     "when": "6-24h",
@@ -6306,7 +6306,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-25T02:32:43Z",
+ "checked": "2026-11-25T03:49:58Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
