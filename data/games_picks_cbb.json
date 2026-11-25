@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-25T20:30:29Z",
+ "asof": "2026-11-25T20:33:48Z",
  "recenter": {
   "2026-11-25": 2.18,
   "2026-11-26": 1.7
@@ -1998,6 +1998,22 @@
    "tm": 148.2
   },
   {
+   "id": "401921672",
+   "sport": "cbb",
+   "kick": "2026-11-26T04:59:00Z",
+   "home": "Saint Louis",
+   "away": "Stanford",
+   "mk": "spread",
+   "side": "home",
+   "line": 3.5,
+   "price": -124.0,
+   "edge": 4.2,
+   "x": 4.0,
+   "why": "no edge at -124",
+   "m": 7.7,
+   "tm": 150.8
+  },
+  {
    "id": "401920531",
    "sport": "cbb",
    "kick": "2026-11-27T04:30:00Z",
@@ -2078,22 +2094,6 @@
    "tm": 146.4
   },
   {
-   "id": "401921672",
-   "sport": "cbb",
-   "kick": "2026-11-26T04:59:00Z",
-   "home": "Saint Louis",
-   "away": "Stanford",
-   "mk": "spread",
-   "side": "home",
-   "line": 4.5,
-   "price": -101.0,
-   "edge": 3.2,
-   "x": 4.0,
-   "why": "edge under 4 (venue: neutral)",
-   "m": 7.7,
-   "tm": 150.8
-  },
-  {
    "id": "401922285",
    "sport": "cbb",
    "kick": "2026-11-26T00:00:00Z",
@@ -2166,7 +2166,7 @@
    "mk": "total",
    "side": "over",
    "line": 160.5,
-   "price": -110.0,
+   "price": -124.0,
    "edge": 3.5,
    "x": 5.0,
    "why": "edge under 5 (tier: power)",
@@ -2410,9 +2410,9 @@
   "401921672": {
    "mk": "spread",
    "side": "home",
-   "line": 4.5,
-   "price": -101.0,
-   "edge": 3.2,
+   "line": 3.5,
+   "price": -124.0,
+   "edge": 4.2,
    "ev": null,
    "units": 0.0,
    "home": "Saint Louis",
@@ -2579,7 +2579,7 @@
    "mk": "total",
    "side": "under",
    "line": 140.5,
-   "price": -124.0,
+   "price": -119.0,
    "edge": 1.9,
    "ev": null,
    "units": 0.0,
@@ -2734,9 +2734,9 @@
   "401925050": {
    "mk": "total",
    "side": "over",
-   "line": 147.5,
-   "price": -124,
-   "ev": 0.03,
+   "line": 149.5,
+   "price": -101,
+   "ev": 0.038,
    "edge": 7.2,
    "units": 1.0,
    "bk": "poly",
@@ -2784,7 +2784,7 @@
    "mk": "total",
    "side": "over",
    "line": 160.5,
-   "price": -110.0,
+   "price": -124.0,
    "edge": 3.5,
    "ev": null,
    "units": 0.0,
@@ -2929,7 +2929,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 26378,
+  "snapshots": 26383,
   "buckets": [
    {
     "when": "24h+",
@@ -2942,9 +2942,9 @@
    },
    {
     "when": "6-24h",
-    "clvN": 5311,
-    "clvRet": -0.004,
-    "clvT": -1.97,
+    "clvN": 5312,
+    "clvRet": -0.0041,
+    "clvT": -1.99,
     "clv": 0.64,
     "beat": 0.42,
     "still": 0.389
@@ -21538,7 +21538,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-25T20:30:29Z",
+ "checked": "2026-11-25T20:33:48Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}

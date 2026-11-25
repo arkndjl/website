@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-25T20:27Z",
+ "asof": "2026-11-25T20:32Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -69,8 +69,8 @@
      "rows": 597
     },
     "static/data/nba-proj.json": {
-     "flags": 6,
-     "rows": 512
+     "flags": 5,
+     "rows": 511
     },
     "static/data/nba-xpm/2027.json": {
      "flags": 3,
@@ -103,20 +103,6 @@
      "pos": "C",
      "rotowire": "GSW",
      "site": "FA"
-    },
-    {
-     "d": "2026-11-25",
-     "field": "tm",
-     "file": "static/data/nba-proj.json",
-     "flag": "moved",
-     "head": "Finds work with Orlando",
-     "kind": null,
-     "move": null,
-     "pid": "4773",
-     "player": "Kevin Porter Jr.",
-     "pos": "PG",
-     "rotowire": "ORL",
-     "site": "MIL"
     },
     {
      "d": "2026-10-22",
@@ -301,7 +287,7 @@
    ],
    "joined": 0,
    "players": 605,
-   "rows": 2071
+   "rows": 2070
   },
   "nfl": {
    "by_file": {
@@ -4479,63 +4465,27 @@
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 1,
-     "rows": 638
+     "flags": 0,
+     "rows": 640
     },
     "static/data/lines/nhl.json": {
      "flags": 0,
      "rows": 32
     },
     "static/data/nhl-war/2027.json": {
-     "flags": 2,
+     "flags": 1,
      "rows": 868
     },
     "static/data/pctl-nhl.json": {
-     "flags": 1,
-     "rows": 369
+     "flags": 0,
+     "rows": 377
     },
     "static/data/xaav-nhl.json": {
-     "flags": 12,
+     "flags": 10,
      "rows": 850
     }
    },
    "flags": [
-    {
-     "d": "2026-11-25",
-     "field": "depth",
-     "file": "static/data/depth/nhl.json",
-     "flag": "minors",
-     "head": "Sent down to minors",
-     "kind": "down",
-     "move": {
-      "d": "2026-11-25",
-      "head": "Sent down to minors",
-      "kind": "down"
-     },
-     "pid": "7087",
-     "player": "Sam Morton",
-     "pos": "LW",
-     "rotowire": "CGY",
-     "site": "CGY"
-    },
-    {
-     "d": "2026-11-25",
-     "field": "tm",
-     "file": "static/data/nhl-war/2027.json",
-     "flag": "moved",
-     "head": "Defending cage Wednesday",
-     "kind": null,
-     "move": {
-      "d": "2026-11-18",
-      "head": "Dealt loss in growing rivalry",
-      "kind": "trade"
-     },
-     "pid": "4804",
-     "player": "Mackenzie Blackwood",
-     "pos": "G",
-     "rotowire": "COL",
-     "site": "UTA"
-    },
     {
      "d": "2026-11-07",
      "field": "tm",
@@ -4553,42 +4503,6 @@
      "pos": "G",
      "rotowire": "FA",
      "site": "NYR"
-    },
-    {
-     "d": "2026-11-25",
-     "field": "tm",
-     "file": "static/data/xaav-nhl.json",
-     "flag": "moved",
-     "head": "Dealing with illness Wednesday",
-     "kind": null,
-     "move": {
-      "d": "2026-11-13",
-      "head": "Two-point effort in Finland",
-      "kind": "exit"
-     },
-     "pid": "5744",
-     "player": "K'Andre Miller",
-     "pos": "D",
-     "rotowire": "CAR",
-     "site": "FA"
-    },
-    {
-     "d": "2026-11-25",
-     "field": "tm",
-     "file": "static/data/xaav-nhl.json",
-     "flag": "moved",
-     "head": "Defending cage Wednesday",
-     "kind": null,
-     "move": {
-      "d": "2026-11-18",
-      "head": "Dealt loss in growing rivalry",
-      "kind": "trade"
-     },
-     "pid": "4804",
-     "player": "Mackenzie Blackwood",
-     "pos": "G",
-     "rotowire": "COL",
-     "site": "UTA"
     },
     {
      "d": "2026-09-11",
@@ -4769,29 +4683,11 @@
      "pos": "C",
      "rotowire": "FA",
      "site": "FA"
-    },
-    {
-     "d": "2026-11-25",
-     "field": "tm",
-     "file": "static/data/pctl-nhl.json",
-     "flag": "moved",
-     "head": "Defending cage Wednesday",
-     "kind": null,
-     "move": {
-      "d": "2026-11-18",
-      "head": "Dealt loss in growing rivalry",
-      "kind": "trade"
-     },
-     "pid": "4804",
-     "player": "Mackenzie Blackwood",
-     "pos": "G",
-     "rotowire": "COL",
-     "site": "UTA"
     }
    ],
    "joined": 0,
    "players": 1438,
-   "rows": 2757
+   "rows": 2767
   }
  }
 }
