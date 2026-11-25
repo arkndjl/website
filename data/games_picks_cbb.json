@@ -1,7 +1,7 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-25T03:50:05Z",
+ "asof": "2026-11-25T03:53:16Z",
  "recenter": {
   "2026-11-25": 1.61,
   "2026-11-24": 1.73
@@ -1766,19 +1766,19 @@
     }
    },
    "total | total: low": {
-    "n": 6,
-    "window": 6,
-    "mean": 0.0368,
-    "t": 1.03,
+    "n": 8,
+    "window": 8,
+    "mean": 0.0519,
+    "t": 1.64,
     "p": null,
-    "days": 4,
+    "days": 5,
     "sd": 0.0948,
-    "cusum": 2.72,
+    "cusum": 0.77,
     "cusumMax": 2.72,
     "h": 10.0,
     "rho": 0.175,
     "edge": {
-     "cusum": 1.02,
+     "cusum": 0.64,
      "cusumMax": 1.02,
      "h": 4.595
     },
@@ -1786,17 +1786,17 @@
     "why": "",
     "drift": {
      "mu1": 0.0288,
-     "n": 6,
+     "n": 8,
      "sd": 0.0948,
      "rho": 0.175,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.511,
-     "info": 0.55,
-     "real": -0.523,
-     "realSe": 1.403,
+     "llr": -0.129,
+     "info": 0.74,
+     "real": 0.343,
+     "realSe": 1.225,
      "need": 64
     }
    }
@@ -1808,30 +1808,30 @@
   "since": "2026-11-11T20:00:00Z",
   "why": "owner: paper until live picks beat the close (Nov 11 2026)",
   "pooled": {
-   "n": 411,
-   "days": 14,
-   "llr": -4.77,
+   "n": 413,
+   "days": 15,
+   "llr": -4.58,
    "lo": -2.944,
    "hi": 2.944,
    "state": "paused",
    "at": "2026-11-16",
    "sd": 0.12,
    "rho": 0.05,
-   "real": -0.037,
+   "real": -0.029,
    "realSe": 0.201,
-   "clvRet": -0.0074,
-   "evDU": 0.0224
+   "clvRet": -0.0069,
+   "evDU": 0.0223
   },
   "back": {
-   "n": 292,
-   "clvRet": 0.0052,
-   "t": 0.95,
-   "days": 11
+   "n": 294,
+   "clvRet": 0.0058,
+   "t": 1.06,
+   "days": 12
   }
  },
  "model": {
   "asof": "2026-11-25T01:31:10Z",
-  "ageH": 2.3,
+  "ageH": 2.4,
   "stale": false
  },
  "picks": [],
@@ -2063,7 +2063,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 3.6,
    "x": 4.0,
    "why": "edge under 4 (venue: neutral)",
@@ -2199,6 +2199,22 @@
    "tm": 140.8
   },
   {
+   "id": "401929287",
+   "sport": "cbb",
+   "kick": "2026-11-26T00:30:00Z",
+   "home": "Mississippi State",
+   "away": "Wake Forest",
+   "mk": "total",
+   "side": "under",
+   "line": 150.5,
+   "price": -119.0,
+   "edge": 2.6,
+   "x": 5.0,
+   "why": "edge under 5 (tier: power)",
+   "m": 5.1,
+   "tm": 147.9
+  },
+  {
    "id": "401928831",
    "sport": "cbb",
    "kick": "2026-11-25T17:30:00Z",
@@ -2303,28 +2319,12 @@
    "mk": "spread",
    "side": "home",
    "line": 6.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 1.8,
    "x": 5.0,
    "why": "edge under 5 (line: 4-9)",
    "m": 8.3,
    "tm": 156.4
-  },
-  {
-   "id": "401929287",
-   "sport": "cbb",
-   "kick": "2026-11-26T00:30:00Z",
-   "home": "Mississippi State",
-   "away": "Wake Forest",
-   "mk": "total",
-   "side": "under",
-   "line": 149.5,
-   "price": -114.0,
-   "edge": 1.6,
-   "x": 5.0,
-   "why": "edge under 5 (tier: power)",
-   "m": 5.1,
-   "tm": 147.9
   },
   {
    "id": "401924737",
@@ -2459,9 +2459,9 @@
   "401929287": {
    "mk": "total",
    "side": "under",
-   "line": 149.5,
-   "price": -114.0,
-   "edge": 1.6,
+   "line": 150.5,
+   "price": -119.0,
+   "edge": 2.6,
    "ev": null,
    "units": 0.0,
    "home": "Mississippi State",
@@ -2496,7 +2496,7 @@
    "mk": "spread",
    "side": "home",
    "line": 6.5,
-   "price": -119.0,
+   "price": -114.0,
    "edge": 1.8,
    "ev": null,
    "units": 0.0,
@@ -2508,7 +2508,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -106.0,
+   "price": -110.0,
    "edge": 3.6,
    "ev": null,
    "units": 0.0,
@@ -2785,7 +2785,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 25552,
+  "snapshots": 25563,
   "buckets": [
    {
     "when": "24h+",
@@ -2798,9 +2798,9 @@
    },
    {
     "when": "6-24h",
-    "clvN": 5160,
+    "clvN": 5162,
     "clvRet": -0.0038,
-    "clvT": -1.8,
+    "clvT": -1.81,
     "clv": 0.65,
     "beat": 0.419,
     "still": 0.389
@@ -21277,7 +21277,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-25T03:50:05Z",
+ "checked": "2026-11-25T03:53:16Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
