@@ -1,0 +1,40 @@
+{{- /* series box score: one line per player summed over the maps of a multi-map match (Bo3 etc.).
+       Counts are summed; ADR, RWA and Rating are round-weighted means over the maps played; HS% is
+       kill-weighted. Series MVP = best series RWA on 1NT. Returns dict "players" "opp" "rf" "ra"
+       "w" "l" (map wins / losses) "rounds". Context: one data/esea.json match row. */ -}}
+{{- $out := dict "rf" 0 "ra" 0 "w" 0 "l" 0 }}
+{{- $rf := 0 }}{{ $ra := 0 }}{{ $w := 0 }}{{ $l := 0 }}
+{{- range .maps }}{{ $rf = add $rf (int (.rf | default 0)) }}{{ $ra = add $ra (int (.ra | default 0)) }}{{ if .win }}{{ $w = add $w 1 }}{{ else }}{{ $l = add $l 1 }}{{ end }}{{ end }}
+{{- $maps := .maps }}
+{{- range $side := slice "players" "opp" }}
+  {{- $s := newScratch }}{{ $names := slice }}
+  {{- range $maps }}{{ $mr := add (int (.rf | default 0)) (int (.ra | default 0)) }}{{ range (index . $side) }}
+    {{- $r := int (.rounds | default $mr) }}
+    {{- $o := $s.Get (printf "p:%s" .name) | default (dict "name" .name "country" .country "pid" .pid "k" 0 "d" 0 "a" 0 "entries" 0 "entryWins" 0 "clutch" 0 "k3" 0 "k4" 0 "k5" 0 "util" 0 "flashed" 0 "rounds" 0 "adrR" 0.0 "hsK" 0.0 "rwaR" 0.0 "rwaN" 0 "ratR" 0.0 "ratN" 0) }}
+    {{- if not (in $names .name) }}{{ $names = $names | append .name }}{{ end }}
+    {{- $o = merge $o (dict
+        "k" (add $o.k (int (.k | default 0))) "d" (add $o.d (int (.d | default 0))) "a" (add $o.a (int (.a | default 0)))
+        "entries" (add $o.entries (int (.entries | default 0))) "entryWins" (add $o.entryWins (int (.entryWins | default 0)))
+        "clutch" (add $o.clutch (int (.clutch | default 0))) "k3" (add $o.k3 (int (.k3 | default 0))) "k4" (add $o.k4 (int (.k4 | default 0))) "k5" (add $o.k5 (int (.k5 | default 0)))
+        "util" (add $o.util (int (.util | default 0))) "flashed" (add $o.flashed (int (.flashed | default 0)))
+        "rounds" (add $o.rounds $r) "adrR" (add $o.adrR (mul (float (.adr | default 0)) $r)) "hsK" (add $o.hsK (mul (float (.hs | default 0)) (int (.k | default 0))))) }}
+    {{- if ne .rwa nil }}{{ $o = merge $o (dict "rwaR" (add $o.rwaR (mul (float .rwa) $r)) "rwaN" (add $o.rwaN $r)) }}{{ end }}
+    {{- if ne .rating nil }}{{ $o = merge $o (dict "ratR" (add $o.ratR (mul (float .rating) $r)) "ratN" (add $o.ratN $r)) }}{{ end }}
+    {{- if and (not $o.country) .country }}{{ $o = merge $o (dict "country" .country) }}{{ end }}
+    {{- $s.Set (printf "p:%s" .name) $o }}
+  {{- end }}{{ end }}
+  {{- $rows := slice }}
+  {{- range $names }}{{ $o := $s.Get (printf "p:%s" .) }}
+    {{- $ln := dict "name" $o.name "country" $o.country "pid" $o.pid "k" $o.k "d" $o.d "a" $o.a "entries" $o.entries "entryWins" $o.entryWins "clutch" $o.clutch "k3" $o.k3 "k4" $o.k4 "k5" $o.k5 "util" $o.util "flashed" $o.flashed "rounds" $o.rounds
+        "adr" (cond (gt $o.rounds 0) (math.Round (div $o.adrR $o.rounds)) 0)
+        "hs" (cond (gt $o.k 0) (math.Round (div $o.hsK $o.k)) 0)
+        "sort" (cond (gt $o.rwaN 0) (div $o.rwaR $o.rwaN) -99.0) }}
+    {{- if gt $o.rwaN 0 }}{{ $ln = merge $ln (dict "rwa" (div (math.Round (mul (div $o.rwaR $o.rwaN) 10)) 10)) }}{{ end }}
+    {{- if gt $o.ratN 0 }}{{ $ln = merge $ln (dict "rating" (div (math.Round (mul (div $o.ratR $o.ratN) 100)) 100)) }}{{ end }}
+    {{- $rows = $rows | append $ln }}
+  {{- end }}
+  {{- $rows = sort $rows "sort" "desc" }}
+  {{- if and (eq $side "players") $rows }}{{ $top := index $rows 0 }}{{ if ne $top.rwa nil }}{{ $rows = slice (merge $top (dict "mapMvp" true)) | append (after 1 $rows) }}{{ end }}{{ end }}
+  {{- $out = merge $out (dict $side $rows) }}
+{{- end }}
+{{- return merge $out (dict "rf" $rf "ra" $ra "w" $w "l" $l "rounds" (add $rf $ra)) }}
