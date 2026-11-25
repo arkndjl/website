@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-24T21:38Z",
+ "asof": "2026-11-24T23:00Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -10,7 +10,7 @@
    },
    "flags": [],
    "joined": 0,
-   "players": 983,
+   "players": 985,
    "rows": 5293
   },
   "cfb": {
@@ -59,7 +59,7 @@
     }
    ],
    "joined": 0,
-   "players": 2620,
+   "players": 2621,
    "rows": 16742
   },
   "nba": {
@@ -292,7 +292,7 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 13,
+     "flags": 12,
      "rows": 2160
     },
     "static/data/nfl-fantasy.json": {
@@ -370,24 +370,6 @@
      "pos": "SLB",
      "rotowire": "JAX",
      "site": "CIN"
-    },
-    {
-     "d": "2026-11-16",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "practice",
-     "head": "Reverts to practice squad",
-     "kind": "practice",
-     "move": {
-      "d": "2026-11-16",
-      "head": "Reverts to practice squad",
-      "kind": "practice"
-     },
-     "pid": "15262",
-     "player": "Shane Buechele",
-     "pos": "QB",
-     "rotowire": "FA",
-     "site": "IND"
     },
     {
      "d": "2026-10-07",
@@ -1110,16 +1092,16 @@
      "site": "CAR"
     },
     {
-     "d": "2026-10-05",
+     "d": "2026-11-24",
      "field": "t",
      "file": "static/data/nfl-war.json",
-     "flag": "practice",
-     "head": "Reverting to practice squad",
-     "kind": "practice",
+     "flag": "released",
+     "head": "Released from PS",
+     "kind": "waived",
      "move": {
-      "d": "2026-10-05",
-      "head": "Reverting to practice squad",
-      "kind": "practice"
+      "d": "2026-11-24",
+      "head": "Released from PS",
+      "kind": "waived"
      },
      "pid": "13960",
      "player": "Craig Reynolds",
@@ -1866,16 +1848,16 @@
      "site": "PIT"
     },
     {
-     "d": "2026-11-19",
+     "d": "2026-11-24",
      "field": "t",
      "file": "static/data/nfl-war.json",
-     "flag": "released",
-     "head": "Gets waived by Steelers",
-     "kind": "waived",
+     "flag": "practice",
+     "head": "Signs to practice squad",
+     "kind": "practice",
      "move": {
-      "d": "2026-11-19",
-      "head": "Gets waived by Steelers",
-      "kind": "waived"
+      "d": "2026-11-24",
+      "head": "Signs to practice squad",
+      "kind": "practice"
      },
      "pid": "15307",
      "player": "Brandon Smith",
@@ -3576,16 +3558,16 @@
      "site": "CAR"
     },
     {
-     "d": "2026-10-05",
+     "d": "2026-11-24",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
-     "flag": "practice",
-     "head": "Reverting to practice squad",
-     "kind": "practice",
+     "flag": "released",
+     "head": "Released from PS",
+     "kind": "waived",
      "move": {
-      "d": "2026-10-05",
-      "head": "Reverting to practice squad",
-      "kind": "practice"
+      "d": "2026-11-24",
+      "head": "Released from PS",
+      "kind": "waived"
      },
      "pid": "13960",
      "player": "Craig Reynolds",
@@ -4278,16 +4260,16 @@
      "site": "PIT"
     },
     {
-     "d": "2026-11-19",
+     "d": "2026-11-24",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
-     "flag": "released",
-     "head": "Gets waived by Steelers",
-     "kind": "waived",
+     "flag": "practice",
+     "head": "Signs to practice squad",
+     "kind": "practice",
      "move": {
-      "d": "2026-11-19",
-      "head": "Gets waived by Steelers",
-      "kind": "waived"
+      "d": "2026-11-24",
+      "head": "Signs to practice squad",
+      "kind": "practice"
      },
      "pid": "15307",
      "player": "Brandon Smith",
