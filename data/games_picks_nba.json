@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-26T17:00:45Z",
+ "asof": "2026-11-26T18:05:33Z",
  "recenter": {
   "2026-11-27": 1.29
  },
@@ -328,29 +328,13 @@
  },
  "model": {
   "asof": "2026-11-26T15:02:37Z",
-  "ageH": 2.0,
+  "ageH": 3.0,
   "stale": false
  },
  "picks": [],
  "paperPicks": [],
  "withdrawn": [],
  "board": [
-  {
-   "id": "401909328",
-   "sport": "nba",
-   "kick": "2026-11-28T00:30:00Z",
-   "home": "IND",
-   "away": "PHI",
-   "mk": "spread",
-   "side": "home",
-   "line": -4.5,
-   "price": -121.0,
-   "edge": 3.9,
-   "x": 5.0,
-   "why": "edge under 5 (role: dog)",
-   "m": -0.6,
-   "tm": 231.4
-  },
   {
    "id": "401909333",
    "sport": "nba",
@@ -360,7 +344,7 @@
    "mk": "total",
    "side": "under",
    "line": 226.5,
-   "price": -126.0,
+   "price": -131.0,
    "edge": 4.5,
    "x": 6.5,
    "why": "edge under 6.5 (total: mid)",
@@ -392,12 +376,28 @@
    "mk": "total",
    "side": "under",
    "line": 221.5,
-   "price": -126.0,
+   "price": -121.0,
    "edge": 3.5,
    "x": 6.5,
    "why": "edge under 6.5 (total: mid)",
    "m": 8.9,
    "tm": 218.0
+  },
+  {
+   "id": "401909328",
+   "sport": "nba",
+   "kick": "2026-11-28T00:30:00Z",
+   "home": "IND",
+   "away": "PHI",
+   "mk": "total",
+   "side": "under",
+   "line": 234.5,
+   "price": -126.0,
+   "edge": 3.1,
+   "x": 6.0,
+   "why": "edge under 6 (total: high)",
+   "m": -0.6,
+   "tm": 231.4
   },
   {
    "id": "401909326",
@@ -430,11 +430,11 @@
    "state": "under"
   },
   "401909328": {
-   "mk": "spread",
-   "side": "home",
-   "line": -4.5,
-   "price": -121.0,
-   "edge": 3.9,
+   "mk": "total",
+   "side": "under",
+   "line": 234.5,
+   "price": -126.0,
+   "edge": 3.1,
    "ev": null,
    "units": 0.0,
    "home": "IND",
@@ -445,7 +445,7 @@
    "mk": "total",
    "side": "under",
    "line": 221.5,
-   "price": -126.0,
+   "price": -121.0,
    "edge": 3.5,
    "ev": null,
    "units": 0.0,
@@ -457,7 +457,7 @@
    "mk": "total",
    "side": "under",
    "line": 226.5,
-   "price": -126.0,
+   "price": -131.0,
    "edge": 4.5,
    "ev": null,
    "units": 0.0,
@@ -530,16 +530,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 5859,
+  "snapshots": 5863,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 344,
-    "clvRet": 0.0403,
-    "clvT": 5.09,
-    "clv": 1.41,
-    "beat": 0.727,
-    "still": 0.131
+    "clvN": 345,
+    "clvRet": 0.0411,
+    "clvT": 5.23,
+    "clv": 1.42,
+    "beat": 0.742,
+    "still": 0.116
    },
    {
     "when": "6-24h",
@@ -7205,7 +7205,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-26T17:00:45Z",
+ "checked": "2026-11-26T18:05:33Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
