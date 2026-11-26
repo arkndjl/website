@@ -51,7 +51,7 @@
       { "n": "KenPom (via Kaggle March Machine Learning Mania)", "u": "https://kenpom.com/", "w": "research backtests only" },
       { "n": "ESPN, Bleacher Report, Floor and Ceiling, No Ceilings, FanSided, ClutchPoints, NBADraft.net, CBS, Tankathon, Sports Illustrated, The Ringer", "u": "https://www.noceilingsnba.com/", "w": "draft big boards and mocks" },
       { "n": "Tankathon", "u": "https://www.tankathon.com/", "w": "prospect birth dates (draft age), heights and weights" },
-      { "n": "Wikidata", "u": "https://www.wikidata.org/", "w": "birth dates (entity search, day precision), with team and citizenship to tell namesakes apart" },
+      { "n": "Wikidata", "u": "https://www.wikidata.org/", "w": "birth dates (entity search, day precision), with team and citizenship to tell namesakes apart; recruit birth dates for age for the class, one query a sport (scripts/recruit_wikidata.py)" },
       { "n": "Wikipedia", "u": "https://en.wikipedia.org/", "w": "birth dates (search fallback); Wooden Award winners; Naismith and National Collegiate Basketball Hall of Fame coach lists for all-time coaches" },
       { "n": "US Department of Education, Equity in Athletics (EADA)", "u": "https://ope.ed.gov/athletics/", "w": "men's basketball program expenses and revenue by school and academic year, 2013-14 on (scripts/eada_pull.py -> scripts/data/eada_mbb.json.gz); an input of the coach pay model" },
       { "n": "Bracket Matrix", "u": "https://www.bracketmatrix.com/", "w": "the live bracketologist consensus (average seed, brackets naming each team), logged daily in season for the committee model's season-end score (scripts/cbb_bracket_matrix.py); not shown on any page" },

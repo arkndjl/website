@@ -1,7 +1,7 @@
 {{- /* the recruit GFX card's stars and predictions, as one row attribute (data-rc, read by assets/js/gfx.js rcBand):
        a ARK stars, s industry stars, p industry 5-star+, o uncommitted, l ARK lean [school, %, espn id],
        e On3/Rivals expert picks [school, experts on it, experts with a pick, espn id] (data/recruit_expert_picks.json),
-       r On3 RPM leader [school, %] (CBB), c class year, y xFV years 1-3 and g Y1 FV 10th-90th (CFB; CBB reads the row's
+       r On3 RPM leader [school, %, espn id] (data/recruit_rpm.json; CBB from the row), c class year, g Y1 FV 10th-90th (CFB; CBB reads the row's
        data-d), ag age and ar years older than the class median (negative = young for the class), when the rows carry them */ -}}
 {{- $m := dict "a" (.ark | default 0) "s" (.stars | default 0) -}}
 {{- with .plus }}{{ $m = merge $m (dict "p" 1) }}{{ end -}}
@@ -10,7 +10,6 @@
 {{- with .exp }}{{ $m = merge $m (dict "e" .) }}{{ end -}}
 {{- with .rpm }}{{ $m = merge $m (dict "r" .) }}{{ end -}}
 {{- with .cls }}{{ $m = merge $m (dict "c" .) }}{{ end -}}
-{{- with .path }}{{ $m = merge $m (dict "y" .) }}{{ end -}}
 {{- with .range }}{{ $m = merge $m (dict "g" .) }}{{ end -}}
 {{- if ne .age nil }}{{ $m = merge $m (dict "ag" .age) }}{{ end -}}
 {{- if ne .ageRel nil }}{{ $m = merge $m (dict "ar" .ageRel) }}{{ end -}}

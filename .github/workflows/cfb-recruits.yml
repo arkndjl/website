@@ -60,10 +60,11 @@ jobs:
           npx playwright install --with-deps chromium
           Y=$(python3 -c "import json; print(json.load(open('data/cfb_recruits.json'))['next'])")
           node scripts/cfb_on3.mjs $Y $((Y + 1)) $((Y + 2))
+          python3 scripts/recruit_wikidata.py cfb || true   # birth dates (scripts/recruit_age.py)
           python3 scripts/cfb_on3_pack.py --live $Y $((Y + 1)) $((Y + 2))
       - name: Recruit tabs and ARK stars
         run: node scripts/cfb_recruit.mjs
       - name: Commit if anything changed
         run: |
           python3 scripts/data_push.py -m "Update the CFB recruit classes ($(date -u +%Y-%m-%d))" \
-            -- data/cfb_recruits.json static/data/cfb-recruits.json static/data/cfb-builder.json scripts/data/cfb_on3_live.json scripts/data/recruit_age_cfb.json
+            -- data/cfb_recruits.json static/data/cfb-recruits.json static/data/cfb-builder.json scripts/data/cfb_on3_live.json scripts/data/recruit_age_cfb.json scripts/data/recruit_wikidata_dob.json

@@ -1480,7 +1480,7 @@
     if (rc.a) items.push({ h: 'ARK', stars: rc.a, col: C.teal });
     items.push({ h: 'INDUSTRY', stars: rc.s || 0, plus: !!rc.p, col: C.lilac });
     if (rc.e) items.push({ h: 'EXPERTS', t: rc.e[0], sub: rc.e[1] + ' of ' + rc.e[2], prob: rc.e[1] / rc.e[2] * 100, img: await logo(rc.e[3]) });
-    else if (rc.r) items.push({ h: 'ON3 RPM', t: rc.r[0], sub: Math.round(rc.r[1]) + '%', prob: rc.r[1] });
+    if (rc.r) items.push({ h: 'ON3 RPM', t: rc.r[0], sub: Math.round(rc.r[1]) + '%', prob: rc.r[1], img: await logo(rc.r[2]) });
     if (rc.l) items.push({ h: 'ARK LEAN', t: rc.l[0], sub: rc.l[1] + '%', prob: rc.l[1], img: await logo(rc.l[2]) });
     return items;
   }
@@ -1615,14 +1615,14 @@
     if (cbb) ranks = [rk('CONS', D.rk), rk('ON3', D.svc && D.svc.on3), rk('247', D.svc && D.svc['247']), rk('ESPN', D.svc && D.svc.espn), rk('RIVALS', D.svc && D.svc.rivals)];
     else { var gr = ct(/^grade$/i), src = ct(/^source$/i), nat = ct(/^nat$/i); ranks = [nat ? rk('ESPN', nat, gr ? 'grade ' + gr : '') : rk(src && src !== 'ESPN' ? 'GRADE, ' + src.toUpperCase() : 'ESPN GRADE', gr, '', true), rk('247 COMP', ct(/^247$/), '', true), rk('RIVALS', ct(/^riv$/i))]; }
     ranks = ranks.filter(Boolean);
-    // the path: CFB xFV in years 1-3, CBB the odds of each NBA role
+    // CFB FV and year-1 FV (no year 2-3 projection for recruits: Noah, Nov 26), CBB the odds of each NBA role
     var pp = function (x) { return x < 0.005 ? '<1%' : Math.min(99, Math.round(x * 100)) + '%'; }, cols, stats, y1 = cbb && D.path && D.path[0];
     if (cbb) {
       cols = [['NBA', D.p, 'played a game'], ['40+', D.p40, 'rotation'], ['50+', D.p50, 'starter'], ['60+', D.p60, 'All-Star']].filter(function (c) { return c[1] != null; }).map(function (c) { return { h: c[0], t: pp(c[1]), pct: Math.max(0.5, c[1] * 100), sub: c[2] }; });
       stats = y1 ? [{ h: 'D-I% Y1', t: pp(y1.on), prob: y1.on * 100 }, { h: 'MIN% Y1', t: String(Math.round(y1.min)), prob: y1.min }, { h: 'BPM Y1', t: (y1.bpm > 0 ? '+' : y1.bpm < 0 ? '−' : '') + Math.abs(y1.bpm).toFixed(1) }] : [];
       if (D.xnil) stats.push({ h: 'xNIL Y1', t: ct(/^xnil$/i) });
     } else {
-      cols = (rc.y || []).map(function (v, k) { return { h: 'Y' + (k + 1), t: String(Math.round(v)), pct: Math.max(0.5, v - 20), sub: rc.c ? String(rc.c + k) : '' }; });
+      cols = [['FV', fv], alt && [alt[0], alt[1]]].filter(function (c) { return c && isFinite(c[1]); }).map(function (c) { return { h: c[0], t: String(Math.round(c[1])), pct: Math.max(0.5, c[1] - 20) }; });
       var on = cn(/^on%$/i), pc = cn(/^pct$/i); stats = [];
       if (on != null) stats.push({ h: 'ON% Y1', t: Math.round(on * 100) + '%', prob: on * 100 });
       if (pc != null) stats.push({ h: 'Y1 BOARD PCTL', t: String(pc), prob: pc });

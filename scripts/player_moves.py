@@ -180,10 +180,18 @@ def build(sp, hist, slugs):
             for r in j('data/cfb_portal.json').get('moves') or []:
                 if r.get('to'): B.add(r.get('name'), r.get('date'), 'transfer', r.get('from'), r.get('to'))
                 elif r.get('from'): B.add(r.get('name'), r.get('date'), 'portal', r.get('from'), None)
+            # past portal classes (scripts/cfb_portal_hist.py, from the cfbhist cache); the open class comes from data/cfb_portal.json
+            cur = int(j('data/cfb_portal.json').get('season') or 9999)
+            for n, _pos, fr, to, d, y in j('scripts/data/cfb_portal_hist.json.gz', []):
+                if int(y) >= cur: continue
+                B.add(n, d or str(y), 'transfer' if to else 'portal', fr, to)
         else:
             for r in j('scripts/data/cbb_recruit_hist.json.gz').get('recruits') or []:
                 d, t = (r.get('x') or {}).get('commit'), (r.get('college') or {}).get('team')
                 if d and t: B.add(r.get('name'), d, 'commit', None, t, r.get('cls'))
+            for y, rows in rec.items():      # the classes being recruited: On3's commit date on the class rows
+                for r in rows:
+                    if r.get('cdate') and r.get('team'): B.add(r['name'], r['cdate'], 'commit', None, r['team'], y)
             for x in j('static/data/cbb/portal.json').get('seasons') or []:
                 for r in x.get('rows') or []:
                     m = re.match(r'from (.+?)(?: \([^)]*\))?$', r.get('sub') or '')
