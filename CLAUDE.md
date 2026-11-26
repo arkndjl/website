@@ -83,7 +83,7 @@
 
 - Rows with a class year in `data-rc` (`layouts/partials/rcgfx.html`: CFB class/future tabs, CBB class tabs) draw the recruit
   card, `buildRCard` in `assets/js/gfx.js`: FV to the whole number with Y1 FV (CFB) or IF NBA (CBB) under it, GRADES,
-  PROJECTION (FV scale, FV and Y1 FV or NBA odds, year-1 cells; no year 2-3 projection for recruits, Noah Nov 26), PREDICTIONS while uncommitted, MOVES or VISITS, FV INPUTS. It is a
+  PROJECTION (FV scale, FV and Y1 FV or NBA odds, year-1 cells; no year 2-3 projection for recruits, Noah Nov 26), PREDICTIONS while uncommitted, MOVES and VISITS (officials first, then the latest unofficial, six in all; committed recruits from the weekly On3 pull in recruit-leans.yml), FV INPUTS. It is a
   projection card: predictive numbers only. Age reads the rows' `age` and `ageRel` (years over the class median); absent = not drawn.
 - Moves on every player card come from `static/data/moves/<sport>.json`, written by `scripts/player_moves.py` (rerun by the
   recruit news workflow) from files already in the repo; headline and transaction rows are kept in

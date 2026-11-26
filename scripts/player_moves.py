@@ -83,8 +83,9 @@ class Book:
             for o in out:
                 if o[1] == 'commit' and tk(o[3]) == tk(e[3]) and o[0] and e[0] and o[0] < e[0] and not near(o[0], e[0], 10) \
                         and not any(q[1] == 'commit' and tk(q[3]) == tk(e[2]) for q in out): o[3] = e[2]
-        vis = [e for e in out if e[1] in ('visit', 'unofficial')]
-        return [e for e in out if e not in vis or e in vis[-6:]]
+        # visits: the last six officials and the last six unofficial ones (the card picks from them)
+        keep = [e for e in out if e[1] == 'visit'][-6:] + [e for e in out if e[1] == 'unofficial'][-6:]
+        return [e for e in out if e[1] not in ('visit', 'unofficial') or any(e is k for k in keep)]
 
 
 def tk(t): return names.team_key(t or '')
@@ -131,7 +132,7 @@ def site_recruits(sp):
     return out
 
 
-def volatile(sp):
+def volatile(sp, slugs):
     """rows from sources that roll off: [name, date, kind, from, to, cls]"""
     out = []
     for n in j('data/recruit_news.json').get(sp) or []:
@@ -148,6 +149,18 @@ def volatile(sp):
         if k == 'sign' and re.search(r'extension|extend', r.get('h') or '', re.I): k = 'extend'
         elif k == 'sign' and re.search(r're-?sign|return' if college else r're-?sign', r.get('h') or '', re.I): k = 'resign'
         out.append([r.get('n'), r.get('d'), k, r.get('fr'), r.get('to'), None])
+    if college:
+        # visits (official: 'visit'; the rest 'unofficial'): On3's live pull of the uncommitted recruits and the weekly
+        # pull of the committed ones; kept here so a recruit's visits stay on his card after he commits
+        rec = site_recruits(sp)
+        for src in ('scripts/data/recruit_on3_live.json.gz', 'scripts/data/recruit_on3_committed.json.gz'):
+            for y, rows in (j(src).get(sp) or {}).items():
+                m = names.Matcher(rec.get(int(y)) or [], team=None)
+                for o in rows:
+                    r, _ = m.find(o.get('name'))
+                    if not r or (o.get('state') and r.get('home') and not r['home'].endswith(o['state'])): continue
+                    for v in o.get('visits') or []:
+                        if v[0] in slugs and v[2]: out.append([r['name'], v[2], 'visit' if v[1] == 'Official' else 'unofficial', None, slugs[v[0]], int(y)])
     return out
 
 
@@ -155,13 +168,12 @@ def build(sp, hist, slugs):
     B = Book()
     old = hist.get(sp) or []
     seen = {json.dumps(r) for r in old}
-    for r in volatile(sp):
+    for r in volatile(sp, slugs):
         if json.dumps(r) not in seen: old.append(r); seen.add(json.dumps(r))
     hist[sp] = old
     for n, d, k, fr, to, cls in old: B.add(n, d, k, fr, to, cls)
     if sp in ('cfb', 'cbb'):
         rec = site_recruits(sp)
-        live = j('scripts/data/recruit_on3_live.json.gz').get(sp) or {}
         if sp == 'cfb':
             # commit dates of the classes being recruited: On3's industry table, joined to the class rows by name
             for y, rows in (j('scripts/data/cfb_on3_live.json').get('classes') or {}).items():
@@ -196,14 +208,6 @@ def build(sp, hist, slugs):
                 for r in x.get('rows') or []:
                     m = re.match(r'from (.+?)(?: \([^)]*\))?$', r.get('sub') or '')
                     if m and r.get('tm'): B.add(r.get('n'), str(int(x['s']) - 1), 'transfer', m.group(1), r['tm'])
-        # visits of the uncommitted recruits (official: 'visit'; the rest 'unofficial')
-        for y, rows in live.items():
-            m = names.Matcher(rec.get(int(y)) or [], team=None)
-            for o in rows:
-                r, _ = m.find(o.get('name'))
-                if not r or (o.get('state') and r.get('home') and not r['home'].endswith(o['state'])): continue
-                for v in o.get('visits') or []:
-                    if v[0] in slugs and v[2]: B.add(r['name'], v[2], 'visit' if v[1] == 'Official' else 'unofficial', None, slugs[v[0]], y)
     return B
 
 

@@ -71,6 +71,28 @@ def pack(years, dest):
     print('wrote', dest, {sp: {y: len(v) for y, v in d.items()} for sp, d in out.items()})
 
 
+COMP = os.path.join(ROOT, 'scripts', 'data', 'recruit_on3_committed.json.gz')   # committed recruits' visits, live classes (the GFX cards)
+
+
+def pack_committed(years):
+    """the committed recruits of the live classes (recruit_on3_visits.mjs --committed): name, state and dated visits,
+    for the recruit cards (scripts/player_moves.py). A class the pull did not reach keeps its last rows."""
+    import gzip
+    out = json.load(gzip.open(COMP, 'rt')) if os.path.exists(COMP) else {}
+    for sp in TEAMS:
+        for y in years:
+            f = os.path.join(CACHE, f'{sp}-{y}-committed.jsonl')
+            if not os.path.exists(f): continue
+            rows = {}
+            for l in open(f):
+                if l.strip():
+                    r = json.loads(l); rows[r['slug']] = {k: r.get(k) for k in ('slug', 'name', 'state', 'visits')}
+            if rows: out.setdefault(sp, {})[str(y)] = [r for r in rows.values() if r.get('visits')]
+    with open(COMP, 'wb') as raw, gzip.GzipFile(filename='', mode='wb', fileobj=raw, mtime=0) as fh:
+        fh.write(json.dumps(out, separators=(',', ':'), sort_keys=True).encode())
+    print('wrote', COMP, {sp: {y: len(v) for y, v in d.items()} for sp, d in out.items()})
+
+
 def read(sp, y, pack_ok=True):
     f = os.path.join(CACHE, f'{sp}-{y}.jsonl')
     if not os.path.exists(f):
@@ -170,3 +192,4 @@ if __name__ == '__main__':
     ys = [int(a) for a in sys.argv[1:] if a.isdigit()]
     if '--pack' in sys.argv: pack(range(2010, ys[0] + 1), HIST)
     if '--live' in sys.argv: pack(ys, LIVEP)
+    if '--committed' in sys.argv: pack_committed(ys)
