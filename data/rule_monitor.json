@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-25T20:34:38Z",
+ "asof": "2026-11-26T01:08:17Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -168,19 +168,19 @@
    "status": "on",
    "stopped": null,
    "n": 7,
-   "clvN": 6,
-   "clvRet": 0.0219,
-   "clvT": 0.2,
-   "days": 5,
-   "beat": 0.667,
-   "settled": 6,
-   "w": 1,
+   "clvN": 7,
+   "clvRet": 0.0116,
+   "clvT": 0.12,
+   "days": 6,
+   "beat": 0.714,
+   "settled": 7,
+   "w": 2,
    "l": 5,
-   "roi": -0.6883,
+   "roi": -0.496,
    "week": {
     "n": 4,
-    "clvRet": 0.0242,
-    "clvT": 0.13
+    "clvRet": 0.0914,
+    "clvT": 0.75
    },
    "exp": {
     "clvRet": 0.1126,
@@ -189,24 +189,24 @@
     "n": 109
    },
    "vsExp": {
-    "gap": -0.0907,
-    "z": -0.83,
+    "gap": -0.101,
+    "z": -1.07,
     "read": "in line"
    },
    "check": {
-    "n": 7,
-    "window": 7,
-    "mean": -0.001,
-    "t": -0.01,
+    "n": 8,
+    "window": 8,
+    "mean": -0.0071,
+    "t": -0.08,
     "p": null,
-    "days": 6,
+    "days": 7,
     "sd": 0.1435,
     "cusum": 0.0,
     "cusumMax": 3.23,
     "h": 10.0,
     "rho": 0.221,
     "edge": {
-     "cusum": 0.31,
+     "cusum": 0.21,
      "cusumMax": 0.91,
      "h": 4.595
     },
@@ -214,33 +214,33 @@
     "why": "",
     "drift": {
      "mu1": 0.0295,
-     "n": 7,
+     "n": 8,
      "sd": 0.1435,
      "rho": 0.221,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.205,
-     "info": 0.3,
-     "real": 0.26,
-     "realSe": 1.872,
+     "llr": -0.105,
+     "info": 0.34,
+     "real": 0.586,
+     "realSe": 1.746,
      "need": 139
     }
    },
    "drift": {
     "mu1": 0.0295,
-    "n": 7,
+    "n": 8,
     "sd": 0.1435,
     "rho": 0.221,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": -0.205,
-    "info": 0.3,
-    "real": 0.26,
-    "realSe": 1.872,
+    "llr": -0.105,
+    "info": 0.34,
+    "real": 0.586,
+    "realSe": 1.746,
     "need": 139,
     "path": [
      [
@@ -272,6 +272,11 @@
       "2026-11-23",
       7,
       -0.205
+     ],
+     [
+      "2026-11-25",
+      8,
+      -0.105
      ]
     ]
    }
@@ -1097,8 +1102,8 @@
    "l": 1,
    "roi": 0.035,
    "week": {
-    "n": 1,
-    "clvRet": -0.0409,
+    "n": 0,
+    "clvRet": null,
     "clvT": null
    },
    "exp": {
@@ -1168,8 +1173,8 @@
    "l": 2,
    "roi": -0.5307,
    "week": {
-    "n": 1,
-    "clvRet": -0.0098,
+    "n": 0,
+    "clvRet": null,
     "clvT": null
    },
    "exp": {
@@ -1523,8 +1528,8 @@
    "l": 1,
    "roi": -1.0,
    "week": {
-    "n": 1,
-    "clvRet": -0.1163,
+    "n": 0,
+    "clvRet": null,
     "clvT": null
    },
    "exp": {
@@ -1828,8 +1833,8 @@
    "l": 0,
    "roi": 0.909,
    "week": {
-    "n": 1,
-    "clvRet": 0.094,
+    "n": 0,
+    "clvRet": null,
     "clvT": null
    },
    "exp": {
@@ -2148,8 +2153,8 @@
    "l": 1,
    "roi": -1.0,
    "week": {
-    "n": 1,
-    "clvRet": -0.005,
+    "n": 0,
+    "clvRet": null,
     "clvT": null
    },
    "exp": {
@@ -3071,9 +3076,9 @@
    "l": 8,
    "roi": 0.0726,
    "week": {
-    "n": 11,
-    "clvRet": -0.0016,
-    "clvT": -0.1
+    "n": 7,
+    "clvRet": -0.01,
+    "clvT": -0.61
    },
    "exp": {
     "clvRet": 0.1336,
@@ -3203,9 +3208,9 @@
    "l": 2,
    "roi": 0.4083,
    "week": {
-    "n": 6,
-    "clvRet": 0.0689,
-    "clvT": 1.98
+    "n": 5,
+    "clvRet": 0.0548,
+    "clvT": 1.22
    },
    "exp": {
     "clvRet": 0.1467,
@@ -3422,9 +3427,9 @@
    "l": 2,
    "roi": 0.3701,
    "week": {
-    "n": 6,
-    "clvRet": 0.0306,
-    "clvT": 0.91
+    "n": 3,
+    "clvRet": 0.0543,
+    "clvT": 0.94
    },
    "exp": {
     "clvRet": 0.1111,
@@ -4048,12 +4053,12 @@
    "sport": "cbb",
    "mk": "total",
    "label": "CBB total",
-   "n": 205,
-   "du": 130.0,
-   "clvRet": -0.0063,
-   "clvT": -0.53,
-   "flat": -0.0012,
-   "adds": -0.0051,
+   "n": 206,
+   "du": 131.0,
+   "clvRet": -0.0066,
+   "clvT": -0.56,
+   "flat": -0.0014,
+   "adds": -0.0052,
    "expEdge": 0.0185,
    "basis": "backtest + live picks"
   },
