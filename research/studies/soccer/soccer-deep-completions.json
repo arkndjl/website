@@ -1,0 +1,89 @@
+{
+ "id": "soccer-deep-completions",
+ "sport": "soccer",
+ "question": "Do deep completions add to xG and market ratings in the soccer game model?",
+ "answer": "No. Every weight raised 1X2 log loss on 2015-22 (+.02 to +.46 x1000); never taken to held out.",
+ "findings": [
+  "Best setting (gain .08, weight .03): +.02 x1000, t by day .39, 4/8 seasons better, 19,466 matches.",
+  "Weight .10: +.19 to +.46 x1000 (t up to 2.29). More deep weight is worse.",
+  "Moving .05 of the xG weight to deep: +.21 x1000, t 1.61. Deep is weaker than xG at the same weight.",
+  "Base: market ratings carry ~.89 of the blend, xG .11; a process stat has little room."
+ ],
+ "method": "Deep completions (Understat 'deep', passes completed within ~20 m of goal) on the goal scale by one ratio (.234 goals per deep, big five 2015-22), walked as a fifth side rating like xG. Scored on 90-minute 1X2 log loss, paired by match; t from match-day sums. Pre-registered grid; held 2023-26 untouched.",
+ "data": "ESPN results + football-data closes + Understat team match histories, big five 2015-22 scored with UEFA matches; 21,359 matches with deep counts.",
+ "n": 19466,
+ "robust": true,
+ "interest": 2,
+ "split_check": "No setting beat the base in more than 4 of 8 seasons.",
+ "chart": {
+  "type": "bar",
+  "title": "Log loss change x1000 by setting (tuning)",
+  "x_label": "gain / weight",
+  "y_label": "x1000",
+  "y_fmt": "signed",
+  "x_reverse": false,
+  "ref": {
+   "y": 0,
+   "label": "base"
+  },
+  "mark": null,
+  "series": [
+   {
+    "name": "tuning 2015-22",
+    "points": [
+     {
+      "x": "k.08 w.03",
+      "y": 0.02,
+      "lo": -0.08,
+      "hi": 0.12,
+      "n": 19466
+     },
+     {
+      "x": "k.08 w.06",
+      "y": 0.07,
+      "lo": -0.1,
+      "hi": 0.24,
+      "n": 19466
+     },
+     {
+      "x": "k.08 w.10",
+      "y": 0.19,
+      "lo": -0.08,
+      "hi": 0.46,
+      "n": 19466
+     },
+     {
+      "x": "k.15 w.03",
+      "y": 0.06,
+      "lo": -0.07,
+      "hi": 0.19,
+      "n": 19466
+     },
+     {
+      "x": "k.15 w.06",
+      "y": 0.19,
+      "lo": -0.06,
+      "hi": 0.44,
+      "n": 19466
+     },
+     {
+      "x": "k.15 w.10",
+      "y": 0.46,
+      "lo": 0.07,
+      "hi": 0.85,
+      "n": 19466
+     },
+     {
+      "x": "for xG .05",
+      "y": 0.21,
+      "lo": -0.05,
+      "hi": 0.47,
+      "n": 19466
+     }
+    ]
+   }
+  ]
+ },
+ "publish": true,
+ "order": 5
+}
