@@ -6,7 +6,9 @@
     python3 scripts/cbb_breakout_sweep.py [research_seasons.csv]
 
 Tests (pre-registered, leave one season out, Holm across all ten; scripts/breakout_lib.py):
-  T1-T6  new signals, each added alone to the kept logistic (feature builders: scripts/cbb_breakout.py bo_extra)
+  T1-T6  new signals, each added alone to the kept logistic (feature builders: scripts/cbb_breakout.py bo_extra);
+         the pXPM gap (Nov 26 2026: next season's projected XPM, point in time, over his best level so far) is tested the
+         same way after them
   T7     gradient-boosted trees (numpy, depth 3, early stopping on an inner split of the training seasons)
   T8     logistic + monotone hinge splines on the four strongest columns
   T9-T10 Platt and isotonic recalibration fit on predictions made inside the training seasons
@@ -27,7 +29,8 @@ import cbb_breakout_research as R  # noqa: E402
 import names as N  # noqa: E402
 
 COACH = os.path.join(R.ROOT, 'scripts', 'data', 'cbb_coaches.json')
-NTEST = 10
+NTEST = 11
+TN = lambda i, k: f'T11 {k}' if k == 'pXPM gap' else f'T{i + 1} {k}'   # the pXPM gap joined after T1-T10 were numbered
 
 
 def new_coaches(teams):
@@ -67,7 +70,7 @@ def design(P, C, fit):
         f = B.bo_feats(a, s0, cur, B.marcel(hist, y), c, 0.0)
         X.append(sum([f['base']] + [f[k] for k in keep], []))
         nc = NC.get((b['team'], y + 1))
-        e = B.bo_extra(a, cur, c, dep.get((pid, y), B.NO_DEP), nc or 0.0)
+        e = B.bo_extra(a, cur, c, dep.get((pid, y), B.NO_DEP), nc or 0.0, s0, B.marcel(hist, y))
         for k in B.BO_EXTRA:
             EX[k].append(e[k])
         has_c.append(nc is not None)
@@ -301,12 +304,12 @@ def main():
     for i, k in enumerate(B.BO_EXTRA):
         pk = oos_logit(S, y, np.column_stack([X, EX[k]]))
         if k == 'coaching change':
-            T[f'T{i + 1} {k}'] = L.compare(by_season(S, y, p_redo, has_c), by_season(S, y, pk, has_c))
-            T[f'T{i + 1} {k}']['coach_rows'] = int(has_c.sum())
+            T[TN(i, k)] = L.compare(by_season(S, y, p_redo, has_c), by_season(S, y, pk, has_c))
+            T[TN(i, k)]['coach_rows'] = int(has_c.sum())
         else:
-            T[f'T{i + 1} {k}'] = L.compare(e_redo, by_season(S, y, pk))
-        print(' ', f'T{i + 1}', k, T[f'T{i + 1} {k}'], flush=True)
-    extra = [k for i, k in enumerate(B.BO_EXTRA) if passed(T[f'T{i + 1} {k}'])]
+            T[TN(i, k)] = L.compare(e_redo, by_season(S, y, pk))
+        print(' ', TN(i, k).split()[0], k, T[TN(i, k)], flush=True)
+    extra = [k for i, k in enumerate(B.BO_EXTRA) if passed(T[TN(i, k)])]
     X2 = np.column_stack([X] + [EX[k] for k in extra])
     p_log = oos_logit(S, y, X2) if extra else p_redo
     e_log = by_season(S, y, p_log)

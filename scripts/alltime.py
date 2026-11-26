@@ -18,7 +18,7 @@ Era adjustment (every sport, teams and players): a season's value is set against
            CS2 Valve VRS points (peak a calendar year, 2024-).
   Players  peak = best season, career = sum of seasons, each season's value measured against replacement in its league:
            NBA VORP (Basketball Reference; before 1974 from WS / 48 and minutes at the 1974-85 fit), per 82 games;
-           NHL point shares (Hockey Reference), per 82 games; CBB Barttorvik BPM x minutes share over replacement (2008-);
+           NHL point shares (Hockey Reference), per 82 games; CBB VORX (XPM x minutes over replacement, Barttorvik 2008-);
            tennis Elo (own fit on the Sackmann archive 1968-), peak and career weeks above the top-20 line;
            soccer GAR seasons where the site has them; CS2 HLTV-style rating where the site has it.
   Era check (about in each table): decade share of the top 100 against the decade's share of rows; KL divergence
@@ -301,8 +301,9 @@ def tennis_players(tour):
 
 
 def cbb_players():
-    """site CBB WAR (scripts/cbb_tabs.py: (shrunk rXPM - REPL) x minutes / 40 x .68 x wins a point; rXPM shrunk GBPM_K
-    minutes toward that season's minutes-weighted mean, Nov 24 2026 port round) on every Barttorvik season 2008-"""
+    """site CBB VORX (scripts/cbb_tabs.py: (shrunk rXPM - REPL) x minutes / 40 x .68 x wins a point; rXPM shrunk GBPM_K
+    minutes toward that season's minutes-weighted mean, Nov 24 2026 port round) on every Barttorvik season 2008-.
+    raw = the season's rXPM (XPM), the rate the era adjustment reads. `--snap --cbb` puts these rows in the snapshot."""
     import cbb_data, cbb_tabs
     wpp = json.load(gzip.open(os.path.join(HERE, 'data', f'cbb_tabs_2026.json.gz')))['wfit']['wpp']
     C = cbb_data.BT_COLS; rows = []
@@ -320,9 +321,10 @@ def cbb_players():
     out = []
     for r, bpm, gb, m, y in rows:
         q = sh[(r['team'], y)]     # rXPM (Nov 26 2026): BPM plus the team's minutes-weighted mean (GBPM - BPM), scripts/cbb_xpm.py
-        x = cbb_tabs.wx({'xpm': bpm + (q[0] / q[1] if q[1] else 0.0)}, m, num[y] / den[y] if den[y] else None)
+        rx = bpm + (q[0] / q[1] if q[1] else 0.0)
+        x = cbb_tabs.wx({'xpm': rx}, m, num[y] / den[y] if den[y] else None)
         war = (x - cbb_tabs.REPL) * m / 40 * .68 * wpp
-        out.append(dict(id=r['pid'], n=r['name'], y=y, tm=r['team'], pos=None, v=war, raw=round(bpm, 1), w=m))
+        out.append(dict(id=r['pid'], n=r['name'], y=y, tm=r['team'], pos=None, v=war, raw=round(rx, 1), w=m))
     return out
 
 
@@ -1158,6 +1160,9 @@ def main():
             src['cfbqb'] = cfb_qb_pull()
             src['cfbsk'] = cfb_skill_pull()
             json.dump(src, gzip.open(SNAP, 'wt'), separators=(',', ':'))
+        if '--cbb' in sys.argv:  # CBB player seasons again from the Barttorvik cache (alltime_pull.py cbbp): VORX on rXPM
+            src['cbbS'] = cbb_players()
+            json.dump(src, gzip.open(SNAP, 'wt'), separators=(',', ':'))
         src['soccerS'] = soccer_players()      # local season files: SV / SVAR (scripts/soccer_sv.py) without a re-pull
         nba_pub(src)                   # the published XPM files (rXPM, VORX on rXPM) over the snapshot's 2010-26 rows
     else:
@@ -1188,7 +1193,7 @@ def main():
     res['cs2'] = {'teams': teams_out('cs2', src['cs2T'], keys=('r',))}
     nf = src['nbafit']
     # era adjustment (era_scale): NBA XPM vs the season's regulars + minutes per 82 vs the season's 90th pct load;
-    # NHL WAR per 82 vs the season, skaters and goalies apart (no minutes before 2008-09); CBB BPM + minutes; soccer GAR/90 + minutes
+    # NHL WAR per 82 vs the season, skaters and goalies apart (no minutes before 2008-09); CBB XPM + minutes; soccer GAR/90 + minutes
     import nba_xpm
     gsn = defaultdict(int)
     for r in src['nbaT']: gsn[r['y']] = max(gsn[r['y']], sum(r['wl'][:2]))
@@ -1198,7 +1203,7 @@ def main():
                            lambda r, m: nba_xpm.VORX_K * (r - nba_xpm.VORX_REP) * m / 48, reg=lambda x: x.get('reg'))
     ERA['nhl'] = era_scale(src['nhlS'], lambda x: x['v'], None, None, reg=lambda x: x.get('reg'), grp=lambda x: 'G' if x.get('pos') == 'G' else 'S')
     wpp = json.load(gzip.open(os.path.join(HERE, 'data', 'cbb_tabs_2026.json.gz')))['wfit']['wpp']
-    ERA['cbb'] = era_scale(src['cbbS'], lambda x: x['raw'], lambda x: x['w'], lambda r, m: (r + 2.0) * m / 40 * .68 * wpp, reg=lambda x: x['w'] >= 400)
+    ERA['cbb'] = era_scale(src['cbbS'], lambda x: x['raw'], lambda x: x['w'], lambda r, m: (r + 1.4) * m / 40 * .68 * wpp, reg=lambda x: x['w'] >= 400)
     ERA['soccer'] = era_scale(src['soccerS'], lambda x: x['v'] / x['raw'] * 90 if x.get('raw') else None, lambda x: x['raw'] or 0,
                               lambda r, m: r * m / 90, reg=lambda x: (x.get('raw') or 0) >= 900)
     cs = cs2_players()
@@ -1222,8 +1227,8 @@ def main():
                                         'MoneyPuck + Hockey Reference', est=f"before {hf['first'] - 1}-{str(hf['first'])[2:]}: WAR from point shares (skaters r {hf['S']['r']:.2f}, goalies r {hf['G']['r']:.2f} on the seasons both have)",
                                         abouts=(f"NHL WAR from {hf['first'] - 1}-{str(hf['first'])[2:]}; earlier seasons est from point shares.", ''))
     res['nhl']['players']['fit'] = hf
-    res['cbb']['players'] = players_out(src['cbbS'], dict(l='WAR', t='wins over a replacement player: (BPM + 2) x minutes / 40 x .68 x wins a point (CBB WAR)', f='%.1f', rl='BPM', rt='Barttorvik box plus-minus', rf='%.1f'),
-                                        dict(l='WAR', t='career WAR, D-I seasons 2007-08 on', f='%.1f', s=1, pl='Peak', pt='best season WAR'),
+    res['cbb']['players'] = players_out(src['cbbS'], dict(l='VORX', t='wins over a replacement player: (XPM + 1.4) x minutes / 40 x .68 x wins a point (CBB VORX)', f='%.1f', rl='XPM', rt='XPM (rXPM): box plus-minus on team totals that track wins', rf='%.1f'),
+                                        dict(l='VORX', t='career VORX, D-I seasons 2007-08 on', f='%.1f', s=1, pl='Peak', pt='best season VORX'),
                                         'Barttorvik', pos=False)
     car, nfit = nfl_career(src['nflpk'], src['nflwav'])
     res['nfl']['players'] = players_out(src['nflpk'], dict(l='WAR', t='NFL WAR (AV WAR, no special teams), 2012 on (snap counts)', f='%.2f', rl='AV', rt='approximate value, rebuilt from nflverse', rf='%.1f'),
@@ -1295,7 +1300,7 @@ def main():
         e = ERA[sp][k]; return f"{e['ref'][0]}-{e['ref'][1]}"
     ET = {'nba': f"Era: XPM against that season's regulars (mean, SD), minutes per 82 against that season's 90th pct load, both in {_e('nba')} units; BPM is per 100 possessions, so pace is already out.",
           'nhl': f"Era: WAR per 82 against that season's regulars (mean, SD), skaters and goalies apart, in {_e('nhl', 'S')} units.",
-          'cbb': f"Era: BPM against that season's regulars (400+ min), minutes against that season's 90th pct, in {_e('cbb')} units.",
+          'cbb': f"Era: XPM against that season's regulars (400+ min), minutes against that season's 90th pct, in {_e('cbb')} units.",
           'soccer': f"Era: GAR per 90 against that season's regulars (900+ min), minutes against that season's 90th pct, in {_e('soccer')} units.",
           'cs2': f"Era: RWA against that year's regulars (1,000+ rounds), rounds against that year's 90th pct, in {_e('cs2')} units.",
           'hkp': 'Era: log NHLe against drafted skaters of the same age and position that season (SD pooled +- 2 seasons).'}

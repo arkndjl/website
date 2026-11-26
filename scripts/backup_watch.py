@@ -450,14 +450,17 @@ def cbb_projected():
 CBB_NEXT = {'G': ['G', 'F'], 'F': ['F', 'C', 'G'], 'C': ['C', 'F']}
 
 
-def cbb_grade(now, last):
-    """shrunk BPM over this season and last (half weight), by minutes: (grade, minutes)"""
+def cbb_grade(now, last, px=None):
+    """shrunk BPM over this season and last (half weight), by minutes: (grade, minutes). px = his preseason pXPM (board
+    form, scripts/cbb_xpm.py): last season's line carries it in place of its BPM. Nov 26 2026,
+    scripts/research/xpm_swap_nov26/backup.py: against the rest of the season's game BPM the grade's squared error falls at
+    every season share (0, .15, .3, .5: t 45 to 64, 12/12 seasons), nothing refit"""
     num = den = mins = 0.0
     for line, w in zip((now, last), CBB_W):
         if not line or line.get('bpm') is None or not line.get('gp') or not line.get('mpg'):
             continue
         m = line['gp'] * line['mpg']
-        num += w * m * line['bpm']; den += w * m; mins += m
+        num += w * m * (px if line is last and px is not None else line['bpm']); den += w * m; mins += m
     return round((num + CBB_K * CBB_REPL) / (den + CBB_K), 1), round(mins)
 
 
@@ -478,7 +481,7 @@ def cbb():
                 continue
             mpg, src = 40 * sh / 100, 'proj'
         cur = now if now and now.get('season') != (r[ci['last']] or {}).get('season') else None
-        g, n = cbb_grade(cur, r[ci['last']])
+        g, n = cbb_grade(cur, r[ci['last']], r[ci['pxpm']] if 'pxpm' in ci and len(r) > ci['pxpm'] else None)
         teams.setdefault(r[ci['team']], []).append({'name': r[ci['name']], 'team': r[ci['team']], 'logo': r[ci['logo']],
             'conf': r[ci['conf']], 'pos': r[ci['pos']], 'cls': r[ci['cls']], 'g': g, 'n': n, 'fv': r[ci['fv']],
             'mpg': round(mpg, 1), 'src': src})
@@ -514,7 +517,7 @@ def cbb():
                 ss.append([lab, pl])
         dt.append({'t': t, 'n': t, 'logo': L[0]['logo'], 'grp': L[0]['conf'], 'units': [{'u': '', 's': ss}]})
     pct_fill(pcts, CBB_MIN)
-    write_depth('cbb', {'asof': time.strftime('%Y-%m-%d'), 'grade': 'BPM', 'use': 'MPG', 'fmt': 1, 'live': live,
+    write_depth('cbb', {'asof': time.strftime('%Y-%m-%d'), 'grade': 'pXPM', 'use': 'MPG', 'fmt': 1, 'live': live,
                         'min': CBB_MIN, 'k': CBB_K, 'repl': CBB_REPL}, dt)
     return {'asof': time.strftime('%Y-%m-%d'), 'teams': rooms, 'live': live, 'gap': CBB_GAP, 'k': CBB_K, 'repl': CBB_REPL,
             'w': CBB_W, 'min': CBB_MIN, 'rows': rows}

@@ -251,10 +251,10 @@ def bo_feats(a, s0, cur, mar, ctx, scal):
 
 # ---------- the improvement sweep's signals (scripts/cbb_breakout_sweep.py) ----------
 BO_EXTRA = ('dev curve by pedigree', 'dev curve by archetype', 'depth opportunity', 'coaching change', 'box profile',
-            'team context')
+            'team context', 'pXPM gap')
 BO_LABEL.update({'dev curve by pedigree': 'pedigree x age', 'dev curve by archetype': 'archetype',
                  'depth opportunity': 'depth', 'coaching change': 'new coach', 'box profile': 'box profile',
-                 'team context': 'team level'})
+                 'team context': 'team level', 'pXPM gap': 'pXPM'})
 
 
 def group(a):
@@ -286,10 +286,24 @@ def depth_tables(lines_y, next_team):
     return out
 
 
-def bo_extra(a, cur, ctx, dep, newcoach):
+def set_px(lines):
+    """each line gets px = the pXPM (board form) a fit on earlier seasons gave after it (scripts/cbb_xpm_hist.py); None
+    where the history file has no row"""
+    import cbb_xpm_hist as XH
+    for o in lines: o['px'] = XH.get(o['pid'], o['y'], 'px2')
+    return lines
+
+
+def bo_extra(a, cur, ctx, dep, newcoach, s0=None, mar=None):
+    """s0 = his best shrunk BPM so far, mar = his Marcel (the pXPM gap's fill for a line with no pXPM)"""
     agec, rgc, ht = a['age'] - 21, a['rg_lrk'] + 6.2146, a['hti'] - 77
     fr = 1.0 if a['cls'] == 1 else 0.0
-    return {'dev curve by pedigree': [agec * rgc, agec * agec * rgc, fr * rgc],
+    s0 = cur if s0 is None else s0
+    px = a.get('px') if a.get('px') is not None else (mar if mar is not None else s0)
+    # pXPM gap (Nov 26 2026, scripts/research/xpm_swap_nov26/breakout.py): next season's projected XPM over his best level so
+    # far; added to the kept logistic, leave one season out log loss .20772 -> .20500, t 5.1, 16/16 seasons
+    return {'pXPM gap': [px - s0],
+            'dev curve by pedigree': [agec * rgc, agec * agec * rgc, fr * rgc],
             'dev curve by archetype': [a['big'], a['guard'], agec * a['big'], agec * a['guard'], ht, agec * ht],
             'depth opportunity': list(dep),
             'coaching change': [float(newcoach), float(newcoach) * (1 - ctx['xfer'])],
@@ -421,6 +435,7 @@ def main():
     import names as N
     fit = json.load(open(FIT))
     base = json.load(gzip.open(BASEF, 'rt'))
+    set_px(base['lines'])
     P = {(o['pid'], o['y']): o for o in base['lines']}
     cur = [o for o in base['lines'] if o['y'] == BASE_YEAR]
     by_key = defaultdict(list)
@@ -502,7 +517,7 @@ def main():
         _, x = bo_row(a, hist, ctx, sfit, keep)
         if extra:
             # a first-year head coach is not in the live inputs: the coaching-change signal did not ship
-            e = bo_extra(a, shr(a['bpm'], a['m']), ctx, DEP.get(a['pid'], NO_DEP), 0.0)
+            e = bo_extra(a, shr(a['bpm'], a['m']), ctx, DEP.get(a['pid'], NO_DEP), 0.0, level(a, hist)[0], marcel(hist, a['y']))
             x = x + sum([e[k] for k in extra], [])
         x = x + [max(0.0, x[j] - kn) for j, ks in spline for kn in ks]
         if sw.get('gbt'):

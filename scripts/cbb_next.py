@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""CBB next-season WAR (Nov 3 2026): the inputs and the live projection shared by scripts/cbb_next_research.py (fit)
-and scripts/cbb_tabs.py (the WAR tab's Next column). Pure Python; coefficients in data/cbb_next_fit.json.
+"""CBB next-season VORX (Nov 3 2026; on XPM since Nov 26 2026): the inputs and the live projection shared by
+scripts/cbb_next_research.py (fit) and scripts/cbb_tabs.py (the VORX tab's Next column). Coefficients in data/cbb_next_fit.json.
 
-    WAR (31 games) = (BPM + 2) x min% / 100 x 31 x .68 x .01432       (scripts/cbb_tabs.py WAR at a 31-game season)
-    last season's view: M2 = OLS on last season's line (BPM, 3-year BPM, min%, class, transfer and team strength,
-                        recruit rank, WAR, age, seasons, BPM over position, OBPM, usage, height)
-    this season's view: the in-season grid, coefficients by season share f = team games / 31 (linear between points)
+    VORX (31 games) = (XPM + 1.4) x min% / 100 x 31 x .68 x .01872     (scripts/cbb_tabs.py VORX at a 31-game season; XPM = rXPM)
+    last season's view: M2 = OLS on last season's line (pXPM, 3-year BPM, min%, class, transfer and team strength,
+                        recruit rank, VORX, age, seasons, XPM over position, O-XPM, usage, height)
+    this season's view: the in-season grid, coefficients by season share f = team games / 31 (linear between points);
+                        its history input is last season's pXPM (board form, scripts/cbb_xpm.py)
+Nov 26 2026 (scripts/research/xpm_swap_nov26/next.py, next_inseason.py): pXPM in the roster row for last-season BPM, walk-forward
+2016-26 RMSE t 22 (11/11 seasons); pXPM for the 3-year BPM in the grid, t 13 to 26 at every season share (11/11).
 """
 import datetime as dt
 import json
@@ -15,7 +18,7 @@ import os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 FIT = os.path.join(os.path.dirname(HERE), 'data', 'cbb_next_fit.json')
-WPP, PACE, REPL, G31 = 0.01432, 0.68, -2.0, 31
+WPP, PACE, REPL, G31 = 0.01872, 0.68, -1.4, 31
 K = G31 * PACE * WPP
 POSMAP = {'Pure PG': 'G', 'Scoring PG': 'G', 'Combo G': 'G', 'Wing G': 'G', 'Wing F': 'F', 'Stretch 4': 'F', 'PF/C': 'C', 'C': 'C'}
 CLS = {'Fr': 1, 'So': 2, 'Jr': 3, 'Sr': 4}
@@ -31,7 +34,7 @@ def f(x, d=None):
 
 
 def war(bpm, mp):
-    """WAR at a 31-game season from BPM and min% (share of team minutes)"""
+    """VORX at a 31-game season from a rate (XPM; game BPM for a line to date) and min% (share of team minutes)"""
     return (bpm - REPL) * mp / 100 * K
 
 
@@ -42,13 +45,13 @@ def line(gbpm, obpm, usg, mins, team_games):
 
 def pxrow(r, td, prev, pm):
     """in-season inputs: r = the season in progress (yr, rg_lrk, unranked, age, seasons, hti, role; its BPM and minutes
-    are not read), td = to-date line (None at f 0), prev = the season before ({bpm3, min_per} or None), pm = position
-    -> minutes-weighted BPM mean of the season before"""
+    are not read), td = to-date line (None at f 0), prev = the season before ({px: pXPM after it, min_per} or None), pm =
+    position -> minutes-weighted XPM mean of the season before"""
     lr = f(r.get('rg_lrk'))
     lr = lr if lr is not None and f(r.get('unranked'), 1) == 0 else -math.log(600)
     c = CLS.get(r['yr'], 3)
     a = f(r.get('age'), 21.0)
-    b3 = f(prev['bpm3']) if prev is not None and f(prev.get('bpm3')) is not None else None
+    b3 = f(prev['px']) if prev is not None and f(prev.get('px')) is not None else None
     m3 = f(prev['min_per'], 0) / 100 if prev is not None else 0.0
     x = [1.0, 1.0 if c == 1 else 0.0, 1.0 if c == 2 else 0.0, lr, b3 if b3 is not None else 0.0, 1.0 if b3 is None else 0.0, m3,
          a - 21, (a - 21) ** 2, min(f(r.get('seasons'), 2), 6) - 2, f(r.get('hti'), 78) - 78]
@@ -85,11 +88,12 @@ def bpm3(seasons, upto):
 
 
 def live(games, prior, season, gl):
-    """the season in progress -> {(board name, board team): next season's WAR}. prior = scripts/cbb_prior.json.gz (the
+    """the season in progress -> {(board name, board team): next season's VORX}. prior = scripts/cbb_prior.json.gz (the
     frozen preseason board: rows, careers, keep); games = this season's Barttorvik-shaped game rows; gl = column index
     (min, usg, obpm, gbpm, team, pid, muid, name). A career without a Barttorvik pid (freshmen) joins its game rows by
     name key + Barttorvik team, as scripts/cbb_live.py does."""
     import names
+    import cbb_xpm_hist as XH
     fit = json.load(open(FIT))
     ins = fit['inseason']
     pm = fit['posmean'][str(season - 1)]
@@ -131,7 +135,7 @@ def live(games, prior, season, gl):
         r = {'yr': now.get('yr') or row[ci['cls']], 'rg_lrk': sum(-math.log(min(v, 500)) for v in rk) / len(rk) if rk else None,
              'unranked': 0.0 if rk else 1.0, 'age': age, 'seasons': 1 + sum(1 for s in S if s['year'] < season and s.get('min_per')),
              'hti': now.get('hti'), 'role': now.get('role') or row[ci['role']]}
-        pv = {'bpm3': bpm3(S, season - 1), 'min_per': prev.get('min_per')} if prev else None
+        pv = {'px': XH.get(c.get('pid'), season - 1, 'px2', bpm3(S, season - 1)), 'min_per': prev.get('min_per')} if prev else None
         n = len(tg.get(a[4], ())) or 1
         td = line(a[1] / a[0], a[2] / a[0], a[3] / a[0], a[0], n)
         x = pxrow(r, td, pv, pm)

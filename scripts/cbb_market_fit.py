@@ -74,11 +74,24 @@ def player_rows(write=False):
             json.dump(out, h, separators=(',', ':'))
     else:
         out = json.load(gzip.open(ROWS))
+    import cbb_xpm_hist as XH
     by = defaultdict(list)
     for r in out:
         r['year'] = int(r['year']); r['pid'] = int(r['pid'])
+        # pXPM after the season (board form, coefficients fit on earlier seasons only): the production input of Transfer%
+        # and landing since Nov 26 2026 (rate()); a row the history file lacks keeps its BPM
+        r['px'] = XH.get(r['pid'], r['year'], 'px2')
         by[r['year']].append(r)
     return by
+
+
+def rate(r):
+    """the player's level in the move and landing inputs: pXPM (what he projects to be next season: 'px' on a history
+    row, the board's live projection on a live row, which passes it as 'bpm'), else the season's BPM.
+    scripts/research/xpm_swap_nov26/market.py, 2025->26 held out: Transfer% log loss .8999 -> .8862 (t 6.5, AUC .710 -> .725),
+    landing log P(school) -5.470 -> -5.419 (t 6.0, top 10 15.1% -> 16.4%); rXPM in the same slot was worse (t -5.1)"""
+    v = r.get('px')
+    return v if v is not None else (r.get('bpm') or 0.0)
 
 
 def team_seasons():
@@ -306,7 +319,7 @@ def move_rows(by, TS, raw):
 
 
 def feats_move(r, srs, p6, minrk, trans, cc_next, cc_now):
-    b = max(-15.0, min(15.0, r.get('bpm') or 0.0))
+    b = max(-15.0, min(15.0, rate(r)))
     m = (r.get('min_per') or 0) / 100
     yr = r.get('yr') or 'Fr'
     s = (srs or 0.0) / 10
@@ -495,7 +508,7 @@ def land_events(by, TS, raw, loc, years, homes=None):
 
 
 def feats_land(r, o, t, dsrs, osrs, oconf, dconf, ol, dl, follow, newhc, open_, hl=None):
-    b = max(-10.0, min(15.0, r.get('bpm') or 0.0))
+    b = max(-10.0, min(15.0, rate(r)))
     d = (dsrs if dsrs is not None else -5.0) / 10
     od = (osrs if osrs is not None else -5.0) / 10
     mi = miles(ol, dl)

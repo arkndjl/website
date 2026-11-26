@@ -760,11 +760,20 @@ def cbb(fit, rng):
         cbb_ap = {k: 26.0 - v for k, v in AC.ap_pre(S).items()}        # the team's preseason AP rank (Erving's term)
     except Exception as e:
         print('cbb preseason AP', e); cbb_ap = {}
+    # XPM (rXPM) = BPM + the team's shift per side (scripts/cbb_tabs.py writes this season's from the game logs): the value
+    # the conviction race and the shown stats use. The voter models stay on BPM: with rXPM in its place every race's
+    # held-out log P(winner) was level or worse (scripts/research/xpm_swap_nov26/awards.py, t -1.5 to .4)
+    try:
+        sh = json.load(open(os.path.join(ROOT, 'scripts', 'data', 'cbb_xpm_shift.json')))
+        xshift = sh['teams'] if str(sh.get('season')) == str(S) else {}
+    except (OSError, ValueError, KeyError, NameError):
+        xshift = {}
     for row in d['rows']:
         r = dict(zip(C, row))
         now = r.get('now') or {}
         if not now.get('gp') or r['team'] not in teams: continue
         last = r.get('last') or {}
+        xo, xd = xshift.get(r['team'], (0.0, 0.0))
         # priors: last season's line (any team) for returners; the board's projected BPM for newcomers
         prior = last['bpm'] if last.get('bpm') is not None and (last.get('gp') or 0) >= 8 else \
             next((x[2] for x in (r.get('parts') or []) if x[0] == 'BPM'), now['bpm'])
@@ -778,7 +787,7 @@ def cbb(fit, rng):
                       'drb': now.get('drb'), 'yr': now.get('yr') or r.get('cls'),
                       'dprior': last['dbpm'] if last.get('dbpm') is not None and (last.get('gp') or 0) >= 8 else .5 * (now.get('dbpm') or 0),
                       'role': now.get('role') or r.get('role') or {'G': 'Combo G', 'C': 'PF/C'}.get(r.get('pos'), 'Wing F'),
-                      'ap_pre': cbb_ap.get(NM.team_key(r['team']), 0.0)})
+                      'ap_pre': cbb_ap.get(NM.team_key(r['team']), 0.0), 'ta': xo + xd, 'tad': xd})
 
     def teams_draw(rng):
         td = team_draws(teams, rng)
@@ -801,7 +810,7 @@ def cbb(fit, rng):
         dmean = c['dbpm'] if SEASON_ONLY else (c['dbpm'] * m0 + c['dprior'] * K) / (m0 + K)
         d_rest = gauss(rng, dmean, 1.5 * math.sqrt(K / (m0 + K)) + (1.5 * math.sqrt(K / mr) if mr > 0 else 0))
         dbpm = (c['dbpm'] * m0 + d_rest * mr) / max(m0 + mr, 1)
-        return {'bpm': bpm, 'ppg': ppg, 'wp': td[c['tm']], 'barthag': td['_b' + c['tm']], 'mpg': c['mpg'],
+        return {'bpm': bpm, 'xpm': bpm + c['ta'], 'dxpm': dbpm + c['tad'], 'ppg': ppg, 'wp': td[c['tm']], 'barthag': td['_b' + c['tm']], 'mpg': c['mpg'],
                 'p5': 1.0 if tinfo[c['tm']][2] in P5 else 0.0, 'dbpm': dbpm, 'blk': c['blk'], 'stl': c['stl'],
                 'drb': c['drb'] if c['drb'] is not None else DRB_MU, 'ap_pre': c['ap_pre']}
 
@@ -810,8 +819,9 @@ def cbb(fit, rng):
     dsp = fit.get('dpoy') or {}
     DRB_MU = dsp['mu'][dsp['cols'].index('drb')] if 'drb' in dsp.get('cols', []) else 0.0
     if not fit.get('wooden', {}).get('test', {}).get('pass'): return None
-    show = [('bpm', 'BPM', '%+.1f'), ('ppg', 'PPG', '%.1f'), ('wp', 'W%', 'pct')]
-    dshow = [('dbpm', 'DBPM', '%+.1f'), ('blk', 'BLK%', '%.1f'), ('stl', 'STL%', '%.1f'), ('wp', 'W%', 'pct')]
+    show = [('xpm', 'XPM', '%+.1f'), ('ppg', 'PPG', '%.1f'), ('wp', 'W%', 'pct')]
+    dshow = [('dxpm', 'D-XPM', '%+.1f'), ('blk', 'BLK%', '%.1f'), ('stl', 'STL%', '%.1f'), ('wp', 'W%', 'pct')]
+    CSHOWN = {'bpm': 'xpm', 'dbpm': 'dxpm'}
     import awards_cbb as AC
     role = lambda aw: (lambda c: c['mpg'] >= 20 and c['role'] in AC.ROLE_POOL[aw])
     races = []
@@ -824,7 +834,8 @@ def cbb(fit, rng):
         spec = fit.get(aw)
         if not spec or not spec['test'].get('pass'): continue
         pool = [c for c in cands if (pool_f or (lambda c: c['mpg'] >= 20))(c)]
-        lead(aw, pool, draw, spec['null'][0], first(sh, spec['null'][0]), rng)
+        cm = CSHOWN.get(spec['null'][0], spec['null'][0])
+        lead(aw, pool, draw, cm, first(sh, cm), rng)
         pool = prune(pool, spec, draw, rng, keep=60)
         p = race(pool, spec, draw, rng)
         races.append((aw, rows_out(pool, p, draw, sh, rng), sh))
@@ -1391,7 +1402,7 @@ NULL_LABEL = {'svar': 'SVAR', 'vorx': 'VORX', 'dxpm': 'D-XPM', 'war': 'WAR', 'gs
               'td': 'TDs', 'sacks': 'sacks', 'dint': 'INTs', 'pass_y': 'pass yards', 'ptd': 'pass TDs', 'gross': 'gross average',
               'rush_y': 'rush yards', 'rtd': 'rush TDs', 'rec_y': 'receiving yards', 'ctd': 'receiving TDs', 'tackles': 'tackles',
               'fgm': 'FGs', 'fgpct': 'FG%', 'pd': 'PDs', 'gar': 'GAR', 'pts': 'points', 'g': 'goals', 'gd': 'defensive goals (WAR)'}
-NULL_LABEL.update({'d_vorx': 'VORX gain', 'dbpm': 'DBPM', 'rvorx': 'VORX', 'rdxpm': 'D-XPM', 'rd_vorx': 'VORX gain'})     # NBA / CBB races added Nov 23 2026
+NULL_LABEL.update({'d_vorx': 'VORX gain', 'dbpm': 'DBPM', 'rvorx': 'VORX', 'rdxpm': 'D-XPM', 'rd_vorx': 'VORX gain', 'xpm': 'XPM'})     # NBA / CBB races added Nov 23 2026
 POLY[('cbb', 'naismith')] = POLY[('cbb', 'wooden')]              # the market is on the Naismith
 BUILD = {'nba': nba, 'nhl': nhl, 'cbb': cbb, 'cfb': cfb, 'nfl': nfl, 'soccer': soccer}
 

@@ -1,0 +1,84 @@
+{
+ "xBPM": {
+  "teamR2": 0.7348,
+  "playerR_vsBPM": 0.7948,
+  "rmse_vs_BPM": 2.2541,
+  "rmse_vs_rXPM": 2.2051
+ },
+ "xBPM + pXPM board": {
+  "teamR2": 0.7406,
+  "playerR_vsBPM": 0.7959,
+  "rmse_vs_BPM": 2.2494,
+  "rmse_vs_rXPM": 2.2006,
+  "pairsBetter": "14/14",
+  "t": 12.05
+ },
+ "xBPM + pXPM core": {
+  "teamR2": 0.7353,
+  "playerR_vsBPM": 0.7949,
+  "rmse_vs_BPM": 2.254,
+  "rmse_vs_rXPM": 2.2046,
+  "pairsBetter": "10/14",
+  "t": 1.67
+ },
+ "rXPM target": {
+  "teamR2": 0.7355,
+  "playerR_vsBPM": 0.7935,
+  "rmse_vs_BPM": 2.2671,
+  "rmse_vs_rXPM": 2.1948,
+  "pairsBetter": "6/14",
+  "t": 1.39
+ },
+ "rXPM target + pXPM board": {
+  "teamR2": 0.741,
+  "playerR_vsBPM": 0.7945,
+  "rmse_vs_BPM": 2.263,
+  "rmse_vs_rXPM": 2.1908,
+  "pairsBetter": "14/14",
+  "t": 6.79
+ },
+ "newcomers": {
+  "scored on bpm_now": {
+   "rmse": [
+    3.0357,
+    3.0437
+   ],
+   "t_rXPM_target_better": -5.35,
+   "n": 10020
+  },
+  "scored on xpm_now": {
+   "rmse": [
+    2.9746,
+    2.9677
+   ],
+   "t_rXPM_target_better": 1.94,
+   "n": 10020
+  }
+ },
+ "whole roster": {
+  "xBPM (both groups)": {
+   "teamR2": 0.7718,
+   "playerR_vsBPM": 0.7948
+  },
+  "BPM target + pXPM board": {
+   "teamR2": 0.776,
+   "playerR_vsBPM": 0.7959,
+   "vs xBPM (both groups)": {
+    "pairsBetter": "14/14",
+    "t": 12.7
+   }
+  },
+  "xXPM (rXPM target + pXPM board)": {
+   "teamR2": 0.7768,
+   "playerR_vsBPM": 0.7945,
+   "vs xBPM (both groups)": {
+    "pairsBetter": "14/14",
+    "t": 7.81
+   },
+   "vs BPM target + pXPM board": {
+    "pairsBetter": "8/14",
+    "t": 2.06
+   }
+  }
+ }
+}
