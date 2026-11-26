@@ -96,3 +96,22 @@ so production needs no team-results file. Downstream: roster prior .7649 -> .767
 +.09 / +.10 (t .87 / .99): tie. Board form = scripts/cbb_xpm.py pxpm2_parts / values2 / frozen (beta2 in
 data/cbb_xpm_fit.json, scripts/data/cbb_pxpm_2026.json): pXPM leaders, portal, board hover. FV, roster prior and the game
 model stay on the box form (v1) until a full refit of the game model with the board form in the roster prior.
+
+## pXPM round 3 (prereg.md "pXPM round 3"; pxpm3.py, pxpm3b.py, pxpm3_record.py)
+
+Board form (v2) as the input of the roster prior / game model and of FV, against the box form (v1). cbb_xpm.CORE picks
+the form the fitted models read (True = box).
+
+| check | box -> board | read |
+| --- | --- | --- |
+| roster prior, next-season team R2 | .7647 -> .7674 (t 3.66, 13/14), player r .7801 -> .7867 | pass |
+| game walk at shipped settings, margin MAE | tune 9.2618 -> 9.2637 (t 3.45), held out 9.5892 -> 9.5903 (t 2.5), lined held 9.0374 -> 9.0376 (t .39), worse 11/11 seasons | FAIL |
+| game walk, prior weight retuned per arm (lam 2-8, ecarry .4-.8) | best tune lam 2 in both: held 9.5594 v 9.5601; board behind at every setting | FAIL |
+| FV returner fit | nested R2 .1073 -> .1138, top-300 r 2010-16 .420 -> .429 (6/7), held-out 2017-19 .386 -> .377 (0/3), top-50 realized FV 39.17 -> 39.03, draft AUC .962 -> .963 | FAIL (held out) |
+| FV distribution | RPS .07888 -> .07910 (limit +.0002), cover80 .910 -> .908 | FAIL |
+
+FV, the roster prior and the game model stay on the box form; no game model refit (its inputs are unchanged). The
+team-context and recruit terms carry what the game prior (last season's efficiency, recruits) and FV (recruit rating)
+already hold. Kept: scripts/data/cbb_team_ctx.json (freeze() writes each season's team context, so the board form no
+longer needs the Barttorvik cache) and set_ctx() for a season in progress. Aside, not acted on: margin MAE falls with a
+lighter prior (lam 2) in both arms, but lam 8 was picked on log loss by the Nov 23 walk-forward retune.
