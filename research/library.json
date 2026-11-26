@@ -2183,14 +2183,18 @@
     },
     {
      "term": "Trades",
-     "short": "Projected trades on Massey-Thaler pick values; real traded picks from Wikipedia.",
+     "short": "Projected trades: NFL on Massey-Thaler pick values; NBA Trade% per pick. Real traded picks from Wikipedia.",
      "body": [
       "Trades in every round (5, 7, 6, 5, 5, 2, 1 a round); next-year picks at .48 of a mid-round pick.",
-      "Solid tag = traded pick; dashed tag = projected trade."
+      "Solid tag = traded pick; dashed tag = projected trade.",
+      "NBA (Trade%): P(pick changes hands on draft night) from ln pick, its square, round 2 and ln picks the holder has; Wikipedia draft pages 2008-2026, 33% of picks traded. Held out by draft: log loss 0.6033 vs 0.6123 slot only (t -2.0, 12/19), 0.6364 flat.",
+      "NBA dashed tag = the likeliest picks a round, as many as the expected count (8.0 R1, 11.8 R2).",
+      "NBA partner FAILED held out (top-3 hit 16% vs 11% uniform, t -0.6): no partner named. NBA-fit value chart FAILED vs Massey-Thaler (100 pure-pick deals 2014-2026: |ln value ratio| 0.363 vs 0.386, t -0.8, 8/13)."
      ],
-     "where": "CFB mocks",
+     "where": "CFB and CBB mocks",
      "sports": [
-      "CFB"
+      "CFB",
+      "CBB"
      ]
     },
     {
