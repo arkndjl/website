@@ -265,6 +265,20 @@ export async function cfbd(pathq) {
   if (!key) throw new Error('CFBD_API_KEY not set');
   const memo = path.join(CFBD_MEMO, pathq.replace(/[^\w=&.-]+/g, '_') + '.json'), ttl = +(process.env.CFBD_TTL_H ?? 6) * 36e5;
   try { const m = JSON.parse(fs.readFileSync(memo, 'utf8')); if (Date.now() - m.at < ttl) return m.data; } catch {}
+  // the month's pace (Nov 2026: the 1,000 were gone by the 25th and the board ran on cached pulls). From the count CFBD
+  // last reported this month: no call once the month is spent, or while the calls used run more than CFBD_PACE_ROOM
+  // (default 250) ahead of an even pace through the month. The callers treat it as they treat a 429: the cached pull,
+  // then ESPN. CFBD_PACE=0 turns both checks off for a hand run.
+  if (cfbdUse.left == null) try {
+    const m = JSON.parse(fs.readFileSync(path.join(CFBD_MEMO, '..', 'cfbd_left.json'), 'utf8')), n = new Date();
+    if (m.at >= Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), 1)) cfbdUse.left = m.left;
+  } catch {}
+  if (cfbdUse.left != null && process.env.CFBD_PACE !== '0') {
+    const n = new Date(), days = new Date(Date.UTC(n.getUTCFullYear(), n.getUTCMonth() + 1, 0)).getUTCDate();
+    const cap = +(process.env.CFBD_QUOTA ?? 1000), room = +(process.env.CFBD_PACE_ROOM ?? 250);
+    if (cfbdUse.left <= 0) throw new Error(`CFBD 429 (month spent) ${pathq}`);
+    if (cap - cfbdUse.left > cap * n.getUTCDate() / days + room) throw new Error(`CFBD paced (${cfbdUse.left} left) ${pathq}`);
+  }
   const r = await fetch(`https://api.collegefootballdata.com/${pathq}`, { headers: { Authorization: `Bearer ${key}`, accept: 'application/json' } });
   const h = r.headers.get('x-calllimit-remaining');
   if (!cfbdUse.calls++) process.on('exit', () => console.log(`CFBD: ${cfbdUse.calls} calls this run, ${cfbdUse.left ?? '?'} left this month`));
