@@ -42,6 +42,7 @@ from collections import defaultdict
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cbb_data as D
+import cbb_xpm as XP
 from cbb_link import TIERS
 
 TRAIN = range(2009, 2017)
@@ -178,6 +179,10 @@ def features(c, i):
             m = (r['mp'] or 0) * (r['gp'] or 0)
             if r['bpm'] is not None: num += w[j] * m * r['bpm']; den += w[j] * m
         f['bpm3'] = shrink(num / den if den else None, den / 5, -4.0, 300)
+        # pXPM through last season (scripts/cbb_xpm.py; Nov 26 2026, scripts/research/cbb_xpm_nov26/fv.py): added to the
+        # shipped drivers OOS +.57 / +.62 (t 3.4 / 3.7, 5/5 folds both splits); in place of bpm3 +.28 / +.36 (t 2.5 / 3.1).
+        # Selection keeps it over last-season BPM: nested pseudo-R2 .105 -> .107, FV range RPS .0802 -> .0789
+        f['pxpm'] = XP.pxpm_lines(prev)
         f['trend'] = f['bpm'] - season_line(prev[-2])['bpm'] if len(prev) >= 2 else 0.0
         f['nprev'] = len(prev)
         f['young'] = max(0.0, 20.5 - f['age'])
@@ -213,9 +218,10 @@ NEW_CANDS = ['lrank', 'rg_lrk', 'unranked2', 'top', 'top5', 'rated', 'grade', 'o
 # hurting in every form (t -3 to -5); two harnesses that disagree are not evidence for it
 RET_CANDS = ['lrank', 'rg_lrk', 'unranked2', 'prpg', 'dprpg', 'age2', 'top', 'top5', 'grade', 'on3', 'r247', 'btrec', 'bpm', 'bpm3', 'obpm', 'dbpm', 'bpm_rel', 'obpm_rel', 'dbpm_rel', 'bpm_x_age', 'trend', 'min_per', 'usg', 'ast', 'to', 'stl', 'blk',
              'orb', 'drb', 'ft', 'tp', 'tpa100', 'ftr', 'rim', 'ortg', 'porpag', 'dporpag', 'power', 'age', 'young',
-             'bpm_x_young', 'ht', 'ht_g', 'guard', 'big', 'yr', 'nprev', 'transfer', 'splus']
-# the xBPM ridge's inputs: the FV candidates (less Stat+, which failed the xBPM forward test) plus the terms that passed it
-XB_RET = [k for k in RET_CANDS if k != 'splus'] + ['waa', 'mates_war', 'tal_team', 'tr_up', 'tr_down']
+             'bpm_x_young', 'ht', 'ht_g', 'guard', 'big', 'yr', 'nprev', 'transfer', 'splus', 'pxpm']
+# the xBPM ridge's inputs: the FV candidates (less Stat+, which failed the xBPM forward test, and pXPM: walk-forward next-season
+# team R2 .7348 -> .7353, player r flat, Nov 26 2026) plus the terms that passed it
+XB_RET = [k for k in RET_CANDS if k not in ('splus', 'pxpm')] + ['waa', 'mates_war', 'tal_team', 'tr_up', 'tr_down']
 XB_NEW = NEW_CANDS + ['mates_war', 'tal_team']
 
 

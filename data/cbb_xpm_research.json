@@ -1,0 +1,211 @@
+{
+ "src": "scripts/research/cbb_xpm_nov26 (Nov 26 2026)",
+ "pxpm": {
+  "teamR2": 0.7319,
+  "playerR": 0.7697,
+  "playerRMSE": 2.36,
+  "bpm": {
+   "teamR2": 0.6425,
+   "playerR": 0.68,
+   "playerRMSE": 3.4068
+  },
+  "vsBPM": {
+   "pairsBetter": 14,
+   "t": 15.66
+  }
+ },
+ "xbpm": {
+  "teamR2": 0.7348,
+  "playerR": 0.7948,
+  "asInput": {
+   "teamR2": [
+    0.7348,
+    0.7353
+   ],
+   "playerR_vsBPM": [
+    0.7948,
+    0.7948
+   ],
+   "pairsBetter": 11,
+   "t": 2.09,
+   "p": 0.02858
+  }
+ },
+ "rxpm": {
+  "R1 side blend": {
+   "after": 0.6578,
+   "gbpm": 0.6578,
+   "bpm": 0.6326,
+   "t": 0.09
+  },
+  "R2 GBPM team-adjusted": {
+   "after": 0.6366,
+   "gbpm": 0.6578,
+   "bpm": 0.6326,
+   "t": -7.89
+  },
+  "R3 side blend + team adjustment": {
+   "after": 0.6362,
+   "gbpm": 0.6578,
+   "bpm": 0.6326,
+   "t": -8.16
+  }
+ },
+ "roster": {
+  "teamR2": [
+   0.7567,
+   0.7647
+  ],
+  "pairsBetter": 13,
+  "t": 4.08,
+  "xbpmSwap": {
+   "teamR2": [
+    0.7567,
+    0.7519
+   ],
+   "playerR_vsBPM": [
+    0.7622,
+    0.7792
+   ],
+   "pairsBetter": 2,
+   "t": -3.18
+  }
+ },
+ "game": {
+  "tuneMae": [
+   9.2643,
+   9.2618
+  ],
+  "tuneT": -2.55,
+  "heldMae": [
+   9.5915,
+   9.5892
+  ],
+  "heldT": -2.76,
+  "linedHeldT": -2.88,
+  "seasonsBetter": 10,
+  "seasons": 11
+ },
+ "fv": {
+  "add": {
+   "driver": "pxpm",
+   "md5_gain": 0.571,
+   "md5_folds": 5,
+   "md5_t": 3.42,
+   "md5_rungs": [
+    0.169,
+    0.059,
+    0.035,
+    0.308
+   ],
+   "salt_gain": 0.617,
+   "salt_folds": 5,
+   "salt_t": 3.73,
+   "salt_rungs": [
+    0.172,
+    0.056,
+    0.037,
+    0.352
+   ],
+   "pass": true
+  },
+  "forBpm3": {
+   "md5": {
+    "gain": 0.283,
+    "folds": 5,
+    "t": 2.48,
+    "rungs": [
+     0.176,
+     0.041,
+     0.005,
+     0.06
+    ]
+   },
+   "salt": {
+    "gain": 0.356,
+    "folds": 5,
+    "t": 3.09,
+    "rungs": [
+     0.176,
+     0.036,
+     0.017,
+     0.127
+    ]
+   },
+   "pass": true
+  },
+  "forBpm": {
+   "md5": {
+    "gain": 0.485,
+    "folds": 5,
+    "t": 3.16,
+    "rungs": [
+     0.175,
+     0.041,
+     -0.005,
+     0.273
+    ]
+   },
+   "salt": {
+    "gain": 0.515,
+    "folds": 5,
+    "t": 3.46,
+    "rungs": [
+     0.178,
+     0.036,
+     -0.002,
+     0.304
+    ]
+   },
+   "pass": true
+  },
+  "gate": {
+   "nestedR2": [
+    0.105,
+    0.1073
+   ],
+   "rps": [
+    0.08018,
+    0.07888
+   ],
+   "top50_2009_16": [
+    37.14,
+    37.63
+   ],
+   "top50_2017_19": [
+    38.97,
+    39.58
+   ],
+   "auc_2017_19": [
+    0.922,
+    0.9262
+   ],
+   "corr300_2009_16": [
+    0.414,
+    0.431
+   ],
+   "corr300_2017_19": [
+    0.434,
+    0.422
+   ]
+  }
+ },
+ "mock": {
+  "kept": [
+   "lnpick",
+   "pxpm",
+   "age"
+  ],
+  "rmse": [
+   1.3633,
+   1.3579
+  ],
+  "drafts": 8,
+  "t": 0.6,
+  "slotErr": [
+   0.5684,
+   0.5713
+  ]
+ },
+ "note": "pxpm/xbpm/rxpm/fv add+swap/mock: research form (D side 25% GBPM, walk-forward or leave-one-pair-out); roster/game/fv gate: shipped form (scripts/cbb_xpm.py)"
+}

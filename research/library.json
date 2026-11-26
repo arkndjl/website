@@ -52,7 +52,7 @@
      "body": [
       "Mean of a capped outcome cannot reach 80; the stretch makes 80 reachable but rare (Oct 31 2026).",
       "K = mean that about 3 players a season reach; T = one player per about 5 seasons (exponential tail, held out).",
-      "K / T: CFB 67.8 / 74.9, CBB 55.3 / 64.8, hockey 54.8 / 73.9, soccer 64.8 / 71.8, ATP 63.5 / 76.6, WTA 60.2 / 75.0.",
+      "K / T: CFB 67.8 / 74.9, CBB 55.9 / 63.3, hockey 54.8 / 73.9, soccer 64.8 / 71.8, ATP 63.5 / 76.6, WTA 60.2 / 75.0.",
       "Order is unchanged. The exact mean (fvx) stays in tooltips; above K the headline reads hotter than realized means."
      ],
      "where": "Headline FV on every prospect board (data/fv_scale.json)",
@@ -590,6 +590,26 @@
       "Forward 2020-26 RMSE: returners 2.558 -> 2.462 (t 18), newcomers 3.439 -> 3.229 (t 14). Not an FV input."
      ],
      "where": "CBB board, true freshmen, standouts",
+     "sports": [
+      "CBB"
+     ]
+    },
+    {
+     "term": "pXPM (CBB)",
+     "short": "Projected Barttorvik BPM next season, O and D, from box score lines only.",
+     "body": [
+      "Per side: (K x mean of sub-200-minute players + minutes x BPM, last three seasons weighted 1 / w1 / w2) / (K + weighted minutes),",
+      "then a fit on next-season BPM: that history, ln minutes, class, and twelve box rates z-scored within the season x minutes / (minutes + 200)",
+      "(steal, block, OREB, DREB, assist, turnover, FT rate, 3PA/100, rim share, usage, TS, height), ridge 10 on the rates.",
+      "O: w .35 / .2, K 200. D: w .6 / .4, K 100. Fit on next-season minutes, 2008-09 to 2025-26 pairs (research form, below: D took 25% GBPM).",
+      "Walk-forward 2012-13 to 2025-26: next-season team adjEM R2 .732 vs BPM .642 (14/14, t 15.7); player r .770 vs .680, RMSE 2.36 vs 3.41.",
+      "xBPM (recruiting and team context too) still projects players better: team .735, r .795; pXPM in xBPM .7353 (t 2.09): not added.",
+      "Roster prior: in place of last-season BPM, next-season team R2 .757 -> .765 (13/14, t 4.08); game margin MAE 2016-20 9.2643 -> 9.2618 (t -2.55), 2021-26 9.5915 -> 9.5892 (t -2.76). xBPM there fails (t -3.18).",
+      "FV returner driver: added OOS +.57% (t 3.42, 5/5); in place of 3-season BPM t 2.48. Nested pseudo-R2 .105 -> .107, RPS .0802 -> .0789, 2017-19 top 50 39.0 -> 39.6.",
+      "NBA mock conviction: in place of 3-season BPM t .6 (8/15 drafts): kept 3-season BPM.",
+      "Descriptive (rXPM): no blend or team adjustment beats GBPM on held-out team win% (.658; team-adjusted .637, BPM .633). WAR stays on GBPM."
+     ],
+     "where": "CBB FV (returners), roster prior / game model",
      "sports": [
       "CBB"
      ]
@@ -2700,7 +2720,7 @@
   },
   {
    "board": "CBB / NBA prospects",
-   "note": "Outcome = peak NBA XPM, careers ending 2008-16; per class = careers per college class in the band; per board = players on a preseason board reaching that FV or better. pct = live D-I board (5,564). Stretch: headline = mean up to 55.3, linear above to 80 at 64.8 (80 about once per 5 seasons).",
+   "note": "Outcome = peak NBA XPM, careers ending 2008-16; per class = careers per college class in the band; per board = players on a preseason board reaching that FV or better. pct = live D-I board (5,564). Stretch: headline = mean up to 55.9, linear above to 80 at 63.3 (80 about once per 5 seasons).",
    "cols": [
     "FV",
     "meaning (rarity anchor; most common role in band)",
@@ -2770,7 +2790,7 @@
      "+0.6 to +1.7",
      "19",
      "median pick 18, 90% drafted",
-     "55-59: 57.0 -> 55.0 (n 1, 50+ 100%)"
+     "55-59: 55.5 -> 55.0 (n 1, 50+ 100%)"
     ],
     [
      "50",
@@ -2780,7 +2800,7 @@
      "+0.0 to +0.6",
      "28",
      "median pick 17, 84% drafted",
-     "50-54: 51.7 -> 49.1 (n 7, 50+ 43%)"
+     "50-54: 51.5 -> 39.6 (n 5, 50+ 20%)"
     ],
     [
      "45",
@@ -2790,7 +2810,7 @@
      "-0.6 to +0.0",
      "43",
      "median pick 23, 85% drafted",
-     "45-49: 47.4 -> 44.4 (n 25, 50+ 32%)"
+     "45-49: 47.1 -> 43.3 (n 29, 50+ 28%)"
     ],
     [
      "40",
@@ -2800,7 +2820,7 @@
      "-1.4 to -0.6",
      "64",
      "median pick 19, 83% drafted",
-     "40-44: 42.5 -> 44.9 (n 55, 50+ 40%)"
+     "40-44: 42.1 -> 45.9 (n 61, 50+ 46%)"
     ],
     [
      "35",
@@ -2810,7 +2830,7 @@
      "-2.1 to -1.4",
      "104",
      "median pick 29, 66% drafted",
-     "35-39: 37.3 -> 35.7 (n 147, 50+ 16%)"
+     "35-39: 37.4 -> 35.5 (n 150, 50+ 15%)"
     ],
     [
      "30",
@@ -2820,7 +2840,7 @@
      "-3.5 to -2.1",
      "191",
      "median pick 38, 57% drafted",
-     "30-34: 32.2 -> 31.8 (n 148, 50+ 11%)"
+     "30-34: 32.1 -> 32.3 (n 151, 50+ 11%)"
     ],
     [
      "20",
@@ -2830,7 +2850,7 @@
      "below -3.5",
      "-",
      "median pick 53, 0% drafted",
-     "20-24: 24.7 -> 24.4 (n 540, 50+ 4%)"
+     "20-24: 24.5 -> 24.3 (n 649, 50+ 3%)"
     ]
    ]
   },

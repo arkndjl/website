@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-11",
+ "asof": "2026-11-26",
  "method": "scripts/fv_scale.py --fit",
  "rule": "FV = mean up to K (3 a season); linear above to 80 at T (one a season x 0.2), capped at the board's reach",
  "boards": {
@@ -13,11 +13,11 @@
    "src": "held-out FBS player-seasons 2019-22 (data/fv_dist.json cfb scorecard)"
   },
   "cbb": {
-   "K": 55.34,
-   "T": 64.82,
-   "tail": 3.0,
-   "tailT": 54.72,
-   "reach": 64.82,
+   "K": 55.9,
+   "T": 63.28,
+   "tail": 2.67,
+   "tailT": 53.67,
+   "reach": 63.28,
    "seasons": 7,
    "src": "held-out top 300 of the 2009-10 to 2015-16 preseason boards (data/fv_dist.json cbb scorecard); K and T from the draft-day scale (cbbx)"
   },
@@ -58,10 +58,10 @@
    "src": "held-out October grades, players born 1979-97: 19 seasons of pools (data/tennis_prospects_fit.json)"
   },
   "cbbx": {
-   "K": 55.34,
+   "K": 55.9,
    "T": 64.82,
-   "tail": 4.19,
-   "tailT": 66.7,
+   "tail": 3.84,
+   "tailT": 66.29,
    "reach": 64.82,
    "seasons": 8,
    "src": "held-out draft-day grades, college exits 2009-16 (scripts/cbb_draftday.py)"
