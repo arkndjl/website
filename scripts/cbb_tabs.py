@@ -2,7 +2,7 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """College basketball production tabs (Nov 3 2026): the CBB page's equivalents of the CFB stats, VORX, breakout, top
 performer, draft board, portal, returning and team talent views. Display only: every number is a season line, a
-game line or an existing model output (FV, xBPM, NBA%, the mocks); nothing here feeds the FV model.
+game line or an existing model output (FV, xXPM, NBA%, the mocks); nothing here feeds the FV model.
 
     python3 scripts/cbb_tabs.py            # daily: this season from static/data/cbb-all.json + the game logs cache
     python3 scripts/cbb_tabs.py --freeze   # once: 2025-26 (Barttorvik season file + game logs) -> scripts/data/cbb_tabs_2026.json.gz
@@ -201,7 +201,7 @@ def board():
 
 
 def prior():
-    """the frozen preseason board (scripts/cbb_prior.json.gz, cbb_live.py): preseason FV, rank and xBPM by (name,
+    """the frozen preseason board (scripts/cbb_prior.json.gz, cbb_live.py): preseason FV, rank and xXPM by (name,
     team), each row's Barttorvik pid, and Barttorvik team name -> board team / logo / conference"""
     d = json.load(gzip.open(PRIOR))
     rows = [dict(zip(d['cols'], r)) for r in d['rows']]
@@ -459,15 +459,16 @@ def main():
         'pos': ['G', 'F', 'C'], 'seasons': [{'s': SEASON, 'l': label(SEASON), 'rows': prows}]})
 
     # ---- breakouts: 1st and 2nd year players playing above their preseason projection
+    xnow = lambda l: l['xpm'] if l.get('xpm') is not None else l['bpm']   # XPM (rXPM) of a line, BPM when it has none
     brk = []
     for r, L, mins in cur:
         if r.get('cls') not in ('Fr', 'So'): continue
         P = pre.get((r['name'], r['team'])) or {}
         last = r.get('last') if r.get('cls') == 'So' else None
-        xb0 = r.get('xb0') if r.get('xb0') is not None else P.get('xbpm')   # preseason xBPM under today's model
+        xb0 = r.get('xb0') if r.get('xb0') is not None else P.get('xbpm')   # preseason xXPM under today's model
         brk.append({'n': r['name'], 'tm': r['team'], 'pos': r['pos'], 'age': age(r), 'sub': r['cls'], 'ph': r.get('photo'), 'lo': r.get('logo'),
                     'xup': r1(r['xbpm'] - xb0) if xb0 is not None and r.get('xbpm') is not None else None,
-                    'over': r1(L['bpm'] - xb0) if xb0 is not None else None, 'bpm': L['bpm'], 'xb0': xb0,
+                    'over': r1(xnow(L) - xb0) if xb0 is not None else None, 'bpm': r1(xnow(L)), 'xb0': xb0,
                     'minup': r1(L['mpg'] - last['mpg']) if last else None, 'usgup': r1(L['usg'] - last['usg']) if last else None,
                     # against the preseason grade under today's model (cbb_live fv0), not the Oct 26 file's grade
                     'fvup': r['fv'] - (r['fv0'] if r.get('fv0') is not None else P['fv']) if (r.get('fv0') is not None or P.get('fv') is not None) else None,
@@ -481,19 +482,19 @@ def main():
         tm, lo, cf = esp(l['bt'])
         s = l['s']
         brk_last.append({'n': l['n'], 'tm': tm, 'pos': r['pos'] if r else l['pos'], 'age': None, 'sub': ('from ' + p['team'] if p['team'] != l['bt'] else 'So'),
-                         'ph': r.get('photo') if r else None, 'lo': lo, 'xup': None, 'over': None, 'bpm': s['bpm'], 'xb0': None,
-                         'bup': r1(s['bpm'] - p['bpm']), 'minup': r1(s['mpg'] - p['mpg']), 'usgup': r1(s['usg'] - p['usg']),
+                         'ph': r.get('photo') if r else None, 'lo': lo, 'xup': None, 'over': None, 'bpm': r1(xnow(s)), 'xb0': None,
+                         'bup': r1(xnow(s) - xnow(p)), 'minup': r1(s['mpg'] - p['mpg']), 'usgup': r1(s['usg'] - p['usg']),
                          'warup': r1(s['war'] - p['war'], 2), 'fvup': None, 'fv': r['fv'] if r else None, 'mp': s['mp'], 'pre': None, 'preL': ''})
     write('breakouts', {
         'title': 'breakouts', 'key': 'xup', 'def': '',
-        'views': [['xup', 'xBPM up', 'live xBPM minus preseason xBPM'], ['over', 'BPM over x', 'BPM minus preseason xBPM'],
+        'views': [['xup', 'xXPM up', 'live xXPM minus preseason xXPM'], ['over', 'XPM over x', 'XPM minus preseason xXPM'],
                   ['minup', 'MPG up', 'minutes a game over last season'], ['usgup', 'USG up', 'usage over last season'], ['fvup', 'FV up', 'FV now minus preseason FV'],
-                  ['warup', 'VORX up', 'VORX over the season before (2025-26)'], ['bup', 'BPM up', 'BPM over the season before (2025-26)']],
-        'cols': [col('xup', 'xBPM up', 'projected BPM now (this season blended in by minutes) minus the preseason projection', 's1'),
-                 col('over', 'BPM over x', 'BPM to date minus the preseason xBPM', 's1'), col('bpm', 'BPM', 'BPM this season', 's1'),
-                 col('xb0', 'xBPM pre', 'preseason projected BPM', 's1'), col('minup', 'MPG up', 'minutes a game over last season (2nd-years)', 's1'),
+                  ['warup', 'VORX up', 'VORX over the season before (2025-26)'], ['bup', 'XPM up', 'XPM over the season before (2025-26)']],
+        'cols': [col('xup', 'xXPM up', 'projected XPM now (this season blended in by minutes) minus the preseason projection', 's1'),
+                 col('over', 'XPM over x', 'XPM to date minus the preseason xXPM', 's1'), col('bpm', 'XPM', 'XPM this season', 's1'),
+                 col('xb0', 'xXPM pre', 'preseason projected XPM', 's1'), col('minup', 'MPG up', 'minutes a game over last season (2nd-years)', 's1'),
                  col('usgup', 'USG up', 'usage % over last season (2nd-years)', 's1'), col('warup', 'VORX up', 'VORX over the season before', 's2'),
-                 col('bup', 'BPM up', 'BPM over the season before', 's1'), col('fvup', 'FV up', 'FV now minus preseason FV', 's0'),
+                 col('bup', 'XPM up', 'XPM over the season before', 's1'), col('fvup', 'FV up', 'FV now minus preseason FV', 's0'),
                  col('fv', 'FV', 'FV now', 'i'), col('mp', 'Min', 'minutes played', 'i')],
         'pre': {'l': 'Pre', 't': 'preseason board rank (FV)'}, 'pos': ['G', 'F', 'C'],
         'min': {'k': 'mp', 'l': 'min ≥', 'def': 0, 'opts': BOPT},
@@ -558,7 +559,7 @@ def main():
                  col('cons', 'Cons', f"consensus rank: median on {M['boards']} 2027 boards; past drafts, ESPN and NBADraft.net final boards", 'i', 1, 1),
                  col('rng', '80%', '80% range of his pick across 2,000 simulated drafts', 's', 0), col('conv', 'Conv', 'conviction mock pick', 'i', 1, 1),
                  col('ret', 'Ret%', 'chance he returns to school instead of entering the 2027 draft (1 - declare model; seniors and internationals 0)', 'p'), col('fv', 'FV', 'FV now', 'i'),
-                 col('nbaP', 'NBA%', 'chance of an NBA career', 'p'), col('xbpm', 'xBPM', 'projected BPM this season', 's1'),
+                 col('nbaP', 'NBA%', 'chance of an NBA career', 'p'), col('xbpm', 'xXPM', 'projected XPM this season', 's1'),
                  col('out', 'Out', 'what he became: NBA career on the FV scale (drafts through 2020, six NBA seasons or more)', 'i'),
                  col('role', 'Career', 'NBA career: peak XPM and role', 's', 0)],
         'pre': {'l': 'Pick', 't': 'actual NBA pick (UDFA: undrafted)'},
@@ -655,12 +656,12 @@ def teams(B, F, by_pid, pidof, bt, t2e, asof):
                                       {'k': 'nfr', 'h': 'Fr', 't': 'true freshmen on the roster', 'f': '.0f', 'x': 1},
                                       {'k': 'frfv', 'h': 'Top Fr FV', 't': 'highest FV among the freshmen', 'f': '.0f', 'x': 1}],
                              'sort': 'rmin', 'rows': ret_rows},
-               'talent': {'plain': 1, 'about': 'Talent: mean FV of the eight highest-graded players. xNBA = sum of NBA% on the roster (expected NBA players). xBPM 8 = mean projected BPM of the top eight. TvE = talent rank minus ARK Ranking rank (+ = rated above the talent).',
+               'talent': {'plain': 1, 'about': 'Talent: mean FV of the eight highest-graded players. xNBA = sum of NBA% on the roster (expected NBA players). xXPM 8 = mean projected XPM of the top eight. TvE = talent rank minus ARK Ranking rank (+ = rated above the talent).',
                           'cols': [{'k': 'tal', 'h': 'Talent', 't': 'mean FV of the eight highest-graded players', 'f': '.1f', 'key': 1},
                                    {'k': 'top', 'h': 'Top FV', 't': 'highest FV on the roster', 'f': '.0f'},
                                    {'k': 'n45', 'h': 'FV 45+', 't': 'players graded FV 45 or better (NBA rotation and up)', 'f': '.0f'},
                                    {'k': 'xnba', 'h': 'xNBA', 't': 'sum of NBA% on the roster: expected NBA players', 'f': '.1f'},
-                                   {'k': 'xb', 'h': 'xBPM 8', 't': 'mean projected BPM of the top eight by xBPM', 'f': '+.1f', 'x': 1},
+                                   {'k': 'xb', 'h': 'xXPM 8', 't': 'mean projected XPM of the top eight by xXPM', 'f': '+.1f', 'x': 1},
                                    {'k': 'ark', 'h': 'ARK', 't': 'ARK Ranking rating: points a game better than an average D-I team', 'f': '+.1f'},
                                    {'k': 'tve', 'h': 'TvE', 't': 'talent rank minus ARK Ranking rank: + = playing above the roster\'s grades', 'f': '+.0f'}],
                           'sort': 'tal', 'rows': tal_rows}}}

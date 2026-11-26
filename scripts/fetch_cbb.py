@@ -41,7 +41,7 @@ LABEL = {   # driver names for the scouting report
     'nprev': 'seasons played', 'transfer': 'transfer', 'bpm_rel': 'BPM vs role', 'obpm_rel': 'offensive BPM vs role',
     'dbpm_rel': 'defensive BPM vs role', 'bpm_x_age': 'production for age', 'rg_lrk': 'recruiting rank (On3, 247, Barttorvik)',
     'unranked2': 'unranked', 'boards': 'draft boards (consensus)', 'prpg': 'PRPG!', 'dprpg': 'D-PRPG', 'age2': 'age curve', 'dunk_rel': 'dunk rate for role',
-    'combine': 'combine testing', 'splus': 'Stat+ (BPM vs position)', 'waa': 'WAA', 'mates_war': "returning teammates' WAR", 'tal_team': "teammates' recruiting",
+    'combine': 'combine testing', 'splus': 'Stat+ (BPM vs position)', 'waa': 'WAA', 'mates_war': "returning teammates' VORX", 'tal_team': "teammates' recruiting",
     'tr_up': 'transfer up', 'tr_down': 'transfer down'}
 
 
@@ -148,7 +148,7 @@ def main():
                     g = {k: v for k, v in hit.items() if k != 'name'} if hit else None
                 cc = {'pid': None, 'name': p['name'], 'dob': None, 'rec': g, 'seasons': [srow]}
             rows.append({'p': p, 't': t, 'c': c, 'cc': cc, 'f': None, 'how': how})
-    # features after every roster is in: the xBPM ridge reads each player's team context (cbb_fit.set_context)
+    # features after every roster is in: the xXPM ridge reads each player's team context (cbb_fit.set_context)
     F.set_context([r['cc'] for r in rows])
     for r in rows: r['f'] = F.features(r['cc'], len(r['cc']['seasons']) - 1)
     print(f'{len(rows)} rostered players; {sum(1 for r in rows if r["c"])} returners matched to Barttorvik '
@@ -253,7 +253,7 @@ def main():
                'calib': calib_groups(fit.get('calibMean') or fit['calib'])}
     json.dump(summary, open(os.path.join(D.ROOT, 'data', 'cbb.json'), 'w'), indent=1)
     print('FV tiers:', dict(sorted(tiers.items(), reverse=True)))
-    for o in out[:25]: print(f'{o[6]:3d} {o[0]:24s} {o[1]:18s} {o[4]} {o[13]} FV {o[8]}{"+" if o[9] else ""} NBA {o[11]:.2f} xBPM {o[12]}')
+    for o in out[:25]: print(f'{o[6]:3d} {o[0]:24s} {o[1]:18s} {o[4]} {o[13]} FV {o[8]}{"+" if o[9] else ""} NBA {o[11]:.2f} xXPM {o[12]}')
 
 
 def restate(r, cls, new, pos):

@@ -619,14 +619,17 @@
      ]
     },
     {
-     "term": "xBPM",
-     "short": "Projected Barttorvik BPM this season.",
+     "term": "xXPM",
+     "short": "Projected XPM this season, the board's projection for every player, freshmen and transfers included.",
      "body": [
-      "A ridge on last season, recruiting, age and size. In season it blends in BPM to date.",
-      "Team context: returning teammates' WAR, teammates' recruiting (top 8, -ln rank), WAA and transferring up or down.",
-      "Forward 2020-26, RMSE goes from 2.558 to 2.462 for returners (t = 18) and from 3.439 to 3.229 for newcomers (t = 14). It is not an FV input."
+      "A ridge on last season, recruiting, age and size, with rXPM (CBB) as the target. Returners also take pXPM (CBB), board form. In season it blends in XPM to date.",
+      "Team context: returning teammates' VORX, teammates' recruiting (top 8, -ln rank), WAA and transferring up or down.",
+      "It was xBPM, the same ridge with BPM as the target and no pXPM. Walk-forward 2012-13 to 2025-26, next-season team R² over the whole roster goes from .7718 to .7768 (14/14, t = 7.81).",
+      "For returners, pXPM added moves it from .7348 to .7406 (t = 12.05). The box form of pXPM alone is t = 1.67, and the rXPM target alone is t = 1.39. For newcomers the target swap is a tie (t = 1.94 scored on XPM).",
+      "The fit rows read pXPM point in time, from a refit that walks forward a season at a time.",
+      "As xBPM, forward 2020-26, RMSE went from 2.558 to 2.462 for returners (t = 18) and from 3.439 to 3.229 for newcomers (t = 14) with team context. It is not an FV input."
      ],
-     "where": "CBB board, true freshmen, standouts",
+     "where": "CBB board hover, true freshmen, standouts, draft board, team talent, team builder",
      "sports": [
       "CBB"
      ]
@@ -659,7 +662,7 @@
       "(steal, block, OREB, DREB, assist, turnover, FT rate, 3PA/100, rim share, usage, TS, height), with a ridge of 10 on the rates.",
       "O: w .35 / .2, K 200. D: w .6 / .4, K 100. Fit on next-season minutes, 2008-09 to 2025-26 pairs (in the research form below, D took 25% GBPM).",
       "Walk-forward 2012-13 to 2025-26: next-season team adjEM R² is .732 compared to .642 for BPM (14/14, t = 15.7). Player r is .770 compared to .680, and RMSE 2.36 compared to 3.41.",
-      "xBPM, which also has recruiting and team context, still projects players better: team .735, r .795. pXPM as an xBPM input gets .7353 (t = 2.09), so it wasn't added.",
+      "xXPM, the board's projection, takes the board form as an input next to recruiting and team context: for returners, team R² is .741 and player r .794.",
       "In the roster prior, in place of last-season BPM, next-season team R² goes from .757 to .765 (13/14, t = 4.08). Game margin MAE goes from 9.2643 to 9.2618 in 2016-20 (t = -2.55) and from 9.5915 to 9.5892 in 2021-26 (t = -2.76). xBPM fails there (t = -3.18).",
       "As an FV returner driver, it adds +.57% out of sample (t = 3.42, 5/5), and in place of 3-season BPM t = 2.48. Nested pseudo-R² goes from .105 to .107, RPS from .0802 to .0789, and the 2017-19 top 50 from 39.0 to 39.6.",
       "In NBA mock conviction, in place of 3-season BPM, it is t = .6 (8/15 drafts), so 3-season BPM stays.",
@@ -717,7 +720,7 @@
      "short": "Hollinger's single-game value.",
      "body": [
       "PTS + .4 FGM - .7 FGA - .4 (FTA - FTM) + .7 ORB + .3 DRB + STL + .7 AST + .7 BLK - .4 PF - TOV.",
-      "Every FV and xBPM test failed (a game, a 40, best game, 20+ games)."
+      "Every FV and xXPM test failed (a game, a 40, best game, 20+ games)."
      ],
      "where": "CBB top performers",
      "sports": [
@@ -728,8 +731,8 @@
      "term": "Standouts (CBB)",
      "short": "First and second-year players playing above their preseason projection.",
      "body": [
-      "xBPM up = live xBPM - preseason xBPM (minutes-blended). The tab also shows BPM over x, minutes, usage and FV gains.",
-      "The last season view puts second-years against their freshman line (VORX, BPM, minutes and usage gains).",
+      "xXPM up = live xXPM - preseason xXPM (minutes-blended). The tab also shows XPM over x, minutes, usage and FV gains.",
+      "The last season view puts second-years against their freshman line (VORX, XPM, minutes and usage gains).",
       "In the FV tests, VORX gain, minutes gain, usage gain and BPM × (1 - minutes share) all fail. Low-minute BPM passes the folds, but not at the top of the board."
      ],
      "where": "CBB standouts tab",
@@ -743,7 +746,7 @@
      "body": [
       "Ret Min% is the share of last season's minutes still on the roster (Barttorvik ids). In VORX is the VORX of incoming transfers.",
       "Talent is the mean FV of the top 8. xNBA is the sum of NBA%. TvE is talent rank minus ARK rank.",
-      "In the FV tests, vacated minutes (opportunity), returning teammates' VORX and teammates' recruiting fail. The last two pass for xBPM."
+      "In the FV tests, vacated minutes (opportunity), returning teammates' VORX and teammates' recruiting fail. The last two pass for xXPM."
      ],
      "where": "CBB returning, team talent",
      "sports": [
@@ -2727,7 +2730,7 @@
   },
   {
    "board": "CBB / NBA prospects",
-   "note": "The outcome is peak NBA XPM, for careers ending 2008-16. Per class is the careers in the band in a college class, and per board is the players on a preseason board who reach that FV or better. pct is the share of the live D-I board (5,564). Stretch: the headline is the mean up to 55.9, then a straight line to 80 at 63.3 (an 80 about once every 5 seasons).",
+   "note": "The outcome is peak NBA XPM, for careers ending 2008-16. Per class is the careers in the band in a college class, and per board is the players on a preseason board who reach that FV or better. pct is the share of the live D-I board (5,558). Stretch: the headline is the mean up to 55.9, then a straight line to 80 at 63.3 (an 80 about once every 5 seasons).",
    "cols": [
     "FV",
     "meaning (rarity anchor; most common role in band)",
@@ -2803,7 +2806,7 @@
      "50",
      "4+ seasons as a starter; most common: 4+ seasons as a starter (31%)",
      "3.56",
-     "3 of 5,564 (0.05%)",
+     "2 of 5,558 (0.04%)",
      "+0.0 to +0.6",
      "28",
      "median pick 17, 84% drafted",
@@ -2813,7 +2816,7 @@
      "45",
      "2+ seasons as a starter; most common: 2+ seasons as a starter (34%)",
      "5.89",
-     "12 of 5,564 (0.22%)",
+     "11 of 5,558 (0.20%)",
      "-0.6 to +0.0",
      "43",
      "median pick 23, 85% drafted",
@@ -2823,7 +2826,7 @@
      "40",
      "rotation, 3+ seasons; most common: rotation, 3+ seasons (35%)",
      "7.33",
-     "19 of 5,564 (0.34%)",
+     "27 of 5,558 (0.49%)",
      "-1.4 to -0.6",
      "64",
      "median pick 19, 83% drafted",
@@ -2833,7 +2836,7 @@
      "35",
      "bench, 100+ games; most common: bench, 100+ games (52%)",
      "12",
-     "43 of 5,564 (0.77%)",
+     "52 of 5,558 (0.94%)",
      "-2.1 to -1.4",
      "104",
      "median pick 29, 66% drafted",
@@ -2843,7 +2846,7 @@
      "30",
      "reached the NBA; most common: reached the NBA (83%)",
      "23",
-     "88 of 5,564 (1.6%)",
+     "91 of 5,558 (1.6%)",
      "-3.5 to -2.1",
      "191",
      "median pick 38, 57% drafted",

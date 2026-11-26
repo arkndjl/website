@@ -43,6 +43,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cbb_data as D
 import cbb_xpm as XP
+import cbb_xpm_hist as XH
 from cbb_link import TIERS
 
 TRAIN = range(2009, 2017)
@@ -183,6 +184,10 @@ def features(c, i):
         # shipped drivers OOS +.57 / +.62 (t 3.4 / 3.7, 5/5 folds both splits); in place of bpm3 +.28 / +.36 (t 2.5 / 3.1).
         # Selection keeps it over last-season BPM: nested pseudo-R2 .105 -> .107, FV range RPS .0802 -> .0789
         f['pxpm'] = XP.pxpm_lines(prev)
+        # pXPM board form (team context + recruit rating): an xXPM input only (xbpm_fit), the FV drivers keep the box form
+        try: _p2 = XP.pxpm2_parts(prev)
+        except (OSError, ValueError, KeyError): _p2 = None
+        f['pxpm2'] = _p2[0] if _p2 else f['pxpm']
         f['trend'] = f['bpm'] - season_line(prev[-2])['bpm'] if len(prev) >= 2 else 0.0
         f['nprev'] = len(prev)
         f['young'] = max(0.0, 20.5 - f['age'])
@@ -221,7 +226,9 @@ RET_CANDS = ['lrank', 'rg_lrk', 'unranked2', 'prpg', 'dprpg', 'age2', 'top', 'to
              'bpm_x_young', 'ht', 'ht_g', 'guard', 'big', 'yr', 'nprev', 'transfer', 'splus', 'pxpm']
 # the xBPM ridge's inputs: the FV candidates (less Stat+, which failed the xBPM forward test, and pXPM: walk-forward next-season
 # team R2 .7348 -> .7353, player r flat, Nov 26 2026) plus the terms that passed it
-XB_RET = [k for k in RET_CANDS if k not in ('splus', 'pxpm')] + ['waa', 'mates_war', 'tal_team', 'tr_up', 'tr_down']
+# pxpm2 (Nov 26 2026, scripts/research/xpm_swap_nov26/xxpm.py): with the target moved to rXPM, walk-forward 2012-25 next-season
+# team R2 .7718 -> .7768 over the whole roster (t 7.8, 14/14); the box form alone was a tie (t 1.7)
+XB_RET = [k for k in RET_CANDS if k not in ('splus', 'pxpm')] + ['waa', 'mates_war', 'tal_team', 'tr_up', 'tr_down', 'pxpm2']
 XB_NEW = NEW_CANDS + ['mates_war', 'tal_team']
 
 
@@ -460,16 +467,24 @@ def model_json(sel, m):
 
 
 def xbpm_fit(rows, cands):
-    """projected college BPM this season: ridge on the same inputs, rows weighted by minutes (capped at 600)."""
+    """xXPM, projected college XPM (rXPM) this season: ridge on the same inputs, rows weighted by minutes (capped at 600).
+    The target was BPM (xBPM) until Nov 26 2026; rows without an rXPM (no game logs) fall back on BPM."""
     rr = [r for r in rows if r['bpm_now'] is not None and r['mpt_now'] >= 100]
     X = matrix(rr, cands); std = Std(X); Z = std(X)
-    y = np.array([r['bpm_now'] for r in rr]); w = np.array([min(600, r['mpt_now']) for r in rr]) / 600
+    y = np.array([r['xpm_now'] if r.get('xpm_now') is not None else r['bpm_now'] for r in rr]); w = np.array([min(600, r['mpt_now']) for r in rr]) / 600
     A = np.hstack([np.ones((len(Z), 1)), Z]); P = np.eye(A.shape[1]) * 50; P[0, 0] = 0
     b = np.linalg.solve((A * w[:, None]).T @ A + P, (A * w[:, None]).T @ y)
     pred = A @ b
     r = float(np.corrcoef(pred, y)[0, 1])
     return {'cols': cands, 'mean': [round(float(x), 6) for x in std.m], 'sd': [round(float(x), 6) for x in std.s],
             'w': [round(float(x), 6) for x in b], 'r': round(r, 3)}
+
+
+def xb_block(rows):
+    xb = {grp: xbpm_fit([r for r in rows if r['year'] in range(2010, 2027) and r['f']['newcomer'] == (grp == 'newcomer')], cands)
+          for grp, cands in (('newcomer', XB_NEW), ('returner', XB_RET))}
+    print('xXPM r:', {g: v['r'] for g, v in xb.items()})
+    return xb
 
 
 def scarcity(rows, years):
@@ -1059,6 +1074,7 @@ def main():
     hsc = horizon_fv(careers)
     print(f'peak XPM where each FV starts, first {HORIZON} NBA seasons:', hsc[HORIZON])
     set_context(careers)
+    by_pid = {c['pid']: c for c in careers}
     rows = []
     for c in careers:
         for i, s in enumerate(c['seasons']):
@@ -1066,7 +1082,19 @@ def main():
             rows.append({'pid': c['pid'], 'cls': (c['last'] - 2009) % FOLDS, 'name': c['name'], 'team': s['team'], 'brole': s['role'], 'conf': s['conf'], 'yr': s['yr'], 'ht': s['ht'],
                          'year': s['year'], 'last': c['last'], 'y': c['nba']['fvx'], 'yh': c['nba']['fvh'], 'yfull': c['nba']['fvx'], 'role': c['nba']['role'], 'peak': c['nba']['peak'], 'xpm': c['nba']['peakXpm'],
                          'pick': c['nba']['pick'], 'draft': c['nba']['draft'], 'f': features(c, i),
-                         'bpm_now': s['bpm'], 'mpt_now': (s['mp'] or 0) * (s['gp'] or 0)})
+                         'bpm_now': s['bpm'], 'xpm_now': XH.get(c['pid'], s['year'], 'xpm', s['bpm']), 'mpt_now': (s['mp'] or 0) * (s['gp'] or 0)})
+    # the fit rows read pXPM point in time (the walking refit in scripts/cbb_xpm_hist.py), as the held-out test did: the
+    # frozen coefficients have seen each row's next season, which would overweight the term
+    for r in rows:
+        if r['f'].get('pxpm2') is not None and not r['f']['newcomer']:
+            c = by_pid[r['pid']]; pv = [s['year'] for s in c['seasons'] if s['year'] < r['year']]
+            v = XH.get(r['pid'], pv[-1], 'px2') if pv else None
+            if v is not None: r['f']['pxpm2'] = v
+    if '--xbpm' in sys.argv:   # refit the xXPM block alone, everything else in the fit file as it is
+        fit = json.load(open(OUT))
+        fit['xbpm'] = xb_block(rows)
+        json.dump(fit, open(OUT, 'w'), indent=1)
+        return
     train = [r for r in rows if r['year'] in TRAIN and r['last'] <= 2020]
     held = [r for r in rows if r['year'] in HELD and r['yh'] is not None]
     global TOP_MEAN
@@ -1145,9 +1173,7 @@ def main():
     print('mean AUC picked that June:', bt['yardsticks'])
 
     # projected college BPM
-    xb = {grp: xbpm_fit([r for r in rows if r['year'] in range(2010, 2027) and r['f']['newcomer'] == (grp == 'newcomer')], cands)
-          for grp, cands in (('newcomer', XB_NEW), ('returner', XB_RET))}
-    print('xBPM r:', {g: v['r'] for g, v in xb.items()})
+    xb = xb_block(rows)
 
     # the absolute grade (emap_fit): one map for the model's E (past boards, calibration) and one for E after the board
     # stage (the live board reads the stage), each fit on its own out-of-fold scores

@@ -56,13 +56,13 @@
       (r.outcome != null ? '<span class="fv-chip" data-fv="' + tierOf(r.outcome) + '">' + r.outcome + '</span> ' : '') + '<span class="cfb__dim">' +
       (r.outcome == null ? 'in NBA' : xp ? 'XPM ' + xp[1] : r.outcome > 20 ? 'NBA' : 'non-NBA') + pick + '</span></span>';
   }
-  // a D-II / D-III player (static/data/cbb-lowdiv.json): the 20 floor until he reaches D-I, D-1% in place of xBPM
-  // this season's XPM (rXPM, scripts/cbb_tabs.py board_cols; BPM when the column is missing); a dash under BPM_MIN minutes, pXPM and xBPM on hover
+  // a D-II / D-III player (static/data/cbb-lowdiv.json): the 20 floor until he reaches D-I, D-1% in place of xXPM
+  // this season's XPM (rXPM, scripts/cbb_tabs.py board_cols; BPM when the column is missing); a dash under BPM_MIN minutes, pXPM and xXPM on hover
   var BPM_MIN = 50;
   function bpmNow(r) { var n = r.now; return n && n.bpm != null && n.gp * n.mpg >= BPM_MIN ? (r.xpm != null ? r.xpm : n.bpm) : null; }
   function bpmCell(r) {
     var b = bpmNow(r), n = r.now, m = n ? Math.round(n.gp * n.mpg) : 0;
-    var t = (n ? m + ' min this season' : 'no D-I minutes this season') + (r.pxpm != null ? '; pXPM ' + sgn(r.pxpm) : '') + (r.xbpm != null ? '; xBPM ' + sgn(r.xbpm) : '');
+    var t = (n ? m + ' min this season' : 'no D-I minutes this season') + (r.pxpm != null ? '; pXPM ' + sgn(r.pxpm) : '') + (r.xbpm != null ? '; xXPM ' + sgn(r.xbpm) : '');
     return '<td class="cfb__num" title="' + esc(t) + '">' + (b == null ? dim : '<span class="' + (b >= 0 ? '' : 'cfb__down') + '">' + sgn(b) + '</span>') + '</td>';
   }
   var LOWTAG = { 'D-II': 'NCAA Division II', 'D-III': 'NCAA Division III' };
@@ -162,7 +162,7 @@
     var line = (r.now ? lineOf(r.now) + '. this season carries ' + Math.round(r.w * 100) + '% of his grade, by minutes played' + (L ? '.</p><p class="cfb__role">' + lineOf(L) : '') : L ? lineOf(L) : 'no D-I season yet');
     return '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + width + 'px">' + faceHtml(r.photo, 'pxframe--card', 280) +
       '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.pos) + (r.role ? ' (' + esc(r.role) + ')' : '') + ' · ' + esc(r.team) + ' · FV ' + r.fv + (r.posRank ? ' (' + r.pos + r.posRank + ')' : '') +
-      ' · NBA ' + pct(r.nbaP) + (r.pxpm != null ? ' · pXPM ' + sgn(r.pxpm) : '') + (r.xbpm != null ? ' · xBPM ' + sgn(r.xbpm) : '') + (links ? ' · ' + links : '') + '</p>' + badgeChips(r) +
+      ' · NBA ' + pct(r.nbaP) + (r.pxpm != null ? ' · pXPM ' + sgn(r.pxpm) : '') + (r.xbpm != null ? ' · xXPM ' + sgn(r.xbpm) : '') + (links ? ' · ' + links : '') + '</p>' + badgeChips(r) +
       '<p class="cfb__role">' + line + '.</p>' + (OVERSEAS[r.name] ? overseasLine(OVERSEAS[r.name]) : '') + '<p class="cfb__role">' + esc(recLine) + '.</p>' +
       (r.npos ? '<p class="cfb__role">' + moveChip(r) + 'NBA position: ' + esc(nposLine(r)) + '.</p>' : '') + window.arkFvo(r.fvd, 'cbb') + compsHtml(r) +
       '<div class="cfb__report"><div><h4>+ strengths</h4><ul>' + (li(rep.plus, 'is-plus') || '<li class="cfb__dim">none</li>') + '</ul></div>' +
@@ -243,7 +243,7 @@
     function cols() { return [].slice.call(w.querySelectorAll('thead th')).filter(function (t) { return !t.hidden; }).length; }
     function val(n) { var el = bar.elements[n]; return !el ? '' : el.type === 'checkbox' ? (el.checked ? '1' : '') : el.value; }
     function setPos(p) { pos = p; chips.forEach(function (c) { var on = c.dataset.pos === p; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
-    // the level select: D-I, international, D-II / D-III. Below D-I, D-1% takes xBPM's place (no D-I line to project)
+    // the level select: D-I, international, D-II / D-III. Below D-I, D-1% takes xXPM's place (no D-I line to project)
     function lvlOk(r, l) { return !l || (l === 'd1' ? !r.intl && !r.low : l === 'intl' ? r.intl : l === 'low' ? r.low : l === 'd2' ? r.div === 'D-II' : l === 'd3' ? r.div === 'D-III' : true); }
     function useCols(l) {
       up = !past && /^(low|d2|d3)$/.test(l || '');

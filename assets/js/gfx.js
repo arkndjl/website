@@ -178,7 +178,7 @@
   async function build(win, btn) {
     var table = win.querySelector('table'); if (!table) return null;
     var hcells = [].slice.call(table.tHead.rows[0].cells), vis = hcells.filter(function (h) { return !h.hidden; });
-    // a board that renders only its shown columns (the basketball board swaps xBPM/Age for Outcome on past seasons): headers by what's shown
+    // a board that renders only its shown columns (the basketball board swaps xXPM/Age for Outcome on past seasons): headers by what's shown
     var row0 = [].slice.call(table.tBodies[0].rows).find(function (r) { return !r.classList.contains('cfb__detail') && r.cells.length > 2; });
     if (row0 && vis.length < hcells.length && row0.cells.length === vis.length) hcells = vis;
     var heads = hcells.map(txt);
