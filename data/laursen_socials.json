@@ -1,26 +1,26 @@
 {
- "asof": "2026-11-26T01:15:29.382Z",
+ "asof": "2026-11-26T03:42:39.478Z",
  "status": {
   "twitch": true,
   "youtube": true,
   "tiktok": true,
-  "x": true,
+  "x": false,
   "ig": false
  },
  "goals": {
   "twitch": {
    "rate": 8.8,
    "prior": 7.4,
-   "tracked": 8.7,
+   "tracked": 8.9,
    "d30": {
     "goal": 281,
     "base": 274,
     "set": 1794899610245,
     "due": 1797491610245,
     "p0": 54,
-    "p": 91,
+    "p": 90,
     "f": 0.571,
-    "m": 0.288
+    "m": 0.295
    },
    "d90": {
     "goal": 295,
@@ -30,25 +30,25 @@
     "p0": 52,
     "p": 80,
     "f": 0.19,
-    "m": 0.096
+    "m": 0.098
    },
    "next": {
     "goal": 300,
-    "eta": "2027-02-09",
-    "p90": 68,
+    "eta": "2027-02-11",
+    "p90": 67,
     "from": 250,
     "base": 274,
     "set": 1794899610245,
     "eta0": "2027-03-07",
     "f": 0.56,
-    "m": 0.521
+    "m": 0.522
    },
    "opened": "2023-10-31"
   },
   "youtube": {
    "rate": 0.9,
    "prior": 1.1,
-   "tracked": 8.7,
+   "tracked": 8.9,
    "d30": {
     "goal": 43,
     "base": 42,
@@ -57,7 +57,7 @@
     "p0": 55,
     "p": 39,
     "f": 0,
-    "m": 0.288
+    "m": 0.295
    },
    "d90": {
     "goal": 44,
@@ -67,11 +67,11 @@
     "p0": 62,
     "p": 51,
     "f": 0,
-    "m": 0.096
+    "m": 0.098
    },
    "next": {
     "goal": 50,
-    "eta": "2027-11-17",
+    "eta": "2027-11-20",
     "p90": 7,
     "from": 25,
     "base": 42,
@@ -85,16 +85,16 @@
   "tiktok": {
    "rate": 10.6,
    "prior": 2.7,
-   "tracked": 8.7,
+   "tracked": 8.9,
    "d30": {
     "goal": 114,
     "base": 106,
     "set": 1795033969428,
     "due": 1797625969428,
     "p0": 53,
-    "p": 97,
+    "p": 96,
     "f": 0.625,
-    "m": 0.236
+    "m": 0.243
    },
    "d90": {
     "goal": 133,
@@ -102,13 +102,13 @@
     "set": 1795100284580,
     "due": 1802876284580,
     "p0": 52,
-    "p": 80,
+    "p": 79,
     "f": 0.154,
-    "m": 0.07
+    "m": 0.073
    },
    "next": {
     "goal": 150,
-    "eta": "2027-03-17",
+    "eta": "2027-03-19",
     "p90": 24,
     "from": 100,
     "base": 100,
@@ -122,16 +122,16 @@
   "x": {
    "rate": 6.5,
    "prior": 1.4,
-   "tracked": 8.7,
+   "tracked": 8.9,
    "d30": {
     "goal": 51,
     "base": 45,
     "set": 1795570750107,
     "due": 1798162750107,
     "p0": 59,
-    "p": 55,
+    "p": 54,
     "f": 0,
-    "m": 0.029
+    "m": 0.036
    },
    "d90": {
     "goal": 52,
@@ -139,13 +139,13 @@
     "set": 1795022156543,
     "due": 1802798156543,
     "p0": 56,
-    "p": 97,
+    "p": 96,
     "f": 0.364,
-    "m": 0.08
+    "m": 0.083
    },
    "next": {
     "goal": 50,
-    "eta": "2026-12-18",
+    "eta": "2026-12-19",
     "p90": 99,
     "from": 25,
     "base": 38,
@@ -1194,6 +1194,15 @@
    "x": 45,
    "ttv": 91,
    "tth": 2152
+  },
+  {
+   "t": 1795664559478,
+   "twitch": 278,
+   "youtube": 42,
+   "tiktok": 111,
+   "x": 45,
+   "ttv": 91,
+   "tth": 2154
   }
  ],
  "yt": {
@@ -2876,26 +2885,26 @@
    {
     "k": "TikTok post day",
     "v": "Wed",
-    "d": "478 expected views vs 342",
+    "d": "474 expected views vs 341",
     "n": 2
    },
    {
     "k": "YouTube post slot",
     "v": "Thu · 4p ET",
-    "d": "863 expected views vs 477",
+    "d": "856 expected views vs 470",
     "n": 3
    },
    {
     "k": "Shorts vs long",
     "v": "Shorts",
-    "d": "1,187 vs 187 median views",
-    "n": 22
+    "d": "1,101 vs 187 median views",
+    "n": 23
    },
    {
     "k": "Batch uploads",
-    "v": "space out",
-    "d": "506 batched vs 522 solo",
-    "n": 12
+    "v": "batch",
+    "d": "506 batched vs 443 solo",
+    "n": 13
    },
    {
     "k": "Upload gap",
@@ -2918,7 +2927,7 @@
    {
     "k": "Follows / hour",
     "v": "0.17 live",
-    "d": "0.01 offline · 11.6x",
+    "d": "0.01 offline · 11.9x",
     "n": 6
    },
    {
@@ -2929,7 +2938,7 @@
    },
    {
     "k": "TikTok hearts",
-    "v": "23.6 / video",
+    "v": "23.7 / video",
     "d": "91 videos · 1.22 followers / video",
     "n": 91
    },
@@ -2955,28 +2964,28 @@
    {
     "k": "Twitch pace",
     "v": null,
-    "d": "at 14 days tracked (8.7)",
+    "d": "at 14 days tracked (8.9)",
     "n": null,
     "wait": true
    },
    {
     "k": "YouTube pace",
     "v": null,
-    "d": "at 14 days tracked (8.7)",
+    "d": "at 14 days tracked (8.9)",
     "n": null,
     "wait": true
    },
    {
     "k": "TikTok pace",
     "v": null,
-    "d": "at 14 days tracked (8.7)",
+    "d": "at 14 days tracked (8.9)",
     "n": null,
     "wait": true
    },
    {
     "k": "X pace",
     "v": null,
-    "d": "at 14 days tracked (8.7)",
+    "d": "at 14 days tracked (8.9)",
     "n": null,
     "wait": true
    },
@@ -2996,18 +3005,18 @@
    {
     "k": "TikTok follows / 1k views",
     "v": null,
-    "d": "at 7 days tracked (8.7)",
+    "d": "at 7 days tracked (8.9)",
     "n": null,
     "wait": true
    }
   ],
   "yt": {
    "n": 23,
-   "nOld": 22,
-   "median": 775,
+   "nOld": 23,
+   "median": 554,
    "shorts": {
-    "n": 15,
-    "med": 1187
+    "n": 16,
+    "med": 1100.5
    },
    "long": {
     "n": 7,
@@ -3018,14 +3027,14 @@
     "med": 506
    },
    "solo": {
-    "n": 5,
-    "med": 522
+    "n": 6,
+    "med": 443
    },
    "last30": 11,
    "gap": 1.2,
    "vpd": 1057.5,
    "subsPerK": 0,
-   "likeRate": 0.91,
+   "likeRate": 0.93,
    "grid": [
     [
      {
@@ -3049,8 +3058,8 @@
       "med": null
      },
      {
-      "n": 0,
-      "med": null
+      "n": 1,
+      "med": 336
      }
     ],
     [
@@ -3210,43 +3219,43 @@
      }
     ]
    ],
-   "base": 477,
+   "base": 470,
    "days": [
     {
      "d": "Sun",
-     "n": 1,
-     "med": 92,
-     "x": 316
+     "n": 2,
+     "med": 214,
+     "x": 317
     },
     {
      "d": "Mon",
      "n": 5,
      "med": 1014,
-     "x": 439
+     "x": 437
     },
     {
      "d": "Tue",
      "n": 5,
      "med": 312,
-     "x": 482
+     "x": 480
     },
     {
      "d": "Wed",
      "n": 4,
      "med": 459,
-     "x": 438
+     "x": 435
     },
     {
      "d": "Thu",
      "n": 3,
      "med": 1266,
-     "x": 863
+     "x": 856
     },
     {
      "d": "Fri",
      "n": 4,
      "med": 1091.5,
-     "x": 428
+     "x": 425
     },
     {
      "d": "Sat",
@@ -3260,37 +3269,37 @@
      "b": "12a",
      "n": 4,
      "med": 649.5,
-     "x": 411
+     "x": 408
     },
     {
      "b": "4a",
      "n": 1,
      "med": 13,
-     "x": 197
+     "x": 194
     },
     {
      "b": "8a",
      "n": 1,
      "med": 554,
-     "x": 495
+     "x": 489
     },
     {
      "b": "12p",
      "n": 5,
      "med": 1014,
-     "x": 418
+     "x": 415
     },
     {
      "b": "4p",
      "n": 3,
      "med": 1246,
-     "x": 743
+     "x": 737
     },
     {
      "b": "8p",
-     "n": 8,
-     "med": 514,
-     "x": 616
+     "n": 9,
+     "med": 506,
+     "x": 584
     }
    ],
    "ups": [
@@ -3302,7 +3311,7 @@
      "views": 996,
      "likes": 21,
      "comments": null,
-     "age": 110.1,
+     "age": 110.2,
      "et": {
       "d": 5,
       "h": 18,
@@ -3318,7 +3327,7 @@
      "views": 2953,
      "likes": 19,
      "comments": null,
-     "age": 106,
+     "age": 106.1,
      "et": {
       "d": 2,
       "h": 21,
@@ -3334,7 +3343,7 @@
      "views": 1266,
      "likes": 21,
      "comments": null,
-     "age": 96.9,
+     "age": 97,
      "et": {
       "d": 4,
       "h": 22,
@@ -3350,7 +3359,7 @@
      "views": 1473,
      "likes": 1,
      "comments": null,
-     "age": 96.8,
+     "age": 96.9,
      "et": {
       "d": 5,
       "h": 1,
@@ -3366,7 +3375,7 @@
      "views": 92,
      "likes": 1,
      "comments": null,
-     "age": 80.8,
+     "age": 80.9,
      "et": {
       "d": 0,
       "h": 1,
@@ -3382,7 +3391,7 @@
      "views": 1331,
      "likes": 10,
      "comments": null,
-     "age": 65,
+     "age": 65.1,
      "et": {
       "d": 1,
       "h": 21,
@@ -3398,7 +3407,7 @@
      "views": 506,
      "likes": 5,
      "comments": null,
-     "age": 65,
+     "age": 65.1,
      "et": {
       "d": 1,
       "h": 21,
@@ -3414,7 +3423,7 @@
      "views": 187,
      "likes": 10,
      "comments": null,
-     "age": 64.2,
+     "age": 64.3,
      "et": {
       "d": 2,
       "h": 15,
@@ -3430,7 +3439,7 @@
      "views": 522,
      "likes": 4,
      "comments": null,
-     "age": 57,
+     "age": 57.1,
      "et": {
       "d": 2,
       "h": 20,
@@ -3446,7 +3455,7 @@
      "views": 300,
      "likes": 4,
      "comments": null,
-     "age": 49.9,
+     "age": 50,
      "et": {
       "d": 2,
       "h": 22,
@@ -3462,7 +3471,7 @@
      "views": 312,
      "likes": 0,
      "comments": null,
-     "age": 49.9,
+     "age": 50,
      "et": {
       "d": 2,
       "h": 23,
@@ -3478,7 +3487,7 @@
      "views": 364,
      "likes": 0,
      "comments": null,
-     "age": 48.9,
+     "age": 49,
      "et": {
       "d": 3,
       "h": 23,
@@ -3494,7 +3503,7 @@
      "views": 1450,
      "likes": 19,
      "comments": null,
-     "age": 9.2,
+     "age": 9.3,
      "et": {
       "d": 1,
       "h": 14,
@@ -3510,7 +3519,7 @@
      "views": 12,
      "likes": 0,
      "comments": null,
-     "age": 9.2,
+     "age": 9.3,
      "et": {
       "d": 1,
       "h": 14,
@@ -3526,7 +3535,7 @@
      "views": 1014,
      "likes": 9,
      "comments": null,
-     "age": 9.2,
+     "age": 9.3,
      "et": {
       "d": 1,
       "h": 14,
@@ -3542,7 +3551,7 @@
      "views": 112,
      "likes": 1,
      "comments": null,
-     "age": 7.8,
+     "age": 7.9,
      "et": {
       "d": 3,
       "h": 0,
@@ -3558,7 +3567,7 @@
      "views": 554,
      "likes": 6,
      "comments": null,
-     "age": 7.4,
+     "age": 7.5,
      "et": {
       "d": 3,
       "h": 10,
@@ -3574,7 +3583,7 @@
      "views": 1251,
      "likes": 10,
      "comments": null,
-     "age": 7.2,
+     "age": 7.3,
      "et": {
       "d": 3,
       "h": 16,
@@ -3590,7 +3599,7 @@
      "views": 2406,
      "likes": 10,
      "comments": null,
-     "age": 6.3,
+     "age": 6.4,
      "et": {
       "d": 4,
       "h": 13,
@@ -3606,7 +3615,7 @@
      "views": 1246,
      "likes": 18,
      "comments": null,
-     "age": 6.2,
+     "age": 6.3,
      "et": {
       "d": 4,
       "h": 16,
@@ -3622,7 +3631,7 @@
      "views": 1187,
      "likes": 9,
      "comments": null,
-     "age": 5.7,
+     "age": 5.8,
      "et": {
       "d": 5,
       "h": 2,
@@ -3638,7 +3647,7 @@
      "views": 13,
      "likes": 0,
      "comments": null,
-     "age": 5.6,
+     "age": 5.7,
      "et": {
       "d": 5,
       "h": 6,
@@ -3654,7 +3663,7 @@
      "views": 336,
      "likes": 6,
      "comments": null,
-     "age": 3,
+     "age": 3.1,
      "et": {
       "d": 0,
       "h": 20,
@@ -3674,7 +3683,7 @@
    "lpH": 0.17,
    "opH": 0.01,
    "hLive": 5.8,
-   "hOff": 202.2,
+   "hOff": 207.4,
    "live": null,
    "grid": [
     [
@@ -3961,14 +3970,14 @@
   },
   "tt": {
    "videos": 91,
-   "hearts": 2152,
-   "hpv": 23.6,
+   "hearts": 2154,
+   "hpv": 23.7,
    "newVideos": 5,
-   "newHearts": 120,
+   "newHearts": 122,
    "fpv": 1.22,
    "n": 10,
-   "views": 3621,
-   "median": 346,
+   "views": 3646,
+   "median": 334,
    "vpd": null,
    "hearts_t": [
     [
@@ -4314,6 +4323,10 @@
     [
      1795645818114,
      2152
+    ],
+    [
+     1795664559478,
+     2154
     ]
    ],
    "grid": [
@@ -4339,8 +4352,8 @@
       "med": null
      },
      {
-      "n": 0,
-      "med": null
+      "n": 1,
+      "med": 319
      }
     ],
     [
@@ -4358,7 +4371,7 @@
      },
      {
       "n": 4,
-      "med": 296
+      "med": 297
      },
      {
       "n": 0,
@@ -4406,7 +4419,7 @@
      },
      {
       "n": 1,
-      "med": 412
+      "med": 413
      },
      {
       "n": 0,
@@ -4414,7 +4427,7 @@
      },
      {
       "n": 1,
-      "med": 558
+      "med": 559
      },
      {
       "n": 0,
@@ -4436,11 +4449,11 @@
      },
      {
       "n": 1,
-      "med": 504
+      "med": 514
      },
      {
       "n": 1,
-      "med": 302
+      "med": 305
      },
      {
       "n": 0,
@@ -4450,7 +4463,7 @@
     [
      {
       "n": 1,
-      "med": 346
+      "med": 349
      },
      {
       "n": 0,
@@ -4503,14 +4516,14 @@
    "days": [
     {
      "d": "Sun",
-     "n": 0,
-     "med": null,
-     "x": null
+     "n": 1,
+     "med": 319,
+     "x": 335
     },
     {
      "d": "Mon",
      "n": 4,
-     "med": 296,
+     "med": 297,
      "x": 298
     },
     {
@@ -4522,19 +4535,19 @@
     {
      "d": "Wed",
      "n": 2,
-     "med": 485,
+     "med": 486,
      "x": 391
     },
     {
      "d": "Thu",
      "n": 2,
-     "med": 403,
-     "x": 360
+     "med": 409.5,
+     "x": 362
     },
     {
      "d": "Fri",
      "n": 1,
-     "med": 346,
+     "med": 349,
      "x": 343
     },
     {
@@ -4550,7 +4563,7 @@
      "desc": "give me that shit boy !!! #fyp #cs2 #csgo #counterstrike #gamertok",
      "pub": 1794854476000,
      "photo": false,
-     "views": 314,
+     "views": 315,
      "r5": null
     },
     {
@@ -4558,7 +4571,7 @@
      "desc": "LAURGOD PLAYOFF 4K #FYP #CS2 #csgo #counterstrike #gamertok ",
      "pub": 1794854866000,
      "photo": false,
-     "views": 278,
+     "views": 279,
      "r5": null
     },
     {
@@ -4566,8 +4579,8 @@
      "desc": "CS2 PLAYER PLAYS VAL NONCHALANT AURAFARMER ACE #fyp #valorant #valtok #gamertok #eboy",
      "pub": 1794855065000,
      "photo": false,
-     "views": 462,
-     "r5": 351
+     "views": 463,
+     "r5": 352
     },
     {
      "id": "7708847220732349709",
@@ -4575,55 +4588,55 @@
      "pub": 1794855860000,
      "photo": true,
      "views": 130,
-     "r5": 296
+     "r5": 297
     },
     {
      "id": "7709535742065691918",
      "desc": "ACE DEAGLE IN ESEA LEAGUE MATCH #fyp #cs2 #csgo #valorant #eboy ",
      "pub": 1795016169000,
      "photo": false,
-     "views": 412,
-     "r5": 319
+     "views": 413,
+     "r5": 320
     },
     {
      "id": "7709624704234949901",
      "desc": "cs2 player tries val 1v3 clutch ice in his veins #fyp #valorant #gaming #cs2 #eboy",
      "pub": 1795036882000,
      "photo": false,
-     "views": 558,
-     "r5": 368
+     "views": 559,
+     "r5": 369
     },
     {
      "id": "7709947569966779661",
      "desc": "insane spraydown ez reads #valorant #cs2 #fyp #gaming #eboy ",
      "pub": 1795112055000,
      "photo": false,
-     "views": 504,
-     "r5": 413
+     "views": 514,
+     "r5": 416
     },
     {
      "id": "7709992246824766733",
      "desc": "INSANE LAURSEN 1V4 CLUTCH IN PLAYOFFS #cs2 #csgo #fyp #valorant #eboy",
      "pub": 1795122457000,
      "photo": false,
-     "views": 302,
-     "r5": 381
+     "views": 305,
+     "r5": 384
     },
     {
      "id": "7710154811559267597",
      "desc": "AWP GOD NOSCOPE+QUICKSCOPE IN PLAYOFFS #fyp #cs2 #csgo #valorant #eboy",
      "pub": 1795160307000,
      "photo": false,
-     "views": 346,
-     "r5": 424
+     "views": 349,
+     "r5": 428
     },
     {
      "id": "7711179653012131086",
      "desc": "INSANE M4A4 TURRET 4K SITE HOLD + ACE ON ANCIENT | #laursen_111 on #Twitch #fyp #cs2 #eboy",
      "pub": 1795398921000,
      "photo": false,
-     "views": 315,
-     "r5": 405
+     "views": 319,
+     "r5": 409
     }
    ]
   },
@@ -4637,9 +4650,9 @@
    },
    "tt": {
     "n": 10,
-    "sum": 3621,
-    "avg": 362,
-    "med": 330.5
+    "sum": 3646,
+    "avg": 365,
+    "med": 334
    }
   },
   "roll_t": [
@@ -5657,6 +5670,11 @@
     1795655729382,
     9756,
     3621
+   ],
+   [
+    1795664559478,
+    9756,
+    3646
    ]
   ]
  }
