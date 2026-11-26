@@ -642,9 +642,10 @@
       "Against GBPM: all rotation players t = 3.03 (14/19), starters t = 4.85 (17/19), split halves t = 1.89 (11/19). Against BPM it is identical.",
       "Next season, which isn't its job, team R² is .624, GBPM .611 (t = 3.37) and BPM .642. pXPM is the projection.",
       "SD 3.62 (BPM 3.81), r with BPM .998, mean gap .24.",
-      "Failed held out: O/D blends of BPM and GBPM, college box weights fit to who sat out, wins or capped-margin anchors, and GBPM moved toward raw net rating (a schedule artifact)."
+      "Failed held out: O/D blends of BPM and GBPM, college box weights fit to who sat out, wins or capped-margin anchors, and GBPM moved toward raw net rating (a schedule artifact).",
+      "As a model input in place of BPM it failed held out: the ten award voter models (t = -1.48 to .36), Transfer% (t = -5.09), Ret% (t = -.19) and the school development outcome (rolling gain 2.50% on BPM, 2.04% on rXPM). Those stay on BPM. Award conviction and the stats shown beside the awards use XPM."
      ],
-     "where": "CBB board (XPM), WAR leaders, stats, portal, awards context",
+     "where": "CBB board (XPM), VORX/XPM leaders, stats, portal, award conviction, all-time list",
      "sports": [
       "CBB"
      ]
@@ -666,6 +667,11 @@
       "Walk-forward, team R² goes from .733 to .746 (13/14, t = 7.87), against .642 for BPM (14/14, t = 15.3). Player r is .780 and RMSE 2.32.",
       "On their own, team context is t = 7.07 and recruit rating t = 4.95. Late-season form, age, role and freshman height, minutes share and its change, and game BPM consistency failed (t = -5.22 to 2.38 alone, and nothing once the two are in).",
       "The board form in the roster prior goes from .765 to .768 (13/14, t = 3.74). As the FV driver in place of the box form it is t = .87, so FV and the game model stay on the box form.",
+      "The board form also goes into the next-season value column (Next) in place of last-season BPM in the roster row: RMSE goes from 30.17 to 29.19 (t = 22.0, 11/11 seasons), and in season it replaces 3-season BPM at every share of the season played (t = 13.07 to 25.58).",
+      "Added to next up odds as the gap between pXPM and the shrunk value, the Brier score goes from .2077 to .2050 (t = 5.1, 16/16).",
+      "In Transfer%, in place of BPM, log loss goes from .8999 to .8862 and AUC from .710 to .725 (t = 6.49). In the landing spot model the right school is in the top 10 16.4% of the time, up from 15.1% (t = 5.95).",
+      "In the depth chart and backup watch grade it replaces last season's BPM (t = 45.15 to 63.87, 12/12 seasons at every share of the season).",
+      "It failed in Ret% (t = .75), and in NBA mock conviction (t = -1.44, 2/15 drafts). The same gap added to NBA next up odds is t = 1.42, so it isn't there.",
       "The descriptive counterpart is rXPM (CBB)."
      ],
      "where": "CBB pXPM leaders, portal, board hover; box form: FV (returners), roster prior / game model",
@@ -674,19 +680,20 @@
      ]
     },
     {
-     "term": "CBB WAR / WAA",
+     "term": "CBB VORX / WAA",
      "short": "Wins over a replacement or an average D-I player.",
      "body": [
-      "WAR = (sXPM + 1.4) × minutes / 40 × 68 possessions a 40 / 100 × .0187 wins a point. WAA uses sXPM alone.",
+      "VORX = (sXPM + 1.4) × minutes / 40 × 68 possessions a 40 / 100 × .0187 wins a point. WAA uses sXPM alone.",
       "XPM is rXPM (CBB), and sXPM = (XPM × min + 100 × season mean) / (min + 100).",
       "Replacement is 1.4 below average, the 9th man's sXPM in 2025-26. Wins a point is fit on 3,485 team seasons 2017-26:",
-      "wins = .39 × games + team WAR (r .87). It is season only, so no earlier season enters a season's WAR.",
+      "wins = .39 × games + team VORX (r .87). It is season only, so no earlier season enters a season's VORX.",
       "GBPM over season BPM moved held-out team win% R² from .633 to .658, 15 of 15 seasons. The shrink cut half-B GBPM MSE from 16.2 to 11.4",
       "(10 of 10) and held-out team wins RMSE from 3.348 to 3.331 (14 of 14). rXPM then replaced GBPM, with the same team totals and BPM's split inside the team.",
       "The textbook slope (.0347 at a margin sd of 11.5) overstates it, since schedules pair strong teams with strong teams and win odds flatten at the ends.",
-      "In the FV test, WAR, WAA, career WAR and 5/4/3 WAR all fail."
+      "In the FV test, VORX, WAA, career VORX and 5/4/3 VORX all fail.",
+      "It is the same value over replacement as NBA VORX, on the college scale. It was called WAR here before."
      ],
-     "where": "CBB WAR leaders, stats, portal, returning",
+     "where": "CBB VORX/XPM leaders, stats, portal, returning",
      "sports": [
       "CBB"
      ]
@@ -721,8 +728,8 @@
      "short": "First and second-year players playing above their preseason projection.",
      "body": [
       "xBPM up = live xBPM - preseason xBPM (minutes-blended). The tab also shows BPM over x, minutes, usage and FV gains.",
-      "The last season view puts second-years against their freshman line (WAR, BPM, minutes and usage gains).",
-      "In the FV tests, WAR gain, minutes gain, usage gain and BPM × (1 - minutes share) all fail. Low-minute BPM passes the folds, but not at the top of the board."
+      "The last season view puts second-years against their freshman line (VORX, BPM, minutes and usage gains).",
+      "In the FV tests, VORX gain, minutes gain, usage gain and BPM × (1 - minutes share) all fail. Low-minute BPM passes the folds, but not at the top of the board."
      ],
      "where": "CBB standouts tab",
      "sports": [
@@ -731,11 +738,11 @@
     },
     {
      "term": "Returning / talent (CBB)",
-     "short": "Team tables for how much of last season's minutes and WAR is back, and roster grades.",
+     "short": "Team tables for how much of last season's minutes and VORX is back, and roster grades.",
      "body": [
-      "Ret Min% is the share of last season's minutes still on the roster (Barttorvik ids). In WAR is the WAR of incoming transfers.",
+      "Ret Min% is the share of last season's minutes still on the roster (Barttorvik ids). In VORX is the VORX of incoming transfers.",
       "Talent is the mean FV of the top 8. xNBA is the sum of NBA%. TvE is talent rank minus ARK rank.",
-      "In the FV tests, vacated minutes (opportunity), returning teammates' WAR and teammates' recruiting fail. The last two pass for xBPM."
+      "In the FV tests, vacated minutes (opportunity), returning teammates' VORX and teammates' recruiting fail. The last two pass for xBPM."
      ],
      "where": "CBB returning, team talent",
      "sports": [
@@ -1012,6 +1019,24 @@
       "CFB",
       "CBB"
      ]
+    },
+    {
+     "term": "CBB WAR / WAA",
+     "short": "Wins over a replacement or an average D-I player.",
+     "body": [
+      "WAR = (sXPM + 1.4) × minutes / 40 × 68 possessions a 40 / 100 × .0187 wins a point. WAA uses sXPM alone.",
+      "XPM is rXPM (CBB), and sXPM = (XPM × min + 100 × season mean) / (min + 100).",
+      "Replacement is 1.4 below average, the 9th man's sXPM in 2025-26. Wins a point is fit on 3,485 team seasons 2017-26:",
+      "wins = .39 × games + team WAR (r .87). It is season only, so no earlier season enters a season's WAR.",
+      "GBPM over season BPM moved held-out team win% R² from .633 to .658, 15 of 15 seasons. The shrink cut half-B GBPM MSE from 16.2 to 11.4",
+      "(10 of 10) and held-out team wins RMSE from 3.348 to 3.331 (14 of 14). rXPM then replaced GBPM, with the same team totals and BPM's split inside the team.",
+      "The textbook slope (.0347 at a margin sd of 11.5) overstates it, since schedules pair strong teams with strong teams and win odds flatten at the ends.",
+      "In the FV test, WAR, WAA, career WAR and 5/4/3 WAR all fail."
+     ],
+     "where": "CBB WAR leaders, stats, portal, returning",
+     "sports": [
+      "CBB"
+     ]
     }
    ]
   },
@@ -1221,7 +1246,7 @@
       "The bar is a shrunk value near the 75-80th percentile of regulars. Anyone already over it (career, this season included) is out.",
       "NBA: BPM +1.0, 1,000+ MP. CBB: BPM +2.8, 40%+ min. NHL: WAR/1,000 min 1.19. Soccer: GAR/90 .090. NFL: PPR/G 12 (TE 9). CFB: PFN z .32.",
       "A logistic on shrunk value plus signals. Each signal is added alone, leaving one season out, and needs t >= 2 and most seasons won, then Holm.",
-      "The age or class curve passes everywhere. Low-volume efficiency and the projection gap pass in most sports. CBB adds team context (t = 3.8).",
+      "The age or class curve passes everywhere. Low-volume efficiency and the projection gap pass in most sports. CBB adds team context (t = 3.8) and the pXPM gap.",
       "Failed: vacated role (all six sports), coaching change, opportunity ahead, improvement trend, splines, Platt, and boosted trees (they never beat the logistic).",
       "Held-out t: NBA 7.9, CBB 14.4, NHL 5.6, soccer 6.2, CFB 6.0, NFL 3.3."
      ],
