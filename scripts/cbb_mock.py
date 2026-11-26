@@ -11,7 +11,7 @@ Inputs
   boards     the 2027 big boards in /mnt/project-files/cbb/boards (or $CBB_BOARDS): Tankathon, CBS, Bleacher Report,
              ESPN (Woo), FanSided, SI, No Ceilings v1. Consensus = .5 x median board rank + .5 x mean, a player missing
              from a board sits at 1.5 x that board's depth.
-  our board  static/data/cbb-all.json (fetch_cbb.py) for FV, xBPM, recruiting and last season, plus the internationals
+  our board  static/data/cbb-all.json (fetch_cbb.py) for FV, xXPM, recruiting and last season, plus the internationals
              (static/data/cbb-intl.json, cbb_intl.py: FV and age, no college BPM); past boards in
              static/data/cbb-past.json (cbb_fit.py); careers in .cache/cbb/careers.json (cbb_link.py).
 

@@ -142,7 +142,7 @@ pXPM is ahead of BPM in 14 of 14 seasons (t = 15.4). Team context and recruit ra
 
 {{< postchart "cbb-pxpm-pairs" >}}
 
-The board's xBPM, which is the site's projection of this season's BPM and also uses recruiting and team context, is still slightly ahead on the player test (r = .795), and behind on the team test (.735).
+The board's xXPM is the site's projection of this season's XPM. It takes pXPM as an input next to recruiting and team context, and for returning players it is slightly ahead of pXPM on the player test (r = .795) and behind on the team test (.741). Before pXPM went into it, it was called xBPM and scored .735.
 
 ### What Didn't Work
 | Test | Result |

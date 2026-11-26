@@ -246,6 +246,19 @@ def xbpm_of(f, fit):
     return float(xb['w'][0] + np.array(xb['w'][1:]) @ zz)
 
 
+_SHIFT = None
+def xpm_now(ln, team):
+    """XPM (rXPM) to date for a live line: BPM plus his team's shift to its game totals (scripts/data/cbb_xpm_shift.json,
+    written by the last cbb_tabs.py run); BPM when the team has no shift yet. xXPM blends toward this."""
+    global _SHIFT
+    if _SHIFT is None:
+        try:
+            d = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'cbb_xpm_shift.json')))
+            _SHIFT = d['teams'] if d.get('season') == SEASON else {}
+        except (OSError, ValueError, KeyError): _SHIFT = {}
+    return ln['bpm'] + sum(_SHIFT.get(team) or (0.0, 0.0))
+
+
 def weight(n, k):
     return n / (n + k) if n and n > 0 else 0.0
 
@@ -603,7 +616,8 @@ def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
         parts += [('this season', w * (emap(e1) - pre), nan)]
         kb = lf['kb'][grp]['k']
         xb0 = xbpm_of(F.features(cc, len(cc['seasons']) - 1), fit)
-        rate = (xb0 * kb + ln['bpm'] * ln['n']) / (kb + ln['n'])
+        xn = xpm_now(ln, tname)
+        rate = (xb0 * kb + xn * ln['n']) / (kb + ln['n'])
         n_ros = (ln['mp'] or 0) * max(0.0, full_games - ln['team_g']) * min(1.0, ln['gp'] / max(1, ln['team_g']))
         row = [None] * len(prior['cols'])
         for c, v in (('name', ln['name']), ('team', tname), ('logo', logo), ('conf', conf), ('pos', 'G' if hti <= 76 else 'F' if hti <= 80 else 'C'),
@@ -612,7 +626,7 @@ def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
                      ('links', {'bt': f"https://barttorvik.com/playerstat.php?year={SEASON}&p={ln['name'].replace(' ', '%20')}&t={ln['team'].replace(' ', '%20')}"})):
             if c in ci: row[ci[c]] = v
         out.append({'row': row, 'e': e1, 'p': w * p1, 'parts': parts, 'fvx': max(float(F.FLOOR), min(80.0, fvx)), 'prov': pre,
-                    'xbpm': (ln['bpm'] * ln['n'] + rate * n_ros) / (ln['n'] + n_ros) if ln['n'] + n_ros > 0 else rate,
+                    'xbpm': (xn * ln['n'] + rate * n_ros) / (ln['n'] + n_ros) if ln['n'] + n_ros > 0 else rate,
                     'w': w, 'f': f_now, 'cc': cc, 'now': show_line(ln, season_label, len(cc['seasons']) if hc else 0), 'src': 'bt', 'seas': next_career(cc, ln)['seasons']})
     print(f"{len(out)} players in this season's box scores are not on the preseason board: graded from the 20 floor "
           f"(drivers fit on {pf['n']} low-information board players, 5-fold R2 {pf['r2']:.3f}), then on their lines")
@@ -674,13 +688,14 @@ def main():
             for k, v, x in parts0: mix[k][0] += (1 - w) * v; mix[k][1] = x
             for k, v, x in parts1: mix[k][0] += w * v; mix[k][1] = x       # the driver's value now: this season's
             kb = lf['kb'][grp]['k']
-            rate = (xb0 * kb + ln['bpm'] * ln['n']) / (kb + ln['n'])
+            xn = xpm_now(ln, row[ci['team']])
+            rate = (xb0 * kb + xn * ln['n']) / (kb + ln['n'])
             # rest-of-season minutes at least kb: a deep-bench line (0.2 min at BPM 490) otherwise weighs its own
-            # few minutes as heavily as the shrunk rate and shows xBPM +45
+            # few minutes as heavily as the shrunk rate and shows xXPM +45
             n_ros = max(kb, (ln['mp'] or 0) * max(0.0, full_games - ln['team_g']) * min(1.0, ln['gp'] / max(1, ln['team_g'])))
             rec['seas'] = next_career(cc, ln)['seasons']   # npos reads minutes played, not the full-season projection
             rec.update(e=(1 - w) * e0 + w * e1, p=(1 - w) * p0 + w * p1, parts=[(k, v, x) for k, (v, x) in mix.items()],
-                       xbpm=(ln['bpm'] * ln['n'] + rate * n_ros) / (ln['n'] + n_ros) if ln['n'] + n_ros > 0 else rate,
+                       xbpm=(xn * ln['n'] + rate * n_ros) / (ln['n'] + n_ros) if ln['n'] + n_ros > 0 else rate,
                        w=w, f=f_now if w >= 0.5 else f_pre, now=show_line(ln, season_label, len(cc['seasons'])))
         recs.append(rec)
     # the board stage: where the draft boards have him (cbb_fit.board_stage), on top of the blended E[FV]
@@ -777,7 +792,7 @@ def main():
     print(f'{played} of {len(recs)} players have played; games through {last}')
     wi = out_cols.index('w')
     for o in out[:20]:
-        print(f"{o[ci['ovr']]:3d} {o[ci['name']]:24s} {o[ci['team']]:18s} FV {o[ci['fv']]} w {o[wi]:.2f} NBA {o[ci['nbaP']]:.2f} xBPM {o[ci['xbpm']]}")
+        print(f"{o[ci['ovr']]:3d} {o[ci['name']]:24s} {o[ci['team']]:18s} FV {o[ci['fv']]} w {o[wi]:.2f} NBA {o[ci['nbaP']]:.2f} xXPM {o[ci['xbpm']]}")
 
 
 if __name__ == '__main__':

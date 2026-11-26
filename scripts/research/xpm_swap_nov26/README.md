@@ -15,7 +15,7 @@ guard metrics no worse. Ties stay as they were.
 | Transfer% | rXPM for BPM | t -5.1 | market.json | no |
 | Landing spot | pXPM board form for BPM | top 10 15.1% -> 16.4%, t 6.0 | market.json | yes |
 | Depth chart / backup watch grade | pXPM for last season's BPM | t 45 to 64, 12/12 | backup.json | yes |
-| xBPM (returners) | pXPM board form added, rXPM target (xXPM) | whole-roster team R2 .7718 -> .7768, t 7.8, 14/14 | xxpm.json | pending (cbb_fit.py) |
+| xBPM (returners) | pXPM board form added, rXPM target (xXPM) | whole-roster team R2 .7718 -> .7768, t 7.8, 14/14 | xxpm.json | yes (second PR) |
 | xBPM (newcomers) | rXPM target | tie (t 1.9 on rXPM, -5.4 on BPM) | xxpm.json | follows the rename |
 | Award voter models (10 awards) | rXPM for BPM | t -1.48 to .36 | awards.json | no; conviction and shown stats on XPM |
 | Ret% | rXPM / pXPM for BPM | t -.19 / .75 | declare.json | no |

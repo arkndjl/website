@@ -38,6 +38,7 @@ _AGC = _AG['coverage']['cfb'][max(_AG['coverage']['cfb'])]
 _CX3 = _CX['pxpm3']                                        # board form as model input (Nov 26)
 _CX2, _CR = _CX['pxpm2'], _CX['rxpm3']                    # board-form pXPM and rXPM rounds (Nov 26)
 _SW = {k: ld(f'scripts/research/xpm_swap_nov26/{k}.json') for k in ('awards', 'next', 'next_inseason', 'breakout', 'declare', 'mock', 'market', 'school_dev', 'backup', 'nba_breakout')}   # BPM to XPM swap tests
+_XX = ld('scripts/research/xpm_swap_nov26/xxpm.json')   # xBPM to xXPM test
 _CXB = dict(zip(ld('data/cbb_xpm_fit.json')['cols2'], zip(ld('data/cbb_xpm_fit.json')['beta2']['o'], ld('data/cbb_xpm_fit.json')['beta2']['d'])))
 import gzip as _gz
 _CW = json.load(_gz.open(ROOT + '/scripts/data/cbb_tabs_2026.json.gz'))   # 2025-26 tabs: WAR fit, Stat+ norms (scripts/cbb_tabs.py --freeze)
@@ -275,11 +276,14 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
        'NBA: 1,334 Basketball-Reference offseason signings 2011-26 (free agent, multi-year or plain contracts, with next season\'s salary on the signing team), on XPM the last two seasons, VORX, minutes, points and minutes a game, games, age and years in the league. MAE is 2.60% compared to 5.04 (t = -19, 16/16, forward 11/11). XPM and VORX add over points and minutes alone (t = -6, 14/16). The max is 25/30/35% by years in the league, and the 2026-27 cap is $165M (projected).',
        'Soccer isn\'t built. There is no public wage data I can reach (Capology blocks it), and xMV is the transfer-market equivalent.'],
       'NBA, NFL, NHL contract value tabs', ['NBA', 'NFL', 'NHL']),
-    E('xBPM', 'Projected Barttorvik BPM this season.',
-      ['A ridge on last season, recruiting, age and size. In season it blends in BPM to date.',
-       'Team context: returning teammates\' WAR, teammates\' recruiting (top 8, -ln rank), WAA and transferring up or down.',
-       'Forward 2020-26, RMSE goes from 2.558 to 2.462 for returners (t = 18) and from 3.439 to 3.229 for newcomers (t = 14). It is not an FV input.'],
-      'CBB board, true freshmen, standouts', ['CBB']),
+    E('xXPM', 'Projected XPM this season, the board\'s projection for every player, freshmen and transfers included.',
+      [re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _t) for _t in ['A ridge on last season, recruiting, age and size, with rXPM (CBB) as the target. Returners also take pXPM (CBB), board form. In season it blends in XPM to date.',
+       'Team context: returning teammates\' VORX, teammates\' recruiting (top 8, -ln rank), WAA and transferring up or down.',
+       f'It was xBPM, the same ridge with BPM as the target and no pXPM. Walk-forward 2012-13 to 2025-26, next-season team R² over the whole roster goes from {_XX["whole roster"]["xBPM (both groups)"]["teamR2"]:.4f} to {_XX["whole roster"]["xXPM (rXPM target + pXPM board)"]["teamR2"]:.4f} ({_XX["whole roster"]["xXPM (rXPM target + pXPM board)"]["vs xBPM (both groups)"]["pairsBetter"]}, t = {_XX["whole roster"]["xXPM (rXPM target + pXPM board)"]["vs xBPM (both groups)"]["t"]}).',
+       f'For returners, pXPM added moves it from {_XX["xBPM"]["teamR2"]:.4f} to {_XX["xBPM + pXPM board"]["teamR2"]:.4f} (t = {_XX["xBPM + pXPM board"]["t"]}). The box form of pXPM alone is t = {_XX["xBPM + pXPM core"]["t"]}, and the rXPM target alone is t = {_XX["rXPM target"]["t"]}. For newcomers the target swap is a tie (t = {_XX["newcomers"]["scored on xpm_now"]["t_rXPM_target_better"]} scored on XPM).',
+       'The fit rows read pXPM point in time, from a refit that walks forward a season at a time.',
+       'As xBPM, forward 2020-26, RMSE went from 2.558 to 2.462 for returners (t = 18) and from 3.439 to 3.229 for newcomers (t = 14) with team context. It is not an FV input.']],
+      'CBB board hover, true freshmen, standouts, draft board, team talent, team builder', ['CBB']),
     E('rXPM (CBB)', 'XPM for a college season: Barttorvik BPM\'s split of credit inside the team, on team totals that track wins.',
       [re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _t) for _t in ['For each side, rXPM = BPM + the team\'s minutes-weighted mean of (GBPM - BPM). GBPM is the minutes-weighted mean of his games\' BPM (Barttorvik).',
        'Team totals equal GBPM\'s, and the gaps between teammates equal BPM\'s.',
@@ -297,7 +301,7 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
        '(steal, block, OREB, DREB, assist, turnover, FT rate, 3PA/100, rim share, usage, TS, height), with a ridge of 10 on the rates.',
        f'O: w .35 / .2, K 200. D: w .6 / .4, K 100. Fit on next-season minutes, 2008-09 to 2025-26 pairs (in the research form below, D took 25% GBPM).',
        f'Walk-forward 2012-13 to 2025-26: next-season team adjEM R² is {_CX["pxpm"]["teamR2"]:.3f} compared to {_CX["pxpm"]["bpm"]["teamR2"]:.3f} for BPM ({_CX["pxpm"]["vsBPM"]["pairsBetter"]}/14, t = {_CX["pxpm"]["vsBPM"]["t"]:.1f}). Player r is {_CX["pxpm"]["playerR"]:.3f} compared to {_CX["pxpm"]["bpm"]["playerR"]:.3f}, and RMSE {_CX["pxpm"]["playerRMSE"]:.2f} compared to {_CX["pxpm"]["bpm"]["playerRMSE"]:.2f}.',
-       f'xBPM, which also has recruiting and team context, still projects players better: team {_CX["xbpm"]["teamR2"]:.3f}, r {_CX["xbpm"]["playerR"]:.3f}. pXPM as an xBPM input gets {_CX["xbpm"]["asInput"]["teamR2"][1]:.4f} (t = {_CX["xbpm"]["asInput"]["t"]}), so it wasn\'t added.',
+       f'xXPM, the board\'s projection, takes the board form as an input next to recruiting and team context: for returners, team R² is {_XX["rXPM target + pXPM board"]["teamR2"]:.3f} and player r {_XX["rXPM target + pXPM board"]["playerR_vsBPM"]:.3f}.',
        f'In the roster prior, in place of last-season BPM, next-season team R² goes from {_CX["roster"]["teamR2"][0]:.3f} to {_CX["roster"]["teamR2"][1]:.3f} ({_CX["roster"]["pairsBetter"]}/14, t = {_CX["roster"]["t"]}). Game margin MAE goes from {_CX["game"]["tuneMae"][0]:.4f} to {_CX["game"]["tuneMae"][1]:.4f} in 2016-20 (t = {_CX["game"]["tuneT"]}) and from {_CX["game"]["heldMae"][0]:.4f} to {_CX["game"]["heldMae"][1]:.4f} in 2021-26 (t = {_CX["game"]["heldT"]}). xBPM fails there (t = {_CX["roster"]["xbpmSwap"]["t"]}).',
        f'As an FV returner driver, it adds +{_CX["fv"]["add"]["md5_gain"]:.2f}% out of sample (t = {_CX["fv"]["add"]["md5_t"]}, 5/5), and in place of 3-season BPM t = {_CX["fv"]["forBpm3"]["md5"]["t"]}. Nested pseudo-R² goes from {_CX["fv"]["gate"]["nestedR2"][0]:.3f} to {_CX["fv"]["gate"]["nestedR2"][1]:.3f}, RPS from {_CX["fv"]["gate"]["rps"][0]:.4f} to {_CX["fv"]["gate"]["rps"][1]:.4f}, and the 2017-19 top 50 from {_CX["fv"]["gate"]["top50_2017_19"][0]:.1f} to {_CX["fv"]["gate"]["top50_2017_19"][1]:.1f}.',
        f'In NBA mock conviction, in place of 3-season BPM, it is t = {_CX["mock"]["t"]} ({_CX["mock"]["drafts"]}/15 drafts), so 3-season BPM stays.',
@@ -331,17 +335,17 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
       'CBB stats, WAR leaders, portal; FV inputs', ['CBB']),
     E('Game Score', 'Hollinger\'s single-game value.',
       ['PTS + .4 FGM - .7 FGA - .4 (FTA - FTM) + .7 ORB + .3 DRB + STL + .7 AST + .7 BLK - .4 PF - TOV.',
-       'Every FV and xBPM test failed (a game, a 40, best game, 20+ games).'],
+       'Every FV and xXPM test failed (a game, a 40, best game, 20+ games).'],
       'CBB top performers', ['CBB']),
     E('Standouts (CBB)', 'First and second-year players playing above their preseason projection.',
-      ['xBPM up = live xBPM - preseason xBPM (minutes-blended). The tab also shows BPM over x, minutes, usage and FV gains.',
-       'The last season view puts second-years against their freshman line (VORX, BPM, minutes and usage gains).',
+      ['xXPM up = live xXPM - preseason xXPM (minutes-blended). The tab also shows XPM over x, minutes, usage and FV gains.',
+       'The last season view puts second-years against their freshman line (VORX, XPM, minutes and usage gains).',
        'In the FV tests, VORX gain, minutes gain, usage gain and BPM × (1 - minutes share) all fail. Low-minute BPM passes the folds, but not at the top of the board.'],
       'CBB standouts tab', ['CBB']),
     E('Returning / talent (CBB)', 'Team tables for how much of last season\'s minutes and VORX is back, and roster grades.',
       ['Ret Min% is the share of last season\'s minutes still on the roster (Barttorvik ids). In VORX is the VORX of incoming transfers.',
        'Talent is the mean FV of the top 8. xNBA is the sum of NBA%. TvE is talent rank minus ARK rank.',
-       'In the FV tests, vacated minutes (opportunity), returning teammates\' VORX and teammates\' recruiting fail. The last two pass for xBPM.'],
+       'In the FV tests, vacated minutes (opportunity), returning teammates\' VORX and teammates\' recruiting fail. The last two pass for xXPM.'],
       'CBB returning, team talent', ['CBB']),
     E('Peak XPM (CBB scale)', 'The CBB FV target, the mean of a career\'s best three NBA XPM seasons, each shrunk toward -2 by 500 minutes.',
       ['Each FV band starts at the XPM that as many careers reached as reached the matching NBA role. See the CBB chart.'],
@@ -1070,7 +1074,7 @@ try:
     _old = json.load(open(OUT))
 except (OSError, ValueError):
     _old = {'sections': []}
-_mine = {e['term'] for sec in sections for e in sec['entries']} | {'CBB WAR / WAA'}   # renamed terms: the old name is not carried over
+_mine = {e['term'] for sec in sections for e in sec['entries']} | {'CBB WAR / WAA', 'xBPM'}   # renamed terms: the old name is not carried over
 for osec in _old.get('sections', []):
     sec = next((x for x in sections if x['id'] == osec['id']), None)
     if sec is None:
