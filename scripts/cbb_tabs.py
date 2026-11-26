@@ -8,7 +8,7 @@ game line or an existing model output (FV, xBPM, NBA%, the mocks); nothing here 
     python3 scripts/cbb_tabs.py --freeze   # once: 2025-26 (Barttorvik season file + game logs) -> scripts/data/cbb_tabs_2026.json.gz
 
 Outputs
-    static/data/cbb/{stats,war,breakouts,top,draft,portal}.json   player tables, drawn by layouts/shortcodes/rookies.html (src=)
+    static/data/cbb/{stats,war,pxpm,breakouts,top,draft,portal}.json   player tables, drawn by layouts/shortcodes/rookies.html (src=)
                                                                     (draft: this draft, then each past draft at draft week, past_drafts)
     data/cbb_teamtabs.json                                          team tables (returning, talent), drawn by teamunits.html (feed=)
 
@@ -35,8 +35,14 @@ Definitions
            possessions buys about the same wins at any pace. Nov 3 2026 (scripts/cbb_war_research_nov03.py): flat beat
            team possessions on held-out team wins in 9 of 10 seasons (t 2.9), and the 10-season slope beat the
            2025-26-only fit (.0124) in 7 of 9 held-out seasons (t 3.4); 2025-26 had the lowest slope of the ten.
+           Nov 26 2026 (scripts/research/cbb_xpm_nov26, rXPM round 3): the input is rXPM (scripts/cbb_xpm.py rxpm_lines), each
+           side's BPM plus the team's minutes-weighted mean (GBPM - BPM): GBPM's team totals (same team win% R2, .676) with
+           BPM's split inside the team (who-sat-out game margins: t 3.0 to 4.9 against GBPM; next-season team R2 .611 ->
+           .624). Shrunk the same 100 minutes; R = -1.4, the 9th man's shrunk rXPM; wins a point refit by --freeze. This
+           season's shift comes from the game logs (team mean game O/D BPM minus the team's lines' mean O/D BPM), saved in
+           scripts/data/cbb_xpm_shift.json for a run with no game logs.
     WAA    the same over an average player (R = 0).
-    Stat+  100 + 25 z, z = BPM against the minutes-weighted mean and sd of his position (G, F, C) in 2025-26 among
+    Stat+  100 + 25 z, z = XPM (rXPM; BPM before Nov 26 2026, r .998) against the minutes-weighted mean and sd of his position (G, F, C) in 2025-26 among
            players with 10%+ of team minutes (the CFB board's Stat+ scale). This season's lines use this season's own
            norms (same pool, LIVE_MIN players a position or the 2025-26 norms): early-season BPM spreads wider (sd
            4.4-5.5 through 8 games against 3.5-4.4 a full season), and its own norms cut the error against the
@@ -58,6 +64,7 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import cbb_data as D
 import cbb_next as NXT
+import cbb_xpm as XP
 
 SEASON, LAST = 2027, 2026
 SD = os.path.join(ROOT, 'static', 'data')
@@ -65,7 +72,8 @@ OUT = os.path.join(SD, 'cbb')
 TEAM_OUT = os.path.join(ROOT, 'data', 'cbb_teamtabs.json')
 FROZEN = os.path.join(HERE, 'data', f'cbb_tabs_{LAST}.json.gz')
 PRIOR = os.path.join(HERE, 'cbb_prior.json.gz')
-REPL = -1.6         # 9th man's shrunk GBPM, 2025-26 (WAR's input; see WAR above)
+SHIFT = os.path.join(HERE, 'data', 'cbb_xpm_shift.json')   # this season's team rXPM shifts, kept for runs with no game logs (--cols)
+REPL = -1.4         # 9th man's shrunk rXPM, 2025-26 (WAR's input; see WAR above; GBPM's was -1.6)
 GBPM_K = 100.0      # minutes of shrink toward the season's mean GBPM (WAR's input; see WAR above)
 PACE = 68.0        # possessions a 40 for every team (not the team's own pace: see WAR above)
 WPP = 1.0          # wins a point of margin: fit in freeze() and read from the frozen file
@@ -107,9 +115,9 @@ def label(s):
 
 
 def wx(L, mins=None, mu=None):
-    """WAR's box input: GBPM, else BPM (a line with no game BPM); with mins and the season's mean mu, shrunk GBPM_K
+    """WAR's box input: rXPM (XPM), else GBPM, else BPM (a line with neither); with mins and the season's mean mu, shrunk GBPM_K
     minutes toward mu (see WAR above)"""
-    x = L.get('gbpm') if L.get('gbpm') is not None else L.get('bpm')
+    x = L.get('xpm') if L.get('xpm') is not None else L.get('gbpm') if L.get('gbpm') is not None else L.get('bpm')
     if x is None or mins is None or mu is None:
         return x
     return (x * mins + GBPM_K * mu) / (mins + GBPM_K)
@@ -136,7 +144,7 @@ def fit_wpp(years=FIT_YEARS):
         games = load_games(y)
         if not games: continue
         X = defaultdict(float)
-        ls = D.load_bt(y); mu = gmu(ls)
+        ls = XP.rxpm_lines(D.load_bt(y)); mu = gmu(ls)
         for l in ls:
             if l['gp'] and l['mp'] and wx(l) is not None:
                 mins = l['mp'] * l['gp']
@@ -203,14 +211,37 @@ def prior():
     return pre, pid, bt
 
 
+def load_shift():
+    try:
+        d = json.load(open(SHIFT))
+        return {t: tuple(v) for t, v in d['teams'].items()} if d.get('season') == SEASON else {}
+    except (OSError, ValueError, KeyError):
+        return {}
+
+
+def board_cols(B, pxof):
+    """static/data/cbb-all.json gets two columns in place: xpm (this season's rXPM) and pxpm (the preseason pXPM,
+    scripts/data/cbb_pxpm_<last>.json). cbb_live.py rewrites the file without them, so every run of it is followed by
+    this (cbb-board.yml: the daily build; cbb-boards.yml: --cols)"""
+    p = os.path.join(SD, 'cbb-all.json')
+    d = json.load(open(p))
+    if len(d['rows']) != len(B): return
+    for k, f in (('xpm', lambda r: r1((r.get('now') or {}).get('xpm'))), ('pxpm', lambda r: r1((pxof(r) or [None])[0]))):
+        if k not in d['cols']: d['cols'].append(k)
+        i = d['cols'].index(k)
+        for row, r in zip(d['rows'], B):
+            row += [None] * (i + 1 - len(row)); row[i] = f(r)
+    json.dump(d, open(p, 'w'), separators=(',', ':'))
+
+
 # ---------------------------------------------------------------- 2025-26, frozen once
 def pos_norms(lines, key='role'):
     """Stat+ scale: minutes-weighted mean and sd of BPM by position among 10%+ minute players (key 'role': Barttorvik
     role mapped by POSMAP; 'pos': already G/F/C)"""
     out = {}
     for p in 'GFC':
-        xs = [(l['bpm'], l['mp'] * l['gp']) for l in lines if (POSMAP.get(l['role']) if key == 'role' else l['pos']) == p
-              and (l['min_per'] or 0) >= 10 and l['bpm'] is not None]
+        xs = [(l['xpm'] if l.get('xpm') is not None else l['bpm'], l['mp'] * l['gp']) for l in lines
+              if (POSMAP.get(l['role']) if key == 'role' else l['pos']) == p and (l['min_per'] or 0) >= 10 and l['bpm'] is not None]
         w = sum(m for _, m in xs)
         mu = sum(b * m for b, m in xs) / w
         sd = (sum(m * (b - mu) ** 2 for b, m in xs) / w) ** .5
@@ -222,15 +253,15 @@ def stat_line(L, mu=None):
     """a Barttorvik season row -> the stats-tab numbers (mu: the season's mean GBPM, WAR's shrink target)"""
     mins = (L['mp'] or 0) * (L['gp'] or 0)
     return {'gp': int(L['gp'] or 0), 'mp': round(mins), 'mpg': r1(L['mp']), 'pts': r1(L['pts_g']), 'reb': r1(L['treb_g']), 'ast_g': r1(L['ast_g']),
-            'bpm': r1(L['bpm']), 'gbpm': r1(L.get('gbpm')), 'obpm': r1(L['obpm']), 'dbpm': r1(L['dbpm']), 'ortg': r1(L['ortg']), 'usg': r1(L['usg']), 'ts': r1(L['ts']),
+            'xpm': r1(L.get('xpm')), 'oxpm': r1(L.get('oxpm')), 'dxpm': r1(L.get('dxpm')), 'bpm': r1(L['bpm']), 'gbpm': r1(L.get('gbpm')), 'obpm': r1(L['obpm']), 'dbpm': r1(L['dbpm']), 'ortg': r1(L['ortg']), 'usg': r1(L['usg']), 'ts': r1(L['ts']),
             'tp': r1((L['tp'] or 0) * 100) if L['tpa'] else None, 'tpa': int(L['tpa'] or 0), 'ft': r1((L['ft'] or 0) * 100) if L['fta'] else None,
             'astp': r1(L['ast']), 'to': r1(L['to']), 'stl': r1(L['stl']), 'blk': r1(L['blk']), 'orb': r1(L['orb']), 'ftr': r1(L['ftr']),
             'war': r1(war(wx(L, mins, mu), mins), 2), 'waa': r1(war(wx(L, mins, mu), mins, 0), 2)}
 
 
 def freeze():
-    lines = [l for l in D.load_bt(LAST) if l['gp'] and l['mp'] and l['bpm'] is not None]
-    prev = {str(l['pid']): l for l in D.load_bt(LAST - 1) if l['gp'] and l['mp'] and l['bpm'] is not None}
+    lines = [l for l in XP.rxpm_lines(D.load_bt(LAST)) if l['gp'] and l['mp'] and l['bpm'] is not None]
+    prev = {str(l['pid']): l for l in XP.rxpm_lines(D.load_bt(LAST - 1)) if l['gp'] and l['mp'] and l['bpm'] is not None}
     games = load_games(LAST)
     if not games:
         sys.exit(f'no {LAST} game logs in {D.CACHE}/games: fetch https://barttorvik.com/{LAST}_all_advgames.json.gz there first')
@@ -247,7 +278,7 @@ def freeze():
         p = None
         if P:
             pm = (P['mp'] or 0) * (P['gp'] or 0)
-            p = {'team': P['team'], 'gp': int(P['gp'] or 0), 'mpg': r1(P['mp']), 'bpm': r1(P['bpm']), 'usg': r1(P['usg']), 'mp': round(pm),
+            p = {'team': P['team'], 'gp': int(P['gp'] or 0), 'mpg': r1(P['mp']), 'bpm': r1(P['bpm']), 'xpm': r1(P.get('xpm')), 'usg': r1(P['usg']), 'mp': round(pm),
                  'war': r1(war(wx(P, pm, mu_prev), pm), 2)}
         out.append({'pid': str(L['pid']), 'n': L['name'], 'bt': L['team'], 'conf': L['conf'], 'yr': L['yr'], 'role': L['role'],
                     'pos': POSMAP.get(L['role'], 'F'), 'ht': L['ht'], 'dob': L['dob'], 'min_per': r1(L['min_per']), 's': s, 'prev': p})
@@ -321,8 +352,30 @@ def main():
         if not L or not L.get('gp'): continue
         mins = (L['mpg'] or 0) * L['gp']
         cur.append((r, L, mins))
+    # this season's rXPM: each side's BPM plus the team's (game BPM - season BPM) minutes-weighted mean (scripts/cbb_xpm.py)
+    ga, sa = defaultdict(lambda: [0.0, 0.0, 0.0]), defaultdict(lambda: [0.0, 0.0, 0.0])
+    for g in games:
+        m = g[GC['min']] or 0
+        if m <= 0 or g[GC['obpm']] is None or g[GC['dbpm']] is None: continue
+        q = ga[t2e.get(g[GC['team']], g[GC['team']])]; q[0] += m * g[GC['obpm']]; q[1] += m * g[GC['dbpm']]; q[2] += m
+    for r, L, mins in cur:
+        if L.get('obpm') is None or L.get('dbpm') is None or not mins: continue
+        q = sa[r['team']]; q[0] += mins * L['obpm']; q[1] += mins * L['dbpm']; q[2] += mins
+    shift = {t: (ga[t][0] / ga[t][2] - q[0] / q[2], ga[t][1] / ga[t][2] - q[1] / q[2]) for t, q in sa.items() if q[2] and ga.get(t) and ga[t][2]}
+    if not shift:
+        shift = load_shift()
+    else:
+        json.dump({'season': SEASON, 'asof': asof, 'teams': {t: [round(o, 3), round(d, 3)] for t, (o, d) in sorted(shift.items())}},
+                  open(SHIFT, 'w'), separators=(',', ':'))
+    for r, L, mins in cur:
+        XP.rxpm_lines([L], team=lambda l: r['team'], shift=shift)
+    PX = XP.frozen()
+    pxof = lambda r: PX.get(pidof.get((r['name'], r['team'])) or '')
+    board_cols(B, pxof)
+    if '--cols' in sys.argv:
+        return
     # this season's Stat+ norms: its own 10%+ minute players by position (team games so far), once LIVE_MIN a position
-    pool = [{'pos': spos(r, L), 'bpm': L['bpm'], 'mp': mins / L['gp'], 'gp': L['gp'], 'role': None,
+    pool = [{'pos': spos(r, L), 'bpm': L['bpm'], 'xpm': L.get('xpm'), 'mp': mins / L['gp'], 'gp': L['gp'], 'role': None,
              'min_per': 100 * mins / (40 * (len(tg.get(e2t.get(r['team'], r['team']), ())) or L['gp']))}
             for r, L, mins in cur if L.get('bpm') is not None and spos(r, L) in ('G', 'F', 'C')]
     live_n = {p: sum(1 for l in pool if l['pos'] == p and l['min_per'] >= 10) for p in 'GFC'}
@@ -330,13 +383,13 @@ def main():
 
     # ---- stats
     def srow(n, tm, pos, ag, sub, ph, lo, s, fv=None, N=None, sp=None):
-        return {'n': n, 'tm': tm, 'pos': pos, 'age': ag, 'sub': sub or '', 'ph': ph, 'lo': lo, 'fv': fv, 'splus': splus(s['bpm'], sp or pos, N), **s}
+        return {'n': n, 'tm': tm, 'pos': pos, 'age': ag, 'sub': sub or '', 'ph': ph, 'lo': lo, 'fv': fv, 'splus': splus(s['xpm'] if s.get('xpm') is not None else s['bpm'], sp or pos, N), **s}
 
     mu_now = gmu([L for _, L, _ in cur], lambda l: (l.get('mpg') or 0) * (l.get('gp') or 0))
     now_rows = []
     for r, L, mins in cur:
         s = {'gp': L['gp'], 'mp': round(mins), 'mpg': L['mpg'], 'pts': L.get('ppg'), 'reb': L.get('rpg'), 'ast_g': L.get('apg'), 'bpm': L['bpm'],
-             'obpm': L['obpm'], 'dbpm': L['dbpm'], 'ortg': L['ortg'], 'usg': L['usg'], 'ts': L.get('ts'), 'tp': L['tp'] if L.get('tpa') else None,
+             'xpm': r1(L.get('xpm')), 'oxpm': r1(L.get('oxpm')), 'dxpm': r1(L.get('dxpm')), 'obpm': L['obpm'], 'dbpm': L['dbpm'], 'ortg': L['ortg'], 'usg': L['usg'], 'ts': L.get('ts'), 'tp': L['tp'] if L.get('tpa') else None,
              'tpa': L.get('tpa'), 'ft': L.get('ft'), 'astp': L.get('ast'), 'to': L.get('to'), 'stl': L.get('stl'), 'blk': L.get('blk'),
              'orb': L.get('orb'), 'ftr': L.get('ftr'), 'war': r1(war(wx(L, mins, mu_now), mins), 2), 'waa': r1(war(wx(L, mins, mu_now), mins, 0), 2),
              'nx': r1(nx_now.get((r['name'], r['team'])), 2)}
@@ -346,10 +399,11 @@ def main():
         r = by_pid.get(l['pid'])
         tm, lo, cf = esp(l['bt'])
         last_rows.append(srow(l['n'], tm, r['pos'] if r else l['pos'], None, l['conf'], r.get('photo') if r else None, lo, {**l['s'], 'nx': nx_last.get(l['pid'])}, r['fv'] if r else None))
-    stat_cols = [col('splus', 'Stat+', 'Stat+ = 100 + 25 z; z = BPM against his position\'s (G, F, C) minutes-weighted mean and sd that season (2025-26 until this season has 40 a position), players with 10%+ of team minutes', '0'),
+    XT = 'XPM (rXPM): box plus-minus on team totals that track wins; points a 100 possessions over an average D-I player'
+    stat_cols = [col('xpm', 'XPM', XT, 's1'), col('oxpm', 'O-XPM', 'offensive XPM', 's1'), col('dxpm', 'D-XPM', 'defensive XPM', 's1'),
+                 col('splus', 'Stat+', 'Stat+ = 100 + 25 z; z = XPM against his position\'s (G, F, C) minutes-weighted mean and sd that season (2025-26 until this season has 40 a position), players with 10%+ of team minutes', '0'),
                  col('pts', 'PTS', 'points a game'), col('reb', 'REB', 'rebounds a game'), col('ast_g', 'AST', 'assists a game'),
                  col('bpm', 'BPM', 'Barttorvik box plus-minus: points a 100 possessions over an average D-I player', 's1'),
-                 col('obpm', 'OBPM', 'offensive BPM', 's1'), col('dbpm', 'DBPM', 'defensive BPM', 's1'),
                  col('ortg', 'ORtg', 'offensive rating: points produced a 100 possessions used'), col('usg', 'USG%', 'share of team possessions used on the floor'),
                  col('ts', 'TS%', 'true shooting %'), col('tp', '3P%', 'three-point %'), col('tpa', '3PA', 'three-point attempts', 'i'),
                  col('ft', 'FT%', 'free throw %'), col('astp', 'AST%', 'assist rate: share of teammates\' field goals he assisted on the floor'),
@@ -358,9 +412,9 @@ def main():
                  col('ftr', 'FTR', 'free throw rate: FTA a 100 FGA'), col('gp', 'G', 'games', 'i'), col('mpg', 'MPG', 'minutes a game'),
                  col('fv', 'FV', 'FV now (the board\'s grade)', 'i')]
     write('stats', {
-        'title': 'stats', 'key': 'splus', 'def': '',
-        'views': [['splus', 'Stat+', 'Stat+'], ['pts', 'PTS', 'points a game'], ['reb', 'REB', 'rebounds a game'], ['ast_g', 'AST', 'assists a game'],
-                  ['bpm', 'BPM', 'box plus-minus'], ['ts', 'TS%', 'true shooting %'], ['tp', '3P%', 'three-point %'], ['stl', 'STL%', 'steal rate'],
+        'title': 'stats', 'key': 'xpm', 'def': '',
+        'views': [['xpm', 'XPM', 'XPM'], ['oxpm', 'O-XPM', 'offensive XPM'], ['dxpm', 'D-XPM', 'defensive XPM'], ['splus', 'Stat+', 'Stat+'], ['pts', 'PTS', 'points a game'], ['reb', 'REB', 'rebounds a game'], ['ast_g', 'AST', 'assists a game'],
+                  ['ts', 'TS%', 'true shooting %'], ['tp', '3P%', 'three-point %'], ['stl', 'STL%', 'steal rate'],
                   ['blk', 'BLK%', 'block rate'], ['ortg', 'ORtg', 'offensive rating']],
         'cols': stat_cols, 'pos': ['G', 'F', 'C'],
         'min': {'k': 'mp', 'l': 'min ≥', 'def': 0, 'opts': SOPT},
@@ -368,19 +422,39 @@ def main():
                     {'s': LAST, 'l': label(LAST), 'rows': last_rows, 'mdef': 400}]})
 
     # ---- WAR leaders
-    wcols = [col('war', 'WAR', f"wins over a replacement player: (GBPM + {-REPL:.1f}) x minutes / 40 x {PACE / 100:.2f} x {WPP:.4f} wins a point; the slope that makes team WAR + {wf['a']} x games track wins ({wf['teams']:,} team-seasons {label(wf['years'][0])} to {label(wf['years'][1])}, r {wf['r']}); GBPM = the minutes-weighted mean of his games' BPM, shrunk {GBPM_K:.0f} minutes toward the season's mean; replacement = the 9th man's GBPM, so a team of replacement players wins {wf['a'] * 100:.1f}% of its games", 's2'),
-             col('waa', 'WAA', 'wins over an average D-I player: GBPM x the same minutes and pace', 's2'),
-             col('bpm', 'BPM', 'Barttorvik box plus-minus', 's1'), col('splus', 'Stat+', 'BPM against his position, 100 + 25 z', '0'),
+    wcols = [col('war', 'WAR', f"wins over a replacement player: (XPM + {-REPL:.1f}) x minutes / 40 x {PACE / 100:.2f} x {WPP:.4f} wins a point; the slope that makes team WAR + {wf['a']} x games track wins ({wf['teams']:,} team-seasons {label(wf['years'][0])} to {label(wf['years'][1])}, r {wf['r']}); XPM shrunk {GBPM_K:.0f} minutes toward the season's mean; replacement = the 9th man's XPM, so a team of replacement players wins {wf['a'] * 100:.1f}% of its games", 's2'),
+             col('waa', 'WAA', 'wins over an average D-I player: XPM x the same minutes and pace', 's2'),
+             col('xpm', 'XPM', XT, 's1'), col('oxpm', 'O-XPM', 'offensive XPM', 's1'), col('dxpm', 'D-XPM', 'defensive XPM', 's1'),
+             col('splus', 'Stat+', 'XPM against his position, 100 + 25 z', '0'),
              col('nx', 'Next', "next season's WAR at 31 games, if he plays D-I: from this line (to date: by share of games played), the 3-year BPM, minutes share, class, age, seasons, recruit rank, usage and height", 's2'),
              col('mpg', 'MPG', 'minutes a game'), col('gp', 'G', 'games', 'i'), col('fv', 'FV', 'FV now', 'i')]
-    WK = ('n', 'tm', 'pos', 'age', 'sub', 'ph', 'lo', 'war', 'waa', 'nx', 'bpm', 'splus', 'mpg', 'gp', 'fv', 'mp')
+    WK = ('n', 'tm', 'pos', 'age', 'sub', 'ph', 'lo', 'war', 'waa', 'nx', 'xpm', 'oxpm', 'dxpm', 'splus', 'mpg', 'gp', 'fv', 'mp')
     slim = lambda rows: [{k: r.get(k) for k in WK} for r in rows]
     write('war', {
         'title': 'WAR leaders', 'key': 'war', 'def': '',
-        'views': [['war', 'WAR', 'wins over replacement'], ['waa', 'WAA', 'wins over average'], ['nx', 'Next', "next season's WAR"], ['bpm', 'BPM', 'box plus-minus']],
+        'views': [['war', 'WAR', 'wins over replacement'], ['waa', 'WAA', 'wins over average'], ['xpm', 'XPM', 'XPM'], ['oxpm', 'O-XPM', 'offensive XPM'], ['dxpm', 'D-XPM', 'defensive XPM'], ['nx', 'Next', "next season's WAR"]],
         'cols': wcols, 'pos': ['G', 'F', 'C'],
         'min': {'k': 'mp', 'l': 'min ≥', 'def': 0, 'opts': [[0, 'any'], [100, '100'], [300, '300'], [600, '600']]},
         'seasons': [{'s': SEASON, 'l': label(SEASON), 'rows': slim(now_rows)}, {'s': LAST, 'l': label(LAST), 'rows': slim(last_rows), 'mdef': 100}]})
+
+    # ---- pXPM: the preseason projection of every player with a D-I season behind him
+    PT = "pXPM: projected XPM this season from his last three seasons, minutes, class, box profile, team and recruit rating; fit to next-season BPM, frozen before the season"
+    lastx = {l['pid']: l['s'].get('xpm') for l in F['lines']}
+    prows = []
+    for r in B:
+        px = pxof(r)
+        if not px: continue
+        L = r.get('now') or {}
+        m = (L.get('mpg') or 0) * (L.get('gp') or 0)
+        prows.append({'n': r['name'], 'tm': r['team'], 'pos': r['pos'], 'age': age(r), 'sub': r.get('cls') or '', 'ph': r.get('photo'), 'lo': r.get('logo'),
+                      'pxpm': r1(px[0]), 'opx': r1(px[1]), 'dpx': r1(px[2]), 'lxpm': lastx.get(pidof.get((r['name'], r['team']))),
+                      'xpm': r1(L.get('xpm')) if m >= 50 else None, 'fv': r['fv'], 'mp': round(m)})
+    write('pxpm', {
+        'title': 'pXPM', 'key': 'pxpm', 'def': '',
+        'views': [['pxpm', 'pXPM', 'projected XPM'], ['opx', 'O-pXPM', 'projected offensive XPM'], ['dpx', 'D-pXPM', 'projected defensive XPM']],
+        'cols': [col('pxpm', 'pXPM', PT, 's1'), col('opx', 'O-pXPM', 'offensive pXPM', 's1'), col('dpx', 'D-pXPM', 'defensive pXPM', 's1'),
+                 col('lxpm', 'XPM 25-26', 'XPM last season', 's1'), col('xpm', 'XPM now', 'XPM this season (50+ minutes)', 's1'), col('fv', 'FV', 'FV now', 'i')],
+        'pos': ['G', 'F', 'C'], 'seasons': [{'s': SEASON, 'l': label(SEASON), 'rows': prows}]})
 
     # ---- breakouts: 1st and 2nd year players playing above their preseason projection
     brk = []
@@ -501,15 +575,17 @@ def main():
         move = 'up' if tc in POWER and fc not in POWER else 'down' if fc in POWER and tc not in POWER else 'across'
         prow.append({'n': r['name'], 'tm': r['team'], 'pos': r['pos'], 'age': age(r), 'ph': r.get('photo'), 'lo': r.get('logo'), 'div': move,
                      'sub': f"from {t2e.get(L['team'], L['team'])}" + (f" ({fc})" if fc else ''),
+                     'pxpm': r1((pxof(r) or [None])[0]), 'xpm': s.get('xpm') if s else None, 'xnow': r1((r.get('now') or {}).get('xpm')),
                      'war': s['war'] if s else r1(war(wx(L, L['gp'] * L['mpg'], F.get('mu')), L['gp'] * L['mpg']), 2), 'bpm': L['bpm'], 'mpg': L['mpg'], 'ppg': L.get('ppg'),
-                     'splus': splus(L['bpm'], spos(r, L)), 'fv': r['fv'], 'xbpm': r.get('xbpm'), 'bnow': (r.get('now') or {}).get('bpm')})
+                     'splus': splus(s['xpm'] if s and s.get('xpm') is not None else L['bpm'], spos(r, L)), 'fv': r['fv']})
     write('portal', {
-        'title': 'portal', 'key': 'war', 'def': '',
-        'views': [['war', 'WAR', 'WAR last season'], ['fv', 'FV', 'FV now'], ['xbpm', 'xBPM', 'projected BPM this season'], ['bpm', 'BPM', 'BPM last season']],
-        'cols': [col('war', 'WAR', 'wins over replacement last season (2025-26) at his old school', 's2'), col('bpm', 'BPM', 'BPM last season', 's1'),
-                 col('splus', 'Stat+', 'last season\'s BPM against his position, 100 + 25 z', '0'), col('ppg', 'PTS', 'points a game last season'),
-                 col('mpg', 'MPG', 'minutes a game last season'), col('xbpm', 'xBPM', 'projected BPM at the new school', 's1'),
-                 col('bnow', 'BPM now', 'BPM this season', 's1'), col('fv', 'FV', 'FV now', 'i')],
+        'title': 'portal', 'key': 'pxpm', 'def': '',
+        'views': [['pxpm', 'pXPM', 'projected XPM at the new school'], ['war', 'WAR', 'WAR last season'], ['fv', 'FV', 'FV now'], ['xpm', 'XPM', 'XPM last season']],
+        'cols': [col('pxpm', 'pXPM', PT, 's1'), col('war', 'WAR', 'wins over replacement last season (2025-26) at his old school', 's2'),
+                 col('xpm', 'XPM', 'XPM last season', 's1'),
+                 col('splus', 'Stat+', 'last season\'s XPM against his position, 100 + 25 z', '0'), col('ppg', 'PTS', 'points a game last season'),
+                 col('mpg', 'MPG', 'minutes a game last season'),
+                 col('xnow', 'XPM now', 'XPM this season', 's1'), col('fv', 'FV', 'FV now', 'i')],
         'divs': ['up', 'across', 'down'], 'pos': ['G', 'F', 'C'],
         'seasons': [{'s': SEASON, 'l': label(SEASON), 'rows': prow}]})
 
@@ -567,7 +643,7 @@ def teams(B, F, by_pid, pidof, bt, t2e, asof):
     for r in tal_rows: r.pop('trk', None); r.pop('rk', None)
     out = {'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'sport': 'cbb', 'season': SEASON, 'label': label(SEASON), 'src': 'Barttorvik',
            'views': {
-               'returning': {'plain': 1, 'about': 'Returning: last season\'s (2025-26) minutes and WAR still on the roster, by Barttorvik player id; transfers in = incoming D-I transfers\' WAR at their old schools. WAR = wins over a replacement player (BPM + 2) x minutes x .68 x wins a point; see the WAR leaders tab.',
+               'returning': {'plain': 1, 'about': 'Returning: last season\'s (2025-26) minutes and WAR still on the roster, by Barttorvik player id; transfers in = incoming D-I transfers\' WAR at their old schools. WAR = wins over a replacement player (XPM + 1.4) x minutes x .68 x wins a point; see the WAR leaders tab.',
                              'cols': [{'k': 'rmin', 'h': 'Ret Min%', 't': 'share of last season\'s minutes returning', 'f': '.1f', 'key': 1},
                                       {'k': 'rwar', 'h': 'Ret WAR', 't': 'last season\'s WAR returning', 'f': '.1f'},
                                       {'k': 'lwar', 'h': 'Lost WAR', 't': 'last season\'s WAR gone (graduated, pro, transferred out)', 'f': '.1f'},

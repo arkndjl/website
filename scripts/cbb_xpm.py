@@ -15,7 +15,23 @@ cbb_live's game-log lines), so the FV board, its in-season regrade and the roste
 Research and the backtests against BPM: scripts/research/cbb_xpm_nov26/ (the D side there took 25% GBPM; GBPM is not on
 every line source, and BPM alone costs .4% of the D side's next-season squared error).
 
+The form above is the core the fitted models read (the FV returner driver and the roster prior were fit on it, and both
+carry recruiting rank and team terms of their own). The pXPM shown on the boards (pxpm2_*, beta2 in the fit file; Nov 26
+2026, scripts/research/cbb_xpm_nov26/pxpm2.py) adds, per side, ridge 10:
+  team context  = 5 x the minutes-weighted mean side BPM of his season-n team's lines / 10, and that x Fr
+  recruit rating = Barttorvik rec / 100 x (Fr, So, Jr+), and a has-rating flag x (Fr, So, Jr+)
+Walk-forward next-season team R2 .7325 -> .7457 (13/14 pairs, t 7.9), player r .770 -> .780, RMSE 2.359 -> 2.316; inside the
+roster prior .7649 -> .7677 (t 3.7), as the FV driver a tie (t .9, 1.0), so the fitted models move at their next refit.
+
+rXPM (descriptive, season only; rxpm_lines): BPM's split between teammates on GBPM's team totals, per side:
+  rXPM_s = BPM_s + team minutes-weighted mean of (GBPM_s - BPM_s)
+scripts/research/cbb_xpm_nov26/rxpm10.py: against GBPM the who-sat-out test is better in all three designs (t 3.0, 4.9, 1.9)
+and next-season team R2 .611 -> .624 (12/14) on identical team totals; against BPM schedule-adjusted wins (WAB a game) R2
+.880 -> .888 and win% .652 -> .676 (19/19 seasons each) on an identical split.
+
     python3 scripts/cbb_xpm.py --fit      # data/cbb_xpm_fit.json from the 2008-09 ... 2025-26 pairs (no 2026-27 outcome)
+    python3 scripts/cbb_xpm.py --fit2     # adds beta2 (the board form) to that file; the core beta is left as it is
+    python3 scripts/cbb_xpm.py --freeze   # scripts/data/cbb_pxpm_2026.json: board-form pXPM by Barttorvik pid after 2025-26
 """
 import json, math, os, sys
 from collections import defaultdict
@@ -56,7 +72,8 @@ def season_lines(y):
         pid = str(r['pid']); q = P[pid]; q['e'] += e
         for k in RATES: q[k] += (r.get(k) or 0.0) * e
         for k in ('rima', 'twopa', 'tpa'): q[k] += r.get(k) or 0.0
-        meta[pid] = {'yr': r.get('yr'), 'hti': r.get('hti') or meta.get(pid, {}).get('hti'), 'name': r.get('name'), 'team': r.get('team')}
+        meta[pid] = {'yr': r.get('yr'), 'hti': r.get('hti') or meta.get(pid, {}).get('hti'), 'name': r.get('name'), 'team': r.get('team'),
+                     'rec': max(r.get('rec') or 0.0, meta.get(pid, {}).get('rec') or 0.0)}
     out = {}
     for pid, q in P.items():
         e = q['e']; v = {k: q[k] / e for k in RATES}
@@ -164,5 +181,125 @@ def fit():
     return out
 
 
+# ---------------------------------------------------------------- the board form (core + team context + recruit rating)
+COLS2 = ['ctx', 'ctx_fr', 'rec_fr', 'rec_so', 'rec_up', 'has_fr', 'has_so', 'has_up']
+FROZEN = os.path.join(D.ROOT, 'scripts', 'data', f'cbb_pxpm_{LAST_TARGET}.json')
+_CTX = {}
+
+
+def team_ctx(rows):
+    """team -> (O, D): 5 x the minutes-weighted mean side BPM of a season's lines (a team's BPM sums to its rating)"""
+    a = defaultdict(lambda: [0.0, 0.0, 0.0])
+    for r in rows:
+        e = mins(r)
+        if not e or r.get('obpm') is None or r.get('dbpm') is None: continue
+        q = a[r.get('team')]; q[0] += e * r['obpm']; q[1] += e * r['dbpm']; q[2] += e
+    return {t: (5 * q[0] / q[2], 5 * q[1] / q[2]) for t, q in a.items() if q[2]}
+
+
+def ctx_of(team, year):
+    """(O, D) team context of a Barttorvik team-season; (0, 0), the average team, when the season file is not there"""
+    if year not in _CTX:
+        try: _CTX[year] = team_ctx(D.load_bt(year))
+        except Exception: _CTX[year] = {}
+    return _CTX[year].get(team, (0.0, 0.0))
+
+
+def extra(n, ctx):
+    """the board form's added terms for a line n, per side"""
+    yr = n.get('yr'); fr = 0.0 if yr in CLS else 1.0; so = 1.0 if yr == 'So' else 0.0; up = 1.0 if yr in ('Jr', 'Sr') else 0.0
+    rec = (n.get('rec') or 0.0) / 100; has = 1.0 if rec > 0 else 0.0
+    return {s: np.array([c / 10, c / 10 * fr, rec * fr, rec * so, rec * up, has * fr, has * so, has * up]) for s, c in zip('od', ctx)}
+
+
+def pxpm2_parts(seasons, ctx=None):
+    """(pXPM, O, D), board form, after a career's last line; ctx = that line's team (O, D) context (looked up when None)"""
+    if not seasons or not mins(seasons[-1]) or seasons[-1].get('obpm') is None or seasons[-1].get('dbpm') is None: return None
+    F = _fit(); n = seasons[-1]; y = n.get('year')
+    if 'beta2' not in F: return pxpm_parts(seasons)
+    NM = F['norms'].get(str(y)) or F['norms'][max(F['norms'], key=int)]
+    X = row(seasons, NM); E = extra(n, ctx if ctx is not None else ctx_of(n.get('team'), y))
+    o, d = (float(np.concatenate([X[s], E[s]]) @ np.array(F['beta2'][s])) for s in 'od')
+    return o + d, o, d
+
+
+_V2 = {}
+def values2(y):
+    """season y -> {pid: (pXPM, O, D, minutes)}, board form, from Barttorvik's files"""
+    if y in _V2: return _V2[y]
+    S = {k: season_lines(k) for k in (y - 2, y - 1, y)}; C = team_ctx(S[y].values()); res = {}
+    for pid, n in S[y].items():
+        p = pxpm2_parts([S[k][pid] for k in (y - 2, y - 1) if pid in S[k]] + [n], C.get(n.get('team'), (0.0, 0.0)))
+        if p: res[pid] = p + (mins(n),)
+    _V2[y] = res
+    return res
+
+
+def fit2():
+    """beta2: the core's design plus COLS2, same target, weights and ridge; the core beta is not refit"""
+    global _FIT
+    F = json.load(open(FIT)); S = {y: season_lines(y) for y in range(FIRST, LAST_TARGET + 1)}; k = 6 + len(BOX) + len(COLS2)
+    A = {s: np.zeros((k, k)) for s in 'od'}; b = {s: np.zeros(k) for s in 'od'}
+    for n in range(FIRST, LAST_TARGET):
+        C = team_ctx(S[n].values()); rows, ys, ws = {'o': [], 'd': []}, {'o': [], 'd': []}, []
+        for pid, q in S[n].items():
+            nx = S[n + 1].get(pid)
+            X = row([S[j][pid] for j in (n - 2, n - 1) if j in S and pid in S[j]] + [q], F['norms'][str(n)]); E = extra(q, C.get(q.get('team'), (0.0, 0.0)))
+            ws.append(mins(nx))
+            for s in 'od': rows[s].append(np.concatenate([X[s], E[s]])); ys[s].append(nx[s + 'bpm'] if nx else 0.0)
+        w = np.array(ws); w = w / (w.sum() / max(1, (w > 0).sum()))
+        for s in 'od':
+            Xs = np.array(rows[s]); A[s] += (Xs * w[:, None]).T @ Xs; b[s] += (Xs * w[:, None]).T @ np.array(ys[s])
+    P = np.zeros(k); P[6:] = LAM
+    F['beta2'] = {s: [round(float(x), 5) for x in np.linalg.solve(A[s] + np.diag(P) + 1e-9 * np.eye(k), b[s])] for s in 'od'}
+    F['cols2'] = F['cols'] + COLS2
+    json.dump(F, open(FIT, 'w'), indent=1); _FIT = F
+    print('cbb_xpm fit2', {s: dict(zip(COLS2, F['beta2'][s][-len(COLS2):])) for s in 'od'})
+    return F
+
+
+def freeze():
+    """board-form pXPM by pid after LAST_TARGET's lines (a player whose last line is the season before carries that one),
+    read by the boards so no workflow needs Barttorvik's season files"""
+    out = {}
+    for y in (LAST_TARGET - 1, LAST_TARGET):
+        S = season_lines(y)
+        for pid, v in values2(y).items(): out[pid] = [round(v[0], 2), round(v[1], 2), round(v[2], 2), y, S[pid].get('name'), S[pid].get('team')]
+    json.dump({'season': LAST_TARGET, 'cols': ['pxpm', 'o', 'd', 'line', 'name', 'team'], 'players': out}, open(FROZEN, 'w'), separators=(',', ':'))
+    print(FROZEN, len(out))
+
+
+_FZ = None
+def frozen():
+    """pid -> [pXPM, O, D, line season, name, team] (scripts/data/cbb_pxpm_<season>.json); {} when the file is missing"""
+    global _FZ
+    if _FZ is None:
+        try: _FZ = json.load(open(FROZEN))['players']
+        except (OSError, ValueError, KeyError): _FZ = {}
+    return _FZ
+
+
+# ---------------------------------------------------------------- rXPM (descriptive)
+def rxpm_shift(lines, team=lambda l: l.get('team'), m=mins):
+    """team -> (O, D) shift = minutes-weighted mean of (GBPM_s - BPM_s) over a season's lines that carry both"""
+    a = defaultdict(lambda: [0.0, 0.0, 0.0])
+    for l in lines:
+        e = m(l)
+        if not e or any(l.get(k) is None for k in ('obpm', 'dbpm', 'ogbpm', 'dgbpm')): continue
+        q = a[team(l)]; q[0] += e * (l['ogbpm'] - l['obpm']); q[1] += e * (l['dgbpm'] - l['dbpm']); q[2] += e
+    return {t: (q[0] / q[2], q[1] / q[2]) for t, q in a.items() if q[2]}
+
+
+def rxpm_lines(lines, team=lambda l: l.get('team'), m=mins, shift=None):
+    """sets xpm / oxpm / dxpm (rXPM) on each line of one season; a team with no game BPM keeps BPM"""
+    sh = shift if shift is not None else rxpm_shift(lines, team, m)
+    for l in lines:
+        if l.get('obpm') is None or l.get('dbpm') is None: continue
+        o, d = sh.get(team(l), (0.0, 0.0)); l['oxpm'] = l['obpm'] + o; l['dxpm'] = l['dbpm'] + d; l['xpm'] = l['oxpm'] + l['dxpm']
+    return lines
+
+
 if __name__ == '__main__':
     if '--fit' in sys.argv: fit()
+    if '--fit2' in sys.argv: fit2()
+    if '--freeze' in sys.argv: freeze()
