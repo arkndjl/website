@@ -87,27 +87,27 @@ def main():
         "id": "nfl-qb-sneak",
         "sport": "NFL",
         "question": "On 3rd or 4th and 1, does the QB sneak convert more often than other plays?",
-        "answer": (f"Yes. Sneaks convert {sn[0][0]*100:.0f}%, other runs {ot[0][0]*100:.0f}%, passes {ps[0][0]*100:.0f}%. "
-                   f"Sneak share of these plays was {s[s.season==2015].kind.eq('sneak').mean()*100:.0f}% in 2015, "
+        "answer": (f"Yes. Sneaks convert {sn[0][0]*100:.0f}% of the time, other runs {ot[0][0]*100:.0f}% and passes {ps[0][0]*100:.0f}%. "
+                   f"The sneak share of these plays went from {s[s.season==2015].kind.eq('sneak').mean()*100:.0f}% in 2015 to "
                    f"{s[s.season==2025].kind.eq('sneak').mean()*100:.0f}% in 2025."),
         "findings": [
-            f"Sneak {sn[0][0]*100:.1f}% ({sn[0][1]*100:.1f}-{sn[0][2]*100:.1f}, n={sn[2]:,}); other run {ot[0][0]*100:.1f}% "
+            f"Sneaks convert {sn[0][0]*100:.1f}% ({sn[0][1]*100:.1f}-{sn[0][2]*100:.1f}, n={sn[2]:,}), and other runs {ot[0][0]*100:.1f}% "
             f"({ot[0][1]*100:.1f}-{ot[0][2]*100:.1f}, n={ot[2]:,}).",
-            f"Pass {ps[0][0]*100:.1f}% ({ps[0][1]*100:.1f}-{ps[0][2]*100:.1f}, n={ps[2]:,}). Gap sneak minus other run "
-            f"{dci[0]*100:+.1f} pts ({dci[1]*100:+.1f} to {dci[2]*100:+.1f}).",
+            f"Passes convert {ps[0][0]*100:.1f}% ({ps[0][1]*100:.1f}-{ps[0][2]*100:.1f}, n={ps[2]:,}). The gap between sneaks and other runs is "
+            f"{dci[0]*100:+.1f} points ({dci[1]*100:+.1f} to {dci[2]*100:+.1f}).",
             f"EPA per play: sneak {sn[1][0]:+.2f} ({sn[1][1]:+.2f} to {sn[1][2]:+.2f}), other run {ot[1][0]:+.2f}, pass {ps[1][0]:+.2f}.",
             f"Without PHI and BUF, sneaks still convert {w_rest[0]*100:.1f}% ({w_rest[1]*100:.1f}-{w_rest[2]*100:.1f}, n={len(rest):,}).",
         ],
-        "method": ("Conversion = first down or TD. Same down and distance; reweighted to the sneak's mix of down and goal-line "
+        "method": ("A conversion is a first down or a TD, on the same down and distance. Reweighting to the sneak's mix of down and goal-line "
                    f"state gives {std['sneak']*100:.0f}/{std['other run']*100:.0f}/{std['pass']*100:.0f}%. "
-                   "Yards to go of 1 hides inches, so sneaks may get the shortest spots."),
+                   "A yards to go of 1 hides inches, so sneaks may get the shortest spots."),
         "data": f"nflverse play-by-play, 2015 to 2026 wk 8, 3rd/4th-and-1 runs and passes, WP 5-95%, {len(s):,} plays.",
         "n": int(len(s)),
         "robust": True,
         "interest": 3,
-        "split_check": (f"2015-20: sneak {halves['2015-20'][0]*100:.0f}% (n={halves['2015-20'][1]:,}) vs other run "
-                        f"{halves['2015-20'][2]*100:.0f}%; 2021-26: {halves['2021-26'][0]*100:.0f}% (n={halves['2021-26'][1]:,}) "
-                        f"vs {halves['2021-26'][2]*100:.0f}%."),
+        "split_check": (f"2015-20: sneaks {halves['2015-20'][0]*100:.0f}% (n={halves['2015-20'][1]:,}) against "
+                        f"{halves['2015-20'][2]*100:.0f}% for other runs. 2021-26: {halves['2021-26'][0]*100:.0f}% (n={halves['2021-26'][1]:,}) "
+                        f"against {halves['2021-26'][2]*100:.0f}%."),
         "chart": {
             "type": "line",
             "title": "Conversion rate on 3rd/4th-and-1 by play type",

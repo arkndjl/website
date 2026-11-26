@@ -2,18 +2,18 @@
   "id": "nhl-score-effects",
   "sport": "NHL",
   "question": "How much do score effects tilt 5v5 shots, and do goals follow?",
-  "answer": "Trailing teams take 52.3% of unblocked attempts down 1, 53.9% down 3+. Goal share: 50.3% and 47.6%.",
+  "answer": "Trailing teams take 52.3% of unblocked attempts down 1 and 53.9% down 3+. Their goal share is 50.3% and 47.6%.",
   "findings": [
-    "Down 1: 52.3% attempt share (51.9-52.6), 50.3% goal share (49.1-51.5).",
-    "Down 1 shooting: 5.93% (5.72-6.16) for vs 6.41% against.",
-    "Down 3+: 53.9% of attempts, 47.6% of goals (45.8-49.4); n=44,721 attempts."
+    "Down 1: 52.3% attempt share (51.9-52.6) and 50.3% goal share (49.1-51.5).",
+    "Down 1 shooting: 5.93% (5.72-6.16) for and 6.41% against.",
+    "Down 3+: 53.9% of attempts and 47.6% of goals (45.8-49.4), n=44,721 attempts."
   ],
-  "method": "Unblocked 5v5 attempts (shots, misses, goals), periods 1-3, by score before the attempt. Game-cluster bootstrap CIs.",
+  "method": "Unblocked 5v5 attempts (shots, misses, goals) in periods 1-3, by the score before the attempt, with game-cluster bootstrap CIs.",
   "data": "NHL API play-by-play + shift charts, regular seasons 2021-22 to 2024-25, 5,248 games; 356,473 attempts.",
   "n": 5248,
   "robust": true,
   "interest": 2,
-  "split_check": "Down-1 attempt share 51.8% in 2021-23, 52.7% in 2023-25.",
+  "split_check": "The down-1 attempt share was 51.8% in 2021-23 and 52.7% in 2023-25.",
   "chart": {
     "type": "bar",
     "title": "5v5 share by score state",

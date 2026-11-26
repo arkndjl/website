@@ -102,19 +102,19 @@ n = int(len(s))
 out = {
     "id": "mlb-tto", "sport": "MLB",
     "question": "Does the times-through-the-order penalty justify pulling starters before the 3rd time?",
-    "answer": f"For an average starter, yes. 3rd time: {s3(B['t3'])} wOBA vs 1st (same pitcher), {w3(t3m[3][0])} vs relievers {w3(rm)}.",
+    "answer": f"For an average starter, yes. The 3rd time through is {s3(B['t3'])} wOBA over the 1st for the same pitcher, {w3(t3m[3][0])} against {w3(rm)} for relievers.",
     "findings": [
-        f"Within pitcher-season: 2nd time {f(B, SE, 't2')}, 3rd time {f(B, SE, 't3')} wOBA vs 1st.",
-        f"Pitch count adds nothing: {f(C, SEC, 'pc_c', 10)} per 100 pitches; 3rd time stays {s3(C['t3'])}.",
-        f"Jump at batter 19: {s3(e1[0]['j3'])} (SE {w3(e1[1]['j3'])}) in 2015-19, {s3(e2[0]['j3'])} (SE {w3(e2[1]['j3'])}) in 2020-25, a smooth rise instead.",
-        f"Batter-adjusted wOBA: starters 1st time {w3(t3m[1][0])}, 3rd time {w3(t3m[3][0])}; relievers inn. 6+ {w3(rm)} (n={len(rel):,}).",
+        f"Within a pitcher-season, wOBA over the 1st time is {f(B, SE, 't2')} the 2nd time and {f(B, SE, 't3')} the 3rd time.",
+        f"Pitch count adds nothing: {f(C, SEC, 'pc_c', 10)} per 100 pitches, and the 3rd time stays at {s3(C['t3'])}.",
+        f"The jump at batter 19 was {s3(e1[0]['j3'])} (SE {w3(e1[1]['j3'])}) in 2015-19 and {s3(e2[0]['j3'])} (SE {w3(e2[1]['j3'])}) in 2020-25, when it became a smooth rise.",
+        f"Batter-adjusted wOBA: starters {w3(t3m[1][0])} the 1st time and {w3(t3m[3][0])} the 3rd time, relievers in inning 6+ {w3(rm)} (n={len(rel):,}).",
     ],
-    "method": "OLS on PA wOBA with pitcher-season fixed effects, batter-season wOBA, platoon and home; SE clustered by game. "
-              "Survivors to the 3rd time are pitchers having better days, so the penalty is if anything understated.",
+    "method": "An OLS on PA wOBA with pitcher-season fixed effects, batter-season wOBA, platoon and home, with SE clustered by game. "
+              "The starters who survive to the 3rd time are having better days, so if anything the penalty is understated.",
     "data": f"Retrosheet play-by-play, 2015-2025 regular season, {n:,} starter PAs (1st-3rd time), {s.gid.nunique():,} games.",
     "n": n, "robust": True, "interest": 3,
-    "split_check": f"3rd-time penalty {s3(splitB['2015-19'][0]['t3'])} in 2015-19 and {s3(splitB['2020-25'][0]['t3'])} in 2020-25; "
-                   "discrete jumps only in 2015-19.",
+    "split_check": f"The 3rd-time penalty was {s3(splitB['2015-19'][0]['t3'])} in 2015-19 and {s3(splitB['2020-25'][0]['t3'])} in 2020-25. "
+                   "The discrete jumps are only in 2015-19.",
     "chart": {"type": "line", "title": "Starter wOBA allowed by batters faced, within pitcher",
               "x_label": "batters faced (3-batter bins)", "y_label": "wOBA allowed", "y_fmt": "num", "x_reverse": False,
               "ref": {"y": round(rm, 3), "label": "relievers, inn. 6+"}, "mark": {"x": 18.5, "label": "3rd time through"},

@@ -2,14 +2,14 @@
   "id": "tennis-serve-first-in-set",
   "sport": "tennis",
   "question": "Does the player who serves first in a set win it more often?",
-  "answer": "Set 1 raw: 52.3% men, 53.7% women. At equal strength: 50.7% and 51.4%, CIs include 50%.",
+  "answer": "Raw, the first server wins set 1 52.3% of the time for men and 53.7% for women. At equal strength it is 50.7% and 51.4%, and both CIs include 50%.",
   "findings": [
     "Men set 1: 50.7% at equal strength (95% CI 49.5-51.9, n=7,090).",
     "Women set 1: 51.4% at equal strength (95% CI 49.8-53.0, n=4,145).",
-    "Raw edge is mostly strength: stronger players are more often the first server in set 1.",
+    "The raw edge is mostly strength, since stronger players are more often the first server in set 1.",
     "All sets, adjusted: men 50.3% (49.6-51.1), women 51.5% (50.4-52.6)."
   ],
-  "method": "Logistic model of set win on first-server flag plus strength (each player's point-win share in other charted matches); later sets add set score. Intercept = first-server win % at equal strength.",
+  "method": "A logistic model of the set win on a first-server flag plus strength (each player's point-win share in other charted matches). Later sets add the set score. The intercept is the first server's win % at equal strength.",
   "data": "Match Charting Project points, 11,235 charted matches with a complete first set.",
   "n": 11235,
   "robust": true,

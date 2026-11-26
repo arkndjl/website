@@ -63,24 +63,24 @@ def main():
         "id": "nfl-onside-surprise",
         "sport": "NFL",
         "question": "Do surprise onside kicks get recovered more than expected late-game onside kicks?",
-        "answer": (f"Yes, {ws[0]*100:.0f}% vs {we[0]*100:.0f}% (2015-23), but below the ~{be*100:.0f}% break-even for an early onside. "
-                   "Net WPA not different from zero."),
+        "answer": (f"Yes, {ws[0]*100:.0f}% against {we[0]*100:.0f}% (2015-23), but that is below the ~{be*100:.0f}% break-even for an early onside. "
+                   "Net WPA isn't different from zero."),
         "findings": [
-            f"Surprise {ws[0]*100:.1f}% ({ws[1]*100:.1f}-{ws[2]*100:.1f}, n={len(sur)}); expected {we[0]*100:.1f}% "
+            f"Surprise onsides were recovered {ws[0]*100:.1f}% of the time ({ws[1]*100:.1f}-{ws[2]*100:.1f}, n={len(sur)}), and expected ones {we[0]*100:.1f}% "
             f"({we[1]*100:.1f}-{we[2]*100:.1f}, n={len(exp_)}).",
-            f"Q1-Q3 surprise onside, kicking-team WPA {a[0]*100:+.1f} pts ({a[1]*100:+.1f} to {a[2]*100:+.1f}, n={len(s13)}); "
-            f"normal kickoff {b[0]*100:+.2f}.",
-            f"Break-even recovery rate for a Q1-Q3 surprise onside: about {be*100:.0f}%.",
-            f"2024-26 expected onsides: {e2[0][0]*100:.1f}% recovered ({e2[0][1]*100:.1f}-{e2[0][2]*100:.1f}, n={e2[1]}).",
+            f"On a Q1-Q3 surprise onside, the kicking team's WPA is {a[0]*100:+.1f} points ({a[1]*100:+.1f} to {a[2]*100:+.1f}, n={len(s13)}). "
+            f"A normal kickoff is {b[0]*100:+.2f}.",
+            f"The break-even recovery rate for a Q1-Q3 surprise onside is about {be*100:.0f}%.",
+            f"In 2024-26, {e2[0][0]*100:.1f}% of expected onsides were recovered ({e2[0][1]*100:.1f}-{e2[0][2]*100:.1f}, n={e2[1]}).",
         ],
-        "method": ("Onside = kickoff described as onside. Expected = Q4 with the kicker trailing; surprise = all others. "
-                   "WPA compared with normal Q1-Q3 kickoffs within 14 points, game bootstrap CIs. Teams pick spots, so rates are upper bounds."),
+        "method": ("An onside is a kickoff described as onside. Expected means Q4 with the kicking team trailing, and surprise is all the others. "
+                   "WPA is compared with normal Q1-Q3 kickoffs within 14 points, with game bootstrap CIs. Teams pick their spots, so the rates are upper bounds."),
         "data": f"nflverse play-by-play, 2015 to 2026 wk 8, {len(o):,} onside kicks.",
         "n": int(len(o)),
         "robust": bool(ws[1] > we[2]),  # recovery gap; WPA gain is not distinguishable from zero
         "interest": 3,
-        "split_check": (f"Surprise recovery {h1.rec.mean()*100:.0f}% in 2015-18 (n={len(h1)}), {h2.rec.mean()*100:.0f}% in 2019-23 "
-                        f"(n={len(h2)}); expected stays near {we[0]*100:.0f}%."),
+        "split_check": (f"Surprise recovery was {h1.rec.mean()*100:.0f}% in 2015-18 (n={len(h1)}) and {h2.rec.mean()*100:.0f}% in 2019-23 "
+                        f"(n={len(h2)}). Expected stays near {we[0]*100:.0f}%."),
         "chart": {
             "type": "bar",
             "title": "Onside kick recovery rate by kickoff-rule era",

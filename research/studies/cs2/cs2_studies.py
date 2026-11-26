@@ -108,7 +108,11 @@ def pct(x, d=1):
 
 
 def pp(x):
-    return f"{100 * x:+.1f} pp"
+    return f"{100 * x:+.1f} points"
+
+
+def pn(x):
+    return f"{100 * x:+.1f}"
 
 
 # ---------- data ----------
@@ -302,31 +306,31 @@ def study_pistol_loser(maps):
     ct, t = res["CT"], res["T"]
 
     def eff(e):
-        return f"{pp(e[0])} ({pp(e[1])[:-3]} to {pp(e[2])})"
+        return f"{pp(e[0])} ({pn(e[1])} to {pn(e[2])})"
     n = len(recs)
     nct = sum(1 for r in recs if r["side"] == "CT")
     a = res["all"]
     zero = a["map"][1] < 0 < a["map"][2]
-    ans = (f"Buying on round 2: {pp(a['w2'][0])} in round 2, {pp(a['w3'][0])} in round 3, map win {pp(a['map'][0])}"
-           + (" (not different from 0)." if zero else "."))
+    ans = (f"Buying on round 2 is worth {pp(a['w2'][0])} in round 2 and {pp(a['w3'][0])} in round 3. The map win is {pp(a['map'][0])}"
+           + (", which isn't different from 0." if zero else "."))
     obj = {
         "id": "cs2-pistol-loser-buy", "sport": "CS2",
         "question": "After losing the pistol round, should the team save or buy on round 2?",
         "answer": ans,
         "findings": [
-            f"CT buy vs save, adjusted: R2 {eff(ct['w2'])}, R3 {eff(ct['w3'])}. {pct(1 - sh['CT'], 0)} of CT losers buy.",
-            f"T buy vs save, adjusted: R2 {eff(t['w2'])}, R3 {eff(t['w3'])}. {pct(1 - sh['T'], 0)} of T losers buy.",
-            f"Map win, buy vs save: CT {eff(ct['map'])}, T {eff(t['map'])}.",
-            f"First-half rounds won (of 12), buy vs save: CT {ct['half'][0]:+.2f} ({ct['half'][1]:+.2f} to {ct['half'][2]:+.2f}), "
+            f"CT buy against save, adjusted: R2 {eff(ct['w2'])}, R3 {eff(ct['w3'])}. {pct(1 - sh['CT'], 0)} of CT losers buy.",
+            f"T buy against save, adjusted: R2 {eff(t['w2'])}, R3 {eff(t['w3'])}. {pct(1 - sh['T'], 0)} of T losers buy.",
+            f"Map win, buy against save: CT {eff(ct['map'])}, T {eff(t['map'])}.",
+            f"First-half rounds won (of 12), buy against save: CT {ct['half'][0]:+.2f} ({ct['half'][1]:+.2f} to {ct['half'][2]:+.2f}), "
             f"T {t['half'][0]:+.2f} ({t['half'][1]:+.2f} to {t['half'][2]:+.2f}).",
         ],
-        "method": ("Pistol loser's round-2 buy class from bo3.gg equipment value (save = eco, buy = half/force). Logistic "
-                   "models adjust for side, team Elo, winner's round-2 equipment, loser's pistol kills and half; "
-                   "cluster-robust CIs by map."),
+        "method": ("The pistol loser's round-2 buy class comes from bo3.gg equipment value (a save is an eco, and a buy is a half or force buy). Logistic "
+                   "models adjust for side, team Elo, the winner's round-2 equipment, the loser's pistol kills and the half, "
+                   "with cluster-robust CIs by map."),
         "data": data_line(maps, f", {n:,} pistol-loss halves ({nct:,} CT)"),
         "n": n,
         "robust": None, "interest": 4,
-        "split_check": (f"Map effect early/late: CT {pp(split['early']['CT'][0])} / {pp(split['late']['CT'][0])}, "
+        "split_check": (f"Map effect early / late: CT {pp(split['early']['CT'][0])} / {pp(split['late']['CT'][0])}, "
                         f"T {pp(split['early']['T'][0])} / {pp(split['late']['T'][0])}."),
         "chart": {"type": "bar", "title": "Pistol loser win %, save vs buy on round 2",
                   "x_label": "side and outcome", "y_label": "win %", "y_fmt": "pct", "x_reverse": False,
@@ -398,19 +402,19 @@ def study_equipment(maps):
     obj = {
         "id": "cs2-equipment-gap", "sport": "CS2",
         "question": "How much does an equipment gap change round win chances on CT and T?",
-        "answer": (f"Full buy vs full buy: CT wins {pct(mt[(2, 2)][0])}. At equal dollar value CT wins "
-                   f"{pct(eq0['CT']['y'])}; an eco beats a full buy {pct(ecoall[0])}."),
+        "answer": (f"Full buy against full buy, the CT side wins {pct(mt[(2, 2)][0])}. At equal dollar value the CT side wins "
+                   f"{pct(eq0['CT']['y'])}, and an eco beats a full buy {pct(ecoall[0])} of the time."),
         "findings": [
-            f"Full buy vs full buy: CT wins {mm(2, 2)}.",
-            f"Force vs full: CT forcing wins {mm(1, 2)}; T forcing wins {pct(1 - mt[(2, 1)][0])} (n={mt[(2, 1)][3]:,}).",
-            f"Eco vs full: CT eco wins {mm(-1, 2)}; T eco wins {pct(1 - mt[(2, -1)][0])} (n={mt[(2, -1)][3]:,}).",
-            f"CT needs about ${cross:.1f}k more equipment value than T for a 50% round (CT rifles and kits cost more).",
+            f"Full buy against full buy: the CT side wins {mm(2, 2)}.",
+            f"Force against full: a CT force wins {mm(1, 2)}, and a T force wins {pct(1 - mt[(2, 1)][0])} (n={mt[(2, 1)][3]:,}).",
+            f"Eco against full: a CT eco wins {mm(-1, 2)}, and a T eco wins {pct(1 - mt[(2, -1)][0])} (n={mt[(2, -1)][3]:,}).",
+            f"The CT side needs about ${cross:.1f}k more equipment value than the T side for a 50% round, since CT rifles and kits cost more.",
         ],
-        "method": ("Non-pistol regulation rounds; equipment value at round start per team from bo3.gg, binned by "
+        "method": ("Non-pistol regulation rounds. Each team's equipment value at the start of the round comes from bo3.gg, binned by "
                    "CT minus T in $4k steps (ends capped at $24k). Round win rate with map-clustered CIs."),
         "data": data_line(maps, f", {n_rounds:,} rounds"),
         "n": n_rounds, "robust": True, "interest": 3,
-        "split_check": (f"Full vs full CT win %: early {pct(sp[0][0])} (n={sp[0][3]:,}), late {pct(sp[1][0])} "
+        "split_check": (f"CT win % in full against full: {pct(sp[0][0])} early (n={sp[0][3]:,}) and {pct(sp[1][0])} late "
                         f"(n={sp[1][3]:,})."),
         "chart": {"type": "line", "title": "Round win % by equipment gap", "x_label": "own minus opponent equipment ($k)",
                   "y_label": "round win %", "y_fmt": "pct", "x_reverse": False,
@@ -469,21 +473,21 @@ def study_pistol_value(maps):
     obj = {
         "id": "cs2-pistol-value", "sport": "CS2",
         "question": "How much is the first pistol round worth, and does the side matter?",
-        "answer": (f"First pistol winner takes the map {pct(wl(rows1)[0][0])}: {pct(a[0][0])} on CT, {pct(bb[0][0])} "
-                   f"on T."),
+        "answer": (f"The winner of the first pistol takes the map {pct(wl(rows1)[0][0])} of the time, {pct(a[0][0])} from the CT side and {pct(bb[0][0])} "
+                   f"from the T side."),
         "findings": [
             f"Pistol 1 won on CT: map win {pct(a[0][0])} ({pct(a[0][1])}-{pct(a[0][2])}, n={a[1]:,}).",
             f"Pistol 1 won on T: map win {pct(bb[0][0])} ({pct(bb[0][1])}-{pct(bb[0][2])}, n={bb[1]:,}).",
-            f"Both pistols: {pct(res['both pistols'][0][0])} map win (n={res['both pistols'][1]:,}). "
-            f"Split pistols, P1 winner: {pct(res['split, won P1'][0][0])}.",
-            f"Above Elo expectation: P1 on T {pp(bb[2])}, on CT {pp(a[2])}. Win vs lose P1, Elo-adjusted: {pp(me1[0])} "
-            f"({pp(me1[1])[:-3]} to {pp(me1[2])}).",
+            f"A team that wins both pistols wins the map {pct(res['both pistols'][0][0])} of the time (n={res['both pistols'][1]:,}). "
+            f"When the pistols are split, the P1 winner wins {pct(res['split, won P1'][0][0])}.",
+            f"Above the Elo expectation, P1 on T is {pp(bb[2])} and on CT {pn(a[2])}. Winning P1 against losing it, Elo-adjusted, is {pp(me1[0])} "
+            f"({pn(me1[1])} to {pn(me1[2])}).",
         ],
-        "method": ("Map win % for pistol round winners (rounds 1 and 13), Wilson CIs. Team strength: logistic model "
-                   "with pre-map Elo; pistol effects as average marginal change, map-clustered CIs."),
+        "method": ("Map win % for the pistol round winners (rounds 1 and 13), with Wilson CIs. Team strength is a logistic model "
+                   "on pre-map Elo, and the pistol effects are average marginal changes with map-clustered CIs."),
         "data": data_line(maps),
         "n": n, "robust": bool(me1[1] > 0), "interest": 4,
-        "split_check": (f"P1 winner map win: early {pct(sp[0][0][0])} (n={sp[0][1]:,}), late {pct(sp[1][0][0])} "
+        "split_check": (f"P1 winner map win: {pct(sp[0][0][0])} early (n={sp[0][1]:,}) and {pct(sp[1][0][0])} late "
                         f"(n={sp[1][1]:,})."),
         "chart": {"type": "bar", "title": "Map win % after winning a pistol round", "x_label": "pistol result",
                   "y_label": "map win %", "y_fmt": "pct", "x_reverse": False, "ref": {"y": 0.5, "label": "50%"},
@@ -527,20 +531,20 @@ def study_side_first(maps):
     obj = {
         "id": "cs2-side-first", "sport": "CS2",
         "question": "Which side should a team start on, map by map?",
-        "answer": (f"Start T. T-first teams win {pct(eall[0])} of maps; {pct(best[1][0])} on {best[0][3:]}, "
+        "answer": (f"Start on T. Teams that start on T win {pct(eall[0])} of maps, from {pct(best[1][0])} on {best[0][3:]} down to "
                    f"{pct(worst[1][0])} on {worst[0][3:]}."),
         "findings": [
-            f"All maps: T-first team wins {pct(eall[0])} ({pct(eall[1])}-{pct(eall[2])}, n={len(allr):,}).",
+            f"All maps: the T-first team wins {pct(eall[0])} ({pct(eall[1])}-{pct(eall[2])}, n={len(allr):,}).",
             f"{best[0][3:]}: T-first {pct(best[1][0])} ({pct(best[1][1])}-{pct(best[1][2])}, n={best[2]:,}).",
             f"{worst[0][3:]}: T-first {pct(worst[1][0])} ({pct(worst[1][1])}-{pct(worst[1][2])}, n={worst[2]:,}).",
-            f"CI excludes 50% on {', '.join(r[0][3:] for r in sig) or 'none'}. Elo-adjusted T-first: "
+            f"The CI excludes 50% on {', '.join(r[0][3:] for r in sig) or 'none'}. Elo-adjusted, T-first is "
             f"{pp(sum(r[3] * r[2] for r in rows) / sum(r[2] for r in rows))}.",
         ],
-        "method": ("Map win % of the team that started T, Wilson CIs. Side choice is not random (pick/veto), so "
+        "method": ("Map win % of the team that started on T, with Wilson CIs. The side choice isn't random (pick/veto), so "
                    "Elo-expected wins are subtracted as a check on team strength."),
         "data": data_line(maps),
         "n": len(allr), "robust": bool(sig), "interest": 3,
-        "split_check": (f"T-first win %: early {pct(sp[0][0][0])} (n={sp[0][1]:,}), late {pct(sp[1][0][0])} "
+        "split_check": (f"T-first win %: {pct(sp[0][0][0])} early (n={sp[0][1]:,}) and {pct(sp[1][0][0])} late "
                         f"(n={sp[1][1]:,})."),
         "chart": {"type": "bar", "title": "Map win % for the team starting T", "x_label": "map",
                   "y_label": "map win %", "y_fmt": "pct", "x_reverse": False, "ref": {"y": 0.5, "label": "50%"},
@@ -623,20 +627,20 @@ def study_streak(maps):
 
     def f(k):
         e, nn, act, pr = res[k]
-        return (f"After {k} loss{'es' if k > 1 else ''} in a row: wins {pct(act)}, model {pct(pr)}, gap {pp(e[0])} "
-                f"({pp(e[1])[:-3]} to {pp(e[2])}, n={nn:,}).")
+        return (f"After {k} loss{'es' if k > 1 else ''} in a row, teams win {pct(act)} against a model {pct(pr)}, a gap of {pp(e[0])} "
+                f"({pn(e[1])} to {pn(e[2])}, n={nn:,}).")
     obj = {
         "id": "cs2-loss-streak", "sport": "CS2",
         "question": "Does a losing streak hurt the next round beyond economy (the no-timeout baseline)?",
-        "answer": (("No tilt. " if e3[0] > -0.005 else "")
-                   + f"After 3+ straight losses a team wins {100 * e3[0]:+.1f} pp vs an economy and score model."),
+        "answer": (("There is no tilt. " if e3[0] > -0.005 else "")
+                   + f"After 3+ straight losses a team wins {100 * e3[0]:+.1f} points more than an economy and score model expects."),
         "findings": [f(1), f(3), f(5),
-                     "bo3.gg round data has no timeout calls, so the timeout effect itself is not measured."],
-        "method": ("Logistic baseline on buy-class matchup by side, equipment values, score gap, Elo and round in half; "
-                   "actual minus predicted win rate by current losing streak in the half, map-clustered CIs."),
+                     "The bo3.gg round data has no timeout calls, so the timeout effect itself isn't measured."],
+        "method": ("A logistic baseline on the buy-class matchup by side, equipment values, score gap, Elo and round in the half. "
+                   "The result is the actual minus the predicted win rate by the current losing streak in the half, with map-clustered CIs."),
         "data": data_line(maps, f", {n:,} rounds"),
         "n": n, "robust": None, "interest": 3,
-        "split_check": (f"3+ streak gap: early {pp(sp[0][0][0])} (n={sp[0][1]:,}), late {pp(sp[1][0][0])} "
+        "split_check": (f"The 3+ streak gap was {pp(sp[0][0][0])} early (n={sp[0][1]:,}) and {pp(sp[1][0][0])} late "
                         f"(n={sp[1][1]:,})."),
         "chart": {"type": "line", "title": "Next-round win vs economy model, by losing streak",
                   "x_label": "rounds lost in a row", "y_label": "actual minus expected", "y_fmt": "signed",

@@ -88,7 +88,7 @@ for nm, yrs in [('2015-19', range(2015, 2020)), ('2020-25', range(2020, 2026))]:
     isplit[nm + 'pa'] = {k: ols_cl(z[(z.bases == k[0]) & (z.outs_pre == k[1])], 'dwe_def', 'iw') for k in [(2, 1), (2, 2), (6, 1)]}
     print(nm, 'PA-level', {b: np.round(v[:2], 4) for b, v in bsplit[nm + 'pa'].items()}, {k: np.round(v[:2], 4) for k, v in isplit[nm + 'pa'].items()})
 
-pt = lambda r: f"{r[0]*100:+.1f} pts (CI {(r[0]-1.96*r[1])*100:+.1f} to {(r[0]+1.96*r[1])*100:+.1f})"
+pt = lambda r: f"{r[0]*100:+.1f} points (CI {(r[0]-1.96*r[1])*100:+.1f} to {(r[0]+1.96*r[1])*100:+.1f})"
 def point(lab, r):
     return {'x': lab, 'y': round(r[0] * 100, 2), 'lo': round((r[0] - 1.96 * r[1]) * 100, 2), 'hi': round((r[0] + 1.96 * r[1]) * 100, 2), 'n': int(r[3])}
 # ---- sac bunt JSON
@@ -101,19 +101,19 @@ nBatt = int(B.bunt_att.sum())
 bt = {
     "id": "mlb-sac-bunt", "sport": "MLB",
     "question": "Do sacrifice-bunt tries with nobody out gain win probability?",
-    "answer": f"No. Bunt tries cost {-bres[(1, False)][0]*100:.1f} to {-bres[(3, False)][0]*100:.1f} win-prob pts per try vs swinging; late and close, up to {-bres[(3, True)][0]*100:.1f}.",
+    "answer": f"No. A bunt try costs {-bres[(1, False)][0]*100:.1f} to {-bres[(3, False)][0]*100:.1f} points of win probability compared to swinging, and up to {-bres[(3, True)][0]*100:.1f} late and close.",
     "findings": [
         f"Runner on 1st, 0 out: {pt(bres[(1, False)])}, n={bres[(1, False)][2]:,} tries of {bres[(1, False)][3]:,} PAs.",
         f"Runner on 2nd: {pt(bres[(2, False)])}. 1st and 2nd: {pt(bres[(3, False)])}.",
         f"1st and 2nd, 7th inning on, within 1 run: {pt(bres[(3, True)])}, n={bres[(3, True)][2]:,} tries.",
-        f"Realized WE to end of inning: no CI excludes 0 (1st: {bres[(1, False, 'h')][0]*100:+.1f} pts). Try rate {rate[2015]:.1%} 2015, {rate[2025]:.1%} 2025.",
+        f"On realized WE to the end of the inning, no CI excludes 0 (1st: {bres[(1, False, 'h')][0]*100:+.1f} points). The try rate was {rate[2015]:.1%} in 2015 and {rate[2025]:.1%} in 2025.",
     ],
-    "method": "Non-pitcher PAs, 0 out, innings 1-9. Bunt try = bunt in play or foul/missed bunt. Outcome: change in empirical WE over the PA. "
-              "OLS with batter and on-deck season wOBA, inning x score x season cells; SE clustered by game.",
+    "method": "Non-pitcher PAs with 0 out in innings 1-9. A bunt try is a bunt in play or a foul or missed bunt. The outcome is the change in empirical WE over the PA. "
+              "An OLS with batter and on-deck season wOBA and inning x score x season cells, with SE clustered by game.",
     "data": f"Retrosheet play-by-play, 2015-2025 regular season, {len(B):,} PAs with runners on and 0 out, {nBatt:,} bunt tries.",
     "n": int(len(B)), "robust": True, "interest": 2,
-    "split_check": f"PA-level loss in both eras for 2nd and 1st+2nd; runner on 1st: {bsplit['2015-19pa'][1][0]*100:+.1f} pts 2015-19, "
-                   f"{bsplit['2020-25pa'][1][0]*100:+.1f} 2020-25 (n.s.).",
+    "split_check": f"There is a PA-level loss in both eras for 2nd and for 1st+2nd. Runner on 1st: {bsplit['2015-19pa'][1][0]*100:+.1f} points in 2015-19 and "
+                   f"{bsplit['2020-25pa'][1][0]*100:+.1f} in 2020-25 (n.s.).",
     "chart": {"type": "bar", "title": "Bunt try minus swing away, 0 out",
               "x_label": "runners, game state", "y_label": "win-prob pts", "y_fmt": "signed", "x_reverse": False,
               "ref": {"y": 0, "label": "no effect"}, "mark": None,
@@ -130,18 +130,18 @@ r61, r61h = ires[(6, 1, False)], ires[(6, 1, False, 'h')]
 ib = {
     "id": "mlb-ibb", "sport": "MLB",
     "question": "Do intentional walks gain win probability for the defense?",
-    "answer": f"Mostly no. Runner on 2nd, 1 out: IBB costs the defense {-r21h[0]*100:.1f} win-prob pts. Other states: no gain distinguishable from 0.",
+    "answer": f"Mostly no. With a runner on 2nd and 1 out, the IBB costs the defense {-r21h[0]*100:.1f} points of win probability. In the other states there is no gain I can tell apart from 0.",
     "findings": [
-        f"Runner on 2nd, 1 out: {pt(r21h)}, n={r21h[2]:,} IBB; late and close {pt(r21l)}.",
-        f"2nd and 3rd, 1 out: {pt(r61)} over the PA but {r61h[0]*100:+.1f} (CI {(r61h[0]-1.96*r61h[1])*100:+.1f} to {(r61h[0]+1.96*r61h[1])*100:+.1f}) to end of inning.",
-        f"IBB batters: +{(I[I.iw==1].q.mean()-I[I.iw==0].q.mean())*1000:.0f} pts of season wOBA over other batters in these states; in the model.",
-        f"IBB per season: {irate[2016]} in 2016, {irate[2025]} in 2025 (non-pitcher batters, innings 1-9).",
+        f"Runner on 2nd, 1 out: {pt(r21h)}, n={r21h[2]:,} IBB. Late and close it is {pt(r21l)}.",
+        f"2nd and 3rd, 1 out: {pt(r61)} over the PA, but {r61h[0]*100:+.1f} (CI {(r61h[0]-1.96*r61h[1])*100:+.1f} to {(r61h[0]+1.96*r61h[1])*100:+.1f}) to the end of the inning.",
+        f"IBB batters are +{(I[I.iw==1].q.mean()-I[I.iw==0].q.mean())*1000:.0f} points of season wOBA over the other batters in these states, which is in the model.",
+        f"IBB per season: {irate[2016]} in 2016 and {irate[2025]} in 2025 (non-pitcher batters, innings 1-9).",
     ],
-    "method": "Defense-view change in empirical WE, from the PA start to the end of the half-inning (main) and over the PA. OLS with batter "
-              "and on-deck season wOBA, inning x score x season cells; SE clustered by game. Compared with pitching to the batter in the same state.",
+    "method": "The change in empirical WE from the defense's view, from the start of the PA to the end of the half-inning (main) and over the PA. An OLS with batter "
+              "and on-deck season wOBA and inning x score x season cells, with SE clustered by game. The comparison is pitching to the batter in the same state.",
     "data": f"Retrosheet play-by-play, 2015-2025 regular season, {nI:,} intentional walks to non-pitchers in innings 1-9.",
     "n": nI, "robust": True, "interest": 3,
-    "split_check": f"Runner on 2nd, 1 out: {isplit['2015-19'][(2, 1)][0]*100:+.1f} pts 2015-19, {isplit['2020-25'][(2, 1)][0]*100:+.1f} 2020-25 "
+    "split_check": f"Runner on 2nd, 1 out: {isplit['2015-19'][(2, 1)][0]*100:+.1f} points in 2015-19 and {isplit['2020-25'][(2, 1)][0]*100:+.1f} in 2020-25 "
                    f"(SE {isplit['2015-19'][(2, 1)][1]*100:.1f}, {isplit['2020-25'][(2, 1)][1]*100:.1f}).",
     "chart": {"type": "bar", "title": "IBB minus pitching to the batter, defense view",
               "x_label": "runners, outs", "y_label": "win-prob pts", "y_fmt": "signed", "x_reverse": False,

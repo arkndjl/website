@@ -180,25 +180,25 @@ def emit():
         "id": "nfl-fourth-down",
         "sport": "NFL",
         "question": "When going for it on 4th down gains win probability, how often do NFL teams go?",
-        "answer": (f"In states where going gains 1+ WP point, teams went {pE[0]*100:.0f}% of the time in 2015-16 and "
+        "answer": (f"In states where going gains 1+ point of WP, teams went {pE[0]*100:.0f}% of the time in 2015-16 and "
                    f"{pL[0]*100:.0f}% in 2024-25."),
         "findings": [
-            f"Clear-kick states: teams go about 4% of the time every season (n={sum(p['n'] for p in pts_kick):,}).",
-            f"WP lost to clear errors: {early[0]*100:.1f} WP pts per team-game in 2015-16 ({early[1]*100:.1f}-{early[2]*100:.1f}), "
+            f"In clear-kick states, teams go about 4% of the time every season (n={sum(p['n'] for p in pts_kick):,}).",
+            f"WP lost to clear errors was {early[0]*100:.1f} points per team-game in 2015-16 ({early[1]*100:.1f}-{early[2]*100:.1f}) and "
             f"{late[0]*100:.1f} in 2024-25 ({late[1]*100:.1f}-{late[2]*100:.1f}).",
-            f"2023-26 go states: go rate {by['1'][0]*100:.0f}% at 4th-and-1 (n={by['1'][3]:,}), {by['2-3'][0]*100:.0f}% at 2-3 yds "
-            f"(n={by['2-3'][3]:,}), {by['4+'][0]*100:.0f}% at 4+ (n={by['4+'][3]:,}).",
+            f"In the 2023-26 go states, the go rate is {by['1'][0]*100:.0f}% at 4th-and-1 (n={by['1'][3]:,}), {by['2-3'][0]*100:.0f}% at 2-3 yds "
+            f"(n={by['2-3'][3]:,}) and {by['4+'][0]*100:.0f}% at 4+ (n={by['4+'][3]:,}).",
             f"Conversion: 4th-and-1 {conv['1'][1]*100:.0f}% ({conv['1'][2]*100:.0f}-{conv['1'][3]*100:.0f}, n={conv['1'][4]:,}), "
             f"4th-and-2 {conv['2'][1]*100:.0f}% ({conv['2'][2]*100:.0f}-{conv['2'][3]*100:.0f}, n={conv['2'][4]:,}).",
         ],
-        "method": ("Per play, expected WPA of go (pooled conversion rate x WPA if converted/failed) vs best of punt/FG, each from "
-                   "boosted models of nflverse WPA on the same pre-snap state, cross-fit by game. Teams' own choice does not set the rate. WP-lost CIs exclude model error."),
+        "method": ("For each play, the expected WPA of going (pooled conversion rate x WPA if converted or failed) against the best of a punt or FG, each from "
+                   "boosted models of nflverse WPA on the same pre-snap state, cross-fit by game. A team's own choice doesn't set the rate. The CIs on WP lost exclude model error."),
         "data": f"nflverse play-by-play, 2015 to 2026 wk 8, Q1-Q4 4th downs (no penalties/kneels), {n:,} plays, {f.game_id.nunique():,} games.",
         "n": int(n),
         "robust": True,
         "interest": 4,
-        "split_check": (f"Model checks out of sample: realized WPA in go states, goers {a[0]*100:+.1f} vs kickers {b[0]*100:+.1f} pts "
-                        f"(n={nga:,}/{ngk:,}); rise in go rate holds every season."),
+        "split_check": (f"The model checks out of sample: on realized WPA in go states, teams that went are {a[0]*100:+.1f} points and teams that kicked are {b[0]*100:+.1f} "
+                        f"(n={nga:,}/{ngk:,}). The rise in the go rate holds every season."),
         "chart": {
             "type": "line",
             "title": "Go rate on 4th down, by what the model recommends",

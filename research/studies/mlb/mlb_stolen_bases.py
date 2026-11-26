@@ -82,18 +82,18 @@ print('runs per team-season', tsr)
 res = {
     "id": "mlb-stolen-bases", "sport": "MLB",
     "question": "After the 2023 base and pickoff rules, do runners still steal too little?",
-    "answer": f"Slightly. Steals of 2nd succeed {sn:.1%} vs {ben:.1%} break-even, +{tsr:.1f} runs per team-season. At 1 out, no edge.",
+    "answer": f"Slightly. Steals of 2nd succeed {sn:.1%} of the time against a {ben:.1%} break-even, worth +{tsr:.1f} runs per team-season. With 1 out there is no edge.",
     "findings": [
-        f"Steal of 2nd: {so:.1%} success 2021-22 (n={len(a2o):,}) to {sn:.1%} 2023-25 (n={len(a2n):,}, CI {lon:.1%}-{hin:.1%}).",
-        f"Attempts per PA with runner on 1st only: {ar_old:.1%} to {ar_new:.1%}. Success fell each year: {seas[2][2]:.1%}, {seas[3][2]:.1%}, {seas[4][2]:.1%}.",
-        f"Run value per attempt 2023-25: +{vn:.3f} (CI {vnlo:+.3f} to {vnhi:+.3f}); 2021-22: {vo:+.3f} (CI {volo:+.3f} to {vohi:+.3f}).",
-        f"1 out: {s1:.1%} vs {be1:.1%} break-even (n={len(a1):,}). 0 out: {s0:.1%} vs {be0:.1%} (n={len(a0):,}).",
+        f"Steals of 2nd went from {so:.1%} success in 2021-22 (n={len(a2o):,}) to {sn:.1%} in 2023-25 (n={len(a2n):,}, CI {lon:.1%}-{hin:.1%}).",
+        f"Attempts per PA with a runner on 1st only went from {ar_old:.1%} to {ar_new:.1%}. Success fell each year: {seas[2][2]:.1%}, {seas[3][2]:.1%}, {seas[4][2]:.1%}.",
+        f"Run value per attempt was +{vn:.3f} in 2023-25 (CI {vnlo:+.3f} to {vnhi:+.3f}) and {vo:+.3f} in 2021-22 (CI {volo:+.3f} to {vohi:+.3f}).",
+        f"1 out: {s1:.1%} against a {be1:.1%} break-even (n={len(a1):,}). 0 out: {s0:.1%} against {be0:.1%} (n={len(a0):,}).",
     ],
-    "method": "Steal attempts from clean states (runner on 1st only, or 2nd only), incl. pickoff-CS and K+CS. Break-even from era RE24 "
-              "(innings 1-8). Run value uses the steal outcome only. Average success above break-even does not prove the marginal try pays.",
+    "method": "Steal attempts from clean states (runner on 1st only, or 2nd only), including pickoff-CS and K+CS. The break-even comes from era RE24 "
+              "(innings 1-8). Run value uses the steal outcome only. Average success above the break-even doesn't prove the marginal try pays.",
     "data": f"Retrosheet play-by-play, 2021-2025 regular season, {n_all:,} steal attempts in clean states.",
     "n": n_all, "robust": True, "interest": 3,
-    "split_check": "Success above break-even in each season 2023, 2024, 2025 for steals of 2nd; gap shrinks from "
+    "split_check": "Success was above the break-even in each of 2023, 2024 and 2025 for steals of 2nd, and the gap shrinks from "
                    f"{seas[2][2]-seas[2][3]:+.1%} to {seas[4][2]-seas[4][3]:+.1%}.",
     "chart": {"type": "bar", "title": "Steal success vs break-even by base and outs",
               "x_label": "base stolen, outs", "y_label": "success %", "y_fmt": "pct", "x_reverse": False, "ref": None, "mark": None,

@@ -187,22 +187,22 @@ if __name__ == "__main__":
             "id": f"{lg}-foul-up-3",
             "sport": L,
             "question": "Up 3 in the last 12 seconds, should the leader foul or defend?",
-            "answer": (f"{'Foul' if robust and sd[0] > 0 else 'No clear edge'}: leader wins {pct(F['win'][0])} fouling, {pct(Dd['win'][0])} defending; "
-                       f"{100*sd[0]:+.1f} pp at equal time (CI {100*sd[1]:+.1f} to {100*sd[2]:+.1f})."),
+            "answer": (f"{'Foul' if robust and sd[0] > 0 else 'There is no clear edge'}. The leader wins {pct(F['win'][0])} of the time fouling and {pct(Dd['win'][0])} defending, "
+                       f"{100*sd[0]:+.1f} points at equal time (CI {100*sd[1]:+.1f} to {100*sd[2]:+.1f})."),
             "findings": [
-                f"Leader win: foul {pct(F['win'][0])} (CI {pct(F['win'][1])}-{pct(F['win'][2])}, n={F['n']}), defend {pct(Dd['win'][0])} (CI {pct(Dd['win'][1])}-{pct(Dd['win'][2])}, n={Dd['n']}).",
-                f"Same-time difference (foul minus defend): {100*sd[0]:+.1f} pp (95% CI {100*sd[1]:+.1f} to {100*sd[2]:+.1f}).",
-                f"Reached OT: foul {pct(F['ot'][0])}, defend {pct(Dd['ot'][0])}. Lost in regulation: foul {pct(F['regloss'][0])}, defend {pct(Dd['regloss'][0])}.",
-                f"Leader win rate once in OT: foul {pct(F['otwin'][0])} (n={int(round(F['ot'][0]*F['n']))}), defend {pct(Dd['otwin'][0])} (n={int(round(Dd['ot'][0]*Dd['n']))}).",
+                f"Leader win rate: {pct(F['win'][0])} fouling (CI {pct(F['win'][1])}-{pct(F['win'][2])}, n={F['n']}) and {pct(Dd['win'][0])} defending (CI {pct(Dd['win'][1])}-{pct(Dd['win'][2])}, n={Dd['n']}).",
+                f"The difference at the same time left (foul minus defend) is {100*sd[0]:+.1f} points (95% CI {100*sd[1]:+.1f} to {100*sd[2]:+.1f}).",
+                f"The game reached OT {pct(F['ot'][0])} of the time after a foul and {pct(Dd['ot'][0])} after defending. The leader lost in regulation {pct(F['regloss'][0])} and {pct(Dd['regloss'][0])} of the time.",
+                f"Once in OT, the leader won {pct(F['otwin'][0])} after fouling (n={int(round(F['ot'][0]*F['n']))}) and {pct(Dd['otwin'][0])} after defending (n={int(round(Dd['ot'][0]*Dd['n']))}).",
             ],
-            "method": ("First trailer possession per game that is live with 12 s or less, final regulation period, down 3. "
-                       "Foul = leader's non-shooting foul sending trailer to the line before any shot. "
-                       "Compared within possession-start bins (4-8, 8-12, 12+ s); outcome = game win incl. OT."),
+            "method": ("The sample is the first trailing-team possession of each game that is live with 12 seconds or less left in the final regulation period, down 3. "
+                       "A foul is the leader's non-shooting foul that sends the trailing team to the line before any shot. "
+                       "Fouling and defending are compared within possession-start bins (4-8, 8-12, 12+ s), and the outcome is the game win, including OT."),
             "data": f"ESPN play-by-play via sportsdataverse, {L}, {seas}, {len(df):,} games.",
             "n": int(len(df)),
             "robust": bool(robust and same_sign),
             "interest": 4,
-            "split_check": f"Foul minus defend: {100*sde[0]:+.1f} pp in 2012-19 (CI {100*sde[1]:+.1f} to {100*sde[2]:+.1f}), {100*sdl[0]:+.1f} in 2020-26 (CI {100*sdl[1]:+.1f} to {100*sdl[2]:+.1f}).",
+            "split_check": f"Foul minus defend was {100*sde[0]:+.1f} points in 2012-19 (CI {100*sde[1]:+.1f} to {100*sde[2]:+.1f}) and {100*sdl[0]:+.1f} in 2020-26 (CI {100*sdl[1]:+.1f} to {100*sdl[2]:+.1f}).",
             "chart": {
                 "type": "line",
                 "title": f"{L}: leader win % up 3, by seconds left at trailer possession start",
