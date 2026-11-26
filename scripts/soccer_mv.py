@@ -3,7 +3,7 @@
 """Soccer players' estimated market value (xMV) for the Player value tab: what a big-five player should be worth on
 Transfermarkt from what he has done, next to the value Transfermarkt shows and the gap between them.
 
-    python3 scripts/soccer_mv.py --link   # Understat player -> Transfermarkt player (needs the dump), frozen
+    python3 scripts/soccer_mv.py --link   # Understat player -> Transfermarkt player (needs the dump; Reep pairs, scripts/reep_ids.py, fill name misses), frozen
     python3 scripts/soccer_mv.py --expo   # exposure inputs frozen from the dump (UEFA minutes, major-finals days), each summer
     python3 scripts/soccer_mv.py --fit    # snapshots 2015-26, fit + leave-one-season-out backtest, all seasons written
     python3 scripts/soccer_mv.py          # this season (live): Transfermarkt profiles, xMV at the fitted weights
@@ -60,6 +60,17 @@ def snapdate(S, md):
 
 
 # ---------------------------------------------------------------- link
+REEP = os.path.join(HERE, 'data', 'reep_soccer.json.gz')
+
+
+def reep_pairs():
+    """Understat id -> [Transfermarkt ids] from the Reep register (scripts/reep_ids.py); {} when absent"""
+    try:
+        return D.load(REEP).get('us_tm') or {}
+    except (OSError, ValueError):
+        return {}
+
+
 def link():
     """Understat player id -> Transfermarkt player id, through each club-season's league appearances in the dump: a
     club is the Transfermarkt club in that league-season sharing the most names; a player is the one name match in
@@ -80,6 +91,7 @@ def link():
     for r in rows:
         us[(r['lg'], r['S'], r['tid'])].append(r)
     out, club, miss = {}, {}, Counter()
+    reep, via_reep = reep_pairs(), []
     for (lg, S, tid), rs in us.items():
         cands = [(k, v) for k, v in roster.items() if k[0] == TMLG[lg] and k[1] == S]
         keys = {NM.key(r['n']) for r in rs}
@@ -104,9 +116,20 @@ def link():
                 if len(c) == 1:
                     row = c[0]
             if row is None:
+                # Reep's pair (scripts/reep_ids.py), only when that Transfermarkt player played for this club in
+                # this league-season and no one else has him: Reep alone joins namesakes (Karim / Omar Rekik)
+                ids = {x['id'] for x in best[1]}
+                c = [t for t in reep.get(str(r['p']), []) if t in ids]
+                if len(c) == 1:
+                    row = {'id': c[0]}; via_reep.append(r['p'])
+            if row is None:
                 miss[lg] += r['min']
                 continue
             out[r['p']] = row['id']
+    taken = Counter(out.values())
+    for p in via_reep:                                     # a Transfermarkt id already held by a name match stays there
+        if taken[out[p]] > 1:
+            del out[p]
     tot = Counter()
     for r in rows:
         tot[r['lg']] += r['min']
@@ -114,7 +137,7 @@ def link():
     for r in rows:
         if r['p'] in out:
             got[r['lg']] += r['min']
-    print({lg: round(got[lg] / tot[lg], 3) for lg in tot}, len(out), 'linked')
+    print({lg: round(got[lg] / tot[lg], 3) for lg in tot}, len(out), 'linked,', sum(p in out for p in via_reep), 'by Reep')
     dob = {str(i): (str(pl.date_of_birth.get(i))[:10] if isinstance(pl.date_of_birth.get(i), str) else None) for i in set(out.values())}
     with gzip.open(LINK, 'wt') as f:
         json.dump({'note': 'Understat player id -> Transfermarkt player id (scripts/soccer_mv.py --link)', 'p': out,
@@ -637,7 +660,7 @@ def current():
     clubs = sorted({club[(o['lg'], tid.get((o['lg'], o['team'])))] for o in need if (o['lg'], tid.get((o['lg'], o['team']))) in club})
     sq = squads(clubs, S - 1) if clubs else {}
     prof = profiles(sorted({i for c in sq.values() for i in c} | {link[o['p']] for o in J['players'] if o['p'] in link}))
-    new = {}
+    new, reep = {}, reep_pairs()
     for o in need:
         c = club.get((o['lg'], tid.get((o['lg'], o['team']))))
         ros = [{'id': i, 'name': (prof.get(str(i)) or {}).get('name')} for i in sq.get(c, [])]
@@ -647,6 +670,9 @@ def current():
             c2 = [x for x in ros if x['name'] and a and (a <= set(NM.key(x['name']).replace('-', ' ').split()) or
                                                          set(NM.key(x['name']).replace('-', ' ').split()) <= a)]
             row = c2[0] if len(c2) == 1 else None
+        if row is None:                                     # Reep's pair when he is in that squad (see link())
+            c3 = [i for i in reep.get(str(o['p']), []) if i in set(sq.get(c, [])) and i not in set(link.values())]
+            row = {'id': c3[0]} if len(c3) == 1 else None
         if row:
             link[o['p']] = row['id']; new[o['p']] = row['id']
     rows, dobs = [], {}
