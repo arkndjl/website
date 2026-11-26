@@ -22,6 +22,7 @@ _HKEPT = ', '.join(dict.fromkeys(_HKN.get(k, k) for k in _HKF['kept'] if k != 'l
 _NX = ld('data/nba_proj3y_fit.json')['exit']['res']['1.0']
 _RX = ld('data/nba_rxpm_research.json')['metrics']
 _VX = ld('data/nba_vorx_research.json')                         # VORX on rXPM (scripts/nba_vorx_research.py)             # rXPM team adjustment (scripts/nba_rxpm_research.py)
+_NT = ld('data/nba_trade_fit.json')                         # NBA draft-night trades (scripts/nba_draft_trades.py)
 _PX = ld('data/nba_pxpm_research.json')                     # pXPM fit + held-out tests (scripts/nba_pxpm_research.py)
 _NBAEX = (f"Held out 2012-23 ({_NX['n']:,} player seasons, {100 * _NX['exitShare']:.0f}% out of the league): RMSE {_NX['exit_vs_cp']['rmse'][1]:.2f} -> "
           f"{_NX['exit_vs_cp']['rmse'][0]:.2f} (t {_NX['exit_vs_cp']['t']:.1f}, {_NX['exit_vs_cp']['won']}/{_NX['exit_vs_cp']['of']} seasons).")
@@ -646,10 +647,16 @@ sections.append({'id': 'drafts', 'title': 'Drafts and mocks', 'entries': [
       ['Need from the whole NFL position room: rookie-deal draft capital or salary, cut for age and expiring deals.',
        'Penalties for doubling up, a set QB and position runs. QB top-pick premium decays by pick.'],
       'CFB mocks (pick reports)', ['CFB']),
-    E('Trades', 'Projected trades on Massey-Thaler pick values; real traded picks from Wikipedia.',
+    E('Trades', 'Projected trades: NFL on Massey-Thaler pick values; NBA Trade% per pick. Real traded picks from Wikipedia.',
       ['Trades in every round (5, 7, 6, 5, 5, 2, 1 a round); next-year picks at .48 of a mid-round pick.',
-       'Solid tag = traded pick; dashed tag = projected trade.'],
-      'CFB mocks', ['CFB']),
+       'Solid tag = traded pick; dashed tag = projected trade.',
+       f"NBA (Trade%): P(pick changes hands on draft night) from ln pick, its square, round 2 and ln picks the holder has; "
+       f"Wikipedia draft pages {_NT['drafts'][0]}-{_NT['drafts'][1]}, {100 * _NT['rate']:.0f}% of picks traded. Held out by draft: "
+       f"log loss {_NT['held']['ll']:.4f} vs {_NT['held']['llSlot']:.4f} slot only (t {_NT['held']['tSlot']:.1f}, {_NT['held']['wonSlot']}/{_NT['held']['of']}), {_NT['held']['llFlat']:.4f} flat.",
+       f"NBA dashed tag = the likeliest picks a round, as many as the expected count ({_NT['perRound']['R1']['expected']:.1f} R1, {_NT['perRound']['R2']['expected']:.1f} R2).",
+       f"NBA partner FAILED held out (top-3 hit {100 * _NT['partner']['top3']:.0f}% vs {100 * _NT['partner']['top3Uniform']:.0f}% uniform, t {_NT['partner']['t']:.1f}): no partner named. "
+       f"NBA-fit value chart FAILED vs Massey-Thaler ({_NT['curve']['n']} pure-pick deals {_NT['curve']['drafts'][0]}-{_NT['curve']['drafts'][1]}: |ln value ratio| {_NT['curve']['err']:.3f} vs {_NT['curve']['errMT']:.3f}, t {_NT['curve']['t']:.1f}, {_NT['curve']['won']}/{_NT['curve']['of']})."],
+      'CFB and CBB mocks', ['CFB', 'CBB']),
     E('Reach / value', 'A pick the other mock takes 2.5x+ and 16+ picks later (reach) or earlier (value).',
       ['Site table only; the GFX drops the chips.'],
       'Mock tables', ['CFB']),
