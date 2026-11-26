@@ -35,6 +35,10 @@ _STB = ld('data/cbb_recruits.json')['model']['stars']       # CBB star cuts and 
 _STB5 = next(x for x in _STB['plusSweep'] if x['perClass'] == _STB['plusPer'])
 _pc = lambda x: f'{100 * x:.0f}%'
 _AGC = _AG['coverage']['cfb'][max(_AG['coverage']['cfb'])]
+_CX2, _CR = _CX['pxpm2'], _CX['rxpm3']                    # board-form pXPM and rXPM rounds (Nov 26)
+_CXB = dict(zip(ld('data/cbb_xpm_fit.json')['cols2'], zip(ld('data/cbb_xpm_fit.json')['beta2']['o'], ld('data/cbb_xpm_fit.json')['beta2']['d'])))
+import gzip as _gz
+_CW = json.load(_gz.open(ROOT + '/scripts/data/cbb_tabs_2026.json.gz'))   # 2025-26 tabs: WAR fit, Stat+ norms (scripts/cbb_tabs.py --freeze)
 _PX = ld('data/nba_pxpm_research.json')                     # pXPM fit + held-out tests (scripts/nba_pxpm_research.py)
 _NBAEX = (f"Held out 2012-23 ({_NX['n']:,} player seasons, {100 * _NX['exitShare']:.0f}% out of the league): RMSE {_NX['exit_vs_cp']['rmse'][1]:.2f} -> "
           f"{_NX['exit_vs_cp']['rmse'][0]:.2f} (t {_NX['exit_vs_cp']['t']:.1f}, {_NX['exit_vs_cp']['won']}/{_NX['exit_vs_cp']['of']} seasons).")
@@ -274,7 +278,17 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
        'Team context (Nov 3 2026): returning teammates\' WAR, teammates\' recruiting (top 8 -ln rank), WAA, transfer up/down.',
        'Forward 2020-26 RMSE: returners 2.558 -> 2.462 (t 18), newcomers 3.439 -> 3.229 (t 14). Not an FV input.'],
       'CBB board, true freshmen, standouts', ['CBB']),
-    E('pXPM (CBB)', 'Projected Barttorvik BPM next season, O and D, from box score lines only.',
+    E('rXPM (CBB)', 'XPM for a college season: Barttorvik BPM\'s split of credit inside the team, on team totals that track wins.',
+      [re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _t) for _t in ['Per side: rXPM = BPM + team minutes-weighted mean of (GBPM - BPM). GBPM = the minutes-weighted mean of his games\' BPM (Barttorvik).',
+       'Team totals equal GBPM\'s; differences between teammates equal BPM\'s.',
+       f'Team totals, 2007-08 to 2025-26: wins above bubble a game R2 {_CR["team"]["wab_g"]["h"]:.3f} vs BPM {_CR["team"]["wab_g"]["bpm"]:.3f} (t {_CR["team"]["wab_g"]["vsBPM"]["t"]:.1f}, {_CR["team"]["wab_g"]["vsBPM"]["seasonsBetter"]}/19); win% {_CR["team"]["wp"]["h"]:.3f} vs {_CR["team"]["wp"]["bpm"]:.3f} ({_CR["team"]["wp"]["vsBPM"]["seasonsBetter"]}/19). Adjusted margin (BPM\'s own anchor): {_CR["team"]["em"]["h"]:.4f} vs {_CR["team"]["em"]["bpm"]:.4f}.',
+       'Split inside the team (who sat out): game margin, opponent and site adjusted, minus the team\'s season mean, on the minutes-weighted rating of the players who played, ratings from the other games.',
+       f'vs GBPM: all rotation t {_CR["sat"]["A"]["t"]} ({_CR["sat"]["A"]["seasonsBetter"]}/19), starters t {_CR["sat"]["R1"]["t"]} ({_CR["sat"]["R1"]["seasonsBetter"]}/19), split halves t {_CR["sat"]["R2b"]["t"]} ({_CR["sat"]["R2b"]["seasonsBetter"]}/19). vs BPM: identical.',
+       f'Next season (not its job): team R2 {_CR["next"]["h"]["teamR2"]:.3f}, GBPM {_CR["next"]["gbpm"]["teamR2"]:.3f} (t {_CR["nextVsGBPM"]["t"]}), BPM {_CR["next"]["bpm"]["teamR2"]:.3f}; pXPM is the projection.',
+       f'SD {_CR["sd"]["h"]:.2f} (BPM {_CR["sd"]["bpm"]:.2f}); r with BPM {_CR["rBPM"]:.3f}; mean gap {_CR["absBPM"]:.2f}.',
+       'Failed held out: O/D blends of BPM and GBPM, college box weights fit to who sat out, wins or capped-margin anchors, GBPM moved toward raw net rating (schedule artifact).']],
+      'CBB board (XPM), WAR leaders, stats, portal, awards context', ['CBB']),
+    E('pXPM (CBB)', 'Projected XPM next season, O and D: three seasons of box lines, team and recruit rating.',
       [re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _t) for _t in ['Per side: (K x mean of sub-200-minute players + minutes x BPM, last three seasons weighted 1 / w1 / w2) / (K + weighted minutes),',
        'then a fit on next-season BPM: that history, ln minutes, class, and twelve box rates z-scored within the season x minutes / (minutes + 200)',
        '(steal, block, OREB, DREB, assist, turnover, FT rate, 3PA/100, rim share, usage, TS, height), ridge 10 on the rates.',
@@ -284,22 +298,26 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
        f'Roster prior: in place of last-season BPM, next-season team R2 {_CX["roster"]["teamR2"][0]:.3f} -> {_CX["roster"]["teamR2"][1]:.3f} ({_CX["roster"]["pairsBetter"]}/14, t {_CX["roster"]["t"]}); game margin MAE 2016-20 {_CX["game"]["tuneMae"][0]:.4f} -> {_CX["game"]["tuneMae"][1]:.4f} (t {_CX["game"]["tuneT"]}), 2021-26 {_CX["game"]["heldMae"][0]:.4f} -> {_CX["game"]["heldMae"][1]:.4f} (t {_CX["game"]["heldT"]}). xBPM there fails (t {_CX["roster"]["xbpmSwap"]["t"]}).',
        f'FV returner driver: added OOS +{_CX["fv"]["add"]["md5_gain"]:.2f}% (t {_CX["fv"]["add"]["md5_t"]}, 5/5); in place of 3-season BPM t {_CX["fv"]["forBpm3"]["md5"]["t"]}. Nested pseudo-R2 {_CX["fv"]["gate"]["nestedR2"][0]:.3f} -> {_CX["fv"]["gate"]["nestedR2"][1]:.3f}, RPS {_CX["fv"]["gate"]["rps"][0]:.4f} -> {_CX["fv"]["gate"]["rps"][1]:.4f}, 2017-19 top 50 {_CX["fv"]["gate"]["top50_2017_19"][0]:.1f} -> {_CX["fv"]["gate"]["top50_2017_19"][1]:.1f}.',
        f'NBA mock conviction: in place of 3-season BPM t {_CX["mock"]["t"]} ({_CX["mock"]["drafts"]}/15 drafts): kept 3-season BPM.',
-       f'Descriptive (rXPM): no blend or team adjustment beats GBPM on held-out team win% ({_CX["rxpm"]["R1 side blend"]["gbpm"]:.3f}; team-adjusted {_CX["rxpm"]["R2 GBPM team-adjusted"]["after"]:.3f}, BPM {_CX["rxpm"]["R1 side blend"]["bpm"]:.3f}). WAR stays on GBPM.']],
-      'CBB FV (returners), roster prior / game model', ['CBB']),
+       f'Board form (Nov 26 2026) adds team context (5 x minutes-weighted mean side BPM of his team / 10; O {_CXB["ctx"][0]:.2f}, D {_CXB["ctx"][1]:.2f}) and recruit rating / 100 by class (Fr O {_CXB["rec_fr"][0]:.2f} D {_CXB["rec_fr"][1]:.2f}, So {_CXB["rec_so"][0]:.2f} / {_CXB["rec_so"][1]:.2f}, Jr+ {_CXB["rec_up"][0]:.2f} / {_CXB["rec_up"][1]:.2f}).',
+       f'Walk-forward: team R2 {_CX2["v1"]["teamR2"]:.3f} -> {_CX2["teamR2"]:.3f} ({_CX2["vsV1"]["pairsBetter"]}/14, t {_CX2["vsV1"]["t"]}); vs BPM {_CX2["bpm"]["teamR2"]:.3f} ({_CX2["vsBPM"]["pairsBetter"]}/14, t {_CX2["vsBPM"]["t"]:.1f}); player r {_CX2["playerR"]:.3f}, RMSE {_CX2["playerRMSE"]:.2f}.',
+       f'Alone: team context t {_CX2["blocks"]["F3"]["t"]}, recruit rating t {_CX2["blocks"]["F2"]["t"]}. Failed: late-season form, age, role and freshman height, minutes share and its change, game BPM consistency (t {min(_CX2["blocks"][k]["t"] for k in ("F4", "F5", "F6", "F7"))} to {_CX2["blocks"]["F1"]["t"]} alone, nothing once the two are in).',
+       f'Board form in the roster prior: {_CX2["roster"]["teamR2"][0]:.3f} -> {_CX2["roster"]["teamR2"][1]:.3f} ({_CX2["roster"]["pairsBetter"]}/14, t {_CX2["roster"]["t"]}); as FV driver in place of the box form t {_CX2["fvSwap"]["md5"]["t"]}: FV and the game model stay on the box form.',
+       'Descriptive counterpart: rXPM (CBB).']],
+      'CBB pXPM leaders, portal, board hover; box form: FV (returners), roster prior / game model', ['CBB']),
     E('CBB WAR / WAA', 'Wins over a replacement / average D-I player.',
-      ['WAR = (sGBPM + 1.6) x minutes / 40 x 68 possessions a 40 / 100 x .0186 wins a point; WAA uses sGBPM.',
-       'GBPM = Barttorvik game BPM, the minutes weighted mean of his games\' BPM. sGBPM = (GBPM x min + 100 x season mean) / (min + 100).',
-       'Replacement 1.6 below average = the 9th man\'s sGBPM (2025-26). Wins a point fit on 3,485 team seasons 2017-26:',
-       'wins = .38 x games + team WAR (r .87; season BPM gave .86). Season only: no earlier season enters a season\'s WAR.',
+      [re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _t) for _t in [f'WAR = (sXPM + 1.4) x minutes / 40 x 68 possessions a 40 / 100 x {_CW["wfit"]["wpp"]:.4f} wins a point; WAA uses sXPM.',
+       'XPM = rXPM (CBB). sXPM = (XPM x min + 100 x season mean) / (min + 100).',
+       f'Replacement 1.4 below average = the 9th man\'s sXPM (2025-26). Wins a point fit on {_CW["wfit"]["teams"]:,} team seasons 2017-26:',
+       f'wins = {_CW["wfit"]["a"]:.2f} x games + team WAR (r {_CW["wfit"]["r"]:.2f}). Season only: no earlier season enters a season\'s WAR.',
        'Nov 24 2026: GBPM over season BPM, held out team win% R2 .633 to .658, 15 of 15 seasons; shrink: half B GBPM MSE 16.2 to 11.4',
-       '(10 of 10), held out team wins RMSE 3.348 to 3.331 (14 of 14). Season BPM stays the predictive input (next season .643 vs .612).',
+       '(10 of 10), held out team wins RMSE 3.348 to 3.331 (14 of 14). Nov 26 2026: rXPM over GBPM (same team totals, BPM\'s split inside the team).',
        'The textbook slope (.0347 at margin sd 11.5) overstates: schedules pair strong with strong and win odds flatten at the ends.',
-       'FV test: WAR, WAA, career and 5/4/3 WAR fail.'],
+       'FV test: WAR, WAA, career and 5/4/3 WAR fail.']],
       'CBB WAR leaders, stats, portal, returning', ['CBB']),
-    E('Stat+ (CBB)', 'BPM against the position: 100 + 25 x z.',
-      ['z = (BPM - position mean) / position sd. Tabs: last season\'s norms (G -.23 / 3.84, F .57 / 4.13, C 1.71 / 4.56),',
-       'then this season\'s own once 40 players a position qualify. FV driver norms: G .10 / 3.85, F .50 / 4.05, C .52 / 4.31 (2008-16).',
-       'FV driver (Nov 3 2026): passes three fold rules (t 2.9-3.5, 4-5/5), held 2017-19 (+.17) and forward 2020-23 (+.26).'],
+    E('Stat+ (CBB)', 'XPM against the position: 100 + 25 x z.',
+      [re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _t) for _t in [f'z = (XPM - position mean) / position sd. Tabs: last season\'s norms (G {_CW["norms"]["G"][0]:.2f} / {_CW["norms"]["G"][1]:.2f}, F {_CW["norms"]["F"][0]:.2f} / {_CW["norms"]["F"][1]:.2f}, C {_CW["norms"]["C"][0]:.2f} / {_CW["norms"]["C"][1]:.2f}),',
+       'then this season\'s own once 40 players a position qualify. FV driver: BPM, norms G .10 / 3.85, F .50 / 4.05, C .52 / 4.31 (2008-16).',
+       'FV driver (Nov 3 2026): passes three fold rules (t 2.9-3.5, 4-5/5), held 2017-19 (+.17) and forward 2020-23 (+.26).']],
       'CBB stats, WAR leaders, portal; FV inputs', ['CBB']),
     E('Game Score', 'Hollinger single-game value.',
       ['PTS + .4 FGM - .7 FGA - .4 (FTA - FTM) + .7 ORB + .3 DRB + STL + .7 AST + .7 BLK - .4 PF - TOV.',

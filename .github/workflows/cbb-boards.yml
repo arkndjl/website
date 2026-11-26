@@ -33,6 +33,10 @@ jobs:
       - name: Regrade the board on them
         # in season the same run as cbb-board.yml (this season's lines blended in); a failed run keeps the board
         run: python3 scripts/cbb_live.py || echo "board not regraded"
+      # cbb_live.py rewrites the board file without the XPM / pXPM columns: put them back (scripts/cbb_tabs.py board_cols)
+      - name: XPM columns
+        continue-on-error: true
+        run: python3 scripts/cbb_tabs.py --cols
       - name: Re-draft the three mocks
         run: python3 scripts/cbb_mock.py --daily || echo "mock draft not updated"
       # weekly moves on the player boards: each row gets its metric as of 7 days back (scripts/board_moves.py)

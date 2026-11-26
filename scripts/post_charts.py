@@ -6,7 +6,8 @@ data/post_charts.json {id: {svg, legend}} and placed with {{< postchart "<id>" >
     python3 scripts/post_charts.py
 
 xpm-*: the XPM stabilization post, from data/nba_xpm_stability_research.json and the pXPM shrink fits
-(old k 600 = nba_xpm.SHRINK_K; next-season RMSEs and the new pXPM from scripts/nba_pxpm_research.py)."""
+(old k 600 = nba_xpm.SHRINK_K; next-season RMSEs and the new pXPM from scripts/nba_pxpm_research.py).
+cbb-*: the college XPM post, from data/cbb_xpm_research.json."""
 import json, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
 import library_build as LB
@@ -54,10 +55,25 @@ def xpm_charts():
     return out
 
 
+def cbb_xpm_charts():
+    """cbb-*: the college XPM post, from data/cbb_xpm_research.json (pxpm2, rxpm3: scripts/research/cbb_xpm_nov26)"""
+    d = json.load(open(os.path.join(ROOT, 'data', 'cbb_xpm_research.json'))); P, H = d['pxpm2']['byPair'], d['rxpm3']
+    out = {}
+    out['cbb-pxpm-pairs'] = {'legend': ['pXPM', 'BPM'], 'svg': LB.chart_svg({
+        'title': 'Next-season team strength R2 by season projected', 'y_fmt': 'num', 'x_label': 'season projected (spring year)', 'y_label': 'R2',
+        'series': [{'points': [{'x': int(k) + 1, 'y': P[n][k]} for k in sorted(P[n])]} for n in ('pxpm', 'bpm')]})}
+    W = H['team']['wab_g']['bySeason']
+    out['cbb-rxpm-wab'] = {'legend': ['XPM', 'BPM'], 'svg': LB.chart_svg({
+        'title': 'Team wins above bubble R2 by season', 'y_fmt': 'num', 'x_label': 'season (spring year)', 'y_label': 'R2',
+        'series': [{'points': [{'x': int(k), 'y': W[n][k]} for k in sorted(W[n])]} for n in ('h', 'bpm')]})}
+    return out
+
+
 if __name__ == '__main__':
     fn = os.path.join(ROOT, 'data', 'post_charts.json')
     try: allc = json.load(open(fn))
     except (OSError, ValueError): allc = {}
     allc.update(xpm_charts())
+    allc.update(cbb_xpm_charts())
     json.dump(allc, open(fn, 'w'), indent=1)
     print(sorted(allc))

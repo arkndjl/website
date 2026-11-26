@@ -380,10 +380,10 @@
   "ab": "WAR",
   "name": "CBB wins above replacement",
   "f": [
-   "(BPM + 2) × MIN / 40 × .68 × .0143"
+   "(XPM + 1.4) × MIN / 40 × .68 × .0187"
   ],
-  "n": "-2.0",
-  "nl": "replacement BPM · 9th man"
+  "n": "-1.4",
+  "nl": "replacement XPM · 9th man"
  },
  "NHL WAR": {
   "ab": "WAR",
@@ -681,5 +681,42 @@
   "f": [
    "share of the game with the win in hand"
   ]
+ },
+ "rXPM (CBB)": {
+  "ab": "XPM",
+  "name": "CBB XPM (rXPM)",
+  "f": [
+   "BPM + team mean of (GBPM − BPM)"
+  ],
+  "bars": [
+   [
+    "XPM",
+    0.888
+   ],
+   [
+    "BPM",
+    0.88
+   ]
+  ],
+  "bl": "team wins above bubble R²"
+ },
+ "pXPM (CBB)": {
+  "ab": "pXPM",
+  "name": "CBB predictive XPM",
+  "f": [
+   "3-season BPM, shrunk, + box profile",
+   "+ team context + recruit rating"
+  ],
+  "bars": [
+   [
+    "pXPM",
+    0.746
+   ],
+   [
+    "BPM",
+    0.642
+   ]
+  ],
+  "bl": "next-season team R²"
  }
 }

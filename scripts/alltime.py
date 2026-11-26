@@ -301,7 +301,7 @@ def tennis_players(tour):
 
 
 def cbb_players():
-    """site CBB WAR (scripts/cbb_tabs.py: (shrunk GBPM - REPL) x minutes / 40 x .68 x wins a point; GBPM shrunk GBPM_K
+    """site CBB WAR (scripts/cbb_tabs.py: (shrunk rXPM - REPL) x minutes / 40 x .68 x wins a point; rXPM shrunk GBPM_K
     minutes toward that season's minutes-weighted mean, Nov 24 2026 port round) on every Barttorvik season 2008-"""
     import cbb_data, cbb_tabs
     wpp = json.load(gzip.open(os.path.join(HERE, 'data', f'cbb_tabs_2026.json.gz')))['wfit']['wpp']
@@ -314,11 +314,13 @@ def cbb_players():
             try: gb = float(r['gbpm'])
             except (ValueError, KeyError): gb = bpm
             rows.append((r, bpm, gb, gp * mpg, y))
-    num, den = defaultdict(float), defaultdict(float)
-    for _, _, gb, m, y in rows: num[y] += gb * m; den[y] += m
+    num, den, sh = defaultdict(float), defaultdict(float), defaultdict(lambda: [0.0, 0.0])
+    for r, bpm, gb, m, y in rows:
+        num[y] += gb * m; den[y] += m; q = sh[(r['team'], y)]; q[0] += (gb - bpm) * m; q[1] += m
     out = []
     for r, bpm, gb, m, y in rows:
-        x = cbb_tabs.wx({'gbpm': gb}, m, num[y] / den[y] if den[y] else None)
+        q = sh[(r['team'], y)]     # rXPM (Nov 26 2026): BPM plus the team's minutes-weighted mean (GBPM - BPM), scripts/cbb_xpm.py
+        x = cbb_tabs.wx({'xpm': bpm + (q[0] / q[1] if q[1] else 0.0)}, m, num[y] / den[y] if den[y] else None)
         war = (x - cbb_tabs.REPL) * m / 40 * .68 * wpp
         out.append(dict(id=r['pid'], n=r['name'], y=y, tm=r['team'], pos=None, v=war, raw=round(bpm, 1), w=m))
     return out
