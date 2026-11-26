@@ -20,7 +20,7 @@ DAYS = 7
 # shows the week since the one before. Not listed: a rolling 7 days.
 # CS2 and tennis count from Monday (Noah, Nov 26 2026): a Sunday / Saturday cut fell before the weekend's finals, and the
 # tennis tour feed turns over on Monday
-POST = {'soccer': 0, 'soccerp': 0, 'cs2': 0, 'tennis': 0, 'tennisp': 0, 'nfl': 1, 'cfb': 2, 'cbb': 3, 'nba': 4, 'nbaproj': 4, 'nhl': 5, 'hockey': 5}
+POST = {'soccer': 0, 'soccerm': 0, 'soccerb': 0, 'soccerp': 0, 'cs2': 0, 'tennis': 0, 'tennisp': 0, 'nfl': 1, 'cfb': 2, 'cbb': 3, 'nba': 4, 'nbaproj': 4, 'nhl': 5, 'hockey': 5}
 # the posts go out in the morning, New York time: from this hour on a post day the board belongs to the next week, so the
 # post's base is the board as posted (the last snapshot before this hour) and the moves restart from it
 POST_HOUR = 10
