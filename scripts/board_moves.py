@@ -1,6 +1,6 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Weekly movement on the player and prospect boards: each row gets its board metric as of the sport's last weekly
-post day (scripts/rank_moves.py POST: soccer Mon, NFL Tue, CFB Wed, CBB Thu, NBA Fri, tennis + NHL Sat, CS2 Sun, as posted; on the post day
+post day (scripts/rank_moves.py POST: soccer + CS2 + tennis Mon, NFL Tue, CFB Wed, CBB Thu, NBA Fri, NHL Sat, as posted; on the post day
 itself, the one a week back), or 7 days back for a board with no post day.
 
 Run after a board's builders, before the commit. Each board keeps its history in scripts/data/moves/<board>.json
@@ -14,6 +14,7 @@ re-rank the rows in view by `w0` and show the rank change, so the move counts wi
   python3 scripts/board_moves.py --seed         rebuild every history from git (needs a non-shallow fetch)
   python3 scripts/board_moves.py r-* cbb-*      the view tables (rookies-shaped tabs, VIEWS): rows get `w0`, one
                                                 value per view in the season's `wkV`, the season gets `wkFrom`
+  python3 scripts/board_moves.py --check        every board with a base this week carries w0 (the build gate)
   python3 scripts/board_moves.py --test         self-check
 """
 import datetime as dt
@@ -44,19 +45,41 @@ def _num(v):
 
 
 # board -> (data file (relative; a glob takes the newest season file), [(list path, id field, value field[, rank])])
+# the value field is the metric the board ranks by in its default view, so the move is in the column the board leads with
 # a list path is keys into the file. rank: the page renders server-side and ranks by the value, so the rows also get
 # `wr`, their rank by w0 among the board's rows (the rank change = wr - rk)
 BOARDS = {
     'cbb': ('static/data/cbb-all.json', [((), ('name', 'team'), 'fv')]),
-    'nfl': ('static/data/nfl-war.json', [(('players',), 'id', 'waa')]),
+    'nfl': ('static/data/nfl-war.json', [(('players',), 'id', 'xv')]),          # the board's lead (XV; WAA until Nov 26 2026)
     'nba': ('static/data/nba-xpm/20*.json', [(('players',), 'id', 'vorx')]),
     'nhl': ('static/data/nhl-war/20*.json', [(('players',), 'id', 'war')]),
-    'soccer': ('static/data/soccer-war/20*.json', [(('players',), 'p', 'gar')]),
+    'nbaproj': ('static/data/nba-proj.json', [(('players',), 'id', 'pxpm')]),    # the NBA board's XPM (proj) and 3Y views
+    'soccer': ('static/data/soccer-war/20*.json', [(('players',), 'p', 'svar')]),   # the board's lead (SVAR; GAR until Nov 26 2026)
     'hockey': ('data/hockey.json', [(('board',), 'name', 'fv'), (('pipe',), 'id', 'fv')]),
     'soccerp': ('data/soccer_prospects.json', [(('board',), 'id', 'fv')]),
     'tennisp': ('data/tennis_prospects.json', [(('atp', 'board'), 'id', 'fv'), (('wta', 'board'), 'id', 'fv')]),
     'cs2': ('data/cs2_players.json', [(('board',), 'id', 'rwa', True), (('prospects',), 'id', 'fv')]),
 }
+
+
+# the boards' other views (the side buttons: pXPM, XPM, O / D ...): board -> (list path, [value fields]). Each row gets
+# `wx`, {field: value as of the base}, beside `w0`, so the page shows the move in whichever view is open
+EXTRA = {
+    'nfl': (('players',), ['pxp']),
+    'nba': (('players',), ['txpm', 'sxpm', 'toxpm', 'tdxpm']),     # the board shows the team-adjusted XPM (txpm) as XPM
+    'nbaproj': (('players',), ['p3']),
+    'nhl': (('players',), ['pwar', 'p3', 'hpm', 'o', 'd']),
+}
+
+
+def full_spec(board):
+    """the board's lists plus one pseudo-list per extra view field (name '<path>@<field>')"""
+    spec = list(BOARDS[board][1])
+    if board in EXTRA:
+        path, fields = EXTRA[board]
+        idf = next(i for p_, i, *_ in spec if p_ == path)
+        spec += [(path, idf, f, False, f) for f in fields]
+    return spec
 
 
 # FV boards: the files that set the grades (fit, display scale, the script that writes the board). A change in their
@@ -126,7 +149,9 @@ def lists(d, spec):
             x = x.get(k) or {}
         rows = x.get(path[-1])
         if isinstance(rows, list):
-            yield x, rows, lambda r, k: r.get(k), lambda r, k, v: r.__setitem__(k, v), idf, val, '.'.join(path), bool(rk)
+            ex = rk[1] if len(rk) > 1 else None      # an extra view field (EXTRA): its base goes in the row's `wx`
+            yield (x, rows, lambda r, k: r.get(k), lambda r, k, v: r.__setitem__(k, v), idf, val,
+                   '.'.join(path) + ('@' + ex if ex else ''), bool(rk and rk[0]))
 
 
 def rid(get, r, idf):
@@ -190,8 +215,18 @@ def step(h, cur, day, days=DAYS, fv=(), sport=None, model=None):
 
 
 def mark(d, spec, base, since):
+    for _, rows, *_ in lists(d, spec):
+        for r in rows:
+            if isinstance(r, dict):
+                r.pop('wx', None)
     for holder, rows, get, put, idf, val, name, rk in lists(d, spec):
         b = (base or {}).get(name) or {}
+        if '@' in name:                     # an extra view: wx[field]
+            for r in rows:
+                v = b.get(rid(get, r, idf)) if since else None
+                if v is not None:
+                    r.setdefault('wx', {})[val] = v
+            continue
         for r in rows:
             v = b.get(rid(get, r, idf)) if since else None
             if v is not None or get(r, 'w0') is not None:
@@ -326,6 +361,32 @@ def vupdate(board, day=None, d=None, h=None, write=True):
     return d, h
 
 
+def check():
+    """the build gate's check (scripts/check_build.py --hugo): a board or view table whose history holds a base for this
+    week (a snapshot on or before the post day) must carry `w0`. A builder run without this script after it drops the
+    column from the page without any error (CBB Nov 16 and Nov 26 2026, the CFB true freshmen tab). -> [errors]"""
+    errs = []
+    for b in list(BOARDS) + list(VIEWS):
+        view = b in VIEWS
+        pat, sport = (VIEWS[b][0], VIEWS[b][1]) if view else (BOARDS[b][0], b)
+        path = latest(pat) if '*' in pat else pat
+        h = load_hist(b)
+        if not path or not os.path.exists(os.path.join(ROOT, path)) or not h.get('hist'):
+            continue
+        d = json.load(open(os.path.join(ROOT, path), encoding='utf-8'))
+        S = (d.get('seasons') or [None])[0] if view else None
+        if h.get('season') != (str(S.get('s')) if view and S else None if view else season_of(d, path)):
+            continue                                    # a new season: the next run starts the history over
+        day = et_today(sport)
+        if not any(k <= cutoff(day, sport).isoformat() and k < day.isoformat() for k in h['hist']):
+            continue                                    # no base yet
+        n = sum('w0' in r for r in S['rows']) if view else \
+            sum(1 for _, rows, get, *_ in lists(d, BOARDS[b][1]) for r in rows if get(r, 'w0') is not None)
+        if not n:
+            errs.append(f'{path}: no weekly moves (w0) on any row; run `python3 scripts/board_moves.py {b}` after the builder')
+    return errs
+
+
 def load_hist(board):
     p = os.path.join(HIST, board + '.json')
     return json.load(open(p)) if os.path.exists(p) else {}
@@ -338,7 +399,7 @@ def save_hist(board, h):
 
 
 def update(board, day=None, d=None, h=None, write=True):
-    pat, spec = BOARDS[board]
+    pat, spec = BOARDS[board][0], full_spec(board)
     path = latest(pat) if '*' in pat else pat
     if not path or not os.path.exists(os.path.join(ROOT, path)):
         print(board, 'no data file'); return None
@@ -357,7 +418,7 @@ def update(board, day=None, d=None, h=None, write=True):
         with open(full, 'w', encoding='utf-8') as f:       # the builders' format: compact, UTF-8 as is
             f.write(json.dumps(d, separators=(',', ':'), ensure_ascii=False, allow_nan=False) + ('\n' if raw.endswith('\n') else ''))
         save_hist(board, h)
-        n = sum(1 for _, rows, get, *_ in lists(d, spec) for r in rows if get(r, 'w0') is not None)
+        n = sum(1 for _, rows, get, *_ in lists(d, BOARDS[board][1]) for r in rows if get(r, 'w0') is not None)
         print(board, path, 'from', since, 'snapshots', len(h['hist']), 'rows with w0', n)
     return d, h
 
@@ -381,7 +442,7 @@ def seed(boards):
     since = (et_today() - dt.timedelta(days=DAYS + 3)).isoformat()
     for board in boards:
         today = et_today(board)
-        pat, spec = BOARDS[board]
+        pat, spec = BOARDS[board][0], full_spec(board)
         path = latest(pat) if '*' in pat else pat
         if not path:
             continue
@@ -501,6 +562,10 @@ if __name__ == '__main__':
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
     if '--test' in sys.argv:
         test()
+    elif '--check' in sys.argv:
+        errs = check()
+        print('\n'.join(errs) or 'board_moves check ok')
+        sys.exit(1 if errs else 0)
     elif '--seed' in sys.argv:
         seed([b for b in args or list(BOARDS) if b in BOARDS])
         vseed([b for b in args or list(VIEWS) if b in VIEWS])

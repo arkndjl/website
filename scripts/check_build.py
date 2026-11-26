@@ -143,6 +143,13 @@ def check_1nt_sync():
     return errs, []
 
 
+def check_moves():
+    """the weekly move columns: a board file rewritten without scripts/board_moves.py loses them silently"""
+    sys.path.insert(0, os.path.join(ROOT, 'scripts'))
+    import board_moves
+    return board_moves.check()
+
+
 def check_hugo():
     hugo = shutil.which('hugo') or os.environ.get('HUGO')
     if not hugo: return ['hugo not found (set HUGO or put it on PATH)']
@@ -159,7 +166,7 @@ if __name__ == '__main__':
     e2, warns = check_sizes(); errs += e2 + check_pairs() + check_cbb_mean() + check_awards()
     e3, w3 = check_fv_scale(); errs += e3; warns += w3
     e4, w4 = check_1nt_sync(); errs += e4; warns += w4
-    if '--hugo' in sys.argv[1:]: errs += check_teams()
+    if '--hugo' in sys.argv[1:]: errs += check_teams() + check_moves()
     if '--hugo' in sys.argv[1:] and not errs: errs += check_hugo()
     for w in warns: print('warning:', w)
     for e in errs: print('FAIL:', e)

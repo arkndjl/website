@@ -49,7 +49,7 @@
       <thead><tr>
         <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, in the order of the view">RK</th>
         <th data-sort="n">Player</th>
-        <th data-sort="wk" data-num title="± = rank change in WAR since the last Saturday post, within the filters; hover for the rank and WAR then. WAR view, current season">±</th>
+        <th data-sort="wk" data-num title="± = rank change in the view's key (WAR, pWAR, HPM ...) since the last Saturday post, within the filters; hover for the rank and the value then. current season">±</th>
         <th data-sort="war" data-num class="c-vorx" title="WAR: wins over replacement this season, at goal value: on-ice xG relative to teammates, finishing, power play and penalty kill, penalties, a share of the team's xG; goalies GSAx at 1. Adds up to team goal differential. Replacement = the players outside each team's top 13 forwards / 7 defencemen / 2 goalies">WAR</th>
         <th data-sort="pos" class="cfb__g" title="position, rank at position within the filters and view">Pos</th>
         <th data-sort="tm" class="nbaxpm__team">Team</th>
@@ -142,7 +142,9 @@
     }).sort(function (a, b) { return (b[key] == null ? -1e9 : b[key]) - (a[key] == null ? -1e9 : a[key]) || b.toi - a.toi; });
     var pr = {};
     list.forEach(function (p, i) { p.rk = i + 1; p.pr = (pr[p.pos] = (pr[p.pos] || 0) + 1); });
-    var wkf = side === '' ? data.wkFrom : null; __wk.rank(list); __wk.show(win, wkf);
+    var wkf = data.wkFrom, WL = { war: 'WAR', pwar: 'pWAR', p3: '3Y', hpm: 'HPM', o: 'O', d: 'D' };   // ± follows the view's key
+    __wk.rank(list, 'rk', key === 'war' ? null : key); if (!list.some(function (p) { return p.wb != null; })) wkf = null;   // a view with no base yet: no column
+    __wk.show(win, wkf);
     var shown = list.length;
     if (sortKey !== 'rk') {
       var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
@@ -168,7 +170,7 @@
       var c = {
         rk: '<td class="cfb__rk">' + p.rk + '</td>',
         n: '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p, 'n') + ' <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + p.toi + ' min' + medals(p, 't') + '</span></td>',
-        wk: __wk.rk(p, wkf, 'WAR', null, p.war),
+        wk: p[key] == null && wkf ? __wk.none : __wk.rk(p, wkf, WL[key] || key, null, p[key]),
         war: '<td class="cfb__num c-vorx nbaxpm__v' + k('war') + '">' + p.war.toFixed(1) + '</td>',
         g60: '<td class="cfb__num">' + (p.g60 == null ? '' : sg2(p.g60)) + '</td>',
         pwar: '<td class="cfb__num c-vorx nbaxpm__v' + k('pwar') + '">' + (p.pwar == null ? '' : p.pwar.toFixed(1)) + '</td>',

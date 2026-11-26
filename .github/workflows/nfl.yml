@@ -75,7 +75,13 @@ jobs:
           ev, sched = os.environ['EVENT'], os.environ['SCHED']
           if ev == 'workflow_run':
               go = now.month in (9, 10, 11, 12, 1, 2) and age('data/nfl_games.json') >= dt.timedelta(hours=3)
-              refresh = age('data/nfl_war.json') < dt.timedelta(hours=20)
+              # the first following run of the New York morning (6 AM on) is a full one, so last night's game is on the
+              # board before the morning post and the weekly moves' 10 AM cut (the 11:27 UTC cron has started 5-10 hours
+              # late all November, and the 20-hour rule alone held Monday night's game off the board until Tuesday afternoon)
+              from zoneinfo import ZoneInfo
+              et = now.astimezone(ZoneInfo('America/New_York'))
+              morning = et.hour >= 6 and age('data/nfl_war.json') > et - et.replace(hour=6, minute=0, second=0, microsecond=0)
+              refresh = age('data/nfl_war.json') < dt.timedelta(hours=20) and not morning
           else:
               go = True
               refresh = sched in ('47 22 * 9-12,1,2 *', '17 3 * 9-12,1,2 *', '7 19 * 9-12,1,2 0', '41 16 * 9-12,1,2 0', '3 20 * 9-12,1,2 0', '57 23 * 9-12,1,2 0,1') or os.environ['MANUAL_REFRESH'] == 'true'
