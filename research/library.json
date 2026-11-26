@@ -296,13 +296,31 @@
     },
     {
      "term": "ARK stars",
-     "short": "Recruit star rating cut from the projected FV, not the industry stars.",
+     "short": "Recruit star rating cut on what past recruits with the same profile became, not the industry stars.",
      "body": [
-      "CFB: 5-star+ top 6 a class, 5 top 3% of board FV, 4 top 10%, 3 above median, 2 on board, 1 off board (year-3 xFV).",
-      "CBB: 5 = 2+ NBA seasons as a starter, 4 = reached the NBA, 3 = D-I starter at BPM +3, 2 = played D-I, 1 = did not.",
-      "Arrow = ARK stars minus industry stars."
+      "CFB: cut on the recruit index (expected NFL outcome, 2011-19 classes). A class holds about 34 five-stars, 102 four-stars, 265 three-stars.",
+      "CFB drafted, held out: 5-star+ 79%, 5-star 55%, 4-star 29%, 3-star 18%, 2-star 9%, 1-star 3%.",
+      "CBB: cut on FV. 5 = 2+ NBA seasons as a starter, 4 = reached the NBA, 3 = D-I starter at BPM +3, 2 = played D-I, 1 = did not.",
+      "Half stars inside each tier. Arrow = ARK stars minus industry stars."
      ],
-     "where": "Recruits tabs",
+     "where": "Recruits tabs; recruit cards",
+     "sports": [
+      "CFB",
+      "CBB"
+     ]
+    },
+    {
+     "term": "5-star+",
+     "short": "The tier above five stars: recruits at even odds or better of the top pro outcome.",
+     "body": [
+      "CFB: a five-star with a 50%+ chance of a top-64 pick. About 6 a class; held out 57% went top 64, 79% were drafted (plain five-stars 29%, 55%).",
+      "The chance reads the recruit index, the log industry rank and the industry rating past 95. Held out by class 2011-21: school-clustered t 2.22, 9/11 classes; 2022 class 4 of 4 top-64.",
+      "Top 3 a class, top-64 rate: 79% with the industry terms, 58% index alone, 70% industry rank. Top 6: 55%, 52%, 55%.",
+      "CBB: FV 41.43+, about 5 a class. Held out 62% became NBA starters (2+ seasons), 42% FV 55+ (plain five-stars 26%).",
+      "CBB line re-tested on the same even-odds rule: a line at FV 43.5 (3.2 a class) hits 69%, but the recruits between the two lines hit 50% and the six-tier R2 falls 0.318 to 0.297. Line kept.",
+      "Position at the top failed in both: CFB quarterback and line flags t -0.63, CBB big and point-guard flags t -0.92."
+     ],
+     "where": "Recruits tabs; recruit cards",
      "sports": [
       "CFB",
       "CBB"

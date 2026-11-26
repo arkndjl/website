@@ -3369,7 +3369,7 @@ table.trophycase__hist td.trophycase__post {
 }
 .gfx__win { margin: 0; width: min(1100px, 100%); max-height: calc(100vh - 32px); display: flex; flex-direction: column; }
 .gfx__body { margin: 10px 12px 0; padding: 2px; overflow: auto; background: var(--win-well); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); }
-.gfx__body img { display: block; width: 100%; height: auto; max-height: calc(100vh - 160px); object-fit: contain; margin: 0; image-rendering: pixelated; }
+.gfx__body img, .gfx__body canvas { display: block; width: 100%; height: auto; max-height: calc(100vh - 160px); object-fit: contain; margin: 0; image-rendering: pixelated; }
 .gfx__bar { display: flex; gap: 8px; justify-content: flex-end; padding: 10px 12px 12px; }
 .gfx__bar a.cfb__btn { text-decoration: none; }
 @media (max-width: 684px) { .cfb__gfx { margin-left: 0; } }
@@ -4073,11 +4073,18 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 .cfbrc__dstar { font-size: 0.75em; margin-left: 3px; }
 @media (max-width: 684px) { .cfbrc__ark { width: 75px; height: 13.5px; vertical-align: -2px; -webkit-mask-size: 15px 13.5px; mask-size: 15px 13.5px; } .cfbrc__ark i { width: calc(var(--n) * 15px); } }
 .games__gfx { float: right; margin-left: 8px; padding: 0 6px; font-size: 0.9em; }
-/* 5-star+: teal like every ARK star, set apart by a white pixel outline and a teal glow (the filter sits on a
-   wrapper, since a mask would clip it); lilac stays the industry's colour */
-.cfbrc__glow { display: inline-flex; align-items: center; white-space: nowrap;
-  filter: drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff) drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff) drop-shadow(0 0 4px var(--foreground)); }
-.cfbrc__plus { margin-left: 4px; font-size: 1.25em; line-height: 1; color: var(--foreground); font-weight: bold; }
+/* 5-star+: its own colour, teal to lilac through white, moving a pixel step at a time; a dark pixel outline, a lilac
+   glow and a white pixel glint that blinks by the plus (the filter sits on a wrapper, since a mask would clip it).
+   Plain ARK stars stay flat teal, the industry's flat lilac. Cards draw the same (assets/js/gfx.js plusStars). */
+.cfbrc__glow { position: relative; display: inline-flex; align-items: center; white-space: nowrap;
+  filter: drop-shadow(1px 0 0 #241a3a) drop-shadow(-1px 0 0 #241a3a) drop-shadow(0 1px 0 #241a3a) drop-shadow(0 -1px 0 #241a3a) drop-shadow(0 0 3px #c8c7ff); }
+.cfbrc__ark.is-plus i { background: linear-gradient(90deg, #7fffd4 0 28%, #fff 40%, #c8c7ff 54% 84%, #7fffd4 100%) 0 0 / 200px 100% repeat-x; animation: arkplus 3s steps(20) infinite; }
+.cfbrc__plus { position: relative; margin-left: 4px; font-size: 1.25em; line-height: 1; color: #fff; font-weight: bold; }
+.cfbrc__plus::after { content: ""; position: absolute; top: -1px; right: -5px; width: 2px; height: 2px; background: #fff;
+  box-shadow: 0 -2px #fff, 0 2px #fff, -2px 0 #fff, 2px 0 #fff; animation: arkglint 3s steps(1) infinite; }
+@keyframes arkplus { to { background-position: -200px 0; } }
+@keyframes arkglint { 0%, 100% { opacity: 0; } 55% { opacity: 1; box-shadow: none; } 65% { opacity: 1; box-shadow: 0 -2px #fff, 0 2px #fff, -2px 0 #fff, 2px 0 #fff; } 80% { opacity: 1; box-shadow: none; } 88% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .cfbrc__ark.is-plus i, .cfbrc__plus::after { animation: none; } .cfbrc__plus::after { opacity: 0; } }
 .cfbm__method { margin: 6px 0; text-align: right; }
 .cfbm__first { margin: 6px 0; font-size: .9em; overflow-wrap: anywhere; }
 .cbb__old{color:var(--muted,#9a8fb5);font-size:.85em}
