@@ -1,6 +1,6 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Weekly movement on the player and prospect boards: each row gets its board metric as of the sport's last weekly
-post day (scripts/rank_moves.py POST: soccer Mon, NFL Tue, CFB Wed, CBB Thu, NBA Fri, tennis + NHL Sat, CS2 Sun, as posted; on the post day
+post day (scripts/rank_moves.py POST: soccer + CS2 + tennis Mon, NFL Tue, CFB Wed, CBB Thu, NBA Fri, NHL Sat, as posted; on the post day
 itself, the one a week back), or 7 days back for a board with no post day.
 
 Run after a board's builders, before the commit. Each board keeps its history in scripts/data/moves/<board>.json
@@ -53,12 +53,33 @@ BOARDS = {
     'nfl': ('static/data/nfl-war.json', [(('players',), 'id', 'xv')]),          # the board's lead (XV; WAA until Nov 26 2026)
     'nba': ('static/data/nba-xpm/20*.json', [(('players',), 'id', 'vorx')]),
     'nhl': ('static/data/nhl-war/20*.json', [(('players',), 'id', 'war')]),
+    'nbaproj': ('static/data/nba-proj.json', [(('players',), 'id', 'pxpm')]),    # the NBA board's XPM (proj) and 3Y views
     'soccer': ('static/data/soccer-war/20*.json', [(('players',), 'p', 'svar')]),   # the board's lead (SVAR; GAR until Nov 26 2026)
     'hockey': ('data/hockey.json', [(('board',), 'name', 'fv'), (('pipe',), 'id', 'fv')]),
     'soccerp': ('data/soccer_prospects.json', [(('board',), 'id', 'fv')]),
     'tennisp': ('data/tennis_prospects.json', [(('atp', 'board'), 'id', 'fv'), (('wta', 'board'), 'id', 'fv')]),
     'cs2': ('data/cs2_players.json', [(('board',), 'id', 'rwa', True), (('prospects',), 'id', 'fv')]),
 }
+
+
+# the boards' other views (the side buttons: pXPM, XPM, O / D ...): board -> (list path, [value fields]). Each row gets
+# `wx`, {field: value as of the base}, beside `w0`, so the page shows the move in whichever view is open
+EXTRA = {
+    'nfl': (('players',), ['pxp']),
+    'nba': (('players',), ['txpm', 'sxpm', 'toxpm', 'tdxpm']),     # the board shows the team-adjusted XPM (txpm) as XPM
+    'nbaproj': (('players',), ['p3']),
+    'nhl': (('players',), ['pwar', 'p3', 'hpm', 'o', 'd']),
+}
+
+
+def full_spec(board):
+    """the board's lists plus one pseudo-list per extra view field (name '<path>@<field>')"""
+    spec = list(BOARDS[board][1])
+    if board in EXTRA:
+        path, fields = EXTRA[board]
+        idf = next(i for p_, i, *_ in spec if p_ == path)
+        spec += [(path, idf, f, False, f) for f in fields]
+    return spec
 
 
 # FV boards: the files that set the grades (fit, display scale, the script that writes the board). A change in their
@@ -128,7 +149,9 @@ def lists(d, spec):
             x = x.get(k) or {}
         rows = x.get(path[-1])
         if isinstance(rows, list):
-            yield x, rows, lambda r, k: r.get(k), lambda r, k, v: r.__setitem__(k, v), idf, val, '.'.join(path), bool(rk)
+            ex = rk[1] if len(rk) > 1 else None      # an extra view field (EXTRA): its base goes in the row's `wx`
+            yield (x, rows, lambda r, k: r.get(k), lambda r, k, v: r.__setitem__(k, v), idf, val,
+                   '.'.join(path) + ('@' + ex if ex else ''), bool(rk and rk[0]))
 
 
 def rid(get, r, idf):
@@ -192,8 +215,18 @@ def step(h, cur, day, days=DAYS, fv=(), sport=None, model=None):
 
 
 def mark(d, spec, base, since):
+    for _, rows, *_ in lists(d, spec):
+        for r in rows:
+            if isinstance(r, dict):
+                r.pop('wx', None)
     for holder, rows, get, put, idf, val, name, rk in lists(d, spec):
         b = (base or {}).get(name) or {}
+        if '@' in name:                     # an extra view: wx[field]
+            for r in rows:
+                v = b.get(rid(get, r, idf)) if since else None
+                if v is not None:
+                    r.setdefault('wx', {})[val] = v
+            continue
         for r in rows:
             v = b.get(rid(get, r, idf)) if since else None
             if v is not None or get(r, 'w0') is not None:
@@ -366,7 +399,7 @@ def save_hist(board, h):
 
 
 def update(board, day=None, d=None, h=None, write=True):
-    pat, spec = BOARDS[board]
+    pat, spec = BOARDS[board][0], full_spec(board)
     path = latest(pat) if '*' in pat else pat
     if not path or not os.path.exists(os.path.join(ROOT, path)):
         print(board, 'no data file'); return None
@@ -385,7 +418,7 @@ def update(board, day=None, d=None, h=None, write=True):
         with open(full, 'w', encoding='utf-8') as f:       # the builders' format: compact, UTF-8 as is
             f.write(json.dumps(d, separators=(',', ':'), ensure_ascii=False, allow_nan=False) + ('\n' if raw.endswith('\n') else ''))
         save_hist(board, h)
-        n = sum(1 for _, rows, get, *_ in lists(d, spec) for r in rows if get(r, 'w0') is not None)
+        n = sum(1 for _, rows, get, *_ in lists(d, BOARDS[board][1]) for r in rows if get(r, 'w0') is not None)
         print(board, path, 'from', since, 'snapshots', len(h['hist']), 'rows with w0', n)
     return d, h
 
@@ -409,7 +442,7 @@ def seed(boards):
     since = (et_today() - dt.timedelta(days=DAYS + 3)).isoformat()
     for board in boards:
         today = et_today(board)
-        pat, spec = BOARDS[board]
+        pat, spec = BOARDS[board][0], full_spec(board)
         path = latest(pat) if '*' in pat else pat
         if not path:
             continue

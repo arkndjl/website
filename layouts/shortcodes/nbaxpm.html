@@ -50,7 +50,7 @@
       <thead><tr>
         <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, in the order of the view (VORX, XPM, offense or defense)">RK</th>
         <th data-sort="n" title="medals: predictive badges, bronze to platinum (75th / 90th / 97th / 99th percentile at the position, 500+ MP): Shot Creator (usage %), Playmaker (assist %), Two-Way Disruptor (steal % + block %), Foul Drawer (free throws a shot), Workhorse (minutes a game). Each predicted next-season XPM beyond this season's XPM, minutes and age, held out (scripts/nba_badge_backtest.py)">Player</th>
-        <th data-sort="wk" data-num title="± = rank change in VORX since the last Friday post, within the filters; hover for the rank and VORX then. VORX view, current season">±</th>
+        <th data-sort="wk" data-num title="± = rank change in the view's key (VORX, pXPM, XPM ...) since the last Friday post, within the filters; hover for the rank and the value then. current season">±</th>
         <th data-sort="vorx" data-num class="c-vorx" title="VORX = .030 x (XPM + 1.4) x MP / 48: wins over a replacement player (XPM -1.4, what freely available players produce), 2.46 wins per point of XPM over a full season's minutes; both fit to NBA team wins 2011-26">VORX</th>
         <th data-sort="pos" class="cfb__g" title="position (Basketball-Reference), rank at position within the filters and view">Pos</th>
         <th data-sort="tm" class="nbaxpm__team">Team</th>
@@ -139,7 +139,9 @@
     }).sort(function (a, b) { return b[key] - a[key] || b.mp - a.mp; });
     var pr = {};
     list.forEach(function (p, i) { p.rk = i + 1; p.pr = (pr[p.pos] = (pr[p.pos] || 0) + 1); });
-    var wkf = side === '' ? data.wkFrom : null; __wk.rank(list); __wk.show(win, wkf);
+    var wkf = data.wkFrom, WL = { vorx: 'VORX', pxpm: 'XPM (proj)', p3: '3Y', xpm: 'XPM', sxpm: 'pXPM', oxpm: 'O-XPM', dxpm: 'D-XPM' };   // ± follows the view's key
+    __wk.rank(list, 'rk', key === 'vorx' ? null : key); if (!list.some(function (p) { return p.wb != null; })) wkf = null;   // a view with no base yet: no column
+    __wk.show(win, wkf);
     var shown = list.length;
     if (sortKey !== 'rk') {
       var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
@@ -189,7 +191,7 @@
     var gfxRow = function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
         '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p) + ' <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + p.mp + ' MP</span></td>' +
-        __wk.rk(p, wkf, 'VORX', null, p.vorx) +
+        __wk.rk(p, wkf, WL[key] || key, null, p[key]) +
         order.map(function (c) { return CELL[c](p); }).join('') + '</tr>';
     };
     body.innerHTML = list.slice(page * PER, page * PER + PER).map(gfxRow).join('');
@@ -218,11 +220,11 @@
     Promise.all([fetch(win.dataset.src + s + '.json').then(function (r) { return r.json(); }), pj]).then(function (a) {
       var d = a[0], pr = a[1];
       // rXPM on this board = the team-adjusted blend (txpm / toxpm / tdxpm, scripts/nba_xpm.py team_adj); bxpm keeps the box blend
-      d.players.forEach(function (p) { if (p.txpm != null) { p.bxpm = p.xpm; p.xpm = p.txpm; p.oxpm = p.toxpm; p.dxpm = p.tdxpm; } });
+      d.players.forEach(function (p) { if (p.txpm != null) { p.bxpm = p.xpm; p.xpm = p.txpm; p.oxpm = p.toxpm; p.dxpm = p.tdxpm; } var w = p.wx; if (w) { w.xpm = w.txpm; w.oxpm = w.toxpm; w.dxpm = w.tdxpm; } });   // wx: the same columns a week back
       // XPM (proj) for the season in progress (scripts/nba_proj.py), joined on the bbref id
       if (pr && pr.season === d.season) {
         var by = {}; pr.players.forEach(function (p) { by[p.id] = p; });
-        d.players.forEach(function (p) { var x = by[p.id]; if (x) { p.pxpm = x.pxpm; p.lo = x.lo; p.hi = x.hi; p.p1 = x.p1; p.p3 = x.p3; } });
+        d.players.forEach(function (p) { var x = by[p.id]; if (x) { p.pxpm = x.pxpm; p.lo = x.lo; p.hi = x.hi; p.p1 = x.p1; p.p3 = x.p3; if (x.w0 != null) { p.wx = p.wx || {}; p.wx.pxpm = x.w0; if (x.wx) p.wx.p3 = x.wx.p3; } } });
         d.proj = 1;
       }
       cache[s] = d; if (bar.elements.season.value !== s) return;

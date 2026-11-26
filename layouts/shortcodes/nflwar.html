@@ -58,7 +58,7 @@
       <thead><tr>
         <th data-sort="rk" data-num aria-sort="ascending" title="rank by XV within the filters (pXP/60 in the per 60 snaps view)">RK</th>
         <th data-sort="n" title="medals: predictive badges, bronze to platinum (75th / 90th / 97th / 99th percentile at the position, 300+ snaps a season): Target Magnet (WR / TE, targets a snap), predicted next-season WAR beyond this season's WAR and age, held out (scripts/nfl_badge_backtest.py). Specialists: Kicker, Field Flipper (punter), Kick Returner, on the special teams credit in WAR, which carried to the next season (scripts/nfl_st_war.py)">Player</th>
-        <th data-sort="wk" data-num title="± = rank change in XV since the last Tuesday post, within the filters; hover for the rank and XV then. season-to-date view only">±</th>
+        <th data-sort="wk" data-num title="± = rank change in XV since the last Tuesday post, within the filters; hover for the rank and XV then (pXP/60 in the per-60 view)">±</th>
         <th data-sort="xv" class="cfb__g" data-num title="XV = WAR from the parts of the stat line that track team margin (EPA, CPOE, sacks taken, first downs, yards after contact, pressures, stops, missed tackles, coverage allowed, penalties), z within the sub-position, weights fit on 2018-25 team margin. 40% of WAR. Held out, the season number that tracks team margin best (vs WAR, SV). season to date, or per 17 games in that view">XV</th>
         <th data-sort="waa" data-num title="WAA = wins over an average regular at the sub-position (slot WR, nickel CB, OT, IOL, ...), same snaps. season to date, or per 17 games in that view">WAA</th>
         <th data-sort="pos" class="cfb__g" title="position, rank at position by the view's key within the filters (QB3 = 3rd QB)">Pos</th>
@@ -169,7 +169,8 @@
       var g = byPos[k], n = g.length;
       g.forEach(function (p) { var lo = 0, eq = 0; g.forEach(function (o) { if (o.pxp < p.pxp) lo++; else if (o.pxp === p.pxp) eq++; }); p.pct = n > 1 ? Math.round(100 * (lo + (eq - 1) / 2) / (n - 1)) : null; });
     });
-    __wk.rank(list);   // the weekly snapshot is XV, the key the season view ranks by __wk.show(win, pace || rate ? null : FROM);
+    // ±: the weekly snapshots are XV and pXP/60, the keys the season and per-60 views rank by (per 17 games: no week)
+    __wk.rank(list, 'rk', rate ? 'pxp' : null); __wk.show(win, pace ? null : FROM);
     // search narrows what's shown, not the ranks
     if (sortKey !== 'rk') {
       var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
@@ -188,7 +189,7 @@
       var C = {
         rk: '<td class="cfb__rk">' + p.rk + '</td>',
         n: '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p) + (p.rook ? ' <span class="nflwar__rook" title="rookie">R</span>' : '') + (p.col ? ' <span class="cfb__dim nflwar__col">' + esc(p.col) + '</span>' : '') + ' <span class="cfb__dim nflwar__tm">' + tl(p.tm) + esc(p.tm) + '</span></td>',
-        wk: p.xv == null && !(pace || rate) && FROM ? __wk.none : __wk.rk(p, pace || rate ? null : FROM, 'XV', null, p.xv),
+        wk: pace || !FROM ? '' : p[key] == null ? __wk.none : __wk.rk(p, FROM, rate ? 'pXP/60' : 'XV', null, p[key]),
         waa: '<td class="cfb__num nflwar__war">' + waa(pace ? p.waaP : p.waa) + '</td>',
         war: '<td class="cfb__num nflwar__war">' + f2(p.war) + '</td>',
         pxp: '<td class="cfb__num' + (rate ? ' nflwar__war is-key' : '') + '">' + (p.pxp == null ? '' : waa(p.pxp)) + '</td>',
