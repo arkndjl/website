@@ -4069,16 +4069,16 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 /* recruits: ARK stars, pixel glyphs (year-3 xFV cut at the backtested outcome bands; scripts/cfb_recruit_fit.py ark_stars) */
 .cfbrc__ark { position: relative; display: inline-block; vertical-align: -3px; width: 100px; height: 18px; --star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 9' shape-rendering='crispEdges'%3E%3Cpath d='M4 0h1v1h-1zM4 1h1v1h-1zM3 2h3v1h-3zM0 3h9v1h-9zM1 4h7v1h-7zM2 5h5v1h-5zM2 6h2v1h-2zM5 6h2v1h-2zM1 7h2v1h-2zM6 7h2v1h-2zM1 8h1v1h-1zM7 8h1v1h-1z'/%3E%3C/svg%3E");
   background: color-mix(in srgb, var(--accent) 28%, transparent); -webkit-mask: var(--star) 0 0 / 20px 18px repeat-x; mask: var(--star) 0 0 / 20px 18px repeat-x; }
-.cfbrc__ark i { position: absolute; inset: 0 auto 0 0; width: calc(var(--n) * 20px); background: var(--foreground); }
+.cfbrc__ark i { position: absolute; inset: 0 auto 0 0; width: calc(var(--n) * 20px); background: #b9f2ff; }   /* ARK stars: flat platinum, the badge platinum (Noah, Nov 26); industry stays lilac */
 .cfbrc__dstar { font-size: 0.75em; margin-left: 3px; }
 @media (max-width: 684px) { .cfbrc__ark { width: 75px; height: 13.5px; vertical-align: -2px; -webkit-mask-size: 15px 13.5px; mask-size: 15px 13.5px; } .cfbrc__ark i { width: calc(var(--n) * 15px); } }
 .games__gfx { float: right; margin-left: 8px; padding: 0 6px; font-size: 0.9em; }
-/* 5-star+: its own colour, teal to lilac through white, moving a pixel step at a time; a dark pixel outline, a lilac
+/* 5-star+: platinum (the badge platinum: ice to white), moving a pixel step at a time; a dark pixel outline, a pale
    glow and a white pixel glint that blinks by the plus (the filter sits on a wrapper, since a mask would clip it).
-   Plain ARK stars stay flat teal, the industry's flat lilac. Cards draw the same (assets/js/gfx.js plusStars). */
+   Plain ARK stars are flat platinum, the industry's flat lilac. Cards draw the same (assets/js/gfx.js plusStars). */
 .cfbrc__glow { position: relative; display: inline-flex; align-items: center; white-space: nowrap;
-  filter: drop-shadow(1px 0 0 #241a3a) drop-shadow(-1px 0 0 #241a3a) drop-shadow(0 1px 0 #241a3a) drop-shadow(0 -1px 0 #241a3a) drop-shadow(0 0 3px #c8c7ff); }
-.cfbrc__ark.is-plus i { background: linear-gradient(90deg, #7fffd4 0 28%, #fff 40%, #c8c7ff 54% 84%, #7fffd4 100%) 0 0 / 200px 100% repeat-x; animation: arkplus 3s steps(20) infinite; }
+  filter: drop-shadow(1px 0 0 #241a3a) drop-shadow(-1px 0 0 #241a3a) drop-shadow(0 1px 0 #241a3a) drop-shadow(0 -1px 0 #241a3a) drop-shadow(0 0 3px #b9f2ff); }
+.cfbrc__ark.is-plus i { background: linear-gradient(90deg, #7fcbe6 0 22%, #fff 36%, #b9f2ff 46% 62%, #8fd9ef 76%, #7fcbe6 100%) 0 0 / 200px 100% repeat-x; animation: arkplus 3s steps(20) infinite; }
 .cfbrc__plus { position: relative; margin-left: 4px; font-size: 1.25em; line-height: 1; color: #fff; font-weight: bold; }
 .cfbrc__plus::after { content: ""; position: absolute; top: -1px; right: -5px; width: 2px; height: 2px; background: #fff;
   box-shadow: 0 -2px #fff, 0 2px #fff, -2px 0 #fff, 2px 0 #fff; animation: arkglint 3s steps(1) infinite; }
