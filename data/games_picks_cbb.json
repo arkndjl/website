@@ -1,10 +1,10 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-26T00:26:10Z",
+ "asof": "2026-11-26T00:39:39Z",
  "recenter": {
-  "2026-11-25": 2.11,
-  "2026-11-26": 1.88
+  "2026-11-25": 2.1,
+  "2026-11-26": 1.85
  },
  "monitor": {
   "clocks": {
@@ -506,19 +506,19 @@
   "stopped": {},
   "checks": {
    "total": {
-    "n": 7,
-    "window": 7,
-    "mean": -0.001,
-    "t": -0.01,
+    "n": 8,
+    "window": 8,
+    "mean": -0.0071,
+    "t": -0.08,
     "p": null,
-    "days": 6,
+    "days": 7,
     "sd": 0.1435,
     "cusum": 0.0,
     "cusumMax": 3.23,
     "h": 10.0,
     "rho": 0.221,
     "edge": {
-     "cusum": 0.31,
+     "cusum": 0.21,
      "cusumMax": 0.91,
      "h": 4.595
     },
@@ -526,17 +526,17 @@
     "why": "",
     "drift": {
      "mu1": 0.0295,
-     "n": 7,
+     "n": 8,
      "sd": 0.1435,
      "rho": 0.221,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.205,
-     "info": 0.3,
-     "real": 0.26,
-     "realSe": 1.872,
+     "llr": -0.105,
+     "info": 0.34,
+     "real": 0.586,
+     "realSe": 1.746,
      "need": 139
     }
    },
@@ -1808,30 +1808,30 @@
   "since": "2026-11-11T20:00:00Z",
   "why": "owner: paper until live picks beat the close (Nov 11 2026)",
   "pooled": {
-   "n": 417,
-   "days": 15,
-   "llr": -4.329,
+   "n": 418,
+   "days": 16,
+   "llr": -4.431,
    "lo": -2.944,
    "hi": 2.944,
    "state": "paused",
    "at": "2026-11-16",
    "sd": 0.12,
    "rho": 0.05,
-   "real": -0.004,
-   "realSe": 0.199,
-   "clvRet": -0.006,
+   "real": -0.008,
+   "realSe": 0.198,
+   "clvRet": -0.0061,
    "evDU": 0.0225
   },
   "back": {
-   "n": 298,
-   "clvRet": 0.0068,
-   "t": 1.21,
-   "days": 12
+   "n": 299,
+   "clvRet": 0.0066,
+   "t": 1.19,
+   "days": 13
   }
  },
  "model": {
   "asof": "2026-11-25T18:14:19Z",
-  "ageH": 6.2,
+  "ageH": 6.4,
   "stale": false
  },
  "picks": [],
@@ -1868,7 +1868,7 @@
     "side": "under",
     "line": 150.5,
     "price": -110.0,
-    "ev": 0.122,
+    "ev": 0.121,
     "units": 0.75
    }
   },
@@ -1945,7 +1945,7 @@
    "mk": "total",
    "side": "under",
    "line": 155.5,
-   "price": -124.0,
+   "price": -129.0,
    "edge": 3.8,
    "x": 5.0,
    "why": "edge under 5 (tier: power)",
@@ -1983,6 +1983,22 @@
    "why": "edge under 5 (tier: power)",
    "m": -3.0,
    "tm": 163.8
+  },
+  {
+   "id": "401920550",
+   "sport": "cbb",
+   "kick": "2026-11-26T01:30:00Z",
+   "home": "UTEP",
+   "away": "Eastern Michigan",
+   "mk": "total",
+   "side": "over",
+   "line": 129.5,
+   "price": -110.0,
+   "edge": 2.8,
+   "x": 5.0,
+   "why": "edge under 5 (total: low)",
+   "m": 1.1,
+   "tm": 132.3
   },
   {
    "id": "401911522",
@@ -2065,22 +2081,6 @@
    "tm": 150.1
   },
   {
-   "id": "401920550",
-   "sport": "cbb",
-   "kick": "2026-11-26T01:30:00Z",
-   "home": "UTEP",
-   "away": "Eastern Michigan",
-   "mk": "total",
-   "side": "over",
-   "line": 130.5,
-   "price": -110.0,
-   "edge": 1.8,
-   "x": 5.0,
-   "why": "edge under 5 (total: low)",
-   "m": 1.1,
-   "tm": 132.3
-  },
-  {
    "id": "401920530",
    "sport": "cbb",
    "kick": "2026-11-27T02:00:00Z",
@@ -2089,7 +2089,7 @@
    "mk": "total",
    "side": "over",
    "line": 159.5,
-   "price": -165.0,
+   "price": -158.0,
    "edge": 1.7,
    "x": 5.0,
    "why": "edge under 5 (tier: power)",
@@ -2137,28 +2137,12 @@
    "mk": "total",
    "side": "under",
    "line": 169.5,
-   "price": -110.0,
+   "price": -134.0,
    "edge": 1.3,
    "x": 5.0,
    "why": "edge under 5 (tier: power)",
    "m": -14.4,
    "tm": 168.2
-  },
-  {
-   "id": "401929287",
-   "sport": "cbb",
-   "kick": "2026-11-26T00:30:00Z",
-   "home": "Mississippi State",
-   "away": "Wake Forest",
-   "mk": "total",
-   "side": "under",
-   "line": 148.5,
-   "price": -106.0,
-   "edge": 1.2,
-   "x": 5.0,
-   "why": "edge under 5 (tier: power)",
-   "m": 4.2,
-   "tm": 147.3
   },
   {
    "id": "401921671",
@@ -2210,18 +2194,6 @@
   }
  ],
  "games": {
-  "401929287": {
-   "mk": "total",
-   "side": "under",
-   "line": 148.5,
-   "price": -106.0,
-   "edge": 1.2,
-   "ev": null,
-   "units": 0.0,
-   "home": "Mississippi State",
-   "away": "Wake Forest",
-   "state": "under"
-  },
   "401921713": {
    "mk": "total",
    "side": "over",
@@ -2285,9 +2257,9 @@
   "401920550": {
    "mk": "total",
    "side": "over",
-   "line": 130.5,
+   "line": 129.5,
    "price": -110.0,
-   "edge": 1.8,
+   "edge": 2.8,
    "ev": null,
    "units": 0.0,
    "home": "UTEP",
@@ -2370,7 +2342,7 @@
    "mk": "total",
    "side": "over",
    "line": 159.5,
-   "price": -165.0,
+   "price": -158.0,
    "edge": 1.7,
    "ev": null,
    "units": 0.0,
@@ -2407,7 +2379,7 @@
    "side": "under",
    "line": 150.5,
    "price": -110.0,
-   "ev": 0.122,
+   "ev": 0.121,
    "edge": 5.1,
    "units": 0.75,
    "bk": "dk",
@@ -2419,7 +2391,7 @@
    "mk": "total",
    "side": "under",
    "line": 155.5,
-   "price": -124.0,
+   "price": -129.0,
    "edge": 3.8,
    "ev": null,
    "units": 0.0,
@@ -2443,7 +2415,7 @@
    "mk": "total",
    "side": "under",
    "line": 169.5,
-   "price": -110.0,
+   "price": -134.0,
    "edge": 1.3,
    "ev": null,
    "units": 0.0,
@@ -2504,20 +2476,20 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 26493,
+  "snapshots": 26501,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 721,
-    "clvRet": 0.0187,
-    "clvT": 2.02,
-    "clv": 1.27,
-    "beat": 0.423,
-    "still": 0.254
+    "clvN": 722,
+    "clvRet": 0.0198,
+    "clvT": 2.15,
+    "clv": 1.29,
+    "beat": 0.44,
+    "still": 0.237
    },
    {
     "when": "6-24h",
-    "clvN": 5315,
+    "clvN": 5316,
     "clvRet": -0.0043,
     "clvT": -2.11,
     "clv": 0.64,
@@ -21121,7 +21093,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-26T00:26:10Z",
+ "checked": "2026-11-26T00:39:39Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
