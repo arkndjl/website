@@ -2964,11 +2964,14 @@ if (fs.existsSync(TFIT)) {
   for (const [tid, [w, l]] of Object.entries(wl)) teamGames[tid] = w + l;
   const wkDone = {};
   for (const g of gamesCfbdNow || []) if (g.seasonType === 'regular') { const x = (wkDone[g.week] ||= [0, 0]); x[1]++; if (g.completed) x[0]++; }
+  // a week with a game that never finished (cancelled, postponed) is final once a later week has results: it was
+  // pulled again on every run (16 calls a run by week 13 of 2026)
+  const lastWk = Math.max(0, ...Object.entries(wkDone).filter(([, [d]]) => d).map(([w]) => +w));
   for (const [w, [d, n]] of Object.entries(wkDone)) {
     if (!d) continue;
     for (const cls of ['fbs', 'fcs']) {
       const name = `gplayers${SEASON}w${w}${cls === 'fbs' ? '' : 'fcs'}.json`;
-      const boxes = hasCache(name) && (d === n || OFFLINE) ? readCache(name)
+      const boxes = hasCache(name) && (d === n || +w < lastWk || OFFLINE) ? readCache(name)
         : await source(name, () => cfbd(`games/players?year=${SEASON}&week=${w}&seasonType=regular&classification=${cls}`));
       for (const g of boxes || []) {
         const seen = new Set();
