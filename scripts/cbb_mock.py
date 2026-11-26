@@ -626,6 +626,26 @@ def declare_odds(pool):
         p['declare'] = 1 / (1 + math.exp(-z))
 
 
+TRADES = os.path.join(D.ROOT, 'data', 'nba_trade_fit.json')    # scripts/nba_draft_trades.py
+
+
+def trade_odds(picks):
+    """Trade%: P(each pick changes hands on draft night), scripts/nba_draft_trades.py (ln pick, its square, round 2,
+    ln picks the holder has; held out 2008-26 by draft). The projected trades: the likeliest picks in each round, as
+    many as the round's expected count. Who gets the pick failed held out, so no partner is named."""
+    try: fit = json.load(open(TRADES))
+    except (OSError, ValueError): return {}
+    import nba_draft_trades as NT
+    held = defaultdict(int)
+    for pk in picks: held[pk['team']] += 1
+    out = {pk['pick']: {'p': NT.trade_p(fit, pk['pick'], pk['round'], held[pk['team']])} for pk in picks}
+    for rd in (1, 2):
+        R = sorted((pk['pick'] for pk in picks if pk['round'] == rd), key=lambda k: -out[k]['p'])
+        k = round(sum(out[x]['p'] for x in R))
+        for x in R[:k]: out[x]['proj'] = True
+    return {k: {'p': round(v['p'], 3), 'proj': v.get('proj', False)} for k, v in out.items()}
+
+
 def assign(pool, scores, picks):
     order = sorted(range(len(pool)), key=lambda i: scores[i])
     slot = {}
@@ -686,6 +706,7 @@ def main():
     print(f'declare: {len(staying)} of {len(pool) + len(staying)} pool players more likely back in school:',
           ', '.join(f"{p['name']} ({p['declare']:.0%})" for p in sorted(staying, key=lambda p: p['cons'])[:12]))
     n = len(picks)
+    trades = trade_odds(picks)
     ps = pred_order(pool, w)
     sc_pred = [s for s in ps]
     sc_conv = [-p['xxpm'] for p in pool]
@@ -721,7 +742,7 @@ def main():
                     cls=o.get('cls') or ('Intl' if not o else None), age=round(o['age'] + 0.7, 2) if o.get('age') else (round(o['ageEst'] + 0.7, 1) if o.get('ageEst') else None),
                     ageEst=bool(o and not o.get('age')), ht=o.get('ht'), cons=p['cons'] if p['nboards'] else None, boards=p['nboards'],
                     xxpm=round(p['xxpm'], 2), declare=round(p['declare'], 3), slots={m: eff[m][i] for m in S if m != mode}, grades=grades, why=why,
-                    sim=sims[i], own=own[pk['pick'] - 1])
+                    sim=sims[i], own=own[pk['pick'] - 1], trade=trades.get(pk['pick']))
 
     mocks = {}
     for mode in S:
@@ -738,6 +759,7 @@ def main():
                        for p in sorted(staying, key=lambda p: p['cons'])],
            'method': {'pred': bt, 'conv': {k: v for k, v in conv.items() if k not in ('mu', 'sd', 'b')}},
            'gradeRatio': GRADE_RATIO, 'gradeSpots': GRADE_SPOTS, 'mocks': mocks,
+           'trades': {k: v for k, v in (json.load(open(TRADES)) if os.path.exists(TRADES) else {}).items() if k in ('drafts', 'rate', 'held', 'perRound', 'partner', 'curve')},
            'sims': {'n': NOISE_SIMS, 'sd': sd, 'days': days, 'orders': sampled, 'noise': noise}}
     json.dump(out, open(OUT, 'w'), indent=1)
     for mode in ('pred', 'blend', 'conv'):
