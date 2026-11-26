@@ -63,7 +63,7 @@
   </tr></thead>
   <tbody>
   {{- range $i, $r := .class }}
-  <tr{{ with .why }} data-why="{{ jsonify . }}"{{ end }} data-rc="{{ partial "rcgfx.html" (dict "ark" .ark "stars" .stars "open" (not .team)) }}">
+  <tr{{ with .why }} data-why="{{ jsonify . }}"{{ end }} data-rc="{{ partial "rcgfx.html" (dict "ark" .ark "stars" .stars "open" (not .team) "cls" $d.next "path" .path "range" .range "age" .age "ageRel" .ageRel) }}">
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td class="cfb__name">{{ $u := "" }}{{ with .img }}{{ $u = printf "https://on3static.com/cdn-cgi/image/height=70,width=96,quality=70,fit=cover/%s" . }}{{ end }}{{ partial "face.html" (dict "u" $u) }}{{ .name }}{{ partial "arkstar.html" (dict "sport" "college-football" "name" .name "team" .team) }}</td>
     <td data-v="{{ .ark | default 0 }}">{{ with .ark }}{{ $lbl := cond (gt . 5) "5-star+ (top 6 a class)" (printf "%g ARK stars" .) }}{{ if gt . 5 }}<span class="cfbrc__glow">{{ end }}<span class="cfbrc__ark{{ if gt . 5 }} is-plus{{ end }}" style="--n:{{ cond (gt . 5) 5 . }}" data-n="{{ . }}" role="img" aria-label="{{ $lbl }}" title="{{ $lbl }}"><i></i></span>{{ if gt . 5 }}<span class="cfbrc__plus" aria-hidden="true">+</span></span>{{ end }}{{ end }}{{ if and .ark .stars }}{{ $dd := sub (cond (gt .ark 5) 5 .ark) .stars }}{{ if gt $dd 0 }}<span class="cfbrc__dstar cfb__up">▲{{ replace (printf "%g" $dd) ".5" "½" | replaceRE "^0½" "½" }}</span>{{ else if lt $dd 0 }}<span class="cfbrc__dstar cfb__down">▼{{ replace (printf "%g" (sub 0 $dd)) ".5" "½" | replaceRE "^0½" "½" }}</span>{{ end }}{{ end }}</td>
@@ -73,12 +73,12 @@
     <td>{{ .conf }}</td>
     <td class="cfb__num" data-v="{{ .wt }}">{{ with .ht }}{{ div (int .) 12 }}-{{ mod (int .) 12 }}{{ end }}{{ with .wt }}, {{ int . }}{{ end }}</td>
     <td class="cfb__dim">{{ .home | default "—" }}</td>
-    <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ partial "num.html" (slice "%.1f" .xfv) }}</span></td>
-    <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ partial "num.html" (slice "%.1f" .fvOn) }}</td>
+    <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int (math.Round .xfv)) 5) 5 }}">{{ partial "num.html" (slice "%.0f" .xfv) }}</span></td>
+    <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ partial "num.html" (slice "%.0f" .fvOn) }}</td>
     <td class="cfb__num rc-on" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
     <td class="cfb__num" data-v="{{ .pct }}">{{ .pct }}</td>
     <td class="cfb__num cfb__dim" data-v="{{ index .range 1 }}">{{ partial "num.html" (slice "%.0f" (index .range 0)) }}–{{ partial "num.html" (slice "%.0f" (index .range 1)) }}</td>
-    <td class="cfb__num cfb__dim" data-v="{{ index .path 2 }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ partial "num.html" (slice "%.1f" $x) }}{{ end }}</td>
+    <td class="cfb__num cfb__dim" data-v="{{ index .path 2 }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ partial "num.html" (slice "%.0f" $x) }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .grade }}">{{ .grade | default "—" }}</td>
     <td class="cfb__num" data-v="{{ .comp | default 0 }}">{{ with .comp }}{{ partial "num.html" (slice "%.4f" .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
@@ -108,7 +108,7 @@
   </tr></thead>
   <tbody>
   {{- range $i, $r := $F.list }}
-  <tr{{ with .why }} data-why="{{ jsonify . }}"{{ end }} data-rc="{{ partial "rcgfx.html" (dict "ark" .ark "stars" .stars "open" (not .team) "lean" (cond (not .team) (index $LN $r.name) nil) "exp" (cond (not .team) (index $EP $r.name) nil)) }}">
+  <tr{{ with .why }} data-why="{{ jsonify . }}"{{ end }} data-rc="{{ partial "rcgfx.html" (dict "ark" .ark "stars" .stars "open" (not .team) "lean" (cond (not .team) (index $LN $r.name) nil) "exp" (cond (not .team) (index $EP $r.name) nil) "cls" $yr "path" .path "range" .range "age" .age "ageRel" .ageRel) }}">
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td class="cfb__name">{{ $u := "" }}{{ with .img }}{{ $u = printf "https://on3static.com/cdn-cgi/image/height=70,width=96,quality=70,fit=cover/%s" . }}{{ end }}{{ partial "face.html" (dict "u" $u) }}{{ .name }}{{ partial "arkstar.html" (dict "sport" "college-football" "name" .name "team" .team) }}</td>
     <td data-v="{{ .ark | default 0 }}">{{ with .ark }}{{ $lbl := cond (gt . 5) "5-star+ (top 6 a class)" (printf "%g ARK stars" .) }}{{ if gt . 5 }}<span class="cfbrc__glow">{{ end }}<span class="cfbrc__ark{{ if gt . 5 }} is-plus{{ end }}" style="--n:{{ cond (gt . 5) 5 . }}" data-n="{{ . }}" role="img" aria-label="{{ $lbl }}" title="{{ $lbl }}"><i></i></span>{{ if gt . 5 }}<span class="cfbrc__plus" aria-hidden="true">+</span></span>{{ end }}{{ end }}{{ if and .ark .stars }}{{ $dd := sub (cond (gt .ark 5) 5 .ark) .stars }}{{ if gt $dd 0 }}<span class="cfbrc__dstar cfb__up">▲{{ replace (printf "%g" $dd) ".5" "½" | replaceRE "^0½" "½" }}</span>{{ else if lt $dd 0 }}<span class="cfbrc__dstar cfb__down">▼{{ replace (printf "%g" (sub 0 $dd)) ".5" "½" | replaceRE "^0½" "½" }}</span>{{ end }}{{ end }}</td>
@@ -120,12 +120,12 @@
     <td class="cfb__dim">{{ .conf | default "—" }}</td>
     <td class="cfb__num" data-v="{{ .wt }}">{{ with .ht }}{{ div (int .) 12 }}-{{ mod (int .) 12 }}{{ end }}{{ with .wt }}, {{ int . }}{{ end }}</td>
     <td class="cfb__dim">{{ .home | default "—" }}</td>
-    <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ partial "num.html" (slice "%.1f" .xfv) }}</span></td>
-    <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ partial "num.html" (slice "%.1f" .fvOn) }}</td>
+    <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int (math.Round .xfv)) 5) 5 }}">{{ partial "num.html" (slice "%.0f" .xfv) }}</span></td>
+    <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ partial "num.html" (slice "%.0f" .fvOn) }}</td>
     <td class="cfb__num rc-on" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
     <td class="cfb__num" data-v="{{ .pct }}">{{ .pct }}</td>
     <td class="cfb__num cfb__dim" data-v="{{ index .range 1 }}">{{ partial "num.html" (slice "%.0f" (index .range 0)) }}–{{ partial "num.html" (slice "%.0f" (index .range 1)) }}</td>
-    <td class="cfb__num cfb__dim" data-v="{{ index .path 2 }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ partial "num.html" (slice "%.1f" $x) }}{{ end }}</td>
+    <td class="cfb__num cfb__dim" data-v="{{ index .path 2 }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ partial "num.html" (slice "%.0f" $x) }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .grade }}">{{ partial "num.html" (slice "%.0f" .grade) }}</td>
     <td class="cfb__dim" data-v="{{ index (dict "espn" "ESPN" "comp" "247 comp" "own" "247" "watch" "watch") .src }}">{{ index (dict "espn" "ESPN" "comp" "247 comp" "own" "247" "watch" "watch") .src }}</td>
@@ -183,7 +183,7 @@
     {{- else }}
     <td class="cfb__num cfb__dim">—</td><td class="cfb__num cfb__dim">—</td><td class="cfb__num cfb__dim">—</td><td class="cfb__num cfb__dim">—</td><td class="cfb__num cfb__dim">—</td>
     {{- end }}
-    <td class="cfbt__top" data-v="{{ with index .top 0 }}{{ .xfv }}{{ end }}">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ $p.name }} <span class="cfb__dim">{{ partial "rpos.html" $p.pos }} {{ partial "num.html" (slice "%.1f" $p.xfv) }}</span>{{ end }}</td>
+    <td class="cfbt__top" data-v="{{ with index .top 0 }}{{ .xfv }}{{ end }}">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ $p.name }} <span class="cfb__dim">{{ partial "rpos.html" $p.pos }} {{ partial "num.html" (slice "%.0f" $p.xfv) }}</span>{{ end }}</td>
   </tr>
   {{- end }}{{ end }}
   </tbody>
@@ -210,7 +210,7 @@
   <tr{{ with .why }} data-why="{{ jsonify . }}"{{ end }}>
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td>{{ .name }}{{ partial "arkstar.html" (dict "sport" "college-football" "name" .name "team" .team) }}</td>
-    <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int .xfv) 5) 5 }}">{{ partial "num.html" (slice "%.1f" .xfv) }}</span></td>
+    <td class="fv" data-v="{{ .xfv }}"><span class="fv-chip" data-fv="{{ mul (div (int (math.Round .xfv)) 5) 5 }}">{{ partial "num.html" (slice "%.0f" .xfv) }}</span></td>
     <td data-v="{{ .ark | default 0 }}">{{ with .ark }}{{ $lbl := cond (gt . 5) "5-star+ (top 6 a class)" (printf "%g ARK stars" .) }}{{ if gt . 5 }}<span class="cfbrc__glow">{{ end }}<span class="cfbrc__ark{{ if gt . 5 }} is-plus{{ end }}" style="--n:{{ cond (gt . 5) 5 . }}" data-n="{{ . }}" role="img" aria-label="{{ $lbl }}" title="{{ $lbl }}"><i></i></span>{{ if gt . 5 }}<span class="cfbrc__plus" aria-hidden="true">+</span></span>{{ end }}{{ end }}{{ if and .ark .stars }}{{ $dd := sub (cond (gt .ark 5) 5 .ark) .stars }}{{ if gt $dd 0 }}<span class="cfbrc__dstar cfb__up">▲{{ replace (printf "%g" $dd) ".5" "½" | replaceRE "^0½" "½" }}</span>{{ else if lt $dd 0 }}<span class="cfbrc__dstar cfb__down">▼{{ replace (printf "%g" (sub 0 $dd)) ".5" "½" | replaceRE "^0½" "½" }}</span>{{ end }}{{ end }}</td>
     <td data-v="{{ .stars | default 0 }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat . "★" }}</span>{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
     <td class="rc-pos" data-v="{{ .g }}">{{ partial "rpos.html" .pos }}</td>
@@ -218,11 +218,11 @@
     <td>{{ .conf }}</td>
     <td class="cfb__num">{{ .cls }}</td>
     <td class="cfb__num" data-v="{{ .wt }}">{{ with .ht }}{{ div (int .) 12 }}-{{ mod (int .) 12 }}{{ end }}{{ with .wt }}, {{ int . }}{{ end }}</td>
-    <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ partial "num.html" (slice "%.1f" .fvOn) }}</td>
+    <td class="cfb__num rc-fvon" data-v="{{ .fvOn }}">{{ partial "num.html" (slice "%.0f" .fvOn) }}</td>
     <td class="cfb__num rc-on" data-v="{{ .pOn }}">{{ math.Round (mul .pOn 100) }}%</td>
     <td class="cfb__num" data-v="{{ .pct }}">{{ .pct }}</td>
     <td class="cfb__num cfb__dim" data-v="{{ index .range 1 }}">{{ partial "num.html" (slice "%.0f" (index .range 0)) }}–{{ partial "num.html" (slice "%.0f" (index .range 1)) }}</td>
-    <td class="cfb__num" data-v="{{ .xfv2 | default 0 }}">{{ with .xfv2 }}{{ partial "num.html" (slice "%.1f" .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .xfv2 | default 0 }}">{{ with .xfv2 }}{{ partial "num.html" (slice "%.0f" .) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num cfb__dim" data-v="{{ .pOn2 | default 0 }}">{{ with .pOn2 }}{{ math.Round (mul . 100) }}%{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .grade }}">{{ .grade | default "—" }}</td>
