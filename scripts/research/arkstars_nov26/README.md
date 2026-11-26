@@ -30,6 +30,6 @@ Hockey, soccer, tennis and CS2 prospect boards have no star tiers or recruiting 
 here (position at the top) failed in both sports, so there is nothing to port.
 
 ## Look
-5-star+ draws in its own colour on boards and cards: teal to lilac through white, stepped pixel shimmer, dark pixel
-outline, lilac glow, white pixel glint by the plus (static/style.css .cfbrc__glow; assets/js/gfx.js plusStars, which the
+5-star+ draws in platinum on boards and cards (Noah, Nov 26: platinum over gold): silver to white, stepped pixel shimmer, dark pixel
+outline, pale glow, white pixel glint by the plus (static/style.css .cfbrc__glow; assets/js/gfx.js plusStars, which the
 card preview animates; saved PNG is the still frame). Reduced-motion users get the still look.

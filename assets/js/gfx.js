@@ -3,6 +3,7 @@
   if (window.__arkGfx) return; window.__arkGfx = true;
   var W, H, PAD = 60;
   var C = { bg: '#4a3b6b', face: '#4a3b6b', well: '#3a2d56', light: '#c8c7ff', dark: '#241a3a', title: '#57068c', teal: '#7fffd4', lilac: '#c8c7ff', white: '#ffffff', down: '#ff9ec7' };
+  var PLAT = '#b9f2ff';   // ARK stars: flat platinum; 5-star+ adds the moving platinum sheen (plusStars)
   var FONT = '"MS PGothic Pixel", "MS PGothic", monospace';
   // college WAR a season per AV (scripts/cfb_av.mjs): team-builder values are AV at FV, drawn as WAR
   var WARK = {{ with site.Data.cfb_war_backtest }}{{ .constants.cwarPerAv }}{{ else }}0.0953{{ end }};
@@ -254,9 +255,9 @@
         // text only: the board's marks (ARKLIST star, riser arrow, injury and RB role tags, photos) stay off
         var cc = c && c.cloneNode(true); if (cc) cc.querySelectorAll('.gfx-off, .cfb__star, .cfb__carried, .cfb__warin, .cfb__riser, .cfb__injchip, .injtag, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__multichip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more, .nflwar__col, .nflwar__tm, .nflwar__rook, .esea-flag, .nbaxpm__tm, .nbaxpm__od, .brk__meta').forEach(function (e) { e.remove(); });
         var cell = { t: txt(cc).replace(/[▾▴▸★↗]/g, '').trim() };
-        // ARK stars (recruit tabs): pixel stars, 5-star+ in its own teal-to-lilac fill with a plus
+        // ARK stars (recruit tabs): pixel stars, 5-star+ in platinum with a plus
         var ark = c && c.querySelector('.cfbrc__ark[data-n]');
-        if (ark) { var an = +ark.getAttribute('data-n'); cell.t = new Array(Math.floor(Math.min(an, 5)) + 1).join('✦') + (an % 1 ? '✧' : '') + (an > 5 ? '+' : ''); cell.color = C.teal; cell.glow = an > 5; }
+        if (ark) { var an = +ark.getAttribute('data-n'); cell.t = new Array(Math.floor(Math.min(an, 5)) + 1).join('✦') + (an % 1 ? '✧' : '') + (an > 5 ? '+' : ''); cell.color = PLAT; cell.glow = an > 5; }
         // mock draft trade tags: a pick already traded (solid) or a projected trade (dashed, ⇅)
         var tags = c ? [].slice.call(c.querySelectorAll('.cfbm__trade[data-g], .nbagl__ct[data-g]')) : [];
         // G League contract tags: two-way teal, NBA contract lilac (solid, no legend)
@@ -423,9 +424,9 @@
             // the sorted column in white, a value below zero in pink
             g.fillStyle = c.color || (k === 0 ? C.lilac : k === 1 || k === sk ? C.white : /^[−-]\d/.test(c.t) && !c.img ? C.down : C.teal);
             var tw0 = tagsW(c, size), ft = fit(g, c.t, colW[k] - (tx - x) - 2 - tw0);
-            if (c.glow) {   // 5-star+: dark pixel outline, lilac glow, the teal-to-lilac fill on top
+            if (c.glow) {   // 5-star+: dark pixel outline, platinum glow and fill
               g.save(); g.fillStyle = C.dark; [[-2, 0], [2, 0], [0, -2], [0, 2]].forEach(function (d) { g.fillText(ft, tx + d[0], cy + d[1]); });
-              g.shadowColor = C.lilac; g.shadowBlur = 12; g.fillStyle = C.lilac; g.fillText(ft, tx, cy); g.restore();
+              g.shadowColor = PT[1]; g.shadowBlur = 12; g.fillStyle = PT[1]; g.fillText(ft, tx, cy); g.restore();
               g.fillStyle = aurora(g, tx, Math.max(1, g.measureText(ft).width), 0);
             }
             g.fillText(ft, tx, cy);
@@ -1457,12 +1458,12 @@
     STAR7.forEach(function (r, j) { for (var i = 0; i < 7; i++) if (r[i] === '#') { g.fillStyle = fill >= 1 || (fill > 0 && i < 4) ? col : C.dark; g.fillRect(x + i * u, y + j * u, u, u); } });
     return 7 * u;
   }
-  // 5-star+ (ARK): its own colour, teal to lilac through white, moving a step at a time; a dark pixel outline and a
+  // 5-star+ (ARK): platinum (the badge platinum), ice to white, moving a step at a time; a dark pixel outline and a
   // white glint that hops from star to star. Still frame = phase 0; the preview animates it (canvas._anim).
-  var PLUS_STEPS = 12;
+  var PLUS_STEPS = 12, PT = ['#7fcbe6', '#b9f2ff', '#8fd9ef'];   // platinum: shade, sheen, mid
   function aurora(g, x, w, ph) {
     var off = ((ph || 0) % PLUS_STEPS) / PLUS_STEPS * w, gr = g.createLinearGradient(x - w + off, 0, x + w + off, 0);
-    [[0, C.teal], [0.14, C.teal], [0.2, C.white], [0.27, C.lilac], [0.42, C.lilac], [0.5, C.teal], [0.64, C.teal], [0.7, C.white], [0.77, C.lilac], [0.92, C.lilac], [1, C.teal]].forEach(function (p) { gr.addColorStop(p[0], p[1]); });
+    [[0, PT[0]], [0.11, PT[0]], [0.18, C.white], [0.23, PT[1]], [0.31, PT[1]], [0.38, PT[2]], [0.5, PT[0]], [0.61, PT[0]], [0.68, C.white], [0.73, PT[1]], [0.81, PT[1]], [0.88, PT[2]], [1, PT[0]]].forEach(function (p) { gr.addColorStop(p[0], p[1]); });
     return gr;
   }
   function plusStars(g, x, sy, sz, ph) {
@@ -1477,7 +1478,7 @@
   async function rcItems(rc) {
     if (!rc) return null;
     var items = [], logo = function (id) { return id ? loadImg('{{ "img/cfb/logos/" | relURL }}' + id + '.png') : Promise.resolve(null); };
-    if (rc.a) items.push({ h: 'ARK', stars: rc.a, col: C.teal });
+    if (rc.a) items.push({ h: 'ARK', stars: rc.a, col: PLAT });
     items.push({ h: 'INDUSTRY', stars: rc.s || 0, plus: !!rc.p, col: C.lilac });
     if (rc.e) items.push({ h: 'EXPERTS', t: rc.e[0], sub: rc.e[1] + ' of ' + rc.e[2], prob: rc.e[1] / rc.e[2] * 100, img: await logo(rc.e[3]) });
     if (rc.r) items.push({ h: 'ON3 RPM', t: rc.r[0], sub: Math.round(rc.r[1]) + '%', prob: rc.r[1], img: await logo(rc.r[2]) });
