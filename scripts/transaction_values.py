@@ -13,7 +13,7 @@
 Rows join by name through scripts/names.py (club from or to checked first, then the name alone when it is unique);
 a pro row with no value this season is left blank.
 
-{asof, <sport>: {"<d>|<n>|<k>": [v, v2]}, rcfb / rcbb: {"<d>|<n>|<k>": [ark, fv]}}
+{asof, <sport>: {"<d>|<n>|<k>": [v, v2]}, rcfb / rcbb: {"<d>|<n>|<k>": [ark, fv(, class when the headline gave none)]}}
 
   python3 scripts/transaction_values.py
 """
@@ -164,7 +164,7 @@ def recruit_values():
             want = tuple(x for x in (r.get('fr'), r.get('to')) if x) or None
             h, _ = rec.find(r['n'], team=want, pos=r.get('pos') or None, cls=(lambda c, y=cls: c == y) if cls else None)
             if h:
-                o[f"{r['d']}|{r['n']}|{r['k']}"] = [h.get('ark'), h.get('fv')]
+                o[f"{r['d']}|{r['n']}|{r['k']}"] = [h.get('ark'), h.get('fv')] + ([h['cls']] if not cls and h.get('cls') else [])
                 continue
             b = lookup(board, r)
             if b: o[f"{r['d']}|{r['n']}|{r['k']}"] = [None, b['fv']]

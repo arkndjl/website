@@ -75,8 +75,8 @@ COMP = os.path.join(ROOT, 'scripts', 'data', 'recruit_on3_committed.json.gz')   
 
 
 def pack_committed(years):
-    """the committed recruits of the live classes (recruit_on3_visits.mjs --committed): name, state and dated visits,
-    for the recruit cards (scripts/player_moves.py). A class the pull did not reach keeps its last rows."""
+    """the committed recruits of the live classes (recruit_on3_visits.mjs --committed): name, state, dated visits and
+    RPM expert picks, for the recruit cards and the Crystal Ball schools (scripts/player_moves.py). A class the pull did not reach keeps its last rows."""
     import gzip
     out = json.load(gzip.open(COMP, 'rt')) if os.path.exists(COMP) else {}
     for sp in TEAMS:
@@ -86,8 +86,8 @@ def pack_committed(years):
             rows = {}
             for l in open(f):
                 if l.strip():
-                    r = json.loads(l); rows[r['slug']] = {k: r.get(k) for k in ('slug', 'name', 'state', 'visits')}
-            if rows: out.setdefault(sp, {})[str(y)] = [r for r in rows.values() if r.get('visits')]
+                    r = json.loads(l); rows[r['slug']] = {k: r.get(k) for k in ('slug', 'name', 'state', 'visits', 'picks')}
+            if rows: out.setdefault(sp, {})[str(y)] = [r for r in rows.values() if r.get('visits') or r.get('picks')]
     with open(COMP, 'wb') as raw, gzip.GzipFile(filename='', mode='wb', fileobj=raw, mtime=0) as fh:
         fh.write(json.dumps(out, separators=(',', ':'), sort_keys=True).encode())
     print('wrote', COMP, {sp: {y: len(v) for y, v in d.items()} for sp, d in out.items()})

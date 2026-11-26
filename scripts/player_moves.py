@@ -211,6 +211,60 @@ def build(sp, hist, slugs):
     return B
 
 
+EXTRA = os.path.join(ROOT, 'data', 'recruit_extra.json')
+VISIT_DAYS = 30
+
+
+def recruit_extra(slugs, lg):
+    """data/recruit_extra.json for the recruit transactions tab (layouts/shortcodes/recruitnews.html):
+      visits  the last VISIT_DAYS days' On3 visits of the class tabs' recruits: {d, n, k: visit (official) | unofficial,
+              to, tl, cls, pos, a (ARK stars), f (xFV)}
+      cb      a 247 Crystal Ball headline names no school: On3's RPM expert pick for the recruit on or before the headline
+              day + 1 (On3 live pull, uncommitted recruits) -> {"<d>|<n>": [school, logo, confidence, pick date]}"""
+    since, today = (dt.date.today() - dt.timedelta(days=VISIT_DAYS)).isoformat(), dt.date.today().isoformat()
+    out = {'visits': {}, 'cb': {}}
+    news = j('data/recruit_news.json')
+    for sp in ('cfb', 'cbb'):
+        rec = site_recruits(sp)
+        vis, seen = [], set()
+        picks = []
+        for src in ('scripts/data/recruit_on3_live.json.gz', 'scripts/data/recruit_on3_committed.json.gz'):
+            for y, rows in (j(src).get(sp) or {}).items():
+                m = names.Matcher(rec.get(int(y)) or [], team=None)
+                for o in rows:
+                    r, _ = m.find(o.get('name'))
+                    if not r or (o.get('state') and r.get('home') and not r['home'].endswith(o['state'])): continue
+                    if o.get('picks'): picks.append((r['name'], int(y), o['picks']))
+                    for v in o.get('visits') or []:
+                        if not (v[2] and since <= v[2] <= today and v[0] in slugs): continue
+                        k = 'visit' if v[1] == 'Official' else 'unofficial'
+                        key = (r['name'], v[2], k, slugs[v[0]])
+                        if key in seen: continue
+                        seen.add(key)
+                        to = slugs[v[0]]
+                        vis.append({'d': v[2], 'n': r['name'], 'k': k, 'to': to, 'tl': lg.get(names.team_key(to)) or None, 'cls': int(y),
+                                    'pos': r.get('pos'), 'a': r.get('ark'), 'f': None if r.get('xfv', r.get('fv')) is None else int(round(r.get('xfv', r.get('fv'))))})
+        vis.sort(key=lambda x: (x['d'], x['n']), reverse=True)
+        out['visits'][sp] = [{k: v for k, v in x.items() if v is not None} for x in vis]
+        cb = {}
+        for n in news.get(sp) or []:
+            if n.get('k') != 'cb' or n.get('to'): continue
+            lim = (dt.date.fromisoformat(n['d']) + dt.timedelta(days=1)).isoformat()
+            for name, y, pk in picks:
+                if (n.get('cls') and y != n['cls']) or not names.same(name, n['n']): continue
+                best = max((p for p in pk if p[0] and p[0] <= lim and p[1] in slugs), key=lambda p: p[0], default=None)
+                if best:
+                    to = slugs[best[1]]
+                    cb[f"{n['d']}|{n['n']}"] = [to, lg.get(names.team_key(to)) or None, best[3], best[0]]
+                break
+        out['cb'][sp] = cb
+    out['asof'] = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%d')
+    prev = j(os.path.relpath(EXTRA, ROOT))
+    if {k: prev.get(k) for k in ('visits', 'cb')} != {k: out[k] for k in ('visits', 'cb')}:
+        json.dump(out, open(EXTRA, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+    print('recruit extra:', {sp: len(v) for sp, v in out['visits'].items()}, 'visits;', {sp: len(v) for sp, v in out['cb'].items()}, 'crystal ball schools')
+
+
 def main():
     hist = j('scripts/data/player_moves_hist.json.gz')
     lg, slugs = logos(), school_slugs()
@@ -234,6 +288,7 @@ def main():
         print(sp, len(P), 'players', sum(len(v) for v in P.values()), 'moves', os.path.getsize(f) // 1024, 'KB')
     with open(HIST, 'wb') as raw, gzip.GzipFile(filename='', mode='wb', fileobj=raw, mtime=0) as fh:      # mtime 0: same rows, same bytes
         fh.write(json.dumps(hist, ensure_ascii=False, separators=(',', ':'), sort_keys=True).encode('utf-8'))
+    recruit_extra(slugs, lg)
 
 
 if __name__ == '__main__':

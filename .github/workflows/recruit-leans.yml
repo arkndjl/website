@@ -63,8 +63,11 @@ jobs:
         run: python3 scripts/recruit_commit_fit.py --live
       - name: Expert picks for the recruit GFX card
         run: python3 scripts/recruit_expert_picks.py
+      - name: Visits and Crystal Ball schools for the recruit transactions tab
+        continue-on-error: true
+        run: python3 scripts/player_moves.py
       - name: Commit if it changed
         # the build gate, then the push; on a rejection this run's files are taken whole onto the new main (scripts/data_push.py)
         run: |
           python3 scripts/data_push.py -m "Update the recruit leans ($(date -u +%Y-%m-%d))" \
-            -- data/recruit_commit_leans.json data/recruit_expert_picks.json data/recruit_rpm.json scripts/geo/recruit_campus.json scripts/data/recruit_on3_live.json.gz scripts/data/recruit_on3_committed.json.gz
+            -- data/recruit_commit_leans.json data/recruit_expert_picks.json data/recruit_rpm.json scripts/geo/recruit_campus.json scripts/data/recruit_on3_live.json.gz scripts/data/recruit_on3_committed.json.gz data/recruit_extra.json static/data/moves scripts/data/player_moves_hist.json.gz
