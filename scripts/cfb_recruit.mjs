@@ -463,7 +463,12 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   const SI = fit.stars?.idx && fit.index ? fit.stars.idx : null;
   const cutStars = (x, S) => { if (x == null || !S) return null; const t = 1 + S.cuts.filter(c => c <= x).length, h = S.half?.[t - 1]; return t <= 4 && h != null && x >= h ? t + 0.5 : t; };
   const arkStars = x => cutStars(x, fit.stars);
-  const starsOf = r => SI ? cutStars(indexScore(fit, r), SI) : arkStars(predict(fit, { ...r, k: 3 }).g.xfv);
+  // 5-star+: a five-star whose chance of a top-64 pick is at least SI.elite.line (the index score, the log industry
+  // rank and the industry rating past 95; scripts/cfb_recruit_retarget.py elite_block)
+  const eliteP = (r, x) => { const e = SI.elite, lir = r.indRank > 0 && r.indRank <= 400 ? Math.log(400) - Math.log(r.indRank) : 0;
+    return sig(e.b0 + e.coef[0] * x + e.coef[1] * lir + e.coef[2] * Math.max(0, ((r.ind || 0) - 95) / 5)); };
+  const idxStars = r => { const x = indexScore(fit, r), t = cutStars(x, SI); return t === 5 && SI.elite && eliteP(r, x) >= SI.elite.line ? 6 : t; };
+  const starsOf = r => SI ? idxStars(r) : arkStars(predict(fit, { ...r, k: 3 }).g.xfv);
   // where FV if on sits on this season's board (percentile), and the P10-P90 range of FV if on at year k:
   // the fit's out-of-sample miss at that year, widened by a mapped grade's own miss when ESPN has no grade yet
   const boardFv = rows.filter(r => r.fv != null && r.pos !== 'K' && r.pos !== 'P').map(r => r.fv).sort((a, b) => a - b);

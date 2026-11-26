@@ -309,7 +309,47 @@ def stars_nfl(data, scores):
 # and in the 2020 and 2021 classes neither fit saw). The tier shares are where the cuts explain the most outcome
 # variance in the classes left out (tests: scripts/research/recruits_cfb_nov16).
 STAR_SHARES = [0.625, 0.85, 0.9475, 0.985]   # cumulative share of signees below 2, 3, 4 and 5 stars
-PLUS_PER = 6                                  # 5-star+ recruits a class, on average (the line is a score, not a count)
+PLUS_PER = 6                                  # 5-star+ recruits a class before Nov 26 2026 (stars_nfl's comparison keeps it)
+# 5-star+ (Nov 26 2026): the five-stars who are better than even to be a top-64 pick. The chance is a logit on the
+# class's elite pool (top 100 by index score, plus the industry's top 100) of the index score, the log industry rank
+# and the industry rating past 95: at the very top the industry's order adds to the index (held out by class on
+# 2011-21, school-clustered t 2.2, 9 of 11 classes, and on the 2022 class neither saw; scripts/research/arkstars_nov26).
+ELITE_LINE = 0.5
+ELITE_POOL = 100
+
+
+def _logit(X, y, lam=1e-3):
+    m = X.mean(0); sd = X.std(0); sd[sd == 0] = 1
+    A = np.c_[np.ones(len(X)), (X - m) / sd]; b = np.zeros(A.shape[1]); P = lam * np.eye(A.shape[1]); P[0, 0] = 0
+    for _ in range(60):
+        p = 1 / (1 + np.exp(-A @ b)); st = np.linalg.solve(A.T @ (A * (p * (1 - p))[:, None]) + P, A.T @ (y - p) - P @ b); b = b + st
+        if np.abs(st).max() < 1e-9: break
+    return np.r_[b[0] - (b[1:] * m / sd).sum(), b[1:] / sd]
+
+
+def elite_x(data, s):
+    ir = np.array([r.get('indRank') or 0 for r in data], float); ind = np.array([r.get('ind') or 0 for r in data], float)
+    lir = np.where((ir > 0) & (ir <= 400), math.log(400) - np.log(np.maximum(ir, 1)), 0.0)
+    return np.c_[s, lir, np.maximum(0.0, (ind - 95) / 5)], ir
+
+
+def elite_pool(s, ir, cls):
+    pool = np.zeros(len(s), bool)
+    for c in set(cls):
+        i = np.where(cls == c)[0]; pool[i[np.argsort(-s[i], kind='stable')[:ELITE_POOL]]] = True; pool[i[(ir[i] > 0) & (ir[i] <= ELITE_POOL)]] = True
+    return pool
+
+
+def elite_block(data, s, oof):
+    """The top-64 logit and each history recruit's chance with his own class held out. Both are fit on the
+    out-of-fold index score: a new recruit's score is one the index never saw, and the in-sample score would take
+    weight from the industry terms that it has not earned."""
+    cls = np.array([r['year'] for r in data]); hit = np.array([bool(r['pick']) and r['pick'] <= 64 for r in data], float)
+    Xo, ir = elite_x(data, oof); po = elite_pool(oof, ir, cls); pool = po; b = _logit(Xo[po], hit[po]); p = np.zeros(len(data))
+    for c in sorted(set(cls)):
+        bc = _logit(Xo[po & (cls != c)], hit[po & (cls != c)]); p[cls == c] = R.sig(bc[0] + Xo[cls == c] @ bc[1:])
+    return {'b0': round(float(b[0]), 4), 'coef': [round(float(x), 4) for x in b[1:]], 'names': ['score', 'lnIndRank', 'ind95'], 'line': ELITE_LINE,
+            'pool': int(pool.sum()), 'hits': int(hit[pool].sum())}, p
 
 
 def index_score(ix, rows, sz):
@@ -324,7 +364,7 @@ def stars_block(data, ix, sz, oof):
     the monotone outcome-on-score curve passes the midpoint of the two tiers' means, kept in the tier's middle half),
     and each tier's outcomes read on the out-of-fold score."""
     s = index_score(ix, data, sz); y = np.array([r['rfv'] for r in data])
-    cuts = [float(x) for x in np.quantile(s, STAR_SHARES)] + [float(np.sort(s)[::-1][PLUS_PER * len(CLASSES) - 1])]
+    cuts = [float(x) for x in np.quantile(s, STAR_SHARES)]
     st = R.cut(s, cuts[:4]); mu = [y[st == t].mean() for t in (1, 2, 3, 4, 5)]
     o = np.argsort(s); bins = np.array_split(o, 80); bx = np.array([s[b].mean() for b in bins]); by = np.maximum.accumulate([y[b].mean() for b in bins])
     half = []
@@ -332,14 +372,15 @@ def stars_block(data, ix, sz, oof):
         lo = cuts[t - 1] if t else float(s.min()); hi = cuts[t]
         x = float(np.interp((mu[t] + mu[t + 1]) / 2, by + np.arange(len(by)) * 1e-9, bx))
         half.append(min(max(x, lo + 0.25 * (hi - lo)), lo + 0.75 * (hi - lo)))
-    so = R.cut(oof, list(np.quantile(oof, STAR_SHARES)) + [float(np.sort(oof)[::-1][PLUS_PER * len(CLASSES) - 1])]); rows = []
+    el, pe = elite_block(data, s, oof)
+    so = R.cut(oof, list(np.quantile(oof, STAR_SHARES))); so[(so == 5) & (pe >= ELITE_LINE)] = 6; rows = []
     for v in (6, 5, 4, 3, 2, 1):
         j = np.where(so == v)[0]
         rows.append({'stars': v, 'n': len(j), 'perClass': round(len(j) / len(CLASSES), 1), 'drafted': round(float(np.mean([data[x]['drafted'] for x in j])), 3),
                      'top32': round(float(np.mean([bool(data[x]['pick']) and data[x]['pick'] <= 32 for x in j])), 3),
                      'top64': round(float(np.mean([bool(data[x]['pick']) and data[x]['pick'] <= 64 for x in j])), 3),
                      'starter': round(float(np.mean([data[x]['avps'] >= 3 for x in j])), 3), 'fv': round(float(y[j].mean()), 1)})
-    return {'shares': STAR_SHARES, 'plusPer': PLUS_PER, 'cuts': [round(x, 3) for x in cuts], 'half': [round(x, 3) for x in half], 'tiers': rows}
+    return {'shares': STAR_SHARES, 'plusPer': rows[0]['perClass'], 'elite': el, 'cuts': [round(x, 3) for x in cuts], 'half': [round(x, 3) for x in half], 'tiers': rows}
 
 
 def stars_only():

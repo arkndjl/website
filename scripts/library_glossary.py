@@ -28,6 +28,12 @@ _CD = ld('data/cbb_declare_fit.json')                      # CBB stay-or-declare
 _CX = ld('data/cbb_xpm_research.json')                     # CBB pXPM fit + tests (scripts/cbb_xpm.py, scripts/research/cbb_xpm_nov26)
 _AG = ld('data/recruit_age_research.json')                  # recruit age for the class (scripts/research/recruit_age_nov26)
 _AGB, _AGF = _AG['cbb'], _AG['cfb']
+_AS = ld('data/arkstars_research.json')                     # 5-star+ tests (scripts/research/arkstars_nov26)
+_ASF, _ASB = _AS['cfb'], _AS['cbb']
+_STF = ld('data/cfb_recruit_retarget.json')['stars']        # CFB star cuts, 5-star+ model and held-out tiers
+_STB = ld('data/cbb_recruits.json')['model']['stars']       # CBB star cuts and the 5-star+ sweep
+_STB5 = next(x for x in _STB['plusSweep'] if x['perClass'] == _STB['plusPer'])
+_pc = lambda x: f'{100 * x:.0f}%'
 _AGC = _AG['coverage']['cfb'][max(_AG['coverage']['cfb'])]
 _PX = ld('data/nba_pxpm_research.json')                     # pXPM fit + held-out tests (scripts/nba_pxpm_research.py)
 _NBAEX = (f"Held out 2012-23 ({_NX['n']:,} player seasons, {100 * _NX['exitShare']:.0f}% out of the league): RMSE {_NX['exit_vs_cp']['rmse'][1]:.2f} -> "
@@ -149,11 +155,20 @@ sections.append({'id': 'fv', 'title': 'FV and grades', 'entries': [
        'CFB recruit profile weighed on NFL outcomes of 2011-19 classes; the board sets the level.',
        'CBB: hurdle on consensus rank and old-for-class; P(reach NBA) then log(FV - 20) given NBA; trained 2009-16.'],
       'Recruits tabs: 2027-2029 classes, class rankings, recruit model', ['CFB', 'CBB']),
-    E('ARK stars', 'Recruit star rating cut from the projected FV, not the industry stars.',
-      ['CFB: 5-star+ top 6 a class, 5 top 3% of board FV, 4 top 10%, 3 above median, 2 on board, 1 off board (year-3 xFV).',
-       'CBB: 5 = 2+ NBA seasons as a starter, 4 = reached the NBA, 3 = D-I starter at BPM +3, 2 = played D-I, 1 = did not.',
-       'Arrow = ARK stars minus industry stars.'],
-      'Recruits tabs', ['CFB', 'CBB']),
+    E('ARK stars', 'Recruit star rating cut on what past recruits with the same profile became, not the industry stars.',
+      [f"CFB: cut on the recruit index (expected NFL outcome, 2011-19 classes). A class holds about {_STF['tiers'][1]['perClass']:.0f} five-stars, {_STF['tiers'][2]['perClass']:.0f} four-stars, {_STF['tiers'][3]['perClass']:.0f} three-stars.",
+       'CFB drafted, held out: ' + ', '.join(f"{'5-star+' if x['stars'] > 5 else str(x['stars']) + '-star'} {_pc(x['drafted'])}" for x in _STF['tiers']) + '.',
+       'CBB: cut on FV. 5 = 2+ NBA seasons as a starter, 4 = reached the NBA, 3 = D-I starter at BPM +3, 2 = played D-I, 1 = did not.',
+       'Half stars inside each tier. Arrow = ARK stars minus industry stars.'],
+      'Recruits tabs; recruit cards', ['CFB', 'CBB']),
+    E('5-star+', 'The tier above five stars: recruits at even odds or better of the top pro outcome.',
+      [f"CFB: a five-star with a 50%+ chance of a top-64 pick. About {_STF['tiers'][0]['perClass']:.0f} a class; held out {_pc(_STF['tiers'][0]['top64'])} went top 64, {_pc(_STF['tiers'][0]['drafted'])} were drafted (plain five-stars {_pc(_STF['tiers'][1]['top64'])}, {_pc(_STF['tiers'][1]['drafted'])}).",
+       f"The chance reads the recruit index, the log industry rank and the industry rating past 95. Held out by class {_ASF['classes'][0]}-{str(_ASF['classes'][1])[2:]}: school-clustered t {_ASF['E1']['t']:.2f}, {_ASF['E1']['won']} classes; {_ASF['forwardClass']} class {_ASF['forward']['new'][1]} of {_ASF['forward']['new'][0]} top-64.",
+       f"Top 3 a class, top-64 rate: {_pc(_ASF['top3']['elite'])} with the industry terms, {_pc(_ASF['top3']['index'])} index alone, {_pc(_ASF['top3']['industry'])} industry rank. Top 6: {_pc(_ASF['top6']['elite'])}, {_pc(_ASF['top6']['index'])}, {_pc(_ASF['top6']['industry'])}.",
+       f"CBB: FV {_STB['cuts'][4]}+, about {_STB['plusPer']} a class. Held out {_pc(_ASB['tier']['hit'])} became NBA starters (2+ seasons), {_pc(_ASB['tier']['fv55'])} FV 55+ (plain five-stars {_pc(_ASB['plain']['hit'])}).",
+       f"CBB line re-tested on the same even-odds rule: a line at FV {_ASB['rule']['line']:.1f} ({_ASB['rule']['perClass']:.1f} a class) hits {_pc(_ASB['rule']['hit'])}, but the recruits between the two lines hit {_pc(_ASB['between']['hit'])} and the six-tier R2 falls {_ASB['tierR2']['shipped']:.3f} to {_ASB['tierR2']['rule']:.3f}. Line kept.",
+       f"Position at the top failed in both: CFB quarterback and line flags t {_ASF['E3']['t']:.2f}, CBB big and point-guard flags t {_ASB['B3']['t']:.2f}."],
+      'Recruits tabs; recruit cards', ['CFB', 'CBB']),
     E('Age for the class', 'Recruit age on Sep 1 of the class year, less the class median. Positive = old for the class.',
       [f"Median {_AGB['median']:.2f} CBB ({_AGB['n']:,} ranked recruits 2009-16), {_AGF['median']:.2f} CFB ({_AGF['n']:,} top-400 recruits who reached the NFL).",
        f"CBB NBA rate at about the same rank: {100 * _AGB['bins'][0]['nba']:.0f}% under 17.9, {100 * _AGB['bins'][2]['nba']:.0f}% at 18.2-18.6, {100 * _AGB['bins'][4]['nba']:.0f}% at 19.0+.",

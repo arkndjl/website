@@ -254,7 +254,7 @@
         // text only: the board's marks (ARKLIST star, riser arrow, injury and RB role tags, photos) stay off
         var cc = c && c.cloneNode(true); if (cc) cc.querySelectorAll('.gfx-off, .cfb__star, .cfb__carried, .cfb__warin, .cfb__riser, .cfb__injchip, .injtag, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__multichip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more, .nflwar__col, .nflwar__tm, .nflwar__rook, .esea-flag, .nbaxpm__tm, .nbaxpm__od, .brk__meta').forEach(function (e) { e.remove(); });
         var cell = { t: txt(cc).replace(/[▾▴▸★↗]/g, '').trim() };
-        // ARK stars (recruit tabs): pixel stars, 5-star+ in lilac with a plus
+        // ARK stars (recruit tabs): pixel stars, 5-star+ in its own teal-to-lilac fill with a plus
         var ark = c && c.querySelector('.cfbrc__ark[data-n]');
         if (ark) { var an = +ark.getAttribute('data-n'); cell.t = new Array(Math.floor(Math.min(an, 5)) + 1).join('✦') + (an % 1 ? '✧' : '') + (an > 5 ? '+' : ''); cell.color = C.teal; cell.glow = an > 5; }
         // mock draft trade tags: a pick already traded (solid) or a projected trade (dashed, ⇅)
@@ -423,9 +423,10 @@
             // the sorted column in white, a value below zero in pink
             g.fillStyle = c.color || (k === 0 ? C.lilac : k === 1 || k === sk ? C.white : /^[−-]\d/.test(c.t) && !c.img ? C.down : C.teal);
             var tw0 = tagsW(c, size), ft = fit(g, c.t, colW[k] - (tx - x) - 2 - tw0);
-            if (c.glow) {   // 5-star+: white pixel outline, teal glow, teal stars on top
-              g.save(); g.fillStyle = C.white; [[-2, 0], [2, 0], [0, -2], [0, 2]].forEach(function (d) { g.fillText(ft, tx + d[0], cy + d[1]); });
-              g.shadowColor = C.teal; g.shadowBlur = 14; g.fillStyle = C.teal; g.fillText(ft, tx, cy); g.restore();
+            if (c.glow) {   // 5-star+: dark pixel outline, lilac glow, the teal-to-lilac fill on top
+              g.save(); g.fillStyle = C.dark; [[-2, 0], [2, 0], [0, -2], [0, 2]].forEach(function (d) { g.fillText(ft, tx + d[0], cy + d[1]); });
+              g.shadowColor = C.lilac; g.shadowBlur = 12; g.fillStyle = C.lilac; g.fillText(ft, tx, cy); g.restore();
+              g.fillStyle = aurora(g, tx, Math.max(1, g.measureText(ft).width), 0);
             }
             g.fillText(ft, tx, cy);
             if (tw0) drawTags(g, c.tags, tx + g.measureText(c.t).width, cy, size);
@@ -1456,6 +1457,23 @@
     STAR7.forEach(function (r, j) { for (var i = 0; i < 7; i++) if (r[i] === '#') { g.fillStyle = fill >= 1 || (fill > 0 && i < 4) ? col : C.dark; g.fillRect(x + i * u, y + j * u, u, u); } });
     return 7 * u;
   }
+  // 5-star+ (ARK): its own colour, teal to lilac through white, moving a step at a time; a dark pixel outline and a
+  // white glint that hops from star to star. Still frame = phase 0; the preview animates it (canvas._anim).
+  var PLUS_STEPS = 12;
+  function aurora(g, x, w, ph) {
+    var off = ((ph || 0) % PLUS_STEPS) / PLUS_STEPS * w, gr = g.createLinearGradient(x - w + off, 0, x + w + off, 0);
+    [[0, C.teal], [0.14, C.teal], [0.2, C.white], [0.27, C.lilac], [0.42, C.lilac], [0.5, C.teal], [0.64, C.teal], [0.7, C.white], [0.77, C.lilac], [0.92, C.lilac], [1, C.teal]].forEach(function (p) { gr.addColorStop(p[0], p[1]); });
+    return gr;
+  }
+  function plusStars(g, x, sy, sz, ph) {
+    var u = Math.max(2, Math.floor(sz / 7)), o = Math.max(2, Math.round(u / 2)), w = 5 * (sz + 10), i;
+    for (i = 0; i < 5; i++) [[-o, 0], [o, 0], [0, -o], [0, o]].forEach(function (d) { pxStar(g, x + i * (sz + 10) + d[0], sy + d[1], sz, 1, C.dark); });
+    var gr = aurora(g, x, w, ph); for (i = 0; i < 5; i++) pxStar(g, x + i * (sz + 10), sy, sz, 1, gr);
+    g.save(); g.font = Math.round(sz * 1.1) + 'px ' + FONT; g.textBaseline = 'middle'; g.textAlign = 'left'; g.fillStyle = C.dark;
+    [[-o, 0], [o, 0], [0, -o], [0, o]].forEach(function (d) { g.fillText('+', x + w - 2 + d[0], sy + sz / 2 + 2 + d[1]); });
+    g.fillStyle = C.white; g.fillText('+', x + w - 2, sy + sz / 2 + 2); g.restore();
+    if ((ph || 0) % 3 !== 2) { var k = Math.floor((ph || 0) / 3) % 5, gx = x + k * (sz + 10) + 5 * u + Math.floor(u / 2), gy = sy + Math.floor(u / 2); g.fillStyle = C.white; g.fillRect(gx, gy - o, o, 3 * o); g.fillRect(gx - o, gy, 3 * o, o); }
+  }
   async function rcItems(rc) {
     if (!rc) return null;
     var items = [], logo = function (id) { return id ? loadImg('{{ "img/cfb/logos/" | relURL }}' + id + '.png') : Promise.resolve(null); };
@@ -1476,6 +1494,12 @@
         var five = Math.min(it.stars, 5), plus = it.stars > 5 || it.plus, room = cwi - 2 * pad - (plus ? 40 : 0);
         var sz = Math.min(Math.floor((room - 4 * 10) / 5 / 7) * 7, Math.floor((h - 2 * pad - 50) / 7) * 7, 70), sy = Math.round(y + 50 + (h - 50 - sz) / 2);
         if (!it.stars) { g.font = Math.min(84, h - 90) + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText('NR', cx + pad, sy + sz / 2); return; }
+        if (it.h === 'ARK' && it.stars > 5) {
+          var px0 = cx + pad, uu = Math.max(2, Math.floor(sz / 7)), rx = px0 - uu, ry = sy - 2 * uu, rw = cx + cwi - 6 - rx, rh = sz + 4 * uu;
+          plusStars(g, px0, sy, sz, 0);
+          (g.canvas._anim = g.canvas._anim || []).push(function (ph) { g.fillStyle = C.face; g.fillRect(rx, ry, rw, rh); plusStars(g, px0, sy, sz, ph); });
+          return;
+        }
         for (var i = 0; i < 5; i++) pxStar(g, cx + pad + i * (sz + 10), sy, sz, five - i >= 1 ? 1 : five - i > 0 ? 0.5 : 0, it.col);
         if (plus) { g.font = Math.round(sz * 1.1) + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText('+', cx + pad + 5 * (sz + 10) - 2, sy + sz / 2 + 2); }
         return;
@@ -3700,7 +3724,14 @@
       '<button type="button" class="cfb__btn" data-close>close</button></div></div>';
     box.querySelector('img').src = url;
     var a = box.querySelector('a'); a.href = url; a.download = name + '.png';
-    function close() { box.remove(); document.removeEventListener('keydown', esc); }
+    // a card with moving parts (5-star+ stars) shows the canvas itself, stepped a few times a second; the saved,
+    // copied and shared picture is the still frame
+    var tick = null;
+    if (canvas._anim && canvas._anim.length && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+      box.querySelector('img').replaceWith(canvas); var ph = 0;
+      tick = setInterval(function () { ph++; canvas._anim.forEach(function (fn) { fn(ph); }); }, 170);
+    }
+    function close() { if (tick) clearInterval(tick); box.remove(); document.removeEventListener('keydown', esc); }
     function esc(e) { if (e.key === 'Escape') close(); }
     box.addEventListener('click', function (e) { if (e.target === box || e.target.closest('[data-close], .gfx__x')) close(); });
     document.addEventListener('keydown', esc);
