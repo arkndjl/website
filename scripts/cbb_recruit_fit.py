@@ -40,6 +40,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import names as N   # noqa: E402
+import recruit_age as RA  # noqa: E402
 import fv_scale as FS   # the headline's stretched top (80 reachable, about one a board every five seasons)  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -1232,8 +1233,10 @@ def write():
             hm = (r.get('home') or '').split(',')[-1].strip()
             nat = 'au' if hm in ('NSW', 'VIC', 'QLD', 'Canberra', 'Australia') else 'ca' if hm in CA_PROV else None
             row['nat'] = nat
-            a = r.get('age')
-            if a is not None and 14 <= a <= 21: row['old'] = old_p(a, c)
+            # his birth-date bound: every On3 age reading so far, a FIBA roster date or a pin (scripts/recruit_age.py)
+            RA.observe('cbb', r.get('key'), r.get('age'), c, row['name'])
+            w = RA.window('cbb', r.get('key'), row['name'], c)
+            if w: row['old'] = RA.old_share(w, c)
             lst.append((r, row, tm))
         n_ranked = len(lst)
         if c in fiba:
@@ -1250,7 +1253,7 @@ def write():
             lead = team_of(rpm[0], smap, bt) if rpm and rpm[0] else None
             recs.append({'name': row['name'], 'pos': row['pos'], 'ht': r.get('htf'), 'wt': row['wt'], 'home': row['home'],
                          'hs': r.get('hs'), 'rk': row['rk'], 'stars': row['stars'], 'fsp': bool(row['fsp']),
-                         'svc': {k: v for k, v in row['svc'].items()}, 'age': r.get('age'),
+                         'svc': {k: v for k, v in row['svc'].items()}, 'age': r.get('age'), **(RA.fields('cbb', r.get('key'), row['name'], c, r.get('age')) if not r.get('fiba') else {}),
                          'team': tm, 'logo': bt[tm]['logo'] if tm else None, 'conf': bt[tm]['conf'] if tm else None,
                          'school': ' '.join(row['team'].split('-')[:-1]).title() if row['team'] and not tm else None, 'signed': bool(r.get('signed')),
                          'lead': [lead, rpm[1]] if lead and not row['team'] and not tm else None,
@@ -1293,6 +1296,7 @@ def write():
         'intl': sorted(intl, key=lambda x: (-x['fv'], -x['s'])),
     }
     json.dump(res, open(OUT, 'w'), separators=(',', ':'), allow_nan=False)
+    RA.save('cbb')
     print('wrote', OUT, {x['year']: (x['n'], x['committed'], x['reliability']['shrink']) for x in out_classes})
     return res
 

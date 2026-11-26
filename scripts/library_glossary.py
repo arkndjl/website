@@ -26,6 +26,9 @@ _NT = ld('data/nba_trade_fit.json')                         # NBA draft-night tr
 _RD = ld('data/return_drivers.json')                       # Return% sweep + reported-return lock (scripts/return_drivers.py, return_news.py)
 _CD = ld('data/cbb_declare_fit.json')                      # CBB stay-or-declare (scripts/cbb_declare.py)
 _CX = ld('data/cbb_xpm_research.json')                     # CBB pXPM fit + tests (scripts/cbb_xpm.py, scripts/research/cbb_xpm_nov26)
+_AG = ld('data/recruit_age_research.json')                  # recruit age for the class (scripts/research/recruit_age_nov26)
+_AGB, _AGF = _AG['cbb'], _AG['cfb']
+_AGC = _AG['coverage']['cfb'][max(_AG['coverage']['cfb'])]
 _PX = ld('data/nba_pxpm_research.json')                     # pXPM fit + held-out tests (scripts/nba_pxpm_research.py)
 _NBAEX = (f"Held out 2012-23 ({_NX['n']:,} player seasons, {100 * _NX['exitShare']:.0f}% out of the league): RMSE {_NX['exit_vs_cp']['rmse'][1]:.2f} -> "
           f"{_NX['exit_vs_cp']['rmse'][0]:.2f} (t {_NX['exit_vs_cp']['t']:.1f}, {_NX['exit_vs_cp']['won']}/{_NX['exit_vs_cp']['of']} seasons).")
@@ -151,6 +154,16 @@ sections.append({'id': 'fv', 'title': 'FV and grades', 'entries': [
        'CBB: 5 = 2+ NBA seasons as a starter, 4 = reached the NBA, 3 = D-I starter at BPM +3, 2 = played D-I, 1 = did not.',
        'Arrow = ARK stars minus industry stars.'],
       'Recruits tabs', ['CFB', 'CBB']),
+    E('Age for the class', 'Recruit age on Sep 1 of the class year, less the class median. Positive = old for the class.',
+      [f"Median {_AGB['median']:.2f} CBB ({_AGB['n']:,} ranked recruits 2009-16), {_AGF['median']:.2f} CFB ({_AGF['n']:,} top-400 recruits who reached the NFL).",
+       f"CBB NBA rate at about the same rank: {100 * _AGB['bins'][0]['nba']:.0f}% under 17.9, {100 * _AGB['bins'][2]['nba']:.0f}% at 18.2-18.6, {100 * _AGB['bins'][4]['nba']:.0f}% at 19.0+.",
+       f"CBB model input: old for the class (18+ on Oct 26 of the senior year), held out t {_AGB['old']['t']:.2f}, {_AGB['old']['classes']}/8 classes.",
+       f"Continuous age in its place t {_AGB['swap']['t']:.2f}, added t {_AGB['add']['t']:.2f}, young flag t {_AGB['young']['t']:.2f} (gate 2.0). Not shipped.",
+       f"CFB top-64 pick rate given an NFL entry: {100 * _AGF['bins'][1]['top64']:.0f}% at 18.0-18.4, {100 * _AGF['bins'][4]['top64']:.0f}% at 19.2+. Draft slot t {_AGF['pick']['t']:.2f}, {_AGF['pick']['classes']}.",
+       f"CFB not in the model: short of the gate, and On3 lists an age for {_AGC['age']} of the top {_AGC['n']} in the latest class read.",
+       'Birth dates: On3 whole-year age, bounded tighter by each daily reading; FIBA youth rosters; pins.',
+       'Cards show age vs the class once the birth date is known to 45 days. Hockey late birthday and soccer birth month failed.'],
+      'Recruit cards; CBB recruit model', ['CFB', 'CBB']),
     E('Badges (players)', 'Bronze to platinum trait medals by the name: one stat each, regressed by volume.',
       ['Tiers at the 75/90/97/99th percentile of the position. CFB badges build archetypes.',
        'On other boards a badge shows only if it predicts the sport\'s own outcome held out beyond the value metric.',

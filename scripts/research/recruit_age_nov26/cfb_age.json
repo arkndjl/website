@@ -1,0 +1,77 @@
+{
+ "median": 18.67,
+ "n": 1415,
+ "rows": 3599,
+ "bins": [
+  {
+   "lo": 0,
+   "hi": 18.0,
+   "n": 65,
+   "rank": 223,
+   "drafted": 0.677,
+   "top64": 0.231
+  },
+  {
+   "lo": 18.0,
+   "hi": 18.4,
+   "n": 329,
+   "rank": 168,
+   "drafted": 0.687,
+   "top64": 0.28
+  },
+  {
+   "lo": 18.4,
+   "hi": 18.8,
+   "n": 475,
+   "rank": 165,
+   "drafted": 0.615,
+   "top64": 0.227
+  },
+  {
+   "lo": 18.8,
+   "hi": 19.2,
+   "n": 357,
+   "rank": 162,
+   "drafted": 0.639,
+   "top64": 0.199
+  },
+  {
+   "lo": 19.2,
+   "hi": 30,
+   "n": 189,
+   "rank": 145,
+   "drafted": 0.593,
+   "top64": 0.201
+  }
+ ],
+ "given NFL entry: drafted + agec": {
+  "gain": 0.00239,
+  "t": 1.15,
+  "classes": "6/9",
+  "n": 1415
+ },
+ "given NFL entry: log pick + agec": {
+  "gain": 0.0066,
+  "t": 1.75,
+  "classes": "6/9",
+  "n": 1415
+ },
+ "given NFL entry: top-64 + agec": {
+  "gain": 0.00085,
+  "t": 0.57,
+  "classes": "6/9",
+  "n": 1415
+ },
+ "given NFL entry: drafted + old": {
+  "gain": 0.00017,
+  "t": 0.11,
+  "classes": "7/9",
+  "n": 1415
+ },
+ "age known (On3 or NFL): drafted + old": {
+  "gain": 0.0003,
+  "t": 0.18,
+  "classes": "7/9",
+  "n": 1477
+ }
+}
