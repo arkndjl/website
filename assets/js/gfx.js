@@ -1467,14 +1467,15 @@
     [[0, PT[0]], [0.11, PT[0]], [0.18, C.white], [0.23, PT[1]], [0.31, PT[1]], [0.38, PT[2]], [0.5, PT[0]], [0.61, PT[0]], [0.68, C.white], [0.73, PT[1]], [0.81, PT[1]], [0.88, PT[2]], [1, PT[0]]].forEach(function (p) { gr.addColorStop(p[0], p[1]); });
     return gr;
   }
-  function plusStars(g, x, sy, sz, ph) {
-    var u = Math.max(2, Math.floor(sz / 7)), o = Math.max(2, Math.round(u / 2)), w = 5 * (sz + 10), i;
-    for (i = 0; i < 5; i++) [[-o, 0], [o, 0], [0, -o], [0, o]].forEach(function (d) { pxStar(g, x + i * (sz + 10) + d[0], sy + d[1], sz, 1, C.dark); });
-    var gr = aurora(g, x, w, ph); for (i = 0; i < 5; i++) pxStar(g, x + i * (sz + 10), sy, sz, 1, gr);
+  function plusStars(g, x, sy, sz, ph, gp) {
+    gp = gp == null ? 10 : gp;
+    var u = Math.max(2, Math.floor(sz / 7)), o = Math.max(2, Math.round(u / 2)), w = 5 * (sz + gp), i;
+    for (i = 0; i < 5; i++) [[-o, 0], [o, 0], [0, -o], [0, o]].forEach(function (d) { pxStar(g, x + i * (sz + gp) + d[0], sy + d[1], sz, 1, C.dark); });
+    var gr = aurora(g, x, w, ph); for (i = 0; i < 5; i++) pxStar(g, x + i * (sz + gp), sy, sz, 1, gr);
     g.save(); g.font = Math.round(sz * 1.1) + 'px ' + FONT; g.textBaseline = 'middle'; g.textAlign = 'left'; g.fillStyle = C.dark;
     [[-o, 0], [o, 0], [0, -o], [0, o]].forEach(function (d) { g.fillText('+', x + w - 2 + d[0], sy + sz / 2 + 2 + d[1]); });
     g.fillStyle = C.white; g.fillText('+', x + w - 2, sy + sz / 2 + 2); g.restore();
-    if ((ph || 0) % 3 !== 2) { var k = Math.floor((ph || 0) / 3) % 5, gx = x + k * (sz + 10) + 5 * u + Math.floor(u / 2), gy = sy + Math.floor(u / 2); g.fillStyle = C.white; g.fillRect(gx, gy - o, o, 3 * o); g.fillRect(gx - o, gy, 3 * o, o); }
+    if ((ph || 0) % 3 !== 2) { var k = Math.floor((ph || 0) / 3) % 5, gx = x + k * (sz + gp) + 5 * u + Math.floor(u / 2), gy = sy + Math.floor(u / 2); g.fillStyle = C.white; g.fillRect(gx, gy - o, o, 3 * o); g.fillRect(gx - o, gy, 3 * o, o); }
   }
   async function rcItems(rc) {
     if (!rc) return null;
@@ -2428,17 +2429,17 @@
     ];
     var hh = 60, gap = 10, n = rows.length, rh = Math.min(190, Math.floor((F.h - hh - (n - 1) * gap) / n)), pad = 14;
     var right = F.x + F.w - pad - 6;
-    // header strip
+    // header strip: each header centred over its column
     g.font = '30px ' + FONT; g.fillStyle = C.lilac;
-    var hx = right;
+    var hx = right + 6;
     cols.forEach(function (c) {
-      var hy = F.y + hh / 2 - 4;
+      var hy = F.y + hh / 2 - 4, mid = hx - c[1] / 2;
       if (c[4]) {   // 5 [star] +  in pixels, no glyph
-        var tw = g.measureText(c[0]).width, sw = 21 + 6, pw = c[4] === 2 ? g.measureText('+').width + 2 : 0, x0 = hx - tw - sw - pw;
-        g.fillStyle = c[4] === 2 ? PT[1] : C.lilac; g.fillText(c[0], x0, hy); pxStar(g, x0 + tw + 4, hy - 12, 21, 1, c[4] === 2 ? PT[1] : PLAT);
-        if (pw) g.fillText('+', hx - pw + 2, hy);
+        var tw = g.measureText(c[0]).width, sw = 21 + 6, pw = c[4] === 2 ? g.measureText('+').width + 2 : 0, x0 = Math.round(mid - (tw + sw + pw) / 2);
+        g.fillStyle = c[4] === 2 ? PT[1] : C.lilac; g.fillText(c[0], x0, hy); pxStar(g, x0 + tw + 4, hy - 12, 21, 1, PLAT);
+        if (pw) g.fillText('+', x0 + tw + sw, hy);
         g.fillStyle = C.lilac;
-      } else g.fillText(c[0], hx - g.measureText(c[0]).width, hy);
+      } else g.fillText(c[0], Math.round(mid - g.measureText(c[0]).width / 2), hy);
       hx -= c[1];
     });
     var numsLeft = hx;
@@ -2452,22 +2453,29 @@
       if (logos[i]) drawLogo(g, logos[i], x, y + pad, ls, ls);
       x += ls + 22;
       // numbers, right-aligned under their headers
-      var nx = right;
-      cols.forEach(function (c) {
-        var t = c[2](d); g.font = Math.round(sz * (c[5] ? 1.15 : 0.92)) + 'px ' + FONT;
-        g.fillStyle = (c[4] && t === '0') ? 'rgba(200,199,255,0.45)' : c[3];
-        g.fillText(t, nx - g.measureText(t).width, l1); nx -= c[1];
+      // each number in its own cell: counts, grades and ranks tinted apart, the class score framed in teal
+      var nx = right + 6, ct = y + 8, ch = Math.round(rh * 0.5);
+      cols.forEach(function (c, k) {
+        var t = c[2](d), cx0 = nx - c[1] + 4, cw0 = c[1] - 8;
+        g.fillStyle = c[5] ? C.dark : c[4] ? 'rgba(36,26,58,0.75)' : 'rgba(200,199,255,0.10)'; g.fillRect(cx0, ct, cw0, ch);
+        if (c[5]) { g.fillStyle = C.teal; g.fillRect(cx0, ct + ch - 4, cw0, 4); }
+        g.font = Math.round(sz * (c[5] ? 1.05 : 0.9)) + 'px ' + FONT;
+        g.fillStyle = (c[4] && t === '0') ? 'rgba(200,199,255,0.4)' : c[3];
+        g.fillText(t, Math.round(nx - c[1] / 2 - g.measureText(t).width / 2), ct + ch / 2 + 2); nx -= c[1];
       });
       g.font = sz + 'px ' + FONT; g.fillStyle = C.white;
-      g.fillText(fit(g, txt(r.querySelector('.cfb__team')) || txt(r.cells[1]), numsLeft - 30 - x), x, l1);
+      g.fillText(fit(g, txt(r.querySelector('.cfb__team')) || txt(r.cells[1]), numsLeft - 24 - x), x, l1);
       // the three best commits: ARK stars, name, position, FV
       var top = (d.top || []).slice(0, 3).map(function (t) { return Array.isArray(t) ? t : [t.name, t.pos, t.xfv, t.ark]; }), tw3 = (right - x) / 3, fs = Math.max(26, Math.min(36, Math.round(rh * 0.23))), ss = Math.max(14, Math.floor(fs * 0.62 / 7) * 7), sg = 3;
       top.forEach(function (t, k) {
         var tx = Math.round(x + k * tw3), a = t[3] || 0, five = Math.min(a, 5), col = a > 5 ? PT[1] : PLAT;
-        for (var q = 0; q < 5; q++) pxStar(g, tx + q * (ss + sg), l2 - ss / 2, ss, five - q >= 1 ? 1 : five - q > 0 ? 0.5 : 0, col);
-        var sx = tx + 5 * (ss + sg) + 2;
+        var sx = tx + 5 * (ss + sg) + 2, sy0 = Math.round(l2 - ss / 2);
+        if (a > 5) {   // 5-star+: the platinum sheen, moving in the preview (still frame = phase 0)
+          var uu = Math.max(2, Math.floor(ss / 7)), bx = tx - uu, by = sy0 - 2 * uu, bw = 5 * (ss + sg) + Math.round(ss * 0.8) + uu, bh = ss + 4 * uu;
+          plusStars(g, tx, sy0, ss, 0, sg);
+          (g.canvas._anim = g.canvas._anim || []).push(function (ph) { g.fillStyle = C.well; g.fillRect(bx, by, bw, bh); plusStars(g, tx, sy0, ss, ph, sg); });
+        } else for (var q = 0; q < 5; q++) pxStar(g, tx + q * (ss + sg), sy0, ss, five - q >= 1 ? 1 : five - q > 0 ? 0.5 : 0, col);
         g.font = fs + 'px ' + FONT;
-        if (a > 5) { g.fillStyle = PT[1]; g.fillText('+', sx - 2, l2); }
         sx += g.measureText('+').width + 6;
         var fv = String(Math.round(t[2])), fw = g.measureText(fv).width, pos = t[1] || '', pw = pos ? g.measureText(pos).width + 12 : 0;
         var room = tx + tw3 - 28 - sx - fw - pw - 12, nm = fit(g, t[0], room);
