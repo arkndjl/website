@@ -13,11 +13,11 @@ draft = false
 Toc = true
 +++
 
-XPM for college basketball is a projection. pXPM takes a player's last three seasons of Barttorvik BPM and his box score, and estimates what his BPM will be next season, in points per 100 possessions over an average D-I player, split into offense and defense.
+XPM (Cross Plus-Minus) for college basketball is a projection of a player's BPM for the following season, in points per 100 possessions above an average D-I player, split into offense and defense. It is built from a player's last three seasons of Barttorvik BPM and his box score rates.
 
-The NBA version of XPM has two parts: rXPM, which describes a season, and pXPM, which projects the next one. I tried to build both for college. pXPM beat BPM clearly. rXPM did not beat what the site already uses (Barttorvik's game BPM, GBPM), so there is no college rXPM. Season value on the College Basketball ARKBOARD stays on GBPM-based WAR, and pXPM is used where the board makes forecasts: the FV model and the preseason team ratings in the game model.
+The NBA version of XPM has two versions. rXPM is the descriptive version, and pXPM is the predictive version. I tried to build both for college basketball. pXPM was much better than BPM at predicting the next season. rXPM was not better than Barttorvik's game BPM (GBPM), which the site already uses for WAR, so there is no college rXPM. Season value on the College Basketball ARKBOARD stays on GBPM-based WAR, and pXPM is used in the FV model and in the preseason team ratings in the game model.
 
-This article goes through why the NBA formula can't be copied, how pXPM is built, how it compares with the public college metrics, and what changed on the site.
+In this article I will go through why the NBA version can't be used for college, how pXPM is built, how it compares to the public college metrics at predicting the next season, and where it is used on the site.
 
 ## Why Not Copy The NBA Version
 NBA XPM is a 50/50 blend of BPM and databallr's DPM, and DPM is built on RAPM. The RAPM base is what lets it pick up defensive and off-ball value that the box score misses. College basketball doesn't have that:
@@ -26,7 +26,7 @@ NBA XPM is a 50/50 blend of BPM and databallr's DPM, and DPM is built on RAPM. T
 - **Lineup data is thin.** ESPN's college play-by-play has no substitutions. NCAA.com's play-by-play does, but only for about half of 2024-25 games and almost all of 2025-26. That is two seasons, not enough for a backtest.
 - **I already tried a RAPM prior.** In early November I built a college XPM as Barttorvik BPM plus a ridge RAPM adjustment from those two seasons of lineups. It was worse than BPM alone at predicting held-out game margins at every penalty I tried, so the best weight on the lineup data was zero.
 
-So college XPM has to come from the box score. BPM is already a box score regression, though, so pXPM has to do something BPM doesn't: it has to project.
+This means college XPM has to be built from the box score. BPM is already a regression on the box score, so rebuilding it from the same stats would not add much. The part that can be improved is projection, since BPM is a measure of one season and is not fit to predict the next one.
 
 ## Formulation
 pXPM is built separately for offense and defense, and the two sides are added together.
@@ -36,18 +36,18 @@ pXPM is built separately for offense and defense, and the two sides are added to
 - **Offense**: weights 1, .35 and .2, with 200 minutes of shrink.
 - **Defense**: weights 1, .6 and .4, with 100 minutes of shrink.
 
-The shrink pulls the weighted BPM toward the season's mean for players with fewer than 200 minutes. A freshman who played 150 minutes is mostly the low-minute average, and a senior with three full seasons is mostly himself. Defense keeps more of the older seasons than offense does.
+The shrink pulls the weighted BPM toward the season's average for players with fewer than 200 minutes. A freshman who played 150 minutes gets slightly more weight on that average than on his own BPM, and a senior with three full seasons gets almost all of the weight on his own BPM. Defense puts more weight on the older seasons than offense does, since defensive BPM from a single season is less stable.
 
 **Fit.** The shrunk history goes into a regression on next-season BPM along with:
 
-- **Class** (So, Jr, Sr, compared to Fr): the development curve. A freshman projects about a point better next season than a senior with the same history.
+- **Class** (So, Jr, Sr, compared to Fr): this accounts for development. A freshman projects about a point better the next season than a senior with the same history.
 - **Minutes** (ln(1 + minutes / 100)).
 - **Twelve box score rates**: steal rate, block rate, offensive and defensive rebound rate, assist rate, turnover rate, free throw rate, 3PA per 100, share of shots at the rim, usage, TS% and height. Each one is z-scored within its season and multiplied by minutes / (minutes + 200), so a 40-minute line can't move the projection much.
 
-Rows are weighted by next-season minutes, and the box rates get a small ridge penalty. The fit uses every pair of seasons from 2008-09 to 2009-10 through 2024-25 to 2025-26. None of the 2026-27 season goes into it.
+Each player is weighted by his minutes the next season, and the box rates have a small ridge penalty. The fit uses every pair of seasons from 2008-09 to 2009-10 through 2024-25 to 2025-26, and nothing from the 2026-27 season is used.
 
 ### What The Box Rates Add
-BPM already uses most of these rates, so their weights in pXPM measure how much BPM over- or under-credits each one for the next season:
+BPM already uses most of these rates, so their weights in pXPM show how much BPM gives too much or too little credit to each one when predicting the next season:
 
 | Rate (per SD) | Offense | Defense |
 | :--- | :---: | :---: |
@@ -64,9 +64,9 @@ BPM already uses most of these rates, so their weights in pXPM measure how much 
 
 *Weights on next-season BPM after the player's own BPM history, per standard deviation of each rate, before the minutes factor (about .8 for a full season).*
 
-Offense is where the box score regresses the most. Shooting efficiency is the least stable stat in the box score (it took 31 NBA games to reach a split-half r of .50, compared with 14 for XPM), so a player whose BPM was driven by a high TS% gives some of it back the next season. Usage and turnovers go the other way. A high-usage player with a lot of turnovers is usually the one creating the offense, and his BPM undersells how much of that carries over.
+The largest weight is on TS%. Shooting efficiency is the least stable stat in the box score (in the NBA it took 31 games to reach a split-half r of .50, compared to 14 for XPM), so a player whose BPM was high because of his TS% will usually lose some of it the next season. Usage and turnovers have the opposite sign. A high-usage player with a lot of turnovers is usually the one creating the offense, and more of his value carries over to the next season than his BPM shows.
 
-On defense, BPM doesn't give enough credit to size. Height, offensive rebounding, assists and blocks all predict a better defensive BPM the next season than the player's current defensive BPM does.
+On defense, BPM doesn't give enough credit to size. Height, offensive rebounding, assists and blocks all predict a better defensive BPM the next season than the player's current defensive BPM shows.
 
 ## Predicting The Next Season
 I used the same harness as the November 24 metric audit:
@@ -90,12 +90,12 @@ There are 14 season pairs (2012-13 to 2013-14 through 2024-25 to 2025-26). pXPM 
 
 *90% intervals from 2,000 resamples of season pairs.*
 
-pXPM beats BPM in all 14 season pairs (t = 15.7), and the player error falls from 3.41 points to 2.36. Most of that comes from using three seasons, the shrink and the class curve (.727 with no box rates). The box rates add the rest.
+pXPM is better than BPM in all 14 season pairs (t = 15.7), and the player error goes from 3.41 points to 2.36. Most of the improvement comes from using three seasons, the shrink and the class terms (.727 without the box rates), and the box rates add the rest.
 
-pXPM is not the best projection on the site, though. xBPM, the board's preseason projection of a player's BPM, is slightly ahead (.735 and .795). It uses everything pXPM uses plus recruiting rank, age and team context (returning teammates, the new team's talent and whether a transfer moved up or down a level). I also tested pXPM as one more input to xBPM, and it only moved the team R² from .7348 to .7353, which isn't enough to add it. So xBPM stays as the board's projected BPM.
+xBPM, the board's preseason projection of a player's BPM, is slightly better than pXPM (.735 and .795). It uses everything pXPM uses, plus recruiting rank, age and team context (returning teammates, the new team's talent and whether a transfer moved up or down a level). I also tested pXPM as an input to xBPM, and it only raised the team R² from .7348 to .7353, which isn't enough to add it, so xBPM stays as the board's projected BPM.
 
 ## Where pXPM Is Used
-Following the site's rule that anything that works in one model gets tested in the others, I tested pXPM in the three models that use last season's BPM.
+I tested pXPM in the three models on the site that use a player's BPM from the previous season.
 
 ### Preseason Team Ratings
 The game model's preseason rating for each team uses a projection of every returning player's BPM. Replacing last-season BPM with pXPM in that projection:
@@ -106,9 +106,9 @@ The game model's preseason rating for each team uses a projection of every retur
 | Game margin MAE, 2016-20 | 9.2643 | **9.2618** |
 | Game margin MAE, 2021-26 (held out) | 9.5915 | **9.5892** |
 
-The team R² is better in 13 of 14 seasons (t = 4.1), and the game margin error is lower in 10 of 11 seasons (t = −2.6 in the tuning years, −2.8 held out). The gain is small because the preseason rating only matters early in the season, before game results take over, but it's consistent.
+The team R² is better in 13 of 14 seasons (t = 4.1), and the game margin error is lower in 10 of 11 seasons (t = −2.6 in the seasons used to fit it, −2.8 held out). The improvement in game margins is small, since the preseason rating only has much weight early in the season, before the model has many game results for each team.
 
-xBPM in the same spot is worse (.752). The preseason rating already has recruiting rank and transfer context, so xBPM counts them twice. pXPM only adds what the box score says about the player.
+Using xBPM in place of pXPM here is worse (.752). The preseason rating already includes recruiting rank and transfer context, so xBPM counts them twice, while pXPM only adds information from the box score.
 
 ### FV
 For returning players, the FV model picks its drivers by out-of-sample deviance. When pXPM is a candidate, the selection takes it ahead of last-season BPM, which drops out:
@@ -121,10 +121,10 @@ For returning players, the FV model picks its drivers by out-of-sample deviance.
 | Realized FV of each board's top 50, 2017-19 boards (held out) | 39.0 | **39.6** |
 | Top-300 correlation, 2017-19 boards (held out) | **.434** | .422 |
 
-Head to head against 3-season BPM as a driver, pXPM wins in every fold of both splits (t = 2.5 and 3.1). The one check it doesn't win is the held-out top-300 correlation on the 2017-19 boards (better in 1 of 3), but the top 50 of those boards realized a higher FV, and the NBA AUC improved on every set of boards.
+Head to head against 3-season BPM as a driver, pXPM is better in every fold of both splits (t = 2.5 and 3.1). The only test it is worse on is the held-out top-300 correlation on the 2017-19 boards (better in 1 of 3 boards). The top 50 of those boards had a higher realized FV, and the AUC for reaching the NBA was higher on every set of boards.
 
 ### NBA Mock Draft
-The conviction mock projects career peak XPM from draft slot, 3-season BPM and age. pXPM in place of 3-season BPM was a tie (better in 8 of 15 drafts, t = 0.6), and the order of the mock was slightly worse, so the mock stays on 3-season BPM.
+The conviction mock projects career peak XPM from draft slot, 3-season BPM and age. Using pXPM in place of 3-season BPM was about even (better in 8 of 15 drafts, t = 0.6), and the order of the mock was slightly worse, so the mock stays on 3-season BPM.
 
 ## Why There Is No rXPM
 For the descriptive version, I tested three versions against GBPM, using each season's team win% held out one season at a time:
@@ -137,7 +137,7 @@ For the descriptive version, I tested three versions against GBPM, using each se
 | Blend with the team adjustment | .636 |
 | BPM | .633 |
 
-The team adjustment is what made NBA rXPM the best descriptive metric, but in college it makes things worse. It forces a team's players to add up to its adjusted efficiency margin, and that is exactly what BPM already does, so the adjusted version falls back to BPM's level. GBPM, the average of a player's single-game BPMs, follows winning more closely, and it is already what CBB WAR is built on.
+In the NBA, the team adjustment is what made rXPM the best descriptive metric, but in college it makes the fit worse. It makes a team's players add up to its adjusted efficiency margin, which BPM already does, so the adjusted version ends up at about the same level as BPM. GBPM, the average of a player's single-game BPMs, has a closer fit to winning, and it is already what CBB WAR is built on.
 
 ## 2025-26 Leaders
 
@@ -156,6 +156,6 @@ The team adjustment is what made NBA rXPM the best descriptive metric, but in co
 
 *Projected BPM for 2026-27 from lines through 2025-26, 500+ minutes.*
 
-Most of this list is gone to the NBA or out of eligibility, which is the point of the FV and team rating inputs: pXPM is a number about next season, and for the players who come back (Tugler and Ngongba here), it now feeds the board's FV and their teams' preseason ratings.
+Most of the players on this list are now in the NBA or out of eligibility. For the players who returned (Tugler and Ngongba here), pXPM is used in their FV and in their teams' preseason ratings.
 
-The formula, the coefficients and every test are in the Process tab under pXPM (CBB), and the research scripts are in the site's repository under scripts/research/cbb_xpm_nov26.
+The formula, coefficients and test results are in the Process tab under pXPM (CBB), and the research scripts are in the site's repository under scripts/research/cbb_xpm_nov26.
