@@ -48,6 +48,17 @@ jobs:
           node scripts/recruit_on3_visits.mjs cfb 2028 2029 --open --top 400
           node scripts/recruit_on3_visits.mjs cbb 2027 2028 2029 --open --top 120
           python3 scripts/recruit_on3_join.py --live 2027 2028 2029
+      # the committed recruits' visits for the GFX cards (scripts/player_moves.py): Mondays and hand runs; a recruit who
+      # commits between pulls keeps the visits the daily pull saw (scripts/data/player_moves_hist.json.gz)
+      - name: On3 visits of the committed recruits (weekly)
+        if: github.event_name != 'workflow_run'
+        continue-on-error: true
+        timeout-minutes: 40
+        run: |
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ] && [ "$(date -u +%u)" != "1" ]; then echo "not Monday"; exit 0; fi
+          node scripts/recruit_on3_visits.mjs cfb 2027 2028 2029 --committed --top 400
+          node scripts/recruit_on3_visits.mjs cbb 2027 2028 2029 --committed --top 120
+          python3 scripts/recruit_on3_join.py --committed 2027 2028 2029
       - name: Score the live classes
         run: python3 scripts/recruit_commit_fit.py --live
       - name: Expert picks for the recruit GFX card
@@ -56,4 +67,4 @@ jobs:
         # the build gate, then the push; on a rejection this run's files are taken whole onto the new main (scripts/data_push.py)
         run: |
           python3 scripts/data_push.py -m "Update the recruit leans ($(date -u +%Y-%m-%d))" \
-            -- data/recruit_commit_leans.json data/recruit_expert_picks.json data/recruit_rpm.json scripts/geo/recruit_campus.json scripts/data/recruit_on3_live.json.gz
+            -- data/recruit_commit_leans.json data/recruit_expert_picks.json data/recruit_rpm.json scripts/geo/recruit_campus.json scripts/data/recruit_on3_live.json.gz scripts/data/recruit_on3_committed.json.gz

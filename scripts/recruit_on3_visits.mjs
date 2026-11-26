@@ -4,6 +4,7 @@
 // the dated RPM expert picks (expert, school, confidence, the pick it replaced).
 //   node scripts/recruit_on3_visits.mjs cfb 2027 2028 [--top 600] [--force]
 //   node scripts/recruit_on3_visits.mjs cfb 2027 2028 2029 --open   (live: uncommitted only, fresh)
+//   node scripts/recruit_on3_visits.mjs cfb 2027 2028 --committed   (committed only, for the cards' visits)
 //   -> scripts/.cache/recruit_on3/<sport>-<class>.jsonl (one recruit a line; resumable)
 // On3 sits behind Cloudflare: one Chromium page clears it, then the pages' Next.js JSON routes are fetched from inside it.
 import fs from 'fs';
@@ -26,7 +27,9 @@ const args = process.argv.slice(2);
 const sp = args[0]; if (!SPORT[sp]) throw new Error('sport: cfb | cbb');
 const years = args.filter(a => /^\d{4}$/.test(a)).map(Number);
 const ti = args.indexOf('--top'), TOP = ti > 0 ? +args[ti + 1] : (sp === 'cfb' ? 600 : 150);
-const force = args.includes('--force'), open = args.includes('--open');   // --open: uncommitted recruits only, always re-pulled (the live classes)
+// --open: uncommitted recruits only, always re-pulled (the live classes); --committed: committed recruits only, into
+// <sport>-<class>-committed.jsonl (their visits for the GFX cards)
+const force = args.includes('--force'), open = args.includes('--open'), committed = args.includes('--committed');
 const PAR = 6;
 
 const { chromium } = await loadPlaywright();
@@ -87,7 +90,7 @@ function pack(slug, rec, pred) {
 fs.mkdirSync(OUT, { recursive: true });
 await boot(`https://www.on3.com/rivals/rankings/industry-player/${SPORT[sp]}/${years[0] || 2027}/`);
 for (const y of years) {
-  const f = path.join(OUT, `${sp}-${y}.jsonl`);
+  const f = path.join(OUT, `${sp}-${y}${committed ? '-committed' : ''}.jsonl`);
   if ((force || open) && fs.existsSync(f)) fs.unlinkSync(f);
   const done = new Set(fs.existsSync(f) ? fs.readFileSync(f, 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l).slug) : []);
   const slugs = [];
@@ -99,7 +102,8 @@ for (const y of years) {
     pages = list.pagination.pageCount;
     for (const it of list.list) {
       if (++seen > TOP) break;
-      if (!open || !it.person.status?.committedOrganizationSlug) slugs.push(it.person.slug);
+      const com = !!it.person.status?.committedOrganizationSlug;
+      if (committed ? com : !open || !com) slugs.push(it.person.slug);
     }
   }
   const todo = slugs.filter(s => !done.has(s));
