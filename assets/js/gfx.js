@@ -2761,25 +2761,53 @@
     for (var k = 0; k < 2; k++) {
       var t = k ? d.them : d.us;
       if (teamLogo(g, t.logo ? await loadImg(t.logo) : null, lx, y - 20, LS)) lx += LS + 28;
-      g.font = '76px ' + FONT; g.fillStyle = k ? C.down : C.teal; var nm = fit(g, (t.ark ? t.ark + ' ' : '') + t.name, w / 2 - LS - 160), nx0 = lx, sw0 = 0; g.fillText(nm, lx, y - 20 + LS / 2 - 18);
-      if (t.std || t.rec) { g.font = '36px ' + FONT; g.fillStyle = C.lilac; var sl = [t.std ? 'STANDINGS ' + t.std : '', t.rec].filter(Boolean).join(' · '); g.fillText(sl, nx0, y - 20 + LS / 2 + 44); sw0 = g.measureText(sl).width; g.font = '76px ' + FONT; }
+      var nf = 76, nt = (t.rank ? t.rank + ' ' : '') + t.name; g.font = nf + 'px ' + FONT; while (nf > 48 && g.measureText(nt).width > w / 2 - LS - 160) { nf -= 4; g.font = nf + 'px ' + FONT; }   // a long name steps down before it's cut
+      g.fillStyle = k ? C.down : C.teal; var nm = fit(g, nt, w / 2 - LS - 160), nx0 = lx, sw0 = 0; g.fillText(nm, lx, y - 20 + LS / 2 - 18);
+      if (t.std || t.rec) { g.font = '36px ' + FONT; g.fillStyle = C.lilac; var sl = [t.std ? 'STANDINGS ' + t.std : '', t.rec].filter(Boolean).join(' · '); g.fillText(sl, nx0, y - 20 + LS / 2 + 44); sw0 = g.measureText(sl).width; g.font = nf + 'px ' + FONT; }
       lx += Math.max(g.measureText(nm).width, sw0 || 0) + 44;
       if (!k) { g.fillStyle = C.lilac; g.font = '52px ' + FONT; g.fillText('VS', lx, y - 20 + LS / 2); lx += g.measureText('VS').width + 44; }
     }
     y += LS + 30;
-    var trees = [vetoTree(d, true), vetoTree(d, false)], bo = trees[0].bo;
+    var trees = [vetoTree(d, true), vetoTree(d, false)], bo = trees[0].bo, SR = bo === 3 && d.series, SK = SR && d.stakes;
     g.font = '48px ' + FONT; g.fillStyle = C.lilac;
-    g.fillText(fit(g, 'BO' + bo + ' · 1NT ' + d.win + '% · ' + d.when, w), x, y); y += 70;
+    g.fillText(fit(g, SR ? ['BO3', SK ? SK.slot : '', d.when].filter(Boolean).join(' · ') : 'BO' + bo + ' · 1NT ' + d.win + '% · ' + d.when, w), x, y); y += 70;
+    if (SR) {   // a Bo3 is called as a series: series win %, spread in maps, likeliest score, the three maps the veto leads to
+      var bh = 80; g.fillStyle = C.down; g.fillRect(x, y, w, bh); g.fillStyle = C.teal; g.fillRect(x, y, w * d.win / 100, bh);
+      g.font = '48px ' + FONT; g.fillStyle = C.dark; g.fillText('1NT ' + d.win + '% SERIES', x + 24, y + bh / 2);
+      var rr = (100 - d.win) + '% ' + d.opp; g.textAlign = 'right'; g.fillText(fit(g, rr, w * 0.4), x + w - 24, y + bh / 2); g.textAlign = 'left';
+      y += bh + 24;
+      var tw = (w - 48) / 3, TH = 160, tiles = [['SERIES SPREAD', d.series.line, d.series.lineSub], ['PROJECTED SERIES', d.series.score, d.series.scoreSub], ['FORMAT', 'Bo3', d.series.mapsSub]];
+      tiles.forEach(function (t, i) {
+        var tx = x + i * (tw + 24); g.fillStyle = C.face; g.fillRect(tx, y, tw, TH); bevel(g, tx, y, tw, TH, true, 3);
+        g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, t[0], tw - 40), tx + 20, y + 34);
+        var tf = 60; g.font = tf + 'px ' + FONT; while (tf > 36 && g.measureText(t[1]).width > tw - 40) { tf -= 4; g.font = tf + 'px ' + FONT; }
+        g.fillStyle = C.white; g.fillText(fit(g, t[1], tw - 40), tx + 20, y + 88);
+        if (t[2]) { g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, t[2], tw - 40), tx + 20, y + 134); }
+      });
+      y += TH + 24;
+      var mps = d.series.maps || [], MH = 170;
+      mps.forEach(function (m, i) {   // side: the team that did not pick a map chooses its side; the decider goes to a knife
+        var mx = x + i * (tw + 24), kn = knife(d, m.map), dec = m.by === 'decider', ourPick = /^1NT/.test(m.by);
+        g.fillStyle = C.well; g.fillRect(mx, y, tw, MH); bevel(g, mx, y, tw, MH, false, 3);
+        g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, 'MAP ' + (i + 1) + ' · ' + m.by, tw - 40), mx + 20, y + 32);
+        g.font = '50px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, m.map, tw - 170), mx + 20, y + 86);
+        g.textAlign = 'right'; g.fillStyle = m.p >= 50 ? C.teal : C.down; g.fillText(m.p + '%', mx + tw - 20, y + 86); g.textAlign = 'left';
+        g.font = '30px ' + FONT;
+        var sd = ourPick ? 'OPP CHOOSES SIDE' : kn ? (dec ? 'WIN KNIFE: START ' : '1NT START ') + kn.side : dec ? 'KNIFE' : '1NT CHOOSES SIDE';
+        g.fillStyle = !ourPick && kn && kn.sure ? C.teal : C.lilac; g.fillText(fit(g, sd, tw - 40), mx + 20, y + 140);
+      });
+      if (mps.length) y += MH + 40;
+    }
     var rows = trees.map(function (T) { return treeRows(T.root, 0); });
-    // expected map (habit line, 1NT bans first) and its knife side, at the bottom
+    // expected map (habit line, 1NT bans first) and its knife side, at the bottom; a playoff Bo3 shows where a win or a loss goes instead
     var expLeaf = null;   // the habit line's decider, 1NT banning first (set while drawing)
-    var BOXH = 300, boxY = bottom - BOXH, avail = boxY - 40 - y;
+    var BOXH = SK ? 280 : SR ? 0 : 300, boxY = bottom - BOXH, avail = boxY - 40 - y;
     var nrows = rows[0].length + rows[1].length, rh = Math.max(56, Math.min(100, Math.floor((avail - 2 * 150) / nrows))), fs = Math.min(52, Math.round(rh * 0.56));
     var ind = 64, cTag = x + w * 0.37, cRep = x + w * 0.47, cDec = x + w * 0.68;
     rows.forEach(function (R, ti) {
       g.font = '48px ' + FONT; g.fillStyle = C.white; g.fillText((ti ? d.opp.toUpperCase() : '1NT') + ' BANS FIRST', x, y + 24);
       g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.textAlign = 'right';
-      g.fillText('EXP. ' + (bo === 3 ? 'SERIES ' : 'MAP ') + Math.round(trees[ti].ev * 100) + '%', x + w, y + 24); g.textAlign = 'left';
+      if (!SR) g.fillText('EXP. ' + (bo === 3 ? 'SERIES ' : 'MAP ') + Math.round(trees[ti].ev * 100) + '%', x + w, y + 24); g.textAlign = 'left';   // a Bo3 headlines the series call above
       y += 74;
       g.font = '32px ' + FONT; g.fillStyle = C.lilac;
       g.fillText('1NT REPLY', cRep, y); g.fillText('DECIDER', cDec, y); g.textAlign = 'right'; g.fillText('KNIFE', x + w - 8, y); g.textAlign = 'left';
@@ -2817,8 +2845,27 @@
       });
       y += 40;
     });
+    // playoff stakes: where a series win and a loss send 1NT (upper / lower bracket), and 1NT's chance at each reward
+    if (SK) {
+      var pc = function (q) { return q == null ? '' : q >= 0.995 ? '>99%' : q < 0.001 ? '<0.1%' : q < 0.1 ? (q * 100).toFixed(1) + '%' : Math.round(q * 100) + '%'; };
+      var nm = function (o) { if (!o) return ''; var q = /^(winner|loser) of (\S+)$/i.exec(o.opp || ''); return o.n + (o.opp ? ' vs ' + (q ? q[2] + ' ' + q[1].toUpperCase() : o.opp) : ''); };
+      g.fillStyle = C.face; g.fillRect(x, boxY, w, BOXH); bevel(g, x, boxY, w, BOXH, true, 4);
+      var cw2 = (w - 48) / 2;
+      [['WIN', SK.win, C.teal], ['LOSE', SK.lose, C.down]].forEach(function (t, i) {
+        var tx = x + 24 + i * cw2;
+        g.font = '38px ' + FONT; g.fillStyle = t[2]; g.fillText(t[0] + (t[1] ? (/^UB/.test(t[1].n) ? ' · UPPER' : ' · LOWER') : ''), tx + 12, boxY + 60);
+        g.font = '60px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, t[1] ? nm(t[1]) : 'OUT', cw2 - 36), tx + 12, boxY + 130);
+      });
+      var cx2 = x + 36, cy2 = boxY + 220;
+      (SK.rewards || []).forEach(function (r) {   // reward chips, as on the bracket GFX
+        g.font = '34px ' + FONT; var t = 'TOP ' + r.top + ': ' + String(r.s).toUpperCase(), p = pc(r.p), tw2 = g.measureText(t).width + 24;
+        g.fillStyle = C.title; g.fillRect(cx2, cy2 - 26, tw2, 52); bevel(g, cx2, cy2 - 26, tw2, 52, true, 2);
+        g.fillStyle = C.white; g.fillText(t, cx2 + 12, cy2); cx2 += tw2 + 16;
+        if (p) { g.fillStyle = C.teal; g.fillText('1NT ' + p, cx2, cy2); cx2 += g.measureText('1NT ' + p).width + 48; }
+      });
+    }
     // the expected map box
-    if (expLeaf) {
+    if (expLeaf && !SR) {
       var kn = knife(d, expLeaf.map), bx = x, bw = w;
       g.fillStyle = C.face; g.fillRect(bx, boxY, bw, BOXH); bevel(g, bx, boxY, bw, BOXH, true, 4);
       var cw = (bw - 48) / 3, tiles = [['EXPECTED MAP', expLeaf.map, C.white], [bo === 3 ? '1NT SERIES' : '1NT WIN', Math.round(expLeaf.p * 100) + '%', expLeaf.p >= 0.5 ? C.teal : C.down],

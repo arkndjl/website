@@ -881,11 +881,16 @@
     {{- $uW := "" }}{{ $oW := "" }}{{ $uT := "" }}{{ $oT := "" }}{{ with site.Data.esea_world }}{{ with .now }}{{ $uW = printf "#%v" .vrs }}{{ $uT = printf "T%v" .tier }}{{ end }}{{ with index .teams ($o.id | default "") }}{{ $oW = printf "#%v" .w }}{{ $oT = printf "T%v" .t }}{{ end }}{{ end }}
     {{- /* knife side: map win % of the team starting T, by map (ARKBOARD Research cs2-side-first, bo3.gg pro maps) */}}
     {{- $sides := dict }}{{ $sf := "research/studies/cs2/cs2-side-first.json" }}{{ if fileExists $sf }}{{ range (index ((os.ReadFile $sf | transform.Unmarshal).chart.series) 0).points }}{{ $sides = merge $sides (dict .x (dict "t" .y "lo" .lo "hi" .hi "n" .n)) }}{{ end }}{{ end }}
+    {{- /* playoff series: this slot, where a win and a loss send 1NT (upper / lower), 1NT's chance at each reward */}}
+    {{- $stk := "" }}{{ with $d.bracket }}{{ $b := . }}{{ with .next }}{{ if and .from $pv.series }}
+      {{- $rw := slice }}{{ range $b.rewards }}{{ $rw = $rw | append (dict "s" .s "top" .top "p" (index $b.odds (printf "top%v" .top))) }}{{ end }}
+      {{- $stk = dict "slot" .from "win" (dict "n" .n "opp" .opp.name "tbd" .opp.tbd) "lose" (cond (isset . "drop") (dict "n" .drop.n "opp" .drop.opp.name "tbd" (.drop.opp.tbd | default false)) "") "rewards" $rw }}
+    {{- end }}{{ end }}{{ end }}
     {{- $gd := dict "opp" $o.name "when" (printf "%s ET" ((time.In "America/New_York" (time (int (div $pv.at 1000)))).Format "Mon Jan 2 · 3:04 PM")) "event" (printf "ESEA S%v · Main · Bo%v" $season ($pv.bestOf | default 1)) "bo" (printf "Bo%v" ($pv.bestOf | default 1))
         "win" $pv.p.win "line" $ln "score" (cond (ge (float $pv.spread.line) 0) (printf "1NT %s" $pv.spread.score) (printf "%s %s" $o.name $pv.spread.score))
         "us" (dict "name" "1NT" "logo" ("img/1nt/1nt-logo.webp" | relURL) "rank" $uW  "rec" $pv.us.rec "talent" $pv.talent.us "tier" $uT "std" (cond (gt (int ($pv.us.rank | default 0)) 0) (printf "%s%v" (cond $pv.us.tied "T-#" "#") $pv.us.rank) "") "world" $uW)
         "them" (dict "name" $o.name "logo" $oLogo "rank" $oW  "rec" $o.rec "talent" $pv.talent.them "tier" $oT "std" (cond (gt (int ($o.rank | default 0)) 0) (printf "%s%v" (cond $o.tied "T-#" "#") $o.rank) "") "world" $oW)
-        "series" $ser "pool" $pv.pool "oppMaps" ($pv.oppMaps | default slice) "bon" ($pv.bestOf | default 1) "sides" $sides
+        "series" $ser "stakes" $stk "pool" $pv.pool "oppMaps" ($pv.oppMaps | default slice) "bon" ($pv.bestOf | default 1) "sides" $sides
         "five" $five "theirFive" $tf "lineupNote" ($pv.lineupNote | default "") "watch" $watch "vetoes" $pv.vetoes "maps" $pv.maps "matchups" $pv.matchups "plan" $pv.plan "talentUs" $pv.talent.us "talentThem" $pv.talent.them }}
     <p class="esea-pv__gfx">
       <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="esea-fan" data-gfx-pv="{{ $gd | jsonify }}" data-gfx-title="1nt-vs-{{ $o.name }}-fan" data-gfx-date="ESEA S{{ $season }}" title="fan graphic: teams, odds, lineups, streams (4:5)">fanGFX</button>
