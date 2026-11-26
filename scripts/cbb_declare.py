@@ -14,7 +14,9 @@ Terms, each a candidate on top of the base (class and era):
   rank     recruiting rank, -ln(min(rank, 300)) (On3 / 247, whichever is better)
   age      age on draft night (June 25)
   ht       height in inches
-  era      nil (2022+ seasons, the transfer portal and NIL era); covid (the 2021 season: the free year kept people in)
+  era      nil (2022+ seasons, the transfer portal and NIL era); covid (the 2021 season: the free year kept people in);
+           e24 (2024+ seasons: the leave rate fell from ~.15 to ~.09 as collective and revenue-share money grew;
+           passed in scripts/return_drivers.py, walk forward t -4.0, 4/4 seasons, and the board on top 5/5 drafts)
   nil x    the era terms crossed with bpm and rank (NIL money keeps the fringe prospect, not the lottery pick)
 Stage A test: walk forward over the held-out seasons 2023-26 (each scored by a fit on the seasons before it, so the
 NIL era is learned from 2022 on), per row log loss against the base, t on the paired difference, seasons won.
@@ -128,7 +130,7 @@ def design(rows, terms, mu, sd):
     def x(r, k):
         if k.startswith('nil_'): return (r['year'] >= 2022) * (r[k[4:]] - mu[k[4:]]) / sd[k[4:]]
         return (r[k] - mu[k]) / sd[k]
-    return np.array([[1, r['cls'] == 'So', r['cls'] == 'Jr', r['year'] >= 2022, r['year'] == 2021] + [x(r, k) for k in terms] for r in rows], float)
+    return np.array([[1, r['cls'] == 'So', r['cls'] == 'Jr', r['year'] >= 2022, r['year'] == 2021, r['year'] >= 2024] + [x(r, k) for k in terms] for r in rows], float)
 
 
 def ll(p, y):
@@ -203,7 +205,7 @@ def main():
            'drafted': {'n': int(dr.sum()), 'base': round(float(p0[dr].mean()), 3), 'model': round(float(p[dr].mean()), 3)},
            'returned': {'n': int((yte == 0).sum()), 'base': round(float(p0[yte == 0].mean()), 3), 'model': round(float(p[yte == 0].mean()), 3)},
            'stageB': stageB,
-           'fit': {'cols': ['const', 'So', 'Jr', 'nil', 'covid'] + kept, 'b': [round(float(x), 4) for x in b_all],
+           'fit': {'cols': ['const', 'So', 'Jr', 'nil', 'covid', 'e24'] + kept, 'b': [round(float(x), 4) for x in b_all],
                    'mu': {k: round(v, 4) for k, v in mu.items()}, 'sd': {k: round(v, 4) for k, v in sd.items()}},
            'board': {'cols': ['const', 'zA', 'board', 'ranked'], 'b': [round(float(x), 4) for x in bB_all], 'depth': BOARD_DEPTH,
                      'ship': bool(stageB['vsRef'] < 0 and stageB['seasonsWon'] >= 3 and stageB['t'] <= -2)}}

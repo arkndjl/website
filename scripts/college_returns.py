@@ -69,7 +69,7 @@ PEND = re.compile(r"\bplan(s|ning)? to\b|\binformed\b|\bfinali[sz]ing\b|\bclose 
 OUT_RE = re.compile(r"\b(enter|enters|entered|entering|in|to enter|will enter|plans to enter|hits?|into) (the )?(transfer )?portal\b|"
                     r"\bdeclares? for (the )?(20\d\d )?(nfl|nba) draft\b|\b(enter|enters|entering|to enter|will enter) (the )?(20\d\d )?(nfl|nba) draft\b|"
                     r"\bstay(s|ing)? in (the )?(nfl|nba) draft\b", re.I)
-NEG = re.compile(r"\?|\bpotential(ly)?\b|\bcould\b|\bmay\b|\bmight\b|\bif\b|\bwould\b|\bwhether\b|\brumou?rs?\b|\bhopes?\b|"
+NEG = re.compile(r"\?|\bpotential(ly)?\b|\bpossib(le|ly|ility)\b|\bchances?\b|\burg(es|ed|ing)\b|\badvis(es|ed|ing)\b|\bencourag|\bcalls? (on|for)\b|\bbegs?\b|\bplead|\btells\b|\brespon(se|ses|ds)\b|\breacts?\b|\bcould\b|\bmay\b|\bmight\b|\bif\b|\bwould\b|\bwhether\b|\brumou?rs?\b|\bhopes?\b|"
                  r"\bworking to\b|\bwants? to\b|\bpush(es|ing)? to\b|\bpitch\b|\bwill [\w .'-]+ (stay|return)\b|"
                  r"\bout for (the )?season\b|\b(from|after) (injury|surgery)\b|\breturns? (to|from) (practice|action|the field|"
                  r"the lineup|play|injury|campus)|\bkick(off)? return|\bpunt return|\breturn (yards|touchdown|td|man|specialist)|"

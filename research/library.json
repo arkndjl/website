@@ -1013,6 +1013,22 @@
      ]
     },
     {
+     "term": "Ret%",
+     "short": "P(back in college next season instead of the 2027 draft) = 1 - P(declares).",
+     "body": [
+      "CFB: the Draft% declare logit (ln xPick, age on draft day, per class group). Leave one draft out on the 2021-25 fall PFF boards (564 prospects, RS seniors and grads out): log loss 0.313 vs 0.411 class only, 0.416 class + position, 0.456 base rate (t -5.5, 9/10 draft x class cells).",
+      "Reported return in the decision window (CFB Nov 20 to the January deadline, CBB Mar 15 to the withdrawal date): Ret% 97%, both sports. CFB: 18 reported returners, 2023-2025 drafts, 0% declared (model 46%): log loss 1.01 -> 0.05, t -3.9, 3/3 cycles. Reported declaration FAILED (t -1.2).",
+      "CBB: class, era (NIL 2022+, COVID 2021, the 2024+ step), recruit rank and BPM shrunk by minutes, walk forward 2023-26: log loss 0.284 vs 0.329 class and era (t -4.7). The 2024+ step: t -4.0, 4/4. Midseason board on top, leave one draft out 2022-26, board-listed: 0.495 vs 0.641 base rate.",
+      "CBB reported return: 69 players, 0% left (model 20%), t -4.6, 3/3: passed.",
+      "FAILED on top of the live model, both sports (each tried in both): PFF grade x snaps (CFB; the BPM analogue), recruit rank (CFB), height, COVID year (CFB), NIL 2022+ step (CFB), NIL x xPick, NIL x age, rookie deal vs NIL, QB, Power 4 / high-major, age in class (CBB), age (CBB), guard (QB analogue), NIL x BPM, NIL x recruit rank."
+     ],
+     "where": "CFB draft board, CBB draft board",
+     "sports": [
+      "CFB",
+      "CBB"
+     ]
+    },
+    {
      "term": "Transfer% (Xfer%)",
      "short": "P(on another FBS or FCS roster next season).",
      "body": [
