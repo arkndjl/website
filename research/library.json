@@ -665,7 +665,8 @@
       "The board form adds team context (5 × the minutes-weighted mean side BPM of his team / 10; O .42, D .15) and recruit rating / 100 by class (Fr O .68 D .50, So .58 / .31, Jr+ .26 / .34).",
       "Walk-forward, team R² goes from .733 to .746 (13/14, t = 7.87), against .642 for BPM (14/14, t = 15.3). Player r is .780 and RMSE 2.32.",
       "On their own, team context is t = 7.07 and recruit rating t = 4.95. Late-season form, age, role and freshman height, minutes share and its change, and game BPM consistency failed (t = -5.22 to 2.38 alone, and nothing once the two are in).",
-      "The board form in the roster prior goes from .765 to .768 (13/14, t = 3.74). As the FV driver in place of the box form it is t = .87, so FV and the game model stay on the box form.",
+      "The board form in the roster prior goes from .765 to .768 (13/14, t = 3.74). As the FV driver in place of the box form it is t = .87.",
+      "Through the game model, the board form moves held-out margin MAE (2021-26) from 9.5892 to 9.5903 (t = 2.5, worse in 11/11 seasons), and 9.5594 against 9.5601 with the prior weight retuned. In FV, nested R² goes from .107 to .114, but the top-300 correlation with outcome on the 2017-19 boards goes from .386 to .377 and RPS from .0789 to .0791. FV, the roster prior and the game model stay on the box form.",
       "The descriptive counterpart is rXPM (CBB)."
      ],
      "where": "CBB pXPM leaders, portal, board hover; box form: FV (returners), roster prior / game model",

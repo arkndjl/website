@@ -167,7 +167,7 @@ The board's xBPM, which is the site's projection of this season's BPM and also u
 - **Preseason team ratings**: the game model's preseason rating uses pXPM in place of last-season BPM for returning players. That raised its next-season team R² from .757 to .765 (13 of 14 seasons) and lowered the held-out game margin error in 2021-26 from 9.5915 to 9.5892.
 - **FV**: pXPM is a driver for returning players. When it was added, the model's selection took it and dropped last-season BPM, and the realized FV of each held-out board's top 50 went from 39.0 to 39.6.
 
-The game model and FV use pXPM without team context and recruit rating, since both models already have their own inputs for those. The full version improved the preseason rating again when I tested it (.765 to .768, 13 of 14 seasons), and it will go in the next time the game model is refit. In the NBA mock draft, pXPM was about even with 3-season BPM (t = .6), so the mock stays on 3-season BPM.
+The game model and FV use pXPM without team context and recruit rating, since both models already have their own inputs for those. I tested the full version in both anyway. It improved the preseason rating again (.765 to .768, 13 of 14 seasons), but game margins came out slightly worse with it in all 11 seasons (held-out error 9.589 to 9.590 points), and FV ranked the 2017-19 boards a little worse (correlation with outcome .386 to .377). Both stay on the simpler version. In the NBA mock draft, pXPM was about even with 3-season BPM (t = .6), so the mock stays on 3-season BPM.
 
 ## Leaders
 ### XPM, 2025-26

@@ -130,9 +130,14 @@ def pxpm_parts(seasons):
     return o + d, o, d
 
 
+CORE = True       # True: the fitted models read the box form (pxpm_parts), as before Nov 26 2026; research switch
+
+
 def pxpm_lines(seasons):
-    """the FV driver: pXPM after a career's last line (cbb_fit.features passes the seasons before the board season)"""
-    try: p = pxpm_parts(seasons)
+    """the FV driver: pXPM after a career's last line (cbb_fit.features passes the seasons before the board season).
+    The fuller form (pxpm2_parts: + team context + recruit rating) since Nov 26 2026 (pxpm3.py); team context from
+    scripts/data/cbb_team_ctx.json, a season not in it from set_ctx or Barttorvik's file"""
+    try: p = pxpm_parts(seasons) if CORE else pxpm2_parts(seasons)
     except (OSError, ValueError, KeyError): return None
     return p[0] if p else None
 
@@ -152,7 +157,7 @@ def values(y):
 
 def pxpm_of(pid, year):
     """one player season's pXPM from Barttorvik's files (None without a line): the roster prior's input"""
-    try: v = values(int(year)).get(str(pid))
+    try: v = (values if CORE else values2)(int(year)).get(str(pid))
     except (OSError, ValueError, TypeError, KeyError): return None
     return v[0] if v else None
 
@@ -197,12 +202,31 @@ def team_ctx(rows):
     return {t: (5 * q[0] / q[2], 5 * q[1] / q[2]) for t, q in a.items() if q[2]}
 
 
+CTXF = os.path.join(D.ROOT, 'scripts', 'data', 'cbb_team_ctx.json')
+_CTXF = None
+
+
 def ctx_of(team, year):
-    """(O, D) team context of a Barttorvik team-season; (0, 0), the average team, when the season file is not there"""
+    """(O, D) team context of a Barttorvik team-season: the committed file (finished seasons, written by --freeze), else
+    set_ctx (the season in progress, from the caller's own lines), else Barttorvik's season file; (0, 0), the average
+    team, when none has it"""
+    global _CTXF
+    if year is None: return (0.0, 0.0)
+    year = int(year)
     if year not in _CTX:
-        try: _CTX[year] = team_ctx(D.load_bt(year))
-        except Exception: _CTX[year] = {}
+        if _CTXF is None:
+            try: _CTXF = json.load(open(CTXF))['seasons']
+            except (OSError, ValueError, KeyError): _CTXF = {}
+        if str(year) in _CTXF: _CTX[year] = {t: tuple(v) for t, v in _CTXF[str(year)].items()}
+        else:
+            try: _CTX[year] = team_ctx(D.load_bt(year))
+            except Exception: _CTX[year] = {}
     return _CTX[year].get(team, (0.0, 0.0))
+
+
+def set_ctx(year, lines):
+    """team context of a season from the caller's lines (cbb_live: the season in progress, where no file is committed)"""
+    _CTX[int(year)] = team_ctx(lines)
 
 
 def extra(n, ctx):
@@ -218,7 +242,7 @@ def pxpm2_parts(seasons, ctx=None):
     F = _fit(); n = seasons[-1]; y = n.get('year')
     if 'beta2' not in F: return pxpm_parts(seasons)
     NM = F['norms'].get(str(y)) or F['norms'][max(F['norms'], key=int)]
-    X = row(seasons, NM); E = extra(n, ctx if ctx is not None else ctx_of(n.get('team'), y))
+    X = row(seasons, NM); E = extra(n, ctx if ctx is not None else ctx_of(n.get('team'), y))   # rec: the line's, 0 without
     o, d = (float(np.concatenate([X[s], E[s]]) @ np.array(F['beta2'][s])) for s in 'od')
     return o + d, o, d
 
@@ -267,6 +291,9 @@ def freeze():
         for pid, v in values2(y).items(): out[pid] = [round(v[0], 2), round(v[1], 2), round(v[2], 2), y, S[pid].get('name'), S[pid].get('team')]
     json.dump({'season': LAST_TARGET, 'cols': ['pxpm', 'o', 'd', 'line', 'name', 'team'], 'players': out}, open(FROZEN, 'w'), separators=(',', ':'))
     print(FROZEN, len(out))
+    ctx = {str(y): {t: [round(o, 3), round(d, 3)] for t, (o, d) in sorted(team_ctx(season_lines(y).values()).items())} for y in range(FIRST, LAST_TARGET + 1)}
+    json.dump({'through': LAST_TARGET, 'seasons': ctx}, open(CTXF, 'w'), separators=(',', ':'))
+    print(CTXF, sum(len(v) for v in ctx.values()))
 
 
 _FZ = None
