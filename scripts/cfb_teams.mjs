@@ -1367,8 +1367,14 @@ const byDays = K => (asof = new Date(), year) => {
 };
 export const draftSd = byDays(DRAFT_SD), draftCut = byDays(DRAFT_CUT);
 // a redshirt senior or grad is out of eligibility (the COVID year that kept them in school ran out with the 2025 season)
+// a reported return for next season dated in the decision window (p.retLock, fetch_cfb.mjs writeAll) stays: declares at
+// the rate reported returners did (scripts/return_news.py, 2023-25 drafts: 0 of 18 declared, Laplace .026; their
+// held-out declare log loss 1.01 -> .05, t -3.9, 3 of 3 cycles; CBB 0 of 69, scripts/cbb_mock.py RET_LOCK). A reported
+// declaration failed (t -1.2): the model has it
+export const RET_LOCK = 0.026, RET_FROM = '11-20';
 export const declareOdds = (p, xPick, asof = new Date(), year) => {
   if (p.elig >= 5 || /^RS-Sr|Gr/.test(p.cls || '')) return 1;
+  if (p.retLock) return RET_LOCK;
   const d = DECLARE[p.elig >= 4 ? 'sr' : 'under'], a = p.age ?? p.ageEst;
   const t = new Date(asof), y = year ?? (t.getUTCMonth() >= 4 ? t.getUTCFullYear() + 1 : t.getUTCFullYear());
   const gap = a != null ? Math.max(-2, Math.min(2, a + Math.max(0, draftDay(y) - t) / 864e5 / 365.25 - d.age0)) : 0;
@@ -1406,6 +1412,9 @@ export function draftOdds(rows, priors = DEFAULT_PRIORS) {
     for (const p of ranked) p.draftP = Math.round(pr(p) * 1000) / 1000;
     odds(lcRest).forEach((x, i) => { rest[i].draftP = Math.round(x * 1000) / 1000; });
   }
+  // Ret% = 1 - declareOdds: back in school instead of the draft (out of eligibility: 0; outside the pool: blank)
+  for (const p of rows) if (p.draft27) p.retP = p.elig >= 5 || /^RS-Sr|Gr/.test(p.cls || '') ? 0 : null;
+  for (const p of pool) p.retP = Math.round((1 - declareOdds(p, p._x, asof, P.draftYear)) * 1000) / 1000;
   for (const p of pool) { delete p._dv; delete p._mRk; delete p._x; }
   for (const [pos, n] of Object.entries(SPECIALISTS)) {
     const sp = rows.filter(p => p.draft27 && p.pos === pos && p.fv != null && p.elig >= 4).sort((a, b) => grade(b) - grade(a) || (b.kp ?? 0) - (a.kp ?? 0));

@@ -602,6 +602,13 @@ def why_pred(p, slot, w):
 
 
 DECLARE = os.path.join(D.ROOT, 'data', 'cbb_declare_fit.json')
+RETURNS = os.path.join(D.ROOT, 'data', 'college_returns.json')    # scripts/college_returns.py
+# a reported return for next season dated in the decision window (Mar 15 to the NCAA withdrawal date) stays in school:
+# scripts/return_news.py, 2024-26: 0 of 69 reported returners left (the model had 21%; log loss .34 -> .02, t -4.6,
+# 3 of 3); CFB 0 of 18. Both sports lock at .026, the larger of the two measured rates, since the live headline reader
+# can misread. A reported declaration failed in both (CBB t -.4: testing the waters)
+RET_LOCK, RET_FROM = 0.026, '03-15'
+DRAFT = 2027
 
 
 def declare_odds(pool):
@@ -611,15 +618,22 @@ def declare_odds(pool):
     try: fit = json.load(open(DECLARE))
     except (OSError, ValueError): fit = None
     import cbb_declare as CD
+    locked = set()
+    try:
+        c = json.load(open(RETURNS))['sports']['cbb']
+        if c.get('target') == DRAFT + 1:
+            locked = {N.key(x['name']) + '|' + N.team_key(x['team']) for x in c.get('locks') or [] if (x.get('date') or '') >= f'{DRAFT}-{RET_FROM}'}
+    except (OSError, ValueError, KeyError): pass
     for p in pool:
         o = p['ours'] or {}
         if not fit or not o or o.get('cls') not in CD.CLS: p['declare'] = 1.0; continue
+        if N.key(p['name']) + '|' + N.team_key(o.get('team') or p['school'] or '') in locked: p['declare'] = RET_LOCK; continue
         A, B = fit['fit'], fit['board']
         rec = o.get('rec') or {}
         rk = [x for x in (rec.get('on3rk'), rec.get('rk247')) if x]
         L = p.get('line') or {}
         f = CD.feats(o.get('xbpm'), L.get('min_per') or 60, min(rk) if rk else None, None, None)
-        x = {'const': 1, 'So': o['cls'] == 'So', 'Jr': o['cls'] == 'Jr', 'nil': 1, 'covid': 0}
+        x = {'const': 1, 'So': o['cls'] == 'So', 'Jr': o['cls'] == 'Jr', 'nil': 1, 'covid': 0, 'e24': 1}
         z = sum(b * (x[c] if c in x else (f[c] - A['mu'][c]) / A['sd'][c]) for c, b in zip(A['cols'], A['b']))
         if p['nboards'] and B['ship']:
             z = B['b'][0] + B['b'][1] * z + B['b'][2] * -math.log(min(p['cons'], B['depth'])) + B['b'][3]

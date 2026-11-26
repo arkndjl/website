@@ -51,7 +51,7 @@ import { weekStatuses, loadReports } from './cfb_avail_reports.mjs';
 import { avOf, nameKey } from './cfb_teams.mjs';
 import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV, specialistWar } from './cfb_av.mjs';
 import { returning, draftsBy } from './cfb_ret_war.mjs';
-import { yardShares, playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDrafts, mockSims, draftOdds, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades, fetchNflRecentR1, ledgerNflTrades } from './cfb_teams.mjs';
+import { yardShares, playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDrafts, mockSims, draftOdds, RET_FROM, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades, fetchNflRecentR1, ledgerNflTrades } from './cfb_teams.mjs';
 import { espnBackups } from './cfb_espn_backups.mjs';
 import { readCfbAll, writeCfbAll } from './cfb_all.mjs';
 import { fvDist, cfbZ, fvdOf, atMean } from './fv_dist.mjs';
@@ -2579,7 +2579,7 @@ fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
 // every graded player, for the database view: column arrays keep it small (fetched by the page)
 for (const r of everyone) { r.on3l = r.links.on3; r.espnl = r.links.espn; }
 const COLS = ['report', 'on3l', 'espnl', 'photo', 'star', 'riser', 'riserWhy', 'inj', 'arch', 'badges', 'rbRole', 'rbSd', 'rbPd', 'snapShare', 'name', 'pos', 'spot', 'team', 'logo', 'conf', 'cls', 'elig', 'age', 'ageEst', 'ht', 'wt', 'pfn', 'pfnLabel',
-              'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'moveOdds', 'multi', 'up', 'moveUp', 'draftP', 'kp', 'fvx',
+              'snaps', 'on3', 'cons', 'consRk', 'consN', 'xnil', 'ynil', 'znil', 'fv', 'plus', 'posRank', 'ovr', 'draft27', 'parts', 'bmi', 'delta', 'div', 'move', 'moveWhy', 'moveOdds', 'multi', 'up', 'moveUp', 'draftP', 'retP', 'kp', 'fvx',
               'transferP', 'stayP', 'lock', 'tWhy', 'homeMi', 'inState', 'sav', 'war', 'waa', 'xv', 'carried', 'src', 'fvd', 'fvg', 'mk', 'fvs', 'mz'];
 // carried over: a player PFN stops listing mid-season (its playing-time cutoff moves; ~620 low-snap backups fell
 // off on Oct 19) keeps the row he had when last listed, marked with that date, until PFN lists him again or the
@@ -2618,7 +2618,10 @@ const draftPriors = () => ({ ...(fs.existsSync(PRIORS) ? JSON.parse(fs.readFileS
 // Draft% (draftOdds in cfb_teams.mjs) is refreshed on every write, so it follows the latest FV and consensus;
 // Transfer% (cfb_transfer.mjs) once its inputs are in (tctx, below), after Draft%, which sets its floor on leaving
 let tctx = null;
-const writeAll = () => { draftOdds([...out.all, ...outFcs.all], { ...draftPriors(), asof: out.asof, draftYear: SEASON + 1 });
+const writeAll = () => {
+  // a reported return for next season from Nov 20 on (the declare window scripts/return_news.py tested) keeps him in school
+  if (tctx?.locks) for (const r of [...out.all, ...outFcs.all]) { const lk = tctx.locks.get(tctx.norm(r.name) + '|' + r.tid); r.retLock = lk && lk.date >= `${SEASON}-${RET_FROM}` ? 1 : null; }
+  draftOdds([...out.all, ...outFcs.all], { ...draftPriors(), asof: out.asof, draftYear: SEASON + 1 });
   // FBS% can't exceed the chance he isn't drafted
   for (const r of outFcs.all) if (r.up != null) { r.upRaw ??= r.up; r.up = Math.min(r.upRaw, Math.round((1 - (r.draftP || 0)) * 100) / 100); r.moveUp = r.up >= FCS_UP.flag || null; }
   if (tctx) transferOdds([...out.all, ...outFcs.all], tctx);

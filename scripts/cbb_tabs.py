@@ -463,25 +463,25 @@ def main():
         r = fvby.get((m['name'], m['school'])) or {}
         sim = m.get('sim') or {}
         drows.append({'n': m['name'], 'tm': m['school'], 'pos': m.get('pos') or '', 'age': m.get('age'), 'ph': m.get('photo') or r.get('photo'), 'lo': m.get('logo'),
-                      'sub': m.get('cls') or '', 'slot': m['pick'], 'cons': m.get('cons'), 'dec': r1((m.get('declare') or 0) * 100, 0), 'fv': m.get('fv'),
+                      'sub': m.get('cls') or '', 'slot': m['pick'], 'cons': m.get('cons'), 'ret': r1((1 - (m.get('declare') or 0)) * 100, 0), 'fv': m.get('fv'),
                       'nbaP': r1(r['nbaP'] * 100, 0) if r.get('nbaP') is not None else None, 'xbpm': r.get('xbpm'),
                       'rng': f"{sim['lo']}-{sim['hi']}" if sim.get('lo') else '', 'conv': (m.get('slots') or {}).get('conv')})
     for s in M.get('staying') or []:
         r = fvby.get((s['name'], s['school'])) or {}
         drows.append({'n': s['name'], 'tm': s['school'], 'pos': r.get('pos') or '', 'age': age(r) if r else None, 'ph': r.get('photo'), 'lo': r.get('logo'),
-                      'sub': (s.get('cls') or '') + ' · stays', 'slot': None, 'cons': s.get('cons'), 'dec': r1((s.get('declare') or 0) * 100, 0), 'fv': r.get('fv'),
+                      'sub': (s.get('cls') or '') + ' · stays', 'slot': None, 'cons': s.get('cons'), 'ret': r1((1 - (s.get('declare') or 0)) * 100, 0), 'fv': r.get('fv'),
                       'nbaP': r1(r['nbaP'] * 100, 0) if r.get('nbaP') is not None else None, 'xbpm': r.get('xbpm'), 'rng': '', 'conv': None})
     write('draft', {
         'title': 'draft board', 'key': 'slot',
         'def': 'past drafts: the board in draft week. FV = draft-day grade (scripts/cbb_draftday.py: season just played + the June boards; '
                'college exits 2009-16 graded by fits that held out his class, later exits by the fit on 2009-16), Cons = consensus of '
                'the ESPN and NBADraft.net final boards, Pick = actual NBA pick, Out = the career on the FV scale (drafts through 2020).',
-        'views': [['slot', 'Mock', 'predictive mock pick'], ['cons', 'Cons', 'consensus rank across the boards'], ['fv', 'FV', 'FV'], ['dec', 'Declare%', 'chance he enters the 2027 draft'],
+        'views': [['slot', 'Mock', 'predictive mock pick'], ['cons', 'Cons', 'consensus rank across the boards'], ['fv', 'FV', 'FV'], ['ret', 'Ret%', 'chance he returns to school instead of entering the 2027 draft'],
                   ['out', 'Out', 'what he became: NBA career on the FV scale']],
         'cols': [col('slot', 'Mock', 'predictive mock pick (consensus + model, Tankathon order)', 'i', 1, 1),
                  col('cons', 'Cons', f"consensus rank: median on {M['boards']} 2027 boards; past drafts, ESPN and NBADraft.net final boards", 'i', 1, 1),
                  col('rng', '80%', '80% range of his pick across 2,000 simulated drafts', 's', 0), col('conv', 'Conv', 'conviction mock pick', 'i', 1, 1),
-                 col('dec', 'Declare%', 'chance he enters the 2027 draft (declare model)', 'p'), col('fv', 'FV', 'FV now', 'i'),
+                 col('ret', 'Ret%', 'chance he returns to school instead of entering the 2027 draft (1 - declare model; seniors and internationals 0)', 'p'), col('fv', 'FV', 'FV now', 'i'),
                  col('nbaP', 'NBA%', 'chance of an NBA career', 'p'), col('xbpm', 'xBPM', 'projected BPM this season', 's1'),
                  col('out', 'Out', 'what he became: NBA career on the FV scale (drafts through 2020, six NBA seasons or more)', 'i'),
                  col('role', 'Career', 'NBA career: peak XPM and role', 's', 0)],
