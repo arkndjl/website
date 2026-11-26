@@ -228,13 +228,26 @@ def transactions(V, since):
     return out
 
 
+def folded(r, rows):
+    """a decommitment that a commitment elsewhere within a day turns into a flip: the flip row carries the move (DJ Jacobs,
+    Ohio State -> Miami, Nov 26 2026), so the decommitment is not a second item"""
+    import names
+    d0 = dt.date.fromisoformat(r['d'])
+    for x in rows:
+        if x is r or x['k'] not in ('flip', 'commit') or not x.get('to') or not names.same(x['n'], r['n']): continue
+        if r.get('fr') and names.same_team(x['to'], r['fr']): continue
+        if 0 <= (dt.date.fromisoformat(x['d']) - d0).days <= 1: return True
+    return False
+
+
 def recruits(since):
     out = []
     d = load('data/recruit_news.json') or {}
     for sp in ('cfb', 'cbb'):
-        seen = set()
-        for r in d.get(sp, []):
+        seen, rows = set(), d.get(sp, [])
+        for r in rows:
             if r['d'] < since or (r['n'], r['k']) in seen: continue
+            if r['k'] == 'decommit' and folded(r, rows): continue
             seen.add((r['n'], r['k']))
             k, on = r['k'], bool(r.get('b'))
             who = r['n'] + (' %s' % r['pos'] if r.get('pos') else '') + (" '%s" % str(r['cls'])[2:] if r.get('cls') else '')
@@ -245,10 +258,14 @@ def recruits(since):
             elif k in ('portal',): t = '%s enters the portal' % who
             elif k == 'cb': t = '%s: 247 Crystal Ball%s' % (who, ' → %s' % r['to'] if r.get('to') else '')
             else: t = '%s commits%s' % (who, ' to %s' % r['to'] if r.get('to') else '')
+            if k == 'commit' and not r.get('fr'):   # a commitment right after a decommitment is a flip
+                dec = next((x for x in rows if x['k'] == 'decommit' and x.get('fr') and folded(x, [r])), None)
+                if dec: k, r = 'flip', dict(r, fr=dec['fr'], fl=dec.get('fl')); t = '%s flips %s → %s' % (who, r['fr'], r['to'])
             w = 45 if k == 'cb' else ({'flip': 76, 'decommit': 66}.get(k, 70)) if on else 40   # a Crystal Ball is a lean, not a move: never MAJOR
             out.append(item('rc|%s|%s|%s|%s' % (sp, r['d'], slug(r['n']), k), r['d'], 'arkboard', 'recruit', TAG[sp], ' '.join(t.split()), w,
                             'recruit · %s' % k + (' · on board' if on else ''), PAGE[sp] + '#recruit-transactions',
                             logo=r.get('fl') if k == 'flip' else (r.get('tl') or r.get('fl')), logo2=r.get('tl') if k == 'flip' else None, sp=sp))
+            out[-1]['n'] = r['n']
     return out
 
 
@@ -536,7 +553,15 @@ def build(state, plays='fetch'):
         if 'at' not in i: i['at'] = (o or {}).get('at') or (now if i['d'] == today else day_ms(i['d']))
         elif o and i['cat'] == 'fv' and o.get('t') == i['t']: i['at'] = o['at']   # an unchanged FV move keeps its first time
     # a past day is frozen: what was reported stays; only today's FV moves are recomputed
-    keep = [o for k, o in old.items() if k not in ids and o['d'] >= since and not (o['cat'] == 'fv' and o['d'] == today)]
+    # an earlier recruit item about a player this build has recruit items for (same name rules) is superseded: a misdated
+    # copy, a decommitment folded into a flip. One the recruit news no longer has at all stays, like any past day.
+    import names
+    now_rc = [i['n'] for i in new if i['cat'] == 'recruit' and i.get('n')]
+    def superseded(o):
+        if o['cat'] != 'recruit': return False
+        w = o['t'].split()
+        return any(names.same(n, ' '.join(w[:j])) for n in now_rc for j in (2, 3, 4) if len(w) >= j)
+    keep = [o for k, o in old.items() if k not in ids and o['d'] >= since and not (o['cat'] == 'fv' and o['d'] == today) and not superseded(o)]
     items = [i for i in new + keep if i['d'] >= since and i['d'] <= today]
     items.sort(key=lambda i: (i['d'], i['w'] >= MAJOR, i['at']), reverse=True)
     days = []

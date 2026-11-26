@@ -42,7 +42,14 @@ jobs:
       - name: Moves for the GFX cards (commitments, flips, visits, portal, pro transactions)
         continue-on-error: true
         run: python3 scripts/player_moves.py
+      # the header strip and /news/ read the recruit moves; the odds-snap rerun (every half hour on paper) can lag hours
+      # when GitHub drops scheduled runs, so a new move goes out with this run
+      - name: Site news
+        continue-on-error: true
+        run: |
+          if git diff --quiet -- data/recruit_news.json; then echo "no news change"; exit 0; fi
+          python3 scripts/news.py
       - name: Commit if anything changed
         run: |
           python3 scripts/data_push.py -m "Update the recruit news ($(date -u +%Y-%m-%d))" \
-            -- data/recruit_news.json data/cfb_recruits.json static/data/cfb-recruits.json static/data/cfb-builder.json static/data/moves scripts/data/player_moves_hist.json.gz
+            -- data/recruit_news.json data/cfb_recruits.json static/data/cfb-recruits.json static/data/cfb-builder.json static/data/moves scripts/data/player_moves_hist.json.gz data/news.json scripts/data/news_state.json
