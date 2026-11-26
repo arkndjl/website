@@ -248,6 +248,7 @@ jobs:
           python3 -m venv /tmp/sv && /tmp/sv/bin/pip install -q pyarrow
           /tmp/sv/bin/python scripts/cfb_season_value.py
           python3 scripts/rookies.py cfb   # the true freshmen tab's SV sort reads it
+          python3 scripts/board_moves.py r-cfb   # the rebuild drops the weekly moves: put them back
       # each game model's season so far against its own walk-forward record, and the model ledger's one-year re-tests
       # (scripts/model_monitor.py -> data/model_monitor/<sport>.json, on the Predictions page's game models tab)
       - name: Model monitor

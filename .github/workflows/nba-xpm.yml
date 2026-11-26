@@ -71,7 +71,12 @@ jobs:
           ev, sched = os.environ['EVENT'], os.environ.get('SCHED', '')
           if ev == 'workflow_run':
               go = now.month not in (7, 8, 9) and age('data/nba_players.json', lambda d: d['asof']) >= dt.timedelta(hours=4)
-              full = go and age('data/nba_xpm.json', lambda d: d.get('updated') or d['seasons'][0]['asof']) >= dt.timedelta(hours=20)
+              # full too on the first following run of the New York morning (6 AM on): last night's games reach the board
+              # before the morning post and the weekly moves' 10 AM cut (the 11:23 UTC cron has started 5-10 hours late)
+              from zoneinfo import ZoneInfo
+              et = now.astimezone(ZoneInfo('America/New_York'))
+              xage = age('data/nba_xpm.json', lambda d: d.get('updated') or d['seasons'][0]['asof'])
+              full = go and (xage >= dt.timedelta(hours=20) or (et.hour >= 6 and xage > et - et.replace(hour=6, minute=0, second=0, microsecond=0)))
           else:
               go = True
               full = sched not in ('40 22 * 10,11,12,1,2,3,4,5,6 *', '50 23 * 10,11,12,1,2,3,4,5,6 *', '20 1 * 10,11,12,1,2,3,4,5,6 *')

@@ -18,6 +18,12 @@ on:
     # 21:41 UTC (4:41 pm ET): lines and picks again before the evening games
     - cron: "41 21 * 11,12,1,2,3,4 *"
   workflow_dispatch:
+  # the cron above has landed the overnight finals between 10 and 11 AM New York all November, after the morning post
+  # and the weekly moves' 10 AM cut. The runs these two finish on do fire on time, so the first of them from 5 AM New
+  # York with no board run yet that morning starts one (the gate job below)
+  workflow_run:
+    workflows: ["esea season", "cfb board"]
+    types: [completed]
 
 permissions:
   contents: write
@@ -28,7 +34,34 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.g.outputs.go }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: data/cbb_live.json
+          sparse-checkout-cone-mode: false
+      - id: g
+        run: |
+          if [ "${{ github.event_name }}" != "workflow_run" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          python3 - >> "$GITHUB_OUTPUT" <<'PY'
+          import json, datetime as dt
+          from zoneinfo import ZoneInfo
+          now = dt.datetime.now(dt.timezone.utc)
+          et = now.astimezone(ZoneInfo('America/New_York'))
+          try:
+              asof = dt.datetime.fromisoformat(json.load(open('data/cbb_live.json'))['asof'].replace('Z', '+00:00'))
+          except Exception:
+              asof = now - dt.timedelta(days=1)
+          start = et.replace(hour=5, minute=0, second=0, microsecond=0)
+          # three tries a morning (5, 7 and 9 AM, the first half hour): a quiet night commits nothing, so asof can't stop it
+          print('go=' + str(now.month in (11, 12, 1, 2, 3, 4) and et.hour in (5, 7, 9) and et.minute < 30 and asof < start).lower())
+          PY
   update:
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
