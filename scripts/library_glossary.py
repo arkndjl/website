@@ -1070,7 +1070,7 @@ try:
     _old = json.load(open(OUT))
 except (OSError, ValueError):
     _old = {'sections': []}
-_mine = {e['term'] for sec in sections for e in sec['entries']}
+_mine = {e['term'] for sec in sections for e in sec['entries']} | {'CBB WAR / WAA'}   # renamed terms: the old name is not carried over
 for osec in _old.get('sections', []):
     sec = next((x for x in sections if x['id'] == osec['id']), None)
     if sec is None:
