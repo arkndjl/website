@@ -12,8 +12,9 @@ OUT = os.path.join(ROOT, 'scripts', 'data', 'cfb_portal_hist.json.gz')
 
 
 def season_rows(d, y):
-    d = d.get('data', d) if isinstance(d, dict) else d
+    d = d.get('data') if isinstance(d, dict) else d
     out = []
+    if not isinstance(d, list): return out
     for r in d or []:
         n = ' '.join(x for x in (r.get('firstName'), r.get('lastName')) if x).strip()
         if n and r.get('origin'): out.append([n, r.get('position'), r['origin'], r.get('destination') or None, (r.get('transferDate') or '')[:10] or None, r.get('season') or y])
@@ -35,8 +36,10 @@ def main():
         if not key: print(y, 'not in the cache and no CFBD_API_KEY'); continue
         r = subprocess.run(['curl', '-sS', '-m', '60', '-H', 'Authorization: Bearer ' + key, '-H', 'accept: application/json',
                             f'https://api.collegefootballdata.com/player/portal?year={y}'], capture_output=True, text=True)
-        try: by[y] = season_rows(json.loads(r.stdout), y)
-        except ValueError: print(y, 'CFBD pull failed'); continue
+        try: d = json.loads(r.stdout)
+        except ValueError: d = None
+        if not isinstance(d, list): print(y, 'CFBD pull failed:', r.stdout[:200].replace(key, '')); continue
+        by[y] = season_rows(d, y)
         print(y, 'from CFBD', len(by[y]))
     rows = [r for y in sorted(by) for r in by[y]]
     if not rows: raise SystemExit('no portal files in the cfbhist cache: nothing written')
