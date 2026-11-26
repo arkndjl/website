@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-26T04:26Z",
+ "asof": "2026-11-26T04:32Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -293,10 +293,10 @@
    "by_file": {
     "static/data/depth/nfl.json": {
      "flags": 12,
-     "rows": 2163
+     "rows": 2169
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 6,
+     "flags": 3,
      "rows": 629
     },
     "static/data/nfl-war.json": {
@@ -462,6 +462,24 @@
      "site": "PHI"
     },
     {
+     "d": "2026-08-31",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "released",
+     "head": "Waived by Eagles",
+     "kind": "waived",
+     "move": {
+      "d": "2026-08-31",
+      "head": "Waived by Eagles",
+      "kind": "waived"
+     },
+     "pid": "19641",
+     "player": "Cole Wisniewski",
+     "pos": "SS",
+     "rotowire": "FA",
+     "site": "PHI"
+    },
+    {
      "d": "2026-10-06",
      "field": "depth",
      "file": "static/data/depth/nfl.json",
@@ -496,24 +514,6 @@
      "pos": "CB",
      "rotowire": "FA",
      "site": "SEA"
-    },
-    {
-     "d": "2026-11-25",
-     "field": "depth",
-     "file": "static/data/depth/nfl.json",
-     "flag": "released",
-     "head": "Cut from IR by Tennessee",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-25",
-      "head": "Cut from IR by Tennessee",
-      "kind": "waived"
-     },
-     "pid": "11924",
-     "player": "Tanoh Kpassagnon",
-     "pos": "DE",
-     "rotowire": "FA",
-     "site": "TEN"
     },
     {
      "d": "2026-08-31",
@@ -4458,24 +4458,6 @@
      "site": "PHI"
     },
     {
-     "d": "2026-11-25",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "released",
-     "head": "Cut loose by Pittsburgh",
-     "kind": "waived",
-     "move": {
-      "d": "2026-11-25",
-      "head": "Set to be waived",
-      "kind": "waived"
-     },
-     "pid": "4307",
-     "player": "Aaron Rodgers",
-     "pos": "QB",
-     "rotowire": "FA",
-     "site": "PIT"
-    },
-    {
      "d": "2026-11-16",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -4492,42 +4474,6 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "ARI"
-    },
-    {
-     "d": "2026-11-25",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "moved",
-     "head": "Claimed off waivers",
-     "kind": "claim",
-     "move": {
-      "d": "2026-11-25",
-      "head": "Claimed off waivers",
-      "kind": "claim"
-     },
-     "pid": "17979",
-     "player": "Kedon Slovis",
-     "pos": "QB",
-     "rotowire": "ARI",
-     "site": "FA"
-    },
-    {
-     "d": "2026-11-25",
-     "field": "t",
-     "file": "static/data/nfl-fantasy.json",
-     "flag": "moved",
-     "head": "Elevated for Thanksgiving Eve",
-     "kind": "up",
-     "move": {
-      "d": "2026-11-25",
-      "head": "Elevated for Thanksgiving Eve",
-      "kind": "up"
-     },
-     "pid": "18919",
-     "player": "Brennan Presley",
-     "pos": "WR",
-     "rotowire": "LAR",
-     "site": "FA"
     },
     {
      "d": "2026-11-16",
@@ -4568,7 +4514,7 @@
    ],
    "joined": 0,
    "players": 2321,
-   "rows": 8150
+   "rows": 8156
   },
   "nhl": {
    "by_file": {
