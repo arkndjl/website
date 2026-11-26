@@ -23,6 +23,8 @@ _NX = ld('data/nba_proj3y_fit.json')['exit']['res']['1.0']
 _RX = ld('data/nba_rxpm_research.json')['metrics']
 _VX = ld('data/nba_vorx_research.json')                         # VORX on rXPM (scripts/nba_vorx_research.py)             # rXPM team adjustment (scripts/nba_rxpm_research.py)
 _NT = ld('data/nba_trade_fit.json')                         # NBA draft-night trades (scripts/nba_draft_trades.py)
+_RD = ld('data/return_drivers.json')                       # Return% sweep + reported-return lock (scripts/return_drivers.py, return_news.py)
+_CD = ld('data/cbb_declare_fit.json')                      # CBB stay-or-declare (scripts/cbb_declare.py)
 _PX = ld('data/nba_pxpm_research.json')                     # pXPM fit + held-out tests (scripts/nba_pxpm_research.py)
 _NBAEX = (f"Held out 2012-23 ({_NX['n']:,} player seasons, {100 * _NX['exitShare']:.0f}% out of the league): RMSE {_NX['exit_vs_cp']['rmse'][1]:.2f} -> "
           f"{_NX['exit_vs_cp']['rmse'][0]:.2f} (t {_NX['exit_vs_cp']['t']:.1f}, {_NX['exit_vs_cp']['won']}/{_NX['exit_vs_cp']['of']} seasons).")
@@ -374,6 +376,38 @@ sections.append({'id': 'players', 'title': 'Player odds and projections', 'entri
       ['Declare: logit on ln xPick and age on draft day; ranked underclassmen ~94%, seniors ~69%, RS seniors 100%.',
        'Picked: log-normal around the mock xPick; the SD narrows toward the draft (PFF dated boards, 2020-26).'],
       'CFB board, draft board', ['CFB']),
+    (lambda c, b, n, fails: E('Ret%', 'P(back in college next season instead of the 2027 draft) = 1 - P(declares).',
+      [f"CFB: the Draft% declare logit (ln xPick, age on draft day, per class group). Leave one draft out on the 2021-25 fall PFF boards "
+       f"({c['n']} prospects, RS seniors and grads out): log loss {c['baselines']['live']:.3f} vs {c['baselines']['class']:.3f} class only, "
+       f"{c['baselines']['classPos']:.3f} class + position, {c['baselines']['rate']:.3f} base rate (t {c['baselines']['liveVsClass']['t']:.1f}, "
+       f"{c['baselines']['liveVsClass']['cellsWon']}/{c['baselines']['liveVsClass']['cells']} draft x class cells).",
+       f"Reported return in the decision window (CFB Nov 20 to the January deadline, CBB Mar 15 to the withdrawal date): Ret% "
+       f"{100 * (1 - max(n['cfb']['kinds']['return']['lockRate'], n['cbb']['kinds']['return']['lockRate'])):.0f}%, both sports. CFB: "
+       f"{n['cfb']['kinds']['return']['n']} reported returners, {n['cfb']['cycles'][0]}-{n['cfb']['cycles'][-1]} drafts, {100 * n['cfb']['kinds']['return']['declared']:.0f}% declared "
+       f"(model {100 * n['cfb']['kinds']['return']['model']:.0f}%): log loss {n['cfb']['kinds']['return']['logLossModel']:.2f} -> "
+       f"{n['cfb']['kinds']['return']['logLossLock']:.2f}, t {n['cfb']['kinds']['return']['t']:.1f}, "
+       f"{n['cfb']['kinds']['return']['cyclesWon']}/{n['cfb']['kinds']['return']['cycles']} cycles. "
+       f"Reported declaration FAILED (t {n['cfb']['kinds']['out']['t']:.1f}).",
+       f"CBB: class, era (NIL 2022+, COVID 2021, the 2024+ step), recruit rank and BPM shrunk by minutes, walk forward 2023-26: "
+       f"log loss {_CD['held']['logLoss']:.3f} vs {_CD['base']['logLoss']:.3f} class and era (t {_CD['held']['t']:.1f}). "
+       f"The 2024+ step: t {b['stageA']['singles']['e24']['t']:.1f}, {b['stageA']['singles']['e24']['won']}/{b['stageA']['singles']['e24']['of']}. "
+       f"Midseason board on top, leave one draft out 2022-26, board-listed: {b['stageB']['shippedRanked']:.3f} vs {b['stageB']['rateRanked']:.3f} base rate.",
+       *([f"CBB reported return: {n['cbb']['kinds']['return']['n']} players, {100 * n['cbb']['kinds']['return']['declared']:.0f}% left "
+          f"(model {100 * n['cbb']['kinds']['return']['model']:.0f}%), t {n['cbb']['kinds']['return']['t']:.1f}, "
+          f"{n['cbb']['kinds']['return']['cyclesWon']}/{n['cbb']['kinds']['return']['cycles']}: {'passed' if n['cbb']['kinds']['return']['pass'] else 'FAILED'}."]
+         if n.get('cbb', {}).get('kinds', {}).get('return', {}).get('n') else []),
+       "FAILED on top of the live model, both sports (each tried in both): " + fails + "."],
+      'CFB draft board, CBB draft board', ['CFB', 'CBB']))(
+        _RD['cfb'], _RD['cbb'], _RD.get('news', {}),
+        ', '.join(dict.fromkeys(
+            [{'prod': 'PFF grade x snaps (CFB; the BPM analogue)', 'rec': 'recruit rank (CFB)', 'ht': 'height', 'covid': 'COVID year (CFB)',
+              'nil22': 'NIL 2022+ step (CFB)', 'nil_lx': 'NIL x xPick', 'nil_age': 'NIL x age', 'econ': 'rookie deal vs NIL',
+              'qb': 'QB', 'p4': 'Power 4 / high-major'}[k] for k, v in _RD['cfb']['singles'].items() if not v['pass']] +
+            [{'age_c': 'age in class (CBB)', 'age': 'age (CBB)', 'hm': 'Power 4 / high-major', 'ht': 'height', 'guard': 'guard (QB analogue)',
+              'nil_bpm': 'NIL x BPM', 'nil_rank': 'NIL x recruit rank', 'nil_age_c': 'NIL x age', 'e24': '2024+ step'}[k]
+             for k, v in _RD['cbb']['stageA']['singles'].items() if not v['pass']] +
+            [{'econ': 'rookie deal vs NIL', 'age_c': 'age in class (CBB)', 'hm': 'Power 4 / high-major', 'guard': 'guard (QB analogue)'}[k]
+             for k, v in _RD['cbb']['stageB']['singles'].items() if not v['pass']]))),
     E('Transfer% (Xfer%)', 'P(on another FBS or FCS roster next season).',
       ['Ridge logit on the 2024-25 and 2025-26 cycles: class, production, role, recruit rank, record, P(HC change), distance from home.',
        'Out-of-time AUC .738. Transfer% + stay + exit = 100%. NIL-era data only (July 2021 on).'],

@@ -1,0 +1,551 @@
+{
+ "_readme": "python3 scripts/return_drivers.py      # needs cfb_draft_pct_backtest.py's cache and the CBB kit; -> data/return_drivers.json",
+ "gate": {
+  "t": -2.0,
+  "cfb": 7,
+  "cbbA": 3,
+  "cbbB": 4
+ },
+ "cbb": {
+  "stageA": {
+   "n": 7304,
+   "nHeld": 1555,
+   "baselines": {
+    "rate": 0.3364,
+    "class": 0.3324,
+    "live": 0.2922,
+    "shipped": 0.2843
+   },
+   "nilShape": {
+    "a": 14.022,
+    "b": -0.121,
+    "hm": -0.113,
+    "n": 400
+   },
+   "singles": {
+    "e24": {
+     "logLoss": 0.2843,
+     "vsLive": -0.0079,
+     "t": -4.05,
+     "won": 4,
+     "of": 4,
+     "pass": true
+    },
+    "age_c": {
+     "logLoss": 0.2842,
+     "vsLive": -0.0002,
+     "t": -0.41,
+     "won": 2,
+     "of": 4,
+     "pass": false
+    },
+    "age": {
+     "logLoss": 0.2842,
+     "vsLive": -0.0001,
+     "t": -0.33,
+     "won": 2,
+     "of": 4,
+     "pass": false
+    },
+    "hm": {
+     "logLoss": 0.2842,
+     "vsLive": -0.0001,
+     "t": -0.73,
+     "won": 4,
+     "of": 4,
+     "pass": false
+    },
+    "ht": {
+     "logLoss": 0.2858,
+     "vsLive": 0.0014,
+     "t": 1.43,
+     "won": 1,
+     "of": 4,
+     "pass": false
+    },
+    "guard": {
+     "logLoss": 0.2836,
+     "vsLive": -0.0007,
+     "t": -0.8,
+     "won": 3,
+     "of": 4,
+     "pass": false
+    },
+    "nil_bpm": {
+     "logLoss": 0.2847,
+     "vsLive": 0.0004,
+     "t": 0.56,
+     "won": 2,
+     "of": 4,
+     "pass": false
+    },
+    "nil_rank": {
+     "logLoss": 0.2838,
+     "vsLive": -0.0005,
+     "t": -0.54,
+     "won": 3,
+     "of": 4,
+     "pass": false
+    },
+    "nil_age_c": {
+     "logLoss": 0.2855,
+     "vsLive": 0.0011,
+     "t": 1.13,
+     "won": 0,
+     "of": 4,
+     "pass": false
+    }
+   }
+  },
+  "stageB": {
+   "drafts": [
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+   ],
+   "n": 1954,
+   "ranked": 212,
+   "live": 0.2278,
+   "shipped": 0.2259,
+   "liveRanked": 0.5029,
+   "shippedRanked": 0.4948,
+   "rateRanked": 0.6408,
+   "boardVsA": {
+    "logLoss": 0.2259,
+    "vsLive": -0.0792,
+    "t": -8.23,
+    "won": 5,
+    "of": 5,
+    "pass": true
+   },
+   "e24": {
+    "logLoss": 0.2259,
+    "vsLive": -0.0018,
+    "t": -3.3,
+    "won": 5,
+    "of": 5,
+    "pass": true
+   },
+   "e24Ranked": {
+    "logLoss": 0.4948,
+    "vsLive": -0.0081,
+    "t": -2.92,
+    "won": 4,
+    "of": 5,
+    "pass": true
+   },
+   "singles": {
+    "econ": {
+     "logLoss": 0.4943,
+     "vsLive": -0.0005,
+     "t": -0.23,
+     "won": 4,
+     "of": 5,
+     "pass": false
+    },
+    "age_c": {
+     "logLoss": 0.4999,
+     "vsLive": 0.0051,
+     "t": 1.03,
+     "won": 2,
+     "of": 5,
+     "pass": false
+    },
+    "hm": {
+     "logLoss": 0.4904,
+     "vsLive": -0.0044,
+     "t": -1.12,
+     "won": 4,
+     "of": 5,
+     "pass": false
+    },
+    "guard": {
+     "logLoss": 0.4967,
+     "vsLive": 0.0019,
+     "t": 0.37,
+     "won": 3,
+     "of": 5,
+     "pass": false
+    }
+   },
+   "calibRanked": [
+    {
+     "pred": "0.0-0.2",
+     "n": 85,
+     "mean": 0.064,
+     "actual": 0.094
+    },
+    {
+     "pred": "0.2-0.4",
+     "n": 37,
+     "mean": 0.306,
+     "actual": 0.297
+    },
+    {
+     "pred": "0.4-0.6",
+     "n": 44,
+     "mean": 0.522,
+     "actual": 0.455
+    },
+    {
+     "pred": "0.6-0.8",
+     "n": 37,
+     "mean": 0.688,
+     "actual": 0.73
+    },
+    {
+     "pred": "0.8-1.0",
+     "n": 9,
+     "mean": 0.822,
+     "actual": 0.667
+    }
+   ]
+  }
+ },
+ "cfb": {
+  "n": 564,
+  "drafts": [
+   2021,
+   2022,
+   2023,
+   2024,
+   2025
+  ],
+  "returnRate": {
+   "sr": 0.291,
+   "under": 0.056
+  },
+  "recMatched": 0.92,
+  "prodSeen": 0.968,
+  "baselines": {
+   "rate": 0.4562,
+   "class": 0.4107,
+   "classPos": 0.4164,
+   "live": 0.3133,
+   "liveVsClass": {
+    "logLoss": 0.3133,
+    "vsLive": -0.0974,
+    "t": -5.54,
+    "cellsWon": 9,
+    "cells": 10
+   },
+   "liveVsClassPos": {
+    "logLoss": 0.3133,
+    "vsLive": -0.1031,
+    "t": -5.77,
+    "cellsWon": 9,
+    "cells": 10
+   }
+  },
+  "singles": {
+   "prod": {
+    "logLoss": 0.3096,
+    "vsLive": -0.0037,
+    "t": -0.88,
+    "cellsWon": 6,
+    "cells": 10,
+    "pass": false
+   },
+   "rec": {
+    "logLoss": 0.3204,
+    "vsLive": 0.007,
+    "t": 2.52,
+    "cellsWon": 1,
+    "cells": 10,
+    "pass": false
+   },
+   "ht": {
+    "logLoss": 0.3155,
+    "vsLive": 0.0022,
+    "t": 0.93,
+    "cellsWon": 5,
+    "cells": 10,
+    "pass": false
+   },
+   "covid": {
+    "logLoss": 0.3135,
+    "vsLive": 0.0001,
+    "t": 0.11,
+    "cellsWon": 5,
+    "cells": 10,
+    "pass": false
+   },
+   "nil22": {
+    "logLoss": 0.3135,
+    "vsLive": 0.0001,
+    "t": 0.11,
+    "cellsWon": 5,
+    "cells": 10,
+    "pass": false
+   },
+   "nil_lx": {
+    "logLoss": 0.316,
+    "vsLive": 0.0027,
+    "t": 2.45,
+    "cellsWon": 4,
+    "cells": 10,
+    "pass": false
+   },
+   "nil_age": {
+    "logLoss": 0.3176,
+    "vsLive": 0.0043,
+    "t": 1.34,
+    "cellsWon": 4,
+    "cells": 10,
+    "pass": false
+   },
+   "econ": {
+    "logLoss": 0.318,
+    "vsLive": 0.0047,
+    "t": 1.1,
+    "cellsWon": 4,
+    "cells": 10,
+    "pass": false
+   },
+   "qb": {
+    "logLoss": 0.3151,
+    "vsLive": 0.0018,
+    "t": 0.41,
+    "cellsWon": 6,
+    "cells": 10,
+    "pass": false
+   },
+   "p4": {
+    "logLoss": 0.3196,
+    "vsLive": 0.0063,
+    "t": 1.72,
+    "cellsWon": 3,
+    "cells": 10,
+    "pass": false
+   }
+  },
+  "nilEraOnly": {
+   "prod": {
+    "vsLive": -0.0051,
+    "t": -0.72,
+    "cellsWon": 4,
+    "cells": 4
+   },
+   "rec": {
+    "vsLive": 0.0031,
+    "t": 0.29,
+    "cellsWon": 2,
+    "cells": 4
+   },
+   "ht": {
+    "vsLive": -0.0068,
+    "t": -1.16,
+    "cellsWon": 3,
+    "cells": 4
+   },
+   "econ": {
+    "vsLive": 0.0159,
+    "t": 1.52,
+    "cellsWon": 0,
+    "cells": 4
+   },
+   "qb": {
+    "vsLive": 0.0125,
+    "t": 1.87,
+    "cellsWon": 0,
+    "cells": 4
+   },
+   "p4": {
+    "vsLive": 0.0046,
+    "t": 0.78,
+    "cellsWon": 1,
+    "cells": 4
+   }
+  },
+  "calib": [
+   {
+    "pred": "0.0-0.2",
+    "n": 425,
+    "mean": 0.059,
+    "actual": 0.073
+   },
+   {
+    "pred": "0.2-0.4",
+    "n": 49,
+    "mean": 0.28,
+    "actual": 0.184
+   },
+   {
+    "pred": "0.4-0.6",
+    "n": 42,
+    "mean": 0.489,
+    "actual": 0.357
+   },
+   {
+    "pred": "0.6-0.8",
+    "n": 27,
+    "mean": 0.698,
+    "actual": 0.704
+   },
+   {
+    "pred": "0.8-1.0",
+    "n": 21,
+    "mean": 0.879,
+    "actual": 0.905
+   }
+  ]
+ },
+ "news": {
+  "cfb": {
+   "cycles": [
+    2023,
+    2024,
+    2025
+   ],
+   "kinds": {
+    "return": {
+     "n": 18,
+     "declared": 0.0,
+     "model": 0.464,
+     "lockRate": 0.026,
+     "logLossModel": 1.0111,
+     "logLossLock": 0.0479,
+     "t": -3.93,
+     "cyclesWon": 3,
+     "cycles": 3,
+     "daysBeforeDeadline": -16,
+     "breakers": [],
+     "pass": true
+    },
+    "out": {
+     "n": 95,
+     "declared": 0.989,
+     "model": 0.903,
+     "lockRate": 0.984,
+     "logLossModel": 0.1268,
+     "logLossLock": 0.0684,
+     "t": -1.18,
+     "cyclesWon": 2,
+     "cycles": 3,
+     "daysBeforeDeadline": -28,
+     "breakers": [
+      {
+       "name": "Cam Ward",
+       "team": "Miami (FL)",
+       "year": 2024,
+       "title": "Ex-Washington State QB Cam Ward declares for NFL Draft in move that has transfer portal implications across college football"
+      }
+     ],
+     "pass": false
+    }
+   }
+  },
+  "cbb": {
+   "cycles": [
+    2024,
+    2025,
+    2026
+   ],
+   "kinds": {
+    "return": {
+     "n": 69,
+     "declared": 0.0,
+     "model": 0.205,
+     "lockRate": 0.007,
+     "logLossModel": 0.34,
+     "logLossLock": 0.0157,
+     "t": -4.57,
+     "cyclesWon": 3,
+     "cycles": 3,
+     "daysBeforeDeadline": -32,
+     "breakers": [],
+     "pass": true
+    },
+    "out": {
+     "n": 73,
+     "declared": 0.822,
+     "model": 0.638,
+     "lockRate": 0.818,
+     "logLossModel": 0.534,
+     "logLossLock": 0.4798,
+     "t": -0.4,
+     "cyclesWon": 2,
+     "cycles": 3,
+     "daysBeforeDeadline": -46,
+     "breakers": [
+      {
+       "name": "Johnell Davis",
+       "team": "Florida Atlantic",
+       "year": 2024,
+       "title": "FAU's Johnell Davis enters portal, will also declare for 2024 NBA draft"
+      },
+      {
+       "name": "Jalon Moore",
+       "team": "Oklahoma",
+       "year": 2024,
+       "title": "Oklahoma forward Jalon Moore enters NBA draft, maintains college eligibility"
+      },
+      {
+       "name": "Xaivian Lee",
+       "team": "Princeton",
+       "year": 2024,
+       "title": "Sophomore standout Xaivian Lee declares for NBA draft, maintaining college eligibility"
+      },
+      {
+       "name": "Norchad Omier",
+       "team": "Miami FL",
+       "year": 2024,
+       "title": "UM\u2019s Norchad Omier enters NBA Draft, aims to make history as first Nicaraguan in league"
+      },
+      {
+       "name": "Alex Karaban",
+       "team": "Connecticut",
+       "year": 2024,
+       "title": "UConn\u2019s Alex Karaban to enter the NBA Draft"
+      },
+      {
+       "name": "Ugonna Onyenso",
+       "team": "Kentucky",
+       "year": 2024,
+       "title": "Report: Kentucky's Ugonna Onyenso Enters Transfer Portal After NBA Draft Declaration"
+      },
+      {
+       "name": "Mackenzie Mgbako",
+       "team": "Indiana",
+       "year": 2025,
+       "title": "Indiana forward Mackenzie Mgbako enters the NBA Draft and the transfer portal"
+      },
+      {
+       "name": "Xaivian Lee",
+       "team": "Princeton",
+       "year": 2025,
+       "title": "Junior star Xaivian Lee enters transfer portal and will \u2018test draft process\u2019 ahead of senior year"
+      },
+      {
+       "name": "John Blackwell",
+       "team": "Wisconsin",
+       "year": 2025,
+       "title": "Wisconsin G John Blackwell enters NBA draft"
+      },
+      {
+       "name": "Labaron Philon",
+       "team": "Alabama",
+       "year": 2025,
+       "title": "Former Baker, Bama star Labaron Philon declares for NBA Draft"
+      },
+      {
+       "name": "Miles Byrd",
+       "team": "San Diego St.",
+       "year": 2026,
+       "title": "San Diego State guard Miles Byrd says he will enter the transfer portal"
+      },
+      {
+       "name": "Acaden Lewis",
+       "team": "Villanova",
+       "year": 2026,
+       "title": "Villanova Basketball Freshman Acaden Lewis Declares For NBA Draft And Enters Transfer Portal"
+      }
+     ],
+     "pass": false
+    }
+   }
+  }
+ }
+}
