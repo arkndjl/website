@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-26T01:24Z",
+ "asof": "2026-11-26T03:38Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -10,7 +10,7 @@
    },
    "flags": [],
    "joined": 0,
-   "players": 991,
+   "players": 992,
    "rows": 5296
   },
   "cfb": {
@@ -59,7 +59,7 @@
     }
    ],
    "joined": 0,
-   "players": 2626,
+   "players": 2627,
    "rows": 16747
   },
   "nba": {
@@ -292,7 +292,7 @@
   "nfl": {
    "by_file": {
     "static/data/depth/nfl.json": {
-     "flags": 11,
+     "flags": 12,
      "rows": 2163
     },
     "static/data/nfl-fantasy.json": {
@@ -300,11 +300,11 @@
      "rows": 629
     },
     "static/data/nfl-war.json": {
-     "flags": 82,
+     "flags": 81,
      "rows": 1858
     },
     "static/data/pctl-nfl.json": {
-     "flags": 80,
+     "flags": 79,
      "rows": 1786
     },
     "static/data/personnel/nfl.json": {
@@ -312,7 +312,7 @@
      "rows": 64
     },
     "static/data/xaav-nfl.json": {
-     "flags": 57,
+     "flags": 58,
      "rows": 1650
     }
    },
@@ -498,6 +498,24 @@
      "site": "SEA"
     },
     {
+     "d": "2026-11-25",
+     "field": "depth",
+     "file": "static/data/depth/nfl.json",
+     "flag": "released",
+     "head": "Cut from IR by Tennessee",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-25",
+      "head": "Cut from IR by Tennessee",
+      "kind": "waived"
+     },
+     "pid": "11924",
+     "player": "Tanoh Kpassagnon",
+     "pos": "DE",
+     "rotowire": "FA",
+     "site": "TEN"
+    },
+    {
      "d": "2026-08-31",
      "field": "depth",
      "file": "static/data/depth/nfl.json",
@@ -532,24 +550,6 @@
      "pos": "QB",
      "rotowire": "FA",
      "site": "PIT"
-    },
-    {
-     "d": "2026-11-11",
-     "field": "t",
-     "file": "static/data/nfl-war.json",
-     "flag": "released",
-     "head": "Won't play in Germany",
-     "kind": "exit",
-     "move": {
-      "d": "2026-11-11",
-      "head": "Won't play in Germany",
-      "kind": "exit"
-     },
-     "pid": "16512",
-     "player": "Ben Brown",
-     "pos": "OL",
-     "rotowire": "NE",
-     "site": "NE"
     },
     {
      "d": "2026-11-03",
@@ -2100,12 +2100,12 @@
      "site": "FA"
     },
     {
-     "d": "2026-11-11",
+     "d": "2026-11-25",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
-     "flag": "released",
-     "head": "Won't play in Germany",
-     "kind": "exit",
+     "flag": "moved",
+     "head": "Logs full practice Wednesday",
+     "kind": null,
      "move": {
       "d": "2026-11-11",
       "head": "Won't play in Germany",
@@ -2928,6 +2928,24 @@
      "site": "BUF"
     },
     {
+     "d": "2026-11-25",
+     "field": "tm",
+     "file": "static/data/xaav-nfl.json",
+     "flag": "released",
+     "head": "Cut from IR by Tennessee",
+     "kind": "waived",
+     "move": {
+      "d": "2026-11-25",
+      "head": "Cut from IR by Tennessee",
+      "kind": "waived"
+     },
+     "pid": "11924",
+     "player": "Tanoh Kpassagnon",
+     "pos": "EDGE",
+     "rotowire": "FA",
+     "site": "CHI"
+    },
+    {
      "d": "2026-11-11",
      "field": "tm",
      "file": "static/data/xaav-nfl.json",
@@ -3034,24 +3052,6 @@
      "pos": "QB",
      "rotowire": "FA",
      "site": "PIT"
-    },
-    {
-     "d": "2026-11-11",
-     "field": "tm",
-     "file": "static/data/pctl-nfl.json",
-     "flag": "released",
-     "head": "Won't play in Germany",
-     "kind": "exit",
-     "move": {
-      "d": "2026-11-11",
-      "head": "Won't play in Germany",
-      "kind": "exit"
-     },
-     "pid": "16512",
-     "player": "Ben Brown",
-     "pos": "OL",
-     "rotowire": "NE",
-     "site": "NE"
     },
     {
      "d": "2026-11-03",
@@ -4586,7 +4586,7 @@
     },
     "static/data/pctl-nhl.json": {
      "flags": 0,
-     "rows": 375
+     "rows": 411
     },
     "static/data/xaav-nhl.json": {
      "flags": 11,
@@ -4812,8 +4812,8 @@
     }
    ],
    "joined": 0,
-   "players": 1439,
-   "rows": 2765
+   "players": 1440,
+   "rows": 2801
   }
  }
 }
