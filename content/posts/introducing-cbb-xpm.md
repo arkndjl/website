@@ -35,7 +35,7 @@ Barttorvik has two versions of BPM for every player:
 
 They are measuring the same thing, but they have different strengths, and it helps to look at a player rating as two separate parts. The first part is the **team total**, which is how much value the whole roster gets credit for. The second part is the **split**, which is how that total is divided between teammates.
 
-For the team total, GBPM is better. A team's minutes-weighted GBPM tracks its wins more closely than its BPM does, which I showed on November 24 when the site's WAR moved to GBPM. For the split, BPM is better, which is the new result here.
+For the team total, GBPM is better. A team's minutes-weighted GBPM tracks its wins more closely than its BPM does, which I showed on November 24 when the site's wins metric (now VORX) moved to GBPM. For the split, BPM is better, which is the new result here.
 
 ### Formulation
 rXPM takes the team total from GBPM and the split from BPM. Every player on a team is shifted by the same amount on offense and the same amount on defense:
@@ -157,7 +157,7 @@ The board's xBPM, which is the site's projection of this season's BPM and also u
 **rXPM** is the descriptive number across the College Basketball ARKBOARD:
 
 - **Board**: the XPM column is a player's rXPM this season.
-- **WAR**: wins above replacement = (XPM + 1.4) × minutes / 40 × .68 × .0187 wins per point. XPM is shrunk 100 minutes toward the season average first, and replacement level is the average 9th man. Team WAR + .39 × games has a correlation of .87 with team wins over 3,485 team-seasons.
+- **VORX**: wins over replacement on XPM = (XPM + 1.4) × minutes / 40 × .68 × .0187 wins per point, the college version of the NBA board's VORX with the same replacement level. XPM is shrunk 100 minutes toward the season average first, and replacement level is the average 9th man. Team VORX + .39 × games has a correlation of .87 with team wins over 3,485 team-seasons.
 - **Stat+**: XPM compared to the player's position, on a scale where 100 is average and 25 is one standard deviation.
 
 **pXPM** is used where the question is about next season:
@@ -172,7 +172,7 @@ The game model and FV use pXPM without team context and recruit rating, since bo
 ## Leaders
 ### XPM, 2025-26
 
-| | Player | Team | XPM | O-XPM | D-XPM | WAR |
+| | Player | Team | XPM | O-XPM | D-XPM | VORX |
 | :---: | :--- | :--- | :---: | :---: | :---: | :---: |
 | 1 | Cameron Boozer | Duke | +15.4 | +9.7 | +5.7 | 6.3 |
 | 2 | Yaxel Lendeborg | Michigan | +14.7 | +8.5 | +6.2 | 5.8 |
@@ -213,6 +213,6 @@ The pXPM list is mostly big men who defend. Nine of the ten are frontcourt playe
 - rXPM's split **beats game BPM at predicting which games a team plays above its average**, based on who played, in all three designs (t = 1.9 to 4.9).
 - **pXPM** = three seasons of BPM by side, shrunk, plus minutes, class, twelve box score rates, team context and recruit rating, fit to next-season BPM.
 - pXPM **beats BPM at predicting next-season team strength in 14 of 14 seasons** (team R² .746 vs .643), with a next-season player error of 2.32 compared to 3.41.
-- rXPM is the input to **WAR, Stat+ and the board's XPM column**. pXPM is on the **pXPM leaders and portal tabs**, and it feeds the **preseason team ratings and FV**.
+- rXPM is the input to **VORX, Stat+ and the board's XPM column**. pXPM is on the **pXPM leaders and portal tabs**, and it feeds the **preseason team ratings and FV**.
 
 Data: [Barttorvik](https://barttorvik.com) (season lines, player game logs, team results). Code ([github.com/arkndjl/website](https://github.com/arkndjl/website)): `scripts/cbb_xpm.py`, `scripts/cbb_tabs.py`, `scripts/research/cbb_xpm_nov26/`.
