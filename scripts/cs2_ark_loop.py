@@ -227,24 +227,24 @@ def card(st):
     for r in ms:
         picks[r["pick"]] += 1
     top = sorted(picks.items(), key=lambda z: -z[1])[:3]
-    verdict = "passes; retunes ship monthly" if st.get("adopted") else "fails; shipped settings kept"
+    verdict = "passes, and retunes ship monthly" if st.get("adopted") else "fails, and the shipped settings stay"
     out = {
         "id": "cs2-ark-loop", "sport": "CS2",
         "question": "Does retuning the CS2 ARK rating every month beat keeping its settings fixed?",
-        "answer": (f"Monthly retune {verdict}: {rec['d']:+.4f} log loss per series, t by month {rec['t']:+.2f} "
+        "answer": (f"The monthly retune {verdict}: {rec['d']:+.4f} log loss per series, t by month {rec['t']:+.2f} "
                    f"(bar {st['crit']:+.2f}), through {st['lastSealed']}."),
         "findings": [
-            f"Won {rec['won'][0]} of {rec['won'][1]} months; top-50 series t {rec['tTop']:+.2f}.",
-            f"Calibration slope {rec['slope']} on {rec['n']:,} scored series.",
-            "Picks: " + ", ".join(f"{n} ({c} months)" for n, c in top) + ".",
-            (f"Shipped {', '.join(f'{k} {v:g}' for k, v in st['shipped'].items())}." if st.get("shipped") else
+            f"It won {rec['won'][0]} of {rec['won'][1]} months. On top-50 series, t = {rec['tTop']:+.2f}.",
+            f"The calibration slope is {rec['slope']} on {rec['n']:,} scored series.",
+            "Settings picked: " + ", ".join(f"{n} ({c} months)" for n, c in top) + ".",
+            (f"Shipped: {', '.join(f'{k} {v:g}' for k, v in st['shipped'].items())}." if st.get("shipped") else
              f"Look {st['looks']}: each new month tightens the bar (Bonferroni on looks).")],
         "method": ("Each month, the settings with the lowest log loss on all earlier series are picked from the shipped "
-                   "set and one-step moves on K, K decay, map K, lower-tier K, region K, span and new-player start, "
-                   "then scored once on that month against the shipped settings."),
+                   "set and from one-step moves on K, K decay, map K, lower-tier K, region K, span and new-player start. "
+                   "They are then scored once on that month against the shipped settings."),
         "data": f"Valve VRS series + bo3.gg maps, Aug 2024 to {st['lastSealed']}, {rec['n']:,} walk-forward series.",
         "n": rec["n"], "robust": bool(st.get("pass")), "interest": 3,
-        "split_check": f"{rec['won'][0]}/{rec['won'][1]} months better; top-50 t {rec['tTop']:+.2f}.",
+        "split_check": f"{rec['won'][0]}/{rec['won'][1]} months better, top-50 t = {rec['tTop']:+.2f}.",
         "chart": {"type": "bar", "title": "Log loss, monthly retune minus fixed", "x_label": "month",
                   "y_label": "log loss gap", "y_fmt": "signed", "ref": {"y": 0, "label": "fixed"}, "mark": None,
                   "series": [{"name": "retune", "points": [{"x": r["m"][2:], "y": round(r["d"] * 1000, 2), "n": r["n"]}

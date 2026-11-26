@@ -2,19 +2,19 @@
   "id": "nfl-onside-surprise",
   "sport": "NFL",
   "question": "Do surprise onside kicks get recovered more than expected late-game onside kicks?",
-  "answer": "Yes, 25% vs 9% (2015-23), but below the ~32% break-even for an early onside. Net WPA not different from zero.",
+  "answer": "Yes, 25% against 9% (2015-23), but that is below the ~32% break-even for an early onside. Net WPA isn't different from zero.",
   "findings": [
-    "Surprise 25.0% (15.5-37.7, n=56); expected 8.9% (6.7-11.6, n=508).",
-    "Q1-Q3 surprise onside, kicking-team WPA -0.6 pts (-1.8 to +0.6, n=54); normal kickoff -0.04.",
-    "Break-even recovery rate for a Q1-Q3 surprise onside: about 32%.",
-    "2024-26 expected onsides: 6.3% recovered (3.2-11.9, n=127)."
+    "Surprise onsides were recovered 25.0% of the time (15.5-37.7, n=56), and expected ones 8.9% (6.7-11.6, n=508).",
+    "On a Q1-Q3 surprise onside, the kicking team's WPA is -0.6 points (-1.8 to +0.6, n=54). A normal kickoff is -0.04.",
+    "The break-even recovery rate for a Q1-Q3 surprise onside is about 32%.",
+    "In 2024-26, 6.3% of expected onsides were recovered (3.2-11.9, n=127)."
   ],
-  "method": "Onside = kickoff described as onside. Expected = Q4 with the kicker trailing; surprise = all others. WPA compared with normal Q1-Q3 kickoffs within 14 points, game bootstrap CIs. Teams pick spots, so rates are upper bounds.",
+  "method": "An onside is a kickoff described as onside. Expected means Q4 with the kicking team trailing, and surprise is all the others. WPA is compared with normal Q1-Q3 kickoffs within 14 points, with game bootstrap CIs. Teams pick their spots, so the rates are upper bounds.",
   "data": "nflverse play-by-play, 2015 to 2026 wk 8, 691 onside kicks.",
   "n": 691,
   "robust": true,
   "interest": 3,
-  "split_check": "Surprise recovery 28% in 2015-18 (n=32), 21% in 2019-23 (n=24); expected stays near 9%.",
+  "split_check": "Surprise recovery was 28% in 2015-18 (n=32) and 21% in 2019-23 (n=24). Expected stays near 9%.",
   "chart": {
     "type": "bar",
     "title": "Onside kick recovery rate by kickoff-rule era",

@@ -2,19 +2,19 @@
   "id": "cs2-equipment-gap",
   "sport": "CS2",
   "question": "How much does an equipment gap change round win chances on CT and T?",
-  "answer": "Full buy vs full buy: CT wins 51.7%. At equal dollar value CT wins 48.5%; an eco beats a full buy 5.6%.",
+  "answer": "Full buy against full buy, the CT side wins 51.7%. At equal dollar value the CT side wins 48.5%, and an eco beats a full buy 5.6% of the time.",
   "findings": [
-    "Full buy vs full buy: CT wins 51.7% (51.4%-52.0%, n=154,499).",
-    "Force vs full: CT forcing wins 36.0% (35.4%-36.5%, n=28,386); T forcing wins 36.0% (n=40,093).",
-    "Eco vs full: CT eco wins 5.9% (5.5%-6.4%, n=11,243); T eco wins 5.4% (n=17,966).",
-    "CT needs about $1.3k more equipment value than T for a 50% round (CT rifles and kits cost more)."
+    "Full buy against full buy: the CT side wins 51.7% (51.4%-52.0%, n=154,499).",
+    "Force against full: a CT force wins 36.0% (35.4%-36.5%, n=28,386), and a T force wins 36.0% (n=40,093).",
+    "Eco against full: a CT eco wins 5.9% (5.5%-6.4%, n=11,243), and a T eco wins 5.4% (n=17,966).",
+    "The CT side needs about $1.3k more equipment value than the T side for a 50% round, since CT rifles and kits cost more."
   ],
-  "method": "Non-pistol regulation rounds; equipment value at round start per team from bo3.gg, binned by CT minus T in $4k steps (ends capped at $24k). Round win rate with map-clustered CIs.",
+  "method": "Non-pistol regulation rounds. Each team's equipment value at the start of the round comes from bo3.gg, binned by CT minus T in $4k steps (ends capped at $24k). Round win rate with map-clustered CIs.",
   "data": "bo3.gg round data, S/A/B-tier pro maps, 2023-10-16 to 2026-11-02, 17,525 maps, 327,073 rounds",
   "n": 327073,
   "robust": true,
   "interest": 3,
-  "split_check": "Full vs full CT win %: early 51.7% (n=76,815), late 51.7% (n=77,684).",
+  "split_check": "CT win % in full against full: 51.7% early (n=76,815) and 51.7% late (n=77,684).",
   "chart": {
     "type": "line",
     "title": "Round win % by equipment gap",

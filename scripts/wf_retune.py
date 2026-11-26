@@ -316,14 +316,14 @@ def card(res):
     out = {
         "id": "wf-retune-sports", "sport": "CS2",
         "question": "Does re-picking a rating's settings each season beat keeping them fixed?",
-        "answer": (f"Passes in {', '.join(ok) if ok else 'no sport'}; fails in "
+        "answer": (f"It passes in {', '.join(ok) if ok else 'no sport'}, and fails in "
                    f"{', '.join(n for n, v in rows if not v['pass']) or 'none'}."),
-        "findings": [f"{n}: {v['d'] * 1000:+.2f} log loss x1000, t by month {v['tMonth']:+.2f}, "
+        "findings": [f"{n}: {v['d'] * 1000:+.2f} log loss ×1000, t by month {v['tMonth']:+.2f}, "
                      f"{v['monthsBetter'][0]}/{v['monthsBetter'][1]} months." for n, v in rows][:4],
-        "method": ("Each season (CS2: month), the settings with the lowest walk-forward log loss on every earlier "
-                   "season are picked from the shipped set and one-step moves on each tuned setting, then scored once "
-                   "on that season against the shipped settings. Held-out seasons only; pass at t by month <= -2."),
-        "data": "Each sport's game-model history, held-out seasons before the 2026-27 lockbox; CS2 Jul 2025 to its last sealed month.",
+        "method": ("Each season (each month in CS2), the settings with the lowest walk-forward log loss on every earlier "
+                   "season are picked from the shipped set and from one-step moves on each tuned setting. They are then scored once "
+                   "on that season against the shipped settings. Only held-out seasons count, and a sport passes at t by month <= -2."),
+        "data": "Each sport's game-model history, on held-out seasons before the 2026-27 lockbox. CS2 runs from Jul 2025 to its last sealed month.",
         "n": int(sum(v.get("n", 0) for _, v in rows)), "robust": bool(ok), "interest": 3,
         "split_check": f"{len(ok)} of {len(rows)} sports pass.",
         "chart": {"type": "bar", "title": "t by month, re-picked minus fixed settings", "x_label": "sport",

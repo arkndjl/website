@@ -2,19 +2,19 @@
   "id": "nfl-two-point",
   "sport": "NFL",
   "question": "Is a two-point try worth more than an extra point on average?",
-  "answer": "No clear edge. 2-pt tries score 0.96 points per try, XPs 0.94; difference +0.02 (-0.03 to +0.07).",
+  "answer": "There is no clear edge. A 2-pt try scores 0.96 points per try and an XP scores 0.94, a difference of +0.02 (-0.03 to +0.07).",
   "findings": [
-    "2-pt success 48.1% (45.5-50.6, n=1,458); break-even vs XP is 47.2%.",
-    "XP rate 93.9% in 2015-17 (n=3,695), 95.8% in 2023-25 (n=3,860).",
-    "2-pt rate by season ranges 41% to 55%; every season CI includes 48%.",
-    "2-pt runs 55% (50-60, n=388), passes 45% (42-48, n=1,041)."
+    "2-pt success is 48.1% (45.5-50.6, n=1,458), and the break-even against the XP is 47.2%.",
+    "The XP rate was 93.9% in 2015-17 (n=3,695) and 95.8% in 2023-25 (n=3,860).",
+    "The 2-pt rate by season ranges from 41% to 55%, and every season's CI includes 48%.",
+    "2-pt runs convert 55% (50-60, n=388), and passes 45% (42-48, n=1,041)."
   ],
-  "method": "Wilson 95% CIs on success rates; expected points = 2 x 2-pt rate vs XP rate. Tries in Q1-Q4, all game states; selection is small since 2-pt tries are mostly score-driven.",
+  "method": "Wilson 95% CIs on the success rates. Expected points are 2 x the 2-pt rate against the XP rate. Tries are from Q1-Q4 in all game states. Selection is small, since 2-pt tries are mostly driven by the score.",
   "data": "nflverse play-by-play, 2015 to 2026 wk 8, 1,458 two-point tries and 14,618 extra points.",
   "n": 16076,
   "robust": false,
   "interest": 2,
-  "split_check": "2-pt rate 47.6% in 2015-20 (n=706), 48.5% in 2021-26 (n=752); XP edge within noise in both.",
+  "split_check": "The 2-pt rate was 47.6% in 2015-20 (n=706) and 48.5% in 2021-26 (n=752). The XP edge is within noise in both.",
   "chart": {
     "type": "line",
     "title": "Expected points per try",

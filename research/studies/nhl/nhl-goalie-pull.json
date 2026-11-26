@@ -2,19 +2,19 @@
   "id": "nhl-goalie-pull",
   "sport": "NHL",
   "question": "When should a trailing team pull its goalie?",
-  "answer": "Pull at 3:18 down one, 6:27 down two. Teams pull at 1:52 and 2:39.",
+  "answer": "Pull at 3:18 down one and at 6:27 down two. Teams pull at 1:52 and 2:39.",
   "findings": [
-    "Down 1, 6v5: 6.3 GF/60 (5.5-7.1), 20.8 GA/60 (19.5-22.2); 2,279 min.",
-    "Down 1, 5v5 last 10 min: 2.35 GF/60 (2.14-2.58), 1.98 GA/60; 12,201 min.",
-    "Optimum CI: 2:42-3:57 down 1, 4:42-9:04 down 2. 2% of down-1 pulls (n=1,801) come that early.",
-    "Gain vs actual timing from 10:00 left, down 1: +0.6 pts tie chance (0.2 to 1.2)."
+    "Down 1 at 6v5: 6.3 GF/60 (5.5-7.1) and 20.8 GA/60 (19.5-22.2), over 2,279 min.",
+    "Down 1 at 5v5 in the last 10 min: 2.35 GF/60 (2.14-2.58) and 1.98 GA/60, over 12,201 min.",
+    "The CI on the optimum is 2:42-3:57 down 1 and 4:42-9:04 down 2. Only 2% of down-1 pulls (n=1,801) come that early.",
+    "The gain over actual timing from 10:00 left, down 1, is +0.6 points of tie chance (0.2 to 1.2)."
   ],
-  "method": "Outcome: level or ahead at 60:00. Per-second Markov model on goal rates by state (6v5, 5v5 down 1/2, tied), game-cluster bootstrap CIs. Model matches observed: down 1 at 6:00, 22.5% predicted vs 24.4% observed (n=1,523).",
+  "method": "The outcome is being level or ahead at 60:00. A per-second Markov model on goal rates by state (6v5, 5v5 down 1/2, tied), with game-cluster bootstrap CIs. The model matches what was observed: down 1 at 6:00, it predicts 22.5% against an observed 24.4% (n=1,523).",
   "data": "NHL API play-by-play + shift charts, regular seasons 2021-22 to 2024-25, 5,248 games; pull times from goalie shifts.",
   "n": 5248,
   "robust": true,
   "interest": 4,
-  "split_check": "Optimum down 1: 3:10 in 2021-23, 3:26 in 2023-25. Median actual pull: 1:47 (2021-22) to 1:58 (2024-25).",
+  "split_check": "The optimum down 1 was 3:10 in 2021-23 and 3:26 in 2023-25. The median actual pull went from 1:47 (2021-22) to 1:58 (2024-25).",
   "chart": {
     "type": "line",
     "title": "Tie chance by pull time, from 10:00 left",

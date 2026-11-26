@@ -2,19 +2,19 @@
   "id": "soccer-first-sub-timing",
   "sport": "soccer",
   "question": "When do teams make their first sub by score state, and does an early first sub pay off?",
-  "answer": "Trailing teams sub first by 60', level and leading by 65'. A first sub before 60' adds +0.04 xG diff; no goal effect found.",
+  "answer": "Trailing teams make their first sub by 60', and level and leading teams by 65'. A first sub before 60' adds +0.04 of xG difference, and I found no effect on goals.",
   "findings": [
     "First tactical sub at HT: trailing 34.4% (n=1606), level 16.0% (n=2206), leading 13.0% (n=1582).",
-    "Subbed by 60' if state held: trailing 60%, level 36%, leading 30%.",
-    "Sub before 60' vs none, 60' to end: xG diff +0.041 (CI +0.005 to +0.078), goal diff +0.045 (CI -0.02 to +0.11); n=4,853.",
-    "Trailing at 60': +0.070 xG diff (CI +0.004 to +0.136, n=1699). HT subs vs none: +0.052 (CI -0.002 to +0.105)."
+    "Subbed by 60' if the state held: trailing 60%, level 36%, leading 30%.",
+    "A sub before 60' against none, from 60' to the end: xG diff +0.041 (CI +0.005 to +0.078), goal diff +0.045 (CI -0.02 to +0.11), n=4,853.",
+    "Trailing at 60': +0.070 xG diff (CI +0.004 to +0.136, n=1699). HT subs against none: +0.052 (CI -0.002 to +0.105)."
   ],
-  "method": "Timing: discrete hazard of first tactical sub per minute by current state. Effect: landmark at 60' (and HT), OLS with match-clustered SE on score state, strength, home, prior xG diff and xG diff in the 15 min before the landmark (the trigger window), opponent early sub. Injury subs and red cards before the landmark excluded.",
+  "method": "Timing is a discrete hazard of the first tactical sub per minute by the current state. The effect is a landmark at 60' (and HT): an OLS with match-clustered SE on score state, strength, home, prior xG diff, the xG diff in the 15 min before the landmark (the trigger window) and an early opponent sub. Injury subs and red cards before the landmark are excluded.",
   "data": "StatsBomb open data, 23 full seasons/tournaments (2015/16 EPL, Serie A, Ligue 1; men's WC/Euro/Copa/AFCON; ISL; women's leagues and tournaments), 2,659 matches, 4,853 team-matches at the 60' landmark.",
   "n": 4853,
   "robust": false,
   "interest": 3,
-  "split_check": "xG-diff effect +0.028 in 2015/16 leagues, +0.048 elsewhere; same sign, neither CI excludes 0 alone.",
+  "split_check": "The xG-diff effect was +0.028 in the 2015/16 leagues and +0.048 elsewhere. The sign is the same, and neither CI excludes 0 alone.",
   "chart": {
     "type": "line",
     "title": "Share of teams with first tactical sub made, state held",

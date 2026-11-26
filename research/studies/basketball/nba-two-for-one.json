@@ -2,19 +2,19 @@
   "id": "nba-two-for-one",
   "sport": "NBA",
   "question": "With 25-40 seconds left in a quarter, does a quick shot for a 2-for-1 pay?",
-  "answer": "Yes: quick shot nets +0.33 pts per quarter-end vs a full possession (CI +0.26 to +0.39).",
+  "answer": "Yes. A quick shot nets +0.33 points per quarter-end compared to a full possession (CI +0.26 to +0.39).",
   "findings": [
-    "Quick (<=10 s): net +0.61 pts to quarter end (CI +0.56 to +0.66), n=6896.",
-    "Full (>10 s): net +0.35 pts (CI +0.32 to +0.38), n=13048.",
-    "Points for/against: quick 1.85/1.24, full 1.25/0.90.",
-    "All start types (incl. transition): quick minus full +0.34 pts (CI +0.31 to +0.37), n=53737."
+    "A quick shot (<=10 s) nets +0.61 points to the end of the quarter (CI +0.56 to +0.66), n=6896.",
+    "A full possession (>10 s) nets +0.35 points (CI +0.32 to +0.38), n=13048.",
+    "Points for and against: 1.85/1.24 quick, 1.25/0.90 full.",
+    "On all start types, transition included, quick minus full is +0.34 points (CI +0.31 to +0.37), n=53737."
   ],
-  "method": "Q1-Q3, first possession starting 25-40 s left. Outcome = own minus opponent points to quarter end. Main sample = inbound after opponent score (no transition); quick vs full compared within 5 s start-time bins, game-clustered bootstrap.",
+  "method": "The sample is the first possession starting with 25-40 s left in Q1-Q3. The outcome is own points minus opponent points to the end of the quarter. The main sample is inbounds after an opponent score (no transition), with quick and full possessions compared within 5 s start-time bins and a game-clustered bootstrap.",
   "data": "ESPN play-by-play via sportsdataverse, NBA 2011-12 to 2025-26, 19,166 games, 19,944 inbound possessions.",
   "n": 19944,
   "robust": true,
   "interest": 3,
-  "split_check": "Quick minus full: +0.32 pts in 2012-19 (CI +0.24 to +0.41), +0.34 in 2020-26 (CI +0.24 to +0.43).",
+  "split_check": "Quick minus full was +0.32 points in 2012-19 (CI +0.24 to +0.41) and +0.34 in 2020-26 (CI +0.24 to +0.43).",
   "chart": {
     "type": "line",
     "title": "Net points to quarter end by seconds used, inbound possessions 25-40 s left",

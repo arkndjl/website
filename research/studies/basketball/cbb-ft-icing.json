@@ -2,18 +2,18 @@
   "id": "cbb-ft-icing",
   "sport": "CBB",
   "question": "Does a timeout before a late free throw make the shooter miss?",
-  "answer": "Icing does not work: iced shooters +2.3 pp vs un-iced, relative to own FT% (CI +0.0 to +4.6).",
+  "answer": "Icing doesn't work. Iced shooters were +2.3 points better than un-iced shooters, relative to their own FT% (CI +0.0 to +4.6).",
   "findings": [
-    "Iced: 71.2% made (CI 68.9-73.4), shooters' usual 72.5%, n=1567.",
-    "Not iced: 69.9% made (CI 69.5-70.2), shooters' usual 73.4%, n=59853.",
-    "Iced minus not iced, vs own FT%: +2.3 pp (95% CI +0.0 to +4.6)."
+    "Iced shooters made 71.2% (CI 68.9-73.4), against their usual 72.5%, n=1567.",
+    "Shooters who weren't iced made 69.9% (CI 69.5-70.2), against their usual 73.4%, n=59853.",
+    "Iced minus not iced, against their own FT%, is +2.3 points (95% CI +0.0 to +4.6)."
   ],
-  "method": "First FT of a trip, last 2:00 of regulation or OT, margin within 3. Iced = defense timeout between foul and FT. Outcome = made minus shooter's leave-one-out FT% (min 20 other FTs); game-clustered bootstrap.",
+  "method": "The sample is the first FT of a trip in the last 2:00 of regulation or OT, with the margin within 3. A shooter is iced when the defense calls timeout between the foul and the FT. The outcome is made minus the shooter's leave-one-out FT% (min 20 other FTs), with a game-clustered bootstrap.",
   "data": "ESPN play-by-play via sportsdataverse, CBB, 2011-12 to 2025-26, 61,420 first free throws.",
   "n": 61420,
   "robust": true,
   "interest": 3,
-  "split_check": "Iced minus not iced: +2.0 pp in 2012-19 (CI -1.0 to +4.8), +2.5 in 2020-26 (CI -0.8 to +6.1).",
+  "split_check": "Iced minus not iced was +2.0 points in 2012-19 (CI -1.0 to +4.8) and +2.5 in 2020-26 (CI -0.8 to +6.1).",
   "chart": {
     "type": "bar",
     "title": "CBB: first FT make % late and close, by shooter's usual FT%",
