@@ -8,12 +8,12 @@
 {{- $date := lower ((time .asof).Format "Jan 2") }}
 {{- $ep := cond $col (printf "drive points by field position (mean points on drives from that spot: own 20 %.1f, midfield %.1f)" (float $d.note.d20) (float $d.note.d50)) "nflverse expected points on 1st-and-10" }}
 <div data-brk-pane="k" style="display:none">
-  {{- partial "wintable-open.html" (dict "title" (printf "%s · kickers" $.title) "icon" "football" "filter" (cond $col "Team,Yr" "Team") "rerank" true "gfxCols" "RK,Player,Adj,Team,FG,Pct" "gfxDate" (printf "kickers · %v" $d.season) "gfxMax" "25") }}
+  {{- partial "wintable-open.html" (dict "title" (printf "%s · kickers" $.title) "icon" "football" "filter" (cond $col "Pos,Team,Yr" "Pos,Team") "rerank" true "gfxCols" "RK,Player,Adj,Pos,Team,FG,Pct" "gfxDate" (printf "kickers · %v" $d.season) "gfxMax" "25") }}
 <table class="cfb__table bw brk__table">
   <thead><tr>
     <th>RK</th><th>Player</th>
     <th title="points over expected, shrunk for sample: FG {{ $h.fg.k }} attempts, XP {{ $h.xp.k }}, kickoffs {{ $h.ko.k }} keep half the observed rate; the rank">Adj</th>
-    <th class="brk__pt">Team</th>{{ if $col }}<th class="bw__x" title="class">Yr</th>{{ end }}
+    <th class="brk__pt">Pos</th><th class="brk__pt">Team</th>{{ if $col }}<th class="bw__x" title="class">Yr</th>{{ end }}
     <th title="field goals made / attempted">FG</th>
     <th class="bw__x" title="field goal points over expected, total: 3 x (made - expected make)">FG+</th>
     <th class="bw__x" title="kickoff points over expected, total: {{ $ep }} of the receiver's start against the mean kickoff from the same spot this season">KO+</th>
@@ -33,11 +33,13 @@
     {{- if $col }}
     <td class="cfb__name"><b>{{ .n }}</b><span class="brk__meta cfb__dim">{{ .pos }} · {{ .t }}</span></td>
     <td class="cfb__num is-key" data-v="{{ .adj }}"><span class="{{ if ge (float .adj) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ partial "num.html" (slice "%+.1f" (float .adj)) }}</span></td>
+    <td class="brk__pt">{{ .pos }}</td>
     <td class="cfb__team brk__pt">{{ with .lg }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span>{{ .t }}</span></td>
     <td class="bw__x">{{ .cls }}</td>
     {{- else }}
     <td class="cfb__name">{{ partial "face.html" (dict "u" (cond (ne .ph nil) (printf "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/%v" .ph) "")) }}<b>{{ .n }}</b><span class="brk__meta cfb__dim">{{ .pos }} · {{ .t }}</span></td>
     <td class="cfb__num is-key" data-v="{{ .adj }}"><span class="{{ if ge (float .adj) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ partial "num.html" (slice "%+.1f" (float .adj)) }}</span></td>
+    <td class="brk__pt">{{ .pos }}</td>
     <td class="cfb__team brk__pt"><img class="cfb__logo" src="/img/nfl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"><span>{{ .t }}</span></td>
     {{- end }}
     <td class="cfb__num" data-v="{{ .fgm }}">{{ .fgm }}/{{ .fga }}</td>
@@ -59,12 +61,12 @@
         "about" (printf "Points over expected by kick. FG: 3 x (made - expected make), expected from a fit on distance%s over the last five seasons. XP: made - season rate. Kickoffs: %s of the receiver's start, against the mean kickoff from the same spot that season (so 2024+ NFL rules have their own baseline). Adj adds each part shrunk for sample: total / (attempts + k), k = noise variance / kicker variance; FG k %v attempts (field goal accuracy over expected barely repeats: year-to-year r %v), XP k %v, kickoffs k %v. %v+ field goals and kickoffs / 3 to be listed%s." (cond $col "" ", roof, wind and cold") $ep $h.fg.k $h.fg.r $h.xp.k $h.ko.k (index $d.min "k") (cond $col ", FBS players on the board" ""))) }}
 </div>
 <div data-brk-pane="p" style="display:none">
-  {{- partial "wintable-open.html" (dict "title" (printf "%s · punters" $.title) "icon" "football" "filter" (cond $col "Team,Yr" "Team") "rerank" true "gfxCols" "RK,Player,Adj,Team,Punts,Net" "gfxDate" (printf "punters · %v" $d.season) "gfxMax" "25") }}
+  {{- partial "wintable-open.html" (dict "title" (printf "%s · punters" $.title) "icon" "football" "filter" (cond $col "Pos,Team,Yr" "Pos,Team") "rerank" true "gfxCols" "RK,Player,Adj,Pos,Team,Punts,Net" "gfxDate" (printf "punters · %v" $d.season) "gfxMax" "25") }}
 <table class="cfb__table bw brk__table">
   <thead><tr>
     <th>RK</th><th>Player</th>
     <th title="points over expected, shrunk for sample: {{ $h.cv }} x (Pin + Dist) + {{ $h.cg }} x Leg x punts, the mix that best predicts next season's points over expected; the rank">Adj</th>
-    <th class="brk__pt">Team</th>{{ if $col }}<th class="bw__x" title="class">Yr</th>{{ end }}
+    <th class="brk__pt">Pos</th><th class="brk__pt">Team</th>{{ if $col }}<th class="bw__x" title="class">Yr</th>{{ end }}
     <th title="punts (blocked punts and fakes left out)">Punts</th>
     <th class="bw__x" title="points over expected on punts from the opponent's 50 and in (pinning: inside-20s against touchbacks), shrunk for sample">Pin</th>
     <th class="bw__x" title="points over expected on punts from beyond the 50 (distance, hang and coverage), shrunk for sample">Dist</th>
@@ -84,11 +86,13 @@
     {{- if $col }}
     <td class="cfb__name"><b>{{ .n }}</b><span class="brk__meta cfb__dim">{{ .pos }} · {{ .t }}</span></td>
     <td class="cfb__num is-key" data-v="{{ .adj }}"><span class="{{ if ge (float .adj) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ partial "num.html" (slice "%+.1f" (float .adj)) }}</span></td>
+    <td class="brk__pt">{{ .pos }}</td>
     <td class="cfb__team brk__pt">{{ with .lg }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span>{{ .t }}</span></td>
     <td class="bw__x">{{ .cls }}</td>
     {{- else }}
     <td class="cfb__name">{{ partial "face.html" (dict "u" (cond (ne .ph nil) (printf "https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/%v" .ph) "")) }}<b>{{ .n }}</b><span class="brk__meta cfb__dim">{{ .pos }} · {{ .t }}</span></td>
     <td class="cfb__num is-key" data-v="{{ .adj }}"><span class="{{ if ge (float .adj) 0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ partial "num.html" (slice "%+.1f" (float .adj)) }}</span></td>
+    <td class="brk__pt">{{ .pos }}</td>
     <td class="cfb__team brk__pt"><img class="cfb__logo" src="/img/nfl/{{ lower .t }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"><span>{{ .t }}</span></td>
     {{- end }}
     <td class="cfb__num">{{ .pu }}</td>
