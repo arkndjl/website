@@ -1,0 +1,234 @@
+{
+ "cfb class": {
+  "n": 1357,
+  "bent_vs_plain": {
+   "t": -1.25,
+   "up": 5
+  },
+  "base": 0.6025,
+  "forms": {
+   "decay": {
+    "t": -0.99,
+    "up": 4,
+    "rmse": 0.6028,
+    "holm": false
+   },
+   "cap": {
+    "t": -1.16,
+    "up": 4,
+    "rmse": 0.603,
+    "holm": false
+   },
+   "star premium": {
+    "t": -0.46,
+    "up": 6,
+    "rmse": 0.6028,
+    "holm": false
+   },
+   "power x decay": {
+    "t": -0.83,
+    "up": 5,
+    "rmse": 0.603,
+    "holm": false
+   }
+  },
+  "weights": {
+   "top": [
+    0.00216,
+    0.00577
+   ],
+   "depth": [
+    0.00454,
+    0.00548
+   ],
+   "t_diff": -0.44
+  }
+ },
+ "cfb roster": {
+  "n": 1605,
+  "bent_vs_plain": {
+   "t": 0.31,
+   "up": 7
+  },
+  "base": 0.7846,
+  "forms": {
+   "decay": {
+    "t": -0.21,
+    "up": 6,
+    "rmse": 0.7847,
+    "holm": false
+   },
+   "cap": {
+    "t": -1.14,
+    "up": 4,
+    "rmse": 0.7856,
+    "holm": false
+   },
+   "star premium": {
+    "t": 0.18,
+    "up": 7,
+    "rmse": 0.7845,
+    "holm": false
+   },
+   "power x decay": {
+    "t": 0.0,
+    "up": 0,
+    "rmse": 0.7846,
+    "holm": false
+   }
+  },
+  "weights": {
+   "top": [
+    0.0021,
+    0.00239
+   ],
+   "depth": [
+    0.0002,
+    0.00203
+   ],
+   "t_diff": 0.82
+  }
+ },
+ "cbb class": {
+  "n": 1342,
+  "bent_vs_plain": {
+   "t": 2.63,
+   "up": 10
+  },
+  "base": 0.4579,
+  "forms": {
+   "decay": {
+    "t": 2.69,
+    "up": 10,
+    "rmse": 0.4568,
+    "holm": true
+   },
+   "cap": {
+    "t": 2.62,
+    "up": 11,
+    "rmse": 0.4555,
+    "holm": true
+   },
+   "star premium": {
+    "t": -1.08,
+    "up": 4,
+    "rmse": 0.4583,
+    "holm": false
+   },
+   "power x decay": {
+    "t": 2.87,
+    "up": 9,
+    "rmse": 0.4556,
+    "holm": true
+   }
+  },
+  "weights": {
+   "top": [
+    -0.01491,
+    0.0053
+   ],
+   "depth": [
+    -0.01504,
+    0.00469
+   ],
+   "t_diff": 0.02
+  }
+ },
+ "cbb roster": {
+  "n": 1835,
+  "bent_vs_plain": {
+   "t": 4.4,
+   "up": 11
+  },
+  "base": 0.6184,
+  "forms": {
+   "decay": {
+    "t": 2.23,
+    "up": 10,
+    "rmse": 0.6174,
+    "holm": true
+   },
+   "cap": {
+    "t": 2.09,
+    "up": 9,
+    "rmse": 0.6162,
+    "holm": true
+   },
+   "star premium": {
+    "t": 1.04,
+    "up": 7,
+    "rmse": 0.6169,
+    "holm": false
+   },
+   "power x decay": {
+    "t": 2.3,
+    "up": 10,
+    "rmse": 0.6134,
+    "holm": true
+   }
+  },
+  "weights": {
+   "top": [
+    -0.01404,
+    0.00323
+   ],
+   "depth": [
+    -0.00422,
+    0.00212
+   ],
+   "t_diff": -2.22
+  }
+ },
+ "cbb first season, no roster controls": {
+  "n": 1546,
+  "base": 0.5342,
+  "forms": {
+   "decay": {
+    "t": 1.89,
+    "up": 11,
+    "of": 13
+   },
+   "cap": {
+    "t": 1.84,
+    "up": 12,
+    "of": 13
+   },
+   "star premium": {
+    "t": -0.18,
+    "up": 6,
+    "of": 13
+   },
+   "power x decay": {
+    "t": 1.32,
+    "up": 10,
+    "of": 13
+   }
+  }
+ },
+ "cbb first season, roster controls": {
+  "n": 1546,
+  "base": 0.4683,
+  "forms": {
+   "decay": {
+    "t": -1.03,
+    "up": 6,
+    "of": 13
+   },
+   "cap": {
+    "t": -2.47,
+    "up": 4,
+    "of": 13
+   },
+   "star premium": {
+    "t": 0.19,
+    "up": 8,
+    "of": 13
+   },
+   "power x decay": {
+    "t": -1.32,
+    "up": 5,
+    "of": 13
+   }
+  }
+ }
+}
