@@ -1089,7 +1089,8 @@ def recent_news():
     for n in rows:
         if n.get('k') not in ('commit', 'flip', 'decommit') or n.get('d', '') < cut: continue
         k = N.key(n['n'])
-        if k not in last or n['d'] > last[k]['d']: last[k] = n
+        o = last.get(k)   # the latest move; on one day a commitment beats a decommitment (as cfb_recruit.mjs applyNews)
+        if not o or n['d'] > o['d'] or (n['d'] == o['d'] and o['k'] == 'decommit' and n['k'] != 'decommit'): last[k] = n
         if n['k'] != 'decommit' and n.get('to'): toward.setdefault(k, set()).add(N.team_key(n['to']))
     return last, toward
 

@@ -362,7 +362,9 @@ export function applyNews(cl, prog, news = readNews(), today = new Date()) {
   const cut = new Date(today.getTime() - NEWS_DAYS * 864e5).toISOString().slice(0, 10), tidOf = {};
   for (const [tid, p] of Object.entries(prog)) if (p.team) tidOf[teamKey(p.team)] ??= tid;
   const last = {};
-  for (const n of news) if (['commit', 'flip', 'decommit'].includes(n.k) && n.d >= cut && (!last[key(n.n)] || n.d > last[key(n.n)].d)) last[key(n.n)] = n;
+  // the latest move; on one day a commitment beats a decommitment (DJ Jacobs left Ohio State and picked Miami on Nov 26 2026)
+  const later = (n, o) => !o || n.d > o.d || (n.d === o.d && o.k === 'decommit' && n.k !== 'decommit');
+  for (const n of news) if (['commit', 'flip', 'decommit'].includes(n.k) && n.d >= cut && later(n, last[key(n.n)])) last[key(n.n)] = n;
   const toward = {};   // schools a recent commit / flip story took him to: a decommit story without a school is about the old one
   for (const n of news) if (['commit', 'flip'].includes(n.k) && n.d >= cut && n.to) (toward[key(n.n)] ||= new Set()).add(teamKey(n.to));
   let moved = 0;
