@@ -249,10 +249,11 @@ def live(sp, loc, cls, spec, refit=True):
         yrs = range(2022 if spec[mode].get('nilOnly') else YEARS[sp][0] + 3, last + 1)
         X, yv, meta = build(sp, loc, cls, yrs, mode, True); dec = DECAY.get(sp, {}).get(mode)
         models[mode] = fit(X, yv, cols, w=[dec ** (last - y) for y, _ in meta] if dec else None)
+    reopened = site_open(sp)   # ESPN still shows a school the recruit news says he left (a decommitment)
     for y in LIVE:
         st = school_stats(cls, min(y, last + 1), loc, sp); active = [t for t in st[0] if t in loc]
         for x in cls.get(y, []):
-            if x['chose']: continue
+            if x['chose'] and (y, N_key(x['name'])) not in reopened: continue
             mode = 'list' if len(x['list']) >= 3 else 'open'
             alts = x['list'] if mode == 'list' else active
             if not alts: continue
@@ -262,6 +263,21 @@ def live(sp, loc, cls, spec, refit=True):
     return models, out
 
 
+def N_key(n):
+    import names
+    return names.key(n)
+
+
+def site_open(sp):
+    """{(year, name key)}: recruits the site lists as uncommitted (data/cfb_recruits.json next class, after the recruit
+    news overlay); CBB reads On3's own status, so none"""
+    if sp != 'cfb': return set()
+    f = os.path.join(ROOT, 'data', 'cfb_recruits.json')
+    if not os.path.exists(f): return set()
+    d = json.load(open(f))
+    return {(d.get('next'), N_key(r['name'])) for r in d.get('class', []) if not r.get('team')}
+
+
 def site_keys(sp, leans):
     """match each lean to the recruit's row on the site (data/cfb_recruits.json future lists, data/cbb_recruits.json
     classes) with the shared name rules plus home state; the page reads leans by year and the row's own name"""
@@ -269,7 +285,7 @@ def site_keys(sp, leans):
     f = os.path.join(ROOT, 'data', f'{sp}_recruits.json')
     if not os.path.exists(f): return {}
     d = json.load(open(f))
-    groups = d.get('future', []) if sp == 'cfb' else d.get('classes', [])
+    groups = ([{'year': d.get('next'), 'list': d.get('class', [])}] + d.get('future', [])) if sp == 'cfb' else d.get('classes', [])
     by = defaultdict(list)
     leans = [x for x in leans if x['set'] == 'list']   # shown: the list model only (calibrated held out; the open field reads overconfident)
     for x in leans: by[(x['year'], names.key(x['name']))].append(x)

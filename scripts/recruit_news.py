@@ -372,14 +372,33 @@ def same_move(a, b):
     return abs((da - db).days) <= (60 if a['k'] == b['k'] and a.get('to') and b.get('to') or a['k'] == 'reclass' else 4)
 
 
-def merge(rows, new):
-    """new into rows: a move already listed (either site) gains the other source and keeps its earliest date"""
+def move_date(votes):
+    """the date of a move from its headlines' dates ({date: headlines}): the earliest, unless it is a lone headline
+    two or more days before a date two or more headlines carry. Google News sometimes dates one copy days early (DJ
+    Jacobs' Nov 26 2026 decommitment: one 247 headline dated Nov 24 among a dozen dated Nov 26)."""
+    d0, two = min(votes), [d for d, n in votes.items() if n >= 2]
+    if votes[d0] >= 2 or not two: return d0
+    c = min(two)
+    return c if (dt.date.fromisoformat(c) - dt.date.fromisoformat(d0)).days >= 2 else d0
+
+
+def merge(rows, new, kept=False):
+    """new into rows: a move already listed (either site) gains the other source; its date is move_date over the
+    headlines merged. kept: rows are earlier runs' and new is this pull (with its headline dates in _v), so an earlier
+    run's lone date gives way to this pull's when this pull's headlines move it (see move_date)."""
     for r in new:
         hit = next((x for x in rows if same_move(x, r)), None)
         if hit:
             if r['k'] == 'flip' or (r['k'] == 'sign' and hit['k'] == 'commit'): hit['k'] = r['k']   # a commitment story about a flip
             for s, u in r['src'].items(): hit['src'].setdefault(s, u)
-            if r['d'] < hit['d']: hit['d'] = r['d']
+            if r.get('b') and not hit.get('b'): hit['n'] = r['n']   # the board's spelling (D.J. Jacobs, not On3's David Jacobs)
+            rv = r.get('_v') or {r['d']: 1}
+            if kept:
+                v = dict(rv); v.setdefault(hit['d'], 1)
+            else:
+                v = hit.setdefault('_v', {hit['d']: 1})
+                for d, n in rv.items(): v[d] = v.get(d, 0) + n
+            hit['d'] = move_date(v)
             for f in ('pos', 'cls', 'ocls', 'to', 'fr', 'b'):
                 if not hit.get(f) and r.get(f): hit[f] = r[f]
         else:
@@ -443,7 +462,8 @@ def main():
         new = pulled[sport]
         pool = Pool(sport)       # earlier rows read again with today's patterns (a fixed false match drops out)
         kept = [r for r in old.get(sport) or [] if r.get('d', '') >= cut and any(x['k'] == r['k'] for x in (parse_cb if r.get('k') == 'cb' else parse)(r.get('t', ''), pool))]
-        rows = merge(kept, new)
+        rows = merge(kept, new, kept=True)
+        for r in rows: r.pop('_v', None)
         for r in rows:          # school logos (full colour, the boards' files)
             for f, lf in (('to', 'tl'), ('fr', 'fl')):
                 u = pool.logos.get(names.team_key(r[f])) if r.get(f) else None
@@ -529,7 +549,16 @@ def _test():
     m = merge([a], [b])
     if len(m) != 1 or set(m[0]['src']) != {'247', 'on3'} or m[0]['d'] != '2026-11-16':
         bad += 1; print('FAIL dedupe', m)
-    print(f'{len(cases) + 3 - bad}/{len(cases) + 3} ok')
+    j = [{'n': 'D.J. Jacobs', 'k': 'decommit', 'fr': 'Ohio State', 'd': d, 'src': {w: d}} for d, w in
+         (('2026-11-24', '247'), ('2026-11-26', '247'), ('2026-11-26', 'on3'), ('2026-11-26', 'on3'))]
+    m = merge([], j)
+    if len(m) != 1 or m[0]['d'] != '2026-11-26':
+        bad += 1; print('FAIL lone early date', m)
+    k = merge([{'n': 'D.J. Jacobs', 'k': 'decommit', 'fr': 'Ohio State', 'd': '2026-11-24', 'src': {'247': 'x'}}],
+              [{'n': 'D.J. Jacobs', 'k': 'decommit', 'fr': 'Ohio State', 'd': '2026-11-26', 'src': {'on3': 'y'}, '_v': {'2026-11-26': 3}}], kept=True)
+    if k[0]['d'] != '2026-11-26':
+        bad += 1; print('FAIL fresh date', k)
+    print(f'{len(cases) + 5 - bad}/{len(cases) + 5} ok')
     sys.exit(1 if bad else 0)
 
 
