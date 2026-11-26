@@ -177,6 +177,7 @@
 
   async function build(win, btn) {
     var table = win.querySelector('table'); if (!table) return null;
+    if (table.querySelector('tbody tr[data-cr]')) return buildClassRank(win, btn);
     var hcells = [].slice.call(table.tHead.rows[0].cells), vis = hcells.filter(function (h) { return !h.hidden; });
     // a board that renders only its shown columns (the basketball board swaps xXPM/Age for Outcome on past seasons): headers by what's shown
     var row0 = [].slice.call(table.tBodies[0].rows).find(function (r) { return !r.classList.contains('cfb__detail') && r.cells.length > 2; });
@@ -1605,7 +1606,7 @@
     var cbb = !!D, open = !!rc.o, nameC = cells[nameI >= 0 ? nameI : 1], name = nameC && nameC.querySelector('button.cfb__who, b') ? pcName(row, nameI >= 0 ? nameI : 1) : nameC ? pcCell(nameC).t : '';
     var posI = gi(POS_COL), pOf = function (r) { var c = r.cells[posI]; if (!c) return ''; c = c.cloneNode(true); c.querySelectorAll('.cfb__dim, span').forEach(function (e) { e.remove(); }); return txt(c); };
     var posT = posI >= 0 ? pOf(row) : '', team = open ? '' : ct(TEAM_COL), conf = open ? '' : ct(/^conf$/i);
-    var fv = cbb ? D.fv : cn(/^xfv/i), alt = cbb ? (D.fvIf != null ? ['IF NBA', D.fvIf] : null) : (cn(/^y1 fv$/i) != null ? ['Y1 FV', cn(/^y1 fv$/i)] : null);
+    var fv = cbb ? D.fv : cn(/^xfv/i), alt = cbb ? (D.y1fv != null ? ['Y1 FV', D.y1fv] : D.fvIf != null ? ['IF NBA', D.fvIf] : null) : (cn(/^y1 fv$/i) != null ? ['Y1 FV', cn(/^y1 fv$/i)] : null);
     if (fv == null) return null;
     var lo = cbb ? D.q10 : rc.g && rc.g[0], hi = cbb ? D.ceil : rc.g && rc.g[1];
     var home = (cbb ? D.home : ct(/^home$/i)) || '', hs = cbb && D.hs ? D.hs : '', age = rc.ag != null ? rc.ag : cbb ? D.age : null, ar = typeof rc.ar === 'number' ? rc.ar : null;
@@ -2403,6 +2404,81 @@
   }
 
   // ---- ARK Top 25 (cfbrank.html): two columns of ranks, each team's score as a bar against #1 ----
+  // ---- class rankings (CFB, CBB): rows carry data-cr {s, n, a6, a5, a4, avg, te, dp, top: [[name, pos, fv, ark]]}.
+  // One row per school: rank, logo, name and its numbers on the first line, its three best commits on the second.
+  async function buildClassRank(win, btn) {
+    var all = [].slice.call(win.querySelectorAll('tbody tr[data-cr]')).filter(function (r) { return !r.hidden; });
+    var rows = all.slice(0, 15); if (!rows.length) return null;
+    var base = txt(win.querySelector('.win__title-text')).replace(/_$/, '').split('::')[0].trim(), yr = rows[0].getAttribute('data-yr');
+    var conf = win.querySelector('[data-tf-bar] select'), cv = conf && conf.value ? ' :: ' + conf.options[conf.selectedIndex].text : '';
+    var F = await frame(2160, 2700, (yr ? yr + ' ' : '') + base + cv, win.getAttribute('data-gfx-date'), tabLink(win));
+    var g = F.g, D = rows.map(function (r) { return JSON.parse(r.getAttribute('data-cr')); });
+    var logos = await Promise.all(rows.map(function (r) { var im = r.querySelector('img.cfb__logo'); return loadImg(im && im.getAttribute('src')); }));
+    var avgH = 'AVG xFV', scH = (txt(win.querySelector('thead th:nth-child(4)')) || 'CLASS').toUpperCase();
+    // columns right to left: [header, width, value, colour, star header]
+    var cols = [
+      [scH, 200, function (d) { return d.s.toFixed(1); }, C.teal, 0, 1],
+      ['DEPTH', 160, function (d) { return d.dp ? '#' + d.dp : '–'; }, C.white],
+      ['TOP END', 180, function (d) { return d.te ? '#' + d.te : '–'; }, C.white],
+      [avgH, 190, function (d) { return d.avg != null ? d.avg.toFixed(1) : '–'; }, C.white],
+      ['4', 110, function (d) { return String(d.a4); }, C.white, 1],
+      ['5', 110, function (d) { return String(d.a5); }, C.white, 1],
+      ['5', 130, function (d) { return String(d.a6); }, PT[1], 2],
+      ['COMMITS', 190, function (d) { return String(d.n); }, C.white]
+    ];
+    var hh = 60, gap = 10, n = rows.length, rh = Math.min(190, Math.floor((F.h - hh - (n - 1) * gap) / n)), pad = 14;
+    var right = F.x + F.w - pad - 6;
+    // header strip
+    g.font = '30px ' + FONT; g.fillStyle = C.lilac;
+    var hx = right;
+    cols.forEach(function (c) {
+      var hy = F.y + hh / 2 - 4;
+      if (c[4]) {   // 5 [star] +  in pixels, no glyph
+        var tw = g.measureText(c[0]).width, sw = 21 + 6, pw = c[4] === 2 ? g.measureText('+').width + 2 : 0, x0 = hx - tw - sw - pw;
+        g.fillStyle = c[4] === 2 ? PT[1] : C.lilac; g.fillText(c[0], x0, hy); pxStar(g, x0 + tw + 4, hy - 12, 21, 1, c[4] === 2 ? PT[1] : PLAT);
+        if (pw) g.fillText('+', hx - pw + 2, hy);
+        g.fillStyle = C.lilac;
+      } else g.fillText(c[0], hx - g.measureText(c[0]).width, hy);
+      hx -= c[1];
+    });
+    var numsLeft = hx;
+    rows.forEach(function (r, i) {
+      var d = D[i], y = F.y + hh + i * (rh + gap);
+      well(g, F.x, y, F.w, rh);
+      var l1 = y + Math.round(rh * 0.33), l2 = y + Math.round(rh * 0.76), sz = Math.min(56, Math.round(rh * 0.36));
+      g.font = Math.round(sz * 1.25) + 'px ' + FONT; g.fillStyle = C.teal;
+      var rk = txt(r.cells[0]), rkw = Math.round(sz * 1.9); g.fillText(rk, F.x + pad + (rkw - g.measureText(rk).width) / 2, y + rh / 2);
+      var x = F.x + pad + rkw + 10, ls = rh - 2 * pad;
+      if (logos[i]) drawLogo(g, logos[i], x, y + pad, ls, ls);
+      x += ls + 22;
+      // numbers, right-aligned under their headers
+      var nx = right;
+      cols.forEach(function (c) {
+        var t = c[2](d); g.font = Math.round(sz * (c[5] ? 1.15 : 0.92)) + 'px ' + FONT;
+        g.fillStyle = (c[4] && t === '0') ? 'rgba(200,199,255,0.45)' : c[3];
+        g.fillText(t, nx - g.measureText(t).width, l1); nx -= c[1];
+      });
+      g.font = sz + 'px ' + FONT; g.fillStyle = C.white;
+      g.fillText(fit(g, txt(r.querySelector('.cfb__team')) || txt(r.cells[1]), numsLeft - 30 - x), x, l1);
+      // the three best commits: ARK stars, name, position, FV
+      var top = (d.top || []).slice(0, 3).map(function (t) { return Array.isArray(t) ? t : [t.name, t.pos, t.xfv, t.ark]; }), tw3 = (right - x) / 3, fs = Math.max(26, Math.min(36, Math.round(rh * 0.23))), ss = Math.max(14, Math.floor(fs * 0.62 / 7) * 7), sg = 3;
+      top.forEach(function (t, k) {
+        var tx = Math.round(x + k * tw3), a = t[3] || 0, five = Math.min(a, 5), col = a > 5 ? PT[1] : PLAT;
+        for (var q = 0; q < 5; q++) pxStar(g, tx + q * (ss + sg), l2 - ss / 2, ss, five - q >= 1 ? 1 : five - q > 0 ? 0.5 : 0, col);
+        var sx = tx + 5 * (ss + sg) + 2;
+        g.font = fs + 'px ' + FONT;
+        if (a > 5) { g.fillStyle = PT[1]; g.fillText('+', sx - 2, l2); }
+        sx += g.measureText('+').width + 6;
+        var fv = String(Math.round(t[2])), fw = g.measureText(fv).width, pos = t[1] || '', pw = pos ? g.measureText(pos).width + 12 : 0;
+        var room = tx + tw3 - 28 - sx - fw - pw - 12, nm = fit(g, t[0], room);
+        g.fillStyle = C.white; g.fillText(nm, sx, l2); sx += g.measureText(nm).width + 12;
+        if (pos) { g.fillStyle = C.lilac; g.fillText(pos, sx, l2); sx += pw; }
+        g.fillStyle = C.teal; g.fillText(fv, sx, l2);
+      });
+    });
+    return F.canvas;
+  }
+
   async function buildRank(win, btn) {
     var d = JSON.parse(win.getAttribute('data-gfx-rank') || '{}'), teams = (d.teams || []).slice(0, 25);
     if (!teams.length) return null;
