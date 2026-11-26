@@ -1072,7 +1072,7 @@ def class_parts(xs):
     return {'a6': sum(1 for x in xs if x['ark'] > 5), 'a5': sum(1 for x in xs if x['ark'] == 5), 'a4': sum(1 for x in xs if 4 <= x['ark'] < 5),
             'avgFv': round(sum(x['fv'] for x in xs) / len(xs), 1),
             'topEnd': round(sum(x['ets'] for x in xs[:TOP_END]), 4), 'depth': round(sum(x['ets'] for x in xs[TOP_END:]), 4),
-            'top3': [[x['name'], x['pos'], x['fv'], x['ark']] for x in xs[:3]]}
+            'top3': [[x['name'], x['pos'], x['fv'], x['ark']] for x in sorted(xs, key=lambda x: (-x['ark'], -x['ets']))[:3]]}
 
 
 def part_ranks(trows):

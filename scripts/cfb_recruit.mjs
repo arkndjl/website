@@ -694,7 +694,7 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
     counts: { class: klass.filter(x => x.tid).length, open: klass.filter(x => !x.tid).length, committed: cls.length, redshirts: redshirts.length, young: young.length, future: future.map(f => f.n) },
     ...(Object.keys(cfbdCover).length ? { cfbd: Object.values(cfbdCover) } : {}) };
 }
-// the class-rankings card's parts: ARK star counts (5-star+, 5, 4 to 4.5), mean xFV, the three best commits, and the
+// the class-rankings card's parts: ARK star counts (5-star+, 5, 4 to 4.5), mean xFV, the three best commits (ARK stars, then xFV: the board's order), and the
 // class score split into its top end (the TOP_END best commits' FV points over the floor) and its depth (the rest)
 const TOP_END = 5;
 function classParts(xs, floor) {
@@ -703,7 +703,7 @@ function classParts(xs, floor) {
   return { a6: xs.filter(x => x.ark > 5).length, a5: xs.filter(x => x.ark === 5).length, a4: xs.filter(x => x.ark >= 4 && x.ark < 5).length,
     avgXfv: xs.length ? r1(xs.reduce((s, x) => s + x.xfv, 0) / xs.length) : null,
     topEnd: pts(xs.slice(0, TOP_END)), depth: pts(xs.slice(TOP_END)),
-    top: xs.slice(0, 3).map(x => ({ name: x.name, pos: x.pos, xfv: x.xfv, ark: x.ark ?? null })) };
+    top: xs.slice().sort((a, b) => (b.ark || 0) - (a.ark || 0) || b.xfv - a.xfv).slice(0, 3).map(x => ({ name: x.name, pos: x.pos, xfv: x.xfv, ark: x.ark ?? null })) };
 }
 function partRanks(ts) {
   for (const [k, rk] of [['topEnd', 'topRk'], ['depth', 'depthRk']])
