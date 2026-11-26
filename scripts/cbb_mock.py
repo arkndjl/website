@@ -310,7 +310,7 @@ def mock_sims(pool, score, picks, sd, sims=NOISE_SIMS, dec=None):
             if sl[s] <= n: tc[H[s][sl[s] - 1]] += 1
         tm = max(tc.items(), key=lambda x: x[1]) if tc else (None, 0)
         out.append({'top5': round(float((sl <= 5).mean()), 3), 'lo': int(lo), 'hi': int(hi) if hi <= n else None,
-                    'tm': tm[0], 'tp': round(tm[1] / sims, 3)})
+                    'tm': tm[0], 'tp': round(tm[1] / sims, 3), 'dr': round(float((sl <= n).mean()), 3)})
     own = []
     for k in range(n):
         c = defaultdict(int)
@@ -660,6 +660,10 @@ def trade_odds(picks):
     return {k: {'p': round(v['p'], 3), 'proj': v.get('proj', False)} for k, v in out.items()}
 
 
+UDFA_N = 30
+UDFA_TEAM = os.path.join(D.ROOT, 'scripts', 'research', 'cbb_udfa_nov26', 'team_test_hw5.json')
+
+
 def assign(pool, scores, picks):
     order = sorted(range(len(pool)), key=lambda i: scores[i])
     slot = {}
@@ -762,9 +766,22 @@ def main():
     for mode in S:
         order = sorted(range(len(pool)), key=lambda i: S[mode][i])[:n]
         mocks[mode] = [row(i, mode, pk) for i, pk in zip(order, picks)]
+    # UDFA signings: the best left after pick n in the predictive order (xPick = his slot there). No team: which team
+    # gives an undrafted rookie his first NBA games did not beat a uniform draw held out (picks made, round-2 picks,
+    # the team's undrafted debuts in the drafts before; scripts/research/cbb_udfa_nov26, UDFA_TEAM)
+    udfa = []
+    for i in sorted(range(len(pool)), key=lambda i: S['pred'][i]):
+        if S['pred'][i] <= n: continue
+        if len(udfa) >= UDFA_N: break
+        p, o = pool[i], pool[i]['ours'] or {}
+        udfa.append({'rank': len(udfa) + 1, 'name': o.get('name') or p['name'], 'pos': o.get('pos') or pos_of(p['pos']), 'role': o.get('role'),
+                     'school': o.get('team') or p['school'], 'logo': o.get('logo'), 'fv': o.get('fv'), 'plus': o.get('plus'), 'nbaP': o.get('nbaP'),
+                     'cls': o.get('cls') or ('Intl' if not o else None), 'age': round(o['age'] + 0.7, 2) if o.get('age') else (round(o['ageEst'] + 0.7, 1) if o.get('ageEst') else None),
+                     'ageEst': bool(o and not o.get('age')), 'cons': p['cons'] if p['nboards'] else None, 'boards': p['nboards'], 'xPick': S['pred'][i],
+                     'declare': round(p['declare'], 3), 'dr': sims[i]['dr']})
     try:                # headshots from the CBB board (scripts/photos.py); internationals have none
         import photos
-        for m in mocks.values(): photos.attach('cbb', m, team='school')
+        for m in list(mocks.values()) + [udfa]: photos.attach('cbb', m, team='school')
     except Exception as e:
         print('mock photos skipped', e)
     out = {'asof': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), 'orderAsof': order_asof, 'boards': nb, 'sources': CB.source_list(), 'pool': len(pool),
@@ -772,7 +789,8 @@ def main():
                         'cls': (p['ours'] or {}).get('cls'), 'cons': p['cons'] if p['nboards'] else None, 'declare': round(p['declare'], 3)}
                        for p in sorted(staying, key=lambda p: p['cons'])],
            'method': {'pred': bt, 'conv': {k: v for k, v in conv.items() if k not in ('mu', 'sd', 'b')}},
-           'gradeRatio': GRADE_RATIO, 'gradeSpots': GRADE_SPOTS, 'mocks': mocks,
+           'gradeRatio': GRADE_RATIO, 'gradeSpots': GRADE_SPOTS, 'mocks': mocks, 'udfa': udfa,
+           'udfaTeam': json.load(open(UDFA_TEAM))['models'] if os.path.exists(UDFA_TEAM) else None,
            'trades': {k: v for k, v in (json.load(open(TRADES)) if os.path.exists(TRADES) else {}).items() if k in ('drafts', 'rate', 'held', 'perRound', 'partner', 'curve')},
            'sims': {'n': NOISE_SIMS, 'sd': sd, 'days': days, 'orders': sampled, 'noise': noise}}
     json.dump(out, open(OUT, 'w'), indent=1)
