@@ -30,6 +30,7 @@ from collections import defaultdict
 import numpy as np
 
 import cbb_games as C
+import cbb_xpm as XPM
 
 SRC = '/mnt/project-files/cbb/backtest/research_seasons.csv'
 COACHES = os.path.join(C.HERE, 'data', 'cbb_coaches.json')
@@ -98,6 +99,12 @@ def xrow(k, r, p, ts, y):
     lr = lr if lr is not None and f(r.get('unranked'), 1) == 0 else -math.log(600)
     if k in ('ret', 'tr'):
         b = f(p['bpm'], REPL); b3 = f(p['bpm3'], b); m = f(p['min_per'], 0) / 100
+        # last season's pXPM in place of his BPM (scripts/cbb_xpm.py; Nov 26 2026, scripts/research/cbb_xpm_nov26/): next-season
+        # team R2 .757 -> .765 (13/14 seasons, t 4.1), game margin MAE 2016-20 t -2.6, held out 2021-26 t -2.8 (10/11 seasons).
+        # Live lines carry it (live_players); history reads Barttorvik's files
+        px = p.get('pxpm')
+        if px is None and p.get('pid') is not None and p.get('year') is not None: px = XPM.pxpm_of(p['pid'], p['year'])
+        if px is not None: b = px
         c = CLS.get(p['yr'], 3)
         old = ts[y - 1].get(p['team'], 0.0); new = ts[y - 1].get(r['team'], 0.0)
         tr = 1.0 if k == 'tr' else 0.0
@@ -217,7 +224,7 @@ def live_players(season, ts, names=False):
 
         def line(i):
             # season i of prev with the 3-season BPM through it, as the research column the models are fit on
-            q = dict(prev[i])
+            q = dict(prev[i]); q['pxpm'] = XPM.pxpm_lines(prev[:i + 1])
             q['bpm3'] = bpm3_research(prev[max(0, i - 2):i + 1])
             return q
         p = line(len(prev) - 1) if prev and prev[-1]['year'] == season - 1 and prev[-1]['min_per'] else None

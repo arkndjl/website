@@ -1,0 +1,190 @@
+{
+ "kept": [
+  "on3",
+  "bpm",
+  "bpm3",
+  "dbpm",
+  "trend",
+  "stl",
+  "blk",
+  "ftr",
+  "rim",
+  "porpag",
+  "power",
+  "age",
+  "ht_g",
+  "transfer",
+  "splus"
+ ],
+ "n": 23106,
+ "add": [
+  {
+   "driver": "pxpm",
+   "md5_gain": 0.571,
+   "md5_folds": 5,
+   "md5_t": 3.42,
+   "md5_rungs": [
+    0.169,
+    0.059,
+    0.035,
+    0.308
+   ],
+   "salt_gain": 0.617,
+   "salt_folds": 5,
+   "salt_t": 3.73,
+   "salt_rungs": [
+    0.172,
+    0.056,
+    0.037,
+    0.352
+   ],
+   "pass": true
+  },
+  {
+   "driver": "pxpm_o",
+   "md5_gain": 0.247,
+   "md5_folds": 4,
+   "md5_t": 1.42,
+   "md5_rungs": [
+    0.131,
+    0.023,
+    -0.003,
+    0.096
+   ],
+   "salt_gain": 0.205,
+   "salt_folds": 4,
+   "salt_t": 0.92,
+   "salt_rungs": [
+    0.133,
+    0.022,
+    -0.016,
+    0.065
+   ],
+   "pass": false
+  },
+  {
+   "driver": "pxpm_d",
+   "md5_gain": 0.184,
+   "md5_folds": 4,
+   "md5_t": 1.12,
+   "md5_rungs": [
+    0.03,
+    0.011,
+    -0.02,
+    0.163
+   ],
+   "salt_gain": 0.167,
+   "salt_folds": 3,
+   "salt_t": 1.16,
+   "salt_rungs": [
+    0.03,
+    0.014,
+    0.011,
+    0.113
+   ],
+   "pass": false
+  }
+ ],
+ "swap": {
+  "pXPM for bpm3": {
+   "md5": {
+    "gain": 0.283,
+    "folds": 5,
+    "t": 2.48,
+    "rungs": [
+     0.176,
+     0.041,
+     0.005,
+     0.06
+    ]
+   },
+   "salt": {
+    "gain": 0.356,
+    "folds": 5,
+    "t": 3.09,
+    "rungs": [
+     0.176,
+     0.036,
+     0.017,
+     0.127
+    ]
+   },
+   "pass": true
+  },
+  "pXPM for bpm": {
+   "md5": {
+    "gain": 0.485,
+    "folds": 5,
+    "t": 3.16,
+    "rungs": [
+     0.175,
+     0.041,
+     -0.005,
+     0.273
+    ]
+   },
+   "salt": {
+    "gain": 0.515,
+    "folds": 5,
+    "t": 3.46,
+    "rungs": [
+     0.178,
+     0.036,
+     -0.002,
+     0.304
+    ]
+   },
+   "pass": true
+  },
+  "pXPM for bpm + bpm3": {
+   "md5": {
+    "gain": 0.068,
+    "folds": 3,
+    "t": 0.43,
+    "rungs": [
+     0.187,
+     -0.0,
+     -0.056,
+     -0.064
+    ]
+   },
+   "salt": {
+    "gain": 0.128,
+    "folds": 3,
+    "t": 0.77,
+    "rungs": [
+     0.187,
+     -0.009,
+     -0.041,
+     -0.009
+    ]
+   },
+   "pass": false
+  },
+  "bpm3 dropped (reference)": {
+   "md5": {
+    "gain": -0.544,
+    "folds": 0,
+    "t": -3.28,
+    "rungs": [
+     0.005,
+     -0.057,
+     -0.049,
+     -0.443
+    ]
+   },
+   "salt": {
+    "gain": -0.512,
+    "folds": 0,
+    "t": -3.24,
+    "rungs": [
+     0.002,
+     -0.057,
+     -0.037,
+     -0.42
+    ]
+   },
+   "pass": false
+  }
+ }
+}

@@ -1,0 +1,87 @@
+{
+ "base": {
+  "kept": [
+   "lnpick",
+   "bpm3",
+   "age"
+  ],
+  "rmse": 1.3633,
+  "rmseSlot": 1.4245,
+  "slotErr": 0.5684,
+  "years": 13
+ },
+ "with pXPM offered": {
+  "kept": [
+   "lnpick",
+   "pxpm",
+   "age"
+  ],
+  "rmse": 1.3579,
+  "slotErr": 0.5713,
+  "years": 14
+ },
+ "singles": [
+  {
+   "driver": "BPM, draft season",
+   "key": "bpm",
+   "rmse": 1.3879,
+   "gain": 0.0366,
+   "t": 3.0,
+   "years": 12,
+   "of": 15
+  },
+  {
+   "driver": "3-season BPM",
+   "key": "bpm3",
+   "rmse": 1.3777,
+   "gain": 0.0468,
+   "t": 3.22,
+   "years": 12,
+   "of": 15
+  },
+  {
+   "driver": "pXPM, draft season",
+   "key": "pxpm",
+   "rmse": 1.3729,
+   "gain": 0.0515,
+   "t": 3.33,
+   "years": 13,
+   "of": 15
+  }
+ ],
+ "pXPM for bpm3": {
+  "kept": [
+   "lnpick",
+   "pxpm",
+   "age"
+  ],
+  "rmse": [
+   1.3633,
+   1.3579
+  ],
+  "drafts": 8,
+  "t": 0.6,
+  "slotErr": [
+   0.5684,
+   0.5713
+  ]
+ },
+ "pXPM added": {
+  "kept": [
+   "lnpick",
+   "bpm3",
+   "age",
+   "pxpm"
+  ],
+  "rmse": [
+   1.3633,
+   1.3639
+  ],
+  "drafts": 8,
+  "t": -0.15,
+  "slotErr": [
+   0.5684,
+   0.5733
+  ]
+ }
+}

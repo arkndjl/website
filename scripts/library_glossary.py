@@ -25,6 +25,7 @@ _VX = ld('data/nba_vorx_research.json')                         # VORX on rXPM (
 _NT = ld('data/nba_trade_fit.json')                         # NBA draft-night trades (scripts/nba_draft_trades.py)
 _RD = ld('data/return_drivers.json')                       # Return% sweep + reported-return lock (scripts/return_drivers.py, return_news.py)
 _CD = ld('data/cbb_declare_fit.json')                      # CBB stay-or-declare (scripts/cbb_declare.py)
+_CX = ld('data/cbb_xpm_research.json')                     # CBB pXPM fit + tests (scripts/cbb_xpm.py, scripts/research/cbb_xpm_nov26)
 _PX = ld('data/nba_pxpm_research.json')                     # pXPM fit + held-out tests (scripts/nba_pxpm_research.py)
 _NBAEX = (f"Held out 2012-23 ({_NX['n']:,} player seasons, {100 * _NX['exitShare']:.0f}% out of the league): RMSE {_NX['exit_vs_cp']['rmse'][1]:.2f} -> "
           f"{_NX['exit_vs_cp']['rmse'][0]:.2f} (t {_NX['exit_vs_cp']['t']:.1f}, {_NX['exit_vs_cp']['won']}/{_NX['exit_vs_cp']['of']} seasons).")
@@ -245,6 +246,18 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
        'Team context (Nov 3 2026): returning teammates\' WAR, teammates\' recruiting (top 8 -ln rank), WAA, transfer up/down.',
        'Forward 2020-26 RMSE: returners 2.558 -> 2.462 (t 18), newcomers 3.439 -> 3.229 (t 14). Not an FV input.'],
       'CBB board, true freshmen, standouts', ['CBB']),
+    E('pXPM (CBB)', 'Projected Barttorvik BPM next season, O and D, from box score lines only.',
+      [re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _t) for _t in ['Per side: (K x mean of sub-200-minute players + minutes x BPM, last three seasons weighted 1 / w1 / w2) / (K + weighted minutes),',
+       'then a fit on next-season BPM: that history, ln minutes, class, and twelve box rates z-scored within the season x minutes / (minutes + 200)',
+       '(steal, block, OREB, DREB, assist, turnover, FT rate, 3PA/100, rim share, usage, TS, height), ridge 10 on the rates.',
+       f'O: w .35 / .2, K 200. D: w .6 / .4, K 100. Fit on next-season minutes, 2008-09 to 2025-26 pairs (research form, below: D took 25% GBPM).',
+       f'Walk-forward 2012-13 to 2025-26: next-season team adjEM R2 {_CX["pxpm"]["teamR2"]:.3f} vs BPM {_CX["pxpm"]["bpm"]["teamR2"]:.3f} ({_CX["pxpm"]["vsBPM"]["pairsBetter"]}/14, t {_CX["pxpm"]["vsBPM"]["t"]:.1f}); player r {_CX["pxpm"]["playerR"]:.3f} vs {_CX["pxpm"]["bpm"]["playerR"]:.3f}, RMSE {_CX["pxpm"]["playerRMSE"]:.2f} vs {_CX["pxpm"]["bpm"]["playerRMSE"]:.2f}.',
+       f'xBPM (recruiting and team context too) still projects players better: team {_CX["xbpm"]["teamR2"]:.3f}, r {_CX["xbpm"]["playerR"]:.3f}; pXPM in xBPM {_CX["xbpm"]["asInput"]["teamR2"][1]:.4f} (t {_CX["xbpm"]["asInput"]["t"]}): not added.',
+       f'Roster prior: in place of last-season BPM, next-season team R2 {_CX["roster"]["teamR2"][0]:.3f} -> {_CX["roster"]["teamR2"][1]:.3f} ({_CX["roster"]["pairsBetter"]}/14, t {_CX["roster"]["t"]}); game margin MAE 2016-20 {_CX["game"]["tuneMae"][0]:.4f} -> {_CX["game"]["tuneMae"][1]:.4f} (t {_CX["game"]["tuneT"]}), 2021-26 {_CX["game"]["heldMae"][0]:.4f} -> {_CX["game"]["heldMae"][1]:.4f} (t {_CX["game"]["heldT"]}). xBPM there fails (t {_CX["roster"]["xbpmSwap"]["t"]}).',
+       f'FV returner driver: added OOS +{_CX["fv"]["add"]["md5_gain"]:.2f}% (t {_CX["fv"]["add"]["md5_t"]}, 5/5); in place of 3-season BPM t {_CX["fv"]["forBpm3"]["md5"]["t"]}. Nested pseudo-R2 {_CX["fv"]["gate"]["nestedR2"][0]:.3f} -> {_CX["fv"]["gate"]["nestedR2"][1]:.3f}, RPS {_CX["fv"]["gate"]["rps"][0]:.4f} -> {_CX["fv"]["gate"]["rps"][1]:.4f}, 2017-19 top 50 {_CX["fv"]["gate"]["top50_2017_19"][0]:.1f} -> {_CX["fv"]["gate"]["top50_2017_19"][1]:.1f}.',
+       f'NBA mock conviction: in place of 3-season BPM t {_CX["mock"]["t"]} ({_CX["mock"]["drafts"]}/15 drafts): kept 3-season BPM.',
+       f'Descriptive (rXPM): no blend or team adjustment beats GBPM on held-out team win% ({_CX["rxpm"]["R1 side blend"]["gbpm"]:.3f}; team-adjusted {_CX["rxpm"]["R2 GBPM team-adjusted"]["after"]:.3f}, BPM {_CX["rxpm"]["R1 side blend"]["bpm"]:.3f}). WAR stays on GBPM.']],
+      'CBB FV (returners), roster prior / game model', ['CBB']),
     E('CBB WAR / WAA', 'Wins over a replacement / average D-I player.',
       ['WAR = (sGBPM + 1.6) x minutes / 40 x 68 possessions a 40 / 100 x .0186 wins a point; WAA uses sGBPM.',
        'GBPM = Barttorvik game BPM, the minutes weighted mean of his games\' BPM. sGBPM = (GBPM x min + 100 x season mean) / (min + 100).',
