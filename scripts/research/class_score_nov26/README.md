@@ -23,4 +23,20 @@ Lead (ledger retests_2027.json `class_score_top_end`): NIL-era CFB seasons, top 
 (t 1.49, n 511); with first-season roster controls, classes 2021-24: .0156 vs -.0026 (t 1.89). CBB NIL era points the
 other way (depth .0165, t -1.65). Retest after the 2027 season.
 
+## Round 4 (second pass, same day)
+
+| Idea | CFB | CBB |
+|---|---|---|
+| Value basis (roster design) | FV if on t 0.09, year-3 xFV t -1.06, blends t -0.3 / -0.1 | headline FV t 1.28, Y1 FV t -0.48, blends t 0.8 / -0.1 |
+| Sum x program development | t -1.91 | t 0.77 |
+| Early / late commit points | t -1.20 | t -0.40 |
+| Sum x enrol rate | no enrolment history | t 0.79 |
+| Class + incoming transfers, first season | t 0.73 (6/10) | **t 6.45 (12/13)**, NIL era t 4.76 |
+
+Only the CBB net class passes. One unit of transfer value (cbb_team_prior `tr`) = .050 rating SD against .0064 for a
+class point, so 7.8 class points; per SD transfers .17, class .08. It is a net-class column, not a change to the
+high school score, and next season's transfers do not exist until the portal opens (spring), so nothing is on the
+board yet. Not testable on stored history: positional need vs the returning roster, decommit risk, per-recruit
+Transfer% / Ret%.
+
 No analogue: no other sport on the site has a class score.

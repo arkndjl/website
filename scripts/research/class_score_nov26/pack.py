@@ -1,7 +1,7 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Pack the class-score tests for Process: data/class_score_research.json (the 'Class score' glossary term) and the
 Research card research/studies/cfb/class-top-end-depth.json. Run after cfb_build.py, cbb_build.py, tests.py (both
-sports, both rounds) and sens.py."""
+sports, both rounds), sens.py, stock.py, concave.py and round4.py."""
 import json, math, os
 import numpy as np
 import tests as T
@@ -44,6 +44,8 @@ for sp in ('cfb', 'cbb'):
                           'forms': {n: {'t': v['t'], 'up': v['classes_up'], 'pass': v['pass'], 'rmse': v['rmse'], 'fwd': st['forward'][n]['t']} for n, v in st['forms'].items()},
                           'weights': st['weights'][k], 'wins': st['wins']['weights'], 'nil': st['nil'], 'pre': st['pre']}
     out[sp]['bend'] = {d: {'t': conc[f'{sp} {d}']['bent_vs_plain']['t'], 'up': conc[f'{sp} {d}']['bent_vs_plain']['up'], 'forms': conc[f'{sp} {d}']['forms'], 'weights': conc[f'{sp} {d}']['weights']} for d in ('class', 'roster')}
+r4 = json.load(open(os.path.join(T.HERE, 'round4.json')))
+for sp in ('cfb', 'cbb'): out[sp]['round4'] = r4[sp]
 out['cbb']['bend']['first'] = {k.split(', ')[1]: v for k, v in conc.items() if k.startswith('cbb first season')}
 json.dump(out, open(os.path.join(T.ROOT, 'data', 'class_score_research.json'), 'w'), indent=1)
 

@@ -69,3 +69,27 @@ Forms: split (same k grid), decay, cap, star premium, power x decay, same grids,
 Held out by season; t clustered by program; Holm within the sport's five; two thirds of seasons; forward (fit through
 2019, score 2020 on) positive. A form ships only if it passes here and is not reversed by the roster-control check
 (round 2's CBB pass was: with returning and transfer value in, depth turns positive and the form loses).
+
+## Round 4: other ways to improve the score (written Nov 26 after rounds 1-3, before any round 4 number)
+
+Noah asked for a second pass. Each idea is scored against the plain sum, held out, t clustered by program, Holm at
+.05 within the sport's round 4 family, two thirds of folds. Controls as round 2. A CBB pass must also hold with
+returning and transfer value in (first season), since round 2's pass did not.
+
+1. **Value basis.** Each commit's points from another live grade, mapped to history the same way: CFB FV if on the
+   board - 20 and year-3 xFV - 20 (the score now uses year-1 xFV); CBB headline FV - 20 and Y1 FV - 20 (the score
+   now uses expected FV points). Each replaces the sum; also a blend (both columns, free weights). Scored on the
+   roster design (round 3) and one class at a time; the roster design decides.
+2. **Development.** Sum + sum x the program's development, where development = its mean rating residual on its
+   four-class recruiting stock over the three seasons before signing. Development's own term is in the base.
+3. **Timing.** Points split by commit date, before Aug 1 ahead of the senior season and after (undated apart), free
+   weights. CFB dates from the On3 history (2012+), CBB from the recruit history.
+4. **Attrition (CBB).** Sum + sum x the program's enrol rate over the three classes before (ranked commits who
+   played for the school they signed with, shrunk to the mean with k = 5). CFB history has no enrolment.
+5. **Portal net class.** First season after signing, returning value in the base: does adding incoming transfer
+   value (CBB transfer value 2014+, CFB incoming transfer production 2016+) to the class beat the class alone, and
+   at what exchange rate. A pass here means a net-class column, not a change to the high school class score.
+
+Not testable on stored history, stated rather than guessed: positional need against the returning roster (the CFB
+past boards cover 2024-25, the CBB past boards 300 players a season), decommit risk (the histories hold final
+signees; decommitments are logged only from Nov 2026), per-recruit Transfer% and Ret% (fit on college players).
