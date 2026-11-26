@@ -2429,17 +2429,17 @@
     ];
     var hh = 60, gap = 10, n = rows.length, rh = Math.min(190, Math.floor((F.h - hh - (n - 1) * gap) / n)), pad = 14;
     var right = F.x + F.w - pad - 6;
-    // header strip
+    // header strip: each header centred over its column
     g.font = '30px ' + FONT; g.fillStyle = C.lilac;
-    var hx = right;
+    var hx = right + 6;
     cols.forEach(function (c) {
-      var hy = F.y + hh / 2 - 4;
+      var hy = F.y + hh / 2 - 4, mid = hx - c[1] / 2;
       if (c[4]) {   // 5 [star] +  in pixels, no glyph
-        var tw = g.measureText(c[0]).width, sw = 21 + 6, pw = c[4] === 2 ? g.measureText('+').width + 2 : 0, x0 = hx - tw - sw - pw;
-        g.fillStyle = c[4] === 2 ? PT[1] : C.lilac; g.fillText(c[0], x0, hy); pxStar(g, x0 + tw + 4, hy - 12, 21, 1, c[4] === 2 ? PT[1] : PLAT);
-        if (pw) g.fillText('+', hx - pw + 2, hy);
+        var tw = g.measureText(c[0]).width, sw = 21 + 6, pw = c[4] === 2 ? g.measureText('+').width + 2 : 0, x0 = Math.round(mid - (tw + sw + pw) / 2);
+        g.fillStyle = c[4] === 2 ? PT[1] : C.lilac; g.fillText(c[0], x0, hy); pxStar(g, x0 + tw + 4, hy - 12, 21, 1, PLAT);
+        if (pw) g.fillText('+', x0 + tw + sw, hy);
         g.fillStyle = C.lilac;
-      } else g.fillText(c[0], hx - g.measureText(c[0]).width, hy);
+      } else g.fillText(c[0], Math.round(mid - g.measureText(c[0]).width / 2), hy);
       hx -= c[1];
     });
     var numsLeft = hx;
@@ -2453,14 +2453,18 @@
       if (logos[i]) drawLogo(g, logos[i], x, y + pad, ls, ls);
       x += ls + 22;
       // numbers, right-aligned under their headers
-      var nx = right;
-      cols.forEach(function (c) {
-        var t = c[2](d); g.font = Math.round(sz * (c[5] ? 1.15 : 0.92)) + 'px ' + FONT;
-        g.fillStyle = (c[4] && t === '0') ? 'rgba(200,199,255,0.45)' : c[3];
-        g.fillText(t, nx - g.measureText(t).width, l1); nx -= c[1];
+      // each number in its own cell: counts, grades and ranks tinted apart, the class score framed in teal
+      var nx = right + 6, ct = y + 8, ch = Math.round(rh * 0.5);
+      cols.forEach(function (c, k) {
+        var t = c[2](d), cx0 = nx - c[1] + 4, cw0 = c[1] - 8;
+        g.fillStyle = c[5] ? C.dark : c[4] ? 'rgba(36,26,58,0.75)' : 'rgba(200,199,255,0.10)'; g.fillRect(cx0, ct, cw0, ch);
+        if (c[5]) { g.fillStyle = C.teal; g.fillRect(cx0, ct + ch - 4, cw0, 4); }
+        g.font = Math.round(sz * (c[5] ? 1.05 : 0.9)) + 'px ' + FONT;
+        g.fillStyle = (c[4] && t === '0') ? 'rgba(200,199,255,0.4)' : c[3];
+        g.fillText(t, Math.round(nx - c[1] / 2 - g.measureText(t).width / 2), ct + ch / 2 + 2); nx -= c[1];
       });
       g.font = sz + 'px ' + FONT; g.fillStyle = C.white;
-      g.fillText(fit(g, txt(r.querySelector('.cfb__team')) || txt(r.cells[1]), numsLeft - 30 - x), x, l1);
+      g.fillText(fit(g, txt(r.querySelector('.cfb__team')) || txt(r.cells[1]), numsLeft - 24 - x), x, l1);
       // the three best commits: ARK stars, name, position, FV
       var top = (d.top || []).slice(0, 3).map(function (t) { return Array.isArray(t) ? t : [t.name, t.pos, t.xfv, t.ark]; }), tw3 = (right - x) / 3, fs = Math.max(26, Math.min(36, Math.round(rh * 0.23))), ss = Math.max(14, Math.floor(fs * 0.62 / 7) * 7), sg = 3;
       top.forEach(function (t, k) {
