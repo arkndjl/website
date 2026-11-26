@@ -1527,8 +1527,11 @@
     var tk = function (i) { return i >= 0 ? nk.teamKey(d.t[i]) : ''; }, vis = /^(visit|unofficial)$/, out = [];
     if (o.cls) {
       var from = (o.cls - 4) + '-01-01';
-      out = ev.filter(function (e) { return (e[4] ? e[4] === o.cls : /^(commit|decommit|flip|sign|reclass)$/.test(e[1]) && (e[0] || '') >= from) && (o.open || !vis.test(e[1])); });
-      if (out.some(function (e) { return e[1] === 'visit'; })) out = out.filter(function (e) { return e[1] !== 'unofficial'; });   // officials when he has taken any
+      out = ev.filter(function (e) { return (e[4] ? e[4] === o.cls : /^(commit|decommit|flip|sign|reclass)$/.test(e[1]) && (e[0] || '') >= from) && vis.test(e[1]) === !!o.vis; });
+      if (o.vis) {   // the visits strip: his officials first, then the latest unofficial ones, six in all, by date
+        var off = out.filter(function (e) { return e[1] === 'visit'; }).slice(-6), un = out.filter(function (e) { return e[1] !== 'visit'; });
+        out = off.concat(un.slice(un.length - Math.min(un.length, 6 - off.length))).sort(function (a, b) { return (a[0] || '') < (b[0] || '') ? -1 : 1; });
+      }
     } else if (o.team) {
       var cur = nk.teamKey(String(o.team).split('/').pop().trim());
       for (var i = ev.length - 1; i >= 0 && cur; i--) {
@@ -1610,7 +1613,7 @@
     var lg = [].slice.call(row.querySelectorAll('img.cfb__logo')).find(function (e) { return !e.closest('.pxframe'); }), logo = open ? null : await loadImg(lg && (lg.currentSrc || lg.src));
     var fi = row.querySelector('img.flag'), flag = fi ? await loadImg(fi.currentSrc || fi.src) : null;
     var items = await rcItems(rc), starI = items.filter(function (it) { return it.stars != null; }), destI = items.filter(function (it) { return it.stars == null; });
-    var mv = await pcMoves(win, name, { cls: rc.c, open: open, team: team });
+    var mv = await pcMoves(win, name, { cls: rc.c }), vs = await pcMoves(win, name, { cls: rc.c, vis: true });
     // each service's rank
     var rk = function (h, v, sub, raw) { return v == null || v === '' ? null : { h: h, t: !raw && /^\d+$/.test(String(v)) ? '#' + v : String(v), sub: sub || '' }; }, ranks;
     if (cbb) ranks = [rk('CONS', D.rk), rk('ON3', D.svc && D.svc.on3), rk('247', D.svc && D.svc['247']), rk('ESPN', D.svc && D.svc.espn), rk('RIVALS', D.svc && D.svc.rivals)];
@@ -1674,10 +1677,12 @@
       g.fillStyle = Math.abs(ar) < 0.05 ? C.lilac : ar < 0 ? C.teal : C.down; g.fillText(fit(g, at0, tcol - lw0 - 384), x + px + lw0 + 384, y);
     }
     // the bands: room left by the fixed ones goes to the projection
-    var gap = 20, GH = 210, SH = 230, partsH = inputBarsH(parts.length), mvH = pcMovesH(mv), destH = destI.length ? 50 + RC_H + 30 : 0, yb = top + 394;
-    var room = bottom - yb - partsH - mvH - destH - (50 + GH + 30), hasScale = lo != null && hi != null;
+    var gap = 20, GH = 210, SH = 230, partsH = inputBarsH(parts.length), mvH = pcMovesH(mv), vsH = pcMovesH(vs), destH = destI.length ? 50 + RC_H + 30 : 0, yb = top + 394;
+    // every band at once (predictions, moves and visits): the FV inputs give up rows before the projection runs short
+    while (parts.length > 4 && bottom - yb - partsH - mvH - vsH - destH - (50 + GH + 30) < 80 + SH + gap + 220) { parts = parts.slice(0, parts.length - 2); partsH = inputBarsH(parts.length); }
+    var room = bottom - yb - partsH - mvH - vsH - destH - (50 + GH + 30), hasScale = lo != null && hi != null;
     var colsH = Math.max(220, Math.min(560, room - 80 - (hasScale ? SH + gap : 0))), projH = 80 + (hasScale ? SH + gap : 0) + colsH;
-    var slack = Math.max(0, room - projH), nb = 2 + (destH ? 1 : 0) + (mvH ? 1 : 0) + (partsH ? 1 : 0), lead = Math.min(64, Math.floor(slack / nb));
+    var slack = Math.max(0, room - projH), nb = 2 + (destH ? 1 : 0) + (mvH ? 1 : 0) + (vsH ? 1 : 0) + (partsH ? 1 : 0), lead = Math.min(64, Math.floor(slack / nb));
     y = yb + lead;
     cardRule(g, x, y, w, 'GRADES'); y += 50;
     var sw = ranks.length ? Math.round(w * (ranks.length >= 4 ? 0.44 : 0.56)) : w;
@@ -1692,6 +1697,7 @@
     y += colsH + 30 + lead;
     if (destH) { cardRule(g, x, y, w, 'PREDICTIONS'); y += 50; rcBand(g, destI, x, y, w, RC_H, gap); y += RC_H + 30 + lead; }
     if (mvH) { movesStrip(g, mv, x, y, w); y += mvH + lead; }
+    if (vsH) { movesStrip(g, vs, x, y, w); y += vsH + lead; }
     if (parts.length) inputBars(g, x, bottom - partsH + 40, w, 'FV INPUTS', '', parts, Math.max(1, Math.max.apply(null, parts.map(function (p) { return Math.abs(p[1]); }))), 1, 470);
     return F.canvas;
   }
