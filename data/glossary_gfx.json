@@ -2,8 +2,8 @@
  "FV (future value)": {
   "ab": "FV",
   "stands": "future value · 20-80",
-  "what": "Grade of what a prospect becomes at peak: the mean outcome of past players with the profile.",
-  "use": "Ranks every prospect board. One scale per board, graded on absolute talent.",
+  "what": "A grade of what a prospect becomes at peak, the mean outcome of past players with the profile.",
+  "use": "It ranks every prospect board. Each board has one scale, graded on absolute talent.",
   "f": [
    "FV = Σ tier odds × tier outcome",
    "50 regular · 60 plus · 70 star · 80 generational"
@@ -179,8 +179,8 @@
  "Stat+": {
   "ab": "Stat+",
   "stands": "production index · CFB",
-  "what": "Production against the position this season. 100 = average, 25 = one SD.",
-  "use": "CFB board, WAR quality and an FV production driver.",
+  "what": "Production against the position this season. 100 is average and 25 points is one SD.",
+  "use": "The CFB board, WAR quality and a production driver in FV.",
   "f": [
    "Stat+ = 100 + 25 × z",
    "z of the PFN position score vs snap-weighted mean"
@@ -296,8 +296,8 @@
  "XPM": {
   "ab": "XPM",
   "stands": "Cross Plus-Minus · NBA",
-  "what": "Points a 100 possessions a player adds over an average player, as played.",
-  "use": "Headline impact number on every NBA board. Feeds VORX, the game models and the CBB FV target.",
+  "what": "The points a player adds per 100 possessions over an average player, as played.",
+  "use": "The headline number on every NBA board. It feeds VORX, the game models and the CBB FV target.",
   "f": [
    "XPM = .5 DPM + .5 BPM",
    "O-XPM, D-XPM: same blend each side"
@@ -490,8 +490,8 @@
  "pXPM (predictive XPM)": {
   "ab": "pXPM",
   "stands": "predictive XPM · NBA",
-  "what": "Projected XPM next season: three seasons by minutes, shrunk to a role mean, aged.",
-  "use": "Small-sample read and next-season level. Separates a hot 300 minutes from a level.",
+  "what": "Next season's XPM from three seasons weighted by minutes, shrunk to a role mean and aged.",
+  "use": "The read on small samples and next season's level. It separates a hot 300 minutes from a level.",
   "f": [
    "(200 × role mean + Σ w MP × XPM)",
    "/ (200 + Σ w MP)  · w 1 / 0.35 / 0.1",
@@ -643,8 +643,8 @@
  "VORX": {
   "ab": "VORX",
   "stands": "Value Over Replacement XPM · NBA",
-  "what": "Wins a player adds over a replacement player across his minutes.",
-  "use": "Default sort of the XPM and rookie boards. Converts to dollars in contract value.",
+  "what": "The wins a player adds over a replacement player across his minutes.",
+  "use": "The default sort of the XPM and rookie boards. Contract value converts it to dollars.",
   "f": [
    "VORX = .030 × (XPM + 1.4) × MP / 48",
    "replacement XPM -1.4 · .030 wins a point"
@@ -776,8 +776,8 @@
  "G League NBA% / 500% / xVORX": {
   "ab": "NBA%",
   "stands": "chance of NBA minutes · G League",
-  "what": "Chance a G League player plays NBA minutes next season. 500% and xVORX: bigger roles.",
-  "use": "G League tab: who is next up.",
+  "what": "The chance a G League player plays NBA minutes next season. 500% and xVORX cover bigger roles.",
+  "use": "The G League tab, for who is next up.",
   "f": [
    "ridge logistic: age, minutes, per-36 box,",
    "efficiency, NBA history, draft slot"
@@ -939,8 +939,8 @@
  "NFL WAR": {
   "ab": "WAR",
   "stands": "wins above replacement · NFL",
-  "what": "Wins a player added over a replacement player at his position, both sides of the ball.",
-  "use": "Season value on the NFL board, team WAR, rookies and standouts.",
+  "what": "The wins a player added over a replacement player at his position, on both sides of the ball.",
+  "use": "Season value on the NFL board, and in team WAR, rookies and standouts.",
   "f": [
    "WAR = .6 × AV WAR + .4 × XV",
    "AV WAR = (AV − repl AV × snaps) × .091"
@@ -1202,8 +1202,8 @@
  "NHL WAR": {
   "ab": "WAR",
   "stands": "wins above replacement · NHL",
-  "what": "Wins a player added over a replacement-level player, from what happened on the ice.",
-  "use": "Descriptive value: who drove results this season. Sums to team goal differential.",
+  "what": "The wins a player added over a replacement-level player, from what happened on the ice.",
+  "use": "Descriptive value, meaning who drove results this season. It sums to team goal differential.",
   "f": [
    "5v5 on-ice xG vs teammates",
    "+ PP xG / 5 + PK / 4",
@@ -1376,8 +1376,8 @@
  "pWAR / HPM": {
   "ab": "pWAR",
   "stands": "projected WAR · NHL",
-  "what": "Expected WAR next season from shrunk, weighted rates and projected ice time.",
-  "use": "Forward-looking value for rosters, trades, backups and the game model.",
+  "what": "Expected WAR next season, from shrunk and weighted rates and projected ice time.",
+  "use": "The forward-looking value for rosters, trades, backups and the game model.",
   "f": [
    "HPM = Marcel rates (1 / .5 / .25), shrunk",
    "pWAR = (HPM − repl) × TOI / 60 ÷ goals a win"
@@ -1520,8 +1520,8 @@
  "GAR (soccer, senior)": {
   "ab": "GAR",
   "stands": "goals above replacement · soccer",
-  "what": "Goals a season a player adds over a replacement regular, one scale for every league.",
-  "use": "Player value on the soccer board. Base of xMV, 1Y / 3Y and backup watch.",
+  "what": "The goals a season a player adds over a replacement regular, on one scale for every league.",
+  "use": "Player value on the soccer board. It is the base of xMV, 1Y / 3Y and backup watch.",
   "f": [
    "shrunk per-90 rates × weights",
    "on-ice xGA, npxG, xA, xGBuildup, GK saves",
@@ -1757,8 +1757,8 @@
  "RWA (CS2)": {
   "ab": "RWA",
   "stands": "round win % added · CS2",
-  "what": "Round win % a player adds per round, opponent-adjusted. 0 = average tier-1 starter.",
-  "use": "Player board, prospect FV and the player term in series odds.",
+  "what": "The round win % a player adds per round, opponent-adjusted. 0 is an average tier-1 starter.",
+  "use": "The player board, prospect FV and the player term in series odds.",
   "f": [
    "box: round share on per-round stat lines",
    "+ ½ plus-minus residual",
@@ -1992,8 +1992,8 @@
  "Next up (breakout odds)": {
   "ab": "BO%",
   "stands": "breakout odds",
-  "what": "Chance of a first season over the quality bar next season, for players never over it.",
-  "use": "Next up tab on every sport page.",
+  "what": "The chance of a first season over the quality bar next season, for players never over it.",
+  "use": "The next up tab on every sport page.",
   "f": [
    "logistic on shrunk value + signals",
    "bar ≈ 75-80th percentile of regulars"

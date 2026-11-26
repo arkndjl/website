@@ -88,24 +88,24 @@ def build(lg):
     print(lg, len(base), "iced", len(I), pi, I.exp.mean(), "not", len(N), pn, N.exp.mean(), "diff", d, de, dl)
     L = lg.upper()
     robust = (d[1] > 0 or d[2] < 0) and ((de[0] > 0) == (dl[0] > 0))
-    verdict = ("Icing works" if robust and d[0] < 0 else "Icing does not work" if robust else "No measurable effect")
+    verdict = ("Icing works" if robust and d[0] < 0 else "Icing doesn't work" if robust else "No measurable effect")
     out = {
         "id": f"{lg}-ft-icing",
         "sport": L,
         "question": "Does a timeout before a late free throw make the shooter miss?",
-        "answer": f"{verdict}: iced shooters {100*d[0]:+.1f} pp vs un-iced, relative to own FT% (CI {100*d[1]:+.1f} to {100*d[2]:+.1f}).",
+        "answer": f"{verdict}. Iced shooters were {100*d[0]:+.1f} points better than un-iced shooters, relative to their own FT% (CI {100*d[1]:+.1f} to {100*d[2]:+.1f}).",
         "findings": [
-            f"Iced: {100*pi[0]:.1f}% made (CI {100*pi[1]:.1f}-{100*pi[2]:.1f}), shooters' usual {100*I.exp.mean():.1f}%, n={len(I)}.",
-            f"Not iced: {100*pn[0]:.1f}% made (CI {100*pn[1]:.1f}-{100*pn[2]:.1f}), shooters' usual {100*N.exp.mean():.1f}%, n={len(N)}.",
-            f"Iced minus not iced, vs own FT%: {100*d[0]:+.1f} pp (95% CI {100*d[1]:+.1f} to {100*d[2]:+.1f}).",
+            f"Iced shooters made {100*pi[0]:.1f}% (CI {100*pi[1]:.1f}-{100*pi[2]:.1f}), against their usual {100*I.exp.mean():.1f}%, n={len(I)}.",
+            f"Shooters who weren't iced made {100*pn[0]:.1f}% (CI {100*pn[1]:.1f}-{100*pn[2]:.1f}), against their usual {100*N.exp.mean():.1f}%, n={len(N)}.",
+            f"Iced minus not iced, against their own FT%, is {100*d[0]:+.1f} points (95% CI {100*d[1]:+.1f} to {100*d[2]:+.1f}).",
         ],
-        "method": ("First FT of a trip, last 2:00 of regulation or OT, margin within 3. Iced = defense timeout between foul and FT. "
-                   "Outcome = made minus shooter's leave-one-out FT% (min 20 other FTs); game-clustered bootstrap."),
+        "method": ("The sample is the first FT of a trip in the last 2:00 of regulation or OT, with the margin within 3. A shooter is iced when the defense calls timeout between the foul and the FT. "
+                   "The outcome is made minus the shooter's leave-one-out FT% (min 20 other FTs), with a game-clustered bootstrap."),
         "data": f"ESPN play-by-play via sportsdataverse, {L}, 2011-12 to 2025-26, {len(base):,} first free throws.",
         "n": int(len(base)),
         "robust": bool(robust),
         "interest": 3,
-        "split_check": f"Iced minus not iced: {100*de[0]:+.1f} pp in 2012-19 (CI {100*de[1]:+.1f} to {100*de[2]:+.1f}), {100*dl[0]:+.1f} in 2020-26 (CI {100*dl[1]:+.1f} to {100*dl[2]:+.1f}).",
+        "split_check": f"Iced minus not iced was {100*de[0]:+.1f} points in 2012-19 (CI {100*de[1]:+.1f} to {100*de[2]:+.1f}) and {100*dl[0]:+.1f} in 2020-26 (CI {100*dl[1]:+.1f} to {100*dl[2]:+.1f}).",
         "chart": {
             "type": "bar",
             "title": f"{L}: first FT make % late and close, by shooter's usual FT%",

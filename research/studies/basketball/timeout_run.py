@@ -143,21 +143,21 @@ if __name__ == "__main__":
         "id": "nba-timeout-after-run",
         "sport": "NBA",
         "question": "Does a timeout stop an opponent run?",
-        "answer": (f"{'Yes' if robust and sd[0] > 0 else 'No'}: after an 8+ pt run, a timeout nets {sd[0]:+.2f} pts "
-                   f"over the next 2:00 vs playing on (CI {sd[1]:+.2f} to {sd[2]:+.2f})."),
+        "answer": (f"{'Yes' if robust and sd[0] > 0 else 'No'}. After a run of 8+ points, a timeout nets {sd[0]:+.2f} points "
+                   f"over the next 2:00 compared to playing on (CI {sd[1]:+.2f} to {sd[2]:+.2f})."),
         "findings": [
-            f"Timeout: next 2:00 net {tm[0]:+.2f} pts (CI {tm[1]:+.2f} to {tm[2]:+.2f}), n={len(T)}.",
-            f"No timeout: next 2:00 net {nm[0]:+.2f} pts (CI {nm[1]:+.2f} to {nm[2]:+.2f}), n={len(N)}.",
-            f"Both groups outscore the opponent after the run (mean reversion plus the ball); same-state gap {sd[0]:+.2f}.",
-            f"Q4 only: timeout minus none {d4[0]:+.2f} pts (CI {d4[1]:+.2f} to {d4[2]:+.2f}), n={len(q4)}.",
+            f"With a timeout, the next 2:00 nets {tm[0]:+.2f} points (CI {tm[1]:+.2f} to {tm[2]:+.2f}), n={len(T)}.",
+            f"With no timeout, the next 2:00 nets {nm[0]:+.2f} points (CI {nm[1]:+.2f} to {nm[2]:+.2f}), n={len(N)}.",
+            f"Both groups outscore the opponent after the run (mean reversion, plus they have the ball). The gap at the same state is {sd[0]:+.2f}.",
+            f"In Q4 only, timeout minus none is {d4[0]:+.2f} points (CI {d4[1]:+.2f} to {d4[2]:+.2f}), n={len(q4)}.",
         ],
-        "method": ("Trigger = score making an unanswered run 8+ pts, >= 2:30 left in quarter, margin within 20. "
-                   "Timeout in that dead ball vs no timeout in next 60 s; net points next 120 s; matched on run size and quarter."),
+        "method": ("The trigger is a score that makes an unanswered run of 8+ points, with at least 2:30 left in the quarter and the margin within 20. "
+                   "A timeout in that dead ball is compared to no timeout in the next 60 s, on net points over the next 120 s, matched on run size and quarter."),
         "data": f"ESPN play-by-play via sportsdataverse, NBA 2011-12 to 2025-26, {df.game_id.nunique():,} games, {len(df):,} runs.",
         "n": int(len(df)),
         "robust": bool(robust),
         "interest": 4,
-        "split_check": f"Timeout minus none: {sde[0]:+.2f} pts in 2012-19 (CI {sde[1]:+.2f} to {sde[2]:+.2f}), {sdl[0]:+.2f} in 2020-26 (CI {sdl[1]:+.2f} to {sdl[2]:+.2f}).",
+        "split_check": f"Timeout minus none was {sde[0]:+.2f} points in 2012-19 (CI {sde[1]:+.2f} to {sde[2]:+.2f}) and {sdl[0]:+.2f} in 2020-26 (CI {sdl[1]:+.2f} to {sdl[2]:+.2f}).",
         "chart": {
             "type": "bar",
             "title": "Net points in next 2:00 after an opponent 8+ pt run, by quarter",
