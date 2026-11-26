@@ -309,6 +309,25 @@
      ]
     },
     {
+     "term": "Age for the class",
+     "short": "Recruit age on Sep 1 of the class year, less the class median. Positive = old for the class.",
+     "body": [
+      "Median 18.84 CBB (1,723 ranked recruits 2009-16), 18.67 CFB (1,415 top-400 recruits who reached the NFL).",
+      "CBB NBA rate at about the same rank: 38% under 17.9, 31% at 18.2-18.6, 18% at 19.0+.",
+      "CBB model input: old for the class (18+ on Oct 26 of the senior year), held out t 2.65, 6/8 classes.",
+      "Continuous age in its place t 1.19, added t 1.20, young flag t 0.84 (gate 2.0). Not shipped.",
+      "CFB top-64 pick rate given an NFL entry: 28% at 18.0-18.4, 20% at 19.2+. Draft slot t 1.75, 6/9.",
+      "CFB not in the model: short of the gate, and On3 lists an age for 34 of the top 300 in the latest class read.",
+      "Birth dates: On3 whole-year age, bounded tighter by each daily reading; FIBA youth rosters; pins.",
+      "Cards show age vs the class once the birth date is known to 45 days. Hockey late birthday and soccer birth month failed."
+     ],
+     "where": "Recruit cards; CBB recruit model",
+     "sports": [
+      "CFB",
+      "CBB"
+     ]
+    },
+    {
      "term": "Badges (players)",
      "short": "Bronze to platinum trait medals by the name: one stat each, regressed by volume.",
      "body": [

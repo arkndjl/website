@@ -48,9 +48,9 @@ for (const y of args.filter(a => /^\d{4}$/.test(a)).map(Number)) {
       const p = it.person, r = p.rating || {};
       out.push({ key: p.key, name: p.name, pos: r.positionAbbr || p.positionAbbreviation, ht: p.height, wt: p.weight,
         cons: r.consensusRating, consRank: r.consensusNationalRank, consStars: r.consensusStars, on3: r.rating, on3Rank: r.nationalRank,
-        state: r.stateAbbr, home: p.homeTownName || null, team: p.status?.committedOrganizationSlug || null,
+        state: r.stateAbbr, home: p.homeTownName || null, age: p.age ?? null, slug: p.slug || null, team: p.status?.committedOrganizationSlug || null,
         fiveStarPlus: !!r.fiveStarPlus, img: p.defaultAssetUrl || null,
-        // each service's grade: [rating, national rank, stars]
+        // age as On3 lists it today (few football recruits have one); each service's grade: [rating, national rank, stars]
         svc: Object.fromEntries((it.ratings || []).filter(x => !['Industry', 'Consensus'].includes(x.type) && x.rating != null).map(x => [x.type.toLowerCase(), [x.rating, x.overallRank ?? null, x.stars ?? null]])),
         hs: p.highSchool?.slug || null, hsType: p.highSchool?.orgType || null,
         signed: !!p.status?.isSigned, commitDate: p.status?.commitmentDate || null, nil: it.nilValue || null,

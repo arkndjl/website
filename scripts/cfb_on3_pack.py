@@ -8,7 +8,8 @@ two files the recruit fit and the recruit tabs read:
 
 A row: [name, home state, industry rating, industry rank, 247's own national rank, 247 vs industry, ESPN vs industry,
 commit date, Rivals rank (the Rivals300: On3's own service, 'On3' in its ratings), Rivals stars, and in the live file
-On3's photo path (on on3static.com, for the recruit tabs' row frames and GFX cards; null when On3 has none)]. The two gaps are the service's rating less the industry rating, each as a z-score within the class among
+On3's photo path (on on3static.com, for the recruit tabs' row frames and GFX cards; null when On3 has none), then for a
+recruit On3 lists an age for: age, age vs the class median, birth date (scripts/recruit_age.py)]. The two gaps are the service's rating less the industry rating, each as a z-score within the class among
 the recruits it rated. The live file also carries the line from the industry rating to 247's composite scale (fit on
 the classes both cover in scripts/cfb_recruit_247.json), for the recruit tabs' composite-to-grade map.
 """
@@ -20,6 +21,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import names as N   # noqa: E402
+import recruit_age as A   # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, 'scripts', '.cache', 'cfb', 'on3')
@@ -49,6 +51,10 @@ def rows(y, img=False):
         out.append([o['name'], o.get('state'), round(o['cons'], 2), o.get('consRank'), sv.get('247', [None, None])[1], gap('247'), gap('espn'),
                     (o.get('commitDate') or '')[:10] or None, o.get('on3Rank'), sv.get('on3', [None, None, None])[2]]
                    + ([re.sub(r'^https?://on3static\.com/', '', o['img']) if o.get('img') else None] if img else []))
+        if img:   # the live file: his age, age vs the class median and birth date where known (scripts/recruit_age.py)
+            A.observe('cfb', o.get('key'), o.get('age'), y, o['name'])
+            g = A.fields('cfb', o.get('key'), o['name'], y, o.get('age'))
+            if g: out[-1] += [g.get('age'), g.get('ageRel'), g.get('dob')]
     return out
 
 
@@ -79,6 +85,7 @@ def main():
         m = comp_map() or prev.get('map')
         out = {'asof': __import__('datetime').date.today().isoformat(), 'map': m, 'classes': {**prev.get('classes', {}), **got}}
         json.dump(out, open(LIVE, 'w'), separators=(',', ':'))
+        A.save('cfb')
         print('live', {y: len(r) for y, r in got.items()}, 'map', m)
 
 
