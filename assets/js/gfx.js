@@ -1341,9 +1341,9 @@
   function fvoBand(g, gp, x, y, w, h) {
     var rg = gp.items[0] && /range/i.test(gp.items[0].h) ? gp.items[0] : null, tiers = rg ? gp.items.slice(1) : gp.items, lw = rg ? Math.round(w * 0.2) : 0;
     if (rg) statCell(g, { h: rg.h, t: rg.t }, x, y, lw - 16, h);
-    var n = tiers.length, cw = (w - lw - (n - 1) * 16) / n, mx = Math.max.apply(null, tiers.map(function (t) { return t.pct || 0; })) || 1, NB = 6;
+    var n = tiers.length, cw = (w - lw - (n - 1) * 16) / n, top = Math.max.apply(null, tiers.map(function (t) { return t.pct || 0; })) || 1, mx = Math.max(top, gp.max || 0), NB = gp.max ? 8 : 6;
     tiers.forEach(function (t, k) {
-      var cx = Math.round(x + lw + k * (cw + 16)), hot = (t.pct || 0) === mx, pad = 22, cwi = Math.round(cw);
+      var cx = Math.round(x + lw + k * (cw + 16)), hot = (t.pct || 0) === top, pad = 22, cwi = Math.round(cw);
       g.fillStyle = C.face; g.fillRect(cx, y, cwi, h); bevel(g, cx, y, cwi, h, true, 3);
       g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(capHead(t.h), cx + pad, y + pad + 16);
       g.font = '44px ' + FONT; g.fillStyle = hot ? C.teal : C.white; g.fillText(t.t, cx + cwi - pad - g.measureText(t.t).width, y + pad + 18);
@@ -1488,15 +1488,199 @@
       pxBar(g, cx + pad, ly, cwi - 2 * pad, bh, it.prob, C.lilac);
     });
   }
+  // ---- moves (scripts/player_moves.py -> static/data/moves/<sport>.json): commitments, flips, visits, portal moves and pro
+  // transactions, fetched on the first card. A recruit keeps the rows of his class; anyone else the chain of teams ending at his.
+  var MV_DATA = {}, MV_SPORT = { cfb: 'cfb', cbb: 'cbb', nfl: 'nfl', nba: 'nba', nhl: 'nhl', hockey: 'nhl', soccer: 'soccer', u22: 'soccer' };
+  var MV_H = 190, MV_MON = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+  var MV_LAB = { commit: ['COMMIT', 'teal'], decommit: ['DECOMMIT', 'down'], flip: ['FLIP', 'white'], sign: ['SIGNED', 'teal'], resign: ['RE-SIGNED', 'teal'], extend: ['EXTENSION', 'teal'], reclass: ['RECLASS', 'lilac'],
+                 visit: ['OFFICIAL VISIT', 'lilac'], unofficial: ['VISIT', 'lilac'], portal: ['PORTAL', 'down'], transfer: ['TRANSFER', 'white'], trade: ['TRADE', 'white'], release: ['RELEASED', 'down'], claim: ['CLAIMED', 'teal'] };
+  function mvDate(d) { var m = String(d || '').match(/^(\d{4})(?:-(\d\d)-(\d\d))?/); return !m ? '' : m[2] ? MV_MON[+m[2] - 1] + ' ' + (+m[3]) + ' \'' + m[1].slice(2) : m[1]; }
+  async function pcMoves(win, name, o) {
+    var sp = MV_SPORT[SITE.split('/').pop()], nk = window.arkName; if (!sp || !nk || !name) return [];
+    var d = await (MV_DATA[sp] || (MV_DATA[sp] = fetch('{{ "data/moves/" | relURL }}' + sp + '.json').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })));
+    var ev = d && d.p && d.p[nk.key(name)]; if (!ev) return [];
+    var tk = function (i) { return i >= 0 ? nk.teamKey(d.t[i]) : ''; }, vis = /^(visit|unofficial)$/, out = [];
+    if (o.cls) {
+      var from = (o.cls - 4) + '-01-01';
+      out = ev.filter(function (e) { return (e[4] ? e[4] === o.cls : /^(commit|decommit|flip|sign|reclass)$/.test(e[1]) && (e[0] || '') >= from) && (o.open || !vis.test(e[1])); });
+      if (out.some(function (e) { return e[1] === 'visit'; })) out = out.filter(function (e) { return e[1] !== 'unofficial'; });   // officials when he has taken any
+    } else if (o.team) {
+      var cur = nk.teamKey(String(o.team).split('/').pop().trim());
+      for (var i = ev.length - 1; i >= 0 && cur; i--) {
+        var e = ev[i]; if (vis.test(e[1])) continue;
+        if (e[3] >= 0 && tk(e[3]) === cur) { out.unshift(e); cur = e[2] >= 0 ? tk(e[2]) : e[1] === 'commit' ? '' : cur; }
+        else if (e[3] < 0 && e[2] >= 0 && tk(e[2]) === cur) out.unshift(e);
+      }
+    }
+    out = out.slice(-6);
+    var tpl = win.getAttribute('data-gfx-logo'), side = async function (i) {
+      if (i < 0) return null; var n = d.t[i], src = d.l[i] || (tpl && /^[A-Za-z]{2,4}$/.test(n) ? tpl.replace('{}', n.toLowerCase()) : '');
+      return { n: n, img: src ? await loadImg(src) : null };
+    };
+    return Promise.all(out.map(async function (e) { return { d: e[0], k: e[1], fr: await side(e[2]), to: await side(e[3]) }; }));
+  }
+  function pcMovesH(mv) { return mv && mv.length ? 50 + MV_H + 30 : 0; }
+  // the strip: one chip a move, oldest at the left: kind, date, then the logos (from, a pixel arrow, to) or the school's name
+  function movesStrip(g, mv, x, y, w) {
+    cardRule(g, x, y, w, mv.every(function (e) { return /visit|unofficial/.test(e.k); }) ? 'VISITS' : 'MOVES'); y += 50;
+    var n = Math.max(mv.length, 3), gap = 20, cw = Math.floor((w - (n - 1) * gap) / n), pad = 20, lz = 64;
+    mv.forEach(function (e, k) {
+      var cx = x + k * (cw + gap), L = MV_LAB[e.k] || [String(e.k).toUpperCase(), 'lilac'], room = cw - 2 * pad;
+      g.fillStyle = C.face; g.fillRect(cx, y, cw, MV_H); bevel(g, cx, y, cw, MV_H, true, 3);
+      g.font = '34px ' + FONT; g.fillStyle = C[L[1]]; g.fillText(fit(g, L[0], room), cx + pad, y + pad + 17);
+      g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(mvDate(e.d), cx + pad, y + 76);
+      var ly = y + 102, cy = ly + lz / 2, tx = cx + pad, end = cx + cw - pad, both = e.fr && e.to;
+      var put = function (s, max) {
+        if (s.img) { drawLogo(g, s.img, tx, ly, lz, lz); tx += lz + 14; return true; }
+        g.font = '34px ' + FONT; g.fillStyle = C.white; var t = fit(g, s.n, max); g.fillText(t, tx, cy); tx += g.measureText(t).width + 14; return false;
+      };
+      if (both) {
+        put(e.fr, (room - 64) / 2);
+        g.fillStyle = C.lilac; g.fillRect(tx, cy - 3, 18, 6); g.fillRect(tx + 18, cy - 9, 6, 18); g.fillRect(tx + 24, cy - 6, 6, 12); g.fillRect(tx + 30, cy - 3, 6, 6); tx += 50;
+        if (put(e.to, end - tx) && end - tx >= 110) { g.font = '34px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, e.to.n, end - tx), tx, cy); }
+      } else {
+        var s = e.to || e.fr; if (!s) return;
+        if (put(s, room) && end - tx >= 60) { g.font = '34px ' + FONT; g.fillStyle = e.to ? C.white : C.lilac; g.fillText(fit(g, s.n, end - tx), tx, cy); }
+      }
+    });
+  }
+  // ---- recruit card (CFB and CBB class tabs: rows with a class year in data-rc). A projection card, so every band is
+  // what he is expected to become: grades (ARK and industry stars, each service's rank), the FV scale (10th-90th range,
+  // FV and the year-1 or NBA-conditional FV), the path (CFB years 1-3; CBB the odds of each NBA role), year-1 college
+  // odds and xNIL, the destination calls while he is uncommitted, his moves or visits, and the FV inputs.
+  function rcScale(g, x, y, w, h, o) {
+    var pad = 28, tx = x + pad, n = 61, bw = (w - 2 * pad) / n, ty = y + 112, th = 40, at = function (v) { return Math.round(tx + (Math.max(20, Math.min(80, Math.round(v))) - 20) * bw); };
+    g.fillStyle = C.face; g.fillRect(x, y, w, h); bevel(g, x, y, w, h, true, 3);
+    g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText('10TH-90TH', tx, y + 42);
+    var lw = g.measureText('10TH-90TH  ').width; g.fillStyle = C.white; g.fillText(Math.round(o.lo) + '-' + Math.round(o.hi), tx + lw, y + 42);
+    for (var v = 20; v <= 80; v++) { g.fillStyle = v >= Math.round(o.lo) && v <= Math.round(o.hi) ? C.lilac : C.dark; g.fillRect(at(v), ty, Math.max(4, Math.floor(bw) - 4), th); }
+    var bwi = Math.max(4, Math.floor(bw) - 4), same = o.alt && Math.round(o.alt[1]) === Math.round(o.fv);
+    if (o.alt && !same) { g.fillStyle = C.white; g.fillRect(at(o.alt[1]), ty - 12, bwi, th + 24); }
+    g.fillStyle = C.teal; g.fillRect(at(o.fv), ty - 12, bwi, th + 24);
+    g.font = '40px ' + FONT;
+    var ft = 'FV ' + Math.round(o.fv), fw = g.measureText(ft).width, fx = Math.max(tx + lw + 200 > at(o.fv) + bwi - fw ? tx : tx, Math.min(at(o.fv) + bwi - fw, x + w - pad - fw));
+    if (fx < tx) fx = tx;
+    g.fillStyle = C.teal; g.fillText(ft, fx, y + 84);
+    if (o.alt) { var t2 = o.alt[0] + ' ' + Math.round(o.alt[1]), w2 = g.measureText(t2).width, ax = Math.max(at(o.alt[1]), fx + fw + 28); if (ax + w2 > x + w - pad) ax = x + w - pad - w2; g.fillStyle = C.white; g.fillText(t2, ax, y + 84); }
+    g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.textAlign = 'center';
+    for (var t = 20; t <= 80; t += 10) g.fillText(String(t), at(t) + bwi / 2, y + h - pad - 8);
+    g.textAlign = 'left';
+  }
+  async function buildRCard(win, row, rc) {
+    var table = row.closest('table'), hcells = pcHeads(table), heads = hcells.map(txt), cells = [].slice.call(row.cells);
+    var rows = pcAll(table), at = pcAt(table, rows, row), nameI = pcNameAt(heads);
+    var gi = function (re) { return heads.findIndex(function (h) { return re.test(h); }); };
+    var cv = function (re) { var i = gi(re), c = i >= 0 && cells[i]; return c && !c.hidden && !(hcells[i] && hcells[i].hidden) ? c : null; };
+    var ct = function (re) { var c = cv(re), t = c ? pcCell(c).t : ''; return t === '—' || pcDash(t) ? '' : t; };
+    var cn = function (re) { var c = cv(re), v = c ? parseFloat(c.getAttribute('data-v')) : NaN; return isFinite(v) ? v : null; };
+    var D = null, why = null; try { D = JSON.parse(row.getAttribute('data-d') || 'null'); why = D ? D.why : JSON.parse(row.getAttribute('data-why') || 'null'); } catch (e) {}
+    var cbb = !!D, open = !!rc.o, nameC = cells[nameI >= 0 ? nameI : 1], name = nameC && nameC.querySelector('button.cfb__who, b') ? pcName(row, nameI >= 0 ? nameI : 1) : nameC ? pcCell(nameC).t : '';
+    var posI = gi(POS_COL), pOf = function (r) { var c = r.cells[posI]; if (!c) return ''; c = c.cloneNode(true); c.querySelectorAll('.cfb__dim, span').forEach(function (e) { e.remove(); }); return txt(c); };
+    var posT = posI >= 0 ? pOf(row) : '', team = open ? '' : ct(TEAM_COL), conf = open ? '' : ct(/^conf$/i);
+    var fv = cbb ? D.fv : cn(/^xfv/i), alt = cbb ? (D.fvIf != null ? ['IF NBA', D.fvIf] : null) : (cn(/^y1 fv$/i) != null ? ['Y1 FV', cn(/^y1 fv$/i)] : null);
+    if (fv == null) return null;
+    var lo = cbb ? D.q10 : rc.g && rc.g[0], hi = cbb ? D.ceil : rc.g && rc.g[1];
+    var home = (cbb ? D.home : ct(/^home$/i)) || '', hs = cbb && D.hs ? D.hs : '', age = rc.ag != null ? rc.ag : cbb ? D.age : null, ar = typeof rc.ar === 'number' ? rc.ar : null;
+    var th0 = row.querySelector('.pxframe img'), photo = await loadPhoto(pcBig(th0 && (th0.currentSrc || th0.src)));
+    var lg = [].slice.call(row.querySelectorAll('img.cfb__logo')).find(function (e) { return !e.closest('.pxframe'); }), logo = open ? null : await loadImg(lg && (lg.currentSrc || lg.src));
+    var fi = row.querySelector('img.flag'), flag = fi ? await loadImg(fi.currentSrc || fi.src) : null;
+    var items = await rcItems(rc), starI = items.filter(function (it) { return it.stars != null; }), destI = items.filter(function (it) { return it.stars == null; });
+    var mv = await pcMoves(win, name, { cls: rc.c, open: open, team: team });
+    // each service's rank
+    var rk = function (h, v, sub, raw) { return v == null || v === '' ? null : { h: h, t: !raw && /^\d+$/.test(String(v)) ? '#' + v : String(v), sub: sub || '' }; }, ranks;
+    if (cbb) ranks = [rk('CONS', D.rk), rk('ON3', D.svc && D.svc.on3), rk('247', D.svc && D.svc['247']), rk('ESPN', D.svc && D.svc.espn), rk('RIVALS', D.svc && D.svc.rivals)];
+    else { var gr = ct(/^grade$/i), src = ct(/^source$/i), nat = ct(/^nat$/i); ranks = [nat ? rk('ESPN', nat, gr ? 'grade ' + gr : '') : rk(src && src !== 'ESPN' ? 'GRADE, ' + src.toUpperCase() : 'ESPN GRADE', gr, '', true), rk('247 COMP', ct(/^247$/), '', true), rk('RIVALS', ct(/^riv$/i))]; }
+    ranks = ranks.filter(Boolean);
+    // the path: CFB xFV in years 1-3, CBB the odds of each NBA role
+    var pp = function (x) { return x < 0.005 ? '<1%' : Math.min(99, Math.round(x * 100)) + '%'; }, cols, stats, y1 = cbb && D.path && D.path[0];
+    if (cbb) {
+      cols = [['NBA', D.p, 'played a game'], ['40+', D.p40, 'rotation'], ['50+', D.p50, 'starter'], ['60+', D.p60, 'All-Star']].filter(function (c) { return c[1] != null; }).map(function (c) { return { h: c[0], t: pp(c[1]), pct: Math.max(0.5, c[1] * 100), sub: c[2] }; });
+      stats = y1 ? [{ h: 'D-I% Y1', t: pp(y1.on), prob: y1.on * 100 }, { h: 'MIN% Y1', t: String(Math.round(y1.min)), prob: y1.min }, { h: 'BPM Y1', t: (y1.bpm > 0 ? '+' : y1.bpm < 0 ? '−' : '') + Math.abs(y1.bpm).toFixed(1) }] : [];
+      if (D.xnil) stats.push({ h: 'xNIL Y1', t: ct(/^xnil$/i) });
+    } else {
+      cols = (rc.y || []).map(function (v, k) { return { h: 'Y' + (k + 1), t: String(Math.round(v)), pct: Math.max(0.5, v - 20), sub: rc.c ? String(rc.c + k) : '' }; });
+      var on = cn(/^on%$/i), pc = cn(/^pct$/i); stats = [];
+      if (on != null) stats.push({ h: 'ON% Y1', t: Math.round(on * 100) + '%', prob: on * 100 });
+      if (pc != null) stats.push({ h: 'Y1 BOARD PCTL', t: String(pc), prob: pc });
+      if (ct(/^xnil$/i)) stats.push({ h: 'xNIL Y1', t: ct(/^xnil$/i) });
+    }
+    var parts = why && why.rows ? why.rows.map(function (r) { return [r[0], +r[1]]; }).filter(function (p) { return p[0] && isFinite(p[1]) && Math.abs(p[1]) >= 0.05; }).sort(function (a, b) { return Math.abs(b[1]) - Math.abs(a[1]); }).slice(0, 10) : [];
+    var wt = txt(win.querySelector('.win__title-text')).replace(/_$/, '').trim(), base = wt.split('::')[0].trim(); if (/^[a-z0-9]/.test(base)) base = SITE.split('/').pop().toUpperCase() + ' ' + base;
+    var F = await frame(2160, 2700, base + ' :: ' + name, win.getAttribute('data-gfx-date'), tabLink(win));
+    var g = F.g, x = F.x + 40, y = F.y + 70, w = F.w - 80, top = y, bottom = F.y + F.h - 30;
+    well(g, F.x, F.y, F.w, F.h);
+    var px = 400, PW = 350, PH = 400, tcol = w - px - PW - 36, qx = x + w - PW, qy = y - 60, qc = qx + PW / 2;
+    photoFrame(g, photo, x, y - 60, 370, 400);
+    // the plaque: FV to the whole number, the year-1 (CFB) or NBA-conditional (CBB) FV under it, then his place
+    var place = '#' + (at + 1) + ' of ' + rows.length, posPlace = '';
+    if (posT && at >= 0) { var pk0 = 0, pn = 0; rows.forEach(function (r, k) { if (pOf(r) === posT) { pn++; if (k < at) pk0++; } }); if (pn >= 3 && pn < rows.length) posPlace = posT + ' #' + (pk0 + 1) + ' of ' + pn; }
+    g.fillStyle = C.face; g.fillRect(qx, qy, PW, PH); bevel(g, qx, qy, PW, PH, true, 6);
+    g.textAlign = 'center'; g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText('FV', qc, qy + 40);
+    var fvT = String(Math.round(fv)); g.textAlign = 'left'; g.font = '104px ' + FONT; var cw0 = g.measureText(fvT).width + 104 * 0.6; chip(g, Math.round(qc - cw0 / 2), qy + 134, fvT, 104, Math.round(fv));
+    if (alt) {
+      g.font = '44px ' + FONT; var a1 = alt[0] + ' ', a2 = String(Math.round(alt[1])), aw = g.measureText(a1 + a2).width, ax = Math.round(qc - aw / 2);
+      g.fillStyle = C.lilac; g.fillText(a1, ax, qy + 244); g.fillStyle = C.white; g.fillText(a2, ax + g.measureText(a1).width, qy + 244);
+    }
+    g.fillStyle = C.dark; g.fillRect(qx + 30, qy + 284, PW - 60, 3);
+    g.textAlign = 'center'; g.font = '32px ' + FONT; g.fillStyle = C.lilac;
+    [place, posPlace].filter(Boolean).forEach(function (l, i, a) { g.fillText(fit(g, l, PW - 30), qc, qy + (a.length > 1 ? 322 + i * 38 : 340)); });
+    g.textAlign = 'left';
+    // name, the line under it, then facts: size and age, home (high school), age against the class
+    if (logo) drawLogo(g, logo, x + px, y - 48, 96, 96);
+    var nx = x + px + (logo ? 120 : 0);
+    if (flag) { g.imageSmoothingEnabled = false; g.drawImage(flag, nx, y - 33, 96, 66); nx += 120; }
+    var ns = 96, nroom = x + px + tcol - nx; g.font = ns + 'px ' + FONT; while (ns > 64 && g.measureText(name).width > nroom) { ns -= 4; g.font = ns + 'px ' + FONT; }
+    g.fillStyle = C.white; g.fillText(fit(g, name, nroom), nx, y); y += 110;
+    var st = cbb ? (D.signed ? 'signed' : '') : /signed|enrolled/i.test(ct(/^status$/i)) ? ct(/^status$/i) : '';
+    g.font = '48px ' + FONT; g.fillStyle = C.teal; g.fillText(fit(g, [posT, open ? 'uncommitted' : team || (cbb && D.school) || '', conf, st].filter(Boolean).join(' · '), tcol), x + px, y); y += 74;
+    var facts = function (list, size) {
+      g.font = size + 'px ' + FONT; var ix = x + px, any = false;
+      list.forEach(function (f) { if (!f[1]) return; var lw = g.measureText(f[0] + ' ').width, vw = g.measureText(f[1]).width; if (ix + lw + vw > x + px + tcol) { if (any) return; f[1] = fit(g, f[1], tcol - lw); vw = g.measureText(f[1]).width; }
+        g.fillStyle = C.lilac; g.fillText(f[0], ix, y); g.fillStyle = C.white; g.fillText(f[1], ix + lw, y); ix += lw + vw + 52; any = true; });
+      if (any) y += size + 22;
+    };
+    var size = cbb ? [D.ht, D.wt].filter(Boolean).join(', ') : ct(/^size$/i);
+    facts([['CLASS', rc.c ? String(rc.c) : ''], ['SIZE', size], ['AGE', age != null ? (Math.round(age * 10) / 10).toString() : '']], 44);
+    facts([['HOME', home + (hs ? ' (' + hs + ')' : '')]], 44);
+    if (ar != null) {   // years against the class median: young at the right in teal, old at the left in pink
+      g.font = '44px ' + FONT; g.fillStyle = C.lilac; g.fillText('AGE FOR CLASS', x + px, y); var lw0 = g.measureText('AGE FOR CLASS  ').width;
+      pxDiv(g, x + px + lw0, y, 360, 24, -ar, 1.5, 8);
+      var at0 = Math.abs(ar) < 0.05 ? 'median' : Math.abs(ar).toFixed(1) + ' yr ' + (ar < 0 ? 'young' : 'old');
+      g.fillStyle = Math.abs(ar) < 0.05 ? C.lilac : ar < 0 ? C.teal : C.down; g.fillText(fit(g, at0, tcol - lw0 - 384), x + px + lw0 + 384, y);
+    }
+    // the bands: room left by the fixed ones goes to the projection
+    var gap = 20, GH = 210, SH = 230, partsH = inputBarsH(parts.length), mvH = pcMovesH(mv), destH = destI.length ? 50 + RC_H + 30 : 0, yb = top + 394;
+    var room = bottom - yb - partsH - mvH - destH - (50 + GH + 30), hasScale = lo != null && hi != null;
+    var colsH = Math.max(220, Math.min(560, room - 80 - (hasScale ? SH + gap : 0))), projH = 80 + (hasScale ? SH + gap : 0) + colsH;
+    var slack = Math.max(0, room - projH), nb = 2 + (destH ? 1 : 0) + (mvH ? 1 : 0) + (partsH ? 1 : 0), lead = Math.min(64, Math.floor(slack / nb));
+    y = yb + lead;
+    cardRule(g, x, y, w, 'GRADES'); y += 50;
+    var sw = ranks.length ? Math.round(w * (ranks.length >= 4 ? 0.44 : 0.56)) : w;
+    rcBand(g, starI, x, y, sw, GH, gap);
+    if (ranks.length) cellGrid(g, ranks, x + sw + gap, y, w - sw - gap, ranks.length, GH, gap);
+    y += GH + 30 + lead;
+    cardRule(g, x, y, w, 'PROJECTION'); y += 50;
+    if (hasScale) { rcScale(g, x, y, w, SH, { lo: lo, hi: hi, fv: fv, alt: alt }); y += SH + gap; }
+    var lw2 = stats.length ? Math.round(w * 0.56) : w;
+    if (cols.length) fvoBand(g, { items: cols, max: cbb ? 100 : Math.max(20, (hi || 40) - 20) }, x, y, lw2, colsH);
+    if (stats.length) { var sc = stats.length > 2 ? 2 : 1, sr = Math.ceil(stats.length / sc); cellGrid(g, stats, cols.length ? x + lw2 + gap : x, y, cols.length ? w - lw2 - gap : w, sc, Math.floor((colsH - (sr - 1) * gap) / sr), gap); }
+    y += colsH + 30 + lead;
+    if (destH) { cardRule(g, x, y, w, 'PREDICTIONS'); y += 50; rcBand(g, destI, x, y, w, RC_H, gap); y += RC_H + 30 + lead; }
+    if (mvH) { movesStrip(g, mv, x, y, w); y += mvH + lead; }
+    if (parts.length) inputBars(g, x, bottom - partsH + 40, w, 'FV INPUTS', '', parts, Math.max(1, Math.max.apply(null, parts.map(function (p) { return Math.abs(p[1]); }))), 1, 470);
+    return F.canvas;
+  }
   async function buildPCard(win, row) {
     var table = row.closest('table'); if (!table) return null;
+    var rc0 = null; try { rc0 = JSON.parse(row.getAttribute('data-rc') || 'null'); } catch (e) {}
+    if (rc0 && rc0.c && !pcMain(row)) { var rcv = await buildRCard(win, row, rc0); if (rcv) return rcv; }
     var mainR = pcMain(row), subRow = mainR ? row : null, mv = pcMove(mainR || row);
     if (mv == null && mainR) mv = pcMove(row);
     if (mainR) { row = mainR; table = row.closest('table'); }
     var hcells = pcHeads(table), heads = hcells.map(txt), cells = [].slice.call(row.cells);
     var rows = pcAll(table), at = pcAt(table, rows, row), nameI = pcNameAt(heads);
     var det = await pcDetail(row), d = det.el;
-    var comps = await pcComps(win, d), compH = pcCompsH(comps);   // the comps strip adds its own height, so no band gives way
+    var comps = await pcComps(win, d), compH = pcCompsH(comps), mvs = [];   // the comps strip adds its own height, so no band gives way
     var gi = function (re) { return heads.findIndex(function (h) { return re.test(h); }); };
     var nameC = cells[nameI >= 0 ? nameI : 1];
     var name = nameC && nameC.querySelector('button.cfb__who, b') ? pcName(row, nameI >= 0 ? nameI : 1) : nameC ? pcCell(nameC).t : txt(d && d.querySelector('.cfb__dhead b'));
@@ -1561,6 +1745,7 @@
     var pk = row.getAttribute('data-pk'), link = tabLink(win);
     if (pk && /#/.test(link)) link += ':p=' + pk;
     else if (win.getAttribute('data-cbb') && window.__arkCbbPid && row.hasAttribute('data-i') && window.__arkCbbRecs) { var rec = window.__arkCbbRecs[+row.getAttribute('data-i')]; if (rec) link = SITE + '#' + win.getAttribute('data-cbb') + ':p=' + window.__arkCbbPid(rec); }
+    mvs = await pcMoves(win, name, { team: rc && rc.o ? '' : team }); var mvH = pcMovesH(mvs); compH += mvH;
     var F = await frame(2160, 2700 + compH, base + ' :: ' + name, win.getAttribute('data-gfx-date'), link);
     var g = F.g, x = F.x + 40, y = F.y + 70, w = F.w - 80, top = y, bottom = F.y + F.h - 30;
     well(g, F.x, F.y, F.w, F.h);
@@ -1703,7 +1888,8 @@
       });
       y += 20;
     }
-    if (comps) { compStrip(g, comps, x, y, w); y += compH; }
+    if (comps) { compStrip(g, comps, x, y, w); y += compH - mvH; }
+    if (mvH) { movesStrip(g, mvs, x, y, w); y += mvH; }
     // badges: the slot for the board's predictive badges (only badges that pass a held-out test are on a board)
     if (badges.length) { y += 6; cardRule(g, x, y, w, 'BADGES'); y += 50; y += badgeRows(g, badges, x, y, w); }
     if (repH) {

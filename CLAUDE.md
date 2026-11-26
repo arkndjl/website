@@ -78,3 +78,13 @@
   `noTicker = true` drops it). `/news/` = `layouts/shortcodes/news.html`; the daily card = `buildNews` in
   `assets/js/gfx.js` (`/news/#gfx` opens the newest). Category icons: 11x11 bitmaps in `data/news_icons.json`.
 - Never surface hidden pages (Franchise Fantasy) or betting lines in the feed.
+
+## Recruit GFX card and MOVES strip
+
+- Rows with a class year in `data-rc` (`layouts/partials/rcgfx.html`: CFB class/future tabs, CBB class tabs) draw the recruit
+  card, `buildRCard` in `assets/js/gfx.js`: FV to the whole number with Y1 FV (CFB) or IF NBA (CBB) under it, GRADES,
+  PROJECTION (FV scale, path or NBA odds, year-1 cells), PREDICTIONS while uncommitted, MOVES or VISITS, FV INPUTS. It is a
+  projection card: predictive numbers only. Age reads the rows' `age` and `ageRel` (years over the class median); absent = not drawn.
+- Moves on every player card come from `static/data/moves/<sport>.json`, written by `scripts/player_moves.py` (rerun by the
+  recruit news workflow) from files already in the repo; headline and transaction rows are kept in
+  `scripts/data/player_moves_hist.json.gz`. A new kind of move needs a label in `MV_LAB` (gfx.js).
