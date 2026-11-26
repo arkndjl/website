@@ -35,7 +35,7 @@ def site_rows(sp):
     f = os.path.join(ROOT, 'data', f'{sp}_recruits.json')
     if not os.path.exists(f): return {}
     d = json.load(open(f)); out = defaultdict(list)
-    for g in (d.get('future', []) if sp == 'cfb' else d.get('classes', [])):
+    for g in (([{'year': d.get('next'), 'list': d.get('class', [])}] + d.get('future', [])) if sp == 'cfb' else d.get('classes', [])):
         for r in g.get('list', []):
             out[str(g['year'])].append((r['name'], (r.get('home') or '').split(', ')[-1]))
     return out

@@ -497,7 +497,7 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
 
   // 1) the next class: commitments to FBS and FCS programs, year 1 next season
   const next = season + 1;
-  const cls = (await prep(next, true)).filter(c => c.tid && prog[c.tid]);
+  const nextAll = await prep(next, true), cls = nextAll.filter(c => c.tid && prog[c.tid]);
   const klass = [], clsRows = cls.map(c => mk(c, 1));
   centreCq(fit, clsRows);
   for (const [i, c] of cls.entries()) {
@@ -549,6 +549,26 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   const band = gr => gr >= 90 ? 5 : gr >= 80 ? 4 : gr >= 70 ? 3 : 0;
   const typical = {};
   for (const c of past) if (c.year === season && c.tid && prog[c.tid]) { const t = typical[band(c.grade)] ||= { n: 0, p4: 0, elo: 0 }; t.n++; t.p4 += prog[c.tid].level === 'P4'; t.elo += prog[c.tid].eloZ; }
+  // 1c) the next class's uncommitted recruits (decommitments, late recruitments), ESPN-graded: scored at the typical
+  // program for their grade, as the later classes are; listed with the commits, never counted in a school's class
+  { const open = [];
+    for (const c of nextAll) {
+      if ((c.tid && prog[c.tid]) || !(c.grade >= 60)) continue;
+      const g = group(c.pos, c.wt); if (!g) continue;
+      const t = typical[band(c.grade)] || typical[0];
+      open.push([c, { ...c, g, k: 1, level: t && t.p4 * 2 >= t.n ? 'P4' : 'G5', eloZ: t ? t.elo / t.n : 0, dev: 0 }]);
+    }
+    centreCq(fit, open.map(x => x[1]));
+    for (const [c, r] of open) {
+      const p = predict(fit, r);
+      whyQueue.push([null, r, false]);
+      klass.push({ name: c.name, pos: c.pos, g: r.g, ht: c.ht, wt: c.wt, grade: c.grade || null, rank: c.rank, posRank: c.posRank, home: c.city && c.state ? `${c.city}, ${c.state}` : c.state,
+        status: 'uncommitted', team: null, tid: null, logo: null, conf: null, level: null,
+        pOn: r3(p.pOn), fvOn: r1(p.fvOn), xfv: r1(p.xfv), pct: pct(p.fvOn), range: range(p, 1, 0, r), path: pathOf(r), xnil: xnil(r.level, p), comp: c.comp, rRiv: c.rRiv ?? null, sRiv: c.sRiv ?? null, img: c.img ?? null, ark: starsOf(r), stars: band(c.grade) || 2, ...ageOf(c) });
+      whyQueue[whyQueue.length - 1][0] = klass[klass.length - 1];
+    }
+    klass.sort((a, b) => (b.ark || 0) - (a.ark || 0) || b.xfv - a.xfv || (b.grade || 0) - (a.grade || 0));
+  }
   const gm = fit.gradeMap || {};
   const future = [];
   let watchGrade = null;
@@ -636,7 +656,7 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   // and freshmen who are on the board at another school (transfers, flipped commitments)
   const hereRs = 1 - (fit.redshirt.away ?? 0), here1 = 1 - (fit.away1 ?? 0);
   for (const x of redshirts) if (slotOf(x.g)) (((add[x.tid] ||= {})[x.g]) ||= []).push({ name: x.name, fv: x.fvOn, stay: x.pOn * hereRs, kind: 'redshirt' });
-  for (const x of klass) if (slotOf(x.g)) (((add[x.tid] ||= {})[x.g]) ||= []).push({ name: x.name, fv: x.fvOn, stay: x.pOn * here1, kind: 'recruit' });
+  for (const x of klass) if (x.tid && slotOf(x.g)) (((add[x.tid] ||= {})[x.g]) ||= []).push({ name: x.name, fv: x.fvOn, stay: x.pOn * here1, kind: 'recruit' });
   const roster = [];
   for (const t of teams) {
     const T = B[t.tid]; if (!T) continue;
@@ -663,7 +683,7 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   const q = f => boardFv[Math.floor(f * (boardFv.length - 1))];
   const boardRef = { p50: q(0.5), p75: q(0.75), p90: q(0.9), p99: q(0.99) };
   return { asof, season, next, floor: fit.floor, blendGames: BLEND_GAMES, boardRef, class: klass, future, redshirts, young, teams: roster,
-    counts: { class: klass.length, committed: cls.length, redshirts: redshirts.length, young: young.length, future: future.map(f => f.n) },
+    counts: { class: klass.filter(x => x.tid).length, open: klass.filter(x => !x.tid).length, committed: cls.length, redshirts: redshirts.length, young: young.length, future: future.map(f => f.n) },
     ...(Object.keys(cfbdCover).length ? { cfbd: Object.values(cfbdCover) } : {}) };
 }
 // class rankings for one class: each school's commits, expected FV points over the floor summed (as classXfv above)
