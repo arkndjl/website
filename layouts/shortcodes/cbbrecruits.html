@@ -49,7 +49,7 @@
       '<p class="cfb__role">odds: ' + pct(r.p) + ' to reach the NBA · 40+ (3+ rotation seasons) ' + pct(r.p40) + ' · 50+ (4+ seasons as a starter) ' + pct(r.p50) + ' · 60+ (2+ All-Star) ' + pct(r.p60) + '.</p>' +
       '<p class="cfb__role">range: 10th percentile FV ' + r.q10 + ', 75th ' + r.q75 + ', 90th ' + r.ceil + '; FV ' + r.fvIf.toFixed(0) + ' if he reaches the NBA; FV percentile on the current board ' + r.pct + '.' + (r.age != null ? ' On3 lists him at ' + r.age + '.' : '') + '</p>' +
       '<p class="cfb__role">ARK stars ' + stars(r.ark) + (r.stars ? ' (industry ' + r.stars + (r.fsp ? '+' : '') + ').' : '.') + '</p>' +
-      '<p class="cfb__role">college: ' + r.path.map(function (x, k) { return 'year ' + (k + 1) + ' plays D-I ' + pct(x.on) + ', ' + Math.round(x.min) + '% of minutes, BPM ' + sgn(x.bpm) + ' if he plays'; }).join(' · ') + '.</p>' +
+      '<p class="cfb__role">college: ' + r.path.slice(0, 1).map(function (x, k) { return 'year ' + (k + 1) + ' plays D-I ' + pct(x.on) + ', ' + Math.round(x.min) + '% of minutes, BPM ' + sgn(x.bpm) + ' if he plays'; }).join(' · ') + '.</p>' +
       '<p class="cfb__role">xNIL year 1 ' + money(r.xnil) + ': college value ' + r.path[0].v.toFixed(1) + ' (minutes share x BPM above −3) at ' + (r.team ? esc(r.team) + '\'s' : 'the expected school\'s') + ' price.</p>' +
       '<details class="cfb__nums" open><summary title="' + esc('start: the average 2009-16 ranked recruit, FV ' + w.fv0.toFixed(1) +
       '. each row moves FV as that input takes his value, in turn; rows sum to his mean outcome ' + r.fvx.toFixed(1) + ' less the start' +
@@ -81,7 +81,6 @@
     <th title="chance he plays D-I in year 1 (5+ games, any school)">D-I%</th>
     <th title="share of team minutes in year 1 if he plays">Min%</th>
     <th title="BPM in year 1 if he plays (Barttorvik, schedule-adjusted)">BPM</th>
-    <th title="expected share of team minutes, years 1 · 2 · 3 (0 when not in D-I: transfer counts, NBA exit does not)">Path</th>
     <th title="expected NIL market value, year 1: college value (minutes share x BPM above -3) at the school's price">xNIL</th>
     <th title="industry consensus stars (On3, 247, ESPN; 5-star+ marked +)">Stars</th>
     <th title="On3 industry consensus national rank (On3, 247, ESPN)">Nat</th>{{ if $has247 }}<th title="247Sports rank">247</th>{{ end }}<th title="ESPN rank">ESPN</th>
@@ -107,7 +106,6 @@
     <td class="cfb__num" data-v="{{ $y1.on }}">{{ math.Round (mul $y1.on 100) }}%</td>
     <td class="cfb__num" data-v="{{ $y1.min }}">{{ math.Round $y1.min }}</td>
     <td class="cfb__num" data-v="{{ $y1.bpm }}">{{ if gt $y1.bpm 0 }}+{{ end }}{{ partial "num.html" (slice "%.1f" $y1.bpm) }}</td>
-    <td class="cfb__num cfb__dim" data-v="{{ mul $y1.on $y1.min }}">{{ range $j, $x := .path }}{{ if $j }} · {{ end }}{{ math.Round (mul $x.on $x.min) }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td data-v="{{ if .fsp }}6{{ else }}{{ .stars | default 0 }}{{ end }}">{{ with .stars }}<span class="cfbrc__stars">{{ strings.Repeat (int .) "★" }}</span>{{ if $r.fsp }}<span title="5-star+">+</span>{{ end }}{{ else }}<span class="cfb__dim">NR</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .rk }}">{{ .rk }}</td>

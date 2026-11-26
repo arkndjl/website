@@ -1,0 +1,35 @@
+# Past CFB portal classes (2021 on) for the MOVES strip on the player GFX cards: CFBD's portal lists already in the
+# cfbhist cache (the cfb game research workflow pulls them) -> scripts/data/cfb_portal_hist.json.gz, then the moves files.
+# No CFBD call. Run by hand from the Actions tab; rerun after a game research run adds a season.
+name: cfb portal history
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/cache/restore@v4
+        with:
+          path: scripts/.cache/cfb/hist
+          key: cfbhist-none
+          restore-keys: cfbhist-
+      - name: Export the portal lists
+        run: python3 scripts/cfb_portal_hist.py
+      - name: Moves for the GFX cards
+        run: python3 scripts/player_moves.py
+      - name: Commit if anything changed
+        run: |
+          python3 scripts/data_push.py -m "Update the CFB portal history ($(date -u +%Y-%m-%d))" \
+            -- scripts/data/cfb_portal_hist.json.gz static/data/moves scripts/data/player_moves_hist.json.gz

@@ -1256,6 +1256,7 @@ def write():
                          'svc': {k: v for k, v in row['svc'].items()}, 'age': r.get('age'), **(RA.fields('cbb', r.get('key'), row['name'], c, r.get('age')) if not r.get('fiba') else {}),
                          'team': tm, 'logo': bt[tm]['logo'] if tm else None, 'conf': bt[tm]['conf'] if tm else None,
                          'school': ' '.join(row['team'].split('-')[:-1]).title() if row['team'] and not tm else None, 'signed': bool(r.get('signed')),
+                         'cdate': (r.get('commitDate') or '')[:10] or None,
                          'lead': [lead, rpm[1]] if lead and not row['team'] and not tm else None,
                          'nat': row['nat'], 'img': r.get('img'), 'on3': f"https://www.on3.com/db/{r['slug']}/" if r.get('slug') else None,
                          'nil': r.get('nil'), 'why': why(M, f, avg), **g,

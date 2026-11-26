@@ -6,7 +6,7 @@ No free source prints a birth date for most high-school recruits. On3 lists a wh
 football top 300, about a third of basketball's), and that age read on a date bounds the birth date to one year. Every
 daily pull narrows the bound (scripts/data/recruit_age_<sport>.json keeps it per On3 player key), and the day the listed age
 goes up pins the birthday. Day-precise dates come from FIBA youth rosters (basketball, scripts/data/fiba_dob.json.gz)
-and the hand pins in data/dob_overrides.json ("cbb_recruits" / "cfb_recruits": {"<names.key>|<class>": {"dob": ...}}).
+Wikidata (scripts/data/recruit_wikidata_dob.json, scripts/recruit_wikidata.py) and the hand pins in data/dob_overrides.json ("cbb_recruits" / "cfb_recruits": {"<names.key>|<class>": {"dob": ...}}).
 
 Row fields (fields()): `age` years to one decimal on the as-of date when the birth date is known to 45 days or better,
 else On3's whole-year age; `ageRel` years older (+) or younger (-) than the class median, only with that precision;
@@ -30,6 +30,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATE = os.path.join(ROOT, 'scripts', 'data', 'recruit_age_{}.json')   # one file a sport: each sport's workflow commits its own
 PINS = os.path.join(ROOT, 'data', 'dob_overrides.json')
 FIBA = os.path.join(ROOT, 'scripts', 'data', 'fiba_dob.json.gz')
+WIKI = os.path.join(ROOT, 'scripts', 'data', 'recruit_wikidata_dob.json')   # scripts/recruit_wikidata.py
 _R = json.load(open(os.path.join(ROOT, 'data', 'recruit_age_research.json')))
 MED = {sp: _R[sp]['median'] for sp in ('cbb', 'cfb')}   # median age on Sep 1 of the class year, day-precise dates (cbb: ranked recruits 2009-16; cfb: top-400 recruits of 2011-19 who reached the NFL)
 TIGHT = 45                           # days: a bound this narrow reads to a tenth of a year
@@ -66,18 +67,24 @@ def observe(sport, key, age, cls, name, on=None):
 
 
 def _exact(sport, name, cls, win):
-    """a day-precise date: the pins, then (basketball) a FIBA roster date that fits the class and On3's bound"""
-    global _P, _F
+    """a day-precise date: the pins, then (basketball) a FIBA roster date, then a Wikidata date, each only when one
+    person of that name fits the class and On3's bound"""
+    global _P, _F, _W
     try: _P
     except NameError:
         _P = json.load(open(PINS)) if os.path.exists(PINS) else {}
         _F = json.load(gzip.open(FIBA, 'rt')) if os.path.exists(FIBA) else {}
+        _W = json.load(open(WIKI)) if os.path.exists(WIKI) else {}
     p = (_P.get(sport + '_recruits') or {}).get(f'{N.key(name)}|{cls}')
     if p and p.get('dob'): return p['dob'], 'pin'
     if sport == 'cbb':
         ds = [d for d in _F.get(N.key(name), []) if cls - 20 <= int(d[:4]) <= cls - 17]
         if win: ds = [d for d in ds if win[0] <= d <= win[1]]
         if len(ds) == 1 and (win or len(_F.get(N.key(name), [])) == 1): return ds[0], 'fiba'
+    al = (_W.get(sport) or {}).get(N.key(name), [])
+    ds = [d for d in al if cls - 20 <= int(d[:4]) <= cls - 17]
+    if win: ds = [d for d in ds if win[0] <= d <= win[1]]
+    if len(ds) == 1 and (win or len(al) == 1): return ds[0], 'wikidata'
     return None, None
 
 

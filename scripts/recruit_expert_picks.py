@@ -1,7 +1,7 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """On3/Rivals expert picks for the uncommitted recruits of the live classes (scripts/data/recruit_on3_live.json.gz,
 pulled daily by the recruit leans workflow) -> data/recruit_expert_picks.json, read by the CFB and CBB class tabs and
-drawn on the recruit GFX card.
+drawn on the recruit GFX card. The same pull's RPM leader (On3's Recruiting Prediction Machine) -> data/recruit_rpm.json.
 Each expert counts once, at his latest pick. Out: {sport: {class: {site row name: [school, k, n, espn id]}}}: the
 school most experts pick (ties: higher summed confidence, then the more recent pick), k experts on it of n with a pick.
 247 Crystal Balls are not here: 247 serves no feed a bot may read (see scripts/research/recruit_experts_nov19/)."""
@@ -14,6 +14,18 @@ import names  # noqa: E402
 from recruit_on3_join import LIVEP, slug_map, CACHE, TEAMS  # noqa: E402
 
 OUT = os.path.join(ROOT, 'data', 'recruit_expert_picks.json')
+RPM = os.path.join(ROOT, 'data', 'recruit_rpm.json')   # On3's Recruiting Prediction Machine: {sport: {class: {row name: [school, %, espn id]}}}
+
+
+def rpm_leader(lead, smap, nm):
+    """the school On3's RPM has in front at its latest reading"""
+    for _d, rows in lead or []:
+        rows = [r for r in rows or [] if r and r[0] in smap and r[1]]
+        if rows:
+            r = max(rows, key=lambda r: r[1]); t = smap[r[0]]
+            return [nm.get(t, t), round(r[1], 1), t]
+        return None
+    return None
 
 
 def leader(picks, smap, nm):
@@ -43,22 +55,25 @@ def site_rows(sp):
 
 def main():
     if not os.path.exists(LIVEP): print('no', LIVEP); return
-    live = json.load(gzip.open(LIVEP, 'rt')); out = {}
+    live = json.load(gzip.open(LIVEP, 'rt')); out, rpm = {}, {}
     for sp, years in live.items():
         smap = slug_map(sp)
         tj = json.load(open(os.path.join(CACHE, f'espn_teams_{TEAMS[sp]}.json')))
         nm = {str(t['team']['id']): t['team']['location'] for t in tj['sports'][0]['leagues'][0]['teams']}
         rows = site_rows(sp)
         for y, recs in years.items():
-            got = [(r, leader(r.get('picks'), smap, nm)) for r in recs]
-            got = [(r, L) for r, L in got if L]
-            by = defaultdict(list)
-            for r, L in got: by[names.key(r['name'])].append((r, L))
-            for name, st in rows.get(y, []):
-                cand = [c for c in by.get(names.key(name), []) if not st or not c[0].get('state') or c[0]['state'] == st]
-                if not cand: cand = [c for c in got if (not st or c[0].get('state') == st) and names.same(c[0]['name'], name)]
-                if len(cand) == 1: out.setdefault(sp, {}).setdefault(y, {})[name] = cand[0][1]
+            for dst, fn in ((out, lambda r: leader(r.get('picks'), smap, nm)), (rpm, lambda r: rpm_leader(r.get('lead'), smap, nm))):
+                got = [(r, fn(r)) for r in recs]
+                got = [(r, L) for r, L in got if L]
+                by = defaultdict(list)
+                for r, L in got: by[names.key(r['name'])].append((r, L))
+                for name, st in rows.get(y, []):
+                    cand = [c for c in by.get(names.key(name), []) if not st or not c[0].get('state') or c[0]['state'] == st]
+                    if not cand: cand = [c for c in got if (not st or c[0].get('state') == st) and names.same(c[0]['name'], name)]
+                    if len(cand) == 1: dst.setdefault(sp, {}).setdefault(y, {})[name] = cand[0][1]
     json.dump(out, open(OUT, 'w'), separators=(',', ':'), sort_keys=True)
+    json.dump(rpm, open(RPM, 'w'), separators=(',', ':'), sort_keys=True)
+    print('wrote', RPM, {sp: {y: len(v) for y, v in d.items()} for sp, d in rpm.items()})
     print('wrote', OUT, {sp: {y: len(v) for y, v in d.items()} for sp, d in out.items()})
 
 
