@@ -2,19 +2,19 @@
   "id": "tennis-serve-direction-mix",
   "sport": "tennis",
   "question": "Do first serves wide, body and T win at equal rates, as mixed-strategy theory predicts?",
-  "answer": "Wide and T: yes, within 1 pt for the same server. Body: no, 4.2 pts lower (men), 4.1 (women).",
+  "answer": "Wide and T do, within 1 point for the same server. Body doesn't. It is 4.2 points lower for men and 4.1 for women.",
   "findings": [
-    "Within-player T minus wide: men -0.1 pts (SE 0.1, 498 player-sides), women -0.4 (SE 0.2, 311).",
-    "Wide vs T differ at p<.05 for 8% of men's and 7% of women's player-sides; 5% expected by chance.",
-    "Body minus wide/T, same server: men -4.2 pts (SE 0.2), women -4.1 (SE 0.2).",
-    "Body is 10% of men's and 20% of women's first serves; charters may log missed targets as body."
+    "T minus wide within a player: men -0.1 points (SE 0.1, 498 player-sides), women -0.4 (SE 0.2, 311).",
+    "Wide and T differ at p<.05 for 8% of men's and 7% of women's player-sides, where 5% is expected by chance.",
+    "Body minus wide/T for the same server: men -4.2 points (SE 0.2), women -4.1 (SE 0.2).",
+    "Body is 10% of men's and 20% of women's first serves, and charters may log missed targets as body."
   ],
-  "method": "Outcome: server wins the point, given the first serve was aimed at that target (faults count). Within-player test compares wide and T for each server and court side (150+ serves each).",
+  "method": "The outcome is the server winning the point, given the first serve was aimed at that target (faults count). The within-player test compares wide and T for each server and court side (150+ serves each).",
   "data": "Match Charting Project points, 11,785 charted matches, 1,857,004 first serves with a direction.",
   "n": 1857004,
   "robust": true,
   "interest": 3,
-  "split_check": "Wide vs T within 0.4 pts in both eras (pre-2015, 2015+), men and women.",
+  "split_check": "Wide and T are within 0.4 points in both eras (pre-2015, 2015+), for men and women.",
   "chart": {
     "type": "bar",
     "title": "Points won by first-serve target",

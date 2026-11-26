@@ -2,19 +2,19 @@
   "id": "cbb-foul-up-3",
   "sport": "CBB",
   "question": "Up 3 in the last 12 seconds, should the leader foul or defend?",
-  "answer": "Foul: leader wins 93.6% fouling, 92.4% defending; +2.8 pp at equal time (CI +0.8 to +4.6).",
+  "answer": "Foul. The leader wins 93.6% of the time fouling and 92.4% defending, +2.8 points at equal time (CI +0.8 to +4.6).",
   "findings": [
-    "Leader win: foul 93.6% (CI 92.0%-94.9%, n=1063), defend 92.4% (CI 91.7%-93.1%, n=6053).",
-    "Same-time difference (foul minus defend): +2.8 pp (95% CI +0.8 to +4.6).",
-    "Reached OT: foul 6.7%, defend 14.2%. Lost in regulation: foul 3.1%, defend 0.9%.",
-    "Leader win rate once in OT: foul 50.7% (n=71), defend 52.7% (n=857)."
+    "Leader win rate: 93.6% fouling (CI 92.0%-94.9%, n=1063) and 92.4% defending (CI 91.7%-93.1%, n=6053).",
+    "The difference at the same time left (foul minus defend) is +2.8 points (95% CI +0.8 to +4.6).",
+    "The game reached OT 6.7% of the time after a foul and 14.2% after defending. The leader lost in regulation 3.1% and 0.9% of the time.",
+    "Once in OT, the leader won 50.7% after fouling (n=71) and 52.7% after defending (n=857)."
   ],
-  "method": "First trailer possession per game that is live with 12 s or less, final regulation period, down 3. Foul = leader's non-shooting foul sending trailer to the line before any shot. Compared within possession-start bins (4-8, 8-12, 12+ s); outcome = game win incl. OT.",
+  "method": "The sample is the first trailing-team possession of each game that is live with 12 seconds or less left in the final regulation period, down 3. A foul is the leader's non-shooting foul that sends the trailing team to the line before any shot. Fouling and defending are compared within possession-start bins (4-8, 8-12, 12+ s), and the outcome is the game win, including OT.",
   "data": "ESPN play-by-play via sportsdataverse, CBB, 2011-12 to 2025-26, 7,116 games.",
   "n": 7116,
   "robust": true,
   "interest": 4,
-  "split_check": "Foul minus defend: +2.2 pp in 2012-19 (CI -0.6 to +4.8), +3.3 in 2020-26 (CI +0.7 to +5.8).",
+  "split_check": "Foul minus defend was +2.2 points in 2012-19 (CI -0.6 to +4.8) and +3.3 in 2020-26 (CI +0.7 to +5.8).",
   "chart": {
     "type": "line",
     "title": "CBB: leader win % up 3, by seconds left at trailer possession start",

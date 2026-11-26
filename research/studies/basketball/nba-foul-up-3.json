@@ -2,19 +2,19 @@
   "id": "nba-foul-up-3",
   "sport": "NBA",
   "question": "Up 3 in the last 12 seconds, should the leader foul or defend?",
-  "answer": "No clear edge: leader wins 92.7% fouling, 91.4% defending; +2.3 pp at equal time (CI -2.4 to +6.4).",
+  "answer": "There is no clear edge. The leader wins 92.7% of the time fouling and 91.4% defending, +2.3 points at equal time (CI -2.4 to +6.4).",
   "findings": [
-    "Leader win: foul 92.7% (CI 88.5%-95.5%, n=219), defend 91.4% (CI 89.9%-92.6%, n=1585).",
-    "Same-time difference (foul minus defend): +2.3 pp (95% CI -2.4 to +6.4).",
-    "Reached OT: foul 9.6%, defend 14.3%. Lost in regulation: foul 1.8%, defend 1.6%.",
-    "Leader win rate once in OT: foul 42.9% (n=21), defend 50.4% (n=226)."
+    "Leader win rate: 92.7% fouling (CI 88.5%-95.5%, n=219) and 91.4% defending (CI 89.9%-92.6%, n=1585).",
+    "The difference at the same time left (foul minus defend) is +2.3 points (95% CI -2.4 to +6.4).",
+    "The game reached OT 9.6% of the time after a foul and 14.3% after defending. The leader lost in regulation 1.8% and 1.6% of the time.",
+    "Once in OT, the leader won 42.9% after fouling (n=21) and 50.4% after defending (n=226)."
   ],
-  "method": "First trailer possession per game that is live with 12 s or less, final regulation period, down 3. Foul = leader's non-shooting foul sending trailer to the line before any shot. Compared within possession-start bins (4-8, 8-12, 12+ s); outcome = game win incl. OT.",
+  "method": "The sample is the first trailing-team possession of each game that is live with 12 seconds or less left in the final regulation period, down 3. A foul is the leader's non-shooting foul that sends the trailing team to the line before any shot. Fouling and defending are compared within possession-start bins (4-8, 8-12, 12+ s), and the outcome is the game win, including OT.",
   "data": "ESPN play-by-play via sportsdataverse, NBA, 2011-12 to 2025-26, 1,804 games.",
   "n": 1804,
   "robust": false,
   "interest": 4,
-  "split_check": "Foul minus defend: -0.4 pp in 2012-19 (CI -10.0 to +7.4), +2.8 in 2020-26 (CI -2.9 to +7.7).",
+  "split_check": "Foul minus defend was -0.4 points in 2012-19 (CI -10.0 to +7.4) and +2.8 in 2020-26 (CI -2.9 to +7.7).",
   "chart": {
     "type": "line",
     "title": "NBA: leader win % up 3, by seconds left at trailer possession start",

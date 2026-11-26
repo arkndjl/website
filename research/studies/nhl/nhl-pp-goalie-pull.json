@@ -2,19 +2,19 @@
   "id": "nhl-pp-goalie-pull",
   "sport": "NHL",
   "question": "Should a team down one late pull its goalie on a power play?",
-  "answer": "Yes with 3:00 or less left: 6v4 adds 8 pts of tie chance at 2:00. Past 4:00 the gain is not clear.",
+  "answer": "Yes, with 3:00 or less left. 6v4 adds 8 points of tie chance at 2:00. Past 4:00 the gain isn't clear.",
   "findings": [
-    "6v4: 14.5 GF/60 (12.1-17.1), 12.4 GA/60 (10.1-15.0); 464 min, 208 goals.",
-    "5v4 trailing, 3rd period: 8.5 GF/60 (7.9-9.1), 1.2 GA/60; 5,159 min.",
-    "Minor at 2:00 left, down 1: 31% level at 60:00 with 6v4 vs 24% at 5v4 (diff CI 3 to 12 pts).",
-    "Minor at 4:00 left: +3.7 pts (-0.4 to 7.6), not distinguishable from zero."
+    "6v4: 14.5 GF/60 (12.1-17.1) and 12.4 GA/60 (10.1-15.0), over 464 min and 208 goals.",
+    "5v4 trailing in the 3rd period: 8.5 GF/60 (7.9-9.1) and 1.2 GA/60, over 5,159 min.",
+    "On a minor with 2:00 left, down 1, a team is level at 60:00 31% of the time at 6v4 and 24% at 5v4 (difference CI 3 to 12 points).",
+    "On a minor with 4:00 left, the gain is +3.7 points (-0.4 to 7.6), which I can't tell apart from zero."
   ],
-  "method": "Outcome: level or ahead at 60:00. Markov model, 2:00 minor: 6v4 vs 5v4 then optimal even-strength pull; rates from trailing teams in the 3rd period. 6v4 time is chosen late, so its rates carry selection.",
+  "method": "The outcome is being level or ahead at 60:00. A Markov model of a 2:00 minor, 6v4 against 5v4 followed by the optimal even-strength pull, with rates from trailing teams in the 3rd period. 6v4 time is chosen late, so its rates carry selection.",
   "data": "NHL API play-by-play + shift charts, regular seasons 2021-22 to 2024-25, 5,248 games.",
   "n": 5248,
   "robust": true,
   "interest": 4,
-  "split_check": "Gain at 2:00 left: +9 pts in 2021-23, +6 pts in 2023-25.",
+  "split_check": "The gain at 2:00 left was +9 points in 2021-23 and +6 points in 2023-25.",
   "chart": {
     "type": "line",
     "title": "Tie chance, down 1, minor called at time t",

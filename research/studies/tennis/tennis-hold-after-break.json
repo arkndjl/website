@@ -2,18 +2,18 @@
   "id": "tennis-hold-after-break",
   "sport": "tennis",
   "question": "Do players drop serve more often right after breaking?",
-  "answer": "No. Same player and match: hold rate after breaking is +0.7 pts (men), +0.5 (women) vs after opponent holds.",
+  "answer": "No. For the same player and match, the hold rate after breaking is +0.7 points (men) and +0.5 (women) higher than after the opponent holds.",
   "findings": [
-    "Men: +0.7 pts (95% CI +0.2 to +1.2), 11,796 player-matches.",
-    "Women: +0.5 pts (95% CI -0.2 to +1.2), 7,616 player-matches.",
-    "Raw hold after breaking: men 82.0%, women 69.1%; mostly stronger servers breaking."
+    "Men: +0.7 points (95% CI +0.2 to +1.2), 11,796 player-matches.",
+    "Women: +0.5 points (95% CI -0.2 to +1.2), 7,616 player-matches.",
+    "The raw hold rate after breaking is 82.0% for men and 69.1% for women, which is mostly stronger servers doing the breaking."
   ],
-  "method": "Hold (non-tiebreak games) by whether the server broke in the previous game. Within player-match difference, weighted; bootstrap CI resampling matches. Form swings within a match bias this upward.",
+  "method": "Holds (non-tiebreak games) by whether the server broke in the previous game. It is a weighted difference within each player-match, with a bootstrap CI resampling matches. Form swings within a match bias this upward.",
   "data": "Match Charting Project points, 11,270 matches, 249,107 service games.",
   "n": 249107,
   "robust": true,
   "interest": 3,
-  "split_check": "Pre-2015 / 2015+: men +1.0 / +0.6 pts, women +0.2 / +0.6 pts.",
+  "split_check": "Pre-2015 / 2015+: men +1.0 / +0.6 points, women +0.2 / +0.6 points.",
   "chart": {
     "type": "bar",
     "title": "Hold rate by previous game",

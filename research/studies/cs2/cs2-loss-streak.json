@@ -2,19 +2,19 @@
   "id": "cs2-loss-streak",
   "sport": "CS2",
   "question": "Does a losing streak hurt the next round beyond economy (the no-timeout baseline)?",
-  "answer": "No tilt. After 3+ straight losses a team wins +0.9 pp vs an economy and score model.",
+  "answer": "There is no tilt. After 3+ straight losses a team wins +0.9 points more than an economy and score model expects.",
   "findings": [
-    "After 1 loss in a row: wins 35.8%, model 36.3%, gap -0.4 pp (-0.7 to -0.2 pp, n=136,681).",
-    "After 3 losses in a row: wins 39.5%, model 38.5%, gap +1.1 pp (+0.7 to +1.5 pp, n=51,700).",
-    "After 5 losses in a row: wins 40.8%, model 40.0%, gap +0.8 pp (+0.1 to +1.6 pp, n=15,367).",
-    "bo3.gg round data has no timeout calls, so the timeout effect itself is not measured."
+    "After 1 loss in a row, teams win 35.8% against a model 36.3%, a gap of -0.4 points (-0.7 to -0.2, n=136,681).",
+    "After 3 losses in a row, teams win 39.5% against a model 38.5%, a gap of +1.1 points (+0.7 to +1.5, n=51,700).",
+    "After 5 losses in a row, teams win 40.8% against a model 40.0%, a gap of +0.8 points (+0.1 to +1.6, n=15,367).",
+    "The bo3.gg round data has no timeout calls, so the timeout effect itself isn't measured."
   ],
-  "method": "Logistic baseline on buy-class matchup by side, equipment values, score gap, Elo and round in half; actual minus predicted win rate by current losing streak in the half, map-clustered CIs.",
+  "method": "A logistic baseline on the buy-class matchup by side, equipment values, score gap, Elo and round in the half. The result is the actual minus the predicted win rate by the current losing streak in the half, with map-clustered CIs.",
   "data": "bo3.gg round data, S/A/B-tier pro maps, 2023-10-16 to 2026-11-02, 17,525 maps, 327,073 rounds",
   "n": 327073,
   "robust": true,
   "interest": 3,
-  "split_check": "3+ streak gap: early +0.9 pp (n=55,017), late +0.9 pp (n=55,026).",
+  "split_check": "The 3+ streak gap was +0.9 points early (n=55,017) and +0.9 points late (n=55,026).",
   "chart": {
     "type": "line",
     "title": "Next-round win vs economy model, by losing streak",

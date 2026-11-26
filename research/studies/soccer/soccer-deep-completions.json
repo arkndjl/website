@@ -2,14 +2,14 @@
  "id": "soccer-deep-completions",
  "sport": "soccer",
  "question": "Do deep completions add to xG and market ratings in the soccer game model?",
- "answer": "No. Every weight raised 1X2 log loss on 2015-22 (+.02 to +.46 x1000); never taken to held out.",
+ "answer": "No. Every weight raised 1X2 log loss on 2015-22 (+.02 to +.46 x1000), so it was never taken to the held-out seasons.",
  "findings": [
-  "Best setting (gain .08, weight .03): +.02 x1000, t by day .39, 4/8 seasons better, 19,466 matches.",
-  "Weight .10: +.19 to +.46 x1000 (t up to 2.29). More deep weight is worse.",
-  "Moving .05 of the xG weight to deep: +.21 x1000, t 1.61. Deep is weaker than xG at the same weight.",
-  "Base: market ratings carry ~.89 of the blend, xG .11; a process stat has little room."
+  "The best setting (gain .08, weight .03) was +.02 x1000, t by day .39, better in 4/8 seasons, over 19,466 matches.",
+  "At a weight of .10 it was +.19 to +.46 x1000 (t up to 2.29). More weight on deep completions is worse.",
+  "Moving .05 of the xG weight to deep was +.21 x1000, t = 1.61. Deep is weaker than xG at the same weight.",
+  "In the base model the market ratings carry ~.89 of the blend and xG .11, so a process stat has little room."
  ],
- "method": "Deep completions (Understat 'deep', passes completed within ~20 m of goal) on the goal scale by one ratio (.234 goals per deep, big five 2015-22), walked as a fifth side rating like xG. Scored on 90-minute 1X2 log loss, paired by match; t from match-day sums. Pre-registered grid; held 2023-26 untouched.",
+ "method": "Deep completions (Understat 'deep', passes completed within ~20 m of goal) are put on the goal scale by one ratio (.234 goals per deep, big five 2015-22) and walked as a fifth side rating like xG. They are scored on 90-minute 1X2 log loss, paired by match, with t from match-day sums. The grid was pre-registered, and held 2023-26 is untouched.",
  "data": "ESPN results + football-data closes + Understat team match histories, big five 2015-22 scored with UEFA matches; 21,359 matches with deep counts.",
  "n": 19466,
  "robust": true,

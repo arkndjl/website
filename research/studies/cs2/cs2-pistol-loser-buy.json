@@ -2,19 +2,19 @@
   "id": "cs2-pistol-loser-buy",
   "sport": "CS2",
   "question": "After losing the pistol round, should the team save or buy on round 2?",
-  "answer": "Buying on round 2: +26.8 pp in round 2, -16.5 pp in round 3, map win -0.8 pp (not different from 0).",
+  "answer": "Buying on round 2 is worth +26.8 points in round 2 and -16.5 points in round 3. The map win is -0.8 points, which isn't different from 0.",
   "findings": [
-    "CT buy vs save, adjusted: R2 +25.0 pp (+24.0 to +25.9 pp), R3 -17.0 pp (-18.6 to -15.5 pp). 66% of CT losers buy.",
-    "T buy vs save, adjusted: R2 +28.3 pp (+27.3 to +29.4 pp), R3 -16.0 pp (-17.6 to -14.5 pp). 50% of T losers buy.",
-    "Map win, buy vs save: CT -1.1 pp (-2.6 to +0.3 pp), T -0.8 pp (-2.2 to +0.7 pp).",
-    "First-half rounds won (of 12), buy vs save: CT +0.30 (+0.20 to +0.40), T +0.27 (+0.17 to +0.37)."
+    "CT buy against save, adjusted: R2 +25.0 points (+24.0 to +25.9), R3 -17.0 points (-18.6 to -15.5). 66% of CT losers buy.",
+    "T buy against save, adjusted: R2 +28.3 points (+27.3 to +29.4), R3 -16.0 points (-17.6 to -14.5). 50% of T losers buy.",
+    "Map win, buy against save: CT -1.1 points (-2.6 to +0.3), T -0.8 points (-2.2 to +0.7).",
+    "First-half rounds won (of 12), buy against save: CT +0.30 (+0.20 to +0.40), T +0.27 (+0.17 to +0.37)."
   ],
-  "method": "Pistol loser's round-2 buy class from bo3.gg equipment value (save = eco, buy = half/force). Logistic models adjust for side, team Elo, winner's round-2 equipment, loser's pistol kills and half; cluster-robust CIs by map.",
+  "method": "The pistol loser's round-2 buy class comes from bo3.gg equipment value (a save is an eco, and a buy is a half or force buy). Logistic models adjust for side, team Elo, the winner's round-2 equipment, the loser's pistol kills and the half, with cluster-robust CIs by map.",
   "data": "bo3.gg round data, S/A/B-tier pro maps, 2023-10-16 to 2026-11-02, 17,525 maps, 34,640 pistol-loss halves (16,992 CT)",
   "n": 34640,
   "robust": false,
   "interest": 4,
-  "split_check": "Map effect early/late: CT -1.1 pp / -1.1 pp, T +0.9 pp / -2.6 pp.",
+  "split_check": "Map effect early / late: CT -1.1 points / -1.1 points, T +0.9 points / -2.6 points.",
   "chart": {
     "type": "bar",
     "title": "Pistol loser win %, save vs buy on round 2",

@@ -2,19 +2,19 @@
  "id": "cs2-ark-loop",
  "sport": "CS2",
  "question": "Does retuning the CS2 ARK rating every month beat keeping its settings fixed?",
- "answer": "Monthly retune passes; retunes ship monthly: -0.0018 log loss per series, t by month -8.66 (bar -2.00), through 2026-10.",
+ "answer": "The monthly retune passes, and retunes ship monthly: -0.0018 log loss per series, t by month -8.66 (bar -2.00), through 2026-10.",
  "findings": [
-  "Won 16 of 16 months; top-50 series t -0.06.",
-  "Calibration slope 0.964 on 15,957 scored series.",
-  "Picks: span 0.3 (14 months), K 384 (2 months).",
-  "Shipped span 0.3."
+  "It won 16 of 16 months. On top-50 series, t = -0.06.",
+  "The calibration slope is 0.964 on 15,957 scored series.",
+  "Settings picked: span 0.3 (14 months), K 384 (2 months).",
+  "Shipped: span 0.3."
  ],
- "method": "Each month, the settings with the lowest log loss on all earlier series are picked from the shipped set and one-step moves on K, K decay, map K, lower-tier K, region K, span and new-player start, then scored once on that month against the shipped settings.",
+ "method": "Each month, the settings with the lowest log loss on all earlier series are picked from the shipped set and from one-step moves on K, K decay, map K, lower-tier K, region K, span and new-player start. They are then scored once on that month against the shipped settings.",
  "data": "Valve VRS series + bo3.gg maps, Aug 2024 to 2026-10, 15,957 walk-forward series.",
  "n": 15957,
  "robust": true,
  "interest": 3,
- "split_check": "16/16 months better; top-50 t -0.06.",
+ "split_check": "16/16 months better, top-50 t = -0.06.",
  "chart": {
   "type": "bar",
   "title": "Log loss, monthly retune minus fixed",

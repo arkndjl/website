@@ -2,14 +2,14 @@
   "id": "tennis-second-serve-first-serve",
   "sport": "tennis",
   "question": "Should players hit a first serve on second serve?",
-  "answer": "No. 1 of 188 men and 0 of 112 women gain with CI above 0. Median player loses 6.8 pts (men), 5.3 (women) per 100.",
+  "answer": "No. 1 of 188 men and 0 of 112 women gain with a CI above 0. The median player loses 6.8 points per 100 (men) and 5.3 (women).",
   "findings": [
-    "Men: 152 of 188 lose with 95% CI below zero; 1 gain with CI above zero.",
-    "Women: 80 of 112 lose with 95% CI below zero; 0 gain with CI above zero.",
-    "Pooled men: 1st serve wins 44.6% per attempt vs 2nd 51.0%.",
-    "Pooled women: 1st serve wins 40.0% per attempt vs 2nd 45.4%."
+    "Men: 152 of 188 lose with a 95% CI below zero, and 1 gains with a CI above zero.",
+    "Women: 80 of 112 lose with a 95% CI below zero, and 0 gain with a CI above zero.",
+    "Pooled men: a 1st serve wins 44.6% per attempt, against 51.0% for a 2nd.",
+    "Pooled women: a 1st serve wins 40.0% per attempt, against 45.4% for a 2nd."
   ],
-  "method": "Per server: P(1st in) x P(win | 1st in) minus P(2nd in) x P(win | 2nd in). Bootstrap 95% CI resampling matches. Assumes first-serve in-rate and win rate hold on second-serve points.",
+  "method": "For each server: P(1st in) x P(win | 1st in) minus P(2nd in) x P(win | 2nd in), with a bootstrap 95% CI resampling matches. It assumes the first-serve in-rate and win rate hold on second-serve points.",
   "data": "Match Charting Project points, 1960-2026 (71% of matches 2015+), 11,785 matches; servers with 500+ second serves.",
   "n": 300,
   "robust": true,

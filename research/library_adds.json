@@ -5,12 +5,12 @@
    "after": "Transfer% (Xfer%)",
    "entry": {
     "term": "Transfer landing (CBB): distance from home",
-    "short": "Two terms for the miles from a player's hometown to each school: log distance and inside 150 miles.",
+    "short": "Two terms for the miles from a player's hometown to each school: log distance, and inside 150 miles.",
     "body": [
-     "Hometown from the recruiting history (ranked recruits: 27% of moves). No hometown on file: both terms are 0 for every school.",
-     "Fit 2022-24 moves, held 2025-26 moves with a hometown (n 371):",
-     "log loss of the chosen school 5.395 -> 5.244 (t 4.56 by origin team), top-10 hit 12.1% -> 21.8%. All moves: top-10 12.6% -> 15.1%.",
-     "A school within 150 miles of home: coefficient +.52; log miles -.35."
+     "The hometown comes from the recruiting history (ranked recruits, 27% of moves). With no hometown on file, both terms are 0 for every school.",
+     "Fit on 2022-24 moves and held on 2025-26 moves with a hometown (n 371),",
+     "log loss of the chosen school goes from 5.395 to 5.244 (t = 4.56 by origin team), and the top-10 hit rate from 12.1% to 21.8%. On all moves, top-10 goes from 12.6% to 15.1%.",
+     "A school within 150 miles of home has a coefficient of +.52, and log miles -.35."
     ],
     "where": "CBB transfer watch, team builder",
     "sports": [
@@ -23,12 +23,12 @@
    "after": "Staff score / coach pay",
    "entry": {
     "term": "Coach pay (CBB): program spending",
-    "short": "Men's basketball expenses from the Equity in Athletics survey enter the pay model.",
+    "short": "Men's basketball expenses from the Equity in Athletics survey go into the pay model.",
     "body": [
-     "ln(men's basketball expenses), z-scored inside the academic year, newest year ending before the season.",
-     "Leave one school out, 746 pay rows at 79 public schools: RMSE of ln pay .336 -> .280, R2 .50 -> .65 (t 3.95 by school).",
-     "Kept drivers: spending, tenure, high-major, program level.",
-     "The survey covers private schools, so their value estimate reads a measured budget."
+     "ln(men's basketball expenses), z-scored inside the academic year, from the newest year ending before the season.",
+     "Leaving one school out, on 746 pay rows at 79 public schools, RMSE of ln pay goes from .336 to .280 and R² from .50 to .65 (t = 3.95 by school).",
+     "The drivers kept are spending, tenure, high-major and program level.",
+     "The survey covers private schools too, so their value estimate reads a measured budget."
     ],
     "where": "CBB coach pay, coaching jobs",
     "sports": [
@@ -43,11 +43,11 @@
     "term": "Bracket Matrix stack (Selection Sunday)",
     "short": "On Selection Sunday the committee model is stacked with the Bracket Matrix's final consensus.",
     "body": [
-     "Seed line = a + b x model line + c x matrix average seed",
-     "at-large score = a + b x model logit + c x share of brackets naming the team.",
-     "Fit 2015-19, held 2021-26. Seeds (408 teams): log loss 1.257 -> 1.007 (t -3.08 by season, 5 of 6), exact line 51% -> 68%.",
-     "At-large (1,902 candidates): .0507 -> .0296 (t -3.88, 5 of 6).",
-     "Used only when the regular season is over and no bracket is out. Earlier dates are logged daily and scored once after the season."
+     "Seed line = a + b × model line + c × matrix average seed.",
+     "At-large score = a + b × model logit + c × share of brackets naming the team.",
+     "Fit 2015-19 and held 2021-26. Seeds (408 teams): log loss goes from 1.257 to 1.007 (t = -3.08 by season, 5 of 6), and the exact line from 51% to 68%.",
+     "At-large (1,902 candidates): from .0507 to .0296 (t = -3.88, 5 of 6).",
+     "It is used only when the regular season is over and no bracket is out. Earlier dates are logged daily and scored once after the season."
     ],
     "where": "CBB tournament odds",
     "sports": [
@@ -60,14 +60,14 @@
    "after": "+ (young for the grade)",
    "entry": {
     "term": "Estimated age (CBB, birth year only)",
-    "short": "A birth-year-only player gets the mean birth day for his class, not Oct 15.",
+    "short": "A player with only a birth year gets the mean birth day for his class, instead of Oct 15.",
     "body": [
      "k = first D-I season - birth year - (class - 1).",
-     "Mean day of year by k from 16,744 day-precise careers: k 19 Apr 30, k 20 Jul 24, k 21+ Aug 22.",
-     "Held out on 942 board players who entered 2023 or later:",
-     "mean absolute age error .347 yr (Oct 15) and .258 (Jul 1) -> .237 (t 15.6 and 5.8).",
-     "FIBA youth rosters on file add a day-precise date when the birth year agrees with Barttorvik's:",
-     "1,401 of 1,427 checked dates within 3 days."
+     "Mean day of the year by k, from 16,744 day-precise careers: k 19 Apr 30, k 20 Jul 24, k 21+ Aug 22.",
+     "Held out on 942 board players who entered in 2023 or later,",
+     "mean absolute age error goes from .347 yr (Oct 15) and .258 (Jul 1) to .237 (t = 15.6 and 5.8).",
+     "FIBA youth rosters on file add a day-precise date when the birth year agrees with Barttorvik's.",
+     "1,401 of 1,427 checked dates were within 3 days."
     ],
     "where": "CBB board age",
     "sports": [
@@ -82,10 +82,10 @@
     "term": "xTerm",
     "short": "The contract length, in years, a player would sign for as a free agent now.",
     "body": [
-     "Same inputs and signings as xAAV (3,242 CapWages deals 2010-26), linear in years, clipped 1-8.",
-     "Held out a signing year at a time: mean miss .83 years vs 1.00 by position x age (t -13.0, 16/17 years)",
-     "forward 2016-26 .82 vs 1.01 (t -12.2, 11/11).",
-     "Surplus = (xAAV - cap hit) x seasons left on the current deal."
+     "It uses the same inputs and signings as xAAV (3,242 CapWages deals 2010-26), linear in years and clipped 1-8.",
+     "Held out a signing year at a time, the mean miss is .83 years, compared to 1.00 by position × age (t = -13.0, 16/17 years),",
+     "and forward 2016-26 it is .82 compared to 1.01 (t = -12.2, 11/11).",
+     "Surplus = (xAAV - cap hit) × seasons left on the current deal."
     ],
     "where": "NHL contract value tab (xTerm, Surplus)",
     "sports": [
@@ -98,15 +98,15 @@
    "after": "P20 / P50 / P80 projections",
    "entry": {
     "term": "Exit hurdle (NHL / NBA 3Y)",
-    "short": "3Y WAR = the chance he plays in the next three seasons x his WAR if he does.",
+    "short": "3Y WAR is the chance he plays in the next three seasons × his WAR if he does.",
     "body": [
-     "Stay chance: logistic on pWAR pace, age, age squared, ln TOI per 82 and share of team games played.",
-     "WAR if he plays: the 3Y form refit on players who stayed.",
-     "Leave one season out 2010-23: skaters RMSE 2.455 -> 2.447 (t -6.9 by season, 14 of 14), goalies 4.074 -> 4.066 (t -3.0, 10 of 14).",
-     "Kept at every season share .1 to 1.",
-     "IN 3Y column (skaters): chance he plays in season S+3; held-out error under 3 points in every tenth.",
-     "Goalies fail that check (up to 10 points) and get no column.",
-     "NBA: 3Y XPM = stay x XPM given he plays + (1 - stay) x -2. Numbers under 1Y / 3Y XPM."
+     "The stay chance is a logistic on pWAR pace, age, age squared, ln TOI per 82 and the share of team games played.",
+     "WAR if he plays is the 3Y form refit on the players who stayed.",
+     "Leaving one season out 2010-23, skaters RMSE goes from 2.455 to 2.447 (t = -6.9 by season, 14 of 14) and goalies from 4.074 to 4.066 (t = -3.0, 10 of 14).",
+     "It is kept at every season share from .1 to 1.",
+     "The IN 3Y column (skaters) is the chance he plays in season S+3. Its held-out error is under 3 points in every tenth.",
+     "Goalies fail that check (up to 10 points), so they get no column.",
+     "NBA: 3Y XPM = stay × XPM given he plays + (1 - stay) × -2. The numbers are under 1Y / 3Y XPM."
     ],
     "where": "NHL value board (3Y, IN 3Y); NBA VORX/XPM leaders (3Y)",
     "sports": [
@@ -122,12 +122,12 @@
     "term": "Altitude gap (internationals)",
     "short": "Goal rates shift by .35 per km the venue sits above the visitor's home ground, past the first 1,000 m.",
     "body": [
-     "Gap = max(0, venue - visitor home - 1,000 m) less the same for the home side, in km.",
-     "Elevations: SRTM 90 m at the venue city; a nation's home elevation = median of its home venues since 1990.",
-     "Tuned 2000-15 (c .35 from 0 to .5). Held 2016 to Jul 2026, 9,734 matches, 464 with a gap:",
-     "log loss t -2.59 by match day with frozen rates, -3.51 in the model (.85529 -> .85402); 10 of 11 years",
+     "Gap = max(0, venue - visitor home - 1,000 m) minus the same for the home side, in km.",
+     "Elevations are SRTM 90 m at the venue city, and a nation's home elevation is the median of its home venues since 1990.",
+     "Tuned on 2000-15 (c .35, from 0 to .5). Held 2016 to Jul 2026, 9,734 matches, 464 with a gap:",
+     "log loss t = -2.59 by match day with frozen rates and -3.51 in the model (.85529 to .85402), 10 of 11 years,",
      "Holm p .020 over four sports.",
-     "Failed in CFB (held t +1.02) and CBB (held t -0.49, tune wrong sign). MLS not run."
+     "It failed in CFB (held t = +1.02) and CBB (held t = -0.49, with the wrong sign in tuning). MLS wasn't run."
     ],
     "where": "Soccer internationals",
     "sports": [
@@ -142,12 +142,12 @@
     "term": "Held-out coverage (80% ranges)",
     "short": "How often the outcome landed inside the printed 80% range, on seasons scored after the range was set.",
     "body": [
-     "CBB FV range: 91.1% (n 1199, boards 2013-16), too wide: the floor at 20 sits inside most ranges.",
+     "The CBB FV range covers 91.1% (n 1199, boards 2013-16), which is too wide, since the floor at 20 sits inside most ranges.",
      "A conformal correction leaves it at 91.0%.",
-     "NBA 3Y (shrunk target) conformal band by projection group: 80.3% overall, 75.9% at proj 2+, 83.6% at 0-2.",
-     "NHL 3Y skaters conformal band: 77.9% overall, 75.7% at pWAR .5-2.",
-     "Tolerance was 3 points in every group of 100+: none passed, so no range on the site changed.",
-     "CFB FV, NFL 3Y and rank ranges not scored (rows not rebuildable here)."
+     "The NBA 3Y (shrunk target) conformal band by projection group covers 80.3% overall, 75.9% at proj 2+ and 83.6% at 0-2.",
+     "The NHL 3Y skaters conformal band covers 77.9% overall and 75.7% at pWAR .5-2.",
+     "The tolerance was 3 points in every group of 100+. None passed, so no range on the site changed.",
+     "The CFB FV, NFL 3Y and rank ranges weren't scored, since their rows can't be rebuilt."
     ],
     "where": "Process",
     "sports": [
@@ -162,15 +162,15 @@
    "after": "Held out / LOSO / LOCO",
    "entry": {
     "term": "Ship gate, placebo-calibrated",
-    "short": "Null inputs through the tune/held gate: 0 of 1,200 passed.",
+    "short": "I ran null inputs through the tune/held gate, and 0 of 1,200 passed.",
     "body": [
-     "200 placebos per sport (NBA, NFL, CBB, CFB, NHL, soccer):",
-     "rest and recent-form columns permuted across the games of a day, or swapped between teams inside a season",
+     "200 placebos for each sport (NBA, NFL, CBB, CFB, NHL, soccer):",
+     "rest and recent-form columns permuted across the games of a day, or swapped between teams inside a season,",
      "stacked on the model's walk-forward number.",
-     "False passes: 0 of 1,200 under both gates (95% upper bound .31%). Held t <= -2 alone: 4 of 1,200 (.33%; nominal 2.3%).",
-     "Held t sd .89: the clustered t is conservative, an extra null column costs a parameter (mean t +.44).",
-     "Same recipe as a column of the real NBA design: 0 of 200. The gate stands.",
-     "Registered Nov 19 2026: 87.7% of 24 rebuilt kept terms forecast to keep their sign on the 2026-27 lockbox (80% interval",
+     "False passes were 0 of 1,200 under both gates (95% upper bound .31%). Held t <= -2 alone passed 4 of 1,200 (.33%; nominal 2.3%).",
+     "The held t has an sd of .89, so the clustered t is conservative, and an extra null column costs a parameter (mean t +.44).",
+     "The same recipe as a column of the real NBA design passed 0 of 200. The gate stands.",
+     "Registered Nov 19 2026: 87.7% of 24 rebuilt kept terms are forecast to keep their sign on the 2026-27 lockbox (80% interval",
      "79.2-95.8%)."
     ],
     "where": "Process",
@@ -189,12 +189,12 @@
    "after": "VORX",
    "entry": {
     "term": "MD / PAOE (matchups)",
-    "short": "MD: points per 100 matchup possessions a defender's assignments scored against everyone. PAOE: what they scored against him minus MD, shrunk by poss / (poss + 300).",
+    "short": "MD is the points per 100 matchup possessions a defender's assignments scored against everyone. PAOE is what they scored against him minus MD, shrunk by poss / (poss + 300).",
     "body": [
-     "Source rows: one defender on one offensive player in one game (NBA.com box score matchups via shufinskiy/nba_data)",
-     "partial possessions and points. Each assignment's season rate is pulled toward the league by 100 possessions.",
-     "Defenders with 1,000+ partial possessions. Odd/even game reliability of PAOE at 1,000+ possessions: r .82 (2017-18 to 2025-26).",
-     "As a prior-season team-defence input PAOE did not help (team net RMSE 3.528 vs 3.525, held 2023-26 t +0.13): display only."
+     "The source rows are one defender on one offensive player in one game (NBA.com box score matchups via shufinskiy/nba_data),",
+     "with partial possessions and points. Each assignment's season rate is pulled toward the league by 100 possessions.",
+     "Defenders need 1,000+ partial possessions. The odd/even game reliability of PAOE at 1,000+ possessions is r .82 (2017-18 to 2025-26).",
+     "As a prior-season team-defence input, PAOE did not help (team net RMSE 3.528 compared to 3.525, held 2023-26 t = +0.13), so it is display only."
     ],
     "where": "NBA VORX/XPM leaders > matchups",
     "sports": [
@@ -209,9 +209,9 @@
     "term": "Managers (soccer)",
     "short": "League goal difference a match above the game model's pre-match expectation, by manager.",
     "body": [
-     "Residual = actual 90-minute GD minus the walk-forward model's expected GD; shrunk with 40 average matches",
-     "100+ matches, 2012-13 to 2025-26 (Transfermarkt managers).",
-     "As a term in a manager's first 10 matches at a new club: held 2023-26 t -0.05 (failed)."
+     "Residual = the actual 90-minute GD minus the walk-forward model's expected GD, shrunk with 40 average matches,",
+     "for managers with 100+ matches, 2012-13 to 2025-26 (Transfermarkt managers).",
+     "As a term in a manager's first 10 matches at a new club it failed (held 2023-26 t = -0.05)."
     ],
     "where": "Soccer managers tab",
     "sports": [
@@ -226,10 +226,10 @@
     "term": "Shots rating (national teams)",
     "short": "A second attack/defence pair from shots on target, blended into the national-team match model.",
     "body": [
-     "Target = shots on target x running goals a shot on target (about .3); same update as goals.",
-     "Goal means move by .15 x (shots gap - goals gap) in logs once both sides have 5 matches with ESPN stats (12 competitions",
+     "Target = shots on target × running goals a shot on target (about .3), with the same update as goals.",
+     "Goal means move by .15 × (shots gap - goals gap) in logs once both sides have 5 matches with ESPN stats (12 competitions,",
      "2010 on).",
-     "Held 2016 to Jul 2026 on 5,191 matches where it applies: 1X2 log loss .8699 -> .8680, t -4.18, 9/11 years."
+     "Held 2016 to Jul 2026 on the 5,191 matches where it applies, 1X2 log loss goes from .8699 to .8680, t = -4.18, 9/11 years."
     ],
     "where": "Soccer internationals, Nations League odds",
     "sports": [
@@ -242,14 +242,14 @@
    "after": "Tennis picks",
    "entry": {
     "term": "Set-score chances (tennis)",
-    "short": "Chance of each final set score (2-0, 2-1, ... 0-3) for a tennis match, from the match chance.",
+    "short": "The chance of each final set score (2-0, 2-1, ... 0-3) for a tennis match, from the match chance.",
     "body": [
-     "Each set is won with one per-match logit x + tau x e:",
+     "Each set is won with one per-match logit x + tau × e.",
      "e is a standard normal drawn once a match, so a player who is better on the day stays better across sets.",
-     "x is solved so the set scores add back to the model's match chance exactly; tau = 1.1, fit on 2012-22 tour main draws.",
-     "Held out 2023 to Nov 10 2026 (n 20,336): exact set-score log loss 1.2870 with independent sets",
-     "1.2668 with tau (t -11.3 by tournament, 4 of 4 seasons).",
-     "Shown under each match card's win bar. Model numbers only; no market line."
+     "x is solved so the set scores add back to the model's match chance exactly. tau = 1.1, fit on 2012-22 tour main draws.",
+     "Held out 2023 to Nov 10 2026 (n 20,336), exact set-score log loss is 1.2870 with independent sets",
+     "and 1.2668 with tau (t = -11.3 by tournament, 4 of 4 seasons).",
+     "It is shown under each match card's win bar. These are model numbers only, with no market line."
     ],
     "where": "Tennis ARKBOARD: matches tab cards",
     "sports": [
@@ -262,16 +262,16 @@
    "after": "P20 / P50 / P80 projections",
    "entry": {
     "term": "Award odds",
-    "short": "Chance of each award: a voter model on simulated rests of the season, blended with Polymarket where a liquid market is open.",
+    "short": "The chance of each award, from a voter model on simulated rests of the season, blended with Polymarket where a liquid market is open.",
     "body": [
-     "Model: 3,000 simulated rests of the season, each finish scored by a voter model fit on past ballots.",
-     "Blend: model^.05 x market^.95, renormalised. 7 held 2025-26 races, winner log loss: model 2.32, market 1.12, blend 1.13 (t -2.3).",
-     "Blended only when the event has 3+ two-sided quotes, prices summing within 25% of 1 and $50,000 traded. Otherwise model only.",
-     "The cell hover keeps the model number; the weekly ledger scores the model alone against the market.",
-     "Conviction view: P(lead) = share of simulations in which he leads the award's pool on this season's value alone.",
-     "Games left run at this season's own rate: no last season, no shrunk or predictive rate, no voter model, no market.",
-     "NFL and CFB: SVAR by position (no SV: OL, K, P; CFB defence). NBA VORX, D-XPM for DPOY; NHL WAR, GSAx for Vezina; CBB BPM.",
-     "Soccer: SVAR (GAR rebuilt from this season alone: one-season xG plus-minus, finishing and keeper saves at face value)."
+     "The model is 3,000 simulated rests of the season, with each finish scored by a voter model fit on past ballots.",
+     "The blend is model^.05 × market^.95, renormalised. On 7 held 2025-26 races, winner log loss was 2.32 for the model, 1.12 for the market and 1.13 for the blend (t = -2.3).",
+     "It is blended only when the event has 3+ two-sided quotes, prices summing within 25% of 1 and $50,000 traded. Otherwise it is the model only.",
+     "The cell hover keeps the model number, and the weekly ledger scores the model alone against the market.",
+     "Conviction view: P(lead) is the share of simulations in which he leads the award's pool on this season's value alone.",
+     "The games left run at this season's own rate, with no last season, no shrunk or predictive rate, no voter model and no market.",
+     "NFL and CFB use SVAR by position (no SV for OL, K, P or CFB defence). NBA uses VORX, and D-XPM for DPOY. NHL uses WAR, and GSAx for the Vezina. CBB uses BPM.",
+     "Soccer uses SVAR (GAR rebuilt from this season alone: a one-season xG plus-minus, with finishing and keeper saves at face value)."
     ],
     "where": "Awards tabs (predictive awards, conviction awards): NBA, NFL, NHL, CFB, CBB, soccer",
     "sports": [
@@ -291,21 +291,21 @@
     "term": "Opponent adjustment (player and lineup rates)",
     "short": "A game's rate minus what that opponent allowed in its other games, shrunk.",
     "body": [
-     "adjusted = value - exposure x D[opponent]. D = the opponent's allowed rate in its other games minus the league's,",
-     "shrunk toward 0 by n / (n + K). Kept only where the odd / even game split-half r of a season rises",
+     "adjusted = value - exposure × D[opponent]. D is the opponent's allowed rate in its other games minus the league's,",
+     "shrunk toward 0 by n / (n + K). It is kept only where the odd / even game split-half r of a season rises",
      "(paired bootstrap P >= .90 on held seasons) and the first part of a season predicts the rest no worse.",
      "NBA lineups and on/off (held 2025-26): fives r .13 to .17, trios .35 to .41, pairs .50 to .55, on-off .22 to .24.",
      "Soccer GAR inputs (held 2022-26): on-pitch xG for .65 to .70, against .45 to .54, buildup .64 to .65.",
      "College basketball lineups and on/off (2025-26, 6,247 games): the opponent is its season offence and defence rating,",
-     "schedule counted, with a home term. Odd / even r: fives .18 to .25, pairs .48 to .64, on court .54 to .69, on-off .08 to .12.",
-     "First half to second half with ratings solved apart on each side: pairs r .41 to .44 (t -6.3), on court .46 to .50 (t -4.4).",
+     "with schedule counted and a home term. Odd / even r: fives .18 to .25, pairs .48 to .64, on court .54 to .69, on-off .08 to .12.",
+     "First half to second half, with ratings solved apart on each side: pairs r .41 to .44 (t = -6.3), on court .46 to .50 (t = -4.4).",
      "Failed: NHL goalie GSAx against opposing finishing (P .18 to .60), NHL lines, pairs and on-ice xG (P .02 to .77),",
-     "NBA box value (+.003, too small to move a rank).",
-     "Adjusted at the source already: XPM, college BPM, tennis SPW+ / RPW+, CS2 and 1NT RWA, team units, every game model.",
-     "Weather, tested Nov 20 2026 (airport hourly observations nearest the venue), none used:",
-     "soccer, 24,926 matches 2013-26: wet +2% goals, cold -0.7% per F under 40, wind -0.3% per mph over 10; walk-forward totals",
-     "deviance t +.1 to -1.5, xG totals worse. Tennis, 1,125 outdoor events: +.37 serve points won and +.50 aces per 100",
-     "per 10 F inside an event (held 2020-26 t -2.7), .04% of the error and no match dates or forecast feed."
+     "and NBA box value (+.003, too small to move a rank).",
+     "Already adjusted at the source: XPM, college BPM, tennis SPW+ / RPW+, CS2 and 1NT RWA, team units and every game model.",
+     "I tested weather (airport hourly observations nearest the venue), and none of it is used.",
+     "Soccer, 24,926 matches 2013-26: wet +2% goals, cold -0.7% per F under 40, wind -0.3% per mph over 10. Walk-forward totals",
+     "deviance was t = +.1 to -1.5, and xG totals were worse. Tennis, 1,125 outdoor events: +.37 serve points won and +.50 aces per 100",
+     "per 10 F inside an event (held 2020-26 t = -2.7), which is .04% of the error, and there are no match dates or forecast feed."
     ],
     "where": "NBA and college basketball lineups, on/off, lineup leaders; soccer GAR",
     "sports": [
@@ -322,20 +322,20 @@
    "after": "Game projection",
    "entry": {
     "term": "Games to watch (W)",
-    "short": "The next seven days' best games across every sport, 0-100.",
+    "short": "The best games of the next seven days across every sport, on a 0-100 scale.",
     "body": [
-     "W = 100 x (.30 Q + .20 C + .20 S + .20 L + .10 T) + bonus, cap 100. Display only, no backtest.",
-     "Q quality: each side 1 - (rank - .5) / min(N, 60) in the sport's rating order, 0 past 60; mean of the two.",
-     "C closeness: 1 - (P home - P away)^2, percentile among the sport's games. T total: projected points or goals, percentile.",
-     "S stars: each side's top three players by the sport's value (NFL WAR, NBA VORX, NHL WAR, soccer GAR, college FV - 20)",
-     "x chance to play (injury tags: out / IR 0, doubtful .25, questionable / day-to-day .6; the game model's play chances first),",
-     "weighted 1 / .7 / .5, scored by rank in the sport's teams like Q.",
-     "L leverage: a target's swing from one result, dP = phi(Phi^-1(p)) / sqrt(n / 4 + 1 / 2), p = the season sims' odds,",
-     "n = games left; playoff 1, division / bye / top four .5, soccer title and relegation 1; side L = min(1, sum / .35);",
-     "game L = .6 x higher side + .4 x lower; postseason games 1. Tennis and CS2: round and format levels.",
-     "Bonus: named rivalry 6, division or conference game 2, both ranked 4, one ranked 1. Top 15, at most 4 a sport.",
-     "A listed game that starts moves to \"scores\" with its W frozen and its live / final score (ESPN scoreboard; tennis and CS2 from the site's files); it drops 24 hours after the final.",
-     "Source: scripts/watch_games.py -> data/watch.json, every half hour."
+     "W = 100 × (.30 Q + .20 C + .20 S + .20 L + .10 T) + bonus, capped at 100. It is display only, with no backtest.",
+     "Q (quality): each side is 1 - (rank - .5) / min(N, 60) in the sport's rating order, 0 past 60, and Q is the mean of the two.",
+     "C (closeness): 1 - (P home - P away)^2, as a percentile among the sport's games. T (total): projected points or goals, as a percentile.",
+     "S (stars): each side's top three players by the sport's value (NFL WAR, NBA VORX, NHL WAR, soccer GAR, college FV - 20)",
+     "× chance to play (injury tags: out / IR 0, doubtful .25, questionable / day-to-day .6; the game model's play chances first),",
+     "weighted 1 / .7 / .5, and scored by rank among the sport's teams like Q.",
+     "L (leverage): a target's swing from one result, dP = phi(Phi^-1(p)) / sqrt(n / 4 + 1 / 2), where p is the season sims' odds",
+     "and n is games left. Playoff is 1, division / bye / top four .5, and soccer title and relegation 1. Side L = min(1, sum / .35),",
+     "and game L = .6 × the higher side + .4 × the lower. Postseason games are 1. Tennis and CS2 use round and format levels.",
+     "Bonus: a named rivalry 6, a division or conference game 2, both ranked 4, one ranked 1. The list is the top 15, with at most 4 from a sport.",
+     "A listed game that starts moves to \"scores\" with its W frozen and its live or final score (ESPN scoreboard; tennis and CS2 from the site's files). It drops 24 hours after the final.",
+     "Source: scripts/watch_games.py to data/watch.json, every half hour."
     ],
     "where": "Standings: games to watch",
     "sports": [
@@ -355,20 +355,20 @@
    "after": "RWA (CS2)",
    "entry": {
     "term": "xMV / xTV / team value (CS2)",
-    "short": "xMV: prize money a player adds over replacement for two seasons; xTV: xMV priced on reported buyouts; team value sums the five.",
+    "short": "xMV is the prize money a player adds over replacement for two seasons, xTV is xMV priced on reported buyouts, and team value sums the five.",
     "body": [
-     "xMV: prize money a player adds over a replacement-level player in a five of four average tier-1 starters, for two seasons",
-     "(aging curve, 15% a year discount). No fee data. xTV = A x xMV: what a buyout should cost. Team value = the current five's xTV summed.",
-     "Prize curve: a roster's prize money over the next 182 days on its five's mean RWA vs the tier-1 starter mean (VRS top 20),",
-     "Poisson, rating + rating squared, Valve's VRS prize ledger (every snapshot's top-ten winnings, Feb 2024 on).",
-     "Held out from Jul 2025: deviance explained 0.79 vs VRS points 0.76; both together 0.81 (rosters only, players can't carry VRS points).",
-     "A and the replacement level (tier-1 mean - q SDs) fit on 7 reported buyouts (insider/press, unconfirmed; group deals as the sum): A 1.49, q 4.",
-     "Leave one fee out: x1.60 typical miss; flat price per player x1.70; replacement fixed at the VRS 51-100 starters x2.33;",
-     "blend toward flat prices (A x xMV^g, g fit) x1.69: fails, kept linear.",
-     "Reported fees sit near flat and most are Falcons deals, so values are compressed and at that buyer's prices.",
-     "Eternal Fire to Aurora (reported under $2.5M for five) prices at $6.4M: a miss. Contracts are not public and not modelled.",
-     "Signed = the same value at the first map of the player's current stint (bo3.gg); stints from before Jul 2024 start there.",
-     "Transactions: moves read from map lineups (join, out, core, drop, rebrand, exit); loans and fees are not in the lineups."
+     "xMV is the prize money a player adds over a replacement-level player in a five with four average tier-1 starters, for two seasons",
+     "(aging curve, 15% a year discount). There is no fee data in it. xTV = A × xMV, which is what a buyout should cost. Team value is the current five's xTV summed.",
+     "The prize curve is a roster's prize money over the next 182 days on its five's mean RWA against the tier-1 starter mean (VRS top 20),",
+     "a Poisson on rating + rating squared, from Valve's VRS prize ledger (every snapshot's top-ten winnings, Feb 2024 on).",
+     "Held out from Jul 2025, deviance explained is 0.79, compared to 0.76 for VRS points and 0.81 for both together (rosters only, since players can't carry VRS points).",
+     "A and the replacement level (tier-1 mean - q SDs) are fit on 7 reported buyouts (insider/press, unconfirmed; group deals as the sum): A 1.49, q 4.",
+     "Leaving one fee out, the typical miss is ×1.60. A flat price per player is ×1.70, and replacement fixed at the VRS 51-100 starters is ×2.33.",
+     "A blend toward flat prices (A × xMV^g, g fit) is ×1.69, which fails, so it stays linear.",
+     "The reported fees sit near flat and most are Falcons deals, so the values are compressed and at that buyer's prices.",
+     "Eternal Fire to Aurora (reported under $2.5M for five) prices at $6.4M, which is a miss. Contracts aren't public and aren't modelled.",
+     "Signed is the same value at the first map of the player's current stint (bo3.gg). Stints from before Jul 2024 start there.",
+     "Transactions are moves read from map lineups (join, out, core, drop, rebrand, exit). Loans and fees aren't in the lineups."
     ],
     "where": "Counter-Strike transfer values, team values, signings",
     "sports": [
@@ -381,11 +381,11 @@
    "after": "SV / SVAR (soccer)",
    "entry": {
     "term": "p/90 (soccer)",
-    "short": "Predictive SV rate: this season and the two before.",
+    "short": "The predictive SV rate, from this season and the two before.",
     "body": [
      "SV a 90 at weights 1, .5, .25, shrunk toward the position mean of regulars by 225 minutes (defenders 450, keepers 28,800),",
-     "less .008 a year over age 29. Nov 24 2026, held out: next season team GD R2 .634 to .650, 11 of 11 pairs;",
-     "r with next season's SV a 90 .690 to .718. The most predictive soccer metric on players; display only."
+     "minus .008 a year over age 29. Held out, next-season team GD R² goes from .634 to .650, 11 of 11 pairs,",
+     "and r with next season's SV a 90 from .690 to .718. It is the most predictive soccer metric on players, and it is display only."
     ],
     "where": "Soccer GAR leaders, depth chart, next up",
     "sports": [
@@ -398,16 +398,16 @@
    "after": "SVAR",
    "entry": {
     "term": "Most predictive and most descriptive metric (by sport)",
-    "short": "Each sport's metrics scored on one test (Nov 24 2026, held out, no 2026-27 outcomes).",
+    "short": "Each sport's metrics scored on one test, held out, with no 2026-27 outcomes.",
     "body": [
-     "Describe: season value x season minutes summed per team, on that season's results, held out. Predict: season n value x",
-     "season n+1 minutes, on n+1 results; and a player's value against his next season. Tennis and CS2: held out matches and maps.",
+     "Describe: season value × season minutes summed for each team, on that season's results, held out. Predict: season n value ×",
+     "season n+1 minutes, on n+1 results, and a player's value against his next season. Tennis and CS2 use held-out matches and maps.",
      "NBA: describe rXPM (.999), predict pXPM (.657). NFL: describe XV (.604), predict pXP/60 within position, AV for teams (.317).",
      "CFB: describe XV (.689), predict cWAR (.256, tie XV). CBB: describe WAR on GBPM (.658), predict the roster prior BPM (.783).",
      "NHL: describe WAR (.978), predict pWAR for teams (.387), Marcel WAR for a player (r .446). Soccer: describe SVAR (.894),",
      "predict p/90 (.650, r .718). Tennis: describe PA (.141), predict ARK (.107, tie Elo). CS2: describe season RWA, predict RWA rating",
-     "(next month team R2 .124, player r .820), ARK for teams. Public metrics scored: nflverse EPA, PFN impact, Barttorvik PRPG,",
-     "MoneyPuck game score, FotMob rating, Transfermarkt value, official tennis rank, HLTV 2.0 style rating, bo3.gg rating: none leads."
+     "(next month team R² .124, player r .820), ARK for teams. The public metrics scored were nflverse EPA, PFN impact, Barttorvik PRPG,",
+     "MoneyPuck game score, FotMob rating, Transfermarkt value, official tennis rank, an HLTV 2.0 style rating and the bo3.gg rating. None of them leads."
     ],
     "where": "Every ARKBOARD: descriptive tabs lead with the describe pick, predictive tabs with the predict pick",
     "sports": [
@@ -427,133 +427,133 @@
   {
    "term": "xAAV",
    "lines": [
-    "NHL against AFP Analytics' public projections, 109 signings of summer 2026 both priced (ours from a fit on earlier years only",
-    "AFP's dated May 18 2026): mean miss 1.03% of the cap vs AFP .77 (t +2.7 against ours)",
-    "restricted free agents 1.52 vs .85 (n 30), unrestricted .81 vs .70 (n 73). xAAV has no free-agent status input."
+    "I also scored the NHL version against AFP Analytics' public projections, on the 109 signings of summer 2026 that both priced (ours from a fit on earlier years only,",
+    "AFP's dated May 18 2026). Our mean miss was 1.03% of the cap, compared to .77 for AFP (t = +2.7 against ours).",
+    "Restricted free agents were 1.52 compared to .85 (n 30), and unrestricted .81 compared to .70 (n 73). xAAV has no free-agent status input."
    ]
   },
   {
    "term": "Futures",
    "lines": [
     "NHL points totals (Hockey-Reference preseason over/under, 2013-14 to 2025-26 without 2019-20, graded at -110):",
-    "day-0 season sim misses by 9.93 points vs the line's 10.15; actual - line = .65 x (sim - line), t 4.8 (2014-19 .93",
-    "2021-26 .35, t 2.6). The sim's side of every line 191-150-2, +6.9% (season t 1.4); held-out rule 54-45, +4.1% (t .7).",
-    "No proven edge."
+    "the day-0 season sim misses by 9.93 points, compared to 10.15 for the line. Actual - line = .65 × (sim - line), t = 4.8 (2014-19 .93,",
+    "2021-26 .35, t = 2.6). The sim's side of every line went 191-150-2, +6.9% (season t = 1.4), and the held-out rule 54-45, +4.1% (t = .7).",
+    "There is no proven edge."
    ]
   },
   {
    "term": "Season odds",
    "lines": [
-    "NHL, tested Nov 19 2026 and not used: preseason points over/under as the sim's prior.",
-    "2014-19 no gain at any weight (points MAE +.01, t +.1); 2020-26 -.21 points (t -8.8, 7/7 seasons), playoff Brier .1635 -> .1591.",
-    "Held-only, so it fails the gate; registered for one score after 2026-27."
+    "In the NHL I tested the preseason points over/under as the sim's prior, and it isn't used.",
+    "In 2014-19 there was no gain at any weight (points MAE +.01, t = +.1). In 2020-26 it was -.21 points (t = -8.8, 7/7 seasons), and playoff Brier went from .1635 to .1591.",
+    "It only held in the later seasons, so it fails the gate. It is registered for one more score after 2026-27."
    ]
   },
   {
    "term": "Game projection",
    "lines": [
-    "NHL win model against MoneyPuck's pregame number and the close, same lined games with a pregame-dated MoneyPuck file (log loss",
-    "model / MoneyPuck / close): 2020-21 .6553 / .6655 / .6557; 2021-22 .6415 / .6558 / .6398; 2022-23 .6589 / .6705 / .6593",
+    "The NHL win model against MoneyPuck's pregame number and the close, on the same lined games with a pregame-dated MoneyPuck file (log loss,",
+    "model / MoneyPuck / close): 2020-21 .6553 / .6655 / .6557; 2021-22 .6415 / .6558 / .6398; 2022-23 .6589 / .6705 / .6593;",
     "2023-24 .6556 / .6723 / .6560; 2024-25 .6654 / .6635 / .6584; 2025-26 .6818 / .6858 / .6781.",
-    "Stacking MoneyPuck on the model does not help (2024-26 n 3,684: .66825 -> .66844, t +.5), so it is not used.",
-    "Spread of the logits against the market's, 2023-26: model 1.23-1.33, MoneyPuck .98-1.18."
+    "Stacking MoneyPuck on the model doesn't help (2024-26 n 3,684: .66825 to .66844, t = +.5), so it isn't used.",
+    "The spread of the logits against the market's, 2023-26, is 1.23-1.33 for the model and .98-1.18 for MoneyPuck."
    ]
   },
   {
    "term": "Player game projections",
    "lines": [
-    "NBA minutes in a team's first 10 games add preseason starts (share of the last two preseason games started",
-    "fading to 0 by game 11): games 1-10 held 2024-26 minutes MAE 4.714 -> 4.676 (t -3.48, 3/3 seasons)."
+    "NBA minutes in a team's first 10 games add preseason starts (the share of the last two preseason games started,",
+    "fading to 0 by game 11). In games 1-10, held 2024-26, minutes MAE goes from 4.714 to 4.676 (t = -3.48, 3/3 seasons)."
    ]
   },
   {
    "term": "Team needs and pick rule",
    "lines": [
-    "Pre-draft meetings: +3.0 log-pick units for a top-30 visit or private workout with the team, +1.75 for another meeting.",
-    "Real picks 1-100, 2024-26: top-1 hits 5.7% -> 11.7%; weight picked on two drafts, scored on the third +4.0 points (t 2.5).",
-    "Off until the 2027 meetings page exists (winter)."
+    "Pre-draft meetings add +3.0 log-pick units for a top-30 visit or private workout with the team, and +1.75 for another meeting.",
+    "On real picks 1-100, 2024-26, top-1 hits go from 5.7% to 11.7%. With the weight picked on two drafts and scored on the third, it is +4.0 points (t = 2.5).",
+    "It is off until the 2027 meetings page exists (winter)."
    ]
   },
   {
    "term": "Tennis picks",
    "lines": [
-    "Polymarket (global) venue: tour-level main draws, 6 to 24 hours out, model 4+ points over the mid, mid between 25% and 75%.",
-    "Price = ask + fee (.03 x p x (1 - p)). Tune Oct 2025-Apr 2026: 164 picks, close value +4.2 points (t 3.5).",
-    "Held May-Nov 10 2026: 404 picks, close value +2.2 points after costs (t 4.5), realised +8.3% (t 1.3). Paper stakes."
+    "Polymarket (global) venue: tour-level main draws, 6 to 24 hours out, with the model 4+ points over the mid and the mid between 25% and 75%.",
+    "Price = ask + fee (.03 × p × (1 - p)). Tuned Oct 2025-Apr 2026: 164 picks, close value +4.2 points (t = 3.5).",
+    "Held May-Nov 10 2026: 404 picks, close value +2.2 points after costs (t = 4.5), realised +8.3% (t = 1.3). Paper stakes."
    ]
   },
   {
    "term": "G League NBA% / 500% / xVORX",
    "lines": [
     "xXPM = ridge E[NBA XPM over his NBA minutes, next 3 seasons | plays], weighted by those minutes (lambda 300).",
-    "xVORX counts 0 for a season out of the NBA (75% of G League seasons): it sits near 0 for most; xXPM is the rate alone.",
-    "xXPM held out vs no G League stats: minute-weighted RMSE 1.44 vs 1.60 (t -3.6, 11/15 seasons, Holm), bias .01."
+    "xVORX counts 0 for a season out of the NBA (75% of G League seasons), so it sits near 0 for most players. xXPM is the rate alone.",
+    "Held out against no G League stats, xXPM minute-weighted RMSE is 1.44 compared to 1.60 (t = -3.6, 11/15 seasons, Holm), with a bias of .01."
    ]
   },
   {
    "term": "SV (CFB QBs, skill players)",
    "lines": [
-    "pSV/60: SV per 60 plays over three seasons weighted 1, .7, .5, shrunk to the QB mean with 650 plays.",
-    "Next season wMSE .0258 raw to .0159 (t -11.7, 10 of 10 seasons 2016-25)."
+    "pSV/60 is SV per 60 plays over three seasons weighted 1, .7, .5, shrunk to the QB mean with 650 plays.",
+    "Next-season wMSE goes from .0258 raw to .0159 (t = -11.7, 10 of 10 seasons 2016-25)."
    ]
   },
   {
    "term": "GAR (soccer, senior)",
    "lines": [
-    "1Y P20/P80: held out projection residuals in five bands of season share; left out seasons hit .200 and .800 (3Y .201, .800).",
-    "aGAR/90 (first seasons) = GAR/90 less .0032 a year of age over 21. Ranks the next two seasons better than GAR/90: .664 vs .654, t -2.66."
+    "1Y P20/P80 come from held-out projection residuals in five bands of season share. Left-out seasons hit .200 and .800 (3Y .201, .800).",
+    "aGAR/90 (first seasons) = GAR/90 minus .0032 a year of age over 21. It ranks the next two seasons better than GAR/90, .664 compared to .654, t = -2.66."
    ]
   },
   {
    "term": "Tennis ARK",
    "lines": [
-    "SV: season WAR, calendar year to date, every level, same per match credit as WAR.",
-    "Split half r .81 ATP, .82 WTA (2015 to 2025); next season r .85 ATP, .84 WTA."
+    "SV is season WAR for the calendar year to date, at every level, with the same credit per match as WAR.",
+    "Split-half r is .81 ATP and .82 WTA (2015 to 2025), and next-season r is .85 ATP and .84 WTA."
    ]
   },
   {
    "term": "pWAR / HPM",
    "lines": [
-    "Nov 24 2026: 5 on 5 on ice and individual xG read MoneyPuck's flurry, score and venue adjusted columns; WAR keeps raw xG.",
-    "Next season team GD R2 .384 to .387 (t 2.88, 13 of 17 pairs); weights refit held out .373 to .376, walk forward t 3.59.",
-    "PP on ice xG at weight .2 fails (t 1.19 worse); score and venue alone is flat (t .32)."
+    "5 on 5 on-ice and individual xG read MoneyPuck's flurry, score and venue adjusted columns. WAR keeps raw xG.",
+    "Next-season team GD R² goes from .384 to .387 (t = 2.88, 13 of 17 pairs). With the weights refit, held out it goes from .373 to .376, walk-forward t = 3.59.",
+    "PP on-ice xG at a weight of .2 fails (t = 1.19 worse), and score and venue alone is flat (t = .32)."
    ]
   },
   {
    "term": "XV",
    "lines": [
-    "NFL Nov 24 2026: weights fit per side, offense parts on points scored a game, defense parts on points allowed a game.",
-    "XV from weeks 1 to 9 on weeks 10 on margin, R2 .604 to .622 (t 2.19, 7 of 8 seasons); next season team R2 .235 to .258.",
-    "XV is the most descriptive NFL metric held out (.604 vs WAR .401, SV .257) and the most descriptive CFB one (.689 vs cWAR .639)."
+    "The NFL weights are fit for each side: offense parts on points scored a game, and defense parts on points allowed a game.",
+    "XV from weeks 1 to 9 on the margin from week 10 on goes from R² .604 to .622 (t = 2.19, 7 of 8 seasons), and next-season team R² from .235 to .258.",
+    "Held out, XV is the most descriptive NFL metric (.604, compared to .401 for WAR and .257 for SV) and the most descriptive CFB one (.689, compared to .639 for cWAR)."
    ]
   },
   {
    "term": "College WAR",
    "lines": [
-    "Team WAR (Nov 24 2026): starter time no graded player covers counts one SD below an average starter (season AV's line), not at",
-    "the WAR line. Held out by season 2019 to 2025, team WAR tracks SRS at R2 .654 against .639 (t 3.5, 7 of 7 seasons)."
+    "In team WAR, starter time that no graded player covers counts one SD below an average starter (season AV's line), instead of at",
+    "the WAR line. Held out by season 2019 to 2025, team WAR tracks SRS at R² .654, compared to .639 (t = 3.5, 7 of 7 seasons)."
    ]
   },
   {
    "term": "Tennis ARK",
    "lines": [
-    "Nov 24 2026: ARK adds the points added term, CP x pPA gap / 10 on the match blend. Next season log loss t -8.7, 14 of 15 seasons.",
-    "rPA is shrunk by 300 points toward 0: held out describe R2 .128 to .135 (15 of 15). WAR counts Futures and ITF at half,",
-    "Challenger, qualifying and team events at .85 (next season R2 .083 to .085, t -7.1); SV keeps every match in full."
+    "ARK adds the points added term, CP × pPA gap / 10 on the match blend. Next-season log loss t = -8.7, 14 of 15 seasons.",
+    "rPA is shrunk by 300 points toward 0, which moves held-out describe R² from .128 to .135 (15 of 15). WAR counts Futures and ITF at half,",
+    "and Challenger, qualifying and team events at .85 (next-season R² .083 to .085, t = -7.1). SV keeps every match in full."
    ]
   },
   {
    "term": "RWA (CS2)",
    "lines": [
-    "Map offsets (Nov 24 2026): each player's decayed residual on each map, shrunk 1,000 rounds toward 0, added to RWA per map.",
-    "Held Jul 2025 to Oct 2026: next month map error .027816 to .027691, t by month 7.0, 15 of 16 months."
+    "Map offsets: each player's decayed residual on each map, shrunk 1,000 rounds toward 0, is added to his RWA on that map.",
+    "Held Jul 2025 to Oct 2026, next-month map error goes from .027816 to .027691, t by month 7.0, 15 of 16 months."
    ]
   },
   {
    "term": "CS2 ARK",
    "lines": [
-    "Nov 24 2026: Valve lists one series up to several times under alias team names (9,624 of 37,399 rows). Repeats of a date and",
-    "both fives are dropped before every replay. Held log loss on clean rows: ARK .6105, team RWA .6245, VRS .6640."
+    "Valve lists one series up to several times under alias team names (9,624 of 37,399 rows). Repeats of a date and",
+    "both fives are dropped before every replay. Held log loss on the clean rows: ARK .6105, team RWA .6245, VRS .6640."
    ]
   }
  ],
@@ -561,26 +561,26 @@
   {
    "term": "GAR (soccer, senior)",
    "body": [
-    "Shrunk per-90 rates (on-pitch xG for and against, on-off, npxG, xGBuildup, keeper saves) plus xG plus-minus (offence, defence)",
+    "Shrunk per-90 rates (on-pitch xG for and against, on-off, npxG, xGBuildup, keeper saves) plus an xG plus-minus (offence, defence),",
     "weighted to next-season team goal difference.",
-    "On-pitch xG and xGBuildup are opponent and home adjusted: minus what that club allowed in its other matches, shrunk,",
-    "and the league's home / away gap. Odd vs even matches of a player-season, held 2022-26: on-pitch xG for r .65 to .70,",
-    "against .45 to .54, buildup .64 to .65. Own npxG and xA gain .003 to .006 and stay raw.",
-    "xG plus-minus: weighted ridge over 3 seasons of on-pitch spells (same 22 on the field)",
-    "a spell's npxG a 90 on the attacking side's players (offence) and the defending side's (defence), league-season and home terms",
-    "offence shrunk toward his xG + xA a 90 over the window, defence toward 0.",
-    "Replacement per position = regulars (900+ minutes) on the bottom three sides by goal difference of each finished league-season",
-    "pooled. League strength counts. Held out R2 .686 (.673 before plus-minus; nested test t -2.97, 9/11 seasons).",
-    "PAR = GAR x points per goal of difference (.626)."
+    "On-pitch xG and xGBuildup are adjusted for opponent and home: minus what that club allowed in its other matches, shrunk,",
+    "and the league's home / away gap. On odd against even matches of a player-season, held 2022-26, on-pitch xG for goes from r .65 to .70,",
+    "against from .45 to .54 and buildup from .64 to .65. A player's own npxG and xA gain .003 to .006, so they stay raw.",
+    "The xG plus-minus is a weighted ridge over 3 seasons of on-pitch spells (the same 22 on the field):",
+    "a spell's npxG a 90 on the attacking side's players (offence) and the defending side's (defence), with league-season and home terms.",
+    "Offence is shrunk toward his xG + xA a 90 over the window, and defence toward 0.",
+    "Replacement for each position is the regulars (900+ minutes) on the bottom three sides by goal difference of each finished league-season,",
+    "pooled. League strength counts. Held out R² is .686 (.673 before the plus-minus; nested test t = -2.97, 9/11 seasons).",
+    "PAR = GAR × points per goal of difference (.626)."
    ]
   },
   {
    "term": "xMV",
    "body": [
-    "Ridge on log Transfermarkt value: GAR now and past two seasons, minutes, age, position, league, club",
-    "national-team matchday squads in the last 12 and 24 months, last season's Champions League + Europa League minutes",
-    "last season's goals over xG and assists over xA.",
-    "Held out R2 .73 (Oct) to .80 (Jul). Gap to TM forecasts TM's next move (slope .26 Oct",
+    "A ridge on log Transfermarkt value from GAR now and in the past two seasons, minutes, age, position, league and club,",
+    "national-team matchday squads in the last 12 and 24 months, last season's Champions League + Europa League minutes,",
+    "and last season's goals over xG and assists over xA.",
+    "Held out R² runs from .73 in October to .80 in July. The gap to TM forecasts TM's next move (slope .26 in October,",
     "12/12 seasons) and the summer fee over TM (corr .22, 1,850 sales 2015-22)."
    ]
   }

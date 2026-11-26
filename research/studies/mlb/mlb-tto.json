@@ -2,19 +2,19 @@
   "id": "mlb-tto",
   "sport": "MLB",
   "question": "Does the times-through-the-order penalty justify pulling starters before the 3rd time?",
-  "answer": "For an average starter, yes. 3rd time: +.022 wOBA vs 1st (same pitcher), .339 vs relievers .323.",
+  "answer": "For an average starter, yes. The 3rd time through is +.022 wOBA over the 1st for the same pitcher, .339 against .323 for relievers.",
   "findings": [
-    "Within pitcher-season: 2nd time +.013 (CI +.011 to +.016), 3rd time +.022 (CI +.020 to +.025) wOBA vs 1st.",
-    "Pitch count adds nothing: -.004 (CI -.012 to +.004) per 100 pitches; 3rd time stays +.025.",
-    "Jump at batter 19: +.017 (SE .003) in 2015-19, +.000 (SE .003) in 2020-25, a smooth rise instead.",
-    "Batter-adjusted wOBA: starters 1st time .321, 3rd time .339; relievers inn. 6+ .323 (n=664,061)."
+    "Within a pitcher-season, the 2nd time is +.013 wOBA over the 1st (CI +.011 to +.016) and the 3rd time is +.022 (CI +.020 to +.025).",
+    "Pitch count adds nothing: -.004 (CI -.012 to +.004) per 100 pitches, and the 3rd time stays at +.025.",
+    "The jump at batter 19 was +.017 (SE .003) in 2015-19 and +.000 (SE .003) in 2020-25, when it became a smooth rise.",
+    "Batter-adjusted wOBA: starters .321 the 1st time and .339 the 3rd time, relievers in inning 6+ .323 (n=664,061)."
   ],
-  "method": "OLS on PA wOBA with pitcher-season fixed effects, batter-season wOBA, platoon and home; SE clustered by game. Survivors to the 3rd time are pitchers having better days, so the penalty is if anything understated.",
+  "method": "An OLS on PA wOBA with pitcher-season fixed effects, batter-season wOBA, platoon and home, with SE clustered by game. The starters who survive to the 3rd time are having better days, so if anything the penalty is understated.",
   "data": "Retrosheet play-by-play, 2015-2025 regular season, 1,109,963 starter PAs (1st-3rd time), 24,958 games. Retrosheet: the information used here was obtained free of charge from and is copyrighted by Retrosheet (www.retrosheet.org).",
   "n": 1109963,
   "robust": true,
   "interest": 3,
-  "split_check": "3rd-time penalty +.024 in 2015-19 and +.020 in 2020-25; discrete jumps only in 2015-19.",
+  "split_check": "The 3rd-time penalty was +.024 in 2015-19 and +.020 in 2020-25. The discrete jumps are only in 2015-19.",
   "chart": {
     "type": "line",
     "title": "Starter wOBA allowed by batters faced, within pitcher",

@@ -2,19 +2,19 @@
  "id": "esea-stand-in",
  "sport": "CS2",
  "question": "What does a stand-in cost an ESEA team?",
- "answer": "About 2 pp beyond the five's own ratings, too small to beat held-out matches. Rate the five who play.",
+ "answer": "About 2 points beyond the five's own ratings, which is too small to help on held-out matches. Rate the five who play.",
  "findings": [
   "Win %: core five 51.3% (n=7,717), 1 stand-in 48.6% (n=4,633), 2+ 49.3% (n=988).",
-  "After player Elo + FACEIT level of the five: first stand-in -0.09 log-odds (SE 0.04), second +0.16.",
-  "Held S58-S59 log loss: t -1.5, leave-one-day-out t -0.3. Not shipped.",
-  "Stand-in's FACEIT level counts like a core player's: .59 vs .54 log-odds per level (SE .08/.04)."
+  "After the five's player Elo and FACEIT level, the first stand-in is -0.09 log-odds (SE 0.04) and the second is +0.16.",
+  "Held S58-S59 log loss: t = -1.5, and leave-one-day-out t = -0.3. It didn't ship.",
+  "A stand-in's FACEIT level counts like a core player's, .59 against .54 log-odds per level (SE .08/.04)."
  ],
- "method": "Core = 5 most-used players in the team's prior 20 maps that season (no lookahead). Logistic on the five's round-share player Elo and FACEIT level plus stand-in count, walk-forward ratings.",
+ "method": "The core is the 5 most-used players in the team's prior 20 maps that season (no lookahead). A logistic on the five's round-share player Elo and FACEIT level plus the stand-in count, with walk-forward ratings.",
  "data": "FACEIT ESEA NA league, S53-S59, 18,217 matches; 6,078 with both cores defined",
  "n": 6078,
  "robust": false,
  "interest": 4,
- "split_check": "First stand-in negative in 4 of 5 seasons; a whole-season core (lookahead) inflates the raw gap to 54.9% vs 50.1%.",
+ "split_check": "The first stand-in is negative in 4 of 5 seasons. A whole-season core (lookahead) inflates the raw gap to 54.9% against 50.1%.",
  "chart": {
   "type": "bar",
   "title": "Match win % by stand-ins in the five",

@@ -2,19 +2,19 @@
   "id": "cs2-pistol-value",
   "sport": "CS2",
   "question": "How much is the first pistol round worth, and does the side matter?",
-  "answer": "First pistol winner takes the map 59.5%: 57.1% on CT, 61.9% on T.",
+  "answer": "The winner of the first pistol takes the map 59.5% of the time, 57.1% from the CT side and 61.9% from the T side.",
   "findings": [
     "Pistol 1 won on CT: map win 57.1% (56.1%-58.2%, n=8,809).",
     "Pistol 1 won on T: map win 61.9% (60.9%-63.0%, n=8,716).",
-    "Both pistols: 69.3% map win (n=8,912). Split pistols, P1 winner: 49.4%.",
-    "Above Elo expectation: P1 on T +11.3 pp, on CT +6.0 pp. Win vs lose P1, Elo-adjusted: +17.2 pp (+16.0 to +18.6 pp)."
+    "A team that wins both pistols wins the map 69.3% of the time (n=8,912). When the pistols are split, the P1 winner wins 49.4%.",
+    "Above the Elo expectation, P1 on T is +11.3 points and on CT +6.0. Winning P1 against losing it, Elo-adjusted, is +17.2 points (+16.0 to +18.6)."
   ],
-  "method": "Map win % for pistol round winners (rounds 1 and 13), Wilson CIs. Team strength: logistic model with pre-map Elo; pistol effects as average marginal change, map-clustered CIs.",
+  "method": "Map win % for the pistol round winners (rounds 1 and 13), with Wilson CIs. Team strength is a logistic model on pre-map Elo, and the pistol effects are average marginal changes with map-clustered CIs.",
   "data": "bo3.gg round data, S/A/B-tier pro maps, 2023-10-16 to 2026-11-02, 17,525 maps",
   "n": 17525,
   "robust": true,
   "interest": 4,
-  "split_check": "P1 winner map win: early 59.3% (n=8,762), late 59.7% (n=8,763).",
+  "split_check": "P1 winner map win: 59.3% early (n=8,762) and 59.7% late (n=8,763).",
   "chart": {
     "type": "bar",
     "title": "Map win % after winning a pistol round",

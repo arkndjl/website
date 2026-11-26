@@ -2,19 +2,19 @@
   "id": "soccer-after-conceding",
   "sport": "soccer",
   "question": "Do teams score more or less in the minutes after a goal?",
-  "answer": "No momentum swing. Team that just conceded scores 0.95x baseline in the next 10 min; scorer 1.06x. Restart dips the first 3 min.",
+  "answer": "There is no momentum swing. The team that just conceded scores at 0.95x its baseline in the next 10 min, and the scorer at 1.06x. The restart dips the first 3 min.",
   "findings": [
-    "Team that conceded, 0-10 min: xG 0.92x baseline (CI 0.88-0.96), goals 0.95x (CI 0.88-1.02).",
-    "Team that scored, 0-10 min: xG 0.99x (CI 0.95-1.03), goals 1.06x (CI 0.99-1.12).",
-    "First 3 min after a goal both teams sit below baseline (xG 0.74x and 0.87x): restart time.",
-    "No sign a team is most vulnerable just after scoring: its opponent's goals 0-10 min are 0.95x baseline."
+    "The team that conceded, 0-10 min: xG 0.92x baseline (CI 0.88-0.96), goals 0.95x (CI 0.88-1.02).",
+    "The team that scored, 0-10 min: xG 0.99x (CI 0.95-1.03), goals 1.06x (CI 0.99-1.12).",
+    "In the first 3 min after a goal both teams sit below baseline (xG 0.74x and 0.87x), which is the restart.",
+    "There is no sign that a team is most vulnerable just after it scores. Its opponent's goals in 0-10 min are 0.95x baseline."
   ],
-  "method": "Team-minutes (11v11) by time since last goal. Baseline: league rate for the same 15-min band and score state, scaled by pre-match strength (leave-one-out season xG). Observed/expected; CIs bootstrap by match.",
+  "method": "Team-minutes (11v11) by time since the last goal. The baseline is the league rate for the same 15-min band and score state, scaled by pre-match strength (leave-one-out season xG). Results are observed over expected, with CIs bootstrapped by match.",
   "data": "StatsBomb open data, 23 full seasons/tournaments (2015/16 EPL, Serie A, Ligue 1; men's WC/Euro/Copa/AFCON; ISL; women's leagues and tournaments), 2,856 matches, 527,256 team-minutes.",
   "n": 2856,
   "robust": false,
   "interest": 3,
-  "split_check": "Conceding team 0-10 min goals: 1.09x in 2015/16 leagues, 0.88x elsewhere; direction flips, so no stable effect.",
+  "split_check": "The conceding team's goals in 0-10 min were 1.09x in the 2015/16 leagues and 0.88x elsewhere. The direction flips, so there is no stable effect.",
   "chart": {
     "type": "line",
     "title": "xG rate after a goal vs matched baseline",
