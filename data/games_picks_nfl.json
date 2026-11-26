@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-26T09:35:53Z",
+ "asof": "2026-11-26T09:39:40Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -52,7 +52,7 @@
  },
  "model": {
   "asof": "2026-11-26T09:30:07Z",
-  "ageH": 0.1,
+  "ageH": 0.2,
   "stale": false
  },
  "picks": [],
@@ -140,6 +140,22 @@
    "tm": 49.2
   },
   {
+   "id": "2026_12_CHI_DET",
+   "sport": "nfl",
+   "kick": "2026-11-26T18:00:00Z",
+   "home": "DET",
+   "away": "CHI",
+   "mk": "total",
+   "side": "under",
+   "line": 56.5,
+   "price": -121.0,
+   "edge": 3.2,
+   "x": null,
+   "why": "total market off",
+   "m": 0.9,
+   "tm": 53.3
+  },
+  {
    "id": "2026_12_WAS_ARI",
    "sport": "nfl",
    "kick": "2026-11-29T21:25:00Z",
@@ -186,22 +202,6 @@
    "why": "total market off",
    "m": 15.7,
    "tm": 46.9
-  },
-  {
-   "id": "2026_12_CHI_DET",
-   "sport": "nfl",
-   "kick": "2026-11-26T18:00:00Z",
-   "home": "DET",
-   "away": "CHI",
-   "mk": "spread",
-   "side": "home",
-   "line": -1.5,
-   "price": -119.0,
-   "edge": 2.4,
-   "x": null,
-   "why": "spread market off",
-   "m": 0.9,
-   "tm": 53.3
   },
   {
    "id": "2026_12_NYJ_MIA",
@@ -302,11 +302,11 @@
  ],
  "games": {
   "2026_12_CHI_DET": {
-   "mk": "spread",
-   "side": "home",
-   "line": -1.5,
-   "price": -119.0,
-   "edge": 2.4,
+   "mk": "total",
+   "side": "under",
+   "line": 56.5,
+   "price": -121.0,
+   "edge": 3.2,
    "ev": null,
    "units": 0.0,
    "home": "DET",
@@ -534,7 +534,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 6604,
+  "snapshots": 6605,
   "buckets": [
    {
     "when": "24h+",
@@ -547,12 +547,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 392,
-    "clvRet": -0.0393,
-    "clvT": -10.44,
+    "clvN": 393,
+    "clvRet": -0.0394,
+    "clvT": -10.49,
     "clv": 0.2,
-    "beat": 0.253,
-    "still": 0.681
+    "beat": 0.252,
+    "still": 0.682
    },
    {
     "when": "1-6h",
@@ -2950,7 +2950,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-26T09:35:53Z",
+ "checked": "2026-11-26T09:39:40Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
