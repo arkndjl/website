@@ -22,7 +22,7 @@
     <td data-v="{{ $a }}">{{ with $a }}{{ $lbl := cond (gt . 5) "5-star+" (printf "%g ARK stars" .) }}{{ if gt . 5 }}<span class="cfbrc__glow">{{ end }}<span class="cfbrc__ark{{ if gt . 5 }} is-plus{{ end }}" style="--n:{{ cond (gt . 5) 5 . }}" data-n="{{ . }}" role="img" aria-label="{{ $lbl }}" title="{{ $lbl }}"><i></i></span>{{ if gt . 5 }}<span class="cfbrc__plus" aria-hidden="true">+</span></span>{{ end }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ $f }}">{{ with $f }}{{ printf "%d" (int .) }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .cls }}">{{ with .ocls }}{{ . }}→{{ end }}{{ .cls }}</td>
-    <td title="{{ index $kt .k }}"><span class="tx__k tx__k--{{ .k }}">{{ .k }}</span></td>
+    <td title="{{ index $kt .k }}"><span class="tx__k tx__k--{{ .k }}">{{ index (dict "cb" "crystal ball") .k | default .k }}</span></td>
     <td>{{ with .fr }}<span class="cfb__team">{{ with $r.fl }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ . }}</span></span>{{ end }}</td>
     <td>{{ with .to }}<span class="cfb__team">{{ with $r.tl }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ . }}</span></span>{{ end }}</td>
     <td class="tx__x tx__src">{{ with index .src "247" }}<a href="{{ . }}" rel="noopener" target="_blank">247</a>{{ end }}{{ with index .src "on3" }} <a href="{{ . }}" rel="noopener" target="_blank">On3</a>{{ end }}</td>
