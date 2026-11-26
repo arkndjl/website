@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""College basketball production tabs (Nov 3 2026): the CBB page's equivalents of the CFB stats, WAR, breakout, top
+"""College basketball production tabs (Nov 3 2026): the CBB page's equivalents of the CFB stats, VORX, breakout, top
 performer, draft board, portal, returning and team talent views. Display only: every number is a season line, a
 game line or an existing model output (FV, xBPM, NBA%, the mocks); nothing here feeds the FV model.
 
@@ -13,15 +13,17 @@ Outputs
     data/cbb_teamtabs.json                                          team tables (returning, talent), drawn by teamunits.html (feed=)
 
 Definitions
-    WAR    wins over a replacement player = (GBPM - R) x minutes / 40 x 68 / 100 x wins a point.
+    VORX   wins over a replacement player on XPM (rXPM) = (XPM - R) x minutes / 40 x 68 / 100 x wins a point. Called WAR
+           until Nov 26 2026 (Noah: one name with the NBA's VORX, .030 x (XPM + 1.4) x MP / 48; same replacement, -1.4);
+           the json keys stay war / waa / rwar / lwar / inwar. History of the input, oldest first:
            GBPM = Barttorvik's game BPM, the minutes-weighted mean of his games' BPM (the live line sums the game logs the
            same way; BPM when a line has none). Nov 24 2026 (scripts/research/metric_audit_nov24/cbb): GBPM in place of
-           season BPM tracks team wins better held out (win% R2 .633 -> .658, 15/15 seasons; WAR form 14/14, t 28.7);
+           season BPM tracks team wins better held out (win% R2 .633 -> .658, 15/15 seasons; VORX form 14/14, t 28.7);
            season BPM stays the predictive input (next-season team R2 .643 against GBPM's .612), so Next is BPM based.
            Nov 24 2026 port round (scripts/research/metric_audit_nov24/port/tennis_cs2_cbb, pre-registered): GBPM is
            shrunk GBPM_K = 100 minutes toward the season's minutes-weighted mean GBPM, (GBPM x min + 100 x mean) / (min
            + 100). Half-A games' rate vs the same players' half-B GBPM: minutes-weighted MSE 16.2 -> 11.4 (10/10 seasons,
-           t 8.5); WAR form held-out team wins RMSE 3.348 -> 3.331 (14/14, t 8.2). Season-only (no prior-season input).
+           t 8.5); VORX form held-out team wins RMSE 3.348 -> 3.331 (14/14, t 8.2). Season-only (no prior-season input).
            R = -1.6: the minutes-weighted shrunk GBPM of the 9th man in team minutes, 2025-26 (raw GBPM's was -2.3,
            BPM's -2.0).
            wins a point = fit on 2016-17 to 2025-26 team-seasons (FIT_YEARS): wins = a x games + b x team sum of
@@ -47,7 +49,7 @@ Definitions
            norms (same pool, LIVE_MIN players a position or the 2025-26 norms): early-season BPM spreads wider (sd
            4.4-5.5 through 8 games against 3.5-4.4 a full season), and its own norms cut the error against the
            full-season Stat+ by about a third (10 of 10 seasons, scripts/cbb_war_research_nov03.py).
-    Next   next season's WAR at 31 games (scripts/cbb_next.py; fit by scripts/cbb_next_research.py): 2025-26 rows from
+    Next   next season's VORX at 31 games (scripts/cbb_next.py; fit by scripts/cbb_next_research.py): 2025-26 rows from
            the 2025-26 line (scripts/data/cbb_next_2027.json), this season's from the line to date on the in-season grid.
     Game Score   Hollinger: PTS + .4 FGM - .7 FGA - .4 (FTA - FTM) + .7 ORB + .3 DRB + STL + .7 AST + .7 BLK - .4 PF - TOV.
 """
@@ -73,9 +75,9 @@ TEAM_OUT = os.path.join(ROOT, 'data', 'cbb_teamtabs.json')
 FROZEN = os.path.join(HERE, 'data', f'cbb_tabs_{LAST}.json.gz')
 PRIOR = os.path.join(HERE, 'cbb_prior.json.gz')
 SHIFT = os.path.join(HERE, 'data', 'cbb_xpm_shift.json')   # this season's team rXPM shifts, kept for runs with no game logs (--cols)
-REPL = -1.4         # 9th man's shrunk rXPM, 2025-26 (WAR's input; see WAR above; GBPM's was -1.6)
-GBPM_K = 100.0      # minutes of shrink toward the season's mean GBPM (WAR's input; see WAR above)
-PACE = 68.0        # possessions a 40 for every team (not the team's own pace: see WAR above)
+REPL = -1.4         # 9th man's shrunk rXPM, 2025-26 (VORX's input; see VORX above; GBPM's was -1.6)
+GBPM_K = 100.0      # minutes of shrink toward the season's mean GBPM (VORX's input; see VORX above)
+PACE = 68.0        # possessions a 40 for every team (not the team's own pace: see VORX above)
 WPP = 1.0          # wins a point of margin: fit in freeze() and read from the frozen file
 FIT_YEARS = range(2017, LAST + 1)   # team-seasons the wins-a-point slope is fit on (Barttorvik season files + game logs)
 LIVE_MIN = 40      # 10%+ minute players a position before this season's Stat+ uses its own norms
@@ -115,8 +117,8 @@ def label(s):
 
 
 def wx(L, mins=None, mu=None):
-    """WAR's box input: rXPM (XPM), else GBPM, else BPM (a line with neither); with mins and the season's mean mu, shrunk GBPM_K
-    minutes toward mu (see WAR above)"""
+    """VORX's box input: rXPM (XPM), else GBPM, else BPM (a line with neither); with mins and the season's mean mu, shrunk GBPM_K
+    minutes toward mu (see VORX above)"""
     x = L.get('xpm') if L.get('xpm') is not None else L.get('gbpm') if L.get('gbpm') is not None else L.get('bpm')
     if x is None or mins is None or mu is None:
         return x
@@ -250,7 +252,7 @@ def pos_norms(lines, key='role'):
 
 
 def stat_line(L, mu=None):
-    """a Barttorvik season row -> the stats-tab numbers (mu: the season's mean GBPM, WAR's shrink target)"""
+    """a Barttorvik season row -> the stats-tab numbers (mu: the season's mean GBPM, VORX's shrink target)"""
     mins = (L['mp'] or 0) * (L['gp'] or 0)
     return {'gp': int(L['gp'] or 0), 'mp': round(mins), 'mpg': r1(L['mp']), 'pts': r1(L['pts_g']), 'reb': r1(L['treb_g']), 'ast_g': r1(L['ast_g']),
             'xpm': r1(L.get('xpm')), 'oxpm': r1(L.get('oxpm')), 'dxpm': r1(L.get('dxpm')), 'bpm': r1(L['bpm']), 'gbpm': r1(L.get('gbpm')), 'obpm': r1(L['obpm']), 'dbpm': r1(L['dbpm']), 'ortg': r1(L['ortg']), 'usg': r1(L['usg']), 'ts': r1(L['ts']),
@@ -289,7 +291,7 @@ def freeze():
     with gzip.open(FROZEN, 'wt') as fh:
         json.dump({'season': LAST, 'asof': now(), 'norms': norms, 'wfit': fit, 'mu': mu_last, 'tempo': {k: round(v, 2) for k, v in tempo.items()}, 'lines': out, 'top': tg},
                   fh, separators=(',', ':'))
-    print(f'{FROZEN}: {len(out)} lines, {len(tg)} top games, Stat+ norms {norms}, WAR fit {fit}')
+    print(f'{FROZEN}: {len(out)} lines, {len(tg)} top games, Stat+ norms {norms}, VORX fit {fit}')
 
 
 def gline(g):
@@ -318,7 +320,7 @@ def main():
     tg = defaultdict(set)
     for g in games: tg[g[GC['team']]].add(g[GC['muid']])
     gnow = statistics.median([len(v) for v in tg.values()]) if tg else 0     # median team games so far
-    # next season's WAR (scripts/cbb_next.py): last season's rows from the 2025-26 line, this season's from the line to date
+    # next season's VORX (scripts/cbb_next.py): last season's rows from the 2025-26 line, this season's from the line to date
     nx_last = json.load(open(os.path.join(HERE, 'data', f'cbb_next_{SEASON}.json')))['war']
     nx_now = NXT.live(games, json.load(gzip.open(PRIOR)), SEASON, GC)
     t2e = {k: v[0] for k, v in bt.items()}
@@ -421,18 +423,18 @@ def main():
         'seasons': [{'s': SEASON, 'l': label(SEASON), 'rows': now_rows, 'mdef': mdef(SOPT, 20 * gnow)},
                     {'s': LAST, 'l': label(LAST), 'rows': last_rows, 'mdef': 400}]})
 
-    # ---- WAR leaders
-    wcols = [col('war', 'WAR', f"wins over a replacement player: (XPM + {-REPL:.1f}) x minutes / 40 x {PACE / 100:.2f} x {WPP:.4f} wins a point; the slope that makes team WAR + {wf['a']} x games track wins ({wf['teams']:,} team-seasons {label(wf['years'][0])} to {label(wf['years'][1])}, r {wf['r']}); XPM shrunk {GBPM_K:.0f} minutes toward the season's mean; replacement = the 9th man's XPM, so a team of replacement players wins {wf['a'] * 100:.1f}% of its games", 's2'),
+    # ---- VORX leaders
+    wcols = [col('war', 'VORX', f"wins over a replacement player: (XPM + {-REPL:.1f}) x minutes / 40 x {PACE / 100:.2f} x {WPP:.4f} wins a point; the slope that makes team VORX + {wf['a']} x games track wins ({wf['teams']:,} team-seasons {label(wf['years'][0])} to {label(wf['years'][1])}, r {wf['r']}); XPM shrunk {GBPM_K:.0f} minutes toward the season's mean; replacement = the 9th man's XPM, so a team of replacement players wins {wf['a'] * 100:.1f}% of its games", 's2'),
              col('waa', 'WAA', 'wins over an average D-I player: XPM x the same minutes and pace', 's2'),
              col('xpm', 'XPM', XT, 's1'), col('oxpm', 'O-XPM', 'offensive XPM', 's1'), col('dxpm', 'D-XPM', 'defensive XPM', 's1'),
              col('splus', 'Stat+', 'XPM against his position, 100 + 25 z', '0'),
-             col('nx', 'Next', "next season's WAR at 31 games, if he plays D-I: from this line (to date: by share of games played), the 3-year BPM, minutes share, class, age, seasons, recruit rank, usage and height", 's2'),
+             col('nx', 'Next', "next season's VORX at 31 games, if he plays D-I: from this line (to date: by share of games played), his pXPM, minutes share, class, age, seasons, recruit rank, usage and height", 's2'),
              col('mpg', 'MPG', 'minutes a game'), col('gp', 'G', 'games', 'i'), col('fv', 'FV', 'FV now', 'i')]
     WK = ('n', 'tm', 'pos', 'age', 'sub', 'ph', 'lo', 'war', 'waa', 'nx', 'xpm', 'oxpm', 'dxpm', 'splus', 'mpg', 'gp', 'fv', 'mp')
     slim = lambda rows: [{k: r.get(k) for k in WK} for r in rows]
     write('war', {
-        'title': 'WAR leaders', 'key': 'war', 'def': '',
-        'views': [['war', 'WAR', 'wins over replacement'], ['waa', 'WAA', 'wins over average'], ['xpm', 'XPM', 'XPM'], ['oxpm', 'O-XPM', 'offensive XPM'], ['dxpm', 'D-XPM', 'defensive XPM'], ['nx', 'Next', "next season's WAR"]],
+        'title': 'VORX/XPM leaders', 'key': 'war', 'def': '',
+        'views': [['war', 'VORX', 'wins over replacement'], ['waa', 'WAA', 'wins over average'], ['xpm', 'XPM', 'XPM'], ['oxpm', 'O-XPM', 'offensive XPM'], ['dxpm', 'D-XPM', 'defensive XPM'], ['nx', 'Next', "next season's VORX"]],
         'cols': wcols, 'pos': ['G', 'F', 'C'],
         'min': {'k': 'mp', 'l': 'min ≥', 'def': 0, 'opts': [[0, 'any'], [100, '100'], [300, '300'], [600, '600']]},
         'seasons': [{'s': SEASON, 'l': label(SEASON), 'rows': slim(now_rows)}, {'s': LAST, 'l': label(LAST), 'rows': slim(last_rows), 'mdef': 100}]})
@@ -486,11 +488,11 @@ def main():
         'title': 'breakouts', 'key': 'xup', 'def': '',
         'views': [['xup', 'xBPM up', 'live xBPM minus preseason xBPM'], ['over', 'BPM over x', 'BPM minus preseason xBPM'],
                   ['minup', 'MPG up', 'minutes a game over last season'], ['usgup', 'USG up', 'usage over last season'], ['fvup', 'FV up', 'FV now minus preseason FV'],
-                  ['warup', 'WAR up', 'WAR over the season before (2025-26)'], ['bup', 'BPM up', 'BPM over the season before (2025-26)']],
+                  ['warup', 'VORX up', 'VORX over the season before (2025-26)'], ['bup', 'BPM up', 'BPM over the season before (2025-26)']],
         'cols': [col('xup', 'xBPM up', 'projected BPM now (this season blended in by minutes) minus the preseason projection', 's1'),
                  col('over', 'BPM over x', 'BPM to date minus the preseason xBPM', 's1'), col('bpm', 'BPM', 'BPM this season', 's1'),
                  col('xb0', 'xBPM pre', 'preseason projected BPM', 's1'), col('minup', 'MPG up', 'minutes a game over last season (2nd-years)', 's1'),
-                 col('usgup', 'USG up', 'usage % over last season (2nd-years)', 's1'), col('warup', 'WAR up', 'WAR over the season before', 's2'),
+                 col('usgup', 'USG up', 'usage % over last season (2nd-years)', 's1'), col('warup', 'VORX up', 'VORX over the season before', 's2'),
                  col('bup', 'BPM up', 'BPM over the season before', 's1'), col('fvup', 'FV up', 'FV now minus preseason FV', 's0'),
                  col('fv', 'FV', 'FV now', 'i'), col('mp', 'Min', 'minutes played', 'i')],
         'pre': {'l': 'Pre', 't': 'preseason board rank (FV)'}, 'pos': ['G', 'F', 'C'],
@@ -580,8 +582,8 @@ def main():
                      'splus': splus(s['xpm'] if s and s.get('xpm') is not None else L['bpm'], spos(r, L)), 'fv': r['fv']})
     write('portal', {
         'title': 'portal', 'key': 'pxpm', 'def': '',
-        'views': [['pxpm', 'pXPM', 'projected XPM at the new school'], ['war', 'WAR', 'WAR last season'], ['fv', 'FV', 'FV now'], ['xpm', 'XPM', 'XPM last season']],
-        'cols': [col('pxpm', 'pXPM', PT, 's1'), col('war', 'WAR', 'wins over replacement last season (2025-26) at his old school', 's2'),
+        'views': [['pxpm', 'pXPM', 'projected XPM at the new school'], ['war', 'VORX', 'VORX last season'], ['fv', 'FV', 'FV now'], ['xpm', 'XPM', 'XPM last season']],
+        'cols': [col('pxpm', 'pXPM', PT, 's1'), col('war', 'VORX', 'wins over replacement last season (2025-26) at his old school', 's2'),
                  col('xpm', 'XPM', 'XPM last season', 's1'),
                  col('splus', 'Stat+', 'last season\'s XPM against his position, 100 + 25 z', '0'), col('ppg', 'PTS', 'points a game last season'),
                  col('mpg', 'MPG', 'minutes a game last season'),
@@ -643,12 +645,12 @@ def teams(B, F, by_pid, pidof, bt, t2e, asof):
     for r in tal_rows: r.pop('trk', None); r.pop('rk', None)
     out = {'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'sport': 'cbb', 'season': SEASON, 'label': label(SEASON), 'src': 'Barttorvik',
            'views': {
-               'returning': {'plain': 1, 'about': 'Returning: last season\'s (2025-26) minutes and WAR still on the roster, by Barttorvik player id; transfers in = incoming D-I transfers\' WAR at their old schools. WAR = wins over a replacement player (XPM + 1.4) x minutes x .68 x wins a point; see the WAR leaders tab.',
+               'returning': {'plain': 1, 'about': 'Returning: last season\'s (2025-26) minutes and VORX still on the roster, by Barttorvik player id; transfers in = incoming D-I transfers\' VORX at their old schools. VORX = wins over a replacement player (XPM + 1.4) x minutes x .68 x wins a point; see the VORX leaders tab.',
                              'cols': [{'k': 'rmin', 'h': 'Ret Min%', 't': 'share of last season\'s minutes returning', 'f': '.1f', 'key': 1},
-                                      {'k': 'rwar', 'h': 'Ret WAR', 't': 'last season\'s WAR returning', 'f': '.1f'},
-                                      {'k': 'lwar', 'h': 'Lost WAR', 't': 'last season\'s WAR gone (graduated, pro, transferred out)', 'f': '.1f'},
-                                      {'k': 'inwar', 'h': 'In WAR', 't': 'incoming D-I transfers\' WAR last season at their old schools', 'f': '.1f'},
-                                      {'k': 'net', 'h': 'Net', 't': 'Ret WAR + In WAR - last season\'s WAR: production gained or lost before freshmen', 'f': '+.1f'},
+                                      {'k': 'rwar', 'h': 'Ret VORX', 't': 'last season\'s VORX returning', 'f': '.1f'},
+                                      {'k': 'lwar', 'h': 'Lost VORX', 't': 'last season\'s VORX gone (graduated, pro, transferred out)', 'f': '.1f'},
+                                      {'k': 'inwar', 'h': 'In VORX', 't': 'incoming D-I transfers\' VORX last season at their old schools', 'f': '.1f'},
+                                      {'k': 'net', 'h': 'Net', 't': 'Ret VORX + In VORX - last season\'s VORX: production gained or lost before freshmen', 'f': '+.1f'},
                                       {'k': 'ntr', 'h': 'Trans', 't': 'incoming D-I transfers', 'f': '.0f', 'x': 1},
                                       {'k': 'nfr', 'h': 'Fr', 't': 'true freshmen on the roster', 'f': '.0f', 'x': 1},
                                       {'k': 'frfv', 'h': 'Top Fr FV', 't': 'highest FV among the freshmen', 'f': '.0f', 'x': 1}],

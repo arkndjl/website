@@ -129,9 +129,9 @@ cover = "/og/college-basketball.png"
 {{< lazytab tab="transactions" >}}
 {{< transactions sport="cbb" title="transactions" tab="transactions" >}}
 {{< /lazytab >}}
-{{< wintabs tab="leaders" tabs="WAR leaders,pXPM,stats" sub="true" label="leaders views" >}}
-{{< lazytab tab="WAR leaders" >}}
-{{< rookies sport="cbb" src="data/cbb/war.json" icon="basketball" title="WAR leaders" tab="WAR leaders" >}}
+{{< wintabs tab="leaders" tabs="VORX/XPM leaders,pXPM,stats" sub="true" label="leaders views" >}}
+{{< lazytab tab="VORX/XPM leaders" >}}
+{{< rookies sport="cbb" src="data/cbb/war.json" icon="basketball" title="VORX/XPM leaders" tab="VORX/XPM leaders" >}}
 {{< /lazytab >}}
 {{< lazytab tab="pXPM" >}}
 {{< rookies sport="cbb" src="data/cbb/pxpm.json" icon="basketball" title="pXPM" tab="pXPM" >}}
