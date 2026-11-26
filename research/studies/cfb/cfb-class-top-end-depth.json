@@ -1,0 +1,60 @@
+{
+ "id": "cfb-class-top-end-depth",
+ "sport": "CFB",
+ "date": "2026-11-26",
+ "question": "Does a recruiting class's top end win more than its depth?",
+ "answer": "No. Point for point they are worth the same: CFB t = 0.70, CBB t = 0.51. The plain sum is not beaten.",
+ "findings": [
+  "CFB, four classes on a roster: top 5 0.044 rating SD per 10 points, depth 0.027 (n=1,605).",
+  "CFB class sum over no class score: t = 3.49, 13/13 seasons. No reweighting passes (best t = -0.20).",
+  "CBB, returning and transfer value held fixed: top 2 0.071, depth 0.049 per 10 points (n=1,546).",
+  "CBB without the roster held fixed, depth reads -0.084: a deep class follows a thin returning roster."
+ ],
+ "method": "Program rating z (opponent-adjusted margin in CFB, net rating in CBB) on the class's top-end and depth FV points, with the ratings before signing, a three-season baseline and program level as controls. Forms that reweight the class (split, decay, cap, star premium, power x decay) were pre-registered and scored held out by class or season, t clustered by program.",
+ "data": "CFBD composite classes 2009-25 and cfbfastR results 2005-25; consensus-ranked CBB classes 2009-25 and program net ratings 2008-26. 1,605 CFB program-seasons, 1,546 CBB classes.",
+ "n": 3151,
+ "robust": true,
+ "interest": 4,
+ "split_check": "CFB NIL-era seasons: top 5 0.069, depth 0.006, t = 1.49 (n=511). Not distinguishable yet.",
+ "auto": "scripts/research/class_score_nov26/pack.py",
+ "chart": {
+  "type": "bar",
+  "title": "Rating SD per 10 class points",
+  "x_label": "part of the class",
+  "y_label": "rating SD per 10 points",
+  "y_fmt": "num",
+  "ref": null,
+  "mark": null,
+  "series": [
+   {
+    "name": "per 10 points",
+    "points": [
+     {
+      "x": "CFB top 5",
+      "y": 0.044,
+      "lo": 0.0152,
+      "hi": 0.0728
+     },
+     {
+      "x": "CFB depth",
+      "y": 0.0267,
+      "lo": 0.0046,
+      "hi": 0.0488
+     },
+     {
+      "x": "CBB top 2",
+      "y": 0.071,
+      "lo": 0.0275,
+      "hi": 0.1145
+     },
+     {
+      "x": "CBB depth",
+      "y": 0.0485,
+      "lo": -0.0064,
+      "hi": 0.1034
+     }
+    ]
+   }
+  ]
+ }
+}

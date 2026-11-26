@@ -346,6 +346,31 @@
      ]
     },
     {
+     "term": "Class score",
+     "short": "A class's commits' FV points over the floor, summed. Top end and depth are its two parts.",
+     "body": [
+      "CFB sums xFV - 20 and CBB sums expected FV points. Top end is the best 5 commits in CFB and the best 2 in CBB, and depth is the rest.",
+      "Both parts were tested against results: program rating z, with the ratings before signing, a three-season baseline and program level as controls, held out and clustered by program. Reweightings were pre-registered: split, decay by rank in class, cap, star premium (points to a power), average + size, power x decay.",
+      "CFB, the four classes on a roster (2013-25, n = 1,605): the sum beats no class score at t = 3.49, 13 of 13 seasons. A top-end point is worth 0.0044 rating SD (SE 0.0015) and a depth point 0.0027 (SE 0.0011), difference t = 0.70.",
+      "Per standard deviation that is 0.17 rating SD for top end and 0.11 for depth. Raw correlation with the season's rating: 0.54 and 0.43; after the controls 0.24 and 0.23.",
+      "No CFB reweighting beats the sum: split t = -1.59, decay t = -0.52, cap t = -1.82, star premium t = -0.20, power x decay t = -2.15. One class at a time (2012-22, n = 1,357) the best is t = 0.03. Quarterback and line points next to the sum: t = -3.09.",
+      "CBB, one class at a time (2012-23, n = 1,342): discounting depth looks better (power x decay t = 2.52, 9 of 12 classes) and a depth point reads -0.0084. That is roster turnover: a deep freshman class follows a thin returning roster.",
+      "With returning and transfer value held fixed (first season, n = 1,546), a CBB top-end point is worth 0.0071 (SE 0.0022) and a depth point 0.0049 (SE 0.0028), difference t = 0.51, and every discount loses: decay t = -1.03, cap t = -2.47, star premium t = 0.19, power x decay t = -1.32.",
+      "CBB rating bends with the class total (diminishing returns, t = 4.40), which changes no class's order. CFB does not bend (t = 0.31).",
+      "The sum stays the class score in both sports, and top end and depth stay descriptive ranks. Lead: in NIL-era CFB seasons a top-end point is worth 0.0069 and a depth point 0.0006 (t = 1.49, n = 511); retest after the 2027 season.",
+      "Second pass, same test. Another value basis does not beat the one in use: CFB FV if on the board t = 0.09 and year-3 xFV t = -1.06; CBB headline FV t = 1.28 and Y1 FV t = -0.48. Blends fail too.",
+      "Program development times the sum: CFB t = -1.91, CBB t = 0.77. Early and late commits weighted apart: t = -1.20 and -0.40. CBB enrol rate of the three classes before: t = 0.79.",
+      "Incoming transfers next to the class, first season: CBB passes at t = 6.45, 12 of 13 classes (NIL era t = 4.76). A unit of transfer value is worth 7.8 class points, and per standard deviation transfers move the rating 0.17 SD to the class's 0.08. CFB incoming transfer production: t = 0.73.",
+      "That is a net class (high school commits plus transfers), not a change to the high school score. Not testable on stored history: positional need against the returning roster, decommit risk, per-recruit Transfer% and Ret%.",
+      "History points are the live model's by composite rating and level (CFB) or consensus rank (CBB); against the live class scores r = 0.966 and 0.997."
+     ],
+     "where": "Recruits tabs: class rankings; class rankings GFX",
+     "sports": [
+      "CFB",
+      "CBB"
+     ]
+    },
+    {
      "term": "Badges (players)",
      "short": "Bronze to platinum trait medals next to the name, each on one stat, regressed by volume.",
      "body": [
