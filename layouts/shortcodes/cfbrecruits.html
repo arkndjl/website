@@ -48,7 +48,7 @@
 {{- end }}
 
 {{- if eq $view "class" -}}{{ $LN := index (site.Data.recruit_commit_leans.cfb | default dict) (string .next) | default dict }}{{ $EP := index (site.Data.recruit_expert_picks.cfb | default dict) (string .next) | default dict }}{{ $RP := index (site.Data.recruit_rpm.cfb | default dict) (string .next) | default dict }}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "recruits") "filter" "Pos,Team,Conf,Stars,Status" "tab" ($.Get "tab") "gfxCols" "Recruit,ARK,Pos,Team,Grade,xFV,xNIL,On%" "gfxDate" $date "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "recruits") "filter" "Pos,Team,Conf,Stars,Status" "tab" ($.Get "tab") "gfxCols" "Recruit,ARK,Pos,Team,xFV,Y1 FV,xNIL,On%" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cfbrc">
   <thead><tr>
     {{- /* ARK (the rank) first, then stars, position, team, conf, size, home; the xFV line; NIL; the industry grades */}}
@@ -91,7 +91,7 @@
 {{- partial "wintable-close.html" (dict "rows" (len .class) "fresh" "cfb_recruits" "note" (printf "top %d of %d commits and %d uncommitted, %d class · updated %s" (len .class) (int .counts.class) (int (.counts.open | default 0)) (int .next) (lower ((time .asof).Format "Jan 2")))) -}}
 {{- else if eq $view "future" -}}{{ $yr := int ($.Get "year") }}
 {{- range where (.future | default slice) "year" $yr -}}{{ $F := . }}{{ $LN := index (site.Data.recruit_commit_leans.cfb | default dict) (string $yr) | default dict }}{{ $EP := index (site.Data.recruit_expert_picks.cfb | default dict) (string $yr) | default dict }}{{ $RP := index (site.Data.recruit_rpm.cfb | default dict) (string $yr) | default dict }}{{ $hasEsp := gt (len (where $F.list "src" "espn")) 0 }}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%d class" $yr)) "filter" "Pos,Team,Stars,Status,Source" "tab" ($.Get "tab") "gfxCols" "Recruit,ARK,Pos,Team,Grade,xFV,xNIL,On%" "gfxDate" $date "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%d class" $yr)) "filter" "Pos,Team,Stars,Status,Source" "tab" ($.Get "tab") "gfxCols" "Recruit,ARK,Pos,Team,xFV,Y1 FV,xNIL,On%" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cfbrc">
   <thead><tr>
     {{- /* ARK (the rank) first, then stars, position, team (or the lean), conf, size, home; the xFV line; NIL; the grades */}}

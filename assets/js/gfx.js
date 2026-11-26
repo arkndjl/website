@@ -210,7 +210,7 @@
       if (ageBody.length && ageFilled * 2 >= ageBody.length) {
         var ak = idx.indexOf(ageI); if (ak >= 0) { idx.splice(ak, 1); if (ak < nameAt) nameAt--; }
         var aAt = nameAt + 1;
-        while (aAt < idx.length && (FV_COL.test(heads[idx[aAt]]) || POS_COL.test(heads[idx[aAt]]))) aAt++;
+        while (aAt < idx.length && (FV_COL.test(heads[idx[aAt]]) || POS_COL.test(heads[idx[aAt]]) || /^(if nba|y1 fv)$/i.test(heads[idx[aAt]]))) aAt++;
         idx.splice(aAt, 0, ageI);
       } else ageI = -1;
     } else ageI = -1;
