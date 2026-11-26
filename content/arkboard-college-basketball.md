@@ -202,10 +202,13 @@ cover = "/og/college-basketball.png"
 {{< cbbrecruits view="class" year="2029" title="2029 class" tab="2029 class" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
-{{< wintabs tab="mock draft" tabs="predictive mock,blended mock,conviction mock" sub="true" label="mock draft views" >}}
+{{< wintabs tab="mock draft" tabs="predictive mock,blended mock,conviction mock,udfa signings" sub="true" label="mock draft views" >}}
 {{< cbbmock mode="pred" title="predictive mock" tab="predictive mock" >}}
 {{< cbbmock mode="blend" title="blended mock" tab="blended mock" >}}
 {{< cbbmock mode="conv" title="conviction mock" tab="conviction mock" >}}
+{{< lazytab tab="udfa signings" >}}
+{{< cbbudfa title="udfa signings" tab="udfa signings" >}}
+{{< /lazytab >}}
 {{< /wintabs >}}
 {{< wintabs tab="all-time" tabs="all-time teams,all-time offenses,all-time defenses" sub="true" label="all-time views" >}}
 {{< lazytab tab="all-time teams" >}}
