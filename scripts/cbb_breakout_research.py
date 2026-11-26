@@ -51,6 +51,7 @@ def load(src):
         o = B.line(r)
         if abs(o['bpm']) < 40:
             P[(o['pid'], o['y'])] = o
+    B.set_px(P.values())
     return P, raw
 
 

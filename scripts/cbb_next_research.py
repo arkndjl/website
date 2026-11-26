@@ -2,8 +2,11 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """CBB next-season player value (Nov 3 2026): research for a "next" WAR column on the CBB WAR / stats tabs.
 
-Target: next season's CBB WAR at a 31-game season, (BPM + 2) x min% / 100 x 31 x .68 x WPP (scripts/cbb_tabs.py WAR,
-pace 68, replacement -2), for returners and D-I transfers who play D-I the next season (Barttorvik research seasons).
+Target: next season's CBB VORX at a 31-game season, (XPM + 1.4) x min% / 100 x 31 x .68 x WPP (scripts/cbb_tabs.py VORX,
+pace 68, replacement -1.4; XPM = rXPM, scripts/cbb_xpm_hist.py; BPM + 2 before Nov 26 2026), for returners and D-I transfers
+who play D-I the next season (Barttorvik research seasons). Every XPM input is point in time (scripts/cbb_xpm_hist.py): last
+season's pXPM (board form) is the roster row's rate and the grid's history input, the value held flat and the position /
+offence inputs are rXPM.
 Units: player seasons y-1 -> y, walk-forward: every model is fit on target seasons before y and scored on y
 (y = 2016..2026, 11 held-out seasons).
 
@@ -26,7 +29,8 @@ seasons, height (no transfer terms: next season's school isn't known). Scored le
 season's WAR pace held flat and against the same model with no in-season line (f 0).
 
     python3 scripts/cbb_next_research.py [--logs DIR]   -> data/cbb_next_fit.json   (DIR: {year}.json.gz Barttorvik
-        all_advgames files for 2015-2025; without it the in-season grid is skipped)
+        all_advgames files for 2015-2025, default scripts/.cache/cbb/advgames; without them the in-season grid is kept
+        from the last fit)
 """
 import json
 import math
@@ -39,36 +43,47 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import cbb_roster as R
+import cbb_xpm_hist as XH
 import gzip
 from cbb_next import war, line, pxrow, POSMAP, K, NX
 
 ROOT = os.path.dirname(HERE)
 OUT = os.path.join(ROOT, 'data', 'cbb_next_fit.json')
-REPL = -2.0
+from cbb_next import REPL
 NEXT = os.path.join(HERE, 'data', 'cbb_next_2027.json')
 FIRST, LAST = 2016, 2026
 f = R.f
 
 
+def xpm(r, pid, y):
+    """the season's rXPM (BPM for a line the history file does not have)"""
+    return XH.get(pid, y, 'xpm', f(r['bpm'], REPL))
+
+
 def posmeans(by):
-    """year -> position -> minutes-weighted BPM mean (10%+ minute players)"""
+    """year -> position -> minutes-weighted XPM mean (10%+ minute players)"""
     out = {}
     for y, rows in by.items():
         acc = defaultdict(lambda: [0.0, 0.0])
-        for r in rows.values():
-            m, b = f(r['min_per'], 0), f(r['bpm'])
+        for pid, r in rows.items():
+            m, b = f(r['min_per'], 0), xpm(r, pid, y)
             if m >= 10 and b is not None:
                 a = acc[POSMAP.get(r['role'], 'F')]; a[0] += m * b; a[1] += m
         out[y] = {p: a[0] / a[1] for p, a in acc.items()}
     return out
 
 
-def extra(p, pm):
-    """M2's added inputs from last season's line p (nothing from the target season)"""
+def extra(p, pm, pid, y):
+    """M2's added inputs from last season's line p of season y (nothing from the target season)"""
     a = f(p.get('age'), 21.0)
-    b = f(p['bpm'], REPL)
+    b = xpm(p, pid, y)
     return [a - 21, (a - 21) ** 2, min(f(p.get('seasons'), 2), 6) - 2, b - pm.get(POSMAP.get(p['role'], 'F'), 0.0),
-            f(p.get('obpm'), 0.0), f(p.get('usg'), 18.0) - 18, f(p.get('hti'), 78) - 78]
+            XH.get(pid, y, 'oxpm', f(p.get('obpm'), 0.0)), f(p.get('usg'), 18.0) - 18, f(p.get('hti'), 78) - 78]
+
+
+def withpx(p, pid, y):
+    """line p of season y with its point-in-time pXPM (board form) set, the roster row's rate (scripts/cbb_roster.py xrow)"""
+    q = dict(p); q['pxpm'] = XH.get(pid, y, 'px2'); return q
 
 
 def ols(X, y, lam=1.0):
@@ -90,12 +105,12 @@ def main():
             p = by[y - 1].get(pid)
             h = R.healthy({y - k: by[y - k][pid] for k in (1, 2, 3) if y - k in by and pid in by[y - k]}, y)
             k = R.kind(r, p, h)
-            x = R.xrow(k, r, h if h else p, ts, y)
+            x = R.xrow(k, r, h if h else (withpx(p, pid, y - 1) if k in ('ret', 'tr') else p), ts, y)
             d = {'k': k, 'x': x, 'team': r['team'], 'bpm': max(-15, min(15, f(r['bpm'], REPL))), 'mp': f(r['min_per'], 0), 'pid': pid}
-            d['war'] = war(f(r['bpm'], REPL), d['mp'])
+            d['war'] = war(xpm(r, pid, y), d['mp'])
             if k in ('ret', 'tr'):
-                d['cur'] = war(f(p['bpm'], REPL), f(p['min_per'], 0))
-                d['e'] = extra(p, pm[y - 1])
+                d['cur'] = war(xpm(p, pid, y - 1), f(p['min_per'], 0))
+                d['e'] = extra(p, pm[y - 1], pid, y - 1)
             rows[y].append(d)
 
     def fitkind(Q, xs):
@@ -178,16 +193,18 @@ def main():
         a = s['all']
         print(f"{m:6s} n {a['n']} rmse {a['rmse']} (prior {a['rmse_prior']}) t {a['t_players']} season-t {a['t_seasons']} won {a['won']}/{a['of']} slope {a['slope']}"
               f" | M4 yrs rmse {s['m4yrs']['rmse']} t {s['m4yrs']['t_players']} won {s['m4yrs']['won']}/{s['m4yrs']['of']}")
-    out = {}
-    if '--logs' in sys.argv:
-        out = partial(by, sys.argv[sys.argv.index('--logs') + 1])
+    logs = sys.argv[sys.argv.index('--logs') + 1] if '--logs' in sys.argv else os.path.join(HERE, '.cache', 'cbb', 'advgames')
+    if os.path.exists(os.path.join(logs, f'{LAST - 1}.json.gz')): out = partial(by, logs)
+    else:
+        out = json.load(open(OUT)).get('inseason', {}) if os.path.exists(OUT) else {}
+        print('no game logs in', logs, ': in-season grid kept from the last fit')
     # live coefficients: M2 fit on every target season through LAST (offseason / last season's frozen view)
     trr = [q for yy in rows if yy <= LAST for q in rows[yy] if q['k'] in ('ret', 'tr')]
     cfull = ols([q['x'] + [q['cur']] + q['e'] for q in trr], [q['war'] for q in trr])
     nxt = live2027(by, ts, pm, cfull)
     json.dump({'built': 'scripts/cbb_next_research.py', 'season': LAST + 1, 'war': nxt}, open(NEXT, 'w'), separators=(',', ':'))
     print(NEXT, len(nxt), 'players')
-    json.dump({'built': 'scripts/cbb_next_research.py', 'target': 'next-season WAR at 31 games, (BPM + 2) x min% / 100 x 31 x .68 x .01432',
+    json.dump({'built': 'scripts/cbb_next_research.py', 'target': 'next-season VORX at 31 games, (XPM + 1.4) x min% / 100 x 31 x .68 x .01872',
                'units': 'returners + D-I transfers who play D-I next season', 'walk_forward': [FIRST, LAST], 'forms_tried': 4,
                'summary': summ, 'M2': [round(float(v), 5) for v in cfull], 'n_fit': len(trr),
                'posmean': {str(LAST): pm[LAST]}, 'inseason': out}, open(OUT, 'w'), indent=1)
@@ -229,9 +246,9 @@ def live2027(by, ts, pm, c):
         if not bt or p is None or not f(p['min_per']):
             continue
         k = 'ret' if p['team'] == bt else 'tr'
-        x = R.xrow(k, {'team': bt, 'rg_lrk': p.get('rg_lrk'), 'unranked': p.get('unranked')}, p, ts, LAST + 1)
-        cur = war(f(p['bpm'], REPL), f(p['min_per'], 0))
-        out[pid] = round(float(np.dot(c, x + [cur] + extra(p, pm[LAST]))), 2)
+        x = R.xrow(k, {'team': bt, 'rg_lrk': p.get('rg_lrk'), 'unranked': p.get('unranked')}, withpx(p, pid, LAST), ts, LAST + 1)
+        cur = war(xpm(p, pid, LAST), f(p['min_per'], 0))
+        out[pid] = round(float(np.dot(c, x + [cur] + extra(p, pm[LAST], pid, LAST))), 2)
     return out
 
 
@@ -253,7 +270,9 @@ def partial(by, logdir):
                 t = td.get(pid) if td is not None else None
                 if fr > 0 and t is None:
                     continue
-                L.append((pxrow(r, t, by[s - 1].get(pid) if s - 1 in by else None, pm[s - 1]), war(f(q['bpm'], REPL), f(q['min_per'], 0)),
+                pv = by[s - 1].get(pid) if s - 1 in by else None
+                if pv is not None: pv = {'px': XH.get(pid, s - 1, 'px2', f(pv.get('bpm3'))), 'min_per': pv.get('min_per')}
+                L.append((pxrow(r, t, pv, pm[s - 1]), war(xpm(q, pid, s + 1), f(q['min_per'], 0)),
                           war(t[0], t[3]) if t else None))
             data[fr][s] = L
         print('logs', s, {fr: len(data[fr][s]) for fr in GRID})

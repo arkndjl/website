@@ -1,0 +1,36 @@
+{
+ "kept": [
+  "bpm",
+  "rank"
+ ],
+ "n": 1555,
+ "base": 0.2843,
+ "rXPM for BPM": {
+  "terms": [
+   "xpm",
+   "rank"
+  ],
+  "logLoss": 0.2844,
+  "t": -0.19,
+  "seasons": "3/4"
+ },
+ "pXPM for BPM": {
+  "terms": [
+   "px2",
+   "rank"
+  ],
+  "logLoss": 0.2829,
+  "t": 0.75,
+  "seasons": "3/4"
+ },
+ "pXPM added": {
+  "terms": [
+   "bpm",
+   "rank",
+   "px2"
+  ],
+  "logLoss": 0.2833,
+  "t": 0.45,
+  "seasons": "2/4"
+ }
+}
