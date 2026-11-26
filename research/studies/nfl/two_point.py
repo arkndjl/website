@@ -137,21 +137,21 @@ def emit():
         "id": "nfl-two-point",
         "sport": "NFL",
         "question": "Is a two-point try worth more than an extra point on average?",
-        "answer": (f"No clear edge. 2-pt tries score {2*W2[0]:.2f} points per try, XPs {W1[0]:.2f}; "
-                   f"difference {epd[0]:+.2f} ({epd[1]:+.2f} to {epd[2]:+.2f})."),
+        "answer": (f"There is no clear edge. A 2-pt try scores {2*W2[0]:.2f} points per try and an XP scores {W1[0]:.2f}, "
+                   f"a difference of {epd[0]:+.2f} ({epd[1]:+.2f} to {epd[2]:+.2f})."),
         "findings": [
-            f"2-pt success {W2[0]*100:.1f}% ({W2[1]*100:.1f}-{W2[2]*100:.1f}, n={S['n2']:,}); break-even vs XP is {W1[0]*50:.1f}%.",
-            f"XP rate {w_xp_old[0]*100:.1f}% in 2015-17 (n={n0:,}), {w_xp_recent[0]*100:.1f}% in 2023-25 (n={n:,}).",
-            f"2-pt rate by season ranges {min(two_rates)*100:.0f}% to {max(two_rates)*100:.0f}%; every season CI includes 48%.",
-            "2-pt runs 55% (50-60, n=388), passes 45% (42-48, n=1,041).",
+            f"2-pt success is {W2[0]*100:.1f}% ({W2[1]*100:.1f}-{W2[2]*100:.1f}, n={S['n2']:,}), and the break-even against the XP is {W1[0]*50:.1f}%.",
+            f"The XP rate was {w_xp_old[0]*100:.1f}% in 2015-17 (n={n0:,}) and {w_xp_recent[0]*100:.1f}% in 2023-25 (n={n:,}).",
+            f"The 2-pt rate by season ranges from {min(two_rates)*100:.0f}% to {max(two_rates)*100:.0f}%, and every season's CI includes 48%.",
+            "2-pt runs convert 55% (50-60, n=388), and passes 45% (42-48, n=1,041).",
         ],
-        "method": ("Wilson 95% CIs on success rates; expected points = 2 x 2-pt rate vs XP rate. Tries in Q1-Q4, "
-                   "all game states; selection is small since 2-pt tries are mostly score-driven."),
+        "method": ("Wilson 95% CIs on the success rates. Expected points are 2 x the 2-pt rate against the XP rate. Tries are from Q1-Q4 "
+                   "in all game states. Selection is small, since 2-pt tries are mostly driven by the score."),
         "data": f"nflverse play-by-play, 2015 to 2026 wk 8, {S['n2']:,} two-point tries and {S['n1']:,} extra points.",
         "n": int(S["n2"] + S["n1"]),
         "robust": False,
         "interest": 2,
-        "split_check": "2-pt rate 47.6% in 2015-20 (n=706), 48.5% in 2021-26 (n=752); XP edge within noise in both.",
+        "split_check": "The 2-pt rate was 47.6% in 2015-20 (n=706) and 48.5% in 2021-26 (n=752). The XP edge is within noise in both.",
         "chart": {
             "type": "line",
             "title": "Expected points per try",
@@ -181,23 +181,23 @@ def emit():
         "id": "nfl-down-14-go-for-two",
         "sport": "NFL",
         "question": "Down 14 in the 4th, should a team go for two after the first touchdown?",
-        "answer": (f"Yes. With two TDs and a stop, going for 2 first wins {S['agg']*100:.0f}% vs {S['conv']*100:.0f}% kicking. "
+        "answer": (f"Yes. Given two TDs and a stop, going for 2 first wins {S['agg']*100:.0f}% of the time, against {S['conv']*100:.0f}% for kicking. "
                    f"Teams went for 2 {pts[-1]['y']*100:.0f}% of the time in 2025-26."),
         "findings": [
-            f"Win chance gain given two TDs: {dd[0]*100:+.1f} pts ({dd[1]*100:+.1f} to {dd[2]*100:+.1f}).",
-            f"Down 8 at a Q4 PAT: went for 2 in {round(early[0]['y']*early[0]['n'] + early[1]['y']*early[1]['n'])} of "
-            f"{early[0]['n'] + early[1]['n']} in 2015-18, {round(pts[-1]['y']*pts[-1]['n'])} of {pts[-1]['n']} in 2025-26.",
+            f"The gain in win chance given two TDs is {dd[0]*100:+.1f} points ({dd[1]*100:+.1f} to {dd[2]*100:+.1f}).",
+            f"Down 8 at a Q4 PAT, teams went for 2 in {round(early[0]['y']*early[0]['n'] + early[1]['y']*early[1]['n'])} of "
+            f"{early[0]['n'] + early[1]['n']} in 2015-18 and in {round(pts[-1]['y']*pts[-1]['n'])} of {pts[-1]['n']} in 2025-26.",
             f"Inputs: 2-pt {S['W2'][0]*100:.1f}% (n={S['n2']:,}), XP {S['W1'][0]*100:.1f}% (n={S['n1']:,}), overtime 50/50.",
             "The early 2-pt result also tells the team whether it needs a TD or a TD and 2 on the next drive.",
         ],
-        "method": ("Closed-form win chance given two TDs and no opponent score, with pooled 2-pt and XP rates; "
-                   "CI from Beta draws of both rates. Go-for-2 share counts Q4 tries at down 8, Wilson CIs."),
+        "method": ("A closed-form win chance given two TDs and no opponent score, with pooled 2-pt and XP rates. "
+                   "The CI comes from Beta draws of both rates. The go-for-2 share counts Q4 tries at down 8, with Wilson CIs."),
         "data": f"nflverse play-by-play, 2015 to 2026 wk 8; {k_all + (n_all - k_all)} Q4 PATs at down 8; {S['n2']:,} 2-pt tries.",
         "n": int(n_all),
         "robust": True,
         "interest": 4,
-        "split_check": (f"Gain holds with 2015-20 rates ({(e_agg-e_con)*100:+.1f} pts) and 2021-26 rates "
-                        f"({(l_agg-l_con)*100:+.1f} pts)."),
+        "split_check": (f"The gain holds with the 2015-20 rates ({(e_agg-e_con)*100:+.1f} points) and the 2021-26 rates "
+                        f"({(l_agg-l_con)*100:+.1f} points)."),
         "chart": {
             "type": "bar",
             "title": "Share going for 2 when down 8 at a 4th-quarter PAT",

@@ -118,21 +118,21 @@ if __name__ == "__main__":
         "id": "nba-two-for-one",
         "sport": "NBA",
         "question": "With 25-40 seconds left in a quarter, does a quick shot for a 2-for-1 pay?",
-        "answer": (f"{'Yes' if sd[0] > 0 and robust else 'Small edge'}: quick shot nets {sd[0]:+.2f} pts per quarter-end vs a full possession "
+        "answer": (f"{'Yes' if sd[0] > 0 and robust else 'A small edge'}. A quick shot nets {sd[0]:+.2f} points per quarter-end compared to a full possession "
                    f"(CI {sd[1]:+.2f} to {sd[2]:+.2f})."),
         "findings": [
-            f"Quick (<=10 s): net {qm[0]:+.2f} pts to quarter end (CI {qm[1]:+.2f} to {qm[2]:+.2f}), n={len(q)}.",
-            f"Full (>10 s): net {fm[0]:+.2f} pts (CI {fm[1]:+.2f} to {fm[2]:+.2f}), n={len(f)}.",
-            f"Points for/against: quick {qa[0]:.2f}/{qb[0]:.2f}, full {fa[0]:.2f}/{fb[0]:.2f}.",
-            f"All start types (incl. transition): quick minus full {sd_all[0]:+.2f} pts (CI {sd_all[1]:+.2f} to {sd_all[2]:+.2f}), n={len(df)}.",
+            f"A quick shot (<=10 s) nets {qm[0]:+.2f} points to the end of the quarter (CI {qm[1]:+.2f} to {qm[2]:+.2f}), n={len(q)}.",
+            f"A full possession (>10 s) nets {fm[0]:+.2f} points (CI {fm[1]:+.2f} to {fm[2]:+.2f}), n={len(f)}.",
+            f"Points for and against: {qa[0]:.2f}/{qb[0]:.2f} quick, {fa[0]:.2f}/{fb[0]:.2f} full.",
+            f"On all start types, transition included, quick minus full is {sd_all[0]:+.2f} points (CI {sd_all[1]:+.2f} to {sd_all[2]:+.2f}), n={len(df)}.",
         ],
-        "method": ("Q1-Q3, first possession starting 25-40 s left. Outcome = own minus opponent points to quarter end. "
-                   "Main sample = inbound after opponent score (no transition); quick vs full compared within 5 s start-time bins, game-clustered bootstrap."),
+        "method": ("The sample is the first possession starting with 25-40 s left in Q1-Q3. The outcome is own points minus opponent points to the end of the quarter. "
+                   "The main sample is inbounds after an opponent score (no transition), with quick and full possessions compared within 5 s start-time bins and a game-clustered bootstrap."),
         "data": f"ESPN play-by-play via sportsdataverse, NBA 2011-12 to 2025-26, {df.game_id.nunique():,} games, {len(dead):,} inbound possessions.",
         "n": int(len(dead)),
         "robust": bool(robust),
         "interest": 3,
-        "split_check": f"Quick minus full: {sde[0]:+.2f} pts in 2012-19 (CI {sde[1]:+.2f} to {sde[2]:+.2f}), {sdl[0]:+.2f} in 2020-26 (CI {sdl[1]:+.2f} to {sdl[2]:+.2f}).",
+        "split_check": f"Quick minus full was {sde[0]:+.2f} points in 2012-19 (CI {sde[1]:+.2f} to {sde[2]:+.2f}) and {sdl[0]:+.2f} in 2020-26 (CI {sdl[1]:+.2f} to {sdl[2]:+.2f}).",
         "chart": {
             "type": "line",
             "title": "Net points to quarter end by seconds used, inbound possessions 25-40 s left",

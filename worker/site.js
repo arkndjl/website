@@ -115,6 +115,7 @@ export default {
 // with one field, data = JSON {verification_token, message_id, from_name, amount, currency, is_public, type}.
 // Checked against the KOFI_TOKEN worker secret. Every payment is stored; /api/supporters lists only names from
 // public payments (is_public true), ranked by total, names only, no amounts.
+// Ko-fi's "Send Single Donation Test" posts from "Jo Example"; it is stored but never listed.
 async function kofi(request, env) {
   if (request.method !== "POST") return json({ error: "method" }, 405, { allow: "POST" });
   if (!env.KOFI_TOKEN) return json({ error: "not set up" }, 503);
@@ -144,7 +145,7 @@ export class Supporters extends DurableObject {
   }
   top(n) {
     const out = [];
-    for (const r of this.sql.exec(`SELECT name, SUM(amount) a, MAX(t) t FROM tips WHERE pub = 1 AND name != '' GROUP BY lower(name) ORDER BY a DESC, t ASC LIMIT ?`, n)) out.push(r.name);
+    for (const r of this.sql.exec(`SELECT name, SUM(amount) a, MAX(t) t FROM tips WHERE pub = 1 AND name != '' AND lower(name) != 'jo example' GROUP BY lower(name) ORDER BY a DESC, t ASC LIMIT ?`, n)) out.push(r.name);
     return out;
   }
 }

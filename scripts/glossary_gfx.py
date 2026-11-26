@@ -60,8 +60,8 @@ def nba():
     last = [p for p in S[-1]['players'] if (p.get('mp') or 0) >= 1000 * S[-1]['games'] / 82]
     xpm = {
         'stands': 'Cross Plus-Minus · NBA',
-        'what': 'Points a 100 possessions a player adds over an average player, as played.',
-        'use': 'Headline impact number on every NBA board. Feeds VORX, the game models and the CBB FV target.',
+        'what': 'The points a player adds per 100 possessions over an average player, as played.',
+        'use': 'The headline number on every NBA board. It feeds VORX, the game models and the CBB FV target.',
         'f': ['XPM = .5 DPM + .5 BPM', 'O-XPM, D-XPM: same blend each side'],
         'parts': [['databallr DPM', .5], ['Basketball-Reference BPM', .5]],
         'test': {'t': 'next-season team net rating · RMSE', 'lo': True, 'unit': '',
@@ -74,8 +74,8 @@ def nba():
     }
     vorx = {
         'stands': 'Value Over Replacement XPM · NBA',
-        'what': 'Wins a player adds over a replacement player across his minutes.',
-        'use': 'Default sort of the XPM and rookie boards. Converts to dollars in contract value.',
+        'what': 'The wins a player adds over a replacement player across his minutes.',
+        'use': 'The default sort of the XPM and rookie boards. Contract value converts it to dollars.',
         'f': ['VORX = .030 × (XPM + 1.4) × MP / 48', 'replacement XPM -1.4 · .030 wins a point'],
         'test': {'t': 'rookies: order of next-3-season VORX · Spearman', 'lo': False, 'unit': '',
                  'rows': [['VORX', .398, 1], ['pXPM', .395, 0], ['aXPM', .379, 0], ['XPM', .330, 0]],
@@ -88,8 +88,8 @@ def nba():
     px = J('data/nba_pxpm_research.json'); k = px['ship'][0]
     pxpm = {
         'stands': 'predictive XPM · NBA',
-        'what': 'Projected XPM next season: three seasons by minutes, shrunk to a role mean, aged.',
-        'use': 'Small-sample read and next-season level. Separates a hot 300 minutes from a level.',
+        'what': "Next season's XPM from three seasons weighted by minutes, shrunk to a role mean and aged.",
+        'use': "The read on small samples and next season's level. It separates a hot 300 minutes from a level.",
         'f': [f'({k} × role mean + Σ w MP × XPM)', f'/ ({k} + Σ w MP)  · w 1 / {px["ship"][1]:g} / {px["ship"][2]:g}', '+ aging to next season'],
         'test': {'t': 'next-season XPM · RMSE', 'lo': True, 'unit': '',
                  'rows': [['pXPM', px['loo']['player'], 1], ['k 600 shrink', px['base']['pXPM (live)']['player'], 0],
@@ -112,8 +112,8 @@ def nhl():
     sk = [p for p in S[-1]['players'] if p.get('grp') != 'G' and (p.get('toi') or 0) >= 500]
     war = {
         'stands': 'wins above replacement · NHL',
-        'what': 'Wins a player added over a replacement-level player, from what happened on the ice.',
-        'use': 'Descriptive value: who drove results this season. Sums to team goal differential.',
+        'what': 'The wins a player added over a replacement-level player, from what happened on the ice.',
+        'use': 'Descriptive value, meaning who drove results this season. It sums to team goal differential.',
         'f': ['5v5 on-ice xG vs teammates', '+ PP xG / 5 + PK / 4', '+ finishing + penalties', f"÷ {fit['goalsPerWin']} goals a win"],
         'test': {'t': 'team WAR vs team goal differential, same season', 'tiles': [['R²', f"{fit['r2Same']:.3f}".lstrip('0'), 'same season'], ['team seasons', f"{fit['teamSeasons']}", '2009-26']],
                  'n': 'projection test: see pWAR'},
@@ -124,8 +124,8 @@ def nhl():
     }
     pwar = {
         'stands': 'projected WAR · NHL',
-        'what': 'Expected WAR next season from shrunk, weighted rates and projected ice time.',
-        'use': 'Forward-looking value for rosters, trades, backups and the game model.',
+        'what': 'Expected WAR next season, from shrunk and weighted rates and projected ice time.',
+        'use': 'The forward-looking value for rosters, trades, backups and the game model.',
         'f': ['HPM = Marcel rates (1 / .5 / .25), shrunk', 'pWAR = (HPM − repl) × TOI / 60 ÷ goals a win'],
         'test': {'t': 'next-season team goal diff · R²', 'lo': False, 'unit': '',
                  'rows': [['pWAR', fit['r2'], 1], ['points only', fit['r2Points'], 0], ['on-ice xG only', fit['r2OnIceXg'], 0]],
@@ -144,8 +144,8 @@ def soccer():
     last = [p for p in S[-1]['players'] if (p.get('min') or 0) >= 900]
     return {
         'stands': 'goals above replacement · soccer',
-        'what': 'Goals a season a player adds over a replacement regular, one scale for every league.',
-        'use': 'Player value on the soccer board. Base of xMV, 1Y / 3Y and backup watch.',
+        'what': 'The goals a season a player adds over a replacement regular, on one scale for every league.',
+        'use': 'Player value on the soccer board. It is the base of xMV, 1Y / 3Y and backup watch.',
         'f': ['shrunk per-90 rates × weights', 'on-ice xGA, npxG, xA, xGBuildup, GK saves', 'PAR = GAR × .626 points a goal'],
         'parts': [[n, fit['w'][k]] for n, k in (('xA', 'xas'), ('npxG', 'npxg'), ('xGBuildup', 'bup'), ('on-ice xGA', 'ona')) if k in fit['w']],
         'test': {'t': 'next-season team goal diff · R²', 'lo': False, 'unit': '',
@@ -163,8 +163,8 @@ def nfl():
     P = d['players']
     return {
         'stands': 'wins above replacement · NFL',
-        'what': 'Wins a player added over a replacement player at his position, both sides of the ball.',
-        'use': 'Season value on the NFL board, team WAR, rookies and standouts.',
+        'what': 'The wins a player added over a replacement player at his position, on both sides of the ball.',
+        'use': 'Season value on the NFL board, and in team WAR, rookies and standouts.',
         'f': ['WAR = .6 × AV WAR + .4 × XV', 'AV WAR = (AV − repl AV × snaps) × .091'],
         'parts': [['AV WAR', .6], ['XV (stat lines)', .4]],
         'test': {'t': 'margin lost on missed games · t', 'lo': False, 'unit': '',
@@ -182,8 +182,8 @@ def fv():
     rows = sorted(d['rows'], key=lambda r: -r['fvx'])[:10]
     return {
         'stands': 'future value · 20-80',
-        'what': 'Grade of what a prospect becomes at peak: the mean outcome of past players with the profile.',
-        'use': 'Ranks every prospect board. One scale per board, graded on absolute talent.',
+        'what': 'A grade of what a prospect becomes at peak, the mean outcome of past players with the profile.',
+        'use': 'It ranks every prospect board. Each board has one scale, graded on absolute talent.',
         'f': ['FV = Σ tier odds × tier outcome', '50 regular · 60 plus · 70 star · 80 generational'],
         'test': {'t': 'CBB held out: grade given vs outcome reached', 'tiles': [['slope', f"{c['slope']:.2f}", '1 = exact'], ['bias', f"{c['bias']:+.1f}", 'FV points'], ['players', f"{c['n']:,}", f"{d['seasons'][0]}-{d['seasons'][1]}"]]},
         'viz': {'kind': 'cal', 't': 'FV given vs outcome FV', 'lo': 20, 'hi': 65,
@@ -200,8 +200,8 @@ def cs2():
     b = sorted(d['board'], key=lambda r: -r['rwa'])
     return {
         'stands': 'round win % added · CS2',
-        'what': 'Round win % a player adds per round, opponent-adjusted. 0 = average tier-1 starter.',
-        'use': 'Player board, prospect FV and the player term in series odds.',
+        'what': 'The round win % a player adds per round, opponent-adjusted. 0 is an average tier-1 starter.',
+        'use': 'The player board, prospect FV and the player term in series odds.',
         'f': ['box: round share on per-round stat lines', '+ ½ plus-minus residual', '+ tier lift · opponents credited'],
         'test': {'t': 'next-map round share · R²', 'lo': False, 'unit': '',
                  'rows': [['RWA', sc.get('ARK player rating', .134), 1], ['Nov 2 RWA', sc.get('Nov 2 rating (no headshots, damage taken, plus-minus or tier lift)', .120), 0],
@@ -218,8 +218,8 @@ def gleague():
     rows = [dict(p, lab=str(s['season'] - 1) + '-' + str(s['season'])[2:]) for s in S for p in s['players'] if p.get('p1') is not None]
     return {
         'stands': 'chance of NBA minutes · G League',
-        'what': 'Chance a G League player plays NBA minutes next season. 500% and xVORX: bigger roles.',
-        'use': 'G League tab: who is next up.',
+        'what': 'The chance a G League player plays NBA minutes next season. 500% and xVORX cover bigger roles.',
+        'use': 'The G League tab, for who is next up.',
         'f': ['ridge logistic: age, minutes, per-36 box,', 'efficiency, NBA history, draft slot'],
         'test': {'t': 'next season NBA minutes · AUC', 'lo': False, 'unit': '',
                  'rows': [['with G League stats', g['auc'], 1], ['NBA history only', g['auc_hist'], 0]],
@@ -235,8 +235,8 @@ def nextup():
     d = J('static/data/next-up/nba.json')
     return {
         'stands': 'breakout odds',
-        'what': 'Chance of a first season over the quality bar next season, for players never over it.',
-        'use': 'Next up tab on every sport page.',
+        'what': 'The chance of a first season over the quality bar next season, for players never over it.',
+        'use': 'The next up tab on every sport page.',
         'f': ['logistic on shrunk value + signals', 'bar ≈ 75-80th percentile of regulars'],
         'test': {'t': 'held-out t vs no-signal baseline', 'lo': False, 'unit': '',
                  'rows': [['CBB', 14.4, 1], ['NBA', 7.9, 1], ['soccer', 6.2, 1], ['CFB', 6.0, 1], ['NHL', 5.6, 1], ['NFL', 3.3, 1]],
@@ -252,8 +252,8 @@ def statplus():
     b = J('data/cfb_statplus_backtest.json')['byPosition']
     return {
         'stands': 'production index · CFB',
-        'what': 'Production against the position this season. 100 = average, 25 = one SD.',
-        'use': 'CFB board, WAR quality and an FV production driver.',
+        'what': 'Production against the position this season. 100 is average and 25 points is one SD.',
+        'use': 'The CFB board, WAR quality and a production driver in FV.',
         'f': ['Stat+ = 100 + 25 × z', 'z of the PFN position score vs snap-weighted mean'],
         'test': {'t': 'validity vs NFL AV · r', 'lo': False, 'unit': '',
                  'rows': [[k, v, 1] for k, v in sorted(b.items(), key=lambda kv: -kv[1])], 'n': 'FBS players who reached the NFL'},

@@ -76,23 +76,23 @@ for half, lab in [(0, 'top'), (1, 'bottom')]:
             pts[b].append({'x': f'{lab}: {yl}', 'y': round(z[yc].mean(), 3), 'lo': round(lo, 3), 'hi': round(hi, 3), 'n': int(len(z))})
 tw, bw, ts, bs_ = R[('top', 'bat_win')], R[('bottom', 'bat_win')], R[('top', 'scored')], R[('bottom', 'scored')]
 tr = R[('top', 'runs_half')]
-pp = lambda t: f"{t[0]*100:+.1f} pts (CI {t[1]*100:+.1f} to {t[2]*100:+.1f})"
+pp = lambda t: f"{t[0]*100:+.1f} points (CI {t[1]*100:+.1f} to {t[2]*100:+.1f})"
 n_main = int(st.tied.sum())
 out = {
     "id": "mlb-ghost-runner", "sport": "MLB",
     "question": "With the extra-inning runner on 2nd, does bunting him to 3rd pay, and has the home edge changed?",
-    "answer": f"No measurable edge either way; visitors' bunts {tr[0]:+.2f} runs (CI {tr[1]:+.2f} to {tr[2]:+.2f}). Home teams win {post.hw.mean():.1%} of extra games.",
+    "answer": f"There is no measurable edge either way. Visitors' bunts are worth {tr[0]:+.2f} runs (CI {tr[1]:+.2f} to {tr[2]:+.2f}). Home teams win {post.hw.mean():.1%} of extra games.",
     "findings": [
-        f"Visitors, tied, leadoff bunt try vs swing: runs {tr[0]:+.2f} (CI {tr[1]:+.2f} to {tr[2]:+.2f}), win {pp(tw)}.",
-        f"Home, tied, bunt try vs swing: scored {pp(bs_)}, win {pp(bw)}.",
-        f"Home win % in extra-inning games: {pre.hw.mean():.1%} 2015-19 (n={len(pre):,}), {post.hw.mean():.1%} 2020-25 (n={len(post):,}).",
-        f"Leadoff bunt attempt rate in extras: {st.bunt_att.mean():.1%} of {len(st):,} halves; bunters hit {st[st.bunt_att==1].q.mean()*1000:+.0f} pts of wOBA vs swingers {st[st.bunt_att==0].q.mean()*1000:+.0f}.",
+        f"Visitors, tied, a leadoff bunt try against swinging: runs {tr[0]:+.2f} (CI {tr[1]:+.2f} to {tr[2]:+.2f}), win {pp(tw)}.",
+        f"Home, tied, a bunt try against swinging: scored {pp(bs_)}, win {pp(bw)}.",
+        f"The home win % in extra-inning games was {pre.hw.mean():.1%} in 2015-19 (n={len(pre):,}) and {post.hw.mean():.1%} in 2020-25 (n={len(post):,}).",
+        f"The leadoff bunt attempt rate in extras is {st.bunt_att.mean():.1%} of {len(st):,} halves. Bunters hit {st[st.bunt_att==1].q.mean()*1000:+.0f} points of wOBA and swingers {st[st.bunt_att==0].q.mean()*1000:+.0f}.",
     ],
-    "method": "Leadoff PA of each extra half-inning (runner on 2nd, 0 out), non-pitchers. Bunt try = bunt in play or a foul/missed bunt. "
-              "Linear model with batter-season wOBA and season; game bootstrap CIs. Intent beyond the batter is not observed.",
+    "method": "The leadoff PA of each extra half-inning (runner on 2nd, 0 out), non-pitchers. A bunt try is a bunt in play or a foul or missed bunt. "
+              "A linear model with batter-season wOBA and season, with game bootstrap CIs. Intent beyond the batter isn't observed.",
     "data": f"Retrosheet play-by-play, 2020-2025 regular season (7-inning games removed), {n_main:,} tied extra half-innings; 2015-19 extras for home win %.",
     "n": n_main, "robust": False, "interest": 2,
-    "split_check": f"Win diff, bunt minus swing: visitors {SP[('2020-22','top')]*100:+.1f} pts 2020-22, {SP[('2023-25','top')]*100:+.1f} 2023-25; "
+    "split_check": f"Win difference, bunt minus swing: visitors {SP[('2020-22','top')]*100:+.1f} points in 2020-22 and {SP[('2023-25','top')]*100:+.1f} in 2023-25, "
                    f"home {SP[('2020-22','bottom')]*100:+.1f}, {SP[('2023-25','bottom')]*100:+.1f} (raw).",
     "chart": {"type": "bar", "title": "Leadoff with runner on 2nd, tied extra innings",
               "x_label": "half-inning: outcome", "y_label": "batting team %", "y_fmt": "pct", "x_reverse": False,
