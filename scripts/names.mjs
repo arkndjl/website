@@ -99,9 +99,17 @@ export function strength(a, b) {
   if (!ka || !kb) return 0;
   if (ka === kb || ka.replace(/ /g, '') === kb.replace(/ /g, '')) return 3;
   const ta = ka.split(' '), tb = kb.split(' ');
-  if (ta.length < 2 || tb.length < 2) return 0;
+  if (ta.length < 2 || tb.length < 2) {
+    // a mononym against a full name (Bremer / Gleison Bremer, Jonny / Jonny Otto): his first or last name, 4+ letters, only trusted with the team
+    const [s, o] = ta.length < 2 ? [ta, tb] : [tb, ta];
+    return o.length >= 2 && s[0].length >= 4 && (s[0] === o[0] || s[0] === o[o.length - 1]) ? 1 : 0;
+  }
   const f = ta.slice(0, -1).join(' '), l = ta[ta.length - 1], g = tb.slice(0, -1).join(' '), m = tb[tb.length - 1];
-  if (l === m) return firstFits(f, g);
+  if (l === m) {
+    // one source drops a leading given name (Mehmet Zeki Çelik / Zeki Çelik): the shorter is the longer's tail, only trusted with the team
+    const [s, o] = ta.length < tb.length ? [ta, tb] : [tb, ta];
+    return firstFits(f, g) || (s.length < o.length && o.slice(-s.length).join(' ') === s.join(' ') ? 1 : 0);
+  }
   if (ta.length === 3 && tb.length === 3 && ta.slice(1).join(' ') === tb.slice(1).join(' ')) return firstFits(ta[0], tb[0]);
   if (ta.length === 3 && ta[1] + ta[2] === m && ta[0] === g) return 3;
   if (tb.length === 3 && tb[1] + tb[2] === l && tb[0] === f) return 3;
@@ -144,7 +152,7 @@ export function posFits(a, b, sport = 'football') {
 export class Matcher {
   constructor(rows, { name = 'name', team = 'team', pos = 'pos', id = null, sport = 'football', teamEq = sameTeam } = {}) {
     this.rows = [...rows]; this.f = { name, team, pos, id }; this.sport = sport; this.teamEq = teamEq;
-    this.byKey = new Map(); this.byLast = new Map(); this.byId = new Map();
+    this.byKey = new Map(); this.byLast = new Map(); this.byId = new Map(); this.byFirst = new Map();
     for (const r of this.rows) {
       const n = this.get(r, 'name');
       if (!n) continue;
@@ -152,6 +160,7 @@ export class Matcher {
       push(this.byKey, k, r);
       if (t[0]) push(this.byLast, t[t.length - 1], r);
       if (t.length === 3) push(this.byLast, t[1], r);   // a two-part surname under its first part too
+      if (t.length > 1) push(this.byFirst, t[0], r);    // for a mononym that is his first name
       const i = this.get(r, 'id');
       if (i != null && i !== '') push(this.byId, String(i), r);
     }
@@ -165,6 +174,7 @@ export class Matcher {
     const last = t[t.length - 1];
     let pool = [...(this.byLast.get(last) || [])];
     if (t.length === 3) pool = pool.concat(this.byLast.get(t[1]) || []);
+    pool = pool.concat((t.length === 1 ? this.byFirst.get(t[0]) : this.byKey.get(t[0])) || []);   // mononyms (strength 1)
     if (last.length >= 6) for (const l2 of this.lasts) {
       if (l2 !== last && Math.abs(l2.length - last.length) <= 1 && l2[0] === last[0] && oneOff(l2, last)) pool = pool.concat(this.byLast.get(l2));
     }
@@ -222,6 +232,10 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv.includes(
   for (const [a, b] of [['Josh Allen', 'Jordan Allen'], ['Chris Bell', 'Charles Bell'], ['Malik Brown', 'Malachi Brown'], ['AJ Green', 'AJ Greene'], ['Dan Jackson', 'Dante Jackson'], ['Jalen Smith', 'Jaylen Smith']])
     ok(!same(a, b), [a, b]);
   ok(strength('Sylvester Smith-Reed', 'Sylvester Smith') === 1 && strength('Bryce Underwood', 'Bryce Underwod') === 1 && strength('Devin Jackson', 'Devon Jackson') === 1, 'strength 1');
+  ok(strength('Mehmet Zeki Çelik', 'Zeki Çelik') === 1 && strength('Destiny Udogie', 'Iyenoma Destiny Udogie') === 1 && strength('Zeki Çelik', 'Zeki Mehmet Çelik') === 2, 'dropped given name');
+  ok(strength('Bremer', 'Gleison Bremer') === 1 && strength('Jonny Otto', 'Jonny') === 1 && strength('Rod', 'Rod Smith') === 0 && strength('Bremer', 'Pedro') === 0, 'mononym');
+  { const m4 = new Matcher([{ name: 'Gleison Bremer', team: 'Juventus' }, { name: 'Jonny Otto', team: 'Alaves' }, { name: 'Djené', team: 'Getafe' }]);
+    ok(m4.find('Bremer', { team: 'Juventus' })[1] === 'variant+team' && m4.find('Jonny', { team: 'Alaves' })[1] === 'variant+team' && m4.find('Bremer', { team: 'Torino' })[0] == null && m4.find('Djené Dakonam', { team: 'Getafe' })[1] === 'variant+team' && m4.find('Bremer')[0] == null, 'mononym matcher'); }
   ok(strength('J. M. Cerundolo', 'Juan Manuel Cerundolo') === 1 && strength('J. Sinner', 'Jannik Sinner') === 1 && strength('J. Sinner', 'Matteo Sinner') === 0, 'initial');
   ok(sameTeam('N. Carolina', 'North Carolina') && sameTeam('UConn', 'Connecticut') && !sameTeam('Michigan', 'Michigan State'), 'teams');
   // the short forms here, in scripts/names.py and in the browser (data/team_alias.json, python3 scripts/names.py --teams) are one list

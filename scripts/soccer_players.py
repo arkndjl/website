@@ -730,24 +730,34 @@ def _fit():
 def staleness(S):
     """big-five leagues whose Understat match files trail the results: 9+ finished league matches (about a round)
     on ESPN's scoreboard after the league's newest Understat match. [] when every league is in step. The GAR view
-    keeps the last Understat numbers and shows the lag in the status bar; the stats view shows that league's FotMob
-    stats instead (static/data/soccer-more/b<S>.json, scripts/soccer_more.py; Noah Nov 23 2026)"""
+    moves that league onto the FotMob stand-in (scripts/soccer_fm_gar.py overlay, Nov 26 2026); the stats view shows
+    that league's FotMob stats instead (static/data/soccer-more/b<S>.json, scripts/soccer_more.py; Noah Nov 23 2026)"""
     today = dt.date.today().isoformat()
     out = []
     for lg in D.BIG5:
         try:
             d = D.us_league(lg, S) or {}
             us = max((str(m['t'])[:10] for m in d.get('matches', []) if m.get('res') and m.get('t')), default=None)
-            if not us:
-                continue
-            cut = (dt.date.fromisoformat(us) + dt.timedelta(days=1)).isoformat()
-            n = sum(1 for y in sorted({int(us[:4]), int(today[:4])}) for r in (D.espn_year(lg, y) or [])
+            # no Understat match at all this season (a lost cache during an outage): every finished match is missing
+            cut = (dt.date.fromisoformat(us) + dt.timedelta(days=1)).isoformat() if us else f'{S - 1}-07-20'
+            n = sum(1 for y in sorted({int(cut[:4]), int(today[:4])}) for r in (D.espn_year(lg, y) or [])
                     if r.get('hs') is not None and cut < r['day'] <= today)
             if n >= 9:
                 out.append({'lg': lg, 'last': us, 'missing': n})
         except Exception as e:                           # a freshness check never stops the build
             print(f'staleness {lg}: {e!r}', file=sys.stderr)
     return out
+
+
+def finish(S, out, cur):
+    """a season file's rows once their values are set: GAR order and rank, market value, projections, p/90"""
+    out.sort(key=lambda o: -o['gar'])
+    for i, o in enumerate(out, 1):
+        o['rk'] = i
+    import soccer_mv as MV                               # estimated market value next to GAR (scripts/soccer_mv.py)
+    MV.attach(S, out)
+    proj_attach(S, out, league_share(S, out) if S == cur else None)   # pj / p3: data/soccer_proj_fit.json
+    rate_attach(S, out)                                  # pg90 reads SVAR and age (proj_attach)
 
 
 def write(rows, F, ts, all_seasons=False):
@@ -785,9 +795,6 @@ def write(rows, F, ts, all_seasons=False):
             for f_ in F['feats']:
                 o['c_' + f_] = round(F['w'][f_] * r[f_] * r['min'] / 90, 2)
             out.append(o)
-        out.sort(key=lambda o: -o['gar'])
-        for i, o in enumerate(out, 1):
-            o['rk'] = i
         for o in out:
             c = {f_: o.pop('c_' + f_, 0) for f_ in FEATS}
             o['off'] = round(sum(c[f_] for f_ in ('onf', 'npxg', 'xas', 'bup', 'orp')), 2)
@@ -801,15 +808,27 @@ def write(rows, F, ts, all_seasons=False):
         for o in out:
             if o['p'] in bd:
                 o['bdg'] = bd[o['p']]
-        import soccer_mv as MV                           # estimated market value next to GAR (scripts/soccer_mv.py)
-        MV.attach(S, out)
-        proj_attach(S, out, league_share(S, out) if S == cur else None)   # pj / p3: data/soccer_proj_fit.json
         import soccer_sv as SV                           # SV / SVAR: the season-only value (scripts/soccer_sv.py)
         SV.attach(S, rows, out, LS)
-        rate_attach(S, out)                              # pg90 reads SVAR (above) and age (proj_attach)
-        txt = json.dumps({'season': S, 'label': f'{S - 1}-{S % 100:02d}', 'games': games,
-                          'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'players': out,
-                          'mv': MV.meta(S), 'stale': staleness(S) if S == cur else []}, separators=(',', ':'), allow_nan=False)
+        # a league Understat trails moves onto FotMob (scripts/soccer_fm_gar.py: minutes to date, GAR and SV at the
+        # frozen rate blended with FotMob's estimate); nothing moves once Understat is back in step
+        stale = staleness(S) if S == cur else []
+        fmg = {}
+        if stale:
+            try:
+                import soccer_fm_gar as FG
+                fmg = FG.overlay(S, out, stale, F, SV._fit(), LS)
+            except Exception as e:                       # the stand-in never stops the build
+                print(f'fotmob stand-in skipped: {e!r}', file=sys.stderr)
+            games = max([games] + [o['mp'] for o in out])
+        finish(S, out, cur)
+        import soccer_mv as MV
+        J = {'season': S, 'label': f'{S - 1}-{S % 100:02d}', 'games': games,
+             'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'players': out,
+             'mv': MV.meta(S), 'stale': stale}
+        if fmg:
+            J['fmg'] = fmg                               # leagues on the FotMob stand-in: {lg: {us, fm matches, rows}}
+        txt = json.dumps(J, separators=(',', ':'), allow_nan=False)
         open(os.path.join(SDIR, f'{S}.json'), 'w').write(txt)
         if S == cur:
             top = {'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'season': S, 'current': S,
