@@ -111,6 +111,11 @@
      "key": "cfb_nil_top_end",
      "form": "roster split, top 5 and the rest, NIL-era seasons",
      "gate": "difference t >= 2 and split beats the plain sum held out by season t >= 2"
+    },
+    {
+     "key": "cbb_net_class",
+     "form": "class points + 7.8 x incoming transfer value (cbb_team_prior tr), a net-class column on the CBB class table",
+     "gate": "passed Nov 26 (t 6.45, 12/13 classes); build when next season's transfers exist (portal window, spring 2027)"
     }
    ]
   }

@@ -683,6 +683,180 @@
      "t_diff": 0.82
     }
    }
+  },
+  "round4": {
+   "value": {
+    "roster": {
+     "n": 1605,
+     "folds": 13,
+     "base": 0.7848,
+     "forms": {
+      "FV if on the board": {
+       "t": 0.09,
+       "p": 0.4649,
+       "up": 6,
+       "rmse": 0.7848
+      },
+      "year-3 xFV": {
+       "t": -1.06,
+       "p": 0.8553,
+       "up": 4,
+       "rmse": 0.7853
+      },
+      "blend with FV if on the board": {
+       "t": -0.3,
+       "p": 0.6161,
+       "up": 7,
+       "rmse": 0.785
+      },
+      "blend with year-3 xFV": {
+       "t": -0.13,
+       "p": 0.5503,
+       "up": 9,
+       "rmse": 0.7849
+      }
+     }
+    },
+    "class": {
+     "n": 1357,
+     "folds": 11,
+     "base": 0.6023,
+     "forms": {
+      "FV if on the board": {
+       "t": 0.29,
+       "p": 0.3846,
+       "up": 7,
+       "rmse": 0.6021
+      },
+      "year-3 xFV": {
+       "t": -0.61,
+       "p": 0.7277,
+       "up": 5,
+       "rmse": 0.6024
+      },
+      "blend with FV if on the board": {
+       "t": -0.26,
+       "p": 0.603,
+       "up": 7,
+       "rmse": 0.6024
+      },
+      "blend with year-3 xFV": {
+       "t": -1.47,
+       "p": 0.929,
+       "up": 5,
+       "rmse": 0.6026
+      }
+     }
+    }
+   },
+   "development": {
+    "n": 1357,
+    "folds": 11,
+    "base": 0.6027,
+    "forms": {
+     "sum x development": {
+      "t": -1.91,
+      "p": 0.972,
+      "up": 5,
+      "rmse": 0.6031
+     }
+    },
+    "coef": [
+     [
+      0.00468,
+      0.00128
+     ],
+     [
+      -0.0006,
+      0.00162
+     ]
+    ]
+   },
+   "timing": {
+    "n": 1357,
+    "folds": 11,
+    "base": 0.6023,
+    "forms": {
+     "early / late / undated": {
+      "t": -1.2,
+      "p": 0.885,
+      "up": 5,
+      "rmse": 0.603
+     }
+    },
+    "coef": [
+     [
+      0.00406,
+      0.00191
+     ],
+     [
+      0.00532,
+      0.00202
+     ],
+     [
+      0.00311,
+      0.00354
+     ]
+    ],
+    "share": [
+     0.405,
+     0.456,
+     0.139
+    ]
+   },
+   "portal": {
+    "n": 1266,
+    "folds": 10,
+    "base": 0.7568,
+    "forms": {
+     "class + transfers": {
+      "t": 0.73,
+      "p": 0.233,
+      "up": 6,
+      "rmse": 0.7552
+     }
+    },
+    "coef": [
+     [
+      0.00453,
+      0.00172
+     ],
+     [
+      0.44883,
+      0.18314
+     ]
+    ],
+    "sd": [
+     20.93,
+     0.145
+    ],
+    "nil": {
+     "n": 514,
+     "coef": [
+      [
+       0.00333,
+       0.00241
+      ],
+      [
+       0.64798,
+       0.23727
+      ]
+     ],
+     "t": 0.35,
+     "p": 0.3627,
+     "up": 3,
+     "rmse": 0.7357
+    }
+   },
+   "holm": {
+    "portal: class + transfers": false,
+    "value: FV if on the board": false,
+    "value: blend with year-3 xFV": false,
+    "value: blend with FV if on the board": false,
+    "value: year-3 xFV": false,
+    "timing: early / late / undated": false,
+    "development: sum x development": false
+   }
   }
  },
  "cbb": {
@@ -1406,6 +1580,205 @@
       }
      }
     }
+   }
+  },
+  "round4": {
+   "value": {
+    "roster": {
+     "n": 1835,
+     "folds": 11,
+     "base": 0.6434,
+     "forms": {
+      "headline FV": {
+       "t": 1.28,
+       "p": 0.0995,
+       "up": 11,
+       "rmse": 0.643
+      },
+      "Y1 FV": {
+       "t": -0.48,
+       "p": 0.6844,
+       "up": 2,
+       "rmse": 0.6435
+      },
+      "blend with headline FV": {
+       "t": 0.84,
+       "p": 0.2016,
+       "up": 10,
+       "rmse": 0.6413
+      },
+      "blend with Y1 FV": {
+       "t": -0.12,
+       "p": 0.5482,
+       "up": 8,
+       "rmse": 0.6434
+      }
+     }
+    },
+    "class": {
+     "n": 1342,
+     "folds": 12,
+     "base": 0.4643,
+     "forms": {
+      "headline FV": {
+       "t": 1.0,
+       "p": 0.1598,
+       "up": 8,
+       "rmse": 0.4642
+      },
+      "Y1 FV": {
+       "t": 0.63,
+       "p": 0.2635,
+       "up": 8,
+       "rmse": 0.4642
+      },
+      "blend with headline FV": {
+       "t": 0.35,
+       "p": 0.3616,
+       "up": 6,
+       "rmse": 0.4641
+      },
+      "blend with Y1 FV": {
+       "t": -0.67,
+       "p": 0.7487,
+       "up": 8,
+       "rmse": 0.4644
+      }
+     }
+    }
+   },
+   "development": {
+    "n": 1342,
+    "folds": 12,
+    "base": 0.4644,
+    "forms": {
+     "sum x development": {
+      "t": 0.77,
+      "p": 0.2209,
+      "up": 6,
+      "rmse": 0.4638
+     }
+    },
+    "coef": [
+     [
+      0.00352,
+      0.00143
+     ],
+     [
+      0.00155,
+      0.0006
+     ]
+    ]
+   },
+   "timing": {
+    "n": 1342,
+    "folds": 12,
+    "base": 0.4643,
+    "forms": {
+     "early / late / undated": {
+      "t": -0.4,
+      "p": 0.6566,
+      "up": 7,
+      "rmse": 0.4645
+     }
+    },
+    "coef": [
+     [
+      0.00893,
+      0.00257
+     ],
+     [
+      0.00286,
+      0.00137
+     ],
+     [
+      -0.01253,
+      0.02656
+     ]
+    ],
+    "share": [
+     0.235,
+     0.754,
+     0.011
+    ]
+   },
+   "attrition": {
+    "n": 1342,
+    "folds": 12,
+    "base": 0.4644,
+    "forms": {
+     "sum x enrol rate": {
+      "t": 0.79,
+      "p": 0.216,
+      "up": 6,
+      "rmse": 0.4636
+     }
+    },
+    "coef": [
+     [
+      0.00537,
+      0.00135
+     ],
+     [
+      -0.05978,
+      0.02199
+     ]
+    ],
+    "rate": 0.899
+   },
+   "portal": {
+    "n": 1546,
+    "folds": 13,
+    "base": 0.4965,
+    "forms": {
+     "class + transfers": {
+      "t": 6.45,
+      "p": 0.0,
+      "up": 12,
+      "rmse": 0.468
+     }
+    },
+    "coef": [
+     [
+      0.0064,
+      0.00127
+     ],
+     [
+      0.05023,
+      0.00364
+     ]
+    ],
+    "sd": [
+     12.58,
+     3.435
+    ],
+    "nil": {
+     "n": 639,
+     "coef": [
+      [
+       0.00673,
+       0.00182
+      ],
+      [
+       0.0507,
+       0.00433
+      ]
+     ],
+     "t": 4.76,
+     "p": 0.0,
+     "up": 5,
+     "rmse": 0.4804
+    }
+   },
+   "holm": {
+    "portal: class + transfers": true,
+    "value: headline FV": false,
+    "value: blend with headline FV": false,
+    "attrition: sum x enrol rate": false,
+    "development: sum x development": false,
+    "value: blend with Y1 FV": false,
+    "timing: early / late / undated": false,
+    "value: Y1 FV": false
    }
   }
  }
