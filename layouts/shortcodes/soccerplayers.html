@@ -50,7 +50,7 @@
       <thead><tr>
         <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters">RK</th>
         <th data-sort="n">Player</th>
-        <th data-sort="wk" data-num title="± = rank change in SVAR since the last Monday post, within the filters; hover for the rank and SVAR then. value view, current season, top leagues">±</th>
+        <th data-sort="wk" data-num title="± = rank change in SVAR since the last Monday post, within the filters; hover for the rank and SVAR then (stats view: npxG + xA a 90). current season">±</th>
         {{- if eq $view "stats" }}
         <th data-sort="nx90" data-num title="npxG + xA a 90 minutes">npxG+xA /90</th>
         {{- else }}
@@ -217,7 +217,10 @@
       // ±: the weekly snapshot is SVAR (the value view's key), so the move is SVAR rank then against SVAR rank now, within the same rows
       var wl = list.filter(function (p) { return !p.more; });
       wl.slice().sort(function (a, b) { return (b.svar == null ? -1e9 : b.svar) - (a.svar == null ? -1e9 : a.svar); }).forEach(function (p, i) { p.rkw = i + 1; });
-      var wkf = stats ? null : data.wkFrom; __wk.rank(wl, 'rkw'); __wk.show(win, wkf);
+      var wkf = data.wkFrom;
+      // stats view: npxG + xA a 90 then against now, every league (FotMob rows carry their own base in w0, Understat rows in wx)
+      if (stats) __wk.rank(list, 'rknx90', function (p) { return p.more || p.fmb ? p.w0 : (p.wx || {}).nx90; }); else __wk.rank(wl, 'rkw');
+      __wk.show(win, wkf);
       var shown = list.length;
       if (sortKey !== 'rk') {
         var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
@@ -232,7 +235,7 @@
       if (q) list = list.filter(function (p) { return (p.n + ' ' + p.team).toLowerCase().indexOf(q) >= 0; });
       var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
       var gfxRow = function (p) {
-        var head = '<tr><td class="cfb__rk">' + p['rk' + KEY] + '</td><td class="cfb__name">' + face(p) + flag(p.nat) + '<b>' + esc(p.n) + '</b>' + medals(p) + ' <span class="cfb__dim nbaxpm__tm">' + lgo(p) + esc(p.team) + ' · ' + LG[p.lg] + '</span></td>' + (p.more && wkf ? __wk.none : __wk.rk(p, wkf, 'SVAR', null, p.svar));
+        var head = '<tr><td class="cfb__rk">' + p['rk' + KEY] + '</td><td class="cfb__name">' + face(p) + flag(p.nat) + '<b>' + esc(p.n) + '</b>' + medals(p) + ' <span class="cfb__dim nbaxpm__tm">' + lgo(p) + esc(p.team) + ' · ' + LG[p.lg] + '</span></td>' + (p.more && wkf && !stats ? __wk.none : (stats ? (p.nx90 == null && wkf ? __wk.none : __wk.rk(p, wkf, 'npxG+xA /90', null, p.nx90)) : __wk.rk(p, wkf, 'SVAR', null, p.svar)));
         var key = stats ? '<td class="cfb__num nbaxpm__v is-key">' + fx(p.nx90, 2) + '</td>' : '<td class="cfb__num nbaxpm__v is-key">' + sg(p.svar) + '</td>';
         var ctx = '<td class="cfb__g">' + esc(p.pos || '–') + '<span class="cfb__dim">' + p['pr' + KEY] + '</span></td><td class="nbaxpm__team" style="white-space: nowrap">' + lgo(p) + esc(p.team) + '</td><td class="cfb__num">' + (p.age != null ? p.age.toFixed(1) : '<span class="cfb__dim">–</span>') + '</td>' +
           '<td class="cfb__num nbaxpm__ph">' + p.mp + (p.st !== '' ? ' <span class="cfb__dim">(' + p.st + ')</span>' : '') + '</td><td class="cfb__num nbaxpm__ph">' + p.min + '</td>';

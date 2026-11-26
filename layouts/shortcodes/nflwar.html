@@ -169,8 +169,8 @@
       var g = byPos[k], n = g.length;
       g.forEach(function (p) { var lo = 0, eq = 0; g.forEach(function (o) { if (o.pxp < p.pxp) lo++; else if (o.pxp === p.pxp) eq++; }); p.pct = n > 1 ? Math.round(100 * (lo + (eq - 1) / 2) / (n - 1)) : null; });
     });
-    // ±: the weekly snapshots are XV and pXP/60, the keys the season and per-60 views rank by (per 17 games: no week)
-    __wk.rank(list, 'rk', rate ? 'pxp' : null); __wk.show(win, pace ? null : FROM);
+    // ±: the weekly snapshots are XV and pXP/60, the keys the season and per-60 views rank by, and XV per 17 games
+    __wk.rank(list, 'rk', rate ? 'pxp' : pace ? 'xvP' : null); __wk.show(win, FROM);
     // search narrows what's shown, not the ranks
     if (sortKey !== 'rk') {
       var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
@@ -189,7 +189,7 @@
       var C = {
         rk: '<td class="cfb__rk">' + p.rk + '</td>',
         n: '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p) + (p.rook ? ' <span class="nflwar__rook" title="rookie">R</span>' : '') + (p.col ? ' <span class="cfb__dim nflwar__col">' + esc(p.col) + '</span>' : '') + ' <span class="cfb__dim nflwar__tm">' + tl(p.tm) + esc(p.tm) + '</span></td>',
-        wk: pace || !FROM ? '' : p[key] == null ? __wk.none : __wk.rk(p, FROM, rate ? 'pXP/60' : 'XV', null, p[key]),
+        wk: !FROM ? '' : p[key] == null ? __wk.none : __wk.rk(p, FROM, rate ? 'pXP/60' : pace ? 'XV/17' : 'XV', null, p[key]),
         waa: '<td class="cfb__num nflwar__war">' + waa(pace ? p.waaP : p.waa) + '</td>',
         war: '<td class="cfb__num nflwar__war">' + f2(p.war) + '</td>',
         pxp: '<td class="cfb__num' + (rate ? ' nflwar__war is-key' : '') + '">' + (p.pxp == null ? '' : waa(p.pxp)) + '</td>',

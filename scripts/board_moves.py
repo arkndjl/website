@@ -53,6 +53,9 @@ BOARDS = {
     'nfl': ('static/data/nfl-war.json', [(('players',), 'id', 'xv')]),          # the board's lead (XV; WAA until Nov 26 2026)
     'nba': ('static/data/nba-xpm/20*.json', [(('players',), 'id', 'vorx')]),
     'nhl': ('static/data/nhl-war/20*.json', [(('players',), 'id', 'war')]),
+    # the soccer stats view's other rows: the 13 other leagues and FotMob's big-five rows (shown while Understat trails)
+    'soccerm': ('static/data/soccer-more/20*.json', [(('players',), 'p', '_nx90')]),
+    'soccerb': ('static/data/soccer-more/b20*.json', [(('players',), 'p', '_nx90')]),
     'nbaproj': ('static/data/nba-proj.json', [(('players',), 'id', 'pxpm')]),    # the NBA board's XPM (proj) and 3Y views
     'soccer': ('static/data/soccer-war/20*.json', [(('players',), 'p', 'svar')]),   # the board's lead (SVAR; GAR until Nov 26 2026)
     'hockey': ('data/hockey.json', [(('board',), 'name', 'fv'), (('pipe',), 'id', 'fv')]),
@@ -65,11 +68,47 @@ BOARDS = {
 # the boards' other views (the side buttons: pXPM, XPM, O / D ...): board -> (list path, [value fields]). Each row gets
 # `wx`, {field: value as of the base}, beside `w0`, so the page shows the move in whichever view is open
 EXTRA = {
-    'nfl': (('players',), ['pxp']),
+    'nfl': (('players',), ['pxp', '_xvP']),
+    'soccer': (('players',), ['_nx90']),
     'nba': (('players',), ['txpm', 'sxpm', 'toxpm', 'tdxpm']),     # the board shows the team-adjusted XPM (txpm) as XPM
     'nbaproj': (('players',), ['p3']),
     'nhl': (('players',), ['pwar', 'p3', 'hpm', 'o', 'd']),
 }
+
+
+def _nfl_xvp(d):
+    """XV per 17 team games as the page works it out (nflwar.html): XV x the team's WAR/17 over WAR ratio"""
+    t17 = {}
+    for r in d.get('players') or []:
+        if r.get('war') and r.get('pace') is not None and abs(r['war']) > .1:
+            t = r['tm'].split('/')[-1]
+            if t not in t17 or abs(r['war']) > t17[t][1]:
+                t17[t] = (r['pace'] / r['war'], abs(r['war']))
+    for r in d.get('players') or []:
+        t = t17.get(r['tm'].split('/')[-1])
+        r['_xvP'] = None if r.get('xv') is None or not t else round(r['xv'] * t[0], 2)
+
+
+def _nx90(d):
+    """npxG + xA a 90 as the stats view ranks it (soccerplayers.html): Understat rows npxg, FotMob rows xg"""
+    for r in d.get('players') or []:
+        x = r.get('npxg') if 'npxg' in r else r.get('xg')
+        r['_nx90'] = None if x is None else (x + (r.get('xa') or 0)) / (max(r.get('min') or 0, 1) / 90)
+
+
+# values the page derives in the browser: worked out here before the snapshot (fields named _x, dropped before the write)
+PREP = {'nfl': _nfl_xvp, 'soccer': _nx90, 'soccerm': _nx90, 'soccerb': _nx90}
+
+
+def prep(board, d):
+    if board in PREP:
+        PREP[board](d)
+
+
+def unprep(d):
+    for r in (d.get('players') or []) if isinstance(d, dict) else []:
+        for k in [k for k in r if k.startswith('_')]:
+            del r[k]
 
 
 def full_spec(board):
@@ -225,7 +264,7 @@ def mark(d, spec, base, since):
             for r in rows:
                 v = b.get(rid(get, r, idf)) if since else None
                 if v is not None:
-                    r.setdefault('wx', {})[val] = v
+                    r.setdefault('wx', {})[val.lstrip('_')] = v
             continue
         for r in rows:
             v = b.get(rid(get, r, idf)) if since else None
@@ -411,9 +450,11 @@ def update(board, day=None, d=None, h=None, write=True):
     if h.get('season') != s:                # a new season (or a first run) starts the history over
         h = {'season': s, 'hist': {}}
     day = day or et_today(board)
+    prep(board, d)
     h, since = step(h, snap(d, spec), day, fv=graded(spec), sport=board, model=fingerprint(board))
     # wkFrom names the post day the moves count from (the values are the last snapshot on or before it)
     mark(d, spec, h['hist'].get(since) if since else None, cutoff(day, board).isoformat() if since else None)
+    unprep(d)
     if write:
         with open(full, 'w', encoding='utf-8') as f:       # the builders' format: compact, UTF-8 as is
             f.write(json.dumps(d, separators=(',', ':'), ensure_ascii=False, allow_nan=False) + ('\n' if raw.endswith('\n') else ''))
@@ -453,6 +494,7 @@ def seed(boards):
             s = season_of(d, path)
             if h.get('season') != s:
                 h = {'season': s, 'hist': {}}
+            prep(board, d)
             h, _ = step(h, snap(d, spec), dt.date.fromisoformat(day), fv=graded(spec), sport=board, model=fingerprint(board, rev))
         save_hist(board, h)
         update(board, today)
