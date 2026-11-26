@@ -66,11 +66,12 @@
 {{- if eq $view "class" -}}{{ $yr := int ($.Get "year") }}{{ $st := $d.model.stars }}
 {{- range where .classes "year" $yr -}}{{ $C := . }}{{ $LN := index (site.Data.recruit_commit_leans.cbb | default dict) (string $yr) | default dict }}{{ $EP := index (site.Data.recruit_expert_picks.cbb | default dict) (string $yr) | default dict }}
 {{- $hasConf := false }}{{ $has247 := false }}{{ range $C.list }}{{ if .conf }}{{ $hasConf = true }}{{ end }}{{ if index .svc "247" }}{{ $has247 = true }}{{ end }}{{ end }}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%d class" $yr)) "icon" "basketball" "filter" (cond $hasConf "Pos,Team,Conf,Stars,Status" "Pos,Team,Stars,Status") "tab" ($.Get "tab") "gfxCols" "Recruit,FV,Pos,Team,Size,ARK,NBA%,xNIL" "gfxDate" $date "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%d class" $yr)) "icon" "basketball" "filter" (cond $hasConf "Pos,Team,Conf,Stars,Status" "Pos,Team,Stars,Status") "tab" ($.Get "tab") "gfxCols" "Recruit,FV,If NBA,Pos,Team,ARK,NBA%,xNIL" "gfxDate" $date "gfxMax" "25") -}}
 <table class="cfb__table cbbrc">
   <thead><tr>
     <th>RK</th><th>Recruit</th>
     <th class="cfb__g" title="FV on the CBB board's scale: the NBA role a career reaches (20 non-NBA, 30 reached the NBA, 40 rotation, 50 4+ seasons as a starter, 60 2+ All-Star, 65+ All-NBA); the mean outcome, steps of 1">FV</th>
+    <th title="FV if he reaches the NBA">If NBA</th>
     <th class="cfb__g">Pos</th><th title="committed school; dim = On3 prediction leader">Team</th>{{ if $hasConf }}<th title="conference">Conf</th>{{ end }}
     <th title="age (dash = no birth date)">Age</th><th title="height, weight">Size</th>
     <th class="cfb__g" title="ARK stars = cut of the recruit's FV; cuts set on backtested outcomes: 5-star+ = top {{ $st.plusPer }} a class, 5 = 2+ seasons as an NBA starter, 4 = reached the NBA, 3 = a D-I season as a starter at BPM +3 or better, 2 = played D-I, 1 = did not. arrow = ARK stars - industry stars">ARK</th>
@@ -92,6 +93,7 @@
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td class="cfb__name">{{ $u := "" }}{{ with .img }}{{ $u = printf "https://on3static.com/cdn-cgi/image/height=70,width=96,quality=70,fit=cover/%s" (replaceRE `^https://on3static\.com/` "" .) }}{{ end }}{{ partial "face.html" (dict "u" $u) }}{{ with .nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index site.Data.soccer_countries.name . | default . }}" width="16" height="11" loading="lazy">{{ end }}<button type="button" class="cfb__who" aria-expanded="false">{{ .name }}</button>{{ partial "arkstar.html" (dict "sport" "college-basketball" "name" .name "team" (.team | default "")) }}</td>
     <td class="fv cfb__g" data-v="{{ .fvx }}"><span class="fv-chip" data-fv="{{ math.Max 20 (mul (div (int .fv) 5) 5) }}" title="mean outcome {{ partial "num.html" (slice "%.1f" .fvx) }}">{{ .fv }}</span></td>
+    <td class="cfb__num" data-v="{{ .fvIf }}">{{ partial "num.html" (slice "%.0f" .fvIf) }}</td>
     <td class="cfb__g" data-v="{{ .pos }}">{{ .pos }}</td>
     <td data-v="{{ .team | default .school | default "uncommitted" }}">{{ with .team }}<span class="cfb__team">{{ with $r.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ . }}</span></span>{{ else }}{{ with $r.school }}<span>{{ . }}</span>{{ else }}{{ with $r.lead }}<span class="cfb__dim" title="uncommitted; On3 prediction leader">{{ index . 0 }} {{ index . 1 }}%</span>{{ else }}{{ with index $LN $r.name }}<span class="cfb__team cfb__dim" title="uncommitted; ARK lean {{ index . 0 }} {{ index . 1 }}%">{{ with index . 2 }}<img class="cfb__logo" src="/img/cfb/logos/{{ . }}.png" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ index . 0 }} {{ index . 1 }}%</span></span>{{ else }}<span class="cfb__dim">—</span>{{ end }}{{ end }}{{ end }}{{ end }}</td>
     {{- if $hasConf }}<td>{{ .conf }}</td>{{ end }}
