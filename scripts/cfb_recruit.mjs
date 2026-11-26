@@ -680,10 +680,11 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
     const mine = klass.filter(x => x.tid === t.tid);
     roster.push({ tid: t.tid, team: t.team, logo: t.logo, conf: t.conf, level: prog[t.tid].level, av26: T.av26, avBack: r1(avBase), av27: r1(avNew), gain: r1(avNew - avBase),
       classN: mine.length, classXfv: r1(mine.reduce((s, x) => s + (x.xfv - fit.floor), 0)), classAv: r1(mine.reduce((s, x) => s + x.pOn * avOf(x.fvOn), 0)),
-      classXnil: mine.reduce((s, x) => s + x.xnil, 0), redshirtN: redshirts.filter(x => x.tid === t.tid).length, top: mine.slice(0, 3).map(x => ({ name: x.name, pos: x.pos, xfv: x.xfv })), pos });
+      classXnil: mine.reduce((s, x) => s + x.xnil, 0), redshirtN: redshirts.filter(x => x.tid === t.tid).length, ...classParts(mine, fit.floor), pos });
   }
   // class rank: expected FV points over the floor, summed (FBS programs)
   roster.sort((a, b) => b.classXfv - a.classXfv).forEach((t, i) => { t.classRk = i + 1; });
+  partRanks(roster);
   roster.slice().sort((a, b) => b.av27 - a.av27).forEach((t, i) => { t.rk27 = i + 1; });
   // later classes ranked the same way, commits so far (the class-rankings year filter)
   for (const f of future) f.teams = classRanks(f.list, fit.floor);
@@ -693,6 +694,21 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
     counts: { class: klass.filter(x => x.tid).length, open: klass.filter(x => !x.tid).length, committed: cls.length, redshirts: redshirts.length, young: young.length, future: future.map(f => f.n) },
     ...(Object.keys(cfbdCover).length ? { cfbd: Object.values(cfbdCover) } : {}) };
 }
+// the class-rankings card's parts: ARK star counts (5-star+, 5, 4 to 4.5), mean xFV, the three best commits, and the
+// class score split into its top end (the TOP_END best commits' FV points over the floor) and its depth (the rest)
+const TOP_END = 5;
+function classParts(xs, floor) {
+  xs = xs.slice().sort((a, b) => b.xfv - a.xfv);
+  const pts = a => r1(a.reduce((s, x) => s + (x.xfv - floor), 0));
+  return { a6: xs.filter(x => x.ark > 5).length, a5: xs.filter(x => x.ark === 5).length, a4: xs.filter(x => x.ark >= 4 && x.ark < 5).length,
+    avgXfv: xs.length ? r1(xs.reduce((s, x) => s + x.xfv, 0) / xs.length) : null,
+    topEnd: pts(xs.slice(0, TOP_END)), depth: pts(xs.slice(TOP_END)),
+    top: xs.slice(0, 3).map(x => ({ name: x.name, pos: x.pos, xfv: x.xfv, ark: x.ark ?? null })) };
+}
+function partRanks(ts) {
+  for (const [k, rk] of [['topEnd', 'topRk'], ['depth', 'depthRk']])
+    ts.slice().sort((a, b) => b[k] - a[k] || b.classXfv - a.classXfv).forEach((t, i) => { t[rk] = i + 1; });
+}
 // class rankings for one class: each school's commits, expected FV points over the floor summed (as classXfv above)
 export function classRanks(list, floor) {
   const by = {};
@@ -701,9 +717,10 @@ export function classRanks(list, floor) {
     xs = xs.slice().sort((a, b) => b.xfv - a.xfv);
     return { tid: xs[0].tid, team: xs[0].team, logo: xs[0].logo, conf: xs[0].conf, classN: xs.length,
       classXfv: r1(xs.reduce((s, x) => s + (x.xfv - floor), 0)), classAv: r1(xs.reduce((s, x) => s + x.pOn * avOf(x.fvOn), 0)),
-      classXnil: xs.reduce((s, x) => s + (x.xnil || 0), 0), top: xs.slice(0, 3).map(x => ({ name: x.name, pos: x.pos, xfv: x.xfv })) };
+      classXnil: xs.reduce((s, x) => s + (x.xnil || 0), 0), ...classParts(xs, floor) };
   });
   out.sort((a, b) => b.classXfv - a.classXfv || b.classN - a.classN).forEach((t, i) => { t.classRk = i + 1; });
+  partRanks(out);
   return out;
 }
 // expected FV at each starting slot (as the team builder's slots()): each player there with his chance

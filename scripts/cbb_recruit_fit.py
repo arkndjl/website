@@ -785,6 +785,27 @@ def path_of(models, F):
     return out
 
 
+# ---------------------------------------------------------------- Y1 FV
+# The board grade a recruit carries at the end of his freshman season if he plays D-I: the draft-week grade of every
+# 2009-25 recruit's freshman season (scripts/cbb_draftday.build: the returner model on next preseason's row with his
+# class held out, then the June boards, at the score's mean outcome; rows in scripts/data/cbb_y1fv_rows.json.gz, rebuilt
+# by scripts/research/cbb_y1fv_nov26/ after a board refit) on the consensus rank and its curve, log link. Classes held
+# out (Nov 26 2026, 3,532 recruits): RMSE 7.71 (class mean) -> 5.85 (rank) -> 5.30 (t 13.6 on the mean, 17/17
+# classes), r .73, calibrated by bin; no other driver passes. It orders the freshman season's BPM as the rank does
+# (rank correlation .43 both), so it is a scale for the rank, not a better scout.
+Y1_ROWS = os.path.join(ROOT, 'scripts', 'data', 'cbb_y1fv_rows.json.gz')
+Y1_COLS = ['lrk', 'lrk2']
+
+
+def y1fv_fit(rows, F):
+    d = json.load(gzip.open(Y1_ROWS, 'rt'))
+    fv = {(c, k): v for c, k, v in d['rows']}
+    D = [{'cls': r['cls'], 'f': f, 'on': 1.0, 'v': max(fv[(r['cls'], r['key'])] - 20.0, 1e-3)} for r, f in zip(rows, F) if (r['cls'], r.get('key')) in fv]
+    t = d['test']
+    return PathPart('v', Y1_COLS).fit(D), {'n': len(D), 'classes': t['classes'], 'rmse': t['rmse'], 't': t['vs_null']['t'], 'wins': t['vs_null']['classes'],
+                                             'of': t['vs_null']['of'], 'r': t['r'], 'freshman': t['freshman']}
+
+
 # ---------------------------------------------------------------- xNIL
 def xnil_price(H, teams, tm, conf, f, ref):
     """dollars a unit of college value draws at his school: the level's program budget (tilted by program strength,
@@ -1041,6 +1062,24 @@ def dob_old(dob, c):
     return 1.0 if (ref.year - b.year - ((ref.month, ref.day) < (b.month, b.day))) >= 18 else 0.0
 
 
+TOP_END = 2
+
+
+def class_parts(xs):
+    """The class-rankings card's parts: ARK star counts (5-star+, 5, 4 to 4.5), mean FV, the three best commits, and the
+    class's FV points split into its top end (the TOP_END best commits) and its depth (the rest)."""
+    xs = sorted(xs, key=lambda x: -x['ets'])
+    return {'a6': sum(1 for x in xs if x['ark'] > 5), 'a5': sum(1 for x in xs if x['ark'] == 5), 'a4': sum(1 for x in xs if 4 <= x['ark'] < 5),
+            'avgFv': round(sum(x['fv'] for x in xs) / len(xs), 1),
+            'topEnd': round(sum(x['ets'] for x in xs[:TOP_END]), 4), 'depth': round(sum(x['ets'] for x in xs[TOP_END:]), 4),
+            'top3': [[x['name'], x['pos'], x['fv'], x['ark']] for x in xs[:3]]}
+
+
+def part_ranks(trows):
+    for k, rk in (('topEnd', 'topRk'), ('depth', 'depthRk')):
+        for i, x in enumerate(sorted(trows, key=lambda x: (-x[k], -x['ets']))): x[rk] = i + 1
+
+
 def class_ranks(lst, bt):
     """One class's rankings: committed schools by summed E[share] (FV points), with the class's year-1 college value."""
     by = defaultdict(list)
@@ -1054,9 +1093,11 @@ def class_ranks(lst, bt):
                       'top': [[x['name'], x['pos'], x['fv']] for x in xs[:3]], 'best': min(x['rk'] or 999 for x in xs),
                       'xnil': sum(x['xnil'] for x in xs), 'v1': round(sum(x['path'][0]['v'] for x in xs), 2),
                       'min1': round(sum(x['path'][0]['on'] * x['path'][0]['min'] for x in xs), 1),
-                      'ark5': sum(1 for x in xs if x['ark'] >= 5), 'ark4': sum(1 for x in xs if 4 <= x['ark'] < 5)})
+                      'ark5': sum(1 for x in xs if x['ark'] >= 5), 'ark4': sum(1 for x in xs if 4 <= x['ark'] < 5),
+                      **class_parts(xs)})
     trows.sort(key=lambda x: -x['ets'])
     for i, x in enumerate(trows): x['rk'] = i + 1
+    part_ranks(trows)
     return trows
 
 
@@ -1210,6 +1251,8 @@ def write():
     allr = [r for r in H['recruits']]
     Fa, _ = frame(allr, smap, teams, ref)
     pmods, ptests = path_fit(allr, Fa)
+    y1m, y1t = y1fv_fit(allr, Fa)
+    print('Y1 FV:', y1t['n'], 'rows')
     # the board's FV distribution, for the percentile a recruit's FV would take on it
     bd = json.load(open(os.path.join(ROOT, 'static', 'data', 'cbb-all.json')))
     bi = {c: k for k, c in enumerate(bd['cols'])}
@@ -1248,8 +1291,9 @@ def write():
         Fl = frame([x[1] for x in lst[:n_ranked]], smap, teams, ref)[0] + (frame([x[1] for x in lst[n_ranked:]], smap, teams, ref)[0] if len(lst) > n_ranked else [])
         G = grade(M, Fl, rel[c]['shrink'])
         P = path_of(pmods, Fl)
+        Y1 = 20 + y1m.predict(Fl)
         recs = []
-        for (r, row, tm), f, g, pth in zip(lst, Fl, G, P):
+        for (r, row, tm), f, g, pth, y1 in zip(lst, Fl, G, P, Y1):
             rpm = (r.get('rpm') or [[None, None]])[0]
             lead = team_of(rpm[0], smap, bt) if rpm and rpm[0] else None
             recs.append({'name': row['name'], 'pos': row['pos'], 'ht': r.get('htf'), 'wt': row['wt'], 'home': row['home'],
@@ -1262,7 +1306,7 @@ def write():
                          'nat': row['nat'], 'img': r.get('img'), 'on3': f"https://www.on3.com/db/{r['slug']}/" if r.get('slug') else None,
                          'nil': r.get('nil'), 'why': why(M, f, avg), **g,
                          'ark': ark_of(stars, g['fvx']), 'pct': int(min(99, np.searchsorted(bfv, g['fvx'], side='right') * 100 // len(bfv))),
-                         'path': pth, 'xnil': int(round(pth[0]['v'] * xnil_price(H, teams, tm, bt[tm]['conf'] if tm else None, f, ref), -3)),
+                         'y1fv': round(float(np.clip(y1, 20, 80)), 1), 'path': pth, 'xnil': int(round(pth[0]['v'] * xnil_price(H, teams, tm, bt[tm]['conf'] if tm else None, f, ref), -3)),
                          'status': 'signed' if r.get('signed') else 'committed' if tm or row['team'] else 'uncommitted'})
             if r.get('fiba'):
                 recs[-1].update({'prov': True, 'cls': c, 's': r['s'], 'fiba': r['fiba'], 'dob': r.get('dob'), 'fibaUrl': r['url'], 'src': r.get('src')})
@@ -1291,6 +1335,7 @@ def write():
                               'byClass': {str(c): [round(a, 3), round(b, 3)] for c, a, b in zip(TRAIN, rr0, rr1)}},
                   'forward': {str(k): v for k, v in fwd.items()}, 'calib': calib, 'bands': bands, 'stars': stars,
                   'path': {str(k): v for k, v in ptests.items()}, 'pathEra': PATH_ERA,
+                  'y1fv': y1t,
                   'xnil': {'budget': {k: XNIL[k] for k in ('HM', 'MM', 'LM')}, 'tilt': XNIL['tilt'], 'rep': REP_BPM, 'ref': {k: v for k, v in H['nilRef'].items() if k != 'conf'},
                            'levels': {k: sorted(v) for k, v in LEVELS.items()}},
                   'research': RESEARCH},

@@ -154,6 +154,9 @@
   <thead><tr>
     <th>RK</th><th>Team</th><th title="conference">Conf</th>
     <th title="sum over commits of (xFV - 20)">Class</th><th>Commits</th>
+    <th title="commits at 5-star+ (ARK)">5-star+</th><th title="commits at 5 ARK stars">5-star</th><th title="commits at 4-4½ ARK stars">4-star</th>
+    <th title="mean xFV of the commits">Avg xFV</th>
+    <th title="rank by the five best commits' (xFV - 20), summed">Top end</th><th title="rank by the rest of the class's (xFV - 20), summed">Depth</th>
     <th title="sum over commits of P(on) x college WAR/season at FV if on; year 1">Class WAR</th>
     <th title="sum of commits' xNIL, year 1">Class xNIL</th>
     <th title="next season's starters, returners only; college WAR/season by FV ({{ .next }} class)">Back</th>
@@ -164,12 +167,15 @@
   </tr></thead>
   <tbody>
   {{- range $set := $sets }}{{ range $set.rows }}
-  <tr data-yr="{{ $set.yr }}">
+  <tr data-yr="{{ $set.yr }}" data-cr="{{ dict "s" .classXfv "n" .classN "a6" (.a6 | default 0) "a5" (.a5 | default 0) "a4" (.a4 | default 0) "avg" .avgXfv "te" .topRk "dp" .depthRk "top" .top | jsonify }}">
     <td class="cfb__rk">{{ .classRk }}</td>
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
     <td>{{ .conf }}</td>
     <td class="cfb__num" data-v="{{ .classXfv }}"><b class="cfbt__big">{{ partial "num.html" (slice "%.1f" .classXfv) }}</b></td>
     <td class="cfb__num">{{ .classN }}</td>
+    <td class="cfb__num">{{ .a6 | default 0 }}</td><td class="cfb__num">{{ .a5 | default 0 }}</td><td class="cfb__num">{{ .a4 | default 0 }}</td>
+    <td class="cfb__num" data-v="{{ .avgXfv }}">{{ with .avgXfv }}{{ partial "num.html" (slice "%.1f" .) }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ with .topRk }}{{ sub 0 . }}{{ end }}" title="{{ .topEnd }}">{{ with .topRk }}#{{ . }}{{ end }}</td><td class="cfb__num" data-v="{{ with .depthRk }}{{ sub 0 . }}{{ end }}" title="{{ .depth }}">{{ with .depthRk }}#{{ . }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .classAv }}">{{ partial "num.html" (slice "%.2f" (mul .classAv $k)) }}</td>
     <td class="cfb__num" data-v="{{ .classXnil }}">{{ with .classXnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     {{- if $set.cur }}
