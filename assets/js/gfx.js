@@ -175,6 +175,21 @@
     });
   }
 
+  // what a table GFX column holds, for its cell tint: 'id' (text, logos: no cell), 'delta' (a move), 'rate' (%, per game),
+  // 'count' (games, minutes, age, size, records) or 'value' (every other number)
+  var COUNT_COL = /^(age|g|gp|gs|mp|min|mpg|toi|snaps|ht|wt|yrs?|n|w|l|t|d|otl|w-l|record|rec|starts|maps|rounds|matches|played|pl|att|commits|pick|pk|rd|seed|exp|nhl gp|wt\. gp|ip|pa|ab|poss|sample)$/i;
+  var RATE_COL = /%|\/|^per |pct|rate$|^p\(|^odds|^prob|^usg|^ts$|^efg$|share/i;
+  function colKind(head, cells, first, wk, age) {
+    if (first || NAME_COL.test(head) || POS_COL.test(head) || CLASS_COL.test(head) || TEAM_COL.test(head)) return 'id';
+    var f = cells.filter(function (c) { return c.t && !/^[-–—]$/.test(c.t); });
+    if (cells.filter(function (c) { return c.img || c.flag; }).length * 2 > cells.length) return 'id';
+    var numb = f.filter(function (c) { return /^[#~≈˜+−\-$<>]{0,2}\.?\d[\d,.:'"\/\-–]*\s*(%|[kKmMbB]|st|nd|rd|th|pp)?$/.test(c.t) || /^[▲▼]\s*\d/.test(c.t); }).length;
+    if (wk || /^[±Δ]|Δ$|^chg$|^move$/i.test(head)) return f.length && numb * 2 < f.length && !wk ? 'id' : 'delta';
+    if (!f.length || numb * 10 < f.length * 6) return 'id';
+    if (age || COUNT_COL.test(head) || f.filter(function (c) { return /^\d+-\d+(-\d+)?$/.test(c.t); }).length * 2 > f.length) return 'count';
+    if (RATE_COL.test(head) || f.filter(function (c) { return /%$/.test(c.t) || /^[+−-]?\.\d+$/.test(c.t); }).length * 2 > f.length) return 'rate';
+    return 'value';
+  }
   async function build(win, btn) {
     var table = win.querySelector('table'); if (!table) return null;
     if (table.querySelector('tbody tr[data-cr]')) return buildClassRank(win, btn);
@@ -388,43 +403,63 @@
       if (!done && !fits([24])) { size = 24; colW = widths(24); }
       break;
     }
-    // what's left over spreads evenly between the columns, so the table runs edge to edge without one wide gap
-    var spare = gw - sum(colW);
-    if (spare > 0 && colW.length > 1) colW = colW.map(function (w, k) { return k < colW.length - 1 ? w + spare / (colW.length - 1) : w; });
-    else if (spare > 0) colW[0] += spare;
+    // every number sits in its own cell under a centred header. Columns are grouped by meaning and each group has its own
+    // tint: counts (games, minutes, age, records), rates (%, per game), value (the metrics), delta (moves). The lead metric
+    // (the sorted column, else FV, else the first value column) gets the dark cell with the teal underline. Identity columns
+    // (rank, name, position, class, team) stay plain text at the left.
+    var kinds = cols.map(function (ci, k) { return colKind(heads[ci], cdata.map(function (r) { return r[k]; }), k === 0, ci === wkI, ci === ageI); });
+    var sk = cols.indexOf(sortI), lead = sk > 0 && kinds[sk] !== 'id' ? sk : -1;
+    if (lead < 0) lead = cols.findIndex(function (ci, k) { return FV_COL.test(heads[ci]) && kinds[k] !== 'id'; });
+    if (lead < 0) lead = kinds.indexOf('value');
+    // spare width: the number cells take a little, the identity columns the rest, so the table runs edge to edge
+    var spare = gw - sum(colW), numK = kinds.filter(function (q) { return q !== 'id'; }).length, idK = kinds.length - numK;
+    if (spare > 0) {
+      var each = numK ? Math.min(spare / kinds.length, size * 1.1) : 0, rest = spare - each * numK;
+      colW = colW.map(function (w, k) { return w + (kinds[k] !== 'id' ? each + (idK ? 0 : rest / numK) : rest / idK); });
+    }
+    var TINT = { count: 'rgba(200,199,255,0.10)', rate: 'rgba(87,6,140,0.30)', value: 'rgba(127,255,212,0.15)', delta: 'rgba(36,26,58,0.75)' };
     g.font = size + 'px ' + FONT;
     for (var gi = 0; gi < groups; gi++) {
       var x0 = ix + PADI + gi * (gw + 40), y0 = iy + PADI;
       g.fillStyle = C.face; g.fillRect(x0, y0, gw, rowH - 6); bevel(g, x0, y0, gw, rowH - 6, true, 3);
       var cx = x0;
       g.font = Math.max(24, size - 8) + 'px ' + FONT;
-      var sk = cols.indexOf(sortI), sx = x0 + sum(colW.slice(0, Math.max(0, sk)));
       cols.forEach(function (ci, k) {
-        var hy = y0 + (rowH - 6) / 2, hx = cx + size * 0.45;
-        g.fillStyle = k === sk && k > 0 ? C.teal : C.lilac; g.fillText(capHead(heads[ci]), hx, hy);
-        if (k === sk && k > 0) { var ax = hx + g.measureText(capHead(heads[ci])).width + 10, u = Math.max(3, Math.round(size / 16)), up = sortDir === 'ascending';
+        var hy = y0 + (rowH - 6) / 2, ht = capHead(heads[ci]), hw = g.measureText(ht).width, srt = k === sk && k > 0;
+        var u = Math.max(3, Math.round(size / 16)), aw = srt ? 10 + 5 * u : 0;
+        var hx = kinds[k] === 'id' ? cx + size * 0.45 : Math.round(cx + (colW[k] - hw - aw) / 2);
+        g.fillStyle = k === lead || srt ? C.teal : C.lilac; g.fillText(ht, hx, hy);
+        if (srt) { var ax = hx + hw + 10, up = sortDir === 'ascending';
           for (var ar = 0; ar < 3; ar++) g.fillRect(ax + ar * u, hy + (up ? 1 - ar : ar - 1) * u - u / 2, (5 - 2 * ar) * u, u); }   // pixel arrow: the sort's direction
         cx += colW[k]; });
-      if (sk > 0) { g.fillStyle = 'rgba(127,255,212,0.06)'; g.fillRect(sx, y0 + rowH - 6, colW[sk], rowH * Math.min(per, cdata.length - gi * per) + 6); }
       g.font = size + 'px ' + FONT;
+      var cm = Math.max(3, Math.round(size / 12)), cv = Math.max(3, Math.round((rowH - size * 1.2) / 2) - 1), ul = Math.max(3, Math.round(size / 14));
       cdata.slice(gi * per, gi * per + per).forEach(function (row, r) {
         var y = y0 + rowH * (r + 1);
         if (r % 2) { g.fillStyle = 'rgba(36,26,58,0.45)'; g.fillRect(x0, y, gw, rowH); }
         g.fillStyle = 'rgba(200,199,255,0.08)'; g.fillRect(x0, y + rowH - 2, gw, 2);
         var x = x0;
         row.forEach(function (c, k) {
-          var tx = x + size * 0.45, cy = y + rowH / 2;
+          var tx = x + size * 0.45, cy = y + rowH / 2, kd = kinds[k], num = kd !== 'id';
+          if (num) {   // the cell
+            var bx = Math.round(x + cm), bw = Math.round(colW[k] - 2 * cm), by = Math.round(y + cv), bh = Math.round(rowH - 2 * cv);
+            g.fillStyle = k === lead ? C.dark : TINT[kd]; g.fillRect(bx, by, bw, bh);
+            if (k === lead) { g.fillStyle = C.teal; g.fillRect(bx, by + bh - ul, bw, ul); cy -= ul / 2; }
+            var cw0 = g.measureText(c.t).width + (c.img ? size * 0.95 + 10 : 0) + tagsW(c, size);
+            tx = Math.round(x + (colW[k] - Math.min(cw0, bw - 4)) / 2);
+          }
           if (c.chip) {
-            var tw = g.measureText(c.t).width + 24;
-            g.fillStyle = c.chip; g.fillRect(tx - 12, cy - size * 0.6, tw, size * 1.2);
-            g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(tx - 12, cy + size * 0.6 - 3, tw, 3);
+            var tw = g.measureText(c.t).width + 24, ch = Math.min(size * 1.2, rowH - 2 * cv - (k === lead ? ul + 4 : 4));
+            g.fillStyle = c.chip; g.fillRect(tx - 12, cy - ch / 2, tw, ch);
+            g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(tx - 12, cy + ch / 2 - 3, tw, 3);
             g.fillStyle = c.ink; g.fillText(c.t, tx, cy);
           } else {
             if (c.img) { var s = size * 0.95; drawLogo(g, c.img, tx, cy - s / 2, s, s); tx += s + 10; }
             if (c.flag) { var fh = Math.round(size * 0.69); g.save(); g.imageSmoothingEnabled = false; g.drawImage(c.flag, tx, Math.round(cy - fh / 2), size, fh); g.restore(); tx += size + 10; }
-            // the sorted column in white, a value below zero in pink
-            g.fillStyle = c.color || (k === 0 ? C.lilac : k === 1 || k === sk ? C.white : /^[−-]\d/.test(c.t) && !c.img ? C.down : C.teal);
-            var tw0 = tagsW(c, size), ft = fit(g, c.t, colW[k] - (tx - x) - 2 - tw0);
+            // names white, the rest of the identity lilac; numbers white, the lead metric teal, a value below zero pink
+            var neg = /^[−-]\.?\d/.test(c.t) && !c.img, nameCol = NAME_COL.test(heads[cols[k]]) || (k === 1 && !num);
+            g.fillStyle = c.color || (!num ? (nameCol ? C.white : C.lilac) : neg ? C.down : k === lead ? C.teal : /^[-–—]?$/.test(c.t) ? 'rgba(200,199,255,0.45)' : C.white);
+            var tw0 = tagsW(c, size), ft = fit(g, c.t, colW[k] - (tx - x) - (num ? cm + 2 : 2) - tw0);
             if (c.glow) {   // 5-star+: dark pixel outline, platinum glow and fill
               g.save(); g.fillStyle = C.dark; [[-2, 0], [2, 0], [0, -2], [0, 2]].forEach(function (d) { g.fillText(ft, tx + d[0], cy + d[1]); });
               g.shadowColor = PT[1]; g.shadowBlur = 12; g.fillStyle = PT[1]; g.fillText(ft, tx, cy); g.restore();
