@@ -202,3 +202,15 @@ not below GBPM's (the incumbent descriptive metric, today's WAR input) and playe
 built from odd games (BPM-like deviations + odd-game GBPM team mean) not below odd-game GBPM at t < -1; (iv) G: SD within
 1.5x GBPM's. Reported against BPM as it falls: WAB / win% (expected better), adjEM (expected .9954 vs .9996, BPM's own
 anchor), N.
+
+## pXPM round 3: the fuller form inside the fitted models (Nov 26 2026, 21:55Z; before pxpm3.py is run)
+Noah: "FV and the game model should switch to the fuller pXPM, do the game model refit". The fuller form (pxpm2_parts,
+beta2 as fit in round 2, no retune) replaces the box form wherever a fitted model reads pXPM (cbb_xpm.pxpm_lines,
+pxpm_of). Checks, the first ship's protocol (prod_check.py):
+- roster prior harness: next-season team R2 not below the box form's (t > -1); expected up (round 2: t 3.7).
+- game walk, shipped params: margin MAE tune 2016-20 and held out 2021-26, paired t; ship rule: held out not worse
+  (t <= 0) and tune not worse at t > 1.5. Then the refit: cbb_roster.py --prior, cbb_games.py --fit, picks --rules, with
+  the refit's own held-out MAE reported against the committed fit's.
+- FV: cbb_fit.py refit with the fuller pXPM as the candidate; gates as in the first ship (nested pseudo-R2, RPS,
+  2017-19 top 50 and AUC not below the committed fit's beyond noise: nested R2 drop < .001, RPS rise < .0002).
+A check that fails stops that model's switch; the other still moves if its own check passes.

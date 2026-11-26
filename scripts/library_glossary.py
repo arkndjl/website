@@ -35,6 +35,7 @@ _STB = ld('data/cbb_recruits.json')['model']['stars']       # CBB star cuts and 
 _STB5 = next(x for x in _STB['plusSweep'] if x['perClass'] == _STB['plusPer'])
 _pc = lambda x: f'{100 * x:.0f}%'
 _AGC = _AG['coverage']['cfb'][max(_AG['coverage']['cfb'])]
+_CX3 = _CX['pxpm3']                                        # board form as model input (Nov 26)
 _CX2, _CR = _CX['pxpm2'], _CX['rxpm3']                    # board-form pXPM and rXPM rounds (Nov 26)
 _CXB = dict(zip(ld('data/cbb_xpm_fit.json')['cols2'], zip(ld('data/cbb_xpm_fit.json')['beta2']['o'], ld('data/cbb_xpm_fit.json')['beta2']['d'])))
 import gzip as _gz
@@ -301,7 +302,8 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
        f'The board form adds team context (5 × the minutes-weighted mean side BPM of his team / 10; O {_CXB["ctx"][0]:.2f}, D {_CXB["ctx"][1]:.2f}) and recruit rating / 100 by class (Fr O {_CXB["rec_fr"][0]:.2f} D {_CXB["rec_fr"][1]:.2f}, So {_CXB["rec_so"][0]:.2f} / {_CXB["rec_so"][1]:.2f}, Jr+ {_CXB["rec_up"][0]:.2f} / {_CXB["rec_up"][1]:.2f}).',
        f'Walk-forward, team R² goes from {_CX2["v1"]["teamR2"]:.3f} to {_CX2["teamR2"]:.3f} ({_CX2["vsV1"]["pairsBetter"]}/14, t = {_CX2["vsV1"]["t"]}), against {_CX2["bpm"]["teamR2"]:.3f} for BPM ({_CX2["vsBPM"]["pairsBetter"]}/14, t = {_CX2["vsBPM"]["t"]:.1f}). Player r is {_CX2["playerR"]:.3f} and RMSE {_CX2["playerRMSE"]:.2f}.',
        f'On their own, team context is t = {_CX2["blocks"]["F3"]["t"]} and recruit rating t = {_CX2["blocks"]["F2"]["t"]}. Late-season form, age, role and freshman height, minutes share and its change, and game BPM consistency failed (t = {min(_CX2["blocks"][k]["t"] for k in ("F4", "F5", "F6", "F7"))} to {_CX2["blocks"]["F1"]["t"]} alone, and nothing once the two are in).',
-       f'The board form in the roster prior goes from {_CX2["roster"]["teamR2"][0]:.3f} to {_CX2["roster"]["teamR2"][1]:.3f} ({_CX2["roster"]["pairsBetter"]}/14, t = {_CX2["roster"]["t"]}). As the FV driver in place of the box form it is t = {_CX2["fvSwap"]["md5"]["t"]}, so FV and the game model stay on the box form.',
+       f'The board form in the roster prior goes from {_CX2["roster"]["teamR2"][0]:.3f} to {_CX2["roster"]["teamR2"][1]:.3f} ({_CX2["roster"]["pairsBetter"]}/14, t = {_CX2["roster"]["t"]}). As the FV driver in place of the box form it is t = {_CX2["fvSwap"]["md5"]["t"]}.',
+       f'Through the game model, the board form moves held-out margin MAE (2021-26) from {_CX3["game"]["heldMae"][0]:.4f} to {_CX3["game"]["heldMae"][1]:.4f} (t = {_CX3["game"]["heldT"]}, worse in {_CX3["gameSeasonsWorse"]}/{_CX3["gameSeasons"]} seasons), and {_CX3["retune"]["core"]["held"]:.4f} against {_CX3["retune"]["full"]["held"]:.4f} with the prior weight retuned. In FV, nested R² goes from {_CX3["fv"]["nestedR2"][0]:.3f} to {_CX3["fv"]["nestedR2"][1]:.3f}, but the top-300 correlation with outcome on the 2017-19 boards goes from {_CX3["fv"]["top300Corr2017_19"][0]:.3f} to {_CX3["fv"]["top300Corr2017_19"][1]:.3f} and RPS from {_CX3["fv"]["rps"][0]:.4f} to {_CX3["fv"]["rps"][1]:.4f}. FV, the roster prior and the game model stay on the box form.',
        'The descriptive counterpart is rXPM (CBB).']],
       'CBB pXPM leaders, portal, board hover; box form: FV (returners), roster prior / game model', ['CBB']),
     E('CBB WAR / WAA', 'Wins over a replacement or an average D-I player.',
