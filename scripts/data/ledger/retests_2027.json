@@ -99,6 +99,20 @@
      "gate": "same"
     }
    ]
+  },
+  {
+   "key": "class_score_top_end",
+   "registered": "2026-11-26",
+   "prereg": "scripts/research/class_score_nov26/prereg.md",
+   "trigger": "after the 2027 CFB season (NIL-era seasons 2022-27) and the 2026-27 CBB season",
+   "harness": "scripts/research/class_score_nov26/stock.py",
+   "tests": [
+    {
+     "key": "cfb_nil_top_end",
+     "form": "roster split, top 5 and the rest, NIL-era seasons",
+     "gate": "difference t >= 2 and split beats the plain sum held out by season t >= 2"
+    }
+   ]
   }
  ]
 }
