@@ -92,10 +92,12 @@ PLAIN = [  # player-first and school-first headline shapes that name the player 
     re.compile(rf"\b{NAME}(?:'s)? (?:decommitment|de-commitment|decommits|flip|commitment)\b"),
     re.compile(rf"^(?:[^:]*: )?{SCHOOL} (?:lands|flips|adds|gets|secures|loses)(?: (?:commitment|commit|pledge) from)? {DESC}{NAME}\b"),
 ]
-TO_RE = [re.compile(rf"\b(?:commits?|commitment|pledges?|flips?|flipped|transfers?|signs?|chooses|picks|heads?) (?:back )?"
-                    rf"(?:to|with|from \S+(?: \S+)?(?: \S+)? to)? ?{SCHOOL}"),
-         re.compile(rf"^(?:[^:]*: )?{SCHOOL} (?:lands|flips|adds|gets|secures|picks up)\b")]
+# the school that opens "Penn State flips Louisville linebacker commit Josiah Pouncy" is where he went: tried first
+TO_RE = [re.compile(rf"^(?:[^:]*: )?{SCHOOL} (?:lands|flips|adds|gets|secures|picks up)\b"),
+         re.compile(rf"\b(?:commits?|commitment|pledges?|flips?|flipped|transfers?|signs?|chooses|picks|heads?) (?:back )?"
+                    rf"(?:to|with|from \S+(?: \S+)?(?: \S+)? to)? ?{SCHOOL}")]
 FR_RE = [re.compile(rf"\b(?:decommits?|de-commits?|flips?|flipped|backs off|transfers?) from {SCHOOL}"),
+         re.compile(rf"^(?:[^:]*: )?\S+(?: \S+){{0,2}} flips {SCHOOL} (?:[\w'-]+ ){{0,3}}commit\b"),
          re.compile(rf"\b(?:previously|formerly|once) committed to {SCHOOL}"),
          re.compile(rf"\bfrom {SCHOOL}"),
          re.compile(rf"^(?:[^:]*: )?{SCHOOL}(?: football| basketball| recruiting)?(?: \w+)?:? (?:loses?|sees)\b"),
@@ -461,7 +463,17 @@ def main():
     for sport in ('cfb', 'cbb'):
         new = pulled[sport]
         pool = Pool(sport)       # earlier rows read again with today's patterns (a fixed false match drops out)
-        kept = [r for r in old.get(sport) or [] if r.get('d', '') >= cut and any(x['k'] == r['k'] for x in (parse_cb if r.get('k') == 'cb' else parse)(r.get('t', ''), pool))]
+        kept = []
+        for r in old.get(sport) or []:
+            if r.get('d', '') < cut: continue
+            x = next((x for x in (parse_cb if r.get('k') == 'cb' else parse)(r.get('t', ''), pool) if x['k'] == r['k']), None)
+            if x is None and r['k'] == 'flip':   # a decommitment + commitment folded into a flip: its headline is the commitment's
+                x = next((x for x in parse(r.get('t', ''), pool) if x['k'] == 'commit'), None)
+            if x is None: continue
+            if r['k'] != 'cb' and x.get('to') and not (r['k'] == 'flip' and x['k'] == 'commit'):   # today's patterns fix a misread school
+                r['to'] = x['to']
+                if x.get('fr'): r['fr'] = x['fr']
+            kept.append(r)
         rows = merge(kept, new, kept=True)
         for r in rows: r.pop('_v', None)
         for r in rows:          # school logos (full colour, the boards' files)
@@ -477,6 +489,24 @@ def main():
         rows = [r for r in rows if not (r['k'] == 'decommit' and not r.get('fr') and any(
             x['k'] in ('flip', 'commit') and names.same(x['n'], r['n']) and
             abs((dt.date.fromisoformat(x['d']) - dt.date.fromisoformat(r['d'])).days) <= 4 for x in rows))]
+        # a decommitment followed within a day by a commitment elsewhere is one flip (DJ Jacobs, Ohio State -> Miami,
+        # Nov 26 2026): the commitment row becomes the flip and the decommitment goes
+        for r in [r for r in rows if r['k'] == 'decommit' and r.get('fr')]:
+            x = next((x for x in rows if x['k'] in ('flip', 'commit') and x.get('to') and names.same(x['n'], r['n'])
+                      and not names.same_team(x['to'], r['fr'])
+                      and 0 <= (dt.date.fromisoformat(x['d']) - dt.date.fromisoformat(r['d'])).days <= 1), None)
+            if x:
+                x['k'], x['fr'] = 'flip', x.get('fr') or r['fr']
+                if r.get('fl') and not x.get('fl'): x['fl'] = r['fl']
+                for s_, u in r['src'].items(): x['src'].setdefault(s_, u)
+                rows.remove(r)
+        # one spelling per player: a headline's name (On3's David Jacobs) takes the board's (D.J. Jacobs) when the shared
+        # name rules, the class and the position agree
+        for r in rows:
+            if r.get('b') and pool.by.get(names.key(r['n'])): continue
+            hit = [x for x in pool.rows if x.get('cls') and x['cls'] == r.get('cls') and names.same(x['n'], r['n'])
+                   and (not r.get('pos') or not x.get('pos') or names.pos_fits(x['pos'], r['pos'], 'football' if sport == 'cfb' else 'basketball'))]
+            if len({x['n'] for x in hit}) == 1: r['n'], r['b'] = hit[0]['n'], 1
         rows.sort(key=lambda r: (r['d'], r['n']), reverse=True)
         out[sport] = [{k: v for k, v in r.items() if v is not None} for r in rows]
         print(f'{sport}: {len(new)} moves pulled, {len(rows)} kept', file=sys.stderr)
@@ -493,7 +523,7 @@ def _test():
             self.sport, self.rows, self.teams = 'cfb', [], {}
             for t in ('Arkansas', 'Kentucky', 'Iowa State', 'Oklahoma', 'Maryland', 'North Carolina', 'Florida State',
                       'Alabama', 'Miami', 'Notre Dame', 'Texas A&M', 'Ohio State', 'LSU', 'Penn State', 'Tennessee',
-                      'Michigan', 'Michigan State', 'Ole Miss', 'Kansas', 'SMU'):
+                      'Michigan', 'Michigan State', 'Ole Miss', 'Kansas', 'SMU', 'Louisville'):
                 self.team(t)
             self.add('Cayden Daughtry', 'WR', 2027, 'Arkansas', 3)
             self.add('Kaegan Morton', 'WR', 2027, 'Arkansas', 210)
@@ -501,6 +531,7 @@ def _test():
             for r in self.rows: self.by.setdefault(names.key(r['n']), []).append(r)
     p = P()
     cases = [
+        ('Penn State flips Louisville linebacker commit Josiah Pouncy', ('Josiah Pouncy', 'flip', 'Penn State', 'Louisville')),
         ('Five-star Cayden Daughtry commits to Arkansas', ('Cayden Daughtry', 'commit', 'Arkansas', None)),
         ('Georgia RB Trace Washington commits to Kentucky', ('Trace Washington', 'commit', 'Kentucky', None)),
         ('Commit: Iowa State lands JUCO DB Jontavius Wyman', ('Jontavius Wyman', 'commit', 'Iowa State', None)),
