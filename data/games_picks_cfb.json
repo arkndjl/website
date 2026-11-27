@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-27T15:42:25Z",
+ "asof": "2026-11-27T15:49:13Z",
  "recenter": {
   "week": 0.53
  },
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-27",
-  "ageH": -8.3,
+  "ageH": -8.2,
   "stale": false
  },
  "picks": [],
@@ -565,6 +565,22 @@
    "tm": 50.7
   },
   {
+   "id": "401871082",
+   "sport": "cfb",
+   "kick": "2026-11-28T19:00:00.000Z",
+   "home": "Florida International",
+   "away": "Sam Houston",
+   "mk": "total",
+   "side": "over",
+   "line": 41.5,
+   "price": -116.0,
+   "edge": 2.0,
+   "x": 7.5,
+   "why": "edge under 7.5 (side: over)",
+   "m": 14.5,
+   "tm": 43.5
+  },
+  {
    "id": "401864548",
    "sport": "cfb",
    "kick": "2026-11-29T02:00:00.000Z",
@@ -659,22 +675,6 @@
    "why": "total market off",
    "m": 1.1,
    "tm": 53.6
-  },
-  {
-   "id": "401866474",
-   "sport": "cfb",
-   "kick": "2026-11-28T17:00:00.000Z",
-   "home": "Ball State",
-   "away": "Central Michigan",
-   "mk": "total",
-   "side": "under",
-   "line": 50.5,
-   "price": -116.0,
-   "edge": 4.6,
-   "x": null,
-   "why": "total market off",
-   "m": -3.2,
-   "tm": 45.9
   }
  ],
  "games": {
@@ -1375,16 +1375,16 @@
    "state": "off"
   },
   "401871082": {
-   "mk": "spread",
-   "side": "home",
-   "line": 10.5,
-   "price": -131.0,
-   "edge": 4.0,
+   "mk": "total",
+   "side": "over",
+   "line": 41.5,
+   "price": -116.0,
+   "edge": 2.0,
    "ev": null,
    "units": 0.0,
    "home": "Florida International",
    "away": "Sam Houston",
-   "state": "off"
+   "state": "under"
   },
   "401871083": {
    "mk": "total",
@@ -1511,16 +1511,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 31215,
+  "snapshots": 31223,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 6383,
-    "clvRet": -0.0211,
-    "clvT": -12.65,
-    "clv": 0.88,
-    "beat": 0.426,
-    "still": 0.322
+    "clvN": 6386,
+    "clvRet": -0.0201,
+    "clvT": -12.06,
+    "clv": 0.9,
+    "beat": 0.433,
+    "still": 0.316
    },
    {
     "when": "6-24h",
@@ -6294,7 +6294,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-27T15:42:25Z",
+ "checked": "2026-11-27T15:49:13Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
