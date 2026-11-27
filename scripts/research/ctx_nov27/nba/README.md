@@ -74,3 +74,33 @@ No 2026-27 outcome is read (files and games <= 2025-26). Keys: `xpm` box blend, 
 - A better preseason prior that hurts a regression fit on the old blend (T3 / T4): any sport that swaps a prior under a
   fitted multi-year projection (NHL / soccer / NFL projections) must refit and rescore the downstream form, not the prior alone.
 - Game model player value on the board's predictive metric (T1 fail): NHL game lineup value on pWAR, NFL on pXP/60.
+
+## Round 2 (port round)
+
+| item | swap / check | target | before -> after | t | k/n | result |
+|---|---|---|---|---|---|---|
+| P2 award games-left rate | Nov 4 shrink (sx0) -> pXPM form on the to-date line | rest-of-season stand-in XPM, 2019-26, 200+ min left | RMSE 1.4574 -> 1.3967 (defense .6300 -> .6183) | 7.64 (3.03) | 8/8 (6/8) | PASS |
+| P2 guard | as-of races, winner log loss (72 races, 1,500 sims) | MVP / DPOY / ROY | 1.8613 -> 1.8242; by award 1.507 -> 1.485, 2.865 -> 2.787, 1.212 -> 1.200 | 1.55 | 6/8 | holds, shipped |
+| P2 B (no aging) | same | same | 1.4574 -> 1.3937 | 8.03 | 8/8 | passes too; A shipped (the board's own column) |
+| P3 A | 1Y / 3Y history terms on rXPM in place of box XPM | next season / next three, LOSO | f 1: 1Y 1.1375 -> 1.1383, 3Y 1.1253 -> 1.1254 | -2.35 / -0.40 | 4/14, 6/12 | FAIL |
+| P3 B | 1Y / 3Y + prior two seasons' VORX | same | 1Y 1.1375 -> 1.1378, 3Y 1.1253 -> 1.1284 | -0.46 / -3.29 | 6/14, 4/12 | FAIL |
+| P4 game model | fit form vs serve form | code | serve = the same Model class walked to today (nba_games_build.py:213, F['params']); values() reads the two seasons before, ARC the same; no in-season board value (ik 0) | | | OK, no change |
+| P5a next up ceiling | sx0 -> pXPM as the input | pinball .80, LOSO | .30605 -> .30298, cover .799 -> .800 | 1.34 | 12/16 | FAIL; research script pinned to sx0 |
+
+P5 fit forms against the Nov 24 rebuild (git history is a single commit here, so checked by refit, not by date):
+- ceiling: refit on sx0 reproduces the shipped coefficients exactly (max diff 0). The research script read `sxpm`
+  (pXPM since Nov 24): a refit would have trained on a form the build does not serve. Pinned to sx0.
+- rookie aXPM age slope: same pattern (`sxpm` in nba_rookie_age_research.py; the build feeds role_sxpm). Pinned; refit
+  reproduces the shipped file byte for byte.
+- G League call-up / xXPM (box xpm, vorx0), xAAV (role_sxpm, vorx0), badges (sx0), awards voter fits (vorx0 / rvorx by
+  award), XPM (proj) fit and 1Y / 3Y (box xpm): read keys the rebuild left unchanged. Not stale.
+- as-of award backtest (scripts/awards_asof.py) crashed on every sport's voter races since the conviction lead was
+  added (spec had no 'null'): fixed. NBA arm now runs the games-left rate through nba_xpm.pxpm, as the live draw.
+  NBA temperature in data/awards_temp.json is 0, so nothing depends on a refit.
+
+Leads from round 2:
+- scripts/player_pctl.py:804 scores the NBA percentile fit against `vorx` (rXPM since Nov 24) while its draws are
+  .030 x (box XPM + 1.4) x MP / 48: target `vorx0` or move the draws. Needs the pctl box cache to refit.
+- scripts/nba_proj.py:195 adds VORX to date (rXPM) to the rest of season on the box-blend projection; $ per win
+  renormalises it, so the surplus effect is small. Same for nba_proj3y_research.py:91 (research only).
+- The full NBA as-of run (2012-13 on) needs the ESPN box backfill: `python3 scripts/awards_asof.py nba --box --noscore`.

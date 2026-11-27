@@ -18,7 +18,7 @@ To-date inputs
 - NBA: archived box lines (scripts/nba_pbox_hist.json.gz; 2012-13..2017-18 pulled into the cache) summed to date.
 - WAR (NHL) and XPM (NBA) are season files and cannot be rebuilt by date. Variant 'box' (the test): the to-date
   value predicted from to-date box stats by a ridge fit on the other seasons' full-season lines, the predictive rate
-  = that estimate shrunk to last season's published value by minutes. Variant 'end' (a bound: it leaks the rest of
+  = that estimate shrunk to last season's published value by minutes (NHL) / run through pXPM (NBA, nba_xpm.pxpm). Variant 'end' (a bound: it leaks the rest of
   the season, so it can only understate the temperature): the season-end published rate x to-date minutes.
 - CFB: sportsdataverse ESPN player box + schedule files (no positions: QB = 8+ pass attempts a team game, defender
   = under 50 scrimmage yards and 20+ tackles per 12 games; no defensive interceptions or forced fumbles).
@@ -76,7 +76,7 @@ def loso_specs(races, cols, depth):
     rr = [(s, [[r[c] for c in cols] for r in pool], o) for s, pool, o in races]
     for s, _, _ in races:
         b, mu, sd = E.fit([(X, o) for t, X, o in rr if t != s and o], depth=depth)
-        out[s] = {'cols': cols, 'b': b, 'mu': mu, 'sd': sd, 'test': {'pass': True}}
+        out[s] = {'cols': cols, 'null': [cols[0]], 'b': b, 'mu': mu, 'sd': sd, 'test': {'pass': True}}   # null: the races' lead metric (awards.lead)
     return out
 
 
@@ -345,7 +345,8 @@ def nba_build(sims):
         bx, bd = standin(S)
         Lf, Tf = full[S]
         Gs = min(82, int(sorted(v[1] for v in Tf.values())[len(Tf) // 2]))
-        pri = XP.shrink_prior(S)
+        import nba_games as NG
+        hist = ((XP.pxpm_hist(S)[0], NG.aging_curve(S)), XP.shrink_prior(S))    # pXPM as the board had it in season: the curve from pairs ending before S
         pg0 = A.per_game(S - 1)
         seen = set()
         for s in range(2010, S): seen |= set(xpm[s])
@@ -368,7 +369,7 @@ def nba_build(sims):
                         xv, dv = float(v @ bx), float(v @ bd)
                     else:
                         xv, dv = x['xpm'], x['dxpm']
-                    sh = XP.shrink({'id': pid, 'mp': r['mp'], 'xpm': xv, 'oxpm': xv - dv, 'dxpm': dv}, max(teams[r['tm']][1], 1), pri)
+                    sh = XP.pxpm({'id': pid, 'mp': r['mp'], 'xpm': xv, 'oxpm': xv - dv, 'dxpm': dv, 'age': x.get('age')}, max(teams[r['tm']][1], 1), hist)   # the live draw's games-left rate
                     q = pg0.get(pid, {})
                     cands.append({'id': pid, 'n': x['n'], 'tm': r['tm'], 'g': r['g'], 'tg': teams[r['tm']][1], 'mp': r['mp'],
                                   'xpm': xv, 'dxpm': dv, 'sx': sh['sxpm'], 'sdx': sh['sdxpm'],
