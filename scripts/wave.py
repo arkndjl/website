@@ -78,6 +78,10 @@ BRANDS = [
      'keep': r"^\s*['’]47\b|\b(Mets|Knicks|New York Rangers|Ravens|Barcelona)\b", 'stores': []},
     {'id': 'newbalance', 'name': 'NEW BALANCE', 'kind': 'brand',
      'terms': [r'New Balance', r'ニューバランス'], 'stores': []},
+    {'id': 'awakeny', 'name': 'AWAKE NY', 'kind': 'brand',
+     'terms': [r'Awake NY', r'Awake New York'], 'stores': []},
+    {'id': 'whodecideswar', 'name': 'WHO DECIDES WAR', 'kind': 'brand',
+     'terms': [r'Who Decides War'], 'stores': []},
 ]
 TEAMS = [
     {'id': 'mets', 'name': 'METS', 'kind': 'team', 'terms': [r'\bMets\b']},
@@ -144,7 +148,6 @@ SUGGEST = [
     {'name': '1017 ALYX 9SM', 'tags': ['streetwear', 'gothic', 'slim bottom'], 'ties': [], 'nyc': False, 'u': 'https://www.alyxstudio.com/', 'terms': [r'\bALYX\b', r'1017 ALYX']},
     {'name': 'JJJJound', 'tags': ['streetwear'], 'ties': ['New Balance'], 'nyc': False, 'u': 'https://www.jjjjound.com/', 'terms': [r'JJJJound']},
     {'name': 'Joe Freshgoods', 'tags': ['streetwear'], 'ties': ['New Balance'], 'nyc': False, 'u': 'https://joefreshgoods.com/', 'terms': [r'Joe Freshgoods']},
-    {'name': 'Awake NY', 'tags': ['streetwear', 'oversized top'], 'ties': [], 'nyc': True, 'u': 'https://awakenewyork.com/', 'terms': [r'Awake NY', r'Awake New York']},
     {'name': 'Hysteric Glamour', 'tags': ['streetwear', 'slim bottom'], 'ties': [], 'nyc': False, 'u': 'https://www.hystericglamour.jp/', 'terms': [r'Hysteric Glamour', r'HYSTERIC GLAMOUR']},
     {'name': 'Boris Bidjan Saberi', 'tags': ['gothic', 'slim bottom'], 'ties': [], 'nyc': False, 'u': 'https://www.borisbidjansaberi.com/', 'terms': [r'Boris Bidjan Saberi']},
     {'name': 'Kidill', 'tags': ['gothic', 'streetwear', 'oversized top'], 'ties': [], 'nyc': False, 'u': 'https://kidill.com/', 'terms': [r'\bKIDILL\b', r'\bKidill\b']},
@@ -154,7 +157,6 @@ SUGGEST = [
     {'name': 'Balenciaga', 'tags': ['streetwear', 'gothic', 'oversized top'], 'ties': [], 'nyc': False, 'u': 'https://www.balenciaga.com/', 'terms': [r'Balenciaga']},
     {'name': 'Comme des Garçons Homme Plus', 'tags': ['gothic', 'oversized top'], 'ties': [], 'nyc': False, 'u': 'https://www.comme-des-garcons.com/', 'terms': [r'Comme des Gar[cç]ons Homme Plus', r'CDG Homme Plus']},
     {'name': 'Guidi', 'tags': ['gothic', 'slim bottom'], 'ties': [], 'nyc': False, 'u': 'https://www.guidi.it/', 'terms': [r'\bGuidi\b']},
-    {'name': 'Who Decides War', 'tags': ['streetwear', 'gothic'], 'ties': [], 'nyc': True, 'u': 'https://whodecideswar.com/', 'terms': [r'Who Decides War']},
     {'name': 'Noah', 'tags': ['streetwear'], 'ties': [], 'nyc': True, 'u': 'https://noahny.com/', 'terms': [r'\bNoah NY\w*', r'^Noah$', r'\bNoah x\b', r'\bx Noah\b']},
     {'name': 'Only NY', 'tags': ['streetwear'], 'ties': [], 'nyc': True, 'u': 'https://onlyny.com/', 'terms': [r'Only NY']},
     {'name': 'Stüssy', 'tags': ['streetwear', 'oversized top'], 'ties': [], 'nyc': False, 'u': 'https://www.stussy.com/', 'terms': [r'St[uü]ssy']},
