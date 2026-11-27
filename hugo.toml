@@ -383,3 +383,14 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
         #   weight = 27
         #   [languages.en.menu.main.params]
         #   icon = "img/icons/franchise.svg"
+
+# static/img is also readable as an asset (assets/img/...), so a template can ask Hugo for a small copy of a logo
+# (layouts/partials/ticklogo.html: the ticker's 20px logos from the 256px files). Naming one assets mount drops the
+# default one, so assets -> assets is listed too. The files are still published from static/ as before.
+[module]
+  [[module.mounts]]
+    source = 'assets'
+    target = 'assets'
+  [[module.mounts]]
+    source = 'static/img'
+    target = 'assets/img'
