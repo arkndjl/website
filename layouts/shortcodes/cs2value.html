@@ -29,7 +29,7 @@
   {{- range .teams }}
   <tr>
     <td class="cfb__rk">{{ .vrk }}</td>
-    <td style="white-space: nowrap" title="{{ delimit .ros ", " }}">{{ if .logo }}<img class="cs__logo" src="/img/cs2/{{ .k }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b>{{ with .rk }} <span class="cfb__dim">#{{ . }}</span>{{ end }}</td>
+    <td class="cfb__name" style="white-space: nowrap" title="{{ delimit .ros ", " }}">{{ if .logo }}<img class="cs__logo" src="/img/cs2/{{ .k }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}<b>{{ .n }}</b>{{ with .rk }} <span class="cfb__dim">#{{ . }}</span>{{ end }}</td>
     <td class="cs__tier" data-v="{{ .tier }}" data-filter="Tier {{ .tier }}"><span class="cs__t cs__t--{{ .tier }}">T{{ .tier }}</span></td>
     <td class="cfb__num" data-v="{{ .v }}"><b>{{ partial "cs2money.html" .v }}</b></td>
     <td class="cfb__num" data-v="{{ .v0 }}">{{ partial "cs2money.html" .v0 }}</td>
