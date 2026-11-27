@@ -33,3 +33,37 @@ won, guard no worse.
   outside outcome; rXPM adds a team shift a recruit's features cannot see. Follows H3's verdict.
 - Game model player values (avail / pre_out on last season's game BPM): needs the full game walk and Barttorvik game
   logs for 2017-26; left as a lead with the rerun command.
+
+# Round 2 (port round), written before scoring
+
+Holm over R1, R2, R3. Same pass rule (paired t >= 2 after Holm, most folds, guard no worse).
+
+## R1 (P2) awards games-left rate (scripts/awards.py cbb draw): prior = pXPM in place of last season's BPM
+- Now: rest-of-season mean = (BPM to date x m0 + prior x 300) / (m0 + 300), prior = last season's BPM (8+ games).
+- Candidate: prior = his preseason pXPM board form (px2 of the season before, point in time), K 300 unchanged.
+  Secondary (reported, not the pass test): K picked on earlier seasons from 300 / 450 / 600 / 900 / 1200.
+- Data: Barttorvik game logs 2017-2026 (game BPM by minutes). Checkpoints after the team's 5th, 10th, 15th, 20th game.
+  Pool as the race's: 20+ minutes a game to date, played 60%+ of team games, a line last season with 8+ games.
+- Target: his minutes-weighted game BPM over the team's remaining games (50+ minutes left). Score: squared error
+  weighted by remaining minutes, per season; paired t over the 10 seasons, k/10. Guard: the top 100 by BPM to date
+  at each checkpoint (the award pool's top) no worse.
+
+## R2 (P3) xXPM returners: season-only prior value (last season's rXPM and VORX) beside the model prior
+- The shipped ridge already holds last season's BPM, 3-season BPM and WAA beside pXPM, so the open form is rXPM / VORX.
+  Reduced harness (the full one needs the careers cache): walk-forward least squares, target next-season rXPM weighted
+  by next minutes, pairs 2012->13 ... 2024->25. Base = [px2, last BPM, last BPM x minutes share (WAA form), ln minutes].
+  Candidate = base + [last rXPM, last VORX]. Downstream score (the rule from NBA T3/T4): next-season team R2 of the
+  returners' minutes-weighted projection against their minutes-weighted actual rXPM, by pair; paired t over pairs.
+  A pass here is a lead for the full refit (cbb_fit.py --xbpm), not a ship.
+
+## R3 (P5 / P1) backup watch xGap terms, fit before the grade moved to pXPM (data/backup_age.json cbb, Nov 11)
+- Pairs as scripts/backup_age_fit.py cbb_pairs but graded as the live grade is now (last season's slot = px2 after
+  that season, point in time). Before: the shipped a, b, c (fit on BPM-graded pairs) applied to these pairs. After:
+  walk-forward refit on these pairs (the script's own fit()). Score: squared error of the two-season gap on held
+  seasons, paired t over pairs, seasons improved.
+
+## Not a test
+- P4: the game model's absence terms run the same functions on logs to date in history and live (static read); the
+  one check is the roster prior's history rows, which read pXPM from the frozen full-sample coefficients: compare its
+  next-season error with the walk-forward pXPM on 2012-2018 lines (a gap over .01 RMSE = a leak worth a walk).
+- P6: next up companion column to pXPM (display).
