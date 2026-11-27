@@ -53,3 +53,38 @@ the ice-time shrink target), so it says who plays; Marcel WAR says who produced.
 - Rookies in A shrink to the whole group's mean; the projections tab has a newcomer mean (pctl_fit_nhl mu F:n, D:n, G:n).
 - xAAV history reads pwar / p3 on the latest fit's weights; a nested store exists for HPM only.
 - transaction_values NHL: this season's WAR to date; a move's value going forward would be Marcel WAR.
+
+## Cross-sport analogues (round 1)
+- A: each sport's awards games-left rate should be the player-level predictive pick on the scale of the value the
+  voter model reads. B: backup grades (NBA, soccer, NFL); neutral target = backup passes the starter in minutes a game.
+- Display: tooltips naming the descriptive metric where the fit reads the projected one.
+
+## Round 2 (port round)
+`test2.py` -> `results2.json` (prereg.md C, D; Holm family of 2).
+
+| item | swap | target | before -> after | t / p Holm | k/n | result |
+|---|---|---|---|---|---|---|
+| P1 | xGap: + Marcel GAR a 60 gap (grade stays HPM) | pair's 2-season HPM gap, walk forward, 914 pairs | MSE .01721 -> .01673 | -2.41 / .016 | 9/10 | **PASS, shipped** (d .127) |
+| P1 guard | same | pair's 2-season GAR a 60 gap | .1189 -> .1116 | -3.72 | 9/10 | ok |
+| P3 lead | awards Marcel rate: newcomer mean for players with no prior season | next-season WAR, 563 rookies | MSE 1.257 -> 1.281 | -1.49 / .92 | 4/14 | **FAIL**, group mean kept |
+
+- P3: nothing to add. The projections tab's prior is already Marcel on season-only WAR (player_pctl.season_values reads
+  `war`), and 3Y (nhl_proj_fit) already carries it beside pWAR (`both` beat `cal`, bfull shipped).
+- P5 stale fits against the Nov 24 pWAR rebuild:
+  - data/backup_age.json nhl (Nov 11): refit, `python3 scripts/backup_age_fit.py --nhl` (new flag, NHL block alone).
+    a -.0157 -> -.0213, b .815 -> .725, c .0113 -> .0095, d .127; 1,158 -> 1,262 pairs.
+  - data/hockey_fit.json (Nov 11, outcome = pwar): refit `python3 scripts/hockey_prospects.py --fit --frozen`, board
+    rebuilt. Same drivers kept at every stage; class-out MSE 87.11 -> 87.92 (slot 91.63 -> 92.44). Board FV: 181 of 193
+    unchanged, 12 up 1; pipeline 237 of 299 unchanged, rest within 1 but four.
+  - data/nhl_proj_fit.json + nhl_exit_fit (Nov 3, read pwar): needs the MoneyPuck cache for the in-season grid.
+    Rerun: `python3 scripts/nhl_players.py` (fills scripts/.cache/nhl/mp) then `python3 scripts/nhl_proj_research.py --partial`.
+  - data/xaav_fit.json nhl (Nov 4, reads pwar, p3): needs scripts/.cache/xaav/nhl_signings.json (CapWages pull).
+    Rerun the xaav fit for nhl once the cache is there.
+  - Not stale: nhl_breakout_fit, nhl_ceiling_fit, pctl_fit_nhl (read descriptive war only; the HPM group is not kept);
+    nhl_games_fit and nhl_hpm_nested (both Nov 24).
+- P6: next up's value beside the odds was this season's WAR a 1,000 minutes; now Marcel WAR a 1,000 minutes (the
+  fit's own 5/4/3, K 1,000 form), label mWAR/1k. Not rebuilt here (stats API pull timed out); nhl.yml reruns it.
+- Text for data/terms.json (lead): key `mWAR/1k`, n "Marcel WAR a 1,000 minutes", d "His last three seasons of WAR by
+  minutes, newest counting most, pulled toward replacement.", g = the glossary term for NHL WAR.
+- Analogues: xGap second-gap term for soccer (p/90 beside GAR/90) and CFB; stale-fit check after any metric rebuild
+  with a per-sport refit flag like --nhl so one sport's block can move alone.
