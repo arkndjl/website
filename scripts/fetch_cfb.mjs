@@ -1666,6 +1666,9 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       // prices ignore grade), which would make xNIL another estimate of pay. On3 is kept as a diagnostic
       const kNow = 1, pr = curve(kNow);
       const best = sse(pr);
+      // yNIL against On3's valuations (the fit's own target): mean and SD of log(yNIL / On3), the hover range on yNIL
+      const yl = fitSet.map(p => Math.log(p.ynil / p.on3.nil)), yMu = yl.reduce((a, b) => a + b, 0) / yl.length;
+      const ySd = Math.sqrt(yl.reduce((a, b) => a + (b - yMu) ** 2, 0) / yl.length);
       for (const p of all) { p.xnil = Math.round(pr(p) / 1000) * 1000; p.znil = p.xnil - p.ynil; p.nilMkt = mkt(p); }
       // the FBS curves for the FCS build: worth weight sums by market, pools, starter lines, coefficients
       const fvG5 = {};
@@ -1677,7 +1680,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       const zs = { p4: 0, g5: 0 }; for (const p of all) { const x = val.get(p); zs[mkt(p)] += Math.exp(x.pos) * x.v; }
       nilMarket = { bPre, bNow, fvP4, fvG5, pools, zs, valueKey, savK, price: { p4: pools.p4 / zs.p4, g5: pools.g5 / zs.g5 } };
       // perWar: the market's price of one college WAR a season (a position-average player), P4 and G5
-      nilFit = { n: train.length, value: valueKey, perWar: { p4: Math.round(pools.p4 / zs.p4 / CWAR_PER_AV / 1000) * 1000, g5: Math.round(pools.g5 / zs.g5 / CWAR_PER_AV / 1000) * 1000 }, valueTest, savN: withSav.length, pool: Math.round(pool), fvP4, kNow: Math.round(kNow * 100) / 100, rmseLog: Math.round(Math.sqrt(best / train.length) * 100) / 100,
+      nilFit = { n: train.length, yN: yl.length, yBias: Math.round(yMu * 100) / 100, ySd: Math.round(ySd * 100) / 100, value: valueKey, perWar: { p4: Math.round(pools.p4 / zs.p4 / CWAR_PER_AV / 1000) * 1000, g5: Math.round(pools.g5 / zs.g5 / CWAR_PER_AV / 1000) * 1000 }, valueTest, savN: withSav.length, pool: Math.round(pool), fvP4, kNow: Math.round(kNow * 100) / 100, rmseLog: Math.round(Math.sqrt(best / train.length) * 100) / 100,
         pre: bPre.map(x => Math.round(x * 1000) / 1000), now: bNow.map(x => Math.round(x * 1000) / 1000) };
     }
   }

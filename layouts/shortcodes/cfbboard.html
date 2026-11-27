@@ -99,6 +99,7 @@
                has; consensus and Draft% live on the draft board, FBS% on the FCS board. PFN and On3 are inputs to FV, so they
                live in the scouting report. */ -}}
         {{- $warT := "college WAR = wins a 12-game season over a replacement starter = snap share x (line + weight x quality) x .227; quality from Stat+, badges, FV. line = margin lost when an average starter at the spot sits (OT / IOL, slot WR, nickel CB): QB 2.7 pts a game (regular seasons 2019-25), others .8-1.7; blend of missed games, NFL spot values, position grade. QB production partly credited to offensive teammates. 4.4 pts of margin a game = 1 win. K, P: points over an average K / P. FCS: vs FCS starters. no snaps = 0" -}}
+        {{- $yr := "" }}{{ with $d }}{{ with .nilFit }}{{ with .ySd }}{{ $yr = printf "; vs On3 valuations: within x/÷ %.1f for two in three (%v players)" (math.Pow 2.718281828 .) $d.nilFit.yN }}{{ end }}{{ end }}{{ end -}}
         {{- $since := "" }}{{ with $d }}{{ with .since }}{{ $since = printf " (%v)" . }}{{ end }}{{ end -}}
         {{- $th := dict
           "rk" (slice "" (cond (eq $preset "war") "rank by XV among the players in view" (cond (eq $preset "nil") "rank by xNIL among the players in view" "")) "RK")
@@ -118,7 +119,7 @@
           "up" (slice "cfb__now" "FBS% = P(on an FBS roster next season), FCS players. logit fit on 2023-26 FCS-to-FBS moves: production, team strength, year in school, position; conference, recruiting reorder only. 2nd-4th years highest, 5th-years lowest. cap: 1 - Draft%" "FBS%")
           "xfer" (slice "cfb__now" "Transfer% = P(on another FBS or FCS roster next season). logit fit on 2024-25, 2025-26 cycles (ESPN rosters, CFBD portal check): class, production, role, recruiting rank, team record, P(head-coach change), P4 / G5 / FCS, distance from home. Transfer% + stay + exit (draft, eligibility) = 100%. hover: stay odds, top factors" "Xfer%")
           "xnil" (slice "cfb__now" "xNIL = expected open-market NIL value now: FV, position, role; fit on On3 valuations; priced in the reachable market (P4, G5, FCS). FCS players: FBS fit" "xNIL")
-          "ynil" (slice "cfb__now" "yNIL = estimated NIL pay entering the season: program budget split by preseason index; FCS programs ~$0.4M" "yNIL")
+          "ynil" (slice "cfb__now" (print "yNIL = estimated NIL pay entering the season: program budget split by preseason index; FCS programs ~$0.4M" $yr) "yNIL")
           "znil" (slice "cfb__now" "zNIL = xNIL - yNIL: value change vs estimated pay" "zNIL")
           "cls" (slice "" "" "Class")
           "age" (slice "" "" "Age")
