@@ -295,13 +295,17 @@ def injuries(V, since):
 
 FV_BOARDS = [   # tag key, file, path to rows, id fields, name field, team field, page hash
     ('cbb', 'static/data/cbb-all.json', None, ('name', 'team'), 'name', 'team', '#board'),
-    ('hockey', 'data/hockey.json', ('board',), ('name',), 'name', 'club', '#board'),
-    ('u22', 'data/soccer_prospects.json', ('board',), ('id',), 'name', 'club', '#board'),
-    ('tennis', 'data/tennis_prospects.json', ('atp', 'board'), ('id',), 'name', None, '#board'),
-    ('tennis', 'data/tennis_prospects.json', ('wta', 'board'), ('id',), 'name', None, '#board'),
+    ('hockey', 'data/hockey.json', ('board',), ('name',), 'name', 'club', '#draft-board'),
+    ('u22', 'data/soccer_prospects.json', ('board',), ('id',), 'name', 'club', '#big-board'),
+    ('tennis', 'data/tennis_prospects.json', ('atp', 'board'), ('id',), 'name', None, '#atp-big-board'),
+    ('tennis', 'data/tennis_prospects.json', ('wta', 'board'), ('id',), 'name', None, '#wta-big-board'),
     ('cs2', 'data/cs2_players.json', ('prospects',), ('id',), 'n', 'tm', '#prospects'),
     ('cfb', 'static/data/cfb-all.json', None, ('name', 'team'), 'name', 'team', '#board'),
 ]
+
+OLD_HREF = {'/arkboard/hockey-prospects/#board': '/arkboard/hockey-prospects/#draft-board',
+            '/arkboard/soccer-prospects/#board': '/arkboard/soccer-prospects/#big-board',
+            '/arkboard/tennis-prospects/#board': ('/arkboard/tennis-prospects/#atp-big-board', '/arkboard/tennis-prospects/#wta-big-board')}   # (ATP, WTA): WTA ids start with w
 
 
 def fv_rows(rel, path):
@@ -547,6 +551,10 @@ def build(state, plays='fetch'):
         except Exception as ex:   # one broken source never empties the feed
             print('news: source failed:', repr(ex), file=sys.stderr)
     old = {i['id']: i for i in (load('data/news.json') or {}).get('items', [])}
+    for o in old.values():   # frozen FV items written before the boards' tabs were renamed: "#board" opens nothing there
+        if o.get('cat') == 'fv' and o.get('href') in OLD_HREF:
+            h = OLD_HREF[o['href']]
+            o['href'] = h[o['id'].split('|')[-1][:1] == 'w'] if isinstance(h, tuple) else h
     ids = {i['id'] for i in new}
     for i in new:
         o = old.get(i['id'])
