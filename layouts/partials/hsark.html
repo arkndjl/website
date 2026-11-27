@@ -1,0 +1,7 @@
+{{- /* A college player's ARK stars as a high school recruit (data/arkstars_hs.json, scripts/arkstars_hist.py):
+       dict "sport" ("cfb" | "cbb") "name" "team". A table cell's content; a player with no grade (a specialist) is a dash. */ -}}
+{{- $by := (index (site.Data.arkstars_hs | default dict) .sport | default dict).by | default dict -}}
+{{- with index $by (printf "%s|%s" .name (.team | default "")) -}}
+{{- $lbl := cond (gt . 5.0) "5-star+" (printf "%g ARK stars" .) -}}
+{{- if gt . 5.0 }}<span class="cfbrc__glow">{{ end }}<span class="cfbrc__ark{{ if gt . 5.0 }} is-plus{{ end }}" style="--n:{{ cond (gt . 5.0) 5.0 . }}" data-n="{{ . }}" role="img" aria-label="{{ $lbl }}" title="{{ $lbl }}"><i></i></span>{{ if gt . 5.0 }}<span class="cfbrc__plus" aria-hidden="true">+</span></span>{{ end }}
+{{- else }}<span class="cfb__dim">—</span>{{ end -}}

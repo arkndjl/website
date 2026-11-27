@@ -160,3 +160,16 @@
 - Football position pay (`XNIL.pos` in `scripts/fetch_cfb.mjs`) and the basketball mid- and low-major levels (`XNIL` in
   `scripts/cbb_recruit_fit.py`) are set on the College Sports Commission's yearly pay report (`scripts/research/nil_nov27/pos2.py`,
   `cbb_levels.py`): redo both when a new report is out.
+
+## HS ARK stars (every college player's high school grade)
+
+- `scripts/arkstars_hist.py` grades past classes (2008 on) with the same index and cuts as the live recruit tabs, one row a
+  recruit from ESPN's class lists, the 247 composite and On3's team commit lists (`scripts/on3_commits.mjs`; team id lists in
+  `scripts/data/arkstars_on3_teams.json` and `arkstars_on3_extra.json`). Packs: `scripts/data/arkstars_hist_cfb.json.gz`,
+  `arkstars_hist_cbb.json.gz`. No flag = the join only: `static/data/arkstars-cfb.json`, `arkstars-cbb.json` (by ESPN id, with
+  `how` = how he was matched) and `data/arkstars_hs.json` ("Name|Team" -> stars). `--update` folds a new On3 pull in, `--pull`
+  rebuilds every class (needs the full On3 cache), `--test` reruns the held-out tests into `data/arkstars_hist_research.json`
+  (the Process "ARK stars" entry reads it). `.github/workflows/arkstars-hist.yml`: weekly pull, join after each board run.
+- A table shows it with `{{ partial "hsark.html" (dict "sport" "cfb" "name" .name "team" .team) }}` under an `HS` header
+  (portal, transfer watch, re-signed). No source lists him = 1 star; specialists get no grade. A change to how thin rows are
+  graded must pass the forward test (fit 2011-19, test 2020-21) before it ships.
