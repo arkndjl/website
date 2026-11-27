@@ -34,6 +34,7 @@ OUT = os.path.join(ROOT, 'data', 'awards.json')
 TEMP = os.path.join(ROOT, 'data', 'awards_temp.json')
 SIMS = 3000
 PACE_GP = False          # football: rest-of-season rate per game the player appeared in (False = per team game)
+LEFT_K = 0               # football: games of the player's last-season rate the rest-of-season rate is shrunk with (c['prev']; 0 = raw)
 AV_ACT = 0.0             # availability floor of a candidate who is playing now (0 = off)
 MKT_W = 0.95             # the market's weight in the shown P(win) (log-linear blend), where a liquid market is open
 # a liquid market: this many two-sided quotes, raw prices summing inside this range (the test's rule), and this much
@@ -895,6 +896,7 @@ def football_draw(teams, per_left, sport):
         if PACE_GP and c['f'].get('gp'): gn = max(min(c['f']['gp'], gn), 1)
         for k, kind in per_left:
             rate = c['f'][k] / gn
+            if LEFT_K and (c.get('prev') or {}).get(k) is not None: rate = (c['f'][k] + LEFT_K * c['prev'][k]) / (gn + LEFT_K)
             mu = rate * gr
             sdv = math.sqrt(max(mu, 0)) if kind == 'count' else .3 * mu
             f[k] = c['f'][k] + (gauss(rng, mu, abs(sdv)) if k == 'svar' else max(gauss(rng, mu, sdv), 0))

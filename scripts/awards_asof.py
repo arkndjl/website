@@ -596,6 +596,8 @@ def cfb_build(sims):
                 w, g, _, _, G = teams[r['tid']]
                 k = G / max(g, 1)
                 c = {'id': r['id'], 'n': r['n'], 'tid': r['tid'], 'tm': r['tid'], 'pos': r['pos'], 'f': f}
+                q = full[S - 1][0].get(r['id']) if S - 1 in full else None       # last season's rate a game (--leftk)
+                if q: c['prev'] = {x: q[x] / max(q['gp'], 1) for x, _ in AW.CFB_LEFT if x in q}
                 c['pf'] = dict(f, **{x: f[x] * k for x, _ in AW.CFB_LEFT if x in f}, yds=f['yds'] * k)
                 cands.append(c)
             left = [(k, kind) for k, kind in AW.CFB_LEFT if k in CFB_NUM or k == 'int']
@@ -702,6 +704,8 @@ def main(argv):
         if a.startswith('--from='): NBA_FIRST = int(a[7:])
         if a.startswith('--av='): AW.AV_ACT = float(a[5:])
     if '--pacegp' in argv: AW.PACE_GP = True
+    for a in argv:
+        if a.startswith('--leftk='): AW.LEFT_K = float(a[8:])      # football: rest-of-season rate shrunk to last season's
     if '--box' in argv: VARS = ('box',)
     for sp in [a for a in argv if a in BUILD]:
         os.makedirs(CACHE, exist_ok=True)
