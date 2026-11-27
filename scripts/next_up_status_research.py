@@ -28,6 +28,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import breakout_lib as L  # noqa: E402
 import next_up_young_research as Y  # noqa: E402
 from cbb_freshman_bo_research import logit  # noqa: E402
+from next_up import status_x  # noqa: E402  (stdlib only: the tab builder runs where numpy is not installed)
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 OUT = os.path.join(ROOT, 'data', 'next_up_status.json')
@@ -48,19 +49,6 @@ def status(sport, a, DR):
         return status_x(sport, None if pk is None or pk >= 270 else pk)
     if sport == 'soccer':
         return status_x(sport, a.get('mv'))
-
-
-def status_x(sport, v):
-    """v: recruit rank (cbb), stars (cfb), pick (nba, nfl), market value EUR M (soccer); None = unranked / undrafted / missing"""
-    if sport == 'cbb':
-        lr = -math.log(min(500.0, v)) if v else -math.log(500)
-        return [lr, 0.0 if v else 1.0, max(0.0, lr + math.log(100))]
-    if sport == 'cfb':
-        return [float(v) if v else 2.0, 0.0 if v else 1.0]
-    if sport in ('nba', 'nfl'):
-        return [-math.log(v if v else (61 if sport == 'nba' else 270)), 0.0 if v else 1.0]
-    if sport == 'soccer':
-        return [math.log(v + 0.1) if v else math.log(5.1), 0.0 if v else 1.0]
 
 
 def main():
