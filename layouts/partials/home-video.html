@@ -12,7 +12,10 @@
     {{- end }}
   {{- end }}
 {{- end -}}
-{{- $v = first 16 (sort $v "pub" "desc") -}}
+{{- $v = sort $v "pub" "desc" -}}
+{{- /* the newest ARKNDJL video is always #1, even when a LAURSEN_111 video is newer */ -}}
+{{- with where $v "k" "arkndjl" }}{{ $top := index . 0 }}{{ $v = (slice $top) | append (where $v "id" "ne" $top.id) }}{{ end -}}
+{{- $v = first 16 $v -}}
 {{- with $v }}
 {{- $f := index . 0 }}
 <div class="win hvid" id="video">
