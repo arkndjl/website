@@ -16,7 +16,9 @@ on:
   workflow_run:
     workflows: [cbb board, cbb boards, cbb recruits, cfb board, cs2, esea season, nba xpm, nfl, nhl, nhl goalies,
                 odds snap, picks refresh, soccer, soccer prospects, tennis, tennis prospects, model refits, build gate,
-                wave]
+                wave, awards, cfb recruits, cs2 ark loop, esea research, process refresh, recruit leans, recruit news,
+                rotowire history, search index, site stats, soccer extra, soccer intl, cbb bracket matrix,
+                cs2 market log, darko log, dratings log, nhl lineups log]
     types: [completed]
   schedule:
     - cron: "13 */3 * * *"
@@ -27,10 +29,6 @@ permissions:
   issues: write
   actions: write
 
-concurrency:
-  group: data-health
-  cancel-in-progress: false
-
 jobs:
   run:
     # failed runs only: a green, skipped or cancelled completion starts no runner (the check job closes recovered issues)
@@ -40,6 +38,12 @@ jobs:
       contains(fromJSON('["failure", "timed_out", "startup_failure"]'), github.event.workflow_run.conclusion)
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    # one alert at a time per workflow. No workflow-level group: every watched workflow's completion starts a run here
+    # (1,700 a week, nearly all skipped), and in one shared group a waiting red-run alert was cancelled by the next
+    # skipped run that queued behind it
+    concurrency:
+      group: data-health-run-${{ github.event.workflow_run.name }}
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
         with:
@@ -67,6 +71,9 @@ jobs:
     if: github.event_name != 'workflow_run'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    concurrency:
+      group: data-health
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
       - name: Stale feeds

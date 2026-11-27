@@ -43,9 +43,11 @@ the feed (a weekly product gets 8 days). A feed's stamp is its checked, else aso
 missing or has no asof counts as stale, so a renamed file can't hide.
 """
 import datetime as dt
+import http.client
 import json
 import os
 import sys
+import time
 import urllib.error
 import urllib.request
 
@@ -135,13 +137,21 @@ def gh(path, method='GET', body=None):
                                  headers={'Authorization': f'Bearer {tok}', 'Accept': 'application/vnd.github+json',
                                           'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'arkboard-data-health',
                                           **({'Content-Type': 'application/json'} if body is not None else {})})
-    try:
-        with urllib.request.urlopen(req, timeout=30) as r:
-            t = r.read()
-            return json.loads(t) if t else {}
-    except urllib.error.HTTPError as e:
-        print(f'GitHub {method} {path}: {e.code} {e.read()[:200]!r}')
-        return None
+    for k in range(3):
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                t = r.read()
+                return json.loads(t) if t else {}
+        except urllib.error.HTTPError as e:
+            print(f'GitHub {method} {path}: {e.code} {e.read()[:200]!r}')
+            return None
+        except (urllib.error.URLError, http.client.HTTPException, OSError) as e:
+            # a dropped connection (the Nov 22 check died on RemoteDisconnected): reads are retried, writes are not
+            # (a POST that did land would file the issue twice)
+            print(f'GitHub {method} {path}: {type(e).__name__} {e}')
+            if method != 'GET' or k == 2:
+                return None
+            time.sleep(3 * (k + 1))
 
 
 def ensure_label():
@@ -468,7 +478,10 @@ def cmd_injury_report():
 # the workflows data-health.yml listens to (its workflow_run list; `test` fails when the two differ)
 WATCH = ['cbb board', 'cbb boards', 'cbb recruits', 'cfb board', 'cs2', 'esea season', 'nba xpm', 'nfl', 'nhl',
          'nhl goalies', 'odds snap', 'picks refresh', 'soccer', 'soccer prospects', 'tennis', 'tennis prospects',
-         'model refits', 'build gate', 'wave']
+         'model refits', 'build gate', 'wave', 'awards', 'cfb recruits', 'cs2 ark loop', 'esea research',
+         'process refresh', 'recruit leans', 'recruit news', 'rotowire history', 'search index', 'site stats',
+         'soccer extra', 'soccer intl', 'cbb bracket matrix', 'cs2 market log', 'darko log', 'dratings log',
+         'nhl lineups log']
 RED = ('failure', 'timed_out', 'startup_failure')
 RED_WORD = {'failure': 'failed', 'timed_out': 'timed out', 'startup_failure': 'failed to start',
             'cancelled': 'was cancelled by a job time limit'}
