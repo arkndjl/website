@@ -1,0 +1,65 @@
+{{- /* class rankings: click a school, its class opens under the row (every commit, best first) with the classGFX button
+       (assets/js/gfx.js buildClassCard). Rows carry data-cr and data-yr; the table names its file in data-cls-src
+       (static/data/classes/<sport>.json, scripts/class_cards.py). Printed once per page. */ -}}
+<script>
+(function () {
+  if (window.__arkClassDrop) return; window.__arkClassDrop = true;
+  var cache = {};
+  window.__arkClassData = function (src) { return cache[src] || (cache[src] = fetch(src).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).catch(function (e) { delete cache[src]; throw e; })); };
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function money(n) { return n >= 1e6 ? '$' + (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + 'M' : '$' + Math.round(n / 1e3) + 'K'; }
+  function stars(a) {
+    var lbl = a > 5 ? '5-star+' : a + ' ARK stars', s = '<span class="cfbrc__ark' + (a > 5 ? ' is-plus' : '') + '" style="--n:' + Math.min(a, 5) + '" role="img" aria-label="' + lbl + '" title="' + lbl + '"><i></i></span>';
+    return a > 5 ? '<span class="cfbrc__glow">' + s + '<span class="cfbrc__plus" aria-hidden="true">+</span></span>' : s;
+  }
+  function gap(r) {
+    if (r.s == null) return '<span class="cfb__dim">—</span>';
+    var v = Math.min(r.a, 5) - r.s;
+    return v > 0 ? '<span class="cfb__up">+' + v + '</span>' : v < 0 ? '<span class="cfb__down">−' + (-v) + '</span>' : '0';
+  }
+  function shut(table) { table.querySelectorAll('tr.cfb__detail').forEach(function (d) { d.remove(); }); }
+  function render(team, yr, Y, t) {
+    var hs = t.r.some(function (r) { return r.hs; }), wt = t.r.every(function (r) { return r.w; });
+    var head = '<tr><th>Recruit</th><th>ARK</th><th>Pos</th><th>Ht</th>' + (wt ? '<th>Wt</th>' : '') + (hs ? '<th>High school</th>' : '') + '<th>Hometown</th>' +
+      '<th>xFV</th><th>Y1 FV</th><th title="industry stars">Stars</th><th title="ARK stars minus industry stars (5-star+ counts as 5)">Δ★</th><th>xNIL</th></tr>';
+    var body = t.r.map(function (r) {
+      return '<tr><td>' + esc(r.n) + '</td><td>' + stars(r.a) + '</td><td>' + esc(r.p) + '</td><td class="cfb__num">' + esc(r.h || '—') + '</td>' + (wt ? '<td class="cfb__num">' + r.w + '</td>' : '') +
+        (hs ? '<td>' + esc(r.hs || '—') + '</td>' : '') + '<td>' + esc(r.o || '—') + '</td><td class="cfb__num"><b>' + r.f + '</b></td><td class="cfb__num">' + r.y + '</td>' +
+        '<td class="cfb__num">' + (r.s == null ? '<span class="cfb__dim">—</span>' : r.s + (r.sp ? '+' : '')) + '</td><td class="cfb__num">' + gap(r) + '</td><td class="cfb__num">' + (r.x ? money(r.x) : '—') + '</td></tr>';
+    }).join('');
+    return '<p class="cfb__dhead"><b>' + esc(team) + '</b> · ' + esc(yr) + ' · #' + t.rk + ' of ' + Y.of +
+      ' <button type="button" class="cfb__btn cfb__cardbtn" data-gfx data-gfx-mode="class" title="class card graphic (16:9)">classGFX</button></p>' +
+      '<div class="clsd"><table class="clsd__t"><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>';
+  }
+  document.addEventListener('click', function (e) {
+    var t = e.target; if (!t.closest) return;
+    var table = t.closest('table[data-cls-src]'); if (!table) return;
+    if (t.closest('thead') && !t.closest('tr.cfb__detail')) { shut(table); return; }
+    if (t.closest('a, button, tr.cfb__detail')) return;
+    var tr = t.closest('tbody tr[data-cr]'); if (!tr) return;
+    var next = tr.nextElementSibling, open = next && next.classList.contains('cfb__detail');
+    shut(table); if (open) return;
+    var sc = table.closest('.wintable__scroll') || table.parentElement, cols = table.tHead.rows[0].cells.length;
+    var yr = tr.getAttribute('data-yr'), team = (tr.querySelector('.cfb__team span') || tr.cells[1]).textContent.trim();
+    tr.insertAdjacentHTML('afterend', '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + Math.max(260, sc.clientWidth - 30) + 'px"><p class="cfb__dim">…</p></div></td></tr>');
+    var box = tr.nextElementSibling.querySelector('.cfb__dwrap');
+    window.__arkClassData(table.getAttribute('data-cls-src')).then(function (d) {
+      var Y = (d.y || {})[yr], c = Y && Y.t[team];
+      if (!box.isConnected) return;
+      if (!c) { shut(table); return; }
+      box.innerHTML = render(team, yr, Y, c);
+    }).catch(function () { if (box.isConnected) shut(table); });
+  });
+  // a filter, a class year or a search reorders the rows: the open class closes
+  ['change', 'input'].forEach(function (ev) {
+    document.addEventListener(ev, function (e) {
+      var w = e.target.closest && e.target.closest('.win'); if (!w || e.target.closest('tr.cfb__detail')) return;
+      w.querySelectorAll('table[data-cls-src]').forEach(shut);
+    });
+  });
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('button'); if (!b || b.closest('table')) return;
+    var w = b.closest('.win'); if (w) w.querySelectorAll('table[data-cls-src]').forEach(shut);
+  });
+})();
+</script>

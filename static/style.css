@@ -5330,3 +5330,12 @@ a.tick__g--nw:hover .tick__me { color: #fff; }
 .arklog__months td.is-m { color: #cf9bff; }
 .arklog__months td.is-f { color: #ff9ec7; }
 @media (max-width: 684px) { .proclog__mo { flex: 0 0 auto; margin-left: 0; min-height: 32px; } }
+
+/* class rankings: a school's class under its row (layouts/partials/classdrop.html) */
+.clsd { overflow-x: auto; margin-top: 8px; max-width: 100%; }
+.clsd__t { border-collapse: collapse; white-space: nowrap; }
+.cfb__table tr.cfb__detail .clsd__t th, .cfb__table tr.cfb__detail .clsd__t td { padding: 2px 12px 2px 0; text-align: left; background: none; border: 0; position: static; white-space: nowrap; cursor: default; }
+.cfb__table tr.cfb__detail .clsd__t th { color: #c8c7ff; font-weight: normal; }
+.cfb__table tr.cfb__detail .clsd__t .cfb__num { text-align: right; }
+.cfb__table tr.cfb__detail .clsd__t tr { cursor: default; }
+.cfb__table tr.cfb__detail .clsd__t tr:hover { background: none; }

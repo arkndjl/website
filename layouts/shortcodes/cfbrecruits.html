@@ -156,7 +156,8 @@
 {{- range .future }}{{ if .teams }}{{ $sets = $sets | append (dict "yr" .year "rows" (sort .teams "classRk") "cur" false) }}{{ end }}{{ end -}}
 {{- $n := 0 }}{{ range $sets }}{{ $n = add $n (len .rows) }}{{ end -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "class rankings") "filter" "Conf" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Class,Commits,Top recruit,Roster 27" "gfxDate" $date "gfxMax" "25") -}}
-<table class="cfb__table cfbt">
+{{ partial "classdrop.html" . }}
+<table class="cfb__table cfbt" data-cls-src="{{ "data/classes/cfb.json" | relURL }}">
   <thead><tr>
     <th>RK</th><th>Team</th><th title="conference">Conf</th>
     <th title="sum over commits of (xFV - 20)">Class</th><th>Commits</th>
