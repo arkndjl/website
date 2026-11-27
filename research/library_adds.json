@@ -385,9 +385,11 @@
     "body": [
      "SV a 90 at weights 1, .5, .25, shrunk toward the position mean of regulars by 225 minutes (defenders 450, keepers 28,800),",
      "minus .008 a year over age 29. Held out, next-season team GD R² goes from .634 to .650, 11 of 11 pairs,",
-     "and r with next season's SV a 90 from .690 to .718. It is the most predictive soccer metric on players, and it is display only."
+     "and r with next season's SV a 90 from .690 to .718. It is the most predictive soccer metric on players.",
+     "1Y / 3Y count the two seasons before twice over, as GAR and as SVAR, pooled a 90 and shrunk with 900 minutes.",
+     "With SVAR in, the GAR prior's weight falls to about zero. Held out 1Y RMSE 1.310 to 1.305, t -2.6 (Nov 27 2026)."
     ],
-    "where": "Soccer GAR leaders, depth chart, next up",
+    "where": "Soccer SVAR leaders, depth chart, next up, backup watch xGap",
     "sports": [
      "Soccer"
     ]
@@ -403,7 +405,7 @@
      "Describe: season value × season minutes summed for each team, on that season's results, held out. Predict: season n value ×",
      "season n+1 minutes, on n+1 results, and a player's value against his next season. Tennis and CS2 use held-out matches and maps.",
      "NBA: describe rXPM (.999), predict pXPM (.657). NFL: describe XV (.604), predict pXP/60 within position, AV for teams (.317).",
-     "CFB: describe XV (.689), predict cWAR (.256, tie XV). CBB: describe WAR on GBPM (.658), predict the roster prior BPM (.783).",
+     "CFB: describe XV (.689), predict cWAR (.256, tie XV). CBB: describe VORX on rXPM, predict pXPM in board form.",
      "NHL: describe WAR (.978), predict pWAR for teams (.387), Marcel WAR for a player (r .446). Soccer: describe SVAR (.894),",
      "predict p/90 (.650, r .718). Tennis: describe PA (.141), predict ARK (.107, tie Elo). CS2: describe season RWA, predict RWA rating",
      "(next month team R² .124, player r .820), ARK for teams. The public metrics scored were nflverse EPA, PFN impact, Barttorvik PRPG,",

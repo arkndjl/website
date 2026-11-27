@@ -1099,8 +1099,8 @@
     var sg = function (n, dgt) { return (n > 0 ? '+' : n < 0 ? '−' : '') + Math.abs(n).toFixed(dgt); }, pc = function (p) { return Math.round(p * 100) + '%'; };
     var zm = function (n) { return (n < 0 ? '−' : '+') + money(Math.abs(n)); };
     var bands = [
-      ['VALUE', [r.statPlus != null && cell('Stat+', String(r.statPlus), 'statPlus', r.statPlus, r.pfn != null ? (r.pfnLabel || 'PFN') + ' ' + r.pfn.toFixed(1) : ''),
-                 r.war != null && cell('WAR', (+r.war).toFixed(2), 'war', r.war), r.waa != null && cell('WAA', sg(+r.waa, 2), 'waa', r.waa), r.xv != null && cell('XV', (+r.xv).toFixed(2), 'xv', r.xv)]],
+      ['VALUE', [r.xv != null && cell('XV', (+r.xv).toFixed(2), 'xv', r.xv), r.statPlus != null && cell('Stat+', String(r.statPlus), 'statPlus', r.statPlus, r.pfn != null ? (r.pfnLabel || 'PFN') + ' ' + r.pfn.toFixed(1) : ''),
+                 r.war != null && cell('WAR', (+r.war).toFixed(2), 'war', r.war), r.waa != null && cell('WAA', sg(+r.waa, 2), 'waa', r.waa)]],
       ['OUTLOOK', [r.on3 != null && cell('On3', String(r.on3), 'on3', r.on3), r.cons != null && cell('Consensus', '#' + r.consRk, null, null, 'avg ' + r.cons.toFixed(1) + ' · ' + r.consN + ' of 10'),
                    r.draftP != null && pcProb(cell('Draft%', pc(r.draftP))), r.transferP != null && pcProb(cell('Xfer%', pc(r.transferP)))]],
       ['NIL', [r.xnil ? cell('xNIL', money(r.xnil), 'xnil', r.xnil) : null, r.ynil != null && cell('yNIL', money(r.ynil)), r.znil != null && cell('zNIL', zm(r.znil), null, null, '', r.znil >= 0 ? C.teal : C.down)]]
