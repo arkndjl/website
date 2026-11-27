@@ -541,12 +541,14 @@ def main():
     drows = []
     # DECT (scripts/dect.py): college players with a year left, a consensus rank and a yNIL
     import dect as DECT
-    try: dfit = json.load(open(DECT.OUT)); nilby = {(p['name'], p['team']): p for p in json.load(open(os.path.join(ROOT, 'data', 'cbb_market.json')))['nil']}
-    except (OSError, ValueError, KeyError): dfit, nilby = None, {}
+    try:
+        dfit = json.load(open(DECT.OUT)); mk = json.load(open(os.path.join(ROOT, 'data', 'cbb_market.json'))); nilby = {(p['name'], p['team']): p for p in mk['nil']}
+        payk = {t['team']: max(0.4, min(2.0, t['y'] / t['x'])) for t in mk['teamsNil'] if t.get('x') and t.get('y')}      # school pay per market dollar
+    except (OSError, ValueError, KeyError): dfit, nilby, payk = None, {}, {}
     def dect_of(m, a):
         n = nilby.get((m['name'], m['school'])) or {}
         if not dfit or 'gap' not in dfit or (m.get('cls') or '') not in ('Fr', 'So', 'Jr') or (m.get('declare') or 0) >= 1 or a is None: return {}
-        v = DECT.nba_dect(m.get('cons'), a, n.get('y'), n.get('x'), dfit)      # a = age on draft night
+        v = DECT.nba_dect(m.get('cons'), a, n.get('y'), n.get('x'), dfit, payk.get(m['school']))      # a = age on draft night
         return dict(zip(('dect', 'dectD', 'dectM', 'dectL', 'dectP', 'dectT'), v)) if v else {}
     for m in M['mocks']['pred']:
         r = fvby.get((m['name'], m['school'])) or {}
@@ -571,7 +573,7 @@ def main():
         'cols': [col('slot', 'Mock', 'predictive mock pick (consensus + model, Tankathon order)', 'i', 1, 1),
                  col('cons', 'Cons', f"consensus rank: median on {M['boards']} 2027 boards; past drafts, ESPN and NBADraft.net final boards", 'i', 1, 1),
                  col('rng', '80%', '80% range of his pick across 2,000 simulated drafts', 's', 0), col('conv', 'Conv', 'conviction mock pick', 'i', 1, 1),
-                 col('ret', 'Ret%', 'chance he returns to school instead of entering the 2027 draft (1 - declare model; seniors and internationals 0)', 'p'), col('dect', 'DECT', "DECT = declare, even, college or transfer: the one worth most to him. college = yNIL + the same draft value a year older, transfer = the same on xNIL (the open market), declare = rookie deal + later earnings over the pick spread, each as the sure amount he would trade the gamble for, $ at this season's cap. Even = the top two are inside the model's error. college players with a year left. hover: the edges", 'dect'),
+                 col('ret', 'Ret%', 'chance he returns to school instead of entering the 2027 draft (1 - declare model; seniors and internationals 0)', 'p'), col('dect', 'DECT', "DECT = declare, even, college or transfer: the one worth most to him. college = what his school would pay next season (xNIL x the school's pay per market dollar) + the same draft value a year older, transfer = the same on xNIL (the open market), declare = rookie deal + later earnings over the pick spread, each as the sure amount he would trade the gamble for, $ at this season's cap. Even = the top two are inside the model's error. college players with a year left. hover: the edges", 'dect'),
                  col('fv', 'FV', 'FV now', 'i'),
                  col('nbaP', 'NBA%', 'chance of an NBA career', 'p'), col('xbpm', 'xXPM', 'projected XPM this season', 's1'),
                  col('out', 'Out', 'what he became: NBA career on the FV scale (drafts through 2020, six NBA seasons or more)', 'i'),

@@ -7,7 +7,8 @@ Transfer% (what he will do).
     python3 scripts/dect.py         # NFL / CFB + NBA / CBB fits and history checks -> data/dect_fit.json (scripts/cfb_teams.mjs dectOf, scripts/cbb_tabs.py)
 
   declare   the rookie deal + d^4 x later earnings, over the pick spread from his xPick and the spread of earnings at a pick
-  college   pay at his school for the season (yNIL) + d x the same draft value one year older
+  college   what his school would pay him next season (xNIL x the school's pay per market dollar: its roster's yNIL over
+            its xNIL) + d x the same draft value one year older
   transfer  pay on the open market (xNIL) + d x the same draft value one year older. No draft cost for the move: the
             test for one (CBB returners who transferred against those who stayed) is in the fit and is not there
   DECT      the one worth most as a certainty equivalent (log utility over W0 + the outcome), dollars at this season's
@@ -440,6 +441,27 @@ def nba(out):
                      'cost': {'n': len(A), 'moved': int(sum(r['mv'] for r in A)), 'draftedLater': int(ya.sum()), 'draftedMoved': round(float(np.mean([r['later'] for r in A if r['mv']])), 4),
                               'draftedStayed': round(float(np.mean([r['later'] for r in A if not r['mv']])), 4), 'b': round(float(ba[5]), 3), 't': round(float(ba[5] / sa[5]), 2), 'seasons': [2021, 2024]}}
     print(json.dumps(V['transfer'], indent=1))
+    # a bigger role: does a blocked player (under half his team's minutes) who moves gain minutes or draft odds over one who stays? 2012-24, walk forward from 2019
+    R2 = []
+    for r in rows:
+        if r['left'] or not 2012 <= r['year'] <= 2024 or (r['year'] + 1) not in seas[r['pid']]: continue
+        s0, s1 = seas[r['pid']][r['year']], seas[r['pid']][r['year'] + 1]; m0, m1 = num(s0['min_per']), num(s1['min_per'])
+        if m0 is None or m1 is None: continue
+        R2.append({**r, 'mv': int(s0['team'] != s1['team']), 'm0': m0, 'm1': m1, 'bl': int(m0 < 50), 'later': int(any(num(q['nba_draft']) and num(q['nba_draft']) > r['year'] for q in seas[r['pid']].values()))})
+    def XR(S, full, mu=None, sd=None):
+        C = np.array([[r['bpm'], r['rank'], r['age'], r['ht'], r['m0']] for r in S], float); mu, sd = (C.mean(0), C.std(0)) if mu is None else (mu, sd); C = (C - mu) / sd
+        return np.column_stack([np.ones(len(S)), C] + ([[r['mv'] for r in S], [r['mv'] * r['bl'] for r in S], [r['bl'] for r in S]] if full else [])), mu, sd
+    Xf, _, _ = XR(R2, True); yf = np.array([r['later'] for r in R2], float); bf = logit(Xf, yf, 1e-3); pf = 1 / (1 + np.exp(-Xf @ bf)); sf = np.sqrt(np.diag(np.linalg.inv((Xf * (pf * (1 - pf))[:, None]).T @ Xf + 1e-3 * np.eye(Xf.shape[1]))))
+    dl = []
+    for ty in range(2019, 2025):
+        tr = [r for r in R2 if r['year'] < ty]; te = [r for r in R2 if r['year'] == ty]; ye = np.array([r['later'] for r in te], float); ll = []
+        for full in (False, True):
+            Xt, mu, sd = XR(tr, full); bb = logit(Xt, np.array([r['later'] for r in tr], float), 1e-3); pe = np.clip(1 / (1 + np.exp(-XR(te, full, mu, sd)[0] @ bb)), 1e-6, 1 - 1e-6); ll.append(-(ye * np.log(pe) + (1 - ye) * np.log(1 - pe)))
+        dl += list(ll[1] - ll[0])
+    dl = np.array(dl); cell = lambda b_, m: (lambda S: {'n': len(S), 'min0': round(float(np.mean([r['m0'] for r in S])), 1), 'min1': round(float(np.mean([r['m1'] for r in S])), 1), 'draftedLater': round(float(np.mean([r['later'] for r in S])), 3)})([r for r in R2 if r['bl'] == b_ and r['mv'] == m])
+    V['role'] = {'n': len(R2), 'seasons': [2012, 2024], 'blockedMoved': cell(1, 1), 'blockedStayed': cell(1, 0), 'b': round(float(bf[7]), 3), 't': round(float(bf[7] / sf[7]), 2),
+                 'walkForward': {'from': 2019, 'n': int(len(dl)), 'dLogLoss': round(float(dl.mean()), 5), 't': round(float(dl.mean() / (dl.std() / math.sqrt(len(dl)))), 2)}}
+    print(json.dumps(V['role']))
     print(json.dumps(V['check']['readings'], indent=1))
     out['nba'] = V
 
@@ -466,11 +488,11 @@ def readings(H, ret):
     return o
 
 
-def nba_dect(rank, age, ynil, xnil=None, fit=None):
-    """verdict4 for a college player at consensus rank `rank`, `age` on draft night, `ynil` / `xnil` dollars (scripts/cbb_tabs.py)"""
+def nba_dect(rank, age, ynil, xnil=None, fit=None, k=None):
+    """verdict4 for a college player at consensus rank `rank`, `age` on draft night, `ynil` / `xnil` dollars, k = his school's pay per market dollar (scripts/cbb_tabs.py)"""
     fit = fit or json.load(open(OUT)); G = fit['nba']['grid']
     if rank is None or age is None or ynil is None or rank > 100: return None
-    return verdict4(interp(G, G['bins'], math.log(max(1, rank))), age - G['age0'], G['ageB'], G['ageSE'], ynil / 1e6, xnil / 1e6 if xnil is not None else None,
+    return verdict4(interp(G, G['bins'], math.log(max(1, rank))), age - G['age0'], G['ageB'], G['ageSE'], (xnil * k if xnil is not None and k is not None else ynil) / 1e6, xnil / 1e6 if xnil is not None else None,
                     fit['sig']['cbb'], fit['gap']['cbb'], fit['d'], fit['w0'])
 
 

@@ -35612,7 +35612,7 @@
      "xPick": "33-100",
      "n": 22,
      "declareEV": 33.9,
-     "got": 32.51,
+     "got": 32.5,
      "beat": 0.273,
      "drafted": 0.818
     },
@@ -35669,9 +35669,9 @@
     "saysCollege": 0.334,
     "returnedWhenCollege": 0.268,
     "returnedWhenDeclare": 0.122,
-    "auc": 0.691,
+    "auc": 0.69,
     "aucRel": 0.695,
-    "aucInThirds": 0.559
+    "aucInThirds": 0.558
    },
    "ce": {
     "saysCollege": 0.334,
@@ -35682,10 +35682,10 @@
     "aucInThirds": 0.558
    },
    "even": {
-    "share": 0.359,
-    "returned": 0.253,
-    "returnedCollege": 0.294,
-    "nCollege": 68,
+    "share": 0.361,
+    "returned": 0.252,
+    "returnedCollege": 0.299,
+    "nCollege": 67,
     "returnedDeclare": 0.09
    }
   }
@@ -38078,7 +38078,7 @@
     "again": 33,
     "drafted": 0.474,
     "meanDeclareEV": 37.55,
-    "meanGot": 30.6,
+    "meanGot": 30.61,
     "beatDeclare": 0.316
    },
    "bands": [
@@ -38087,21 +38087,21 @@
      "n": 55,
      "saysReturn": 0.0,
      "returned": 0.018,
-     "medianEdge": -29.27
+     "medianEdge": -29.25
     },
     {
      "rank": "15-30",
      "n": 58,
      "saysReturn": 0.0,
      "returned": 0.276,
-     "medianEdge": -11.75
+     "medianEdge": -11.73
     },
     {
      "rank": "31-60",
      "n": 99,
      "saysReturn": 0.0,
      "returned": 0.556,
-     "medianEdge": -4.75
+     "medianEdge": -4.72
     }
    ],
    "readings": {
@@ -38112,31 +38112,31 @@
      "returnedWhenCollege": null,
      "returnedWhenDeclare": 0.34,
      "auc": 0.817,
-     "aucRel": 0.748,
+     "aucRel": 0.746,
      "aucInThirds": 0.662
     },
     "median": {
      "saysCollege": 0.642,
      "returnedWhenCollege": 0.493,
      "returnedWhenDeclare": 0.066,
-     "auc": 0.808,
-     "aucRel": 0.824,
-     "aucInThirds": 0.751
+     "auc": 0.807,
+     "aucRel": 0.823,
+     "aucInThirds": 0.752
     },
     "ce": {
      "saysCollege": 0.637,
      "returnedWhenCollege": 0.467,
      "returnedWhenDeclare": 0.117,
-     "auc": 0.769,
-     "aucRel": 0.815,
+     "auc": 0.766,
+     "aucRel": 0.814,
      "aucInThirds": 0.737
     },
     "even": {
-     "share": 0.392,
-     "returned": 0.265,
-     "returnedCollege": 0.64,
-     "nCollege": 75,
-     "returnedDeclare": 0.037
+     "share": 0.387,
+     "returned": 0.256,
+     "returnedCollege": 0.632,
+     "nCollege": 76,
+     "returnedDeclare": 0.056
     }
    }
   },
@@ -38150,28 +38150,28 @@
    },
    "byVerdict": {
     "D": {
-     "n": 42,
+     "n": 40,
      "D": 1.0,
      "C": 0.0,
      "T": 0.0
     },
     "E": {
-     "n": 79,
-     "D": 0.848,
-     "C": 0.127,
-     "T": 0.025
+     "n": 78,
+     "D": 0.846,
+     "C": 0.128,
+     "T": 0.026
     },
     "C": {
-     "n": 59,
-     "D": 0.458,
-     "C": 0.305,
-     "T": 0.237
+     "n": 60,
+     "D": 0.467,
+     "C": 0.3,
+     "T": 0.233
     },
     "T": {
-     "n": 12,
-     "D": 0.333,
-     "C": 0.5,
-     "T": 0.167
+     "n": 14,
+     "D": 0.429,
+     "C": 0.429,
+     "T": 0.143
     }
    },
    "cost": {
@@ -38186,6 +38186,33 @@
      2021,
      2024
     ]
+   }
+  },
+  "role": {
+   "n": 4643,
+   "seasons": [
+    2012,
+    2024
+   ],
+   "blockedMoved": {
+    "n": 203,
+    "min0": 29.4,
+    "min1": 47.6,
+    "draftedLater": 0.074
+   },
+   "blockedStayed": {
+    "n": 1163,
+    "min0": 36.1,
+    "min1": 50.2,
+    "draftedLater": 0.11
+   },
+   "b": -0.241,
+   "t": -0.64,
+   "walkForward": {
+    "from": 2019,
+    "n": 2096,
+    "dLogLoss": 0.01067,
+    "t": 1.35
    }
   }
  }

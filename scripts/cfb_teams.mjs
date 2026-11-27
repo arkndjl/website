@@ -1394,8 +1394,9 @@ export const declareOdds = (p, xPick, asof = new Date(), year) => {
   const gap = a != null ? Math.max(-2, Math.min(2, a + Math.max(0, draftDay(y) - t) / 864e5 / 365.25 - d.age0)) : 0;
   return 1 / (1 + Math.exp(-(d.a + d.b * Math.log(xPick) + d.age * gap)));
 };
-// DECT (Declare, Even, College, Transfer; scripts/dect.py -> data/dect_fit.json): college = yNIL + d x the same draft
-// value a year older (his stock held where it is), transfer = the same on xNIL (the open market), declare = the rookie
+// DECT (Declare, Even, College, Transfer; scripts/dect.py -> data/dect_fit.json): college = what his school would pay him
+// next season (xNIL x the school's pay per market dollar, its roster's yNIL over its xNIL; yNIL when he has no xNIL) + d x the
+// same draft value a year older (his stock held where it is), transfer = the same on xNIL (the open market), declare = the rookie
 // deal + d^4 x later earnings, each as a certainty equivalent (log utility over w0 + the outcome) across the fit's
 // outcome bins [weight, rookie, later] by position group at age 22 (nflverse whole-year draft age, half a year under
 // the age on draft day); the age term scales the later part. Even = the top two are inside one standard error
@@ -1425,7 +1426,7 @@ export const dectVerdict = (B, x, G, nilC, nilT, sig, gap, d, w0) => {
   const even = V[a] - V[b] < se, st = V.T != null && V.T > V.C ? 'T' : 'C', r2 = v => Math.round(v * 100) / 100;
   return [r2(V[st] - V.D), r2(V.D), r2(f(N[st])[2] - c0[3]), even ? 'E' : a, even ? [a, b].sort().join('') : '', V.T != null ? r2(V.T - V.C) : null];
 };
-export const dectOf = (p, xPick, asof = new Date(), year, fit = DECT) => {
+export const dectOf = (p, xPick, asof = new Date(), year, fit = DECT, k = null) => {
   const g = DECT_GRP[p.pos], a = p.age ?? p.ageEst;
   if (!fit || !g || a == null || !(xPick > 0) || xPick > DECT_MAX || p.ynil == null) return null;
   const G = fit.grid, lx = Math.max(G.lx[0], Math.min(G.lx.at(-1), Math.log(xPick)));
@@ -1433,7 +1434,7 @@ export const dectOf = (p, xPick, asof = new Date(), year, fit = DECT) => {
   const B = G.bins[g][i - 1].map((b, k) => b.map((v, j) => v + w * (G.bins[g][i][k][j] - v)));
   const t = new Date(asof), y = year ?? (t.getUTCMonth() >= 4 ? t.getUTCFullYear() + 1 : t.getUTCFullYear());
   const x = a + Math.max(0, draftDay(y) - t) / 864e5 / 365.25 - 0.5 - G.age0;
-  return dectVerdict(B, x, G, p.ynil / 1e6, p.xnil != null ? p.xnil / 1e6 : null, fit.sig.cfb, fit.gap.cfb, fit.d, fit.w0);
+  return dectVerdict(B, x, G, (p.xnil != null && k != null ? p.xnil * k : p.ynil) / 1e6, p.xnil != null ? p.xnil / 1e6 : null, fit.sig.cfb, fit.gap.cfb, fit.d, fit.w0);
 };
 // the likely entrants for a mock: a prospect more likely to stay in school than declare sits out, except that the
 // group still sends its expected number (the sum of its odds), the best by xPick, so the class isn't drafted as if
@@ -1472,7 +1473,10 @@ export function draftOdds(rows, priors = DEFAULT_PRIORS) {
   for (const p of pool) p.retP = Math.round((1 - declareOdds(p, p._x, asof, P.draftYear)) * 1000) / 1000;
   // DECT (dectOf): for prospects with a year of eligibility left, the side worth most (certainty equivalents), its edge over declaring, the mean edge
   for (const p of rows) if (p.draft27) { p.dect = p.dectL = p.dectD = p.dectM = p.dectP = p.dectT = null; for (const k of ['dor', 'dorD', 'dec', 'decD', 'decM', 'decE']) delete p[k]; }
-  for (const p of pool) if (p.retP > 0) { const v = dectOf(p, p._x, asof, P.draftYear); if (v) [p.dect, p.dectD, p.dectM, p.dectL, p.dectP, p.dectT] = v; }
+  const pay = {};      // school pay per market dollar: the roster's yNIL over its xNIL (30 priced players or more), kept inside .4 to 2
+  for (const p of rows) if (p.xnil != null && p.ynil != null) { const t = pay[p.team] ??= [0, 0, 0]; t[0] += p.ynil; t[1] += p.xnil; t[2]++; }
+  const payK = t => { const v = pay[t]; return v && v[2] >= 30 && v[1] > 0 ? Math.max(0.4, Math.min(2, v[0] / v[1])) : null; };
+  for (const p of pool) if (p.retP > 0) { const v = dectOf(p, p._x, asof, P.draftYear, DECT, payK(p.team)); if (v) [p.dect, p.dectD, p.dectM, p.dectL, p.dectP, p.dectT] = v; }
   for (const p of pool) { delete p._dv; delete p._mRk; delete p._x; }
   for (const [pos, n] of Object.entries(SPECIALISTS)) {
     const sp = rows.filter(p => p.draft27 && p.pos === pos && p.fv != null && p.elig >= 4).sort((a, b) => grade(b) - grade(a) || (b.kp ?? 0) - (a.kp ?? 0));
