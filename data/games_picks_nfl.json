@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-27T05:29:29Z",
+ "asof": "2026-11-27T05:32:41Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -220,6 +220,22 @@
    "tm": 45.4
   },
   {
+   "id": "2026_12_NO_CIN",
+   "sport": "nfl",
+   "kick": "2026-11-29T18:00:00Z",
+   "home": "CIN",
+   "away": "NO",
+   "mk": "spread",
+   "side": "home",
+   "line": 9.5,
+   "price": -123.0,
+   "edge": 1.6,
+   "x": null,
+   "why": "spread market off",
+   "m": 11.1,
+   "tm": 50.2
+  },
+  {
    "id": "2026_12_CAR_TB",
    "sport": "nfl",
    "kick": "2026-12-01T01:15:00Z",
@@ -234,22 +250,6 @@
    "why": "spread market off",
    "m": 3.8,
    "tm": 44.0
-  },
-  {
-   "id": "2026_12_NO_CIN",
-   "sport": "nfl",
-   "kick": "2026-11-29T18:00:00Z",
-   "home": "CIN",
-   "away": "NO",
-   "mk": "total",
-   "side": "over",
-   "line": 49.5,
-   "price": -105.0,
-   "edge": 0.7,
-   "x": null,
-   "why": "total market off",
-   "m": 11.1,
-   "tm": 50.2
   }
  ],
  "games": {
@@ -290,11 +290,11 @@
    "state": "off"
   },
   "2026_12_NO_CIN": {
-   "mk": "total",
-   "side": "over",
-   "line": 49.5,
-   "price": -105.0,
-   "edge": 0.7,
+   "mk": "spread",
+   "side": "home",
+   "line": 9.5,
+   "price": -123.0,
+   "edge": 1.6,
    "ev": null,
    "units": 0.0,
    "home": "CIN",
@@ -450,16 +450,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 6772,
+  "snapshots": 6776,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 2663,
-    "clvRet": -0.0345,
-    "clvT": -22.29,
-    "clv": 0.27,
-    "beat": 0.317,
-    "still": 0.544
+    "clvN": 2665,
+    "clvRet": -0.0348,
+    "clvT": -22.44,
+    "clv": 0.26,
+    "beat": 0.313,
+    "still": 0.547
    },
    {
     "when": "6-24h",
@@ -2866,7 +2866,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-27T05:29:29Z",
+ "checked": "2026-11-27T05:32:41Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
