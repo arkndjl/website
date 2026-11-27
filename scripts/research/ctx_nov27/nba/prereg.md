@@ -69,3 +69,7 @@ swap cannot ship as registered: the 1Y / 3Y are consumers of XPM (proj) and the 
 - Harness and target as T4 (leave one season out, 1,000+ window minutes), every f. Pass: t >= 2 at f 1 on the 1Y or 3Y,
   neither target worse (t > -2) at any f, majority of seasons.
 ### P4 / P5: code and fit-date checks; a refit only where the fit's input changed after the fit.
+### P5a next up ceiling input (found in the P5 check; written before scoring)
+- nba_ceiling_research.py reads `sxpm` (pXPM since Nov 24); the build serves sx0. Candidate: pXPM as the ceiling's input, fit and
+  serve. Target: pinball loss at .80 on next-season XPM, held out by season, the shipped final columns.
+- Pass: t >= 2, majority of seasons, coverage .78-.82. Fail: the research script is pinned to sx0 so a refit matches the serve.
