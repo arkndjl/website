@@ -23,7 +23,9 @@ Game model (scripts/data/games_wf/cfb.json.gz margins, 2022-26 scored, coefficie
 season value against his team's, opponent-adjusted, scored the same as raw season EPA (MAE 12.061 vs 12.059, t +0.5);
 absent skill players at season value added nothing (t +0.9). The model keeps its QB charge
 (/mnt/project-files/qb-season-metric/nonqb/).
-Board join by ESPN id (static/data/cfb-all.json): photo, conference, class, WAR."""
+Board join by ESPN id (static/data/cfb-all.json): photo, conference, class, XV (the season's most descriptive number,
+metric audit Nov 24; the tabs show it beside SV), WAR.
+    python3 scripts/cfb_season_value.py --board       # refresh the board fields on the file on hand (no release pull)"""
 import email.utils
 import json
 import math
@@ -49,6 +51,18 @@ MIN_QB, MIN_SKILL = 100, 30
 # x 60. Pre-registered (scripts/research/port_nov23/football/prereg.md C1), next season's rate, 2016-25 leave one season
 # out, 1,714 QB/RB pairs: weighted MSE .0258 raw -> .0159 (paired t -11.7, 10 of 10 seasons), slope .96, K QB 650.
 PSV_K, PSV_W = 650, (1.0, 0.7, 0.5)
+
+
+def board_rows():
+    """ESPN id -> board row (static/data/cfb-all.json)"""
+    B = cfb_all.read_cfb_all()
+    out = {}
+    for r in B['rows']:
+        p = dict(zip(B['cols'], r))
+        m = re.search(r'/id/(\d+)', p.get('espnl') or '')
+        if m:
+            out[m.group(1)] = p
+    return out
 
 
 def add_psv(qbs, y):
@@ -236,7 +250,7 @@ def main():
         b = board.get(i, {})
         gp = sum(1 for v in GP[i].values() if v >= (10 if g == 'QB' else 1)) or 1
         base = {'id': i, 'n': b.get('name') or n, 't': t, 'lo': b.get('logo') or (f'/img/cfb/logos/{tid[t]}.png' if tid.get(t) else None),
-                'conf': b.get('conf'), 'cls': b.get('cls'), 'war': b.get('war'), 'waa': b.get('waa'),
+                'conf': b.get('conf'), 'cls': b.get('cls'), 'xv': b.get('xv'), 'war': b.get('war'), 'waa': b.get('waa'),
                 'ph': f'https://a.espncdn.com/combiner/i?img=/i/headshots/college-football/players/full/{i}.png&w=96&h=70&scale=crop&cquality=60' if b.get('photo') else None,
                 'pts': r1(X['par'] / gp), 'tot': r1(X['par']), 'svar': r1(X['par'] / PPW, 2), 'aepa': r1(X['a'] / X['n'], 3), 'g': gp, 'plays': int(X['n'])}
         if g == 'QB' and X['n'] >= MIN_QB:
@@ -262,6 +276,15 @@ if __name__ == '__main__':
     if '--psv' in sys.argv:          # add pSV/60 to the file on hand (no release pull)
         d = json.load(open(OUT))
         add_psv(d['qbs'], d['season'])
+        with open(OUT, 'w') as fh:
+            json.dump(d, fh, separators=(',', ':'), allow_nan=False)
+    elif '--board' in sys.argv:      # this season's XV / WAR / WAA from the board onto the file on hand
+        d = json.load(open(OUT))
+        board = board_rows()
+        for r in d['qbs'] + d['skill']:
+            b = board.get(str(r['id']), {})
+            for k in ('xv', 'war', 'waa'):
+                r[k] = b.get(k)
         with open(OUT, 'w') as fh:
             json.dump(d, fh, separators=(',', ':'), allow_nan=False)
     else:

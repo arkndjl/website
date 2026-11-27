@@ -3,7 +3,9 @@
 {{- $qb := eq ($.Get "group") "qbs" -}}
 {{- with site.Data.cfb_season_value -}}
 {{- $rows := cond $qb .qbs .skill -}}
-{{- $gfx := cond $qb "RK,QB,SV,Team,Class,Plays,aEPA,EPA/play" "RK,Player,SV,Pos,Team,Class,Plays,aEPA" -}}
+{{- /* XV, the season's most descriptive number (metric audit Nov 24), sits beside SV once the rows carry it (as nflseason.html) */ -}}
+{{- $xv := false }}{{ range $rows }}{{ if isset . "xv" }}{{ $xv = true }}{{ end }}{{ end -}}
+{{- $gfx := cond $qb (cond $xv "RK,QB,SV,XV,Team,Class,Plays,aEPA,EPA/play" "RK,QB,SV,Team,Class,Plays,aEPA,EPA/play") (cond $xv "RK,Player,SV,XV,Pos,Team,Class,Plays,aEPA" "RK,Player,SV,Pos,Team,Class,Plays,aEPA") -}}
 {{- $o := dict "title" ($.Get "title" | default (cond $qb "QB SV" "skill players")) "rerank" true "tab" ($.Get "tab") "gfxCols" $gfx "gfxDate" (printf "%v · %s" .season (lower ((time .asof).Format "Jan 2, 2006"))) "gfxMax" "32" -}}
 {{- if not $qb }}{{ $o = merge $o (dict "filter" "Pos,Conf,Class") }}{{ end -}}
 {{- partial "wintable-open.html" $o -}}
@@ -27,6 +29,9 @@
   {{- end }}
     <th title="this season's points over replacement, total">Pts</th>
     <th title="SVAR = SV over replacement, season total, in wins: points / 53 a win (FBS: win % rises .0189 a point of margin a game, 12 games). FBS games, this season only">SVAR</th>
+  {{- if $xv }}
+    <th title="XV = WAR with quality measured by the parts of the stat line that track winning, season to date (WAR leaders board). Held out, the season number that tracks team rating best">XV</th>
+  {{- end }}
     <th title="WAR, season to date (board)">WAR</th>
   {{- if $qb }}
     <th title="pSV/60 = predictive SV: points over replacement a 60 plays over this season and the two before (play weights 1 / .7 / .5), shrunk to the QB mean with 650 plays; predicts next season's rate better than this season's alone (2016-25, t -11.7, 10 of 10 seasons)">pSV/60</th>
@@ -51,6 +56,9 @@
     <td class="cfb__num">{{ partial "num.html" (slice "%+.3f" (float .aepa)) }}</td>
     <td class="cfb__num">{{ partial "num.html" (slice "%+.1f" (float .tot)) }}</td>
     <td class="cfb__num">{{ with .svar }}{{ partial "num.html" (slice "%+.2f" (float .)) }}{{ end }}</td>
+  {{- if $xv }}
+    <td class="cfb__num">{{ with .xv }}{{ printf "%.2f" (float .) }}{{ end }}</td>
+  {{- end }}
     <td class="cfb__num">{{ with .war }}{{ printf "%.2f" (float .) }}{{ end }}</td>
   {{- if $qb }}
     <td class="cfb__num">{{ with .psv }}{{ partial "num.html" (slice "%+.1f" (float .)) }}{{ end }}</td>
