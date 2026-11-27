@@ -287,7 +287,7 @@ def std(X, cols):
 
 # ---- move (Transfer%) ------------------------------------------------------------------------------------------
 MOVE_F = ['1', 'bpm', 'bpm_pos', 'min', 'min2', 'usg', 'so', 'jr', 'sr', 'srs', 'bpm_x_srs', 'p6', 'rec', 'ht', 'trans',
-          'cc_next', 'cc_now', 'minrk', 'gp', 'age']
+          'cc_next', 'cc_now', 'minrk', 'gp', 'age', 'hc_ten']
 
 
 def move_rows(by, TS, raw):
@@ -313,12 +313,13 @@ def move_rows(by, TS, raw):
             lab = 0 if nxt[y + 1].get(r['pid']) == t else 1 if r['pid'] in nxt[y + 1] else 2
             co, cn, cp = raw.get(y, {}).get(t), raw.get(y + 1, {}).get(t), raw.get(y - 1, {}).get(t)
             f = feats_move(r, TS.get((y, t), {}).get('srs'), r['conf'] in P6, rk.get(r['pid'], 15), prev.get(r['pid']) not in (None, t),
-                           1.0 if co and cn and co['coach'] != cn['coach'] else 0.0, 1.0 if co and cp and co['coach'] != cp['coach'] else 0.0)
+                           1.0 if co and cn and co['coach'] != cn['coach'] else 0.0, 1.0 if co and cp and co['coach'] != cp['coach'] else 0.0,
+                           ten=(co or {}).get('ten'))
             out.append((y, f, lab, r['pid'], t))
     return out
 
 
-def feats_move(r, srs, p6, minrk, trans, cc_next, cc_now):
+def feats_move(r, srs, p6, minrk, trans, cc_next, cc_now, ten=None):
     b = max(-15.0, min(15.0, rate(r)))
     m = (r.get('min_per') or 0) / 100
     yr = r.get('yr') or 'Fr'
@@ -326,7 +327,10 @@ def feats_move(r, srs, p6, minrk, trans, cc_next, cc_now):
     rec = r.get('rg_lrk')
     return [1, b / 5, max(0.0, b) / 5, m, m * m, ((r.get('usg') or 18) - 18) / 5, yr == 'So', yr == 'Jr', yr == 'Sr', s, b / 5 * s, float(p6),
             (rec if rec is not None else -6.2) + 5.5, ((r.get('hti') or 77) - 77) / 3, float(trans), cc_next, cc_now,
-            min(minrk, 13) / 13, min(1.0, (r.get('gp') or 0) / 30), ((r.get('age') or 21) - 21) / 2]
+            min(minrk, 13) / 13, min(1.0, (r.get('gp') or 0) / 30), ((r.get('age') or 21) - 21) / 2,
+            # the head coach's seasons at the school (log, capped at 10; 3 when not on file): players leave settled staffs less.
+            # scripts/research/coach_loyalty_nov27: 2025->26 held out t 2.6, 2024->25 not against it
+            math.log1p(min(ten or 3, 10)) - 1.5]
 
 
 def recal(X, y, B, K, it=50):

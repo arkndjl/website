@@ -1,0 +1,392 @@
+{
+ "move": {
+  "live": [
+   "1",
+   "bpm",
+   "bpm_pos",
+   "min",
+   "min2",
+   "usg",
+   "so",
+   "jr",
+   "sr",
+   "srs",
+   "p6",
+   "rec",
+   "ht",
+   "cc_next",
+   "minrk",
+   "age"
+  ],
+  "n": {},
+  "rates": {
+   "all": {
+    "n": 20098,
+    "moved": 0.2134,
+    "back": 0.4054
+   },
+   "transfer in, came with coach": {
+    "n": 124,
+    "moved": 0.1694,
+    "back": 0.3468
+   },
+   "transfer in, did not": {
+    "n": 3668,
+    "moved": 0.2077,
+    "back": 0.3351
+   },
+   "came with, coach stays": {
+    "n": 113,
+    "moved": 0.1593,
+    "back": 0.3628
+   },
+   "came with, coach leaves": {
+    "n": 11,
+    "moved": 0.2727,
+    "back": 0.1818
+   },
+   "other transfer in, coach stays": {
+    "n": 2972,
+    "moved": 0.1904,
+    "back": 0.3546
+   },
+   "other transfer in, coach leaves": {
+    "n": 696,
+    "moved": 0.2816,
+    "back": 0.2514
+   },
+   "inherited": {
+    "n": 1920,
+    "moved": 0.2344,
+    "back": 0.2839
+   },
+   "recruited by coach": {
+    "n": 18178,
+    "moved": 0.2111,
+    "back": 0.4183
+   },
+   "coach leaves, tie": {
+    "n": 3376,
+    "moved": 0.3009,
+    "back": 0.3027
+   },
+   "coach leaves, no tie": {
+    "n": 233,
+    "moved": 0.2961,
+    "back": 0.1974
+   },
+   "coach stays, tie": {
+    "n": 14802,
+    "moved": 0.1906,
+    "back": 0.4446
+   },
+   "coach stays, no tie": {
+    "n": 1687,
+    "moved": 0.2258,
+    "back": 0.2958
+   }
+  },
+  "terms": {
+   "T1 came_with": {
+    "A": {
+     "auc_moved_base": 0.725,
+     "coef_moved": [
+      -0.418
+     ],
+     "auc_moved": 0.725,
+     "ll_base": 0.88617,
+     "ll": 0.88638,
+     "d": 0.000202,
+     "t": -0.91,
+     "n": 5047,
+     "G": 364
+    },
+    "B": {
+     "auc_moved_base": 0.7304,
+     "coef_moved": [
+      -0.447
+     ],
+     "auc_moved": 0.7306,
+     "ll_base": 0.88247,
+     "ll": 0.88232,
+     "d": -0.000154,
+     "t": 0.83,
+     "n": 5001,
+     "G": 362
+    }
+   },
+   "T2 yrs_hc": {
+    "A": {
+     "auc_moved_base": 0.725,
+     "coef_moved": [
+      0.804
+     ],
+     "auc_moved": 0.7177,
+     "ll_base": 0.88617,
+     "ll": 0.89129,
+     "d": 0.005111,
+     "t": -5.66,
+     "n": 5047,
+     "G": 364
+    },
+    "B": {
+     "auc_moved_base": 0.7304,
+     "coef_moved": [
+      1.024
+     ],
+     "auc_moved": 0.7314,
+     "ll_base": 0.88247,
+     "ll": 0.88249,
+     "d": 2.1e-05,
+     "t": -0.02,
+     "n": 5001,
+     "G": 362
+    }
+   },
+   "T3 inherited": {
+    "A": {
+     "auc_moved_base": 0.725,
+     "coef_moved": [
+      0.47
+     ],
+     "auc_moved": 0.723,
+     "ll_base": 0.88617,
+     "ll": 0.88774,
+     "d": 0.001567,
+     "t": -2.51,
+     "n": 5047,
+     "G": 364
+    },
+    "B": {
+     "auc_moved_base": 0.7304,
+     "coef_moved": [
+      0.596
+     ],
+     "auc_moved": 0.73,
+     "ll_base": 0.88247,
+     "ll": 0.88331,
+     "d": 0.000838,
+     "t": -0.81,
+     "n": 5001,
+     "G": 362
+    }
+   },
+   "T4 hc_ten": {
+    "A": {
+     "auc_moved_base": 0.725,
+     "coef_moved": [
+      -0.255
+     ],
+     "auc_moved": 0.7267,
+     "ll_base": 0.88617,
+     "ll": 0.88306,
+     "d": -0.003118,
+     "t": 2.89,
+     "n": 5047,
+     "G": 364
+    },
+    "B": {
+     "auc_moved_base": 0.7304,
+     "coef_moved": [
+      -0.247
+     ],
+     "auc_moved": 0.7338,
+     "ll_base": 0.88247,
+     "ll": 0.8824,
+     "d": -7.2e-05,
+     "t": 0.06,
+     "n": 5001,
+     "G": 362
+    }
+   },
+   "T5 leave_x_tie": {
+    "A": {
+     "auc_moved_base": 0.725,
+     "coef_moved": [
+      -0.139
+     ],
+     "auc_moved": 0.7249,
+     "ll_base": 0.88617,
+     "ll": 0.88634,
+     "d": 0.000169,
+     "t": -1.57,
+     "n": 5047,
+     "G": 364
+    },
+    "B": {
+     "auc_moved_base": 0.7304,
+     "coef_moved": [
+      -0.295
+     ],
+     "auc_moved": 0.7303,
+     "ll_base": 0.88247,
+     "ll": 0.88271,
+     "d": 0.000234,
+     "t": -1.5,
+     "n": 5001,
+     "G": 362
+    }
+   },
+   "T5b leave_x_came": {
+    "A": {
+     "auc_moved_base": 0.725,
+     "coef_moved": [
+      -0.47,
+      0.39
+     ],
+     "auc_moved": 0.7252,
+     "ll_base": 0.88617,
+     "ll": 0.8863,
+     "d": 0.000126,
+     "t": -0.48,
+     "n": 5047,
+     "G": 364
+    },
+    "B": {
+     "auc_moved_base": 0.7304,
+     "coef_moved": [
+      -0.424,
+      -1.147
+     ],
+     "auc_moved": 0.7293,
+     "ll_base": 0.88247,
+     "ll": 0.88623,
+     "d": 0.00376,
+     "t": -1.56,
+     "n": 5001,
+     "G": 362
+    }
+   },
+   "all (T1-T5)": {
+    "A": {
+     "auc_moved_base": 0.725,
+     "coef_moved": [
+      -0.997,
+      1.342,
+      0.408,
+      -0.365,
+      0.414
+     ],
+     "auc_moved": 0.7146,
+     "ll_base": 0.88617,
+     "ll": 0.89241,
+     "d": 0.006234,
+     "t": -3.07,
+     "n": 5047,
+     "G": 364
+    },
+    "B": {
+     "auc_moved_base": 0.7304,
+     "coef_moved": [
+      -1.064,
+      1.628,
+      0.605,
+      -0.355,
+      0.384
+     ],
+     "auc_moved": 0.7366,
+     "ll_base": 0.88247,
+     "ll": 0.88227,
+     "d": -0.000201,
+     "t": 0.09,
+     "n": 5001,
+     "G": 362
+    }
+   }
+  }
+ },
+ "land": {
+  "terms": {
+   "L1 follow_tie": {
+    "A": {
+     "ll_base": -5.4187,
+     "ll": -5.4194,
+     "d": 0.00065,
+     "t": -1.77,
+     "n": 1362,
+     "coef": [
+      0.133
+     ],
+     "moversWithOption": 42,
+     "tookIt": 11
+    },
+    "B": {
+     "ll_base": -5.4355,
+     "ll": -5.4356,
+     "d": 0.0001,
+     "t": -0.94,
+     "n": 1190,
+     "coef": [
+      -0.059
+     ],
+     "moversWithOption": 65,
+     "tookIt": 16
+    }
+   },
+   "L1b follow_x_yrs": {
+    "A": {
+     "ll_base": -5.4187,
+     "ll": -5.4198,
+     "d": 0.00114,
+     "t": -1.84,
+     "n": 1362,
+     "coef": [
+      0.576
+     ],
+     "moversWithOption": 117,
+     "tookIt": 44
+    },
+    "B": {
+     "ll_base": -5.4355,
+     "ll": -5.4352,
+     "d": -0.0003,
+     "t": 1.01,
+     "n": 1190,
+     "coef": [
+      0.345
+     ],
+     "moversWithOption": 116,
+     "tookIt": 25
+    }
+   },
+   "L2 recruiter": {
+    "A": {
+     "ll_base": -5.4187,
+     "ll": -5.4105,
+     "d": -0.00821,
+     "t": 1.52,
+     "n": 1362,
+     "coef": [
+      2.248
+     ],
+     "moversWithOption": 358,
+     "tookIt": 11
+    },
+    "B": {
+     "ll_base": -5.4355,
+     "ll": -5.421,
+     "d": -0.01446,
+     "t": 2.12,
+     "n": 1190,
+     "coef": [
+      2.112
+     ],
+     "moversWithOption": 260,
+     "tookIt": 12
+    }
+   }
+  },
+  "followShare": {
+   "tie": {
+    "n": 187,
+    "followed": 51,
+    "share": 0.273
+   },
+   "no tie": {
+    "n": 170,
+    "followed": 59,
+    "share": 0.347
+   }
+  }
+ }
+}
