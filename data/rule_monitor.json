@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-27T23:01:14Z",
+ "asof": "2026-11-27T23:11:54Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -2169,19 +2169,19 @@
     "read": "in line"
    },
    "check": {
-    "n": 1,
-    "window": 1,
-    "mean": -0.005,
-    "t": null,
+    "n": 2,
+    "window": 2,
+    "mean": 0.1116,
+    "t": 0.96,
     "p": null,
-    "days": 1,
+    "days": 2,
     "sd": 0.1089,
-    "cusum": 0.24,
+    "cusum": 0.0,
     "cusumMax": 0.24,
     "h": 10.0,
     "rho": 0.078,
     "edge": {
-     "cusum": 0.11,
+     "cusum": 0.0,
      "cusumMax": 0.11,
      "h": 4.595
     },
@@ -2189,17 +2189,17 @@
     "why": "",
     "drift": {
      "mu1": 0.0202,
-     "n": 1,
+     "n": 2,
      "sd": 0.1089,
      "rho": 0.078,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.108,
-     "info": 0.03,
-     "real": -2.65,
-     "realSe": 5.389,
+     "llr": 0.245,
+     "info": 0.07,
+     "real": 4.062,
+     "realSe": 3.811,
      "need": 171
     }
    },
