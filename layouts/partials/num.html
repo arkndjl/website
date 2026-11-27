@@ -1,6 +1,9 @@
 {{- /* Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
        printf for one number that never prints a negative zero: (slice "%+.1f" x) gives what printf gives, except
        that a value which rounds to zero at the digits shown prints as zero does ("-0.0" -> "0.0", "+0.0" with %+). */ -}}
-{{- $f := index . 0 }}{{ $s := printf $f (index . 1) -}}
+{{- $f := index . 0 }}{{ $v := index . 1 -}}
+{{- /* a whole number from JSON (0, not 0.0) under a float verb would print "%!f(int=0)" */ -}}
+{{- if and (findRE `%[-+ 0-9.]*[feg]` $f 1) (in (slice "int" "int64") (printf "%T" $v)) }}{{ $v = float $v }}{{ end -}}
+{{- $s := printf $f $v -}}
 {{- if findRE `^-0(\.0+)?([^0-9.]|$)` $s 1 }}{{ $s = printf $f 0.0 }}{{ end -}}
 {{- return $s -}}
