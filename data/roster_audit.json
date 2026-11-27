@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-27T16:44Z",
+ "asof": "2026-11-27T17:50Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -10,7 +10,7 @@
    },
    "flags": [],
    "joined": 0,
-   "players": 1006,
+   "players": 1011,
    "rows": 5297
   },
   "cfb": {
@@ -4483,7 +4483,7 @@
   "nhl": {
    "by_file": {
     "static/data/depth/nhl.json": {
-     "flags": 0,
+     "flags": 1,
      "rows": 640
     },
     "static/data/lines/nhl.json": {
@@ -4504,6 +4504,24 @@
     }
    },
    "flags": [
+    {
+     "d": "2026-11-27",
+     "field": "depth",
+     "file": "static/data/depth/nhl.json",
+     "flag": "minors",
+     "head": "Headed back to AHL",
+     "kind": "down",
+     "move": {
+      "d": "2026-11-27",
+      "head": "Headed back to AHL",
+      "kind": "down"
+     },
+     "pid": "4647",
+     "player": "Sammy Blais",
+     "pos": "LW",
+     "rotowire": "OTT",
+     "site": "OTT"
+    },
     {
      "d": "2026-11-07",
      "field": "tm",
@@ -4754,7 +4772,7 @@
     }
    ],
    "joined": 0,
-   "players": 1442,
+   "players": 1443,
    "rows": 3258
   }
  }
