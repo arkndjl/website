@@ -770,10 +770,15 @@ const FV_YEARS_W = 0.5;
 // ranks only the top, so full coverage stays 9 boards and a prospect it leaves off isn't diluted for it
 const CONS_W = 0.5, CONS_BOARDS = 9;
 const RISER = { gap: 6, unranked: 55 };
-// xNIL program budgets (football, per season) and the fitted split (see the xNIL block in build())
+// xNIL program budgets (football, per season) and the fitted split (see the xNIL block in build()). A school with a reported
+// roster budget (data/nil_budgets.json: The Athletic's estimates for the 68 power-conference programs, the midpoint) pays that;
+// the rest pay the level budget tilted by roster talent. k (how steeply pay falls down a roster) was 1.1 on On3's valuations
+// alone; 1.375 fits the College Sports Commission's pay percentiles by position and the reported deals better and ranks
+// On3's valued players better (r .66 -> .70, log RMSE unchanged), Nov 27 2026
 // FCS programs: no revenue sharing at almost every FCS school, so NIL is collective and booster money only,
 // ~$0.4M a program (an assumption, scaled like the FBS budgets by level: x e^(.3 z) on the FCS team SRS)
-const XNIL = { p4: 20e6, g5: 3e6, fcs: 0.4e6, fcsMove: 0.4, tilt: 0.3, k: 1.1 };
+const XNIL = { p4: 20e6, g5: 3e6, fcs: 0.4e6, fcsMove: 0.4, tilt: 0.3, k: 1.375 };
+const NIL_BUDGET = (() => { try { const d = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nil_budgets.json'), 'utf8')).cfb; return d.season === SEASON ? d.teams : {}; } catch { return {}; } })();
 // FCS NIL discount at equal FV: FCS median xNIL / FBS median xNIL per 5-point FV tier (both with 3+ players),
 // overall = geometric mean of the tier ratios weighted by FCS players in the tier
 const nilDiscount = (fcs, fbs) => {
@@ -1572,9 +1577,9 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
   //   yNIL (year NIL): what he was likely paid going into the season. Only what was known before it: last
   //     seasons' production (the Marcel blend without this season), On3 grade, 247 recruiting rating,
   //     position, QB x production, the prior-season playing time. Pay comes out of a program's budget, so
-  //     each program splits one: the House settlement revenue-share cap ($20.5M, ~75% to football) plus
-  //     outside NIL, ~$20M at Power 4 and Notre Dame, ~$3M in the Group of Five, tilted by roster talent
-  //     (x e^(.3 z)); shares follow e^(1.1 x index) (calibrated to On3's valuations: R^2 .47, mean error ~0)
+  //     each program splits one: its reported roster budget (data/nil_budgets.json: the 68 power-conference programs,
+  //     $10M to $52M, mean $27M) or, without one, ~$3M in the Group of Five (~$20M for an unlisted Power 4 program),
+  //     tilted by roster talent (x e^(.3 z)); shares follow e^(XNIL.k x index)
   //   xNIL (expected NIL): what he's worth on the open market now, wherever he plays: on-field value (the
   //     expected AV at this season's FV, and playing time) at his position's market price, program held out.
   //     On3's prices alone barely move with FV once position and program are known (+18% per 10 FV), so
@@ -1619,7 +1624,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       const tv = Object.values(tal), tm = tv.reduce((a, b) => a + b, 0) / tv.length, tsd = Math.sqrt(tv.reduce((a, b) => a + (b - tm) ** 2, 0) / tv.length) || 1;
       let pool = 0;
       for (const [tid, ps] of Object.entries(byTeam)) {
-        const budget = (P4.has(ps[0].conf, ps[0].tid) ? XNIL.p4 : XNIL.g5) * Math.exp(XNIL.tilt * (tal[tid] - tm) / tsd);
+        const rep = NIL_BUDGET[ps[0].team];     // reported budget, $M low and high
+        const budget = rep ? (rep[0] + rep[1]) / 2 * 1e6 : (P4.has(ps[0].conf, ps[0].tid) ? XNIL.p4 : XNIL.g5) * Math.exp(XNIL.tilt * (tal[tid] - tm) / tsd);
         const w = ps.map(p => Math.exp(XNIL.k * dot(preF(p), bPre))), sw = w.reduce((a, b) => a + b, 0);
         ps.forEach((p, i) => { p.ynil = Math.round(budget * w[i] / sw / 1000) * 1000; pool += p.ynil; });
       }

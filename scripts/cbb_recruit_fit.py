@@ -76,9 +76,33 @@ def ts_of(fv):
 # rotation players outside the top leagues, 2025-26), so a team's five spots sum to its value above a replacement roster.
 REP_BPM = -3.0
 LEVELS = {'HM': {'ACC', 'B10', 'B12', 'SEC', 'BE'}, 'MM': {'A10', 'MWC', 'WCC', 'Amer', 'MVC', 'P12'}}
-# Men's basketball NIL budgets a program, per season (revenue share and collective, 2026-27; an assumption, scaled like
-# the football ones in fetch_cfb.mjs XNIL by program strength: x e^(.3 z), normalized within the level)
-XNIL = {'HM': 6e6, 'MM': 1.2e6, 'LM': 0.25e6, 'tilt': 0.3}
+# Men's basketball NIL budgets a program, per season (revenue share and collective). High-majors: the reported budget
+# by school (data/nil_budgets.json: CBS Sports' roster spending tiers, the midpoint; a school on that list is priced as
+# a high-major whatever its league, so Gonzaga), XNIL['HM'] their mean for a recruit with no school yet. Mid- and
+# low-majors: an assumption (no school-level reports, and On3 values none of their players, so nothing to test a change
+# on), tilted by program strength (x e^(.3 z), normalized within the level) as the football ones in fetch_cfb.mjs XNIL
+def _budgets():
+    try:
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'nil_budgets.json')) as f:
+            return {t: (lo + hi) / 2 * 1e6 for t, (lo, hi) in json.load(f)['cbb']['teams'].items()}
+    except (OSError, ValueError, KeyError):
+        return {}
+
+
+BUDGET = _budgets()
+_BKEY = None
+
+
+def budget_of(team):
+    """a school's reported budget ($), None when it is not on the list; team names by the shared matcher's team key"""
+    global _BKEY
+    if not team: return None
+    if team in BUDGET: return BUDGET[team]
+    if _BKEY is None:
+        import names as _N
+        _BKEY = ({_N.team_key(t): v for t, v in BUDGET.items()}, _N)
+    return _BKEY[0].get(_BKEY[1].team_key(team))
+XNIL = {'HM': round(sum(BUDGET.values()) / len(BUDGET), -5) if BUDGET else 6e6, 'MM': 1.2e6, 'LM': 0.25e6, 'tilt': 0.3}
 
 
 def college_value(min_per, bpm):
@@ -818,7 +842,7 @@ def xnil_price(H, teams, tm, conf, f, ref):
         zs = [z for t, z in tz.items() if level_of(nr.get('conf', {}).get(t)) == L] if nr.get('conf') else []
         norm[L] = float(np.mean(np.exp(XNIL['tilt'] * np.array(zs)))) if zs else 1.0
     def at(L, z): return XNIL[L] * math.exp(XNIL['tilt'] * z) / norm[L] / nr['value'][L]
-    if tm: return at(level_of(conf), tz.get(tm, 0.0))
+    if tm: return budget_of(tm) / nr['value']['HM'] if budget_of(tm) else at(level_of(conf), tz.get(tm, 0.0))
     return f['hm'] * at('HM', f['prog']) + (1 - f['hm']) * at('MM', 0.0)
 
 

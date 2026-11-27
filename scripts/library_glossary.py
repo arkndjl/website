@@ -21,6 +21,8 @@ _HKEPT = ', '.join(dict.fromkeys(_HKN.get(k, k) for k in _HKF['kept'] if k != 'l
 
 _NX = ld('data/nba_proj3y_fit.json')['exit']['res']['1.0']
 _RX = ld('data/nba_rxpm_research.json')['metrics']
+_NB = ld('data/nil_budgets.json')                           # reported roster budgets by school (yNIL)
+_nbm = lambda k: sum((lo + hi) / 2 for lo, hi in _NB[k]['teams'].values()) / len(_NB[k]['teams'])
 _VX = ld('data/nba_vorx_research.json')                         # VORX on rXPM (scripts/nba_vorx_research.py)             # rXPM team adjustment (scripts/nba_rxpm_research.py)
 _NT = ld('data/nba_trade_fit.json')                         # NBA draft-night trades (scripts/nba_draft_trades.py)
 _RD = ld('data/return_drivers.json')                       # Return% sweep + reported-return lock (scripts/return_drivers.py, return_news.py)
@@ -245,8 +247,10 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
       'CFB board, WAR leaders, true freshmen', ['CFB']),
     E('xNIL / yNIL / zNIL', 'xNIL is what a player is worth on the NIL market now, yNIL is his estimated pay entering the season, and zNIL = xNIL - yNIL.',
       ['xNIL = position price × on-field value (AV at FV, × playing time), shared within the P4 and G5 pools.',
-       'yNIL splits each program\'s budget by a preseason index (about $20M a program in the P4, $3M in the G5 and $0.4M in the FCS).',
+       f'yNIL splits each program\'s budget by a preseason index. The budget is the school\'s reported one: {len(_NB["cfb"]["teams"])} P4 football programs (mean ${_nbm("cfb"):.1f}M) and {len(_NB["cbb"]["teams"])} high-major basketball programs (mean ${_nbm("cbb"):.1f}M).',
+       'Without a report it is assumed: $3M in the G5, $0.4M in the FCS, $1.2M for a mid-major and $0.25M for a low-major in basketball.',
        'It isn\'t fit to On3 valuations, since those only move +18% per 10 FV. zNIL growth is 20% of each coach score.',
+       'Checked against the College Sports Commission\'s pay percentiles by position, On3 valuations and reported deals.',
        'FCS players at an FBS-starter FV are priced at 40% of the FBS rate. CBB xNIL is minutes share × (BPM + 3) at the school\'s price.'],
       'CFB board, team talent, team builder, fv to xNIL charts; CBB recruits', ['CFB', 'CBB']),
     E('Season AV (college)', 'A college player\'s on-field value for a season: snap share × position weight × quality.',

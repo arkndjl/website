@@ -1,0 +1,607 @@
+{
+ "_readme": "Reported roster budgets by school, $M a season (low, high), revenue share plus NIL. Read by scripts/fetch_cfb.mjs (football yNIL) and scripts/cbb_recruit_fit.py / scripts/cbb_market.py (men's basketball yNIL): a listed school's budget is the midpoint, the others keep the level budget tilted by program strength. Refresh by hand when the next survey is published (football each September, basketball each October).",
+ "cfb": {
+  "season": 2026,
+  "source": "The Athletic, estimated football roster budgets for the 68 power-conference programs (Sep 16 2026)",
+  "teams": {
+   "Alabama": [
+    38.0,
+    42.0
+   ],
+   "Arizona": [
+    13.0,
+    18.0
+   ],
+   "Arizona State": [
+    19.0,
+    23.0
+   ],
+   "Arkansas": [
+    22.0,
+    25.0
+   ],
+   "Auburn": [
+    31.0,
+    35.0
+   ],
+   "BYU": [
+    20.0,
+    25.0
+   ],
+   "Baylor": [
+    20.0,
+    23.0
+   ],
+   "Boston College": [
+    8.0,
+    13.0
+   ],
+   "California": [
+    20.0,
+    24.0
+   ],
+   "Cincinnati": [
+    14.0,
+    16.0
+   ],
+   "Clemson": [
+    29.0,
+    32.0
+   ],
+   "Colorado": [
+    18.0,
+    21.0
+   ],
+   "Duke": [
+    12.0,
+    15.0
+   ],
+   "Florida": [
+    31.0,
+    41.0
+   ],
+   "Florida State": [
+    23.0,
+    30.0
+   ],
+   "Georgia": [
+    31.0,
+    34.0
+   ],
+   "Georgia Tech": [
+    23.0,
+    26.0
+   ],
+   "Houston": [
+    15.0,
+    19.0
+   ],
+   "Illinois": [
+    19.0,
+    23.0
+   ],
+   "Indiana": [
+    36.0,
+    40.0
+   ],
+   "Iowa": [
+    17.0,
+    21.0
+   ],
+   "Iowa State": [
+    13.0,
+    17.0
+   ],
+   "Kansas": [
+    15.0,
+    17.0
+   ],
+   "Kansas State": [
+    19.0,
+    22.0
+   ],
+   "Kentucky": [
+    23.0,
+    26.0
+   ],
+   "LSU": [
+    47.0,
+    50.0
+   ],
+   "Louisville": [
+    22.0,
+    25.0
+   ],
+   "Maryland": [
+    21.0,
+    25.0
+   ],
+   "Miami": [
+    44.0,
+    50.0
+   ],
+   "Michigan": [
+    36.0,
+    40.0
+   ],
+   "Michigan State": [
+    21.0,
+    25.0
+   ],
+   "Minnesota": [
+    18.0,
+    22.0
+   ],
+   "Mississippi State": [
+    25.0,
+    30.0
+   ],
+   "Missouri": [
+    27.0,
+    30.0
+   ],
+   "NC State": [
+    22.0,
+    26.0
+   ],
+   "Nebraska": [
+    31.0,
+    35.0
+   ],
+   "North Carolina": [
+    20.0,
+    25.0
+   ],
+   "Northwestern": [
+    21.0,
+    25.0
+   ],
+   "Notre Dame": [
+    41.0,
+    48.0
+   ],
+   "Ohio State": [
+    49.0,
+    54.0
+   ],
+   "Oklahoma": [
+    28.0,
+    34.0
+   ],
+   "Oklahoma State": [
+    15.0,
+    19.0
+   ],
+   "Ole Miss": [
+    39.0,
+    45.0
+   ],
+   "Oregon": [
+    48.0,
+    54.0
+   ],
+   "Penn State": [
+    29.0,
+    32.0
+   ],
+   "Pittsburgh": [
+    16.0,
+    20.0
+   ],
+   "Purdue": [
+    16.0,
+    20.0
+   ],
+   "Rutgers": [
+    20.0,
+    23.0
+   ],
+   "SMU": [
+    21.0,
+    23.0
+   ],
+   "South Carolina": [
+    32.0,
+    35.0
+   ],
+   "Stanford": [
+    16.0,
+    20.0
+   ],
+   "Syracuse": [
+    17.0,
+    22.0
+   ],
+   "TCU": [
+    22.0,
+    25.0
+   ],
+   "Tennessee": [
+    41.0,
+    43.0
+   ],
+   "Texas": [
+    45.0,
+    55.0
+   ],
+   "Texas A&M": [
+    45.0,
+    50.0
+   ],
+   "Texas Tech": [
+    38.0,
+    42.0
+   ],
+   "UCF": [
+    15.0,
+    20.0
+   ],
+   "UCLA": [
+    26.0,
+    30.0
+   ],
+   "USC": [
+    37.0,
+    40.0
+   ],
+   "Utah": [
+    18.0,
+    22.0
+   ],
+   "Vanderbilt": [
+    25.0,
+    28.0
+   ],
+   "Virginia": [
+    20.0,
+    24.0
+   ],
+   "Virginia Tech": [
+    25.0,
+    30.0
+   ],
+   "Wake Forest": [
+    16.0,
+    20.0
+   ],
+   "Washington": [
+    21.0,
+    25.0
+   ],
+   "West Virginia": [
+    18.0,
+    22.0
+   ],
+   "Wisconsin": [
+    27.0,
+    31.0
+   ]
+  }
+ },
+ "cbb": {
+  "season": 2027,
+  "source": "CBS Sports, 2026-27 men's basketball roster spending tiers (Oct 21 2026); top tier open-ended, taken as $20-24M",
+  "teams": {
+   "Alabama": [
+    12.1,
+    15.0
+   ],
+   "Arizona": [
+    15.1,
+    17.5
+   ],
+   "Arizona State": [
+    7.1,
+    9.9
+   ],
+   "Arkansas": [
+    18.0,
+    20.0
+   ],
+   "Auburn": [
+    15.1,
+    17.5
+   ],
+   "BYU": [
+    12.1,
+    15.0
+   ],
+   "Baylor": [
+    12.1,
+    15.0
+   ],
+   "Boston College": [
+    5.0,
+    7.0
+   ],
+   "Butler": [
+    7.1,
+    9.9
+   ],
+   "California": [
+    7.1,
+    9.9
+   ],
+   "Cincinnati": [
+    15.1,
+    17.5
+   ],
+   "Clemson": [
+    10.0,
+    12.0
+   ],
+   "Colorado": [
+    5.0,
+    7.0
+   ],
+   "Creighton": [
+    12.1,
+    15.0
+   ],
+   "DePaul": [
+    7.1,
+    9.9
+   ],
+   "Duke": [
+    20.0,
+    24.0
+   ],
+   "Florida": [
+    25.0,
+    27.0
+   ],
+   "Florida State": [
+    7.1,
+    9.9
+   ],
+   "Georgetown": [
+    12.1,
+    15.0
+   ],
+   "Georgia": [
+    10.0,
+    12.0
+   ],
+   "Georgia Tech": [
+    5.0,
+    7.0
+   ],
+   "Gonzaga": [
+    15.1,
+    17.5
+   ],
+   "Houston": [
+    15.1,
+    17.5
+   ],
+   "Illinois": [
+    20.0,
+    24.0
+   ],
+   "Indiana": [
+    18.0,
+    20.0
+   ],
+   "Iowa": [
+    7.1,
+    9.9
+   ],
+   "Iowa State": [
+    10.0,
+    12.0
+   ],
+   "Kansas": [
+    18.0,
+    20.0
+   ],
+   "Kansas State": [
+    5.0,
+    7.0
+   ],
+   "Kentucky": [
+    20.0,
+    24.0
+   ],
+   "LSU": [
+    15.1,
+    17.5
+   ],
+   "Louisville": [
+    20.0,
+    24.0
+   ],
+   "Marquette": [
+    12.1,
+    15.0
+   ],
+   "Maryland": [
+    12.1,
+    15.0
+   ],
+   "Miami": [
+    15.1,
+    17.5
+   ],
+   "Michigan": [
+    20.0,
+    24.0
+   ],
+   "Michigan State": [
+    15.1,
+    17.5
+   ],
+   "Minnesota": [
+    10.0,
+    12.0
+   ],
+   "Mississippi State": [
+    12.1,
+    15.0
+   ],
+   "Missouri": [
+    15.1,
+    17.5
+   ],
+   "NC State": [
+    10.0,
+    12.0
+   ],
+   "Nebraska": [
+    10.0,
+    12.0
+   ],
+   "North Carolina": [
+    20.0,
+    24.0
+   ],
+   "Northwestern": [
+    7.1,
+    9.9
+   ],
+   "Notre Dame": [
+    5.0,
+    7.0
+   ],
+   "Ohio State": [
+    12.1,
+    15.0
+   ],
+   "Oklahoma": [
+    15.1,
+    17.5
+   ],
+   "Oklahoma State": [
+    15.1,
+    17.5
+   ],
+   "Ole Miss": [
+    15.1,
+    17.5
+   ],
+   "Oregon": [
+    12.1,
+    15.0
+   ],
+   "Penn State": [
+    7.1,
+    9.9
+   ],
+   "Pittsburgh": [
+    12.1,
+    15.0
+   ],
+   "Providence": [
+    12.1,
+    15.0
+   ],
+   "Purdue": [
+    7.1,
+    9.9
+   ],
+   "Rutgers": [
+    7.1,
+    9.9
+   ],
+   "SMU": [
+    12.1,
+    15.0
+   ],
+   "Seton Hall": [
+    7.1,
+    9.9
+   ],
+   "South Carolina": [
+    15.1,
+    17.5
+   ],
+   "St. John's": [
+    20.0,
+    24.0
+   ],
+   "Stanford": [
+    5.0,
+    7.0
+   ],
+   "Syracuse": [
+    10.0,
+    12.0
+   ],
+   "TCU": [
+    10.0,
+    12.0
+   ],
+   "Tennessee": [
+    20.0,
+    24.0
+   ],
+   "Texas": [
+    20.0,
+    24.0
+   ],
+   "Texas A&M": [
+    15.1,
+    17.5
+   ],
+   "Texas Tech": [
+    20.0,
+    24.0
+   ],
+   "UCF": [
+    7.1,
+    9.9
+   ],
+   "UCLA": [
+    12.1,
+    15.0
+   ],
+   "UConn": [
+    18.0,
+    20.0
+   ],
+   "USC": [
+    15.1,
+    17.5
+   ],
+   "Utah": [
+    7.1,
+    9.9
+   ],
+   "Vanderbilt": [
+    15.1,
+    17.5
+   ],
+   "Villanova": [
+    12.1,
+    15.0
+   ],
+   "Virginia": [
+    12.1,
+    15.0
+   ],
+   "Virginia Tech": [
+    7.1,
+    9.9
+   ],
+   "Wake Forest": [
+    5.0,
+    7.0
+   ],
+   "Washington": [
+    5.0,
+    7.0
+   ],
+   "West Virginia": [
+    12.1,
+    15.0
+   ],
+   "Wisconsin": [
+    10.0,
+    12.0
+   ],
+   "Xavier": [
+    12.1,
+    15.0
+   ]
+  }
+ }
+}

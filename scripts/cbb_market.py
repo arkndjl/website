@@ -6,7 +6,8 @@ team builder. Models from data/cbb_market_fit.json (scripts/cbb_market_fit.py); 
     python3 scripts/cbb_market.py          # -> data/cbb_market.json, static/data/cbb-builder.json
 
 NIL, per player (CFB definitions, Noah):
-  yNIL  what he was likely paid going into the season: each program's budget (cbb_recruit_fit.XNIL by level: high
+  yNIL  what he was likely paid going into the season: each program's budget (the reported one, data/nil_budgets.json, or
+        cbb_recruit_fit.XNIL by level: high
         major / mid-major / low major, tilted by program strength x e^(.3 z)) split by a preseason index, his
         preseason value^k. The index uses only what was known before the season (last season's college value, else
         the freshman projection from recruiting rank; FV). Frozen per season on first run (scripts/data/cbb_ynil.json).
@@ -30,7 +31,7 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import cbb_market_fit as M  # noqa: E402
 import names as N  # noqa: E402
-from cbb_recruit_fit import XNIL, REP_BPM, LEVELS  # noqa: E402
+from cbb_recruit_fit import XNIL, REP_BPM, LEVELS, budget_of  # noqa: E402
 from nba_xpm import VORX_REP  # noqa: E402
 
 ALL = os.path.join(ROOT, 'static', 'data', 'cbb-all.json')
@@ -48,12 +49,17 @@ HM = LEVELS['HM']
 ROSTER = 15            # men's basketball roster limit (House settlement, 2025-26 on)
 NBA_REPL = VORX_REP    # replacement XPM, the VORX line
 FLOOR = 0.3            # value floor: a 10% minutes player at BPM 0 (depth is worth something)
-LEVEL_FIT = os.environ.get('CBB_NIL_LEVEL', '0') == '1'   # off: On3's top-42 tail would put the average high-major budget near $18M
+LEVEL_FIT = os.environ.get('CBB_NIL_LEVEL', '0') == '1'   # off: the level is the reported budgets (data/nil_budgets.json), not On3's tail
 SOFT = 0.25            # the NIL budget is a soft target: P(over) cost rises over 25% of budget (as the CFB builder)
 
 
 def lvl(conf):
     return 'HM' if conf in HM else 'MM' if conf in LEVELS['MM'] else 'LM'
+
+
+def nlvl(team, conf):
+    """the NIL market a program pays in: a school with a reported budget (data/nil_budgets.json) is a high-major"""
+    return 'HM' if budget_of(team) else lvl(conf)
 
 
 def r0(x, d=0):
@@ -280,12 +286,12 @@ def main():
     # program strength z (preseason prior rating), within level, and budgets
     pz = {}
     for L in ('HM', 'MM', 'LM'):
-        ts = [t for t, p in power.items() if lvl(p.get('conf')) == L]
+        ts = [t for t, p in power.items() if nlvl(t, p.get('conf')) == L]
         v = np.array([power[t]['prior'] for t in ts]); m, s = v.mean(), v.std() or 1
         norm = float(np.mean(np.exp(XNIL['tilt'] * (v - m) / s)))
         for t in ts:
             pz[t] = (power[t]['prior'] - m) / s
-            power[t]['_budget'] = XNIL[L] * math.exp(XNIL['tilt'] * pz[t]) / norm
+            power[t]['_budget'] = budget_of(t) or XNIL[L] * math.exp(XNIL['tilt'] * pz[t]) / norm
     # On3 valuations for the fit
     on3 = []
     for x in src['on3']['nil100']:
@@ -323,17 +329,17 @@ def main():
         for L in ('HM', 'MM'):
             v = []
             for t, ps in byteam.items():
-                if t in power and lvl(power[t].get('conf')) == L:
+                if t in power and nlvl(t, power[t].get('conf')) == L:
                     v += sorted((val[id(p)] for p in ps), reverse=True)[:5]
             std[L] = float(np.median(v)) if v else 99
         mkt = {}
         for p in P:
-            L = p['level']
+            L = nlvl(p['team'], p.get('conf'))
             mkt[id(p)] = 'HM' if L == 'HM' or val[id(p)] >= std['HM'] else 'MM' if L == 'MM' or val[id(p)] >= std['MM'] else 'LM'
         pool = defaultdict(float); z = defaultdict(float)
         for p in P:
             if id(p) in yn:
-                pool[lvl(power[p['team']].get('conf'))] += yn[id(p)]
+                pool[nlvl(p['team'], power[p['team']].get('conf'))] += yn[id(p)]
             z[mkt[id(p)]] += val[id(p)]
         xn = {id(p): pool[mkt[id(p)]] * val[id(p)] / z[mkt[id(p)]] for p in P}
         return yn, xn, mkt, {k: pool[k] / z[k] for k in pool}, std
@@ -344,8 +350,8 @@ def main():
     # On3 values only the top of the market (its NIL 100 and the valued portal entrants), so it is matched as a tail,
     # not player by player, and for shape only: a (the NBA-value weight) by the matched players' log error with the
     # level removed; k (yNIL concentration) so the top-N yNIL quantiles match On3's with the level removed, N = On3's
-    # valued players (reported only, see below). The level stays the assumed budgets (cbb_recruit_fit.XNIL): matching On3's level (m, CBB_NIL_LEVEL=1)
-    # needs ~3x, an average high-major near $18M, above every reported roster figure (On3's valuations add endorsements)
+    # valued players (reported only, see below). The level is the reported school budgets (data/nil_budgets.json; high-major mean
+    # $13.7M in 2026-27), not On3's tail (on3Tail, reported; m, CBB_NIL_LEVEL=1 would match it)
     def sd_err(d):
         e = [(math.log(on3v[id(p)]) - math.log(max(1e3, d[id(p)]))) for p in fitset if id(p) in d]
         return float(np.std(e)) if e else None
