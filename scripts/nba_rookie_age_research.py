@@ -65,8 +65,9 @@ def load():
             mp = sum(f['mp'] for f in fut if f and f.get('xpm') is not None)
             num = sum(f['xpm'] * f['mp'] for f in fut if f and f.get('xpm') is not None)
             fx = (num - 2.0 * 1000) / (mp + 1000)
-            fv = sum(f['vorx'] for f in fut if f and f.get('vorx') is not None)
-            rows.append((S, p['sxpm'], p['age'], p['mp'], fx, fv, pid, p['xpm'], D[S]['games']))
+            fv = sum(f.get('vorx0', f['vorx']) for f in fut if f and f.get('vorx') is not None)   # box-blend VORX, the target the fit was made on
+            import nba_xpm as XP    # the Oct 31 role shrink the build feeds the fit (rookies.py role_sxpm); the file's sxpm is pXPM since Nov 24
+            rows.append((S, XP.role_sxpm(p, D[S]['games']), p['age'], p['mp'], fx, fv, pid, p['xpm'], D[S]['games']))
     return rows
 
 
