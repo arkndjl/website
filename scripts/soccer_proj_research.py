@@ -20,7 +20,9 @@ out of the big five counted 0 (same players).
 Baselines: flat (1Y G0, 3Y 3 G0), pooled prior alone (S, S-1, S-2 GAR per 90 pooled by minutes x M0 / 90; 3Y x 3),
 flatFit (OLS on [1, G0]: flat with its regression to the mean); the gate uses the best of the three held out.
 Forms (3, pre-registered, OLS): pool [1, G0, P1, lnM0]; age = pool + [a, a^2, a M0/90]; agepos = pool + position
-dummies + [a x position, a^2, a M0/90].
+dummies + [a x position, a^2, a M0/90]. A fourth since Nov 27 2026 (scripts/research/ctx_nov27/soccer, T2a: 1Y t -2.4
+to -3.8 at every share, 3Y RMSE lower at every share): agepossv = agepos + PS1, the S-1 and S-2 seasons' SVAR pooled
+per 90 and shrunk like P (the season-only value of the same two seasons; soccer_players.proj_x sv).
 Leave one season out, prediction seasons 2017-2025 (1Y) / 2017-2023 (3Y). Paired t on squared error with players as
 units (a player's seasons averaged), seasons won, held-out calibration slope (target on prediction).
 Kept: the age form chosen (age or agepos, lower held RMSE at f = 1) beats the better baseline and the pool form at
@@ -126,6 +128,17 @@ def season_files():
     return out
 
 
+def season_sv():
+    """S -> {p: SVAR} from the season files (stints summed)"""
+    out = {}
+    for fn in sorted(os.listdir(SP.SDIR)):
+        m = defaultdict(float)
+        for o in json.load(open(os.path.join(SP.SDIR, fn)))['players']:
+            m[o['p']] += o.get('svar') or 0.0
+        out[int(fn[:4])] = m
+    return out
+
+
 def full_f(S):
     D._us_down[0] = True
     fl = {}
@@ -143,12 +156,13 @@ def spearman(a, b):
 
 def main():
     SF = season_files()
+    SV = season_sv()
     snap = D.load(SNAPS)
     # the season files carry GAR on the bottom-three line: snapshots taken on the fringe line would mix two scales
     assert snap.get('garLine') == 'bottom3', 'rerun --snaps: the snapshots are on the old replacement line'
     dob = SP.proj_dobs()
     res = {'note': 'pred = c . x, x = soccer_players.proj_x(); coefficients per season share f, linear in between',
-           'forms': ['pool', 'age', 'agepos'], 'formsTried': 3, 'K': SP.PROJ_K, 'A0': SP.PROJ_A0}
+           'forms': ['pool', 'age', 'agepos', 'agepossv'], 'formsTried': 4, 'K': SP.PROJ_K, 'A0': SP.PROJ_A0}
     for tgt in ('1y', '3y'):
         last = 2025 if tgt == '1y' else 2023
         res[tgt] = {'grid': []}
@@ -168,7 +182,8 @@ def main():
                     pr = [(x1 or [0, 0.0])[0], (x1 or [0, 0.0])[1], (x2 or [0, 0.0])[0], (x2 or [0, 0.0])[1]]
                     age = SP.age_on(S, dob[p])
                     fx = max(fl[lg], 0.05)
-                    X.append(SP.proj_x(mn, g, pos, age, pr, fx)); Y.append(y); SS.append(S); PID.append(p)
+                    sv = (SV[S - 1].get(p, 0.0) if x1 else 0.0) + (SV[S - 2].get(p, 0.0) if x2 else 0.0)
+                    X.append(SP.proj_x(mn, g, pos, age, pr, fx, sv)); Y.append(y); SS.append(S); PID.append(p)
                     m0, g0 = mn / fx, g / fx
                     pool = (g + pr[1] + pr[3]) / max(mn + pr[0] + pr[2], 1) * m0     # pooled GAR a minute x paced minutes
                     k = 1 if tgt == '1y' else 3
@@ -180,6 +195,7 @@ def main():
                    'pool': [cols.index(c) for c in ('one', 'g0', 'p1', 'lm0')],
                    'age': [cols.index(c) for c in ('one', 'g0', 'p1', 'lm0', 'a', 'a2', 'am')]}
             sel['agepos'] = sel['age'] + [cols.index(c) for c in ('d', 'm', 'fw', 'ad', 'am_', 'af')]
+            sel['agepossv'] = sel['agepos'] + [cols.index('ps1')]
             pr = {'flat': np.array(BF), 'poolAlone': np.array(BP)}
             seasons = sorted(set(SS.tolist()))
             for form, ix in sel.items():
@@ -215,7 +231,7 @@ def main():
             res[tgt]['grid'].append(g)
             print(tgt, f, json.dumps({k: v for k, v in g.items() if k != 'c'}), flush=True)
         G = res[tgt]['grid']
-        pick = min(('age', 'agepos'), key=lambda k: G[-1]['rmse'][k])
+        pick = min(('age', 'agepos', 'agepossv'), key=lambda k: G[-1]['rmse'][k])
         res[tgt]['form'] = pick
         res[tgt]['kept'] = all(x[pick]['tVsBase'] <= -2 and x[pick]['tVsPool'] <= -2 and x[pick]['wonVsBase'] > len(range(S_FIRST, last + 1)) / 2
                                and 0.8 <= x[pick]['slope'] <= 1.2 for x in G)
@@ -224,6 +240,7 @@ def main():
         form = res[tgt]['form']
         ix = {'pool': ['one', 'g0', 'p1', 'lm0'], 'age': ['one', 'g0', 'p1', 'lm0', 'a', 'a2', 'am']}
         ix['agepos'] = ix['age'] + ['d', 'm', 'fw', 'ad', 'am_', 'af']
+        ix['agepossv'] = ix['agepos'] + ['ps1']
         for g in res[tgt]['grid']:
             full = dict(zip(ix[form], g['c'][form]))
             g['live'] = [full.get(c, 0.0) for c in SP.PROJ_COLS]
