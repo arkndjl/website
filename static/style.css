@@ -4942,7 +4942,7 @@ code, pre, kbd, samp, pre code, .highlight, .highlight pre, .highlight code {
 .srch__chip.is-on { color: #fff; background: var(--win-title); border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); }
 .srch__chip.is-on b { color: var(--foreground); }
 .srch__out { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 480px), 1fr)); gap: 18px; align-items: start; }
-.srch__grp { margin: 0; }
+.srch__grp { margin: 0; min-width: 0; max-width: 100%; box-sizing: border-box; }
 .srch__rows { margin: 8px 8px 0; padding: 2px; background: var(--win-well); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); }
 .srch__rows .srch__row + .srch__row { border-top-color: var(--win-face); }
 .srch__grp .win__status { align-items: center; }
