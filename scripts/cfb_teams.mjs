@@ -1426,6 +1426,12 @@ export const dectVerdict = (B, x, G, nilC, nilT, sig, gap, d, w0) => {
   const even = V[a] - V[b] < se, st = V.T != null && V.T > V.C ? 'T' : 'C', r2 = v => Math.round(v * 100) / 100;
   return [r2(V[st] - V.D), r2(V.D), r2(f(N[st])[2] - c0[3]), even ? 'E' : a, even ? [a, b].sort().join('') : '', V.T != null ? r2(V.T - V.C) : null];
 };
+export function schoolPayK(rows) {
+  const pay = {};
+  for (const p of rows) if (p.xnil != null && p.ynil != null) { const t = pay[p.team] ??= [0, 0, 0]; t[0] += p.ynil; t[1] += p.xnil; t[2]++; }
+  const k = {}; for (const [t, v] of Object.entries(pay)) if (v[2] >= 30 && v[1] > 0) k[t] = Math.max(0.4, Math.min(2, v[0] / v[1]));
+  return t => k[t] ?? null;
+}
 export const dectOf = (p, xPick, asof = new Date(), year, fit = DECT, k = null) => {
   const g = DECT_GRP[p.pos], a = p.age ?? p.ageEst;
   if (!fit || !g || a == null || !(xPick > 0) || xPick > DECT_MAX || p.ynil == null) return null;
@@ -1473,9 +1479,9 @@ export function draftOdds(rows, priors = DEFAULT_PRIORS) {
   for (const p of pool) p.retP = Math.round((1 - declareOdds(p, p._x, asof, P.draftYear)) * 1000) / 1000;
   // DECT (dectOf): for prospects with a year of eligibility left, the side worth most (certainty equivalents), its edge over declaring, the mean edge
   for (const p of rows) if (p.draft27) { p.dect = p.dectL = p.dectD = p.dectM = p.dectP = p.dectT = null; for (const k of ['dor', 'dorD', 'dec', 'decD', 'decM', 'decE']) delete p[k]; }
-  const pay = {};      // school pay per market dollar: the roster's yNIL over its xNIL (30 priced players or more), kept inside .4 to 2
-  for (const p of rows) if (p.xnil != null && p.ynil != null) { const t = pay[p.team] ??= [0, 0, 0]; t[0] += p.ynil; t[1] += p.xnil; t[2]++; }
-  const payK = t => { const v = pay[t]; return v && v[2] >= 30 && v[1] > 0 ? Math.max(0.4, Math.min(2, v[0] / v[1])) : null; };
+  // school pay per market dollar: the roster's yNIL over its xNIL (30 priced players or more), kept inside .4 to 2. The whole written
+  // roster (bench and carried rows included, after their pay is shared out) when the caller passes it (P.payK), else these rows
+  const payK = P.payK ? (t => P.payK[t] ?? null) : schoolPayK(rows);
   for (const p of pool) if (p.retP > 0) { const v = dectOf(p, p._x, asof, P.draftYear, DECT, payK(p.team)); if (v) [p.dect, p.dectD, p.dectM, p.dectL, p.dectP, p.dectT] = v; }
   for (const p of pool) { delete p._dv; delete p._mRk; delete p._x; }
   for (const [pos, n] of Object.entries(SPECIALISTS)) {

@@ -51,7 +51,7 @@ import { weekStatuses, loadReports } from './cfb_avail_reports.mjs';
 import { avOf, nameKey } from './cfb_teams.mjs';
 import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV, specialistWar } from './cfb_av.mjs';
 import { returning, draftsBy } from './cfb_ret_war.mjs';
-import { yardShares, playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDrafts, mockSims, draftOdds, RET_FROM, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades, fetchNflRecentR1, ledgerNflTrades } from './cfb_teams.mjs';
+import { yardShares, playerRates, fetchGames, fetchInjuries, cfbd, teamModels, gamesModel, staffModels, mockDrafts, mockSims, draftOdds, schoolPayK, RET_FROM, fetchCombine, olSpot, fetchNflOrder, fetchNflNeeds, fetchNflTrades, applyNflTrades, fetchNflRecentR1, ledgerNflTrades } from './cfb_teams.mjs';
 import { espnBackups } from './cfb_espn_backups.mjs';
 import { readCfbAll, writeCfbAll } from './cfb_all.mjs';
 import { fvDist, cfbZ, fvdOf, atMean } from './fv_dist.mjs';
@@ -2731,10 +2731,11 @@ const draftPriors = () => ({ ...(fs.existsSync(PRIORS) ? JSON.parse(fs.readFileS
 // Draft% (draftOdds in cfb_teams.mjs) is refreshed on every write, so it follows the latest FV and consensus;
 // Transfer% (cfb_transfer.mjs) once its inputs are in (tctx, below), after Draft%, which sets its floor on leaving
 let tctx = null;
+let payK = null;      // school pay per market dollar from the last written roster (bench and carried rows in), for DECT's college side
 const writeAll = () => {
   // a reported return for next season from Nov 20 on (the declare window scripts/return_news.py tested) keeps him in school
   if (tctx?.locks) for (const r of [...out.all, ...outFcs.all]) { const lk = tctx.locks.get(tctx.norm(r.name) + '|' + r.tid); r.retLock = lk && lk.date >= `${SEASON}-${RET_FROM}` ? 1 : null; }
-  draftOdds([...out.all, ...outFcs.all], { ...draftPriors(), asof: out.asof, draftYear: SEASON + 1 });
+  draftOdds([...out.all, ...outFcs.all], { ...draftPriors(), asof: out.asof, draftYear: SEASON + 1, ...(payK ? { payK } : {}) });
   // FBS% can't exceed the chance he isn't drafted
   for (const r of outFcs.all) if (r.up != null) { r.upRaw ??= r.up; r.up = Math.min(r.upRaw, Math.round((1 - (r.draftP || 0)) * 100) / 100); r.moveUp = r.up >= FCS_UP.flag || null; }
   if (tctx) transferOdds([...out.all, ...outFcs.all], tctx);
@@ -2756,6 +2757,7 @@ const writeAll = () => {
     if (z) atMean(r, z);
   }
   const rows = [...now, ...kept, ...extra].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.plus - a.plus) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || (b.comp ?? 0) - (a.comp ?? 0));
+  { const k = schoolPayK(rows); payK = Object.fromEntries([...new Set(rows.map(r => r.team))].map(t => [t, k(t)]).filter(([, v]) => v != null)); }
   const ovr = new Map(rows.map((r, i) => [r, i + 1])), prk = new Map(), seen = {};
   if (kept.length || extra.length) for (const r of rows) if (r.fv != null && r.posRank != null) { const k = `${r.div}|${r.pos}`; prk.set(r, seen[k] = (seen[k] || 0) + 1); }   // position rank is within the division, as build()
   const val = (r, c) => c === 'fvs' ? fvSteps(r) : c === 'ovr' ? ovr.get(r) : c === 'posRank' && prk.has(r) ? prk.get(r) : c === 'photo' ? photoCode(r) : c === 'fv' && r.fv != null ? fvOf('cfb', r.fvx, r.fv) : r[c] ?? null;
