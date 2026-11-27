@@ -30,3 +30,24 @@ Measured before scoring (labels only, no returns): CBB 'game' label differs from
 - Fail: ship nothing in the fit path; report as a lead.
 - If PASS: code change in games_picks.py only. data/games_picks_rules.json is rewritten by `games_picks.py --rules`
   (which also reads the live record, Noah's Nov 11 rule), so the rerun is left to the lead after the sport lenses' --fit.
+
+## T2 (round 2, P4). Close predictor tier cells: conference as it stood
+
+Found: scripts/close_model.py load() / game_cells() set the tier cell (CFB P4 / G5 / FCS, CBB high / mid / low) from
+today's conference map on every past game; a live game reads today's map (its own season's). Table only (closefit).
+- Candidate: tier from games_picks.conf_hist (the game's own season; CFB Pac-12 P4 through 2023, CBB P12 high through
+  2024); games not in the history keep today's map.
+- Target: the consumer's own, close - open (the line move), held-out walk-forward exactly as fit(): spec (knot, ridge)
+  chosen on the tuning seasons under each labelling, each held season predicted from a fit on the seasons before it.
+- Serve form: held rows are predicted with as-it-stood tiers under both arms; only the fit rows' labels differ.
+- Score: paired squared error of the predicted move on held games, t clustered by ET day; per sport x market
+  (CFB spread, CFB total, CBB spread, CBB total). Guard: clvRet of the model's held bets at E > 0.
+- Pass (per sport, decided here): after SSE <= before SSE in both of the sport's markets and the guard not lower by
+  more than 1 se in either. Holm over the two sports for any claim of improvement.
+- If PASS for a sport: switch that sport in close_model.py and rerun `close_model.py --fit` (offline, data/close_fit.json).
+
+## T3 (round 2). Tennis all-time season value: year-end Elo margin -> season-only value
+
+Rule fix (MISMATCH-D), no fitted model reads it. Gate, set here: the list on the season-only value must pass
+alltime.py era_check (adjusted KL <= the era-blind 95% line) for peaks and careers on both tours, as the Elo lists do
+now. Pass -> switch; fail or no offline source rows -> lead with the rerun command.
