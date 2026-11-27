@@ -2153,6 +2153,25 @@ if (OFFLINE) {
                              ...on3.map(o => o.team).filter(Boolean)])];
   espn = await fetchEspn(names); writeCache('espn.json', espn);
 }
+// a PFN name with a letter lost to a bad encoding ("Dakota Qui��onez", Duke) never matched his ESPN roster
+// row, so he sat on the board twice: the name is read back from the one roster name at his school that fits around
+// the lost letter
+function repairName(name, rosterNames) {
+  if (!/�/.test(name || '')) return name;
+  const re = new RegExp('^' + name.split(/�+/).map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.{1,2}') + '$', 'i');
+  const hits = [...new Set((rosterNames || []).filter(n => re.test(n) || re.test(n.normalize('NFD').replace(/[̀-ͯ]/g, ''))))];
+  return hits.length === 1 ? hits[0] : name;
+}
+{ const ix = teamIndex(espn.teams || {}), fixed = {};
+  for (const r of Object.values(pfn).flat()) {
+    if (!/�/.test(r?.name || '')) continue;
+    const k = r.name + '|' + r.team;
+    if (!(k in fixed)) fixed[k] = repairName(r.name, (espn.rosters?.[ix.resolve(r.team)] || []).map(a => a.name));
+    r.name = fixed[k];
+  }
+  const done = Object.entries(fixed).filter(([k, v]) => !k.startsWith(v + '|'));
+  if (Object.keys(fixed).length) console.log(`PFN names with a lost letter: ${Object.keys(fixed).length}, ${done.length} read back from ESPN rosters`);
+}
 // team-level inputs: games, the projected draft order and needs, coaching staffs. Each falls back
 // to its last good pull (cache) so one bad source doesn't stop the update.
 async function source(name, fn) {
