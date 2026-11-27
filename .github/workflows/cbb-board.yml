@@ -149,6 +149,10 @@ jobs:
       - name: Market (NIL, staff, coaching jobs, coach pay, team builder)
         # scripts/cbb_market.py: scores the committed fits (data/cbb_market_fit.json) on today's board, ratings and coaches
         run: python3 scripts/cbb_market.py || { echo "market not updated"; echo market >> /tmp/cbb_failed; }
+      - name: Team builder, next season
+        # scripts/team_builder_next.py: next season's strength, xWins, wins over replacement, NIL dollars a win, the class and DECT on each plan
+        continue-on-error: true
+        run: python3 scripts/team_builder_next.py
       - name: Refit Dengler Units on the graded live picks
         # scripts/units.py --fit (the same fit games_picks.py --rules runs): live picks and paper bets pool into each
         # market's calibration as they grade; a failed fit keeps yesterday's units

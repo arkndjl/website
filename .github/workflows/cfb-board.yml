@@ -198,6 +198,11 @@ jobs:
         if: env.REFRESH == 'true'
         continue-on-error: true
         run: node scripts/fetch_cfb.mjs --offline --news
+      # next season on each team builder plan (scripts/team_builder_next.py: strength, xWins, wins over replacement, NIL
+      # dollars a win, the class, DECT); reads cfb-builder.json as fetch_cfb.mjs left it
+      - name: Team builder, next season
+        continue-on-error: true
+        run: python3 scripts/team_builder_next.py
       # the Predictions page's college football picks (scripts/games_picks.py; graded from ESPN's finals)
       - name: Predictions picks, college football
         continue-on-error: true

@@ -103,6 +103,42 @@
     return s;
   }
 
+  // DECT (scripts/dect.py, read by scripts/team_builder_next.py): [label, $M edge, Even pair]
+  var DECTN = { D: 'Declare', E: 'Even', C: 'College', T: 'Transfer' };
+  function dect(x) { var d = x && x.dect; if (!d || !DECTN[d[0]]) return '';
+    return ' <span class="tbx__dect tbx__dect--' + d[0] + '" data-term="DECT" title="' + esc('DECT ' + DECTN[d[0]] + (d[2] ? ' (' + d[2].split('').map(function (k) { return DECTN[k]; }).join(' / ') + ')' : '') + (d[1] != null ? ', staying edge ' + (d[1] >= 0 ? '+' : '−') + '$' + Math.abs(d[1]).toFixed(1) + 'M' : '')) + '">' + DECTN[d[0]] + '</span>'; }
+  function stars(n) { if (!n) return '<span class="cfb__dim">—</span>'; var plus = n > 5, k = plus ? 5 : n, s = '<span class="cfbrc__ark' + (plus ? ' is-plus' : '') + '" style="--n:' + k + '" role="img" aria-label="' + (plus ? '5-star+' : n + ' ARK stars') + '"><i></i></span>';
+    return plus ? '<span class="cfbrc__glow">' + s + '<span class="cfbrc__plus">+</span></span>' : s; }
+  function num1(x) { return x == null ? '—' : (Math.round(x * 10) / 10).toFixed(1); }
+  // the scoreboard: strength (Elo, rank, xW: now, returning only, with the usual portal, with the plan), value (college WAR,
+  // wins over replacement, NIL dollars a win) and NIL (budget, the reported range, where the money goes)
+  function scoreboard(T, D) {
+    var N = T.nx; if (!N) return '';
+    var n = D.teams.length, rows = [['now', N.now, '#c0b0ff'], ['returning', N.ret, '#8a52ea'], ['usual portal', N.exp, '#a24bff'], ['plan', N.plan, '#7fffd4']];
+    var lo = 1300, hi = 2000;
+    var bridge = rows.map(function (r) { var w = Math.max(2, Math.min(100, (r[1].e - lo) / (hi - lo) * 100));
+      return '<span>' + r[0] + '</span><span class="tbx__bar" title="' + esc(r[0] + ': Elo ' + r[1].e + ', #' + r[1].rk + ' of ' + n + ', ' + num1(r[1].xw) + ' conference-schedule wins of ' + (D.nxFit || {}).games) + '"><i style="width:' + w.toFixed(0) + '%;--c:' + r[2] + '"></i></span><span class="tbx__n">' + r[1].e + '</span><span class="tbx__rk">#' + r[1].rk + '</span>'; }).join('');
+    var str = '<section class="tbx__box tbx__box--str"><h4>' + D.next + ' strength</h4><div class="tbx__big"><b>#' + N.plan.rk + '</b><span>of ' + n + ' FBS</span><b>' + num1(N.plan.xw) + '</b><span>xW</span></div><div class="tbx__bridge">' + bridge + '</div></section>';
+    var WKc = WK, val = '<section class="tbx__box tbx__box--val"><h4>value</h4><div class="tbx__stats">' +
+      '<div class="tbx__stat tbx__stat--teal"><b>' + num1(T.warSea) + '</b><span>college WAR ' + D.next + '</span></div>' +
+      '<div class="tbx__stat"><b>' + num1(T.av26 * WKc) + '</b><span>college WAR now</span></div>' +
+      '<div class="tbx__stat tbx__stat--teal"><b>' + num1(T.war) + '</b><span>wins over replacement</span></div>' +
+      '<div class="tbx__stat"><b>' + money(T.eff) + '</b><span>NIL $ a win · #' + T.effRk + '</span></div></div></section>';
+    var tot = Math.max(T.budget, T.reserve + T.keepCost + Math.max(0, T.spend) + Math.max(0, T.left)) || 1;
+    var seg = function (v, cls, lab) { return v > 0 ? '<i class="tb__seg tb__seg--' + cls + '" style="width:' + (v / tot * 100).toFixed(2) + '%" title="' + esc(lab + ': ' + money(v)) + '"></i>' : ''; };
+    var nil = '<section class="tbx__box tbx__box--nil"><h4>NIL</h4><div class="tbx__stats">' +
+      '<div class="tbx__stat"><b>' + money(T.budget) + '</b><span>budget</span></div>' +
+      '<div class="tbx__stat"><b>' + (T.bud ? money(T.bud[0]) + '-' + money(T.bud[1]).slice(1) : '—') + '</b><span>reported, whole roster</span></div>' +
+      '<div class="tbx__stat"><b>' + money(T.spendNext) + '</b><span>spend ' + D.next + '</span></div>' +
+      '<div class="tbx__stat' + (T.left < 0 ? '' : ' tbx__stat--teal') + '"><b>' + (T.left < 0 ? '−' + money(-T.left) : money(T.left)) + '</b><span>' + (T.left < 0 ? 'over · P ' + pct(T.overP) : 'left') + '</span></div></div>' +
+      '<div class="tb__budget" style="margin-top:6px">' + seg(T.reserve, 'class', 'class') + seg(T.keepCost, 'keep', 'keep') + seg(T.spend, 'sign', 'sign') + seg(T.left, 'left', 'left') + '</div></section>';
+    return '<div class="tbx__board">' + str + val + nil + '</div>';
+  }
+  function tabs(id, panes) {
+    panes = panes.filter(function (p) { return p[2]; });
+    return '<div class="tbx__tabs" role="tablist">' + panes.map(function (p, i) { return '<button type="button" class="tbx__tab" role="tab" data-tbx="' + id + '-' + p[0] + '" aria-selected="' + (i === 0) + '">' + p[0] + (p[1] != null ? '<i>' + p[1] + '</i>' : '') + '</button>'; }).join('') + '</div>' +
+      panes.map(function (p, i) { return '<div class="tbx__pane" data-tbx-pane="' + id + '-' + p[0] + '"' + (i ? ' hidden' : '') + '>' + p[2] + '</div>'; }).join('');
+  }
   function render(T, D, body) {
     curTeam = T.team;
     var tot = Math.max(T.budget, T.reserve + T.keepCost + Math.max(0, T.spend) + Math.max(0, T.left)) || 1;
@@ -110,10 +146,6 @@
     var head = '<div class="tb__head"' + (T.color ? ' style="--team:' + esc(T.color) + '"' : '') + '>' + (T.logo ? '<img class="tb__logo" src="' + esc(T.logo) + '" alt="" width="64" height="64">' : '') +
       '<div><h3 class="tb__name">' + esc(T.full || T.team) + '</h3><p class="cfb__dim">' + esc([T.conf, T.level, T.hc, T.rec ? T.rec.w + '-' + T.rec.l : null].filter(Boolean).join(' · ')) + '</p></div>' +
       '<span class="tb__mode tb__mode--' + T.mode + '" title="' + esc(MODE[T.mode][1]) + '">' + MODE[T.mode][0] + '</span>' + (T.buyer ? '<span class="tb__mode tb__mode--buyer" title="portal space >= 40% of budget">BUYER</span>' : '') + '</div>';
-    var sum = '<section class="tb__panel tb__brief"><h4>the plan in brief</h4><ul class="tb__sum">' + summary(T, D).map(function (x) { var k = x.indexOf('. '); return '<li><b class="tb__lead">' + esc(x.slice(0, k)) + '</b> ' + esc(x.slice(k + 2)) + '</li>'; }).join('') + '</ul></section>';
-    var budget = '<section class="tb__panel"><h4>budget · ' + money(T.budget) + '</h4><div class="tb__budget">' + seg(T.reserve, 'class', 'next recruiting class') + seg(T.keepCost, 'keep', 'retention') + seg(T.spend, 'sign', 'signings') + seg(T.left, 'left', 'unspent') + (T.left < 0 ? '<b class="tb__btick" style="left:' + (T.budget / tot * 100).toFixed(2) + '%" title="budget estimate"></b>' : '') + '</div>' + (T.over > 0 ? '<p class="cfb__dim">plan: ' + money(T.over) + ' past budget estimate; P(past true budget) = ' + pct(T.overP) + '. soft budget: each dollar past it must buy its market worth.</p>' : '') +
-      '<p class="tb__legend"><span><i class="tb__seg--class"></i>class ' + money(T.reserve) + '</span><span><i class="tb__seg--keep"></i>keep ' + money(T.keepCost) + '</span><span><i class="tb__seg--sign"></i>sign ' + money(T.spend) + '</span>' + (T.left >= 0 ? '<span><i class="tb__seg--left"></i>left ' + money(T.left) + '</span>' : '<span><i class="tb__seg--over"></i>budget estimate · over by ' + money(-T.left) + '</span>') + '</p>' +
-      '<p class="cfb__dim">xNIL ' + money(T.market) + ' · yNIL ' + money(T.payroll) + '. WAR a season: ' + war(T.av26) + ' now → ' + war(T.av27) + ' no adds' + (T.avExp != null ? ' → ' + war(T.avExp) + ' expected (usual portal)' : '') + ' → <b class="tb__teal">' + war(T.avPlan) + '</b> plan. next season: returners +1 year' + (T.devFv != null ? ' (mean +' + T.devFv + ' FV)' : '') + '.</p></section>';
     // the depth chart on a field: defense on top, offense below, every starter a tile with his full name, filled
     // in the FV ramp; unit bars against the contender bar and WAR a season on the right. Under 760px it folds
     // to a two-column list, defense then offense
@@ -156,7 +188,7 @@
               (tag ? ' <span class="tb__dtag tb__dtag--' + o.kind + '" title="' + esc(tag[1]) + '">' + tag[0] + '</span>' : '') +
               (o.mv ? ' <span class="tb__dtag tb__dtag--mv" title="' + esc('from ' + lab(o.mv) + ' (position-change model)') + '">' + esc(lab(o.mv)) + '→' + esc(lab(p.g)) + '</span>' : '') +
               (p.g === 'OL' && o.spot && o.spot !== 'any' ? ' <span class="cfb__dim" title="spot this season">' + esc(o.spot) + '</span>' : '') +
-              (o.kind !== 'new' && o.p != null && o.p < 0.9 ? ' <span class="cfb__dim" title="P(here and on the field next season)">' + pct(o.p) + '</span>' : '')) + '</li>';
+              (o.kind !== 'new' && o.p != null && o.p < 0.9 ? ' <span class="cfb__dim" title="P(here and on the field next season)">' + pct(o.p) + '</span>' : '') + dect(o)) + '</li>';
       }).join('') + '</ol></div>';
     }).join('') + '</div><p class="tb__legend"><span class="cfb__dim">% left = spot\'s snap share this season (rotation, injuries); weights WAR a season · % right = P(there) · ' +
       '<span class="tb__dtag tb__dtag--recruit">FR</span> ' + D.next + ' class · <span class="tb__dtag tb__dtag--redshirt">RS</span> redshirt · <span class="tb__dtag tb__dtag--new">NEW</span> signing</span></p></section>';
@@ -164,8 +196,8 @@
     var plan = tbl('the plan · ' + T.plan.length + ' signing' + (T.plan.length === 1 ? '' : 's') + ' · ' + money(T.spend), [['Player'], ['Pos'], ['FV', 'projected FV next season (+1 year)'], ['From'], ['Cost', 'projected price at this level; FCS move-up = 60% of going rate'], ['+WAR', 'room college WAR a season gained; spots weighted by snap share'], ['Xfer%'], ['Land%', 'P(picks this school | moves); conditional logit on 2024-25 transfers (level step, program talent, open playing time, distance from home)'], ['Odds', 'Xfer% x Land% = P(lands here)'], ['Why it\'s realistic'], ['Rivals', 'other plans with this target']],
       T.plan.map(function (p) { return '<tr><td>' + who(p) + (p.swap ? ' <span class="cfb__dim" title="funded by releasing ' + esc(p.swap) + '">for ' + esc(p.swap) + '</span>' : p.fill ? '' : ' <span class="cfb__dim" title="value add after holes filled">value</span>') + '</td><td>' + (p.as ? '<span title="' + esc('signs at ' + lab(p.as) + ': ' + (p.why || 'position-change model') + ' (FV ' + p.fvNow + ' now, ' + p.fv + ' first year there)') + '">' + lab(p.pos) + '→' + lab(p.as) + '</span>' : p.pos) + '</td><td>' + fvc(p.fv) + '</td><td>' + from(p) + '</td><td class="cfb__num">' + money(p.cost) + '</td><td class="cfb__num tb__teal">+' + war(p.gain) + '</td><td class="cfb__num"' + (p.up ? ' title="FCS: P(on FBS roster next season), move-up model"' : '') + '>' + pct(p.tp) + '</td><td class="cfb__num">' + land(p.land) + '</td><td class="cfb__num tb__teal">' + land(p.odds) + '</td><td class="tb__real">' + esc((p.real || []).join('; ') || '—') + '</td><td class="cfb__dim">' + esc((p.rivals || []).join(', ') || '—') + '</td></tr>'; }),
       T.space > 2e5 ? 'none: no realistic starter fits the price.' : 'none: no portal space after class and retention.');
-    var leaving = tbl('leaving', [['Player'], ['Pos'], ['FV'], ['Gone', 'P(not on roster next season)'], ['Why'], ['Draft%'], ['Xfer%'], ['xNIL']],
-      T.leaving.map(function (p) { return '<tr><td>' + who(p) + '</td><td>' + lab(p.pos) + '</td><td>' + fvc(p.fv) + '</td><td class="cfb__num">' + pct(p.gone) + '</td><td><span class="tb__why tb__why--' + p.why.replace(' ', '') + '">' + WHY[p.why] + '</span></td><td class="cfb__num">' + (p.dp == null ? '—' : pct(p.dp)) + '</td><td class="cfb__num">' + pct(p.tp) + '</td><td class="cfb__num">' + (p.xnil ? money(p.xnil) : '—') + '</td></tr>'; }), 'no likely starter departures.');
+    var leaving = tbl('leaving', [['Player'], ['Pos'], ['FV'], ['Gone', 'P(not on roster next season)'], ['Why'], ['DECT', 'worth most to him: Declare, Even, College, Transfer'], ['Draft%'], ['Xfer%'], ['xNIL']],
+      T.leaving.map(function (p) { return '<tr><td>' + who(p) + '</td><td>' + lab(p.pos) + '</td><td>' + fvc(p.fv) + '</td><td class="cfb__num">' + pct(p.gone) + '</td><td><span class="tb__why tb__why--' + p.why.replace(' ', '') + '">' + WHY[p.why] + '</span></td><td>' + (dect(p) || '<span class="cfb__dim">—</span>') + '</td><td class="cfb__num tbx__grp">' + (p.dp == null ? '—' : pct(p.dp)) + '</td><td class="cfb__num">' + pct(p.tp) + '</td><td class="cfb__num tbx__grp tbx__grp--nil">' + (p.xnil ? money(p.xnil) : '—') + '</td></tr>'; }), 'no likely starter departures.');
     var keep = tbl('keep · retention priorities', [['Player'], ['Pos'], ['FV'], ['Xfer%'], ['Raise', 'xNIL - yNIL'], ['Home', 'miles from hometown']],
       T.keep.map(function (p) { return '<tr><td>' + who(p) + '</td><td>' + lab(p.pos) + '</td><td>' + fvc(p.fv) + '</td><td class="cfb__num">' + pct(p.tp) + '</td><td class="cfb__num">' + (p.raise ? '+' + money(p.raise) : '—') + '</td><td class="cfb__num">' + (p.mi != null ? p.mi + ' mi' + (p.home ? ' · home state' : '') : '—') + '</td></tr>'; }), 'no likely starter above the flight-risk line.');
     var walk = (T.walk || []).length ? tbl('let walk · frees ' + money(T.walk.reduce(function (a, w) { return a + w.freed; }, 0)), [['Player'], ['Pos'], ['FV'], ['Frees', 'xNIL x P(return)'], ['Worth', 'college WAR a season over next man up x P(return)'], ['Buys', 'target signed with the freed money'], ['Net', 'college WAR a season gained by swap']],
@@ -181,7 +213,10 @@
     var mvRows = (T.moves || []).map(function (m) { return '<tr><td>' + who(m) + '</td><td>' + esc(lab(m.pos)) + '→' + esc(lab(m.to)) + '</td><td>' + fvc(m.fv) + ' → ' + fvc(Math.round(m.fvTo)) + '</td><td class="cfb__num tb__teal">+' + war(m.gain) + '</td><td class="tb__real">' + esc(m.why || '—') + '</td></tr>'; })
       .concat(olL.map(function (o) { return '<tr><td>' + who(o) + '</td><td>' + esc(o.shift) + '→' + esc(o.at) + '</td><td>' + fvc(Math.round(o.fv)) + '</td><td class="cfb__num">—</td><td class="tb__real">' + esc('best-five OL assignment: ' + o.at) + '</td></tr>'; }));
     var moves = mvRows.length ? tbl('position moves', [['Player'], ['Move'], ['FV', 'FV now -> first year at new position (-' + (D.moveCost || 2) + ' FV)'], ['+WAR', 'college WAR a season gained, both rooms'], ['Why']], mvRows, '') : '';
-    body.innerHTML = head + sum + budget + chart + depth + plan + moves + leaving + '<div class="tb__grid">' + keep + walk + priced + '</div>' + board;
+    var cls = (T.cls || []).length ? tbl(D.next + ' class', [['Player'], ['Pos'], ['FV', 'projected FV (the recruit model)'], ['Y1 FV', 'FV if on the field, year 1'], ['ARK', 'ARK stars'], ['On%', 'P(on the field, year 1)'], ['xNIL']],
+      T.cls.map(function (c) { return '<tr><td>' + who({ name: c.name, team: T.team }) + (c.rk ? ' <span class="cfb__dim">No. ' + c.rk + '</span>' : '') + '</td><td>' + esc(c.pos || '') + '</td><td class="tbx__grp">' + fvc(c.fv) + '</td><td class="cfb__num">' + (c.y1 == null ? '—' : Math.round(c.y1)) + '</td><td>' + stars(c.ark) + '</td><td class="cfb__num">' + pct(c.on) + '</td><td class="cfb__num tbx__grp tbx__grp--nil">' + (c.x ? money(c.x) : '—') + '</td></tr>'; }), '') : '';
+    var nOut = T.leaving.length, nIn = T.plan.length;
+    body.innerHTML = head + scoreboard(T, D) + chart + tabs('cfb', [['depth', null, depth], ['portal', nIn, plan + board], ['leaving', nOut, leaving + walk + priced], ['class', (T.cls || []).length, cls], ['keep', T.keep.length, keep], ['moves', (T.moves || []).length || null, moves]]);
   }
 
   function setup(w, D) {
@@ -189,6 +224,9 @@
     var teams = D.teams, byT = {};
     teams.forEach(function (t) { byT[t.team] = t; });
     LBL = D.labels || {};
+    w.addEventListener('click', function (e) { var b = e.target.closest('[data-tbx]'); if (!b) return;
+      w.querySelectorAll('[data-tbx]').forEach(function (x) { x.setAttribute('aria-selected', String(x === b)); });
+      w.querySelectorAll('[data-tbx-pane]').forEach(function (x) { x.hidden = x.getAttribute('data-tbx-pane') !== b.getAttribute('data-tbx'); }); });
     w.__tb = { data: D, current: null, lineup: lineup, summary: summary, mode: MODE, tier: fvTier, tiers: FVT, lab: lab, was: was };
     window.__arkBuilder = w.__tb;
     var confs = {}; teams.forEach(function (t) { confs[t.conf] = 1; });
