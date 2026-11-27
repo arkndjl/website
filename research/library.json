@@ -212,7 +212,7 @@
      "short": "An OLS on outcome FV for the draft class and for drafted players short of 100 NHL games.",
      "body": [
       "The draft model keeps log slot (board rank as slot), defense, goalie, draft-year NHLe, class strength.",
-      "Leave-one-class-out error is 87.11, compared to 91.63 for draft slot alone (2008-19 classes, 2,541 picks).",
+      "Leave-one-class-out error is 87.92, compared to 92.44 for draft slot alone (2008-19 classes, 2,541 picks).",
       "After the draft, stage models add the latest NHLe, pro games, a World Juniors spot, NHL games and WAR so far."
      ],
      "where": "Hockey prospects board, drafted prospects, fv model tab",
@@ -1024,7 +1024,7 @@
       "Replacement is the xG part of the bottom-three sides' regulars, less sides that collapsed (GK -0.123, D -0.075, M -0.036, F -0.004 a 90), with finishing and saves at league average. League strength is ×0.058 a goal of club rating.",
       "Weights fit on the same season (team goal difference, or first half to second half) could not split a side's xG between its players. The team totals are the same either way, so GAR's split is kept."
      ],
-     "where": "soccer GAR leaders, rookies, all-time players, transactions; conviction awards (Ballon d'Or pool by SVAR)",
+     "where": "soccer SVAR leaders, rookies, all-time players, transactions; conviction awards (Ballon d'Or pool by SVAR)",
      "sports": [
       "Soccer"
      ]
@@ -1040,7 +1040,7 @@
       "Frozen at a quarter, SVAR RMSE goes from 1.66 to 0.53, and the top 150's rank correlation with the final order from 0.40 to 0.85.",
       "Blended into GAR while Understat is up, it adds nothing to next season (team R² 0.569 against 0.568, t 0.7), so it is only the fallback."
      ],
-     "where": "Soccer GAR leaders, rookies, awards, xMV and projections in a league Understat trails",
+     "where": "Soccer SVAR leaders, rookies, awards, xMV and projections in a league Understat trails",
      "sports": [
       "Soccer"
      ]
@@ -1319,8 +1319,11 @@
      "term": "Backup watch / xGap",
      "short": "Second and third-string players who grade above a starter.",
      "body": [
-      "Gap = backup value - starter value (FV in college; WAR, pXPM, HPM or GAR in the pros). College players are listed at a gap >= 3.",
-      "They are ranked by xGap, the gap projected over two seasons with the age (or class) gap added. Held out t = -3.0 to -15.6."
+      "Gap = backup value - starter value (WAA and BPM with pXPM in college; WAR, pXPM, HPM or GAR in the pros).",
+      "They are ranked by xGap, the gap projected over two seasons with the age (or class) gap added. Held out t = -3.0 to -15.6.",
+      "NFL xGap projects from the pXP/60 gap on its own fit of 2,457 pairs: held out squared error .0429 to .0375, t 5.1, 5 of 5.",
+      "NHL adds the Marcel GAR a 60 gap (t -2.4, 9 of 10) and soccer the p/90 gap (t -5.9, 7 of 7) beside the grade gap.",
+      "NBA grades are pXPM: next season XPM error 1.301 to 1.185, t 13, 15 of 15. With pXPM already aged, its age term drops out."
      ],
      "where": "backup watch tab on every sport page",
      "sports": [
@@ -1369,9 +1372,11 @@
      "body": [
       "SV a 90 at weights 1, .5, .25, shrunk toward the position mean of regulars by 225 minutes (defenders 450, keepers 28,800),",
       "minus .008 a year over age 29. Held out, next-season team GD R² goes from .634 to .650, 11 of 11 pairs,",
-      "and r with next season's SV a 90 from .690 to .718. It is the most predictive soccer metric on players, and it is display only."
+      "and r with next season's SV a 90 from .690 to .718. It is the most predictive soccer metric on players.",
+      "1Y / 3Y count the two seasons before twice over, as GAR and as SVAR, pooled a 90 and shrunk with 900 minutes.",
+      "With SVAR in, the GAR prior's weight falls to about zero. Held out 1Y RMSE 1.310 to 1.305, t -2.6 (Nov 27 2026)."
      ],
-     "where": "Soccer GAR leaders, depth chart, next up",
+     "where": "Soccer SVAR leaders, depth chart, next up, backup watch xGap",
      "sports": [
       "Soccer"
      ]
@@ -1383,7 +1388,7 @@
       "Describe: season value × season minutes summed for each team, on that season's results, held out. Predict: season n value ×",
       "season n+1 minutes, on n+1 results, and a player's value against his next season. Tennis and CS2 use held-out matches and maps.",
       "NBA: describe rXPM (.999), predict pXPM (.657). NFL: describe XV (.604), predict pXP/60 within position, AV for teams (.317).",
-      "CFB: describe XV (.689), predict cWAR (.256, tie XV). CBB: describe WAR on GBPM (.658), predict the roster prior BPM (.783).",
+      "CFB: describe XV (.689), predict cWAR (.256, tie XV). CBB: describe VORX on rXPM, predict pXPM in board form.",
       "NHL: describe WAR (.978), predict pWAR for teams (.387), Marcel WAR for a player (r .446). Soccer: describe SVAR (.894),",
       "predict p/90 (.650, r .718). Tennis: describe PA (.141), predict ARK (.107, tie Elo). CS2: describe season RWA, predict RWA rating",
       "(next month team R² .124, player r .820), ARK for teams. The public metrics scored were nflverse EPA, PFN impact, Barttorvik PRPG,",
@@ -2957,7 +2962,7 @@
      "generational",
      "5+ time All-Pro",
      "7+ All-NBA teams, 6.0+ peak XPM",
-     "1 in 4 classes, 4.49+ peak WAR",
+     "1 in 4 classes, 4.05+ peak WAR",
      "#1 / 2 birth years",
      "top 5 overall"
     ],
@@ -2966,7 +2971,7 @@
      "star",
      "2-time All-Pro",
      "3+ All-NBA teams, 3.2+ peak XPM",
-     "#1 / class, 3.94+ peak WAR",
+     "#1 / class, 3.30+ peak WAR",
      "top 3 / birth year",
      "top 10 overall"
     ],
@@ -2975,7 +2980,7 @@
      "plus",
      "Pro Bowler",
      "2+ All-Star, 1.7+ peak XPM",
-     "top 5 / class, 2.43+ peak WAR",
+     "top 5 / class, 2.26+ peak WAR",
      "top 20 / birth year",
      "All-Star / #3 SP"
     ],
@@ -2984,7 +2989,7 @@
      "above average",
      "6+ seasons starting",
      "above-avg starter, 0.6+ peak XPM",
-     "top 10 / class, 1.88+ peak WAR",
+     "top 10 / class, 1.68+ peak WAR",
      "top 45 / birth year",
      "above-average regular"
     ],
@@ -3002,7 +3007,7 @@
      "below average",
      "2+ seasons starting",
      "low-end starter, -0.6+ peak XPM",
-     "top 30 / class, 0.59+ peak WAR",
+     "top 30 / class, 0.65+ peak WAR",
      "top 150 / birth year",
      "low-end regular / platoon"
     ],
@@ -3011,7 +3016,7 @@
      "bench",
      "rotational",
      "end of rotation, -1.4+ peak XPM",
-     "top 45 / class, 0.22+ peak WAR",
+     "top 45 / class, 0.26+ peak WAR",
      "top 250 / birth year (top-flight regular)",
      "bench"
     ],
@@ -3308,7 +3313,7 @@
    "rows": [
     [
      "80",
-     "4.49+ peak WAR a season",
+     "4.05+ peak WAR a season",
      "one in four classes",
      "top 0.1% of picks",
      "0 / 0",
@@ -3316,7 +3321,7 @@
     ],
     [
      "75",
-     "4.24+ peak WAR a season",
+     "3.78+ peak WAR a season",
      "one in two classes",
      "top 0.2% of picks",
      "0 / 2",
@@ -3324,7 +3329,7 @@
     ],
     [
      "70",
-     "3.94+ peak WAR a season",
+     "3.30+ peak WAR a season",
      "the best of a class",
      "top 0.5% of picks",
      "0 / 3",
@@ -3332,27 +3337,27 @@
     ],
     [
      "65",
-     "3.33+ peak WAR a season",
+     "2.98+ peak WAR a season",
      "top 2 of a class",
      "top 0.9% of picks",
      "0 / 3",
-     "-"
+     "65-69: 67.3 -> 64.2 (n 6, NHL 100%)"
     ],
     [
      "60",
-     "2.43+ peak WAR a season",
+     "2.26+ peak WAR a season",
      "top 5 of a class",
      "top 2.4% of picks",
      "1 / 6",
-     "60-64: 62.6 -> 58.5 (n 13, NHL 100%)"
+     "60-64: 62.3 -> 59.0 (n 12, NHL 100%)"
     ],
     [
      "55",
-     "1.88+ peak WAR a season",
+     "1.68+ peak WAR a season",
      "top 10",
      "top 4.7% of picks",
-     "1 / 11",
-     "55-59: 57.8 -> 60.5 (n 13, NHL 100%)"
+     "1 / 13",
+     "55-59: 57.7 -> 60.4 (n 14, NHL 100%)"
     ],
     [
      "50",
@@ -3360,31 +3365,31 @@
      "top 20 (NHL regular)",
      "top 9.4% of picks",
      "5 / 26",
-     "50-54: 52.2 -> 52.3 (n 39, NHL 97%)"
+     "50-54: 52.1 -> 52.2 (n 39, NHL 97%)"
     ],
     [
      "45",
-     "0.59+ peak WAR a season",
+     "0.65+ peak WAR a season",
      "top 30",
      "top 14.2% of picks",
-     "9 / 65",
-     "45-49: 47.3 -> 48.4 (n 63, NHL 98%)"
+     "10 / 66",
+     "45-49: 47.4 -> 48.4 (n 63, NHL 98%)"
     ],
     [
      "40",
-     "0.22+ peak WAR a season",
+     "0.26+ peak WAR a season",
      "top 45 (NHL career)",
      "top 21.3% of picks",
-     "22 / 114",
-     "40-44: 42.3 -> 44.1 (n 119, NHL 98%)"
+     "23 / 115",
+     "40-44: 42.3 -> 44.6 (n 125, NHL 98%)"
     ],
     [
      "30",
      "some NHL games",
      "-",
      "-",
-     "87 / 300",
-     "30-34: 32.1 -> 31.0 (n 448, NHL 63%)"
+     "88 / 300",
+     "30-34: 32.1 -> 31.0 (n 453, NHL 63%)"
     ],
     [
      "20",
@@ -3392,7 +3397,7 @@
      "-",
      "-",
      "193 / 300",
-     "20-24: 22.9 -> 23.4 (n 825, NHL 24%)"
+     "20-24: 22.9 -> 23.5 (n 830, NHL 24%)"
     ]
    ]
   },

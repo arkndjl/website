@@ -335,12 +335,13 @@ def main():
     CB = json.load(open(BEST))
     tiers = [20.0, 25.0, 30.0]
     cf = json.load(open(CEIL))
-    XS = {}
+    XS, PX = {}, {}        # sx0: the Nov 4 shrink the ceiling fit was trained on; PX: the board's pXPM (sxpm), the column shown
     for y in (bs, cur):
         try:
-            XS[y] = {r['id']: r.get('sx0') for r in json.load(open(os.path.join(ROOT, 'static', 'data', 'nba-xpm', f'{y}.json')))['players']}
+            xr = json.load(open(os.path.join(ROOT, 'static', 'data', 'nba-xpm', f'{y}.json')))['players']
+            XS[y] = {r['id']: r.get('sx0') for r in xr}; PX[y] = {r['id']: r.get('sxpm') for r in xr if not r.get('pr')}
         except (OSError, ValueError):
-            XS[y] = {}
+            XS[y], PX[y] = {}, {}
     rows = []
     for pid, now in cur_rows.items():
         a = dict(P.get((pid, bs)) or {})
@@ -381,9 +382,9 @@ def main():
             p100 = 2 * ts / 100 * (1 - tov / 100) * U / 100 * K
             t.append([round(p100 * pace / 100 * 36 / 48, 1), round(ts / 100 * lgts * 100, 1), 1 if dU > 9 else 0])
         sxb = XS[a['y']].get(pid) if a['y'] in XS else None
-        sxc = XS[cur].get(pid)
+        sxc = PX[cur].get(pid); sxb0 = PX.get(a['y'], {}).get(pid)
         xc = round(ceiling(cf, sxb, a), 1) if sxb is not None else None
-        rows.append({'id': pid, 'n': now['n'], 'x': sxc if sxc is not None else sxb, 'xc': xc, 'tm': X.TEAM.get(now['tm'], now['tm']), 'pos': now['pos'],
+        rows.append({'id': pid, 'n': now['n'], 'x': sxc if sxc is not None else sxb0, 'xc': xc, 'tm': X.TEAM.get(now['tm'], now['tm']), 'pos': now['pos'],
                      'age': now['age'], 'ph': None, 'p': round(p, 3), 'best': round(best, 1),
                      'u': round(now['usage_pct'] if now['mp'] >= 60 else a['usage_pct'], 1), 't': t, 'sig': sig})
     # headshots from the XPM board file (ESPN ids)
@@ -402,7 +403,7 @@ def main():
            'base': lab(bs), 'u': {'lab': 'USG', 'dec': 1},
            'tiers': [{'k': u, 'lab': 'USG %d' % u} for u in tiers],
            'stat': {'lab': 'PTS/36', 'eff': 'TS%', 'dec': 1, 'edec': 1},
-           'cur': {'lab': 'pXPM', 't': 'pXPM: XPM shrunk by minutes, this season (XPM leaders board)', 'dec': 1},
+           'cur': {'lab': 'pXPM', 't': 'pXPM: predictive XPM, next season from this season and the two before, aged (XPM board)', 'dec': 1},
            'ceil': {'lab': 'CEIL', 't': 'ceiling XPM: 80th percentile season if usage rises %g points' % cf['scen'],
                     'dec': 1},
            'about': (f'players not yet at the bar (best shrunk BPM so far under +{BAR:g}, BPM shrunk to -2 by MP, k 600, about the '

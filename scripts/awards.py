@@ -7,7 +7,7 @@
 Each race simulates the rest of the season SIMS times and scores every simulated finish with the sport's voter model
 (data/awards_fit.json from scripts/awards_research.py; only awards that passed their held-out test are run):
 - team finish: the board's season odds (projected wins / points and their spread), drawn once a simulation per team
-- player rates over the games left: the board's predictive value (NBA shrunk XPM, NHL pWAR a minute) and box rates
+- player rates over the games left: the board's predictive value (NBA shrunk XPM, NHL Marcel WAR a minute) and box rates
   blended with last season, each with its talent and sampling noise; games left from his share of games so far
 - eligibility: the NBA's 65 games for MVP and DPOY
 A candidate's P(win) is the voter model's softmax averaged over the simulations. Where Polymarket has an open, liquid
@@ -34,6 +34,7 @@ OUT = os.path.join(ROOT, 'data', 'awards.json')
 TEMP = os.path.join(ROOT, 'data', 'awards_temp.json')
 SIMS = 3000
 PACE_GP = False          # football: rest-of-season rate per game the player appeared in (False = per team game)
+LEFT_K = 0               # football: games of the player's last-season rate the rest-of-season rate is shrunk with (c['prev']; 0 = raw)
 AV_ACT = 0.0             # availability floor of a candidate who is playing now (0 = off)
 MKT_W = 0.95             # the market's weight in the shown P(win) (log-linear blend), where a liquid market is open
 # a liquid market: this many two-sided quotes, raw prices summing inside this range (the test's rule), and this much
@@ -387,7 +388,7 @@ def nba(fit, rng):
         q = pg0.get(pid, {})
         cands.append({'id': pid, 'n': r['n'], 'tm': tm, 'ph': r.get('ph'), 'g': p['games'], 'tg': g, 'mp': r['mp'],
                       'xpm': r['xpm'], 'dxpm': r['dxpm'], 'ta': r.get('txpm', r['xpm']) - r['xpm'], 'tad': r.get('tdxpm', r['dxpm']) - r['dxpm'],
-                      'pre_rvorx': (X0.get(pid) or {}).get('vorx') or 0.0, 'sx': r.get('sx0', r['xpm']), 'sdx': r.get('sdx0', r['dxpm']),
+                      'pre_rvorx': (X0.get(pid) or {}).get('vorx') or 0.0, 'sx': r.get('sxpm', r['xpm']), 'sdx': r.get('sdxpm', r['dxpm']),   # games left at pXPM (Nov 27 2026: rest-of-season rate RMSE 1.457 -> 1.397, t 7.6, 8/8 vs the Nov 4 shrink)
                       'ppg': p['pts_per_g'], 'ppg0': q.get('pts_per_g'), 'rpg': p['trb_per_g'], 'rpg0': q.get('trb_per_g'),
                       'apg': p['ast_per_g'], 'apg0': q.get('ast_per_g'), 'st': p['stl_per_g'] + p['blk_per_g'],
                       'st0': (q.get('stl_per_g', 0) + q.get('blk_per_g', 0)) if q else None,
@@ -528,6 +529,9 @@ def nba_races(fit, rng, cands, teams, conf, G=82, min_g=65, sims=SIMS, coy=()):
 
 # ---------------------------------------------------------------- NHL
 
+NHL_MW, NHL_MW_K = (1.0, 0.7, 0.5), 1600.0     # Marcel WAR: season weights, shrink minutes (scripts/player_pctl.py MARCEL, data/pctl_fit_nhl.json)
+
+
 def nhl(fit, rng):
     import awards_nhl as A
     W = {}
@@ -540,9 +544,25 @@ def nhl(fit, rng):
         left = 82 - gp
         # points: 2 a win plus the OT loss point; spread from game luck (about 1.0 points a game sd) and the rating
         teams[p['t']] = (p.get('pts', 0), gp * 2, p.get('xpts', 82.0), math.sqrt(left * 1.0 + (left * .25 * p.get('rsd', .2)) ** 2), 164)
-    hist = {}
+    hist, mu = {}, {}
     for s in range(A.FIRST - 1, S):
-        for r in A.war(s): hist.setdefault(NM.key(r['n']), []).append(r.get('gp') or 0)
+        for r in A.war(s):
+            hist.setdefault(NM.key(r['n']), []).append(r.get('gp') or 0)
+            if r.get('war') is not None and r.get('toi'):
+                m = mu.setdefault(r['grp'], [0.0, 0.0]); m[0] += r['war']; m[1] += r['toi']
+    last2 = {r['id']: r for r in A.war(S - 2)}
+
+    def marcel_war(r):
+        """Marcel WAR a minute: this season to date and the two before at 1 / .7 / .5 by ice time, shrunk with
+        NHL_MW_K minutes to his group's WAR a minute over the seasons before (the projections tab's form). The
+        games left run at this rate: pWAR sits on its own replacement scale (goalies near 0) and misses next-season
+        WAR by more (scripts/research/ctx_nov27/nhl: MSE 1.81 -> 1.47, t 10.7, 15 of 15 seasons)"""
+        m = mu.get(r['grp'])
+        num, den = NHL_MW_K * (m[0] / m[1] if m and m[1] else 0.0), NHL_MW_K
+        for w, q in zip(NHL_MW, (r, last.get(r['id']), last2.get(r['id']))):
+            if q and q.get('war') is not None and q.get('toi'):
+                num += w * q['war']; den += w * q['toi']
+        return num / den
     TG = {t: v[1] / 2 for t, v in teams.items()}
     cands = []
     for r in cur:
@@ -554,7 +574,7 @@ def nhl(fit, rng):
         q = last.get(r['id'], {})
         gp = r.get('gp') or 0
         cands.append({'id': r['id'], 'n': r['n'], 'tm': tm, 'ph': r.get('ph'), 'grp': r['grp'], 'gp': gp, 'tg': TG[tm],
-                      'toi': r.get('toi') or 0, 'war': r.get('war') or 0, 'pwar': r.get('pwar') or 0, 'gd': r.get('gd') or 0,
+                      'toi': r.get('toi') or 0, 'war': r.get('war') or 0, 'mwr': marcel_war(r), 'gd': r.get('gd') or 0,
                       'pts': r.get('pts') or 0, 'g': r.get('g') or 0, 'gsax': r.get('gsax') or 0,
                       'ppg0': (q.get('pts') or 0) / q['gp'] if q.get('gp') else None,
                       'gpg0': (q.get('g') or 0) / q['gp'] if q.get('gp') else None,
@@ -615,7 +635,7 @@ def nhl_draw(fit, teams, G=82):
         gp = c['gp'] + gr
         tpg = c['toi'] / max(c['gp'], 1)
         tr = gr * tpg
-        rate = (c['war'] if SEASON_ONLY else c['pwar']) / max(c['toi'], 1)   # predictive WAR a minute (conviction: this season's)
+        rate = c['war'] / max(c['toi'], 1) if SEASON_ONLY else c['mwr']   # Marcel WAR a minute (conviction: this season's own)
         war_r = gauss(rng, rate * tr, abs(rate) * tr * .35 + .25 * math.sqrt(tr / 60) * (.6 if c['grp'] != 'G' else 1.5))
         war = c['war'] + war_r
         # rates toward last season (no season: 80% of the pace so far), points by 40 games, goals 50, GSAx 40 starts
@@ -752,7 +772,7 @@ def cbb(fit, rng):
         teams[p['t']] = (w, w + l, p['xW'], team_sd(tot - w - l, p['xW'] / max(tot, 1), p.get('rsd', 3), .03), tot)
         tinfo[p['t']] = (p['off'] - p['def'], p.get('rsd', 3) * 1.45, p.get('conf'))
     P5 = {'ACC', 'B10', 'B12', 'BE', 'SEC'}
-    K, TAU = 300, 3.5
+    K, KPX, TAU = 300, 600, 3.5
     cands = []
     try:
         import awards_cbb as AC
@@ -774,15 +794,25 @@ def cbb(fit, rng):
         if not now.get('gp') or r['team'] not in teams: continue
         last = r.get('last') or {}
         xo, xd = xshift.get(r['team'], (0.0, 0.0))
-        # priors: last season's line (any team) for returners; the board's projected BPM for newcomers
+        # priors: his preseason pXPM (the board's frozen column: the predictive pick, on the voter value's BPM scale) with
+        # KPX minutes; without one, last season's line (any team) or the board's projected BPM for newcomers with K.
+        # scripts/research/ctx_nov27/cbb/r1_awards_rate.py, game logs 2017-26, rest-of-season game BPM of 20+ minute
+        # players at the 5th to 20th team game: last season's BPM at K 300 MSE 7.35 -> pXPM at K 300 6.54 (t 17.2, 10/10
+        # seasons), at K 600 (the walk's pick every season) 6.35; the top 100 by BPM to date 7.35 -> 6.11 (t 8.6, 10/10)
         prior = last['bpm'] if last.get('bpm') is not None and (last.get('gp') or 0) >= 8 else \
             next((x[2] for x in (r.get('parts') or []) if x[0] == 'BPM'), now['bpm'])
+        pk = K
+        if r.get('pxpm') is not None: prior, pk = r['pxpm'], KPX
+        elif not (last.get('bpm') is not None and (last.get('gp') or 0) >= 8) and r.get('xb0') is not None:
+            # a newcomer: his preseason xXPM. The board part this line looked for ('BPM') is gone, so his prior had been
+            # his own BPM to date, no shrink at all (r1b_newcomers.py: no shrink MSE 12.52, a flat prior at K 300 8.92, 9/9)
+            prior = r['xb0']
         pp0 = last['ppg'] if last.get('ppg') is not None and (last.get('gp') or 0) >= 8 else None
         espn = re.search(r'/id/(\d+)', (r.get('links') or {}).get('espn', '') or '')
         w, g, _, _, tot = teams[r['team']]
         cands.append({'id': r['name'] + '|' + r['team'], 'n': r['name'], 'tm': r['team'], 'logo': r.get('logo'),
                       'ph': espn.group(1) if espn else None, 'cls': r.get('cls'), 'gp': now['gp'], 'tg': g, 'tot': tot,
-                      'mpg': now.get('mpg') or 0, 'ppg': now.get('ppg') or 0, 'bpm': now.get('bpm') or 0, 'prior': prior,
+                      'mpg': now.get('mpg') or 0, 'ppg': now.get('ppg') or 0, 'bpm': now.get('bpm') or 0, 'prior': prior, 'pk': pk,
                       'pp0': pp0, 'dbpm': now.get('dbpm') or 0, 'blk': now.get('blk') or 0, 'stl': now.get('stl') or 0,
                       'drb': now.get('drb'), 'yr': now.get('yr') or r.get('cls'),
                       'dprior': last['dbpm'] if last.get('dbpm') is not None and (last.get('gp') or 0) >= 8 else .5 * (now.get('dbpm') or 0),
@@ -801,8 +831,9 @@ def cbb(fit, rng):
         gr = games_left(rng, left, av, 'cbb')
         gp = c['gp'] + gr
         m0, mr = c['gp'] * c['mpg'], gr * c['mpg']
-        mean = c['bpm'] if SEASON_ONLY else (c['bpm'] * m0 + c['prior'] * K) / (m0 + K)
-        b_rest = gauss(rng, mean, TAU * math.sqrt(K / (m0 + K)) + (TAU * math.sqrt(K / mr) if mr > 0 else 0))
+        pk = K if SEASON_ONLY else c['pk']       # conviction: this season's own rate, the noise as before
+        mean = c['bpm'] if SEASON_ONLY else (c['bpm'] * m0 + c['prior'] * pk) / (m0 + pk)
+        b_rest = gauss(rng, mean, TAU * math.sqrt(pk / (m0 + pk)) + (TAU * math.sqrt(K / mr) if mr > 0 else 0))
         bpm = (c['bpm'] * m0 + b_rest * mr) / max(m0 + mr, 1)
         pp0 = c['pp0'] if c['pp0'] is not None else .6 * c['ppg'] + 4
         p_rest = gauss(rng, c['ppg'] if SEASON_ONLY else (c['ppg'] * c['gp'] + pp0 * 10) / (c['gp'] + 10), 3.0 * math.sqrt(10 / (c['gp'] + 10)))
@@ -861,6 +892,9 @@ def espn_pool(lg, S):
     return pool
 
 
+LEFT_BLEND, LEFT_G0 = ('pass_y', 'scrim', 'td', 'sacks'), 8
+
+
 def football_draw(teams, per_left, sport):
     def teams_draw(rng):
         return team_draws(teams, rng)
@@ -876,6 +910,14 @@ def football_draw(teams, per_left, sport):
         if PACE_GP and c['f'].get('gp'): gn = max(min(c['f']['gp'], gn), 1)
         for k, kind in per_left:
             rate = c['f'][k] / gn
+            if LEFT_K and (c.get('prev') or {}).get(k) is not None: rate = (c['f'][k] + LEFT_K * c['prev'][k]) / (gn + LEFT_K)
+            if not SEASON_ONLY and k in LEFT_BLEND and 'p17' in c['f']:
+                # games left at the predictive rate: this season's rate a team game blended with last season's by
+                # LEFT_G0 games, no last season = 85% of this one (held out 2016-25 from week 9: t -9.4, 10 of 10
+                # seasons, each of the four stats better; scripts/research/ctx_nov27/nfl/r4_awards.py). Conviction
+                # (SEASON_ONLY) and the college draw keep this season's own rate
+                prior = c['f'].get('p17_' + k) if c['f']['p17'] else None
+                rate = (rate * gn + (.85 * rate if prior is None else prior) * LEFT_G0) / (gn + LEFT_G0)
             mu = rate * gr
             sdv = math.sqrt(max(mu, 0)) if kind == 'count' else .3 * mu
             f[k] = c['f'][k] + (gauss(rng, mu, abs(sdv)) if k == 'svar' else max(gauss(rng, mu, sdv), 0))
@@ -1065,6 +1107,8 @@ def nfl_enrich(fit, cands, tmap, S):
         f.update(prev_gp=float((pv.get(c['id']) or {}).get('gene.gamesPlayed') or 0), prev_yds=q['yds'],
                  prev_def=q['sacks'] + q['dint'], prev_ap=float(ap.get(NM.key(c['n']), 0)),
                  prev_dpoy=float(dpw.get(NM.key(c['n']), 0)), drank=float(rk.get(ab, 16)))
+        f['p17'] = 1.0 if f['prev_gp'] > 0 else 0.0          # last season's line a team game, for the games-left rate
+        for k in LEFT_BLEND: f['p17_' + k] = q[k] / 17
 
 
 nfl_enrich.games = []

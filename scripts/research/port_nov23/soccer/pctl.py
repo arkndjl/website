@@ -37,6 +37,8 @@ def frames(tgt):
     cols = SP.PROJ_COLS
     ix = {'age': ['one', 'g0', 'p1', 'lm0', 'a', 'a2', 'am']}
     ix['agepos'] = ix['age'] + ['d', 'm', 'fw', 'ad', 'am_', 'af']
+    ix['agepossv'] = ix['agepos'] + ['ps1']
+    SV = PR.season_sv()
     ix = [cols.index(c) for c in ix[form]]
     last = 2025 if tgt == '1y' else 2023
     out = {}
@@ -54,7 +56,8 @@ def frames(tgt):
                 y = nxt[p][1] if tgt == '1y' else sum(SF.get(S + k, {}).get(p, [0, 0.0])[1] for k in (1, 2, 3))
                 x1, x2 = SF.get(S - 1, {}).get(p), SF.get(S - 2, {}).get(p)
                 pr = [(x1 or [0, 0.0])[0], (x1 or [0, 0.0])[1], (x2 or [0, 0.0])[0], (x2 or [0, 0.0])[1]]
-                X.append(SP.proj_x(mn, g, pos, SP.age_on(S, dob[p]), pr, max(fl[lg], 0.05)))
+                sv = (SV[S - 1].get(p, 0.0) if x1 else 0.0) + (SV[S - 2].get(p, 0.0) if x2 else 0.0)
+                X.append(SP.proj_x(mn, g, pos, SP.age_on(S, dob[p]), pr, max(fl[lg], 0.05), sv))
                 Y.append(y); SS.append(S); POS.append(pos)
         X, Y, SS = np.array(X), np.array(Y), np.array(SS)
         pred = np.zeros(len(Y))

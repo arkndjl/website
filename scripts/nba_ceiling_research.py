@@ -4,7 +4,7 @@
 
 Rows: player-seasons 2010-25 with 300+ MP and 1,000+ MP the next season. Target = next season's raw XPM
 (static/data/nba-xpm), weight = next season's MP; usage and shot profile from the LAKER history.
-Base: shrunk XPM (the board's sxpm), age, age^2, ln MP; ceiling = mean + the 80th percentile of residuals.
+Base: shrunk XPM (sx0, the Nov 4 shrink; the board's sxpm is pXPM since Nov 24), age, age^2, ln MP; ceiling = mean + the 80th percentile of residuals.
 Candidates added alone (scripts/breakout_lib.py ceiling_tests: pinball loss at .80, held out by season, Holm):
 usage change (dU, dU^2), usage change x context (dU x age, usage, 2P%+, 3PA rate+, sxpm), scaled spread (residual size
 on age, ln MP, |dU|, usage). Writes the 'ceiling' block of data/nba_ceiling_fit.json, which scripts/nba_breakout.py
@@ -44,13 +44,13 @@ def main():
     for (pid, y), a in X.items():
         b = X.get((pid, y + 1))
         la, lb = P.get((pid, y)), P.get((pid, y + 1))
-        if not b or not la or not lb or a['mp'] < 300 or b['mp'] < 1000 or a.get('sxpm') is None or b.get('xpm') is None:
+        if not b or not la or not lb or a['mp'] < 300 or b['mp'] < 1000 or a.get('sx0', a.get('sxpm')) is None or b.get('xpm') is None:
             continue
         rows.append((y + 1, a, b, la, lb))
     S = np.array([r[0] for r in rows], float)
     y = np.array([r[2]['xpm'] for r in rows], float)
     w = np.array([r[2]['mp'] for r in rows], float)
-    sx = np.array([r[1]['sxpm'] for r in rows], float)
+    sx = np.array([r[1].get('sx0', r[1]['sxpm']) for r in rows], float)      # sx0: the Nov 4 shrink the build serves (pXPM here: t 1.34, Nov 27)
     age = np.array([r[1]['age'] or 25 for r in rows], float)
     lmp = np.log([r[1]['mp'] for r in rows])
     u = np.array([r[3]['usage_pct'] for r in rows], float)

@@ -1,0 +1,70 @@
+{
+ "C_xgap_marcel_gap": {
+  "pairs": 1262,
+  "hpm_gap_2y": {
+   "held": 914,
+   "mse_before": 0.017208,
+   "mse_after": 0.01673,
+   "t": -2.41,
+   "won": 9,
+   "seasons": 10
+  },
+  "gar60_gap_2y": {
+   "held": 914,
+   "mse_before": 0.11893,
+   "mse_after": 0.111595,
+   "t": -3.72,
+   "won": 9,
+   "seasons": 10
+  },
+  "coef": {
+   "a": -0.02132,
+   "b": 0.7246,
+   "c": 0.00953,
+   "d": 0.12716
+  },
+  "p": 0.0081,
+  "pass": true,
+  "backup_age_refit": {
+   "n": 1262,
+   "held": 914,
+   "seasons": [
+    2011,
+    2024
+   ],
+   "mse_gap": 0.0214,
+   "mse_age": 0.01721,
+   "t": -6.79,
+   "a": -0.01878,
+   "b": 0.83064,
+   "c": 0.01016,
+   "sd": 0.08943
+  },
+  "backup_age_live": {
+   "a": -0.0157,
+   "b": 0.8147,
+   "c": 0.01132,
+   "unit": "year",
+   "src": "fit",
+   "n": 1158,
+   "held": 840,
+   "seasons": [
+    2011,
+    2024
+   ],
+   "t": -7.76
+  },
+  "p_holm": 0.0162
+ },
+ "D_awards_newcomer_mean": {
+  "seasons": 14,
+  "rows": 563,
+  "mse_before": 1.2565,
+  "mse_after": 1.2806,
+  "t": -1.49,
+  "p": 0.9198,
+  "won": 4,
+  "pass": false,
+  "p_holm": 0.9198
+ }
+}

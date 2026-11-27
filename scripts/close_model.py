@@ -102,15 +102,34 @@ PRICE = -110
 
 # ---------------------------------------------------------------- rows and cells (stdlib)
 
-def tier(sport, g, conf):
+# sports whose past games take the tier of their own season (games_picks.conf_hist) in place of today's conference map.
+# Context audit Nov 27 2026, pre-registered test in scripts/research/ctx_nov27/cross (T2), held-out squared error of the
+# line move with held rows on as-it-stood tiers either way: CBB spread -7.3 (t -1.2), total -22.3 (t -3.1), on. CFB
+# spread +1.6 (t .1), total -4.9 (t -1.7): not better in both markets, stays on today's map.
+TIER_THEN = {'cbb'}
+POWER_THEN = {'cfb': {'Pac-12': 2023}, 'cbb': {'P12': 2024}}
+
+
+def tier(sport, g, conf, then=None):
+    """then: (home conference, away conference, ...) as the game's own season had them, or None for today's map"""
+    cs = list(then[:2]) if then else [conf.get(t) for t in (g['home'], g['away'])]
+    S = g.get('S') or 9999
     if sport == 'cfb':
         if g.get('fcs'):
             return 'FCS'
-        return 'P4' if all(conf.get(t) in P4 or t == 'Notre Dame' for t in (g['home'], g['away'])) else 'G5'
+        hi = lambda c, t: c in P4 or t == 'Notre Dame' or (then is not None and S <= POWER_THEN['cfb'].get(c, 0))
+        return 'P4' if all(hi(c, t) for c, t in zip(cs, (g['home'], g['away']))) else 'G5'
     if sport == 'cbb':
-        cs = [conf.get(t) for t in (g['home'], g['away'])]
-        return 'high' if any(c in CBB_HIGH for c in cs) else 'mid' if any(c in CBB_MID for c in cs) else 'low'
+        hi = lambda c: c in CBB_HIGH or (then is not None and S <= POWER_THEN['cbb'].get(c, 0))
+        return 'high' if any(hi(c) for c in cs) else 'mid' if any(c in CBB_MID for c in cs) else 'low'
     return None
+
+
+def tier_hist(sport):
+    if sport not in TIER_THEN:
+        return {}
+    import games_picks
+    return games_picks.conf_hist(sport)
 
 
 def phase(sport, g):
@@ -170,10 +189,11 @@ def load(sport):
             d = local_day(g['date']) - datetime.timedelta(days=1)
             g['_b2b'] = int(d in played.get(g['home'], ()) or d in played.get(g['away'], ()))
     out = []
+    th = tier_hist(sport)
     for g in rows:
         if g.get('Lo') is None or g.get('L') is None or g.get('m') is None or g['S'] not in SPEC[sport]['tune'] + SPEC[sport]['held']:
             continue
-        g['_tier'] = tier(sport, g, conf)
+        g['_tier'] = tier(sport, g, conf, th.get(str(g.get('id'))))
         out.append(g)
     return out
 

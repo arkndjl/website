@@ -166,8 +166,8 @@ def soccer(ix):
         i = logos.get(team)
         return f'/img/soccer/{i}.png' if i else None
     if d:
-        print('soccer players', ix.add('arkboard-soccer', 'GAR leaders',
-                                       [(p['n'], sub(p.get('pos'), p.get('team')), logo(p.get('team')), p.get('gar'), None) for p in d.get('players') or []]))
+        print('soccer players', ix.add('arkboard-soccer', 'SVAR leaders',
+                                       [(p['n'], sub(p.get('pos'), p.get('team')), logo(p.get('team')), p.get('svar') if p.get('svar') is not None else p.get('gar'), None) for p in d.get('players') or []]))
     g = load('data/soccer_games.json')
     if g:
         print('soccer teams', ix.add('arkboard-soccer', 'ARK Ranking',

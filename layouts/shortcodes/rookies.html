@@ -207,7 +207,7 @@
       // gfx: the file names the GFX's columns after the view (CFB true freshmen: Stat+, xNIL), a dash where a row has none
       if (D.gfx) gc = ['RK', 'Player', kl].concat(D.gfx.filter(function (k) { return k !== key && has(k); }).map(lab).filter(Boolean));
       if (D.title === 'next up') {   // next up: age, best so far, then the current value and its ceiling (or the workload)
-        gc = ['RK', 'Player', kl, 'Pos'].concat(['yr'].map(lab).filter(Boolean), ['Age'], ['mpg', 'snp', 'snpg', 'fv', 'xpm', 'splus', 'war', 'pg90'].map(lab).filter(Boolean)).concat((lab('xc') ? ['best', 'x', 'xc'] : ['best', 'u']).map(lab).filter(function (l) { return l && l !== kl; }));
+        gc = ['RK', 'Player', kl, 'Pos'].concat(['yr'].map(lab).filter(Boolean), ['Age'], ['mpg', 'snp', 'snpg', 'fv', 'xpm', 'splus', 'war', 'pxp', 'pg90'].map(lab).filter(Boolean)).concat((lab('xc') ? ['best', 'x', 'xc'] : ['best', 'u']).map(lab).filter(function (l) { return l && l !== kl; }));
       }
       win.dataset.gfxCols = gc.join(',');
       var t = D.asof ? new Date(D.asof.length === 10 ? D.asof + 'T12:00Z' : D.asof) : null;

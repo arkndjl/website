@@ -97,7 +97,7 @@
         case 'pnS': return r.pre != null ? (r.pre > 0 ? 'dressed for ' + Math.round(r.pre * 100) + '% of his NHL team\'s preseason games' : 'no NHL preseason games') + ' since that season' : 'NHL preseason games';
         case 'comp': return 'past picks with his profile ' + (up ? 'beat' : 'fell short of') + ' their stage grade' +
           (r.comps && r.comps.length ? ' (nearest: ' + r.comps.map(function (c) { return c[0] + ' ' + c[1] + ', FV ' + c[2]; }).join('; ') + ')' : '');
-        case 'war': return (r.war != null ? sgn(r.war, 2) : '0') + ' NHL WAR so far';
+        case 'war': return (r.war != null ? sgn(r.war, 2) : '0') + ' NHL pWAR so far';
         case 'wjc': return up ? 'made the World Juniors roster' : 'no World Juniors spot';
         case 'progp': return (r.progp || 0) + ' pro games last season';
         case 'nhgrow': return 'NHLe ' + (r.nh0 != null ? f1(r.nh0) : '-') + ' in his draft year to ' + (r.nhle != null ? f1(r.nhle) : '-') + ' last season';

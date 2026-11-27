@@ -263,6 +263,20 @@ def weight(n, k):
     return n / (n + k) if n and n > 0 else 0.0
 
 
+def pxn_of(pre, now, w, team_g, full_games):
+    """pXPM after this season (the board form's projection of next season: Transfer%, landing and the team builder are
+    fit on it, scripts/cbb_market_fit.py rate()). pre = what the preseason board had (his pXPM through last season, a
+    newcomer's xXPM), now = pXPM on his career with this season's line (cbb_fit.features on next_career: pxpm2), w = the
+    in-season weight of the line. The weight reaches 1 with the team's last game, where the number is the fit's own form.
+    scripts/research/ctx_nov27/cbb (h1, h2): at season end against the xXPM those models were served, next-season rXPM
+    RMSE 2.570 -> 2.443 (11/11 pairs, t 29.6), Transfer% held-out log loss .8988 -> .8862 (t 6.4, AUC .704 -> .725),
+    landing top 10 15.3% -> 16.5% (t 7.5)"""
+    if now is None: return pre
+    if pre is None: return now
+    w2 = 1 - (1 - w) * (1 - min(1.0, team_g / max(1.0, full_games)))
+    return (1 - w2) * pre + w2 * now
+
+
 # ---------------------------------------------------------------- the preseason board, frozen for the season
 def pack(seasons):
     rnd = lambda v: round(v, 5) if isinstance(v, float) else v
@@ -648,6 +662,7 @@ def unboarded(lines, used, prior, ci, fit, lf, full_games, season_label, emap):
                      ('links', {'bt': f"https://barttorvik.com/playerstat.php?year={SEASON}&p={ln['name'].replace(' ', '%20')}&t={ln['team'].replace(' ', '%20')}"})):
             if c in ci: row[ci[c]] = v
         out.append({'row': row, 'e': e1, 'p': w * p1, 'parts': parts, 'fvx': max(float(F.FLOOR), min(80.0, fvx)), 'prov': pre,
+                    'pxn': pxn_of(f_pre['pxpm2'] if hc and f_pre.get('pxpm2') is not None else xb0, f_now.get('pxpm2'), w, ln['team_g'], full_games),
                     'xbpm': (xn * ln['n'] + rate * n_ros) / (ln['n'] + n_ros) if ln['n'] + n_ros > 0 else rate,
                     'w': w, 'f': f_now, 'cc': cc, 'now': show_line(ln, season_label, len(cc['seasons']) if hc else 0), 'src': 'bt', 'seas': next_career(cc, ln)['seasons']})
     print(f"{len(out)} players in this season's box scores are not on the preseason board: graded from the 20 floor "
@@ -691,8 +706,9 @@ def main():
         e0, p0, parts0 = score(f_pre, fit)
         xb0 = xbpm_of(f_pre, fit)
         ln = lines.get(pid) if pid else None
+        px0 = xb0 if f_pre['newcomer'] or f_pre.get('pxpm2') is None else f_pre['pxpm2']
         rec = {'row': list(row), 'e': e0, 'e_pre': e0, 'p': p0, 'parts': parts0, 'xbpm': xb0, 'xb0': xb0, 'w': 0.0, 'f': f_pre, 'cc': cc, 'now': None, 'bdg': bd,
-               'seas': cc['seasons']}
+               'seas': cc['seasons'], 'pxn': px0}
         if ln:
             used.add(pid)
             if not ln.get('role'):
@@ -718,6 +734,7 @@ def main():
             rec['seas'] = next_career(cc, ln)['seasons']   # npos reads minutes played, not the full-season projection
             rec.update(e=(1 - w) * e0 + w * e1, p=(1 - w) * p0 + w * p1, parts=[(k, v, x) for k, (v, x) in mix.items()],
                        xbpm=(xn * ln['n'] + rate * n_ros) / (ln['n'] + n_ros) if ln['n'] + n_ros > 0 else rate,
+                       pxn=pxn_of(px0, f_now.get('pxpm2'), w, ln['team_g'], full_games),
                        w=w, f=f_now if w >= 0.5 else f_pre, now=show_line(ln, season_label, len(cc['seasons'])))
         recs.append(rec)
     # the board stage: where the draft boards have him (cbb_fit.board_stage), on top of the blended E[FV]
@@ -763,7 +780,8 @@ def main():
     # fvd: the FV outlook (scripts/fv_dist.py); fvg: the grade; bdg: badges; e: E[FV] after the stages (the FV inputs add up to it)
     # xb0: preseason xBPM under today's model (the breakouts tab's baseline, scripts/cbb_tabs.py)
     # npos: projected NBA position (scripts/cbb_nbapos.py, display only): odds at PG..C, expected position, change flag
-    add = [c for c in ('fvd', 'fvg', 'bdg', 'e', 'xb0', 'fv0', 'npos', 'mht', 'mwt', 'msrc') if c not in ci]
+    # pxn: pXPM after this season (pxn_of), the market models' input
+    add = [c for c in ('fvd', 'fvg', 'bdg', 'e', 'xb0', 'fv0', 'npos', 'mht', 'mwt', 'msrc', 'pxn') if c not in ci]
     meas = measurer()
     out_cols = cols + ['now', 'w', 'src'] + add
     out = []
@@ -782,7 +800,8 @@ def main():
         bt_hti = next((q.get('hti') for q in reversed(sz) if q.get('year', SEASON) < SEASON and q.get('hti')), None)
         mht, mwt, msrc = meas(row[ci['name']], row[ci['team']], row[ci['ht']], row[ci['wt']], bt_hti)
         new = {'mht': mht, 'mwt': mwt, 'msrc': msrc, 'fvd': fvd, 'fvg': r['fvg'], 'bdg': r.get('bdg'), 'e': None if r.get('src') == 'bt' else round(float(r['e']), 2),
-               'xb0': round(float(r['xb0']), 1) if r.get('xb0') is not None else None, 'npos': NPOS.describe(r['seas'], pos, row[ci['name']]),
+               'xb0': round(float(r['xb0']), 1) if r.get('xb0') is not None else None,
+               'pxn': round(float(r['pxn']), 2) if r.get('pxn') is not None and r['pxn'] == r['pxn'] else None, 'npos': NPOS.describe(r['seas'], pos, row[ci['name']]),
                'fv0': (r['fv'] if not r['w'] else r['fv0']) if r.get('fv0') is not None else None}
         for c in new:
             if c in ci: row[ci[c]] = new[c]

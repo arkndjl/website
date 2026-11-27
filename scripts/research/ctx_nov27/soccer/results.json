@@ -1,0 +1,387 @@
+{
+ "T1": {
+  "n": 9509,
+  "seasons": [
+   2016,
+   2024
+  ],
+  "own": {
+   "held": 7365,
+   "mse_control": 0.002422,
+   "mse_pg90": 0.002415,
+   "t": -0.3,
+   "seasons_better": "2/7",
+   "r_control": 0.5003,
+   "r_pg90": 0.5356
+  },
+  "guard_sv": {
+   "held": 7365,
+   "mse_control": 0.002685,
+   "mse_pg90": 0.002679,
+   "t": -0.33,
+   "seasons_better": "3/7",
+   "r_control": 0.3725,
+   "r_pg90": 0.4218
+  },
+  "pass": false
+ },
+ "T2": {
+  "1y": [
+   {
+    "f": 0.25,
+    "n": 12273,
+    "rmse": {
+     "control": 1.5157,
+     "T2a_add": 1.5021,
+     "T2b_swap": 1.5022
+    },
+    "slope": {
+     "control": 0.997,
+     "T2a_add": 0.997,
+     "T2b_swap": 0.997
+    },
+    "T2a_add": {
+     "t": -3.79,
+     "won": "9/9"
+    },
+    "T2b_swap": {
+     "t": -3.2,
+     "won": "9/9"
+    }
+   },
+   {
+    "f": 0.5,
+    "n": 13668,
+    "rmse": {
+     "control": 1.4227,
+     "T2a_add": 1.4142,
+     "T2b_swap": 1.4141
+    },
+    "slope": {
+     "control": 0.998,
+     "T2a_add": 0.998,
+     "T2b_swap": 0.998
+    },
+    "T2a_add": {
+     "t": -3.27,
+     "won": "8/9"
+    },
+    "T2b_swap": {
+     "t": -2.89,
+     "won": "8/9"
+    }
+   },
+   {
+    "f": 0.75,
+    "n": 14253,
+    "rmse": {
+     "control": 1.3684,
+     "T2a_add": 1.363,
+     "T2b_swap": 1.3628
+    },
+    "slope": {
+     "control": 0.998,
+     "T2a_add": 0.998,
+     "T2b_swap": 0.998
+    },
+    "T2a_add": {
+     "t": -2.38,
+     "won": "9/9"
+    },
+    "T2b_swap": {
+     "t": -2.15,
+     "won": "9/9"
+    }
+   },
+   {
+    "f": 1.0,
+    "n": 15078,
+    "rmse": {
+     "control": 1.3104,
+     "T2a_add": 1.3054,
+     "T2b_swap": 1.3052
+    },
+    "slope": {
+     "control": 0.999,
+     "T2a_add": 0.998,
+     "T2b_swap": 0.999
+    },
+    "T2a_add": {
+     "t": -2.56,
+     "won": "8/9"
+    },
+    "T2b_swap": {
+     "t": -2.69,
+     "won": "8/9"
+    }
+   }
+  ],
+  "3y": [
+   {
+    "f": 0.25,
+    "n": 9642,
+    "rmse": {
+     "control": 3.9944,
+     "T2a_add": 3.9687,
+     "T2b_swap": 3.9706
+    },
+    "slope": {
+     "control": 0.997,
+     "T2a_add": 0.997,
+     "T2b_swap": 0.997
+    },
+    "T2a_add": {
+     "t": -3.33,
+     "won": "7/7"
+    },
+    "T2b_swap": {
+     "t": -2.41,
+     "won": "7/7"
+    }
+   },
+   {
+    "f": 0.5,
+    "n": 10725,
+    "rmse": {
+     "control": 3.7522,
+     "T2a_add": 3.7369,
+     "T2b_swap": 3.7377
+    },
+    "slope": {
+     "control": 0.998,
+     "T2a_add": 0.998,
+     "T2b_swap": 0.998
+    },
+    "T2a_add": {
+     "t": -2.87,
+     "won": "7/7"
+    },
+    "T2b_swap": {
+     "t": -2.1,
+     "won": "7/7"
+    }
+   },
+   {
+    "f": 0.75,
+    "n": 11080,
+    "rmse": {
+     "control": 3.6348,
+     "T2a_add": 3.6261,
+     "T2b_swap": 3.6269
+    },
+    "slope": {
+     "control": 0.998,
+     "T2a_add": 0.998,
+     "T2b_swap": 0.998
+    },
+    "T2a_add": {
+     "t": -2.39,
+     "won": "7/7"
+    },
+    "T2b_swap": {
+     "t": -1.53,
+     "won": "6/7"
+    }
+   },
+   {
+    "f": 1.0,
+    "n": 11787,
+    "rmse": {
+     "control": 3.4999,
+     "T2a_add": 3.4911,
+     "T2b_swap": 3.4909
+    },
+    "slope": {
+     "control": 0.998,
+     "T2a_add": 0.998,
+     "T2b_swap": 0.998
+    },
+    "T2a_add": {
+     "t": -2.4,
+     "won": "7/7"
+    },
+    "T2b_swap": {
+     "t": -2.08,
+     "won": "6/7"
+    }
+   }
+  ],
+  "T2a_add_pass": true,
+  "T2b_swap_pass": true
+ },
+ "T4": {
+  "n": 10270,
+  "rate": 0.0527,
+  "keep": [
+   "age curve",
+   "low-workload efficiency",
+   "workload scaling",
+   "team move",
+   "club strength",
+   "market value"
+  ],
+  "a_vs_base": {
+   "base": 0.17786,
+   "cand": 0.17106,
+   "gain": 0.006804,
+   "t": 8.76,
+   "won": 11,
+   "seasons": 11
+  },
+  "b_vs_kept": {
+   "base": 0.16256,
+   "cand": 0.1622,
+   "gain": 0.000353,
+   "t": 1.6,
+   "won": 7,
+   "seasons": 11
+  },
+  "pass": false
+ },
+ "T3": {
+  "tune": [
+   {
+    "q": {
+     "av": 0.25,
+     "_avz": "avzpg"
+    },
+    "n": 24463,
+    "base": 0.966038,
+    "d": 4.4e-05,
+    "t": 0.59,
+    "parts": {
+     "big5": {
+      "n": 18168,
+      "d": 0.000146,
+      "t": 1.56
+     },
+     "uefa": {
+      "n": 6295,
+      "d": -0.000249,
+      "t": -2.23
+     }
+    },
+    "seasons_better": "3/10"
+   },
+   {
+    "q": {
+     "av": 0.35,
+     "_avz": "avzpg"
+    },
+    "n": 24463,
+    "base": 0.966038,
+    "d": 5e-06,
+    "t": 0.09,
+    "parts": {
+     "big5": {
+      "n": 18168,
+      "d": 5.7e-05,
+      "t": 0.88
+     },
+     "uefa": {
+      "n": 6295,
+      "d": -0.000146,
+      "t": -2.03
+     }
+    },
+    "seasons_better": "2/10"
+   },
+   {
+    "q": {
+     "av": 0.5,
+     "_avz": "avzpg"
+    },
+    "n": 24463,
+    "base": 0.966038,
+    "d": 1.4e-05,
+    "t": 0.24,
+    "parts": {
+     "big5": {
+      "n": 18168,
+      "d": 1e-06,
+      "t": 0.02
+     },
+     "uefa": {
+      "n": 6295,
+      "d": 5.1e-05,
+      "t": 0.64
+     }
+    },
+    "seasons_better": "2/10"
+   }
+  ],
+  "pick": null
+ },
+ "T6": {
+  "ballon": {
+   "seasons": 9,
+   "ll_gar": -2.016,
+   "ll_svar": -2.0553,
+   "hit_gar": 5,
+   "hit_svar": 5,
+   "svar_vs_gar": {
+    "n": 9,
+    "gain": -0.0392,
+    "t": -0.85,
+    "wins": 4
+   },
+   "svar_vs_null": {
+    "n": 9,
+    "gain": 1.6508,
+    "t": 3.15,
+    "wins": 7,
+    "p": 0.0068
+   },
+   "pass": false
+  },
+  "seriea": {
+   "blocked": "votes page not fetched (Wikipedia 429)",
+   "seasons": 0
+  },
+  "ligue1": {
+   "seasons": 11,
+   "ll_gar": -0.8675,
+   "ll_svar": -0.797,
+   "hit_gar": 7,
+   "hit_svar": 8,
+   "svar_vs_gar": {
+    "n": 11,
+    "gain": 0.0705,
+    "t": 0.55,
+    "wins": 7
+   },
+   "svar_vs_null": {
+    "n": 11,
+    "gain": 0.4335,
+    "t": 1.31,
+    "wins": 9,
+    "p": 0.1097
+   },
+   "pass": true
+  }
+ },
+ "holm": {
+  "family": [
+   "T1",
+   "T2a",
+   "T2b",
+   "T3",
+   "T4"
+  ],
+  "p": {
+   "T2a": 0.0087,
+   "T2b": 0.0158,
+   "T4": 0.055,
+   "T1": 0.38,
+   "T3": 1.0
+  },
+  "note": "one-sided normal p from the weakest season share (T2: 1Y f .75) / the test t; T3 failed at tune, never run held",
+  "pass": {
+   "T2a": true,
+   "T2b": false,
+   "T4": false,
+   "T1": false,
+   "T3": false
+  }
+ }
+}

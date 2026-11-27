@@ -388,7 +388,7 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
     E('GAR (soccer, senior)', 'Goals above replacement, on one scale across leagues.',
       ['Shrunk per-90 rates (on-ice, npxG, xA, xGBuildup, keeper saves), weighted to next-season team goal difference.',
        'Replacement for each position is the regulars (900+ minutes) on the bottom three sides by goal difference of each finished league-season, pooled, less sides that collapsed: GK -.14, D -.09, M -.05, F .00 a match. League strength counts. Held out R² is .61.',
-       'An average side totals about 26 GAR a season. xMV, 1Y / 3Y and backup watch still read GAR over the earlier line (players under 900 minutes) until they are refit.',
+       'An average side totals about 26 GAR a season. 1Y / 3Y is fit on this line. Backup watch and the injury term of the game model grade on the earlier line (players under 900 minutes), in fit and live alike.',
        'PAR = GAR × points per goal of difference (.626).'],
       'Soccer player value, rookies, backup watch', ['Soccer']),
     E('tGAR (soccer prospects)', 'Team-share goals above replacement: minutes / 90 × (club rating - replacement) / 11.',
@@ -451,7 +451,7 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
                   'Weights fit on the same season (team goal difference, or first half to second half) could not split a side\'s xG between its players. '
                   'The team totals are the same either way, so GAR\'s split is kept.'])(json.load(open(os.path.join(ROOT, 'data', 'soccer_sv_fit.json'))),
                                                          json.load(open(os.path.join(ROOT, 'research', 'soccer_sv_shrink.json')))),
-      'soccer GAR leaders, rookies, all-time players, transactions; conviction awards (Ballon d\'Or pool by SVAR)', ['Soccer']),
+      'soccer SVAR leaders, rookies, all-time players, transactions; conviction awards (Ballon d\'Or pool by SVAR)', ['Soccer']),
     E('GAR / SVAR on FotMob (soccer)', 'The stand-in for soccer GAR and SVAR in a league where Understat is behind the results.',
       (lambda G, q, h, z: ['GAR is built on Understat\'s on-pitch data. When its match files trail a league by a round, that league\'s rows move to FotMob\'s season lists, and move back when Understat is in step.',
                   'A ridge fit per position maps FotMob\'s rates a 90 (npxG, xA, finishing, chances created, shots, passing, defensive actions, match rating, keepers\' goals prevented) and the side\'s xG for and against '
@@ -469,7 +469,7 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
                   'Blended into GAR while Understat is up, it adds nothing to next season (team R² %.3f against %.3f, t %.1f), so it is only the fallback.'
                   % (G['test']['blendUp']['r2Blend'], G['test']['blendUp']['r2Understat'], -G['test']['blendUp']['t'])])(
           *(lambda G: (G, G['test']['freeze']['sv_0.75'], G['test']['freeze']['gar_0.75'], G['test']['freeze']['sv_0.25']))(json.load(open(os.path.join(ROOT, 'data', 'soccer_fm_gar_fit.json'))))),
-      'Soccer GAR leaders, rookies, awards, xMV and projections in a league Understat trails', ['Soccer']),
+      'Soccer SVAR leaders, rookies, awards, xMV and projections in a league Understat trails', ['Soccer']),
     E('Yds+ / YOE (returners)', 'Kick and punt return yards over expected, shrunk.',
       ['YOE is return yards minus the mean return from the same spot (5-yard bins, this season). It uses yards instead of EPA, since EPA doesn\'t repeat.'],
       'special teams tab on NFL and CFB pages', ['NFL', 'CFB']),
@@ -570,8 +570,11 @@ sections.append({'id': 'players', 'title': 'Player odds and projections', 'entri
        'CEIL held-out t (pinball .80): NBA 3.9, CBB 6.1, NHL 6.0, soccer 9.3. Coverage is 79-80% of workload-up seasons.'],
       'next up tab', ['NBA', 'CBB', 'NHL', 'Soccer', 'NFL']),
     E('Backup watch / xGap', 'Second and third-string players who grade above a starter.',
-      ['Gap = backup value - starter value (FV in college; WAR, pXPM, HPM or GAR in the pros). College players are listed at a gap >= 3.',
-       'They are ranked by xGap, the gap projected over two seasons with the age (or class) gap added. Held out t = -3.0 to -15.6.'],
+      ['Gap = backup value - starter value (WAA and BPM with pXPM in college; WAR, pXPM, HPM or GAR in the pros).',
+       'They are ranked by xGap, the gap projected over two seasons with the age (or class) gap added. Held out t = -3.0 to -15.6.',
+       'NFL xGap projects from the pXP/60 gap on its own fit of 2,457 pairs: held out squared error .0429 to .0375, t 5.1, 5 of 5.',
+       'NHL adds the Marcel GAR a 60 gap (t -2.4, 9 of 10) and soccer the p/90 gap (t -5.9, 7 of 7) beside the grade gap.',
+       'NBA grades are pXPM: next season XPM error 1.301 to 1.185, t 13, 15 of 15. With pXPM already aged, its age term drops out.'],
       'backup watch tab on every sport page', ['CFB', 'CBB', 'NFL', 'NBA', 'NHL', 'Soccer']),
     E('Comps', 'The nearest historical profiles, shown in the player dropdown.',
       ['CFB uses the nearest 2014-22 profiles. Hockey stage 3-4 comps also feed FV (they passed held out). Everywhere else they are display only.'],

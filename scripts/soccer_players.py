@@ -38,12 +38,13 @@ half's: Nov 27 2026, scripts/soccer_repl_research_nov27.py; repl_line: what a re
 in progress is not in it, so the line holds still through a season); GAR = (value - replacement) x matches of minutes; PAR = GAR x league points
 per goal of difference (a team-season regression). The line before it (replFringe: players with 90-899 minutes, every
 season) sat at about the league median; the fits trained on it still read GAR on it through gar_fringe() until they
-are refit (xMV, the projections, backup watch, the game model's injury term).
+are refit (backup watch, the game model's injury term; the projections were refit on the Nov 27 line, xMV on the
+Nov 9 bottom-three line: rerun soccer_mv.py --snaps and --fit with the Transfermarkt dump to move it onto Nov 27's).
 SV / SVAR (scripts/soccer_sv.py, data/soccer_sv_fit.json): the season-only value, GAR's weights on this season's inputs
 alone (an xG plus-minus over this season's spells, rapm_window span 0) plus finishing and keeper saves shrunk to the league average (split-half k).
 Projections (pj = GAR next season, p3 = GAR over the next three, 0 for a season out of the big five): OLS on the season
-so far at full-season pace, the two seasons before pooled per 90, minutes, age and position, per share of the season
-played (scripts/soccer_proj_research.py -> data/soccer_proj_fit.json).
+so far at full-season pace, the two seasons before pooled per 90 (GAR, and SVAR beside it: Nov 27 2026), minutes, age
+and position, per share of the season played (scripts/soccer_proj_research.py -> data/soccer_proj_fit.json).
 """
 import datetime as dt
 import gzip
@@ -904,7 +905,7 @@ def write(rows, F, ts, all_seasons=False):
 # ---------------------------------------------------------------- projection (scripts/soccer_proj_research.py)
 PROJ_FIT = os.path.join(ROOT, 'data', 'soccer_proj_fit.json')
 PROJ_K, PROJ_A0 = 900, 26
-PROJ_COLS = ['one', 'g0', 'p1', 'lm0', 'a', 'a2', 'am', 'd', 'm', 'fw', 'ad', 'am_', 'af']
+PROJ_COLS = ['one', 'g0', 'p1', 'lm0', 'a', 'a2', 'am', 'd', 'm', 'fw', 'ad', 'am_', 'af', 'ps1']
 
 
 def age_on(S, dob):
@@ -927,14 +928,16 @@ def proj_dobs():
     return out
 
 
-def proj_x(mn, g, pos, age, prior, f):
+def proj_x(mn, g, pos, age, prior, f, sv=0.0):
     """projection inputs: minutes and GAR so far in the season, position, age, prior = [min, GAR] of S-1 then S-2,
-    f = share of the league's season played"""
+    f = share of the league's season played, sv = SVAR of S-1 and S-2 summed (ps1: the season-only value of the two
+    seasons before, pooled and shrunk like the GAR prior; scripts/research/ctx_nov27/soccer T2a)"""
     m0, g0 = mn / f, g / f
     P = (prior[1] + prior[3]) / (prior[0] + prior[2] + PROJ_K) * 90
     a = age - PROJ_A0
     d, m, fw = pos == 'D', pos == 'M', pos == 'F'
-    return [1.0, g0, P * m0 / 90, math.log1p(m0), a, a * a / 10, a * m0 / 900, d, m, fw, a * d, a * m, a * fw]
+    return [1.0, g0, P * m0 / 90, math.log1p(m0), a, a * a / 10, a * m0 / 900, d, m, fw, a * d, a * m, a * fw,
+            sv / (prior[0] + prior[2] + PROJ_K) * m0]
 
 
 def attach_age(S, out, dob=None):
@@ -978,10 +981,10 @@ def proj_attach(S, out, cur_f=None):
     dob = proj_dobs()
     prev = []
     for k in (1, 2):
-        m = defaultdict(lambda: [0, 0.0])
+        m = defaultdict(lambda: [0, 0.0, 0.0])
         try:
             for o in json.load(open(os.path.join(SDIR, f'{S - k}.json')))['players']:
-                m[o['p']][0] += o['min']; m[o['p']][1] += gv(o)
+                m[o['p']][0] += o['min']; m[o['p']][1] += gv(o); m[o['p']][2] += o.get('svar') or 0.0
         except OSError:
             pass
         prev.append(m)
@@ -1006,8 +1009,9 @@ def proj_attach(S, out, cur_f=None):
         mn, g = tot[o['p']]
         lo = longest[o['p']][1]
         f = max((cur_f or {}).get(lo['lg'], 1.0), 0.05)
-        pr = prev[0].get(o['p'], [0, 0.0]) + prev[1].get(o['p'], [0, 0.0])
-        x = proj_x(mn, g, lo['pos'], age_on(S, dob[o['p']]), pr, f)
+        p1, p2 = prev[0].get(o['p'], [0, 0.0, 0.0]), prev[1].get(o['p'], [0, 0.0, 0.0])
+        pr = p1[:2] + p2[:2]
+        x = proj_x(mn, g, lo['pos'], age_on(S, dob[o['p']]), pr, f, p1[2] + p2[2])
         for key, tgt in (('pj', '1y'), ('p3', '3y')):
             c = coef(P[tgt]['grid'], f)
             o[key] = round(sum(u * v for u, v in zip(c, x)), 1)
@@ -1088,6 +1092,10 @@ def backup(rows, F, S):
         print('backup watch ages:', e); dob = {}
     today = dt.date.today()
     age = lambda u: round((today - dt.date.fromisoformat(dob[u][:10])).days / 365.25, 1) if dob.get(u) else None
+    try:                                                  # p/90 for the xGap fit's second gap (backup_age_fit.soccer_fit)
+        pg = {o['p']: o.get('pg90') for o in json.load(open(os.path.join(SDIR, f'{S}.json')))['players']}
+    except (OSError, ValueError, KeyError):
+        pg = {}
     out = []
     for (team, pos), rs in squads.items():
         rs.sort(key=lambda r: -r['min'])
@@ -1102,7 +1110,8 @@ def backup(rows, F, S):
                 out.append({'name': r['n'], 'team': team, 'lg': r['lg'], 'pos': pos, 'str': 2 if i < n else 3,
                             'g': round(g, 2), 'use': r['min'], 'age': age(r['p']),
                             'starter': {'name': low['n'], 'g': round(grade[low['p']], 2), 'use': low['min'], 'age': age(low['p'])},
-                            'gap': round(g - grade[low['p']], 2)})
+                            'gap': round(g - grade[low['p']], 2),
+                            'pgap': round(pg[r['p']] - pg[low['p']], 3) if pg.get(r['p']) is not None and pg.get(low['p']) is not None else None})
     out.sort(key=lambda o: -o['gap'])
     import backup_age
     backup_age.apply('soccer', out)                       # ranked by xGap: the gap two seasons on, with the age gap

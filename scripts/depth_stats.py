@@ -36,7 +36,7 @@ def rows_cfb():
 
 
 def rows_cbb():
-    """the board (FV for everyone on it) with this season's WAR line where he has one"""
+    """the board (FV for everyone on it) with this season's VORX line (key war) where he has one"""
     d = load(os.path.join(DATA, 'cbb-all.json')); c = d['cols']
     board = [dict(zip(c, r)) for r in d['rows']]
     war = load(os.path.join(DATA, 'cbb', 'war.json'))['seasons'][0]['rows']
@@ -66,8 +66,8 @@ SPORTS = {
                 ['p/90', 's2', 'pg90', 'predictive value a 90: SV over three seasons, age over 29']]),
     'cbb': (rows_cbb, 'name', 'team', 'club',
             [['FV', 'i', 'fv', 'FV now'],
-             ['WAR', 's2', 'war', 'wins above replacement this season'],
-             ['Stat+', 'i', 'splus', 'BPM against his position, 100 + 25 z']]),
+             ['VORX', 's2', 'war', 'wins over a replacement player this season, on XPM'],
+             ['Stat+', 'i', 'splus', 'XPM against his position, 100 + 25 z']]),
     'cfb': (rows_cfb, 'name', 'team', 'club',
             [['FV', 'i', 'fv', 'FV now'],
              ['WAR', 's2', 'war', 'wins above replacement this season'],

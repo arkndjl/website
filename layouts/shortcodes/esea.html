@@ -1139,7 +1139,7 @@
 {{- with $d }}{{ with .rankings }}{{ with .teams }}
 {{- partial "wintable-open.html" (dict "title" (printf "S%v rankings" $season) "icon" "crosshair" "filter" "Team" "gfxCols" "#,Team,Standing,W–L,Rounds ±,RWA,ARK,Elo" "gfxDate" (printf "ESEA S%v · %s" $season $syncd) "gfxMax" "25") -}}
 <table class="cfb__table esea-rank">
-  <thead><tr><th title="ARK Ranking: round diff per map .20, team ARK .20, elo .60">#</th><th>Team</th><th title="standing: points, win rate, wins, round differential, rounds won, elo">Standing</th><th>W–L</th><th>Pts</th><th title="round differential">Rounds ±</th><th>Maps</th><th title="team RWA: sum of its five most-used players' RWA this season (round win % added per round); what the match preview compares">RWA</th><th title="team ARK Rating: round-weighted mean of its players' ARK this season">ARK</th><th title="talent = 3 + .7 z(team ARK, shrunk to 1.00 by 4 maps) + .3 z(elo); 1-5 stars">Talent</th><th title="FACEIT elo, top-5 average">Elo</th><th title="power score (z, blended)">Power</th></tr></thead>
+  <thead><tr><th title="ARK Ranking: round diff per map .20, team ARK .20, elo .60">#</th><th>Team</th><th title="standing: points, win rate, wins, round differential, rounds won, elo">Standing</th><th>W–L</th><th>Pts</th><th title="round differential">Rounds ±</th><th>Maps</th><th title="team RWA: sum of the career RWA of its five most-used players this season (round win % added per round); what the match preview compares">RWA</th><th title="team ARK Rating: round-weighted mean of its players' ARK this season">ARK</th><th title="talent = 3 + .7 z(team ARK, shrunk to 1.00 by 4 maps) + .3 z(elo); 1-5 stars">Talent</th><th title="FACEIT elo, top-5 average">Elo</th><th title="power score (z, blended)">Power</th></tr></thead>
   <tbody>
   {{- range sort . "powerRank" }}
   <tr{{ if eq .id "a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a" }} class="is-me"{{ end }}>
@@ -1165,16 +1165,21 @@
        played), by season ARK Rating; 1NT highlighted (data/esea.json rankings.players) */ -}}
 {{- with $d }}{{ with .rankings }}{{ $rk := . }}{{ with .players }}
 {{- $rw := site.Data.esea_rwa }}{{ $rwHead := and $rw (eq $rw.head "rwa") }}
-{{- $rows := slice }}{{ range . }}{{ $pl := . }}{{ $v := -99.0 }}{{ with $rw }}{{ with index .p $pl.id }}{{ $v = float (index . 0) }}{{ end }}{{ end }}{{ $rows = $rows | append (merge $pl (dict "rwa" $v)) }}{{ end }}
+{{- /* a season board reads the season's RWA (esea_rwa.json seasonAll, scripts/esea_rwa.py); career RWA in the hover.
+       Until a file with seasonAll for this season is written, the career rating with its own label */ -}}
+{{- $sa := dict }}{{ with $rw }}{{ with .seasonAll }}{{ if eq (printf "%v" .season) (printf "%v" $season) }}{{ $sa = .p | default dict }}{{ end }}{{ end }}{{ end }}
+{{- $seasonal := gt (len $sa) 0 }}
+{{- $rows := slice }}{{ range . }}{{ $pl := . }}{{ $v := -99.0 }}{{ $cv := -99.0 }}{{ with $rw }}{{ with index .p ($pl.id | default "-") }}{{ $cv = float (index . 0) }}{{ end }}{{ end }}{{ if $seasonal }}{{ with index $sa ($pl.id | default "-") }}{{ $v = float (index . 0) }}{{ end }}{{ else }}{{ $v = $cv }}{{ end }}{{ $rows = $rows | append (merge $pl (dict "rwa" $v "rwaCareer" $cv)) }}{{ end }}
 {{- if $rwHead }}{{ $rows = sort $rows "rwa" "desc" }}{{ end }}
-{{- $rwTh := `<th title="RWA career: round win % added per round, career ESEA league maps, opponent- and division-adjusted; 0 = average Main player">RWA</th>` | safeHTML }}
+{{- $rwTh := (cond $seasonal (printf `<th title="RWA S%v: round win %% added per round, S%v ESEA league maps, opponent- and division-adjusted; 0 = average Main player; hover: career">RWA</th>` $season $season) `<th title="RWA career: round win % added per round, career ESEA league maps, opponent- and division-adjusted; 0 = average Main player">RWA</th>`) | safeHTML }}
 {{- partial "wintable-open.html" (dict "title" (printf "S%v player rankings" $season) "icon" "crosshair" "filter" "Team" "gfxCols" (cond $rwHead "#,Player,Team,Maps,RWA,ARK,K/D,ADR" "#,Player,Team,Maps,ARK,K/D,ADR") "gfxDate" (printf "ESEA S%v · %s" $season $syncd) "gfxMax" "25") -}}
 <table class="cfb__table esea-season esea-prk">
   <thead><tr><th>#</th><th>Player</th><th>Team</th><th>Maps</th>{{ if $rwHead }}{{ $rwTh }}{{ end }}<th title="season ARK Rating as a talent estimate: each stat regressed to the league mean by how fast it stabilises">ARK</th>{{ if and $rw (not $rwHead) }}{{ $rwTh }}{{ end }}<th title="kills per death">K/D</th><th title="kills a round">KPR</th><th title="average damage a round">ADR</th><th title="opening duels won − lost">Entry ±</th><th title="1v1 + 1v2 won">Clutch</th><th title="round MVPs per round">MVP/R</th></tr></thead>
   <tbody>
   {{- range $i, $_ := $rows }}{{ $rv := cond (gt .rwa -98.0) (partial "num.html" (slice "%+.1f" .rwa)) "—" }}
   <tr{{ if eq .tid "a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a" }} class="is-me"{{ end }}><td class="cfb__num">{{ if $rwHead }}{{ add $i 1 }}{{ else }}{{ .rank }}{{ end }}</td><td>{{ if eq .tid "a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a" }}<b>{{ .name }}</b>{{ else }}{{ .name }}{{ end }}</td><td>{{ .team }}</td><td class="cfb__num">{{ .maps }}</td>
-    {{- if $rwHead }}<td class="cfb__num esea-rt" data-v="{{ .rwa }}" data-r="{{ if ge .rwa 2.0 }}hi{{ else if lt .rwa -2.0 }}lo{{ end }}"><b>{{ $rv }}</b></td>{{ end }}
+    {{- $ct := "" }}{{ if and $seasonal (gt .rwaCareer -98.0) }}{{ $ct = printf "RWA career %s" (partial "num.html" (slice "%+.1f" .rwaCareer)) }}{{ end }}
+    {{- if $rwHead }}<td class="cfb__num esea-rt" data-v="{{ .rwa }}" data-r="{{ if ge .rwa 2.0 }}hi{{ else if lt .rwa -2.0 }}lo{{ end }}"{{ with $ct }} title="{{ . }}"{{ end }}><b>{{ $rv }}</b></td>{{ end }}
     <td class="cfb__num esea-rt" data-r="{{ if ge (float .ark) 1.1 }}hi{{ else if lt (float .ark) 0.9 }}lo{{ end }}">{{ if $rwHead }}{{ partial "num.html" (slice "%.2f" (float .ark)) }}{{ else }}<b>{{ partial "num.html" (slice "%.2f" (float .ark)) }}</b>{{ end }}</td>
     {{- if and $rw (not $rwHead) }}<td class="cfb__num" data-v="{{ .rwa }}">{{ $rv }}</td>{{ end }}
     <td class="cfb__num">{{ .kd }}</td><td class="cfb__num">{{ .kpr }}</td><td class="cfb__num">{{ .adr }}</td>

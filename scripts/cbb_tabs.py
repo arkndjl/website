@@ -428,13 +428,13 @@ def main():
              col('waa', 'WAA', 'wins over an average D-I player: XPM x the same minutes and pace', 's2'),
              col('xpm', 'XPM', XT, 's1'), col('oxpm', 'O-XPM', 'offensive XPM', 's1'), col('dxpm', 'D-XPM', 'defensive XPM', 's1'),
              col('splus', 'Stat+', 'XPM against his position, 100 + 25 z', '0'),
-             col('nx', 'Next', "next season's VORX at 31 games, if he plays D-I: from this line (to date: by share of games played), his pXPM, minutes share, class, age, seasons, recruit rank, usage and height", 's2'),
              col('mpg', 'MPG', 'minutes a game'), col('gp', 'G', 'games', 'i'), col('fv', 'FV', 'FV now', 'i')]
-    WK = ('n', 'tm', 'pos', 'age', 'sub', 'ph', 'lo', 'war', 'waa', 'nx', 'xpm', 'oxpm', 'dxpm', 'splus', 'mpg', 'gp', 'fv', 'mp')
+    # Next (next season's VORX, a projection) sits on the pXPM subtab: the leaders tab is this season only (Nov 27 2026, context rule)
+    WK = ('n', 'tm', 'pos', 'age', 'sub', 'ph', 'lo', 'war', 'waa', 'xpm', 'oxpm', 'dxpm', 'splus', 'mpg', 'gp', 'fv', 'mp')
     slim = lambda rows: [{k: r.get(k) for k in WK} for r in rows]
     write('war', {
         'title': 'VORX/XPM leaders', 'key': 'war', 'def': '',
-        'views': [['war', 'VORX', 'wins over replacement'], ['waa', 'WAA', 'wins over average'], ['xpm', 'XPM', 'XPM'], ['oxpm', 'O-XPM', 'offensive XPM'], ['dxpm', 'D-XPM', 'defensive XPM'], ['nx', 'Next', "next season's VORX"]],
+        'views': [['war', 'VORX', 'wins over replacement'], ['waa', 'WAA', 'wins over average'], ['xpm', 'XPM', 'XPM'], ['oxpm', 'O-XPM', 'offensive XPM'], ['dxpm', 'D-XPM', 'defensive XPM']],
         'cols': wcols, 'pos': ['G', 'F', 'C'],
         'min': {'k': 'mp', 'l': 'min ≥', 'def': 0, 'opts': [[0, 'any'], [100, '100'], [300, '300'], [600, '600']]},
         'seasons': [{'s': SEASON, 'l': label(SEASON), 'rows': slim(now_rows)}, {'s': LAST, 'l': label(LAST), 'rows': slim(last_rows), 'mdef': 100}]})
@@ -450,11 +450,12 @@ def main():
         m = (L.get('mpg') or 0) * (L.get('gp') or 0)
         prows.append({'n': r['name'], 'tm': r['team'], 'pos': r['pos'], 'age': age(r), 'sub': r.get('cls') or '', 'ph': r.get('photo'), 'lo': r.get('logo'),
                       'pxpm': r1(px[0]), 'opx': r1(px[1]), 'dpx': r1(px[2]), 'lxpm': lastx.get(pidof.get((r['name'], r['team']))),
-                      'xpm': r1(L.get('xpm')) if m >= 50 else None, 'fv': r['fv'], 'mp': round(m)})
+                      'xpm': r1(L.get('xpm')) if m >= 50 else None, 'fv': r['fv'], 'mp': round(m), 'nx': r1(nx_now.get((r['name'], r['team'])), 2)})
     write('pxpm', {
         'title': 'pXPM', 'key': 'pxpm', 'def': '',
-        'views': [['pxpm', 'pXPM', 'projected XPM'], ['opx', 'O-pXPM', 'projected offensive XPM'], ['dpx', 'D-pXPM', 'projected defensive XPM']],
+        'views': [['pxpm', 'pXPM', 'projected XPM'], ['opx', 'O-pXPM', 'projected offensive XPM'], ['dpx', 'D-pXPM', 'projected defensive XPM'], ['nx', 'Next', "next season's VORX"]],
         'cols': [col('pxpm', 'pXPM', PT, 's1'), col('opx', 'O-pXPM', 'offensive pXPM', 's1'), col('dpx', 'D-pXPM', 'defensive pXPM', 's1'),
+                 col('nx', 'Next', "next season's VORX at 31 games, if he plays D-I: from this line (to date: by share of games played), his pXPM, minutes share, class, age, seasons, recruit rank, usage and height", 's2'),
                  col('lxpm', 'XPM 25-26', 'XPM last season', 's1'), col('xpm', 'XPM now', 'XPM this season (50+ minutes)', 's1'), col('fv', 'FV', 'FV now', 'i')],
         'pos': ['G', 'F', 'C'], 'seasons': [{'s': SEASON, 'l': label(SEASON), 'rows': prows}]})
 
@@ -486,8 +487,10 @@ def main():
                          'bup': r1(xnow(s) - xnow(p)), 'minup': r1(s['mpg'] - p['mpg']), 'usgup': r1(s['usg'] - p['usg']),
                          'warup': r1(s['war'] - p['war'], 2), 'fvup': None, 'fv': r['fv'] if r else None, 'mp': s['mp'], 'pre': None, 'preL': ''})
     write('breakouts', {
-        'title': 'breakouts', 'key': 'xup', 'def': '',
-        'views': [['xup', 'xXPM up', 'live xXPM minus preseason xXPM'], ['over', 'XPM over x', 'XPM minus preseason xXPM'],
+        # standouts is a descriptive tab: it opens on what he has done (XPM to date against the preseason line), the
+        # projection's own move (xXPM up) is a view (Nov 27 2026, context rule)
+        'title': 'breakouts', 'key': 'over', 'def': '',
+        'views': [['over', 'XPM over x', 'XPM minus preseason xXPM'], ['xup', 'xXPM up', 'live xXPM minus preseason xXPM'],
                   ['minup', 'MPG up', 'minutes a game over last season'], ['usgup', 'USG up', 'usage over last season'], ['fvup', 'FV up', 'FV now minus preseason FV'],
                   ['warup', 'VORX up', 'VORX over the season before (2025-26)'], ['bup', 'XPM up', 'XPM over the season before (2025-26)']],
         'cols': [col('xup', 'xXPM up', 'projected XPM now (this season blended in by minutes) minus the preseason projection', 's1'),

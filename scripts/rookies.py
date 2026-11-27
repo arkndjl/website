@@ -278,13 +278,13 @@ def nba():
         'asof': json.load(open(os.path.join(SD, 'nba-xpm', f'{files[-1]}.json'))).get('asof'), 'title': 'rookies', 'key': 'vorx',
         'def': 'rookies: first season on the XPM board. pre-draft FV = the CBB board\'s draft-year FV (college players only); slot = overall pick.',
         'views': [['vorx', 'VORX', 'VORX: wins over replacement, .030 x (XPM + 1.4) x MP / 48'], ['xpm', 'XPM', 'XPM: Cross Plus-Minus, points per 100 over average'],
-                  ['sx', 'pXPM', 'pXPM: predictive XPM, XPM shrunk by minutes toward a role mean'],
+                  ['sx', 'pXPM', 'pXPM: predictive XPM, next season from this season and the two before, aged'],
                   ['r3', '3Y', 'rookie projection: XPM over the next three seasons when he plays, from XPM, age and minutes per 82 games'],
                   ['axpm', 'aXPM', f"age-adjusted XPM: XPM {'-' if ak < 0 else '+'} {abs(ak):.2f} x (age - {a0})"],
                   ['pxpm', 'Proj', 'XPM (proj): this season blended with the preseason prior by minutes (current season)'],
                   ['sur', 'Surplus', 'contract surplus this season: projected VORX x $ per win - salary, $M (current season)']],
         'cols': [col('vorx', 'VORX', 'wins over replacement', '1'), col('xpm', 'XPM', 'XPM: Cross Plus-Minus, points per 100 over average', 's1'),
-                 col('sx', 'pXPM', 'pXPM: predictive XPM, XPM shrunk by minutes toward a role mean', 's1', 1),
+                 col('sx', 'pXPM', 'pXPM: predictive XPM, next season from this season and the two before, aged', 's1', 1),
                  col('r3', '3Y', 'rookie projection: XPM over the next three seasons when he plays, from XPM, age and minutes per 82 games', 's1', 1),
                  col('axpm', 'aXPM', f"age-adjusted XPM: XPM {'-' if ak < 0 else '+'} {abs(ak):.2f} x (age - {a0}), fit on 2010-23 rookies' next three seasons", 's1', 1),
                  col('pxpm', 'Proj', 'XPM (proj): season blended with the prior', 's1', 1), col('oxpm', 'Off', 'offensive XPM', 's1', 1),
@@ -498,8 +498,9 @@ def cfb():
 
 
 # ---------------------------------------------------------------- CBB true freshmen
-def cbb_line(ln):
-    """cbb-all 'now' is the live season line (a dict from cbb_live.show_line); the tab shows it as one short string"""
+def cbb_line(ln, xpm=None):
+    """cbb-all 'now' is the live season line (a dict from cbb_live.show_line); the tab shows it as one short string.
+    xpm: the board's XPM column (rXPM this season, scripts/cbb_tabs.py board_cols), shown in place of BPM when it is there"""
     if not isinstance(ln, dict):
         return ln or ''
     gp = ln.get('gp') or 0
@@ -507,7 +508,9 @@ def cbb_line(ln):
         return ''
     f = lambda x: '0' if not x else f"{x:.1f}".rstrip('0').rstrip('.')
     s = f"{gp} g · {f(ln.get('mpg'))} min · {f(ln.get('ppg'))}/{f(ln.get('rpg'))}/{f(ln.get('apg'))}"
-    if ln.get('bpm') is not None:
+    if xpm is not None:
+        s += f" · XPM {xpm:+.1f}"
+    elif ln.get('bpm') is not None:
         s += f" · BPM {ln['bpm']:+.1f}"
     return s
 
@@ -528,12 +531,13 @@ def cbb():
         rows.append({'n': r['name'], 'tm': r['team'], 'pos': r['pos'], 'age': r.get('age') or r.get('ageEst'), **hw(r.get('ht'), r.get('wt')), 'fv': r['fv'],
                      'xbpm': r.get('xbpm'), 'nbaP': r['nbaP'] * 100 if r.get('nbaP') is not None else None, 'w': r.get('w'),
                      'pre': rec.get('on3rk'), 'preL': f"#{rec['on3rk']}" if rec.get('on3rk') else '', 'pfv': None,
-                     'sub': r.get('conf') or '', 'line': cbb_line(r.get('now')), 'ph': r.get('photo'), 'lo': r.get('logo')})
+                     'sub': r.get('conf') or '', 'line': cbb_line(r.get('now'), r.get('xpm')), 'xpm': r.get('xpm'), 'ph': r.get('photo'), 'lo': r.get('logo')})
     write('cbb', {
         'title': 'true freshmen', 'key': 'fv',
         'def': 'true freshmen: Fr, first year of eligibility. pre = On3 national recruiting rank. season lines join once games start.',
-        'views': [['fv', 'FV', 'FV: mean outcome grade'], ['xbpm', 'xXPM', 'projected XPM this season'], ['nbaP', 'NBA%', 'chance of an NBA career']],
-        'cols': [col('fv', 'FV', 'FV, mean outcome', 'i'), col('xbpm', 'xXPM', 'projected XPM this season', 's1'),
+        'views': [['fv', 'FV', 'FV: mean outcome grade'], ['xpm', 'XPM', 'XPM this season'], ['xbpm', 'xXPM', 'projected XPM this season'],
+                  ['nbaP', 'NBA%', 'chance of an NBA career']],
+        'cols': [col('fv', 'FV', 'FV, mean outcome', 'i'), col('xpm', 'XPM', 'XPM this season', 's1'), col('xbpm', 'xXPM', 'projected XPM this season', 's1'),
                  col('nbaP', 'NBA%', 'chance of an NBA career', 'p', 1), col('w', 'Season wt', 'weight on this season\'s line in the grade', '2', 1),
                  col('line', 'Line', 'season line so far', 's', 1, 0)],
         'pre': {'l': 'Rec', 't': 'On3 national recruiting rank'},
