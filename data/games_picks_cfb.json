@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-27T07:19:57Z",
+ "asof": "2026-11-27T07:58:32Z",
  "recenter": {
-  "week": 0.57
+  "week": 0.56
  },
  "monitor": {
   "clocks": {
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-27",
-  "ageH": -16.7,
+  "ageH": -16.0,
   "stale": false
  },
  "picks": [],
@@ -645,6 +645,22 @@
    "tm": 61.3
   },
   {
+   "id": "401858316",
+   "sport": "cfb",
+   "kick": "2026-11-28T20:30:00.000Z",
+   "home": "Stanford",
+   "away": "SMU",
+   "mk": "total",
+   "side": "under",
+   "line": 61.5,
+   "price": -121.0,
+   "edge": 5.5,
+   "x": null,
+   "why": "total market off",
+   "m": -7.4,
+   "tm": 56.0
+  },
+  {
    "id": "401871062",
    "sport": "cfb",
    "kick": "2026-11-28T20:30:00.000Z",
@@ -659,22 +675,6 @@
    "why": "total market off",
    "m": 1.1,
    "tm": 53.4
-  },
-  {
-   "id": "401864549",
-   "sport": "cfb",
-   "kick": "2026-11-27T20:30:00.000Z",
-   "home": "San Jos\u00e9 State",
-   "away": "North Dakota State",
-   "mk": "spread",
-   "side": "away",
-   "line": -7.5,
-   "price": -116.0,
-   "edge": 4.8,
-   "x": null,
-   "why": "spread market off",
-   "m": -12.3,
-   "tm": 43.5
   }
  ],
  "games": {
@@ -838,7 +838,7 @@
    "mk": "spread",
    "side": "away",
    "line": 2.5,
-   "price": -105.0,
+   "price": -103.0,
    "edge": 1.4,
    "ev": null,
    "units": 0.0,
@@ -874,7 +874,7 @@
    "mk": "spread",
    "side": "home",
    "line": 23.5,
-   "price": -112.0,
+   "price": -116.0,
    "edge": 1.2,
    "ev": null,
    "units": 0.0,
@@ -922,7 +922,7 @@
    "mk": "spread",
    "side": "home",
    "line": 27.5,
-   "price": 107.0,
+   "price": 105.0,
    "edge": 3.6,
    "ev": null,
    "units": 0.0,
@@ -967,11 +967,11 @@
    "state": "off"
   },
   "401862840": {
-   "mk": "spread",
-   "side": "home",
-   "line": -1.5,
-   "price": -119.0,
-   "edge": 2.8,
+   "mk": "total",
+   "side": "under",
+   "line": 57.5,
+   "price": -116.0,
+   "edge": 3.0,
    "ev": null,
    "units": 0.0,
    "home": "UTSA",
@@ -981,9 +981,9 @@
   "401858316": {
    "mk": "total",
    "side": "under",
-   "line": 60.5,
-   "price": -107.0,
-   "edge": 4.5,
+   "line": 61.5,
+   "price": -121.0,
+   "edge": 5.5,
    "ev": null,
    "units": 0.0,
    "home": "Stanford",
@@ -1257,9 +1257,9 @@
   "401864549": {
    "mk": "spread",
    "side": "away",
-   "line": -7.5,
-   "price": -116.0,
-   "edge": 4.8,
+   "line": -8.5,
+   "price": -112.0,
+   "edge": 3.8,
    "ev": null,
    "units": 0.0,
    "home": "San Jos\u00e9 State",
@@ -1294,7 +1294,7 @@
    "mk": "total",
    "side": "under",
    "line": 52.5,
-   "price": -112.0,
+   "price": -116.0,
    "edge": 2.9,
    "ev": null,
    "units": 0.0,
@@ -1511,24 +1511,24 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 31058,
+  "snapshots": 31069,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 6358,
-    "clvRet": -0.0222,
-    "clvT": -13.33,
-    "clv": 0.85,
-    "beat": 0.414,
-    "still": 0.325
+    "clvN": 6360,
+    "clvRet": -0.0218,
+    "clvT": -13.12,
+    "clv": 0.86,
+    "beat": 0.415,
+    "still": 0.331
    },
    {
     "when": "6-24h",
-    "clvN": 714,
+    "clvN": 716,
     "clvRet": -0.0572,
-    "clvT": -22.31,
+    "clvT": -22.32,
     "clv": 0.11,
-    "beat": 0.213,
+    "beat": 0.214,
     "still": 0.584
    },
    {
@@ -6294,7 +6294,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-27T07:19:57Z",
+ "checked": "2026-11-27T07:58:32Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
