@@ -55,6 +55,9 @@ UA = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.3
 NFL_K, NFL_MIN = 300, 50
 NBA_K, NBA_REPL, NBA_MIN, NBA_W = 500, VORX_REP, 50, (1.0, 0.5, 0.25)
 NHL_K, NHL_KG, NHL_MIN, NHL_W = 600, 1500, 100, (1.0, 0.5, 0.25)
+# xGap's second gap (scripts/backup_age_fit.py, Nov 27 2026): Marcel GAR a 60, seasons at 1 / .7 / .5, shrunk to
+# replacement (0) with 1,600 minutes. The grade stays HPM (HPM says who plays; Marcel WAR adds what he produced)
+NHL_MW, NHL_MK = (1.0, 0.7, 0.5), 1600.0
 CBB_K, CBB_REPL, CBB_MIN, CBB_GAP, CBB_W = 240, -6.0, 60, 1.0, (1.0, 0.5)
 NFL_SKIP = {'pk', 'p', 'h', 'pr', 'kr', 'ls'}
 NFL_SLOT = {'qb': 'QB', 'rb': 'RB', 'fb': 'FB', 'wr1': 'WR', 'wr2': 'WR', 'wr3': 'WR', 'te': 'TE', 'lt': 'LT', 'lg': 'LG',
@@ -239,6 +242,8 @@ def depth_rows(charts, grade, team_of, skip=lambda chart, slot: False, slot_name
                    'gap': round(b['g'] - s['g'], 2)}
             if b.get('px') is not None and s.get('px') is not None:      # the predictive rate's gap, where the sport grades carry one
                 row['px'], row['starter']['px'], row['pgap'] = b['px'], s['px'], round(b['px'] - s['px'], 2)
+            if b.get('m') is not None and s.get('m') is not None:
+                row['mgap'] = round(b['m'] - s['m'], 3)       # the gap on the grade's second rate (xGap's d term)
             k = (t, NM.key(nm)); old = out.get(k)
             if old is None or (i, -row['gap']) < (old['str'], -old['gap']):
                 out[k] = row
@@ -400,6 +405,8 @@ def nhl():
             a = acc.setdefault(p['id'], {'n': p['n'], 'tm': p['tm'], 'grp': p['grp'], 'pos': p['pos'], 'num': 0.0, 'den': 0.0, 'toi': 0,
                                          'age': p['age'] + j if p.get('age') is not None else None})
             a['num'] += w * p['toi'] * p['hpm']; a['den'] += w * p['toi']; a['toi'] += p['toi']
+            if p.get('gar') is not None:          # Marcel GAR (descriptive WAR's goals), xGap's second gap
+                a['mn'] = a.get('mn', 0.0) + NHL_MW[j] * p['gar']; a['md'] = a.get('md', 0.0) + NHL_MW[j] * p['toi']
     for p in cur['players']:          # this season's team
         if p['id'] in acc:
             acc[p['id']]['tm'] = p['tm']
@@ -410,8 +417,9 @@ def nhl():
         r, k = repl.get(grp) or 0.0, NHL_KG if grp == 'G' else NHL_K
         p, _ = M.find(nm, team=t)
         if p is None:
-            return {'g': round(r, 3), 'n': 0}       # no NHL minutes yet: the shrink target
-        return {'g': round((p['num'] + k * r) / (p['den'] + k), 3), 'n': round(p['toi']), 'pos': p['pos'], 'age': p['age']}
+            return {'g': round(r, 3), 'n': 0, 'm': 0.0}       # no NHL minutes yet: the shrink target
+        return {'g': round((p['num'] + k * r) / (p['den'] + k), 3), 'n': round(p['toi']), 'pos': p['pos'], 'age': p['age'],
+                'm': p.get('mn', 0.0) / (p.get('md', 0.0) + NHL_MK) * 60}
     charts = [c for c in espn_depth('hockey/nhl') if c[1].lower() in ('default', '')]
     rows = []; n = 0
     for grp, slots in (('F', ('c', 'lw', 'rw')), ('D', ('ld', 'rd')), ('G', ('g',))):

@@ -61,9 +61,10 @@ def rate(by, pid, ys, w, val, use, k, r):
     return (num + k * r) / (den + k)
 
 
-def pro_pairs(S, key, team, grp, shape, nxt, val, use, age, k, repl, w, mn, grade=None):
+def pro_pairs(S, key, team, grp, shape, nxt, val, use, age, k, repl, w, mn, grade=None, extra=None):
     """[(season, gap, age gap, two-season future gap)] for one sport's seasons S. grade(row): the backup watch's own
-    grade where it is not the weighted seasons (NBA: the board's pXPM, point in time in each season's file)"""
+    grade where it is not the weighted seasons (NBA: the board's pXPM, point in time in each season's file);
+    extra(by, pid, y) adds a fifth column, the pair's gap on a second rate (the d term)"""
     by = {y: {key(p): p for p in d['players']} for y, d in S.items()}
     gof = {}
     for d in S.values():
@@ -99,8 +100,19 @@ def pro_pairs(S, key, team, grp, shape, nxt, val, use, age, k, repl, w, mn, grad
                     gb = g(key(b))
                     if use(b) < mn or gb <= gs:
                         continue
-                    out.append((y, gb - gs, age(s, y) - age(b, y), f(key(b)) - f(key(s))))
+                    out.append((y, gb - gs, age(s, y) - age(b, y), f(key(b)) - f(key(s)))
+                               + ((extra(by, key(b), y) - extra(by, key(s), y),) if extra else ()))
     return out
+
+
+def nhl_marcel(by, pid, y, w=(1.0, 0.7, 0.5), K=1600.0):
+    """Marcel GAR a 60 (descriptive WAR's goals over replacement; scripts/backup_watch.py NHL_MW, NHL_MK)"""
+    num = den = 0.0
+    for j, wt in enumerate(w):
+        p = by.get(y - j, {}).get(pid)
+        if p and p.get('gar') is not None and p.get('toi'):
+            num += wt * p['gar']; den += wt * p['toi']
+    return num / (den + K) * 60
 
 
 def cbb_pairs(path, px=False):
@@ -176,10 +188,25 @@ def fit(P, start_after=4):
     if np.mean(e1) > np.mean(e0):          # the age gap makes the held-out seasons worse (NBA on pXPM, which is already aged): gap alone
         b = np.r_[np.linalg.lstsq(X[:, :2], P[:, 3], rcond=None)[0], 0.0]
     sd = float(P[:, 1].std())
-    return {'n': len(P), 'held': len(d), 'seasons': [int(ys[0]), int(ys[-1])], 'mse_gap': round(float(np.mean(e0)), 6),
+    more, b3 = {}, b                  # z (the borrowed terms' units) stays on the gap + age fit
+    if P.shape[1] > 4:                 # the second gap: kept when it cuts the held-out error of gap + age (t <= -2)
+        e2 = []
+        for y in ys[start_after:]:
+            tr, te = P[P[:, 0] + H <= y], P[P[:, 0] == y]
+            if len(tr) < 100 or not len(te):
+                continue
+            b2 = np.linalg.lstsq(np.c_[np.ones(len(tr)), tr[:, [1, 2, 4]]], tr[:, 3], rcond=None)[0]
+            e2 += list((np.c_[np.ones(len(te)), te[:, [1, 2, 4]]] @ b2 - te[:, 3]) ** 2)
+        d2 = np.array(e2) - np.array(e1)
+        t2 = round(float(d2.mean() / (d2.std(ddof=1) / math.sqrt(len(d2)))), 2)
+        more = {'mse_d': round(float(np.mean(e2)), 6), 't_d': t2}
+        if t2 <= -2:
+            b = np.linalg.lstsq(np.c_[np.ones(len(P)), P[:, [1, 2, 4]]], P[:, 3], rcond=None)[0]
+            more['d'] = float(b[3])
+    return {**more, 'n': len(P), 'held': len(d), 'seasons': [int(ys[0]), int(ys[-1])], 'mse_gap': round(float(np.mean(e0)), 6),
             'mse_age': round(float(np.mean(e1)), 6), 't': round(float(d.mean() / (d.std(ddof=1) / math.sqrt(len(d)))), 2),
             'a': float(b[0]), 'b': float(b[1]), 'c': float(b[2]), 'sd': sd,
-            'z': {'a': float(b[0]) / sd, 'b': float(b[1]), 'c': float(b[2]) / sd}}
+            'z': {'a': float(b3[0]) / sd, 'b': float(b3[1]), 'c': float(b3[2]) / sd}}
 
 
 def nfl_pairs(first=2016):
@@ -282,8 +309,31 @@ def live_sd(sport):
     return float(np.std([r['gap'] for r in rows])) if len(rows) > 2 else None
 
 
+def nhl_fit():
+    nhl = seasons('nhl-war')
+    return fit(pro_pairs(nhl, key=lambda p: p['id'], team=lambda p: p['tm'], grp=lambda p: p['pos'],
+                         shape={'C': 1, 'L': 1, 'R': 1, 'D': 2, 'G': 1}, nxt={},
+                         val=lambda p: p.get('hpm'), use=lambda p: p.get('toi') or 0, age=lambda p, y: p.get('age'),
+                         k=lambda g: 1500 if g == 'G' else 600,
+                         repl=lambda y, g: nhl[y].get('repl', {}).get('G' if g == 'G' else 'D' if g == 'D' else 'F', 0.0),
+                         w=(1, .5, .25), mn=100, extra=nhl_marcel))
+
+
+def main_nhl(old):
+    f = nhl_fit()
+    old['sports']['nhl'] = {'a': round(f['a'], 5), 'b': round(f['b'], 4), 'c': round(f['c'], 5), 'unit': 'year', 'src': 'fit',
+                            **{k: f[k] for k in ('n', 'held', 'seasons', 't')},
+                            **({'d': round(f['d'], 5), 't_d': f['t_d']} if 'd' in f else {})}
+    print('nhl', old['sports']['nhl'])
+    txt = json.dumps(dict(old, asof=time.strftime('%Y-%m-%d')), indent=1, allow_nan=False)
+    open(OUT + '.tmp', 'w').write(txt); os.replace(OUT + '.tmp', OUT)
+    print('wrote', OUT)
+
+
 def main():
     old = json.load(open(OUT)) if os.path.exists(OUT) else {'sports': {}}
+    if '--nhl' in sys.argv:            # the NHL block alone (the others keep their last fit)
+        return main_nhl(old)
     F = {}
     nba = seasons('nba-xpm')
     F['nba'] = fit(pro_pairs(nba, key=lambda p: p['id'], team=lambda p: p['tm'],
@@ -292,13 +342,7 @@ def main():
                              val=lambda p: p.get('xpm'), use=lambda p: p['mp'], age=lambda p, y: p.get('age'),
                              k=lambda g: 500, repl=lambda y, g: VORX_REP, w=(1, .5, .25), mn=50,
                              grade=lambda p: p.get('sxpm')))     # the backup watch grades by pXPM (Nov 27 2026)
-    nhl = seasons('nhl-war')
-    F['nhl'] = fit(pro_pairs(nhl, key=lambda p: p['id'], team=lambda p: p['tm'], grp=lambda p: p['pos'],
-                             shape={'C': 1, 'L': 1, 'R': 1, 'D': 2, 'G': 1}, nxt={},
-                             val=lambda p: p.get('hpm'), use=lambda p: p.get('toi') or 0, age=lambda p, y: p.get('age'),
-                             k=lambda g: 1500 if g == 'G' else 600,
-                             repl=lambda y, g: nhl[y].get('repl', {}).get('G' if g == 'G' else 'D' if g == 'D' else 'F', 0.0),
-                             w=(1, .5, .25), mn=100))
+    F['nhl'] = nhl_fit()
     link = json.load(gzip.open(os.path.join(HERE, 'data', 'soccer_mv_link.json.gz'), 'rt'))
     dob = {u: link['dob'].get(str(t)) for u, t in link['p'].items()}
     sage = lambda p, y: (y - 1 + 8 / 12 - (int(dob[p['p']][:4]) + (int(dob[p['p']][5:7]) - 1) / 12)) if dob.get(p['p']) else None
@@ -317,7 +361,8 @@ def main():
     for s in ('nba', 'nhl', 'soccer', 'cbb'):    # own fit, in the grade's units
         f = F[s]
         out[s] = {'a': round(f['a'], 5), 'b': round(f['b'], 4), 'c': round(f['c'], 5), 'unit': 'class' if s == 'cbb' else 'year', 'src': 'fit',
-                  **{k: f[k] for k in ('n', 'held', 'seasons', 't')}}
+                  **{k: f[k] for k in ('n', 'held', 'seasons', 't')},
+                  **({'d': round(f['d'], 5), 't_d': f['t_d']} if 'd' in f else {})}
     for s, z, src, unit in (('nfl', zp, 'pros', 'year'), ('cfb', F['cbb']['z'], 'cbb', 'class')):
         if (old['sports'].get(s) or {}).get('src') == 'fit':   # the NFL's own fit (--nfl) stays
             out[s] = old['sports'][s]

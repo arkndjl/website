@@ -25,6 +25,9 @@ def gap_of(sport, r):
     return 0.0 if b is None or s is None else float(s - b)
 
 
+DKEY = {'nhl': 'mgap'}        # the row key of the d term's gap (default pgap)
+
+
 def apply(sport, rows):
     """sets r['xgap'] and orders the rows by it (ties: the gap today)"""
     try:
@@ -35,6 +38,8 @@ def apply(sport, rows):
     key = T.get('key', 'gap')      # NFL: the pXP/60 gap (pgap) carries the projection, not the grade's (backup_age_fit.py --nfl)
     for r in rows:
         t, g = (T, r[key]) if r.get(key) is not None else (T.get('alt') or T, r['gap'])
-        r['xgap'] = round(t['a'] + t['b'] * g + t['c'] * gap_of(sport, r), nd)
+        # d: the pair's gap on the sport's second rate, where the fit kept it (NHL: Marcel GAR a 60, r['mgap'];
+        # soccer: p/90, r['pgap'])
+        r['xgap'] = round(t['a'] + t['b'] * g + t['c'] * gap_of(sport, r) + t.get('d', 0.0) * (r.get(DKEY.get(sport, 'pgap')) or 0.0), nd)
     rows.sort(key=lambda r: (-r['xgap'], -r['gap']))
     return rows

@@ -30,3 +30,18 @@ Family of 2, Holm at .05 on the one-sided season-clustered p.
 - Target 2 (guard): the pair's GAR a 60 gap in n+1 (both 200+ minutes), linear walk forward, MSE.
 - Pass: target 1 log loss lower with season-clustered t >= 2 and k >= 2/3 of seasons, target 2 not worse.
 - Skaters and goalies scored together; goalies also reported apart.
+
+# Round 2 (port round), written before scoring. Family of 2, Holm at .05.
+
+## C. xGap own fit with the Marcel WAR gap (P1; the grade stays HPM)
+- Pairs and target exactly as scripts/backup_age_fit.py (HPM grade, backup above the lowest-graded starter, target =
+  the pair's HPM gap over the next two seasons). Before: a + b gap + c age gap. After: + d (Marcel GAR a 60 gap,
+  1/.7/.5, K 1600 minutes). Walk forward as fit(): paired squared errors, t; seasons won.
+- Guard: the pair's descriptive GAR a 60 gap over the next two seasons (same shrink), same walk forward, not worse.
+- Pass: t <= -2 on the harness target, most seasons won, guard not worse.
+
+## D. Awards Marcel WAR rate: newcomer mean for players with no prior season (round 1 lead)
+- Rows: season n players with no row in n-1 and n-2, toi_n >= 200 and toi_n+1 >= 200, n = 2012..2025.
+- Before: shrink to the group's mean WAR a minute over seasons before n. After: to the mean of such newcomers
+  (same seasons before n). Target WAR_n+1 at known ice time; season means paired.
+- Pass: t >= 2 and 2/3 of seasons.
