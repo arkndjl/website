@@ -79,6 +79,62 @@ def _done(S):
     return S < current_season()
 
 
+_NAMES = {}
+
+
+def player_names(S, max_age_h=24):
+    """{player id: full name} for season S from the stats API (skaters and goalies, 100 rows a page). MoneyPuck's files
+    drop every non-ASCII letter (Tim Sttzle, Juraj Slafkovsk, Alexis Lafrenire); repair_name puts the league's spelling
+    back. Cached; the current season is read again after max_age_h. A failed pull returns what the cache has ({} with
+    no cache), so the callers keep MoneyPuck's names and never fail on it."""
+    if S in _NAMES:
+        return _NAMES[S]              # one pull a run
+    fn = os.path.join(CACHE, 'names', f'{S}.json')
+    old = load(fn) if os.path.exists(fn) else {}
+    _NAMES[S] = old
+    if old and (_done(S) or time.time() - os.path.getmtime(fn) < max_age_h * 3600):
+        return old
+    out = {}
+    for kind in ('skater', 'goalie'):
+        for start in range(0, 3000, 100):
+            j = get(f'{STATS}/{kind}/summary?isAggregate=true&isGame=false&start={start}&limit=100'
+                    f'&cayenneExp=seasonId={sid(S)}%20and%20gameTypeId=2', tries=2)
+            data = (j or {}).get('data')
+            if data is None:
+                return old            # a failed page: the last full pull, not half a list
+            for r in data:
+                if r.get(f'{kind}FullName'):
+                    out[str(r['playerId'])] = r[f'{kind}FullName']
+            if len(data) < 100:
+                break
+    if out:
+        save(fn, out)
+        _NAMES[S] = out
+    return out or old
+
+
+def repair_name(n, full):
+    """full (the league's name) when n is that name with letters missing, word by word: the word without its non-ASCII
+    letters (Slafkovsk / Slafkovský), or the word with letters gone from the inside where the league writes it in ASCII
+    (Rty / Raty, Mtt / Maatta: vowels only). A short form (Will / William, Joe / Joseph) or any other difference keeps n."""
+    if not n or not full or n == full:
+        return n
+    a, b = n.split(), full.split()
+    if len(a) != len(b):
+        return n
+    for x, y in zip(a, b):
+        if x == y or x == ''.join(c for c in y if c.isascii()):
+            continue
+        gone, k = [], 0                      # y's letters that x lacks, x read in order
+        for c in y:
+            if k < len(x) and c == x[k]: k += 1
+            else: gone.append(c)
+        if k == len(x) and gone and not y.startswith(x) and all(c in 'aeiouy' for c in gone):
+            continue                         # only vowels gone (the accented letters; Joe / Joseph loses consonants)
+        return n
+    return full
+
+
 def games(S, fresh=False):
     """every regular-season and playoff game of season S: id, date, start, teams, score, last period (4 OT, 5 SO)"""
     fn = os.path.join(CACHE, 'games', f'{S}.json')

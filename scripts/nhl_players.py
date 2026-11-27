@@ -115,6 +115,7 @@ def skaters(S):
     for r in mp_file('skaters', S):
         by[r['playerId']][r['situation']] = r
     t5 = {D.team(r['team']): r for r in mp_file('teams', S) if r['situation'] == '5on5'}
+    full = D.player_names(S)     # the league's spelling for the names MoneyPuck strips of non-ASCII letters
     out = []
     for pid, s in by.items():
         al, e5, pp, pk = s.get('all'), s.get('5on5'), s.get('5on4'), s.get('4on5')
@@ -124,7 +125,7 @@ def skaters(S):
         if toi < 60:
             continue
         h = toi / 3600
-        row = {'id': pid, 'n': al['name'], 'tm': D.team(al['team']), 'pos': 'D' if al['position'] == 'D' else 'F',
+        row = {'id': pid, 'n': D.repair_name(al['name'], full.get(str(pid))), 'tm': D.team(al['team']), 'pos': 'D' if al['position'] == 'D' else 'F',
                'p': al['position'], 'gp': int(f(al, 'games_played')), 'toi': toi,
                'g': f(al, 'I_F_goals') / h, 'ixg': f(al, 'I_F_xGoals') / h, 'a1': f(al, 'I_F_primaryAssists') / h,
                'a2': f(al, 'I_F_secondaryAssists') / h, 'pen': (f(al, 'penaltiesDrawn') - f(al, 'penalties')) / h,
@@ -164,14 +165,14 @@ def skaters(S):
 
 
 def goalies(S):
-    out = []
+    out, full = [], D.player_names(S)
     for r in mp_file('goalies', S):
         if r['situation'] != 'all':
             continue
         toi = f(r, 'icetime')
         if toi < 60:
             continue
-        out.append({'id': r['playerId'], 'n': r['name'], 'tm': D.team(r['team']), 'pos': 'G', 'p': 'G',
+        out.append({'id': r['playerId'], 'n': D.repair_name(r['name'], full.get(str(r['playerId']))), 'tm': D.team(r['team']), 'pos': 'G', 'p': 'G',
                     'gp': int(f(r, 'games_played')), 'toi': toi, 'xga': f(r, 'xGoals'), 'ga': f(r, 'goals'),
                     'gsax60': (f(r, 'xGoals') - f(r, 'goals')) / (toi / 3600)})
     return out
