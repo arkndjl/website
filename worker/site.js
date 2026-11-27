@@ -97,7 +97,10 @@ export default {
 
     // same-site only: the browser sends Origin on POST
     const origin = request.headers.get("origin");
-    if (origin && new URL(origin).host !== url.host) return json({ error: "origin" }, 403);
+    // "Origin: null" (sandboxed frames, some privacy modes) is not a URL: refuse it, do not throw a 500
+    let originHost = "";
+    try { originHost = origin ? new URL(origin).host : ""; } catch { originHost = ""; }
+    if (origin && originHost !== url.host) return json({ error: "origin" }, 403);
 
     // the song must be a real file on the site
     const asset = await env.ASSETS.fetch(new Request(new URL(`/audio/${rest}.mp3`, url), { method: "HEAD" }));
