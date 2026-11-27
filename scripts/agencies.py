@@ -17,7 +17,7 @@ clients does not top the board on one outlier.
   python3 scripts/agencies.py            join and write
   python3 scripts/agencies.py --test     the shrinkage and matcher checks
 """
-import json, math, os, sys
+import json, math, os, re, sys
 from collections import defaultdict
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
@@ -43,6 +43,8 @@ ALIAS = {
     'the familie': 'The Familie', 'familie': 'The Familie',
     'network': 'NETWORK', 'network sports': 'NETWORK',
     'jsg': 'Jordan Sports Group', 'jordan sports group': 'Jordan Sports Group',
+    'the biz of athlete': 'The Business of Athletes', 'the business of athletes': 'The Business of Athletes', 'biz of athletes': 'The Business of Athletes',
+    'priority sports': 'Priority Sports', 'priority sports & entertainment': 'Priority Sports', 'esm sports': 'Everett Sports Marketing',
     'family': 'Family', 'none': 'None', 'self': 'None', 'unrepresented': 'None',
 }
 SPECIAL = ('Family', 'None')
