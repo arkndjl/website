@@ -3,6 +3,7 @@
 """Counter-Strike players: ratings, prospects, transfer values and team tiers (data/cs2_players.json).
 
     python3 scripts/cs2_players.py --fit   # backtests -> data/cs2_players_fit.json (settings, scores, failed terms)
+    python3 scripts/cs2_players.py --game  # only the series model's player term, at the saved settings
     python3 scripts/cs2_players.py         # build data/cs2_players.json and add tiers to data/cs2.json
 
 Data: per-map player stats from bo3.gg (scripts/cs2_pstats.py, since Jan 2024), map results and event tiers
@@ -596,9 +597,47 @@ def nick_index(M, bo3):
     return {k: max(v, key=v.get) for k, v in by.items()}, byt
 
 
+class Snaps:
+    """Ratings at a day (maps before it), kept for the run and on disk (scripts/.cache/cs2, one file per settings +
+    data state) so the monthly fits that replay every series (game_test, cs2_events, cs2_pickem) share them."""
+
+    def __init__(self, M, c, p):
+        import hashlib
+        self.M, self.c, self.p, self.th, self.new = M, c, p, {}, 0
+        sig = json.dumps([sorted(p.items()), round(float(c.sum()), 6), round(float(np.abs(c).sum()), 4), len(M.p),
+                          len(M.pids), int(M.d.max())], default=float)
+        self.f = ROOT / "scripts" / ".cache" / "cs2" / f"rwa_snaps_{hashlib.sha1(sig.encode()).hexdigest()[:12]}.npz"
+        try:
+            with np.load(self.f) as z:
+                self.th = {int(k): z[k] for k in z.files}
+        except (OSError, ValueError):
+            pass
+
+    def at(self, T):
+        if T not in self.th:
+            self.th[T] = ratings(self.M, self.c, T, self.p)[0].astype(np.float32)
+            self.new += 1
+        return self.th[T]
+
+    def save(self):
+        if self.new < 20:
+            return
+        try:
+            self.f.parent.mkdir(parents=True, exist_ok=True)
+            for old in self.f.parent.glob("rwa_snaps_*.npz"):
+                old.unlink()
+            np.savez(self.f, **{str(k): v for k, v in self.th.items()})
+            self.new = 0
+        except OSError as e:
+            print("rating snapshots not cached:", e, file=sys.stderr)
+
+
 def game_test(M, c, p):
     """Does the five's mean player rating add to the live series model (player Elo + VRS + team map rating)?
-    Ratings from each month's first day only; same tune / held windows and tiered logistic as cs2_model --fit."""
+    Ratings as of the series' day (maps before it): the form Live serves for upcoming series (today's ratings).
+    Until Nov 27 2026 the fit read each month's first day while the serve read today (scripts/research/ctx_nov27/tcs,
+    pre-registered: held Jul 2025 - Nov 10 2026 log loss month fit .5954 -> day fit .5946, t by month -0.6, 10/17
+    months, top 50 even: an alignment, not a gain). Same tune / held windows and tiered logistic as cs2_model --fit."""
     import cs2_model as CM
     H = json.load(gzip.open(CM.HIST))
     series = [r for r in H["series"] if r[6] == "vrs"]
@@ -606,12 +645,9 @@ def game_test(M, c, p):
     bo3 = cs2_bo3.Bo3()
     rows, _ = CM.replay(series, vrs, json.loads(CM.FIT.read_text())["params"], bo3=bo3)
     nk, nkt = nick_index(M, bo3)
-    snaps = {}
+    snaps = Snaps(M, c, p)
     for r in rows:
-        mo = r["d"][:7]
-        if mo not in snaps:
-            snaps[mo] = ratings(M, c, ordd(mo + "-01"), p)[0]
-        th = snaps[mo]
+        th = snaps.at(ordd(r["d"]))
 
         def mean(ros, k):
             v = [th[nkt.get((names.key(q), k), nk.get(names.key(q)))] for q in ros or []
@@ -620,6 +656,7 @@ def game_test(M, c, p):
         a, b = mean(r["r"][4], r["a"]), mean(r["r"][5], r["b"])
         r["z"] = (a - b) / 10 if a is not None and b is not None else 0.0
         r["zok"] = a is not None and b is not None
+    snaps.save()
     tr = [r for r in rows if CM.TUNE[0] <= r["d"] <= CM.TUNE[1] and r["d"] >= "2024-07-01"]
     he = [r for r in rows if r["d"] >= CM.HELD[0]]
     s = np.array([r["s"] for r in he])
@@ -648,7 +685,8 @@ def game_test(M, c, p):
 
 class Live:
     """Player-rating term for the live series model (scripts/cs2_model.py): the five's mean rating, A minus B, / 10,
-    from ratings as of the first of the series' month (as in game_test). Off (w None) unless game_test passed."""
+    from ratings as of the series' day for a played series (as in game_test) and today's for an upcoming one: one
+    form in the fit and the serve. Off (w None) unless game_test passed."""
 
     def __init__(self, bo3):
         fj = json.loads(FIT.read_text()) if FIT.exists() else {}
@@ -661,14 +699,18 @@ class Live:
         self.c = contributions(self.M, np.array([fj["beta"][k] for k in STATS]), np.array(fj["mline"]),
                                self.p.get("pm", 0.0))
         self.nk, self.nkt = nick_index(self.M, bo3)
-        self.snaps = {}
+        self.snaps = Snaps(self.M, self.c, self.p)
+        self.now = None
 
     def mean(self, ros, k, d):
-        mo = d[:7]  # "now": today's ratings, for upcoming series
-        if mo not in self.snaps:
-            T = dt.date.today().toordinal() + 1 if d == "now" else ordd(mo + "-01")
-            self.snaps[mo] = ratings(self.M, self.c, T, self.p)[0]
-        th = self.snaps[mo]
+        if d == "now":  # today's ratings, for upcoming series
+            if self.now is None:
+                self.now = ratings(self.M, self.c, dt.date.today().toordinal() + 1, self.p)[0]
+            th = self.now
+        else:
+            th = self.snaps.at(ordd(d))
+            if self.snaps.new >= 200:   # a full replay: keep the days for the next script of the run
+                self.snaps.save()
         ix = [self.nkt.get((names.key(q), k), self.nk.get(names.key(q))) for q in ros or []]
         v = [th[i] for i in ix if i is not None]
         return float(np.mean(v)) if len(v) >= 3 else None
@@ -808,7 +850,10 @@ def build():
     th, _ = ratings(M, c, T, p)
     th90, _ = ratings(M, c, T - 90, p)
     th6, _ = ratings(M, c, T - 182, p)
-    _, r12 = window_stats(M, c, th, T - 365, T, p)
+    w12m, r12 = window_stats(M, c, th, T - 365, T, p)
+    # the last year's RWA with no decay and no shrink (+ the board's tier lift): the season-only number RAR is built on,
+    # the same form as the all-time player-seasons (scripts/alltime.py cs2_players)
+    s12 = w12m + (p.get("ssg", 0.0) * sa_share(M, T) if p.get("ssg") else 0.0)
     m12 = np.bincount(M.p, M.d >= T - 365, len(M.pids))
     sm = s_maps(M, T)
     # per-map RWA offsets (metric audit Nov 24 2026, P2): shown for maps with 100+ rounds in the last year
@@ -835,6 +880,7 @@ def build():
     agg = {k: np.bincount(M.p, w12 * M.X[:, j], len(M.pids)) / np.maximum(r12, 1) for j, k in enumerate(STATS)}
     act = (r12 >= 1000) & np.array([M.d[lastrow[i]] >= T - 120 if i in lastrow else False for i in range(len(M.pids))])
     repl = float(np.median(th[act]))
+    repl12 = float(np.median(s12[act]))   # replacement on the season-only scale (RAR); repl stays the rating's (xTV)
     a = p["a"]
     ag = fitj["aging"]
     v = fitj.get("value")
@@ -881,7 +927,8 @@ def build():
                 "tm": ti.get("n") or tname.get(tid) or "", "tk": tk if ti else None, "trk": ti.get("rk"),
                 "tier": ti.get("tier", 4), "logo": bool(ti.get("logo")),
                 "rwa": round(float(a / 2 * (th[i] - mu1)), 2), "p6": p6(i), "d90": round(float(a / 2 * (th[i] - th90[i])), 2),
-                "rar": round(float(r12[i] * a * (th[i] - repl) / 200), 1), "maps": int(m12[i]), "sm": int(sm[i]),
+                # RAR: a descriptive total, so it reads the year's own lines (s12), not the decayed, shrunk rating
+                "rar": round(float(r12[i] * a * (s12[i] - repl12) / 200), 1), "maps": int(m12[i]), "sm": int(sm[i]),
                 "kpr": round(float(agg["k"][i]), 3), "dpr": round(float(agg["d"][i]), 3),
                 "adr": round(float(agg["adr"][i] * 100), 1), "kast": round(float(agg["kast"][i] * 100), 1),
                 "ok": round(float((agg["fk"][i] - agg["fd"][i]) * 100), 1),
@@ -955,8 +1002,20 @@ def build():
     print(f"players: {len(board)} board, {len(pros)} prospects; #1 {board[0]['n']}")
 
 
+def refit_game():
+    """--game: the series model's player term alone (game_test) at the saved settings -> the fit file's "game"."""
+    fj = json.loads(FIT.read_text())
+    M = Maps()
+    c = contributions(M, np.array([fj["beta"][k] for k in STATS]), np.array(fj["mline"]), fj["params"].get("pm", 0.0))
+    fj["game"] = game_test(M, c, fj["params"])
+    print("game", fj["game"], file=sys.stderr)
+    FIT.write_text(json.dumps(fj, indent=1))
+
+
 if __name__ == "__main__":
-    if "--fit" in sys.argv:
+    if "--game" in sys.argv:
+        refit_game()
+    elif "--fit" in sys.argv:
         fit()
     else:
         build()
