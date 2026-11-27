@@ -104,5 +104,10 @@ jobs:
           git add -f research/esea_div_backfill.json.gz 2>/dev/null || true
           git add -f research/esea_regions_early.json.gz research/esea_matches_early.json.gz 2>/dev/null || true
           git commit -m "ESEA research data ($(date -u +%Y-%m-%dT%H:%MZ))" || exit 0
-          git pull --rebase -q origin "${GITHUB_REF_NAME}"
-          git push
+          # main moves every few minutes (odds snaps, sport builds): retry the rebase and push, these files are this job's alone
+          for i in 1 2 3 4 5; do
+            git pull --rebase -q origin "${GITHUB_REF_NAME}" && git push && exit 0
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          exit 1
