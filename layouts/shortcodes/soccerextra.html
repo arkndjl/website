@@ -15,16 +15,16 @@
 {{- $ix := slice -}}
 {{- range $o := $ord }}{{ range $j, $c := $cols }}{{ if eq (index $c 0) $o }}{{ $ix = $ix | append $j }}{{ end }}{{ end }}{{ end -}}
 {{- range $j, $c := $cols }}{{ if not (in $ix $j) }}{{ $ix = $ix | append $j }}{{ end }}{{ end -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default .title) "icon" "soccer" "filter" .filter "tab" ($.Get "tab")) -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default .title) "icon" "soccer" "filter" .filter "rerank" true "tab" ($.Get "tab")) -}}
 <table class="cfb__table tstick2">
   <thead><tr><th>#</th>{{ range $ix }}{{ with index $cols . }}<th{{ with index . 2 }} title="{{ . }}"{{ end }}>{{ index . 0 }}</th>{{ end }}{{ end }}</tr></thead>
   <tbody>
   {{- range $i, $r := .rows }}
-  <tr><td class="cfb__num">{{ add $i 1 }}</td>
+  <tr><td class="cfb__rk">{{ add $i 1 }}</td>
     {{- range $j := $ix }}{{ $c := index $cols $j }}{{ $v := index $r $j }}{{ $f := index $c 1 }}
     {{- if eq $f "s" }}<td{{ if eq $j 0 }} style="white-space: nowrap"{{ end }}>{{ if eq $j 0 }}<b>{{ $v }}</b>{{ else }}{{ with $v }}{{ . }}{{ end }}{{ end }}</td>
     {{- else if eq $v nil }}<td class="cfb__num" data-v=""><span class="cfb__dim">-</span></td>
-    {{- else }}<td class="cfb__num" data-v="{{ $v }}">{{ if eq $f "d" }}{{ int $v }}{{ else if eq $f "1" }}{{ printf "%.1f" (float $v) }}{{ else if eq $f "2" }}{{ printf "%.2f" (float $v) }}{{ else if eq $f "3" }}{{ printf "%.3f" (float $v) }}{{ else if eq $f "+2" }}{{ printf "%+.2f" (float $v) }}{{ else }}{{ printf "%+.3f" (float $v) }}{{ end }}</td>
+    {{- else }}<td class="cfb__num" data-v="{{ $v }}">{{ if eq $f "d" }}{{ int $v }}{{ else if eq $f "1" }}{{ partial "num.html" (slice "%.1f" (float $v)) }}{{ else if eq $f "2" }}{{ partial "num.html" (slice "%.2f" (float $v)) }}{{ else if eq $f "3" }}{{ partial "num.html" (slice "%.3f" (float $v)) }}{{ else if eq $f "+2" }}{{ partial "num.html" (slice "%+.2f" (float $v)) }}{{ else }}{{ partial "num.html" (slice "%+.3f" (float $v)) }}{{ end }}</td>
     {{- end }}{{ end }}
   </tr>
   {{- end }}

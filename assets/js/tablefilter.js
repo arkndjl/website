@@ -2,6 +2,8 @@
 (function () {
   if (window.__arkTf) return; window.__arkTf = true;
   function txt(el) { return (el.textContent || '').replace(/\s+/g, ' ').trim(); }
+  // a cell's value in its column's dropdown: its data-filter when it has one (a tier chip with a share beside it filters as "Tier 1"), else its text
+  function fval(cell) { return cell.hasAttribute('data-filter') ? cell.getAttribute('data-filter') : txt(cell); }
   // search ignores accents and letters with no plain form, so "yildiz" finds Yıldız and "odegaard" Ødegaard (same folds as partials/namekey.html)
   var LET = { 'ø': 'o', 'Ø': 'o', 'ł': 'l', 'Ł': 'l', 'đ': 'd', 'Đ': 'd', 'ð': 'd', 'þ': 'th', 'ß': 'ss', 'æ': 'ae', 'Æ': 'ae', 'œ': 'oe', 'Œ': 'oe', 'ı': 'i', 'ħ': 'h' };
   function fold(s) { return String(s).replace(/[øØłŁđĐðþßæÆœŒıħ]/g, function (c) { return LET[c]; }).normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
@@ -56,7 +58,7 @@
         }
         var c = col(name); if (c < 0) return;
         // a cell's data-o sets its option's place in the dropdown (e.g. days in calendar order)
-        var vals = {}; rows.forEach(function (r) { var cell = r.cells[c], v = txt(cell); if (v && !(v in vals)) vals[v] = cell.hasAttribute('data-o') ? +cell.getAttribute('data-o') : null; });
+        var vals = {}; rows.forEach(function (r) { var cell = r.cells[c], v = fval(cell); if (v && !(v in vals)) vals[v] = cell.hasAttribute('data-o') ? +cell.getAttribute('data-o') : null; });
         var list = Object.keys(vals), isNum = list.every(function (v) { return !isNaN(num(v)); }), ord = list.every(function (v) { return vals[v] != null; });
         list.sort(ord ? function (a, b) { return vals[a] - vals[b]; } : isNum ? function (a, b) { return num(b) - num(a); } : function (a, b) { return a.localeCompare(b); });
         var lab = document.createElement('label'); lab.className = 'cfb__field';
@@ -113,7 +115,7 @@
           var ok = (!day || r.dataset.day === day) && (!yr || r.dataset.yr === yr);
           sels.forEach(function (s) {
             if (!ok || !s.el.value) return;
-            var v = s.attr ? r.getAttribute(s.attr) || '' : txt(r.cells[s.c]);
+            var v = s.attr ? r.getAttribute(s.attr) || '' : fval(r.cells[s.c]);
             ok = s.fv ? num(v) >= num(s.el.value) : v === s.el.value;
           });
           if (ok && !isNaN(amax)) { var a = num(txt(r.cells[ageC])); ok = !isNaN(a) && a <= amax; }
