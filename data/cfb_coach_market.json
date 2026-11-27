@@ -211,7 +211,7 @@
      "role": "HC",
      "from": "UTSA",
      "fromTid": "2636",
-     "p": 0.019
+     "p": 0.018
     },
     {
      "name": "Sonny Cumbie",
@@ -292,6 +292,65 @@
      "from": "Alabama",
      "fromTid": "333",
      "p": 0.004
+    }
+   ],
+   "other": 0.585
+  },
+  {
+   "tid": "2534",
+   "team": "Sam Houston",
+   "logo": "/img/cfb/logos/2534.png",
+   "conf": "C-USA",
+   "hc": "Eric Raisbeck",
+   "open": 0.8,
+   "moved": 0,
+   "out": 0.8,
+   "wp": 0.1,
+   "vsNorm": -0.52,
+   "tenure": 1,
+   "interim": 1,
+   "hires": [
+    {
+     "name": "Freddie Aughtry-Lindsay",
+     "role": "DC",
+     "from": "Sam Houston",
+     "fromTid": "2534",
+     "p": 0.011
+    },
+    {
+     "name": "Zack Patterson",
+     "role": "OC",
+     "from": "Sam Houston",
+     "fromTid": "2534",
+     "p": 0.01
+    },
+    {
+     "name": "Will Muschamp",
+     "role": "DC",
+     "from": "Texas",
+     "fromTid": "251",
+     "p": 0.007
+    },
+    {
+     "name": "Kyle Flood",
+     "role": "OC",
+     "from": "Texas",
+     "fromTid": "251",
+     "p": 0.006
+    },
+    {
+     "name": "A. J. Milwee",
+     "role": "OC",
+     "from": "Texas",
+     "fromTid": "251",
+     "p": 0.006
+    },
+    {
+     "name": "Austin Armstrong",
+     "role": "DC",
+     "from": "Houston",
+     "fromTid": "248",
+     "p": 0.005
     }
    ],
    "other": 0.585
@@ -634,7 +693,7 @@
      "role": "HC",
      "from": "Louisiana Tech",
      "fromTid": "2348",
-     "p": 0.016
+     "p": 0.015
     },
     {
      "name": "Jamey Chadwell",
@@ -2694,7 +2753,7 @@
      "role": "DC",
      "from": "Louisiana",
      "fromTid": "309",
-     "p": 0.041
+     "p": 0.04
     },
     {
      "name": "Tim Leger",
@@ -2780,7 +2839,7 @@
      "role": "HC",
      "from": "New Mexico",
      "fromTid": "167",
-     "p": 0.01
+     "p": 0.009
     },
     {
      "name": "Sonny Cumbie",
@@ -3179,7 +3238,7 @@
      "role": "HC",
      "from": "Liberty",
      "fromTid": "2335",
-     "p": 0.019
+     "p": 0.018
     },
     {
      "name": "Jason Eck",
@@ -4636,7 +4695,7 @@
      "role": "HC",
      "from": "Air Force",
      "fromTid": "2005",
-     "p": 0.015
+     "p": 0.014
     },
     {
      "name": "Jamey Chadwell",
@@ -7903,7 +7962,7 @@
    "to": "152",
    "role": "HC",
    "name": "Jamey Chadwell",
-   "p": 0.024
+   "p": 0.023
   },
   {
    "from": "2335",
@@ -7976,7 +8035,7 @@
    "to": "2628",
    "role": "HC",
    "name": "Jason Eck",
-   "p": 0.013
+   "p": 0.012
   },
   {
    "from": "167",
@@ -7994,14 +8053,14 @@
   },
   {
    "from": "68",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Spencer Danielson",
    "p": 0.011
   },
   {
    "from": "68",
-   "to": "2628",
+   "to": "239",
    "role": "HC",
    "name": "Spencer Danielson",
    "p": 0.011
@@ -8101,19 +8160,20 @@
    "p": 0.009
   },
   {
-   "from": "309",
-   "to": "239",
-   "role": "HC",
-   "name": "Michael Desormeaux",
-   "p": 0.009
-  },
-  {
    "from": "2335",
    "to": "120",
    "role": "DC",
    "name": "Shawn Quinn",
    "p": 0.009,
    "how": "follows HC"
+  },
+  {
+   "from": "251",
+   "to": "2534",
+   "role": "OC",
+   "name": "Kyle Flood / A. J. Milwee",
+   "p": 0.009,
+   "how": "head coach"
   },
   {
    "from": "2636",
@@ -8146,28 +8206,28 @@
   },
   {
    "from": "2005",
-   "to": "52",
-   "role": "HC",
-   "name": "Troy Calhoun",
-   "p": 0.008
-  },
-  {
-   "from": "2005",
    "to": "38",
    "role": "HC",
    "name": "Troy Calhoun",
    "p": 0.008
   },
   {
+   "from": "2005",
+   "to": "52",
+   "role": "HC",
+   "name": "Troy Calhoun",
+   "p": 0.008
+  },
+  {
    "from": "309",
-   "to": "2628",
+   "to": "239",
    "role": "HC",
    "name": "Michael Desormeaux",
    "p": 0.008
   },
   {
    "from": "309",
-   "to": "52",
+   "to": "2628",
    "role": "HC",
    "name": "Michael Desormeaux",
    "p": 0.008
@@ -8221,6 +8281,13 @@
    "to": "152",
    "role": "HC",
    "name": "Blake Harrell",
+   "p": 0.007
+  },
+  {
+   "from": "309",
+   "to": "52",
+   "role": "HC",
+   "name": "Michael Desormeaux",
    "p": 0.007
   },
   {
@@ -8326,6 +8393,13 @@
    "p": 0.006
   },
   {
+   "from": "256",
+   "to": "120",
+   "role": "HC",
+   "name": "Billy Napier",
+   "p": 0.006
+  },
+  {
    "from": "2449",
    "to": "120",
    "role": "HC",
@@ -8340,24 +8414,10 @@
    "p": 0.006
   },
   {
-   "from": "256",
-   "to": "120",
-   "role": "HC",
-   "name": "Billy Napier",
-   "p": 0.006
-  },
-  {
    "from": "2649",
    "to": "152",
    "role": "HC",
    "name": "Mike Jacobs",
-   "p": 0.006
-  },
-  {
-   "from": "249",
-   "to": "2628",
-   "role": "HC",
-   "name": "Neal Brown",
    "p": 0.006
   },
   {
@@ -8384,18 +8444,17 @@
    "p": 0.006
   },
   {
-   "from": "167",
-   "to": "2628",
-   "role": "OC",
-   "name": "Luke Schleusner",
-   "p": 0.006,
-   "how": "follows HC"
-  },
-  {
    "from": "193",
    "to": "120",
    "role": "HC",
    "name": "Chuck Martin",
+   "p": 0.006
+  },
+  {
+   "from": "309",
+   "to": "152",
+   "role": "HC",
+   "name": "Michael Desormeaux",
    "p": 0.006
   },
   {
@@ -8413,13 +8472,6 @@
    "name": "Nathan Young",
    "p": 0.006,
    "how": "follows HC"
-  },
-  {
-   "from": "309",
-   "to": "152",
-   "role": "HC",
-   "name": "Michael Desormeaux",
-   "p": 0.006
   },
   {
    "from": "2335",
@@ -8431,7 +8483,7 @@
   },
   {
    "from": "2084",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Pete Lembo",
    "p": 0.006
@@ -8447,14 +8499,6 @@
   {
    "from": "251",
    "to": "2628",
-   "role": "OC",
-   "name": "Kyle Flood / A. J. Milwee",
-   "p": 0.006,
-   "how": "head coach"
-  },
-  {
-   "from": "251",
-   "to": "2638",
    "role": "OC",
    "name": "Kyle Flood / A. J. Milwee",
    "p": 0.006,
@@ -8478,7 +8522,7 @@
   },
   {
    "from": "68",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "Nate Potter / Zak Hill",
    "p": 0.005,
@@ -8486,7 +8530,7 @@
   },
   {
    "from": "68",
-   "to": "2628",
+   "to": "239",
    "role": "OC",
    "name": "Nate Potter / Zak Hill",
    "p": 0.005,
@@ -8539,13 +8583,6 @@
    "how": "follows HC"
   },
   {
-   "from": "235",
-   "to": "2628",
-   "role": "HC",
-   "name": "Charles Huff",
-   "p": 0.005
-  },
-  {
    "from": "256",
    "to": "152",
    "role": "HC",
@@ -8561,7 +8598,7 @@
   },
   {
    "from": "2649",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Mike Jacobs",
    "p": 0.005
@@ -8576,9 +8613,16 @@
   },
   {
    "from": "249",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Neal Brown",
+   "p": 0.005
+  },
+  {
+   "from": "151",
+   "to": "120",
+   "role": "HC",
+   "name": "Blake Harrell",
    "p": 0.005
   },
   {
@@ -8589,11 +8633,12 @@
    "p": 0.005
   },
   {
-   "from": "151",
-   "to": "120",
-   "role": "HC",
-   "name": "Blake Harrell",
-   "p": 0.005
+   "from": "251",
+   "to": "2534",
+   "role": "DC",
+   "name": "Will Muschamp",
+   "p": 0.005,
+   "how": "head coach"
   },
   {
    "from": "251",
@@ -8648,14 +8693,6 @@
    "p": 0.005
   },
   {
-   "from": "2084",
-   "to": "120",
-   "role": "DC",
-   "name": "Brian Dougherty",
-   "p": 0.005,
-   "how": "follows HC"
-  },
-  {
    "from": "2751",
    "to": "2628",
    "role": "HC",
@@ -8668,6 +8705,14 @@
    "role": "HC",
    "name": "Jay Sawvel",
    "p": 0.005
+  },
+  {
+   "from": "2084",
+   "to": "120",
+   "role": "DC",
+   "name": "Brian Dougherty",
+   "p": 0.005,
+   "how": "follows HC"
   },
   {
    "from": "228",
@@ -8684,6 +8729,14 @@
    "name": "Tom Allen / Nick Eason",
    "p": 0.005,
    "how": "head coach"
+  },
+  {
+   "from": "167",
+   "to": "2628",
+   "role": "OC",
+   "name": "Luke Schleusner",
+   "p": 0.005,
+   "how": "follows HC"
   },
   {
    "from": "167",
@@ -8767,6 +8820,14 @@
    "how": "head coach"
   },
   {
+   "from": "245",
+   "to": "2534",
+   "role": "DC",
+   "name": "Lyle Hemphill / Elijah Robinson",
+   "p": 0.005,
+   "how": "head coach"
+  },
+  {
    "from": "2084",
    "to": "120",
    "role": "OC",
@@ -8776,7 +8837,7 @@
   },
   {
    "from": "68",
-   "to": "239",
+   "to": "2628",
    "role": "DC",
    "name": "Erik Chinander / Terrence Brown",
    "p": 0.005,
@@ -8784,7 +8845,7 @@
   },
   {
    "from": "68",
-   "to": "2628",
+   "to": "239",
    "role": "DC",
    "name": "Erik Chinander / Terrence Brown",
    "p": 0.005,
@@ -8891,11 +8952,12 @@
    "p": 0.004
   },
   {
-   "from": "84",
-   "to": "2628",
-   "role": "HC",
-   "name": "Curt Cignetti",
-   "p": 0.004
+   "from": "2641",
+   "to": "2534",
+   "role": "DC",
+   "name": "Shiel Wood / Rob Greene",
+   "p": 0.004,
+   "how": "head coach"
   },
   {
    "from": "2390",
@@ -8948,14 +9010,14 @@
   },
   {
    "from": "2641",
-   "to": "239",
+   "to": "52",
    "role": "HC",
    "name": "Joey McGuire",
    "p": 0.004
   },
   {
    "from": "2641",
-   "to": "52",
+   "to": "239",
    "role": "HC",
    "name": "Joey McGuire",
    "p": 0.004
@@ -8969,20 +9031,6 @@
    "how": "head coach"
   },
   {
-   "from": "154",
-   "to": "120",
-   "role": "HC",
-   "name": "Jake Dickert",
-   "p": 0.004
-  },
-  {
-   "from": "154",
-   "to": "152",
-   "role": "HC",
-   "name": "Jake Dickert",
-   "p": 0.004
-  },
-  {
    "from": "2005",
    "to": "239",
    "role": "OC",
@@ -8991,6 +9039,55 @@
    "how": "follows HC"
   },
   {
+   "from": "154",
+   "to": "120",
+   "role": "HC",
+   "name": "Jake Dickert",
+   "p": 0.004
+  },
+  {
+   "from": "154",
+   "to": "152",
+   "role": "HC",
+   "name": "Jake Dickert",
+   "p": 0.004
+  },
+  {
+   "from": "256",
+   "to": "52",
+   "role": "HC",
+   "name": "Billy Napier",
+   "p": 0.004
+  },
+  {
+   "from": "235",
+   "to": "52",
+   "role": "HC",
+   "name": "Charles Huff",
+   "p": 0.004
+  },
+  {
+   "from": "235",
+   "to": "2628",
+   "role": "HC",
+   "name": "Charles Huff",
+   "p": 0.004
+  },
+  {
+   "from": "235",
+   "to": "239",
+   "role": "HC",
+   "name": "Charles Huff",
+   "p": 0.004
+  },
+  {
+   "from": "235",
+   "to": "152",
+   "role": "HC",
+   "name": "Charles Huff",
+   "p": 0.004
+  },
+  {
    "from": "2633",
    "to": "152",
    "role": "HC",
@@ -9012,31 +9109,10 @@
    "p": 0.004
   },
   {
-   "from": "235",
-   "to": "52",
-   "role": "HC",
-   "name": "Charles Huff",
-   "p": 0.004
-  },
-  {
-   "from": "235",
+   "from": "249",
    "to": "239",
    "role": "HC",
-   "name": "Charles Huff",
-   "p": 0.004
-  },
-  {
-   "from": "235",
-   "to": "152",
-   "role": "HC",
-   "name": "Charles Huff",
-   "p": 0.004
-  },
-  {
-   "from": "256",
-   "to": "52",
-   "role": "HC",
-   "name": "Billy Napier",
+   "name": "Neal Brown",
    "p": 0.004
   },
   {
@@ -9056,17 +9132,17 @@
    "how": "follows HC"
   },
   {
-   "from": "326",
-   "to": "245",
-   "role": "HC",
-   "name": "GJ Kinne",
-   "p": 0.004
-  },
-  {
    "from": "151",
    "to": "52",
    "role": "HC",
    "name": "Blake Harrell",
+   "p": 0.004
+  },
+  {
+   "from": "326",
+   "to": "245",
+   "role": "HC",
+   "name": "GJ Kinne",
    "p": 0.004
   },
   {
@@ -9094,12 +9170,34 @@
    "how": "follows HC"
   },
   {
+   "from": "99",
+   "to": "2534",
+   "role": "DC",
+   "name": "Blake Baker / Chris Kiffin",
+   "p": 0.004,
+   "how": "head coach"
+  },
+  {
    "from": "2633",
    "to": "2032",
    "role": "DC",
    "name": "Jim Knowles / Anthony Poindexter",
    "p": 0.004,
    "how": "head coach"
+  },
+  {
+   "from": "290",
+   "to": "120",
+   "role": "HC",
+   "name": "Clay Helton",
+   "p": 0.004
+  },
+  {
+   "from": "290",
+   "to": "239",
+   "role": "HC",
+   "name": "Clay Helton",
+   "p": 0.004
   },
   {
    "from": "164",
@@ -9125,16 +9223,23 @@
   },
   {
    "from": "2439",
-   "to": "2628",
+   "to": "239",
    "role": "HC",
    "name": "Dan Mullen",
    "p": 0.004
   },
   {
    "from": "2439",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Dan Mullen",
+   "p": 0.004
+  },
+  {
+   "from": "2711",
+   "to": "239",
+   "role": "HC",
+   "name": "Lance Taylor",
    "p": 0.004
   },
   {
@@ -9153,24 +9258,10 @@
    "p": 0.004
   },
   {
-   "from": "290",
-   "to": "120",
+   "from": "2751",
+   "to": "52",
    "role": "HC",
-   "name": "Clay Helton",
-   "p": 0.004
-  },
-  {
-   "from": "290",
-   "to": "239",
-   "role": "HC",
-   "name": "Clay Helton",
-   "p": 0.004
-  },
-  {
-   "from": "2711",
-   "to": "2628",
-   "role": "HC",
-   "name": "Lance Taylor",
+   "name": "Jay Sawvel",
    "p": 0.004
   },
   {
@@ -9180,20 +9271,6 @@
    "name": "Brian Dougherty",
    "p": 0.004,
    "how": "follows HC"
-  },
-  {
-   "from": "2751",
-   "to": "52",
-   "role": "HC",
-   "name": "Jay Sawvel",
-   "p": 0.004
-  },
-  {
-   "from": "2751",
-   "to": "120",
-   "role": "HC",
-   "name": "Jay Sawvel",
-   "p": 0.004
   },
   {
    "from": "228",
@@ -9220,13 +9297,6 @@
    "how": "follows HC"
   },
   {
-   "from": "193",
-   "to": "2628",
-   "role": "HC",
-   "name": "Chuck Martin",
-   "p": 0.004
-  },
-  {
    "from": "309",
    "to": "239",
    "role": "OC",
@@ -9239,6 +9309,29 @@
    "to": "2628",
    "role": "OC",
    "name": "Tim Leger",
+   "p": 0.004,
+   "how": "follows HC"
+  },
+  {
+   "from": "193",
+   "to": "2628",
+   "role": "HC",
+   "name": "Chuck Martin",
+   "p": 0.004
+  },
+  {
+   "from": "2636",
+   "to": "52",
+   "role": "OC",
+   "name": "Rick Bowie",
+   "p": 0.004,
+   "how": "follows HC"
+  },
+  {
+   "from": "2636",
+   "to": "245",
+   "role": "OC",
+   "name": "Rick Bowie",
    "p": 0.004,
    "how": "follows HC"
   },
@@ -9268,22 +9361,6 @@
    "to": "152",
    "role": "OC",
    "name": "Nathan Young",
-   "p": 0.004,
-   "how": "follows HC"
-  },
-  {
-   "from": "2636",
-   "to": "52",
-   "role": "OC",
-   "name": "Rick Bowie",
-   "p": 0.004,
-   "how": "follows HC"
-  },
-  {
-   "from": "2636",
-   "to": "245",
-   "role": "OC",
-   "name": "Rick Bowie",
    "p": 0.004,
    "how": "follows HC"
   },
@@ -9362,6 +9439,13 @@
    "how": "follows HC"
   },
   {
+   "from": "6",
+   "to": "52",
+   "role": "HC",
+   "name": "Major Applewhite",
+   "p": 0.004
+  },
+  {
    "from": "87",
    "to": "2032",
    "role": "DC",
@@ -9402,11 +9486,12 @@
    "how": "follows HC"
   },
   {
-   "from": "6",
-   "to": "52",
-   "role": "HC",
-   "name": "Major Applewhite",
-   "p": 0.004
+   "from": "99",
+   "to": "2534",
+   "role": "OC",
+   "name": "Charlie Weis Jr. / Joe Cox",
+   "p": 0.004,
+   "how": "head coach"
   },
   {
    "from": "2026",
@@ -9443,6 +9528,14 @@
    "to": "2006",
    "role": "DC",
    "name": "Matt Patricia / Tim Walton",
+   "p": 0.004,
+   "how": "head coach"
+  },
+  {
+   "from": "248",
+   "to": "2534",
+   "role": "DC",
+   "name": "Austin Armstrong",
    "p": 0.004,
    "how": "head coach"
   },
@@ -9510,6 +9603,21 @@
    "p": 0.003
   },
   {
+   "from": "248",
+   "to": "2534",
+   "role": "OC",
+   "name": "Slade Nagle",
+   "p": 0.003,
+   "how": "head coach"
+  },
+  {
+   "from": "84",
+   "to": "2628",
+   "role": "HC",
+   "name": "Curt Cignetti",
+   "p": 0.003
+  },
+  {
    "from": "84",
    "to": "239",
    "role": "HC",
@@ -9526,14 +9634,14 @@
   },
   {
    "from": "2483",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Dan Lanning",
    "p": 0.003
   },
   {
    "from": "2483",
-   "to": "2628",
+   "to": "239",
    "role": "HC",
    "name": "Dan Lanning",
    "p": 0.003
@@ -9583,7 +9691,7 @@
   },
   {
    "from": "251",
-   "to": "152",
+   "to": "120",
    "role": "HC",
    "name": "Steve Sarkisian",
    "p": 0.003
@@ -9625,6 +9733,22 @@
    "how": "head coach"
   },
   {
+   "from": "2005",
+   "to": "38",
+   "role": "OC",
+   "name": "Mike Thiessen",
+   "p": 0.003,
+   "how": "follows HC"
+  },
+  {
+   "from": "2005",
+   "to": "52",
+   "role": "OC",
+   "name": "Mike Thiessen",
+   "p": 0.003,
+   "how": "follows HC"
+  },
+  {
    "from": "154",
    "to": "239",
    "role": "HC",
@@ -9645,22 +9769,6 @@
    "name": "Colin Hitschler",
    "p": 0.003,
    "how": "head coach"
-  },
-  {
-   "from": "2005",
-   "to": "52",
-   "role": "OC",
-   "name": "Mike Thiessen",
-   "p": 0.003,
-   "how": "follows HC"
-  },
-  {
-   "from": "2005",
-   "to": "38",
-   "role": "OC",
-   "name": "Mike Thiessen",
-   "p": 0.003,
-   "how": "follows HC"
   },
   {
    "from": "2294",
@@ -9688,6 +9796,13 @@
    "to": "152",
    "role": "HC",
    "name": "Kirk Ferentz",
+   "p": 0.003
+  },
+  {
+   "from": "256",
+   "to": "239",
+   "role": "HC",
+   "name": "Billy Napier",
    "p": 0.003
   },
   {
@@ -9720,13 +9835,6 @@
    "p": 0.003
   },
   {
-   "from": "256",
-   "to": "239",
-   "role": "HC",
-   "name": "Billy Napier",
-   "p": 0.003
-  },
-  {
    "from": "252",
    "to": "52",
    "role": "HC",
@@ -9749,37 +9857,9 @@
   },
   {
    "from": "252",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Kalani Sitake",
-   "p": 0.003
-  },
-  {
-   "from": "12",
-   "to": "52",
-   "role": "HC",
-   "name": "Brent Brennan",
-   "p": 0.003
-  },
-  {
-   "from": "12",
-   "to": "120",
-   "role": "HC",
-   "name": "Brent Brennan",
-   "p": 0.003
-  },
-  {
-   "from": "12",
-   "to": "152",
-   "role": "HC",
-   "name": "Brent Brennan",
-   "p": 0.003
-  },
-  {
-   "from": "12",
-   "to": "239",
-   "role": "HC",
-   "name": "Brent Brennan",
    "p": 0.003
   },
   {
@@ -9789,6 +9869,34 @@
    "name": "Mike Mutz",
    "p": 0.003,
    "how": "follows HC"
+  },
+  {
+   "from": "12",
+   "to": "52",
+   "role": "HC",
+   "name": "Brent Brennan",
+   "p": 0.003
+  },
+  {
+   "from": "12",
+   "to": "120",
+   "role": "HC",
+   "name": "Brent Brennan",
+   "p": 0.003
+  },
+  {
+   "from": "12",
+   "to": "152",
+   "role": "HC",
+   "name": "Brent Brennan",
+   "p": 0.003
+  },
+  {
+   "from": "12",
+   "to": "239",
+   "role": "HC",
+   "name": "Brent Brennan",
+   "p": 0.003
   },
   {
    "from": "290",
@@ -9876,6 +9984,13 @@
    "how": "follows HC"
   },
   {
+   "from": "151",
+   "to": "239",
+   "role": "HC",
+   "name": "Blake Harrell",
+   "p": 0.003
+  },
+  {
    "from": "256",
    "to": "120",
    "role": "DC",
@@ -9898,27 +10013,12 @@
    "p": 0.003
   },
   {
-   "from": "151",
-   "to": "239",
-   "role": "HC",
-   "name": "Blake Harrell",
-   "p": 0.003
-  },
-  {
    "from": "251",
    "to": "239",
    "role": "DC",
    "name": "Will Muschamp",
    "p": 0.003,
    "how": "follows HC"
-  },
-  {
-   "from": "251",
-   "to": "245",
-   "role": "DC",
-   "name": "Will Muschamp",
-   "p": 0.003,
-   "how": "head coach"
   },
   {
    "from": "194",
@@ -9937,7 +10037,7 @@
   },
   {
    "from": "2005",
-   "to": "52",
+   "to": "38",
    "role": "DC",
    "name": "Steve Russ",
    "p": 0.003,
@@ -9945,7 +10045,7 @@
   },
   {
    "from": "2005",
-   "to": "38",
+   "to": "52",
    "role": "DC",
    "name": "Steve Russ",
    "p": 0.003,
@@ -9968,16 +10068,8 @@
    "how": "head coach"
   },
   {
-   "from": "99",
-   "to": "239",
-   "role": "DC",
-   "name": "Blake Baker / Chris Kiffin",
-   "p": 0.003,
-   "how": "head coach"
-  },
-  {
    "from": "2633",
-   "to": "152",
+   "to": "2534",
    "role": "DC",
    "name": "Jim Knowles / Anthony Poindexter",
    "p": 0.003,
@@ -9985,7 +10077,7 @@
   },
   {
    "from": "2633",
-   "to": "2638",
+   "to": "152",
    "role": "DC",
    "name": "Jim Knowles / Anthony Poindexter",
    "p": 0.003,
@@ -10000,7 +10092,7 @@
   },
   {
    "from": "195",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "John Hauser",
    "p": 0.003
@@ -10021,7 +10113,7 @@
   },
   {
    "from": "84",
-   "to": "2006",
+   "to": "2534",
    "role": "OC",
    "name": "Mike Shanahan / Tino Sunseri",
    "p": 0.003,
@@ -10029,7 +10121,7 @@
   },
   {
    "from": "84",
-   "to": "2638",
+   "to": "2006",
    "role": "OC",
    "name": "Mike Shanahan / Tino Sunseri",
    "p": 0.003,
@@ -10041,22 +10133,6 @@
    "role": "HC",
    "name": "Manny Diaz",
    "p": 0.003
-  },
-  {
-   "from": "2084",
-   "to": "52",
-   "role": "DC",
-   "name": "Brian Dougherty",
-   "p": 0.003,
-   "how": "follows HC"
-  },
-  {
-   "from": "2084",
-   "to": "239",
-   "role": "DC",
-   "name": "Brian Dougherty",
-   "p": 0.003,
-   "how": "follows HC"
   },
   {
    "from": "2641",
@@ -10093,6 +10169,37 @@
    "role": "HC",
    "name": "Bob Chesney",
    "p": 0.003
+  },
+  {
+   "from": "2751",
+   "to": "38",
+   "role": "HC",
+   "name": "Jay Sawvel",
+   "p": 0.003
+  },
+  {
+   "from": "2084",
+   "to": "52",
+   "role": "DC",
+   "name": "Brian Dougherty",
+   "p": 0.003,
+   "how": "follows HC"
+  },
+  {
+   "from": "2084",
+   "to": "2628",
+   "role": "DC",
+   "name": "Brian Dougherty",
+   "p": 0.003,
+   "how": "follows HC"
+  },
+  {
+   "from": "309",
+   "to": "52",
+   "role": "OC",
+   "name": "Tim Leger",
+   "p": 0.003,
+   "how": "follows HC"
   },
   {
    "from": "58",
@@ -10135,22 +10242,6 @@
    "role": "HC",
    "name": "Willie Fritz",
    "p": 0.003
-  },
-  {
-   "from": "309",
-   "to": "52",
-   "role": "OC",
-   "name": "Tim Leger",
-   "p": 0.003,
-   "how": "follows HC"
-  },
-  {
-   "from": "309",
-   "to": "152",
-   "role": "OC",
-   "name": "Tim Leger",
-   "p": 0.003,
-   "how": "follows HC"
   },
   {
    "from": "356",
@@ -10210,17 +10301,18 @@
    "p": 0.003
   },
   {
-   "from": "158",
-   "to": "52",
-   "role": "HC",
-   "name": "Matt Rhule",
-   "p": 0.003
-  },
-  {
    "from": "154",
    "to": "152",
    "role": "DC",
    "name": "Scottie Hazelton",
+   "p": 0.003,
+   "how": "head coach"
+  },
+  {
+   "from": "2567",
+   "to": "2534",
+   "role": "OC",
+   "name": "Rob Likens / Garin Justice",
    "p": 0.003,
    "how": "head coach"
   },
@@ -10232,13 +10324,6 @@
    "p": 0.003
   },
   {
-   "from": "275",
-   "to": "152",
-   "role": "HC",
-   "name": "Luke Fickell",
-   "p": 0.003
-  },
-  {
    "from": "202",
    "to": "52",
    "role": "HC",
@@ -10247,10 +10332,18 @@
   },
   {
    "from": "202",
-   "to": "120",
+   "to": "152",
    "role": "HC",
    "name": "Tre Lamb",
    "p": 0.003
+  },
+  {
+   "from": "145",
+   "to": "2534",
+   "role": "OC",
+   "name": "John David Baker / Cody Woodiel",
+   "p": 0.003,
+   "how": "head coach"
   },
   {
    "from": "213",
@@ -10329,19 +10422,11 @@
   },
   {
    "from": "2084",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "Tony Tokarz",
    "p": 0.003,
    "how": "follows HC"
-  },
-  {
-   "from": "87",
-   "to": "2638",
-   "role": "DC",
-   "name": "Chris Ash / Aaron Henry",
-   "p": 0.003,
-   "how": "head coach"
   },
   {
    "from": "6",
@@ -10365,19 +10450,20 @@
    "p": 0.003
   },
   {
+   "from": "87",
+   "to": "2534",
+   "role": "DC",
+   "name": "Chris Ash / Aaron Henry",
+   "p": 0.003,
+   "how": "head coach"
+  },
+  {
    "from": "333",
    "to": "2032",
    "role": "OC",
    "name": "Ryan Grubb",
    "p": 0.003,
    "how": "head coach"
-  },
-  {
-   "from": "103",
-   "to": "120",
-   "role": "HC",
-   "name": "Bill O'Brien",
-   "p": 0.003
   },
   {
    "from": "99",
@@ -10392,6 +10478,14 @@
    "to": "2433",
    "role": "OC",
    "name": "Charlie Weis Jr. / Joe Cox",
+   "p": 0.003,
+   "how": "head coach"
+  },
+  {
+   "from": "2567",
+   "to": "2534",
+   "role": "DC",
+   "name": "Maurice Crum Jr. / Rickey Hunley Jr.",
    "p": 0.003,
    "how": "head coach"
   },
@@ -10419,7 +10513,7 @@
   },
   {
    "from": "145",
-   "to": "2433",
+   "to": "2534",
    "role": "DC",
    "name": "Bryan Brown / Marcus Woodson",
    "p": 0.003,
@@ -10427,7 +10521,7 @@
   },
   {
    "from": "145",
-   "to": "2638",
+   "to": "2433",
    "role": "DC",
    "name": "Bryan Brown / Marcus Woodson",
    "p": 0.003,
@@ -10456,14 +10550,21 @@
   },
   {
    "from": "2393",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Derek Mason",
    "p": 0.003
   },
   {
+   "from": "183",
+   "to": "120",
+   "role": "HC",
+   "name": "Fran Brown",
+   "p": 0.003
+  },
+  {
    "from": "194",
-   "to": "2032",
+   "to": "152",
    "role": "DC",
    "name": "Matt Patricia / Tim Walton",
    "p": 0.003,
@@ -10478,11 +10579,12 @@
    "how": "head coach"
   },
   {
-   "from": "183",
-   "to": "120",
-   "role": "HC",
-   "name": "Fran Brown",
-   "p": 0.003
+   "from": "245",
+   "to": "2534",
+   "role": "OC",
+   "name": "Holmon Wiggins",
+   "p": 0.003,
+   "how": "head coach"
   },
   {
    "from": "326",
@@ -10510,7 +10612,7 @@
   },
   {
    "from": "2649",
-   "to": "239",
+   "to": "2628",
    "role": "DC",
    "name": "Jahmal Brown",
    "p": 0.002,
@@ -10526,14 +10628,6 @@
   },
   {
    "from": "2641",
-   "to": "239",
-   "role": "DC",
-   "name": "Shiel Wood / Rob Greene",
-   "p": 0.002,
-   "how": "follows HC"
-  },
-  {
-   "from": "2641",
    "to": "52",
    "role": "DC",
    "name": "Shiel Wood / Rob Greene",
@@ -10542,11 +10636,11 @@
   },
   {
    "from": "2641",
-   "to": "2032",
+   "to": "239",
    "role": "DC",
    "name": "Shiel Wood / Rob Greene",
    "p": 0.002,
-   "how": "head coach"
+   "how": "follows HC"
   },
   {
    "from": "2483",
@@ -10604,6 +10698,34 @@
    "how": "follows HC"
   },
   {
+   "from": "194",
+   "to": "152",
+   "role": "HC",
+   "name": "Ryan Day",
+   "p": 0.002
+  },
+  {
+   "from": "194",
+   "to": "52",
+   "role": "HC",
+   "name": "Ryan Day",
+   "p": 0.002
+  },
+  {
+   "from": "194",
+   "to": "239",
+   "role": "HC",
+   "name": "Ryan Day",
+   "p": 0.002
+  },
+  {
+   "from": "194",
+   "to": "2628",
+   "role": "HC",
+   "name": "Ryan Day",
+   "p": 0.002
+  },
+  {
    "from": "254",
    "to": "52",
    "role": "HC",
@@ -10626,40 +10748,12 @@
   },
   {
    "from": "254",
-   "to": "2628",
+   "to": "239",
    "role": "HC",
    "name": "Morgan Scalley",
    "p": 0.002
   },
   {
-   "from": "194",
-   "to": "152",
-   "role": "HC",
-   "name": "Ryan Day",
-   "p": 0.002
-  },
-  {
-   "from": "194",
-   "to": "52",
-   "role": "HC",
-   "name": "Ryan Day",
-   "p": 0.002
-  },
-  {
-   "from": "194",
-   "to": "2628",
-   "role": "HC",
-   "name": "Ryan Day",
-   "p": 0.002
-  },
-  {
-   "from": "194",
-   "to": "239",
-   "role": "HC",
-   "name": "Ryan Day",
-   "p": 0.002
-  },
-  {
    "from": "2751",
    "to": "2628",
    "role": "DC",
@@ -10678,14 +10772,6 @@
   {
    "from": "2751",
    "to": "52",
-   "role": "DC",
-   "name": "Aaron Bohl",
-   "p": 0.002,
-   "how": "follows HC"
-  },
-  {
-   "from": "2751",
-   "to": "120",
    "role": "DC",
    "name": "Aaron Bohl",
    "p": 0.002,
@@ -10766,14 +10852,6 @@
   {
    "from": "2751",
    "to": "52",
-   "role": "OC",
-   "name": "Christian Taylor",
-   "p": 0.002,
-   "how": "follows HC"
-  },
-  {
-   "from": "2751",
-   "to": "120",
    "role": "OC",
    "name": "Christian Taylor",
    "p": 0.002,
@@ -10898,6 +10976,14 @@
    "how": "head coach"
   },
   {
+   "from": "2390",
+   "to": "2534",
+   "role": "OC",
+   "name": "Shannon Dawson",
+   "p": 0.002,
+   "how": "head coach"
+  },
+  {
    "from": "290",
    "to": "152",
    "role": "DC",
@@ -10930,14 +11016,14 @@
   },
   {
    "from": "145",
-   "to": "2628",
+   "to": "239",
    "role": "HC",
    "name": "Pete Golding",
    "p": 0.002
   },
   {
    "from": "145",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Pete Golding",
    "p": 0.002
@@ -10960,7 +11046,7 @@
   },
   {
    "from": "2294",
-   "to": "2638",
+   "to": "2534",
    "role": "OC",
    "name": "Tim Lester",
    "p": 0.002,
@@ -11037,7 +11123,7 @@
   },
   {
    "from": "2",
-   "to": "2638",
+   "to": "2534",
    "role": "DC",
    "name": "D. J. Durkin / Tim Banks",
    "p": 0.002,
@@ -11053,14 +11139,14 @@
   },
   {
    "from": "264",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Jedd Fisch",
    "p": 0.002
   },
   {
    "from": "264",
-   "to": "2628",
+   "to": "239",
    "role": "HC",
    "name": "Jedd Fisch",
    "p": 0.002
@@ -11104,7 +11190,7 @@
   },
   {
    "from": "2649",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "Cris Reisert",
    "p": 0.002,
@@ -11151,7 +11237,7 @@
   },
   {
    "from": "201",
-   "to": "120",
+   "to": "152",
    "role": "HC",
    "name": "Brent Venables",
    "p": 0.002
@@ -11173,6 +11259,14 @@
    "how": "follows HC"
   },
   {
+   "from": "2628",
+   "to": "2534",
+   "role": "DC",
+   "name": "Andy Avalos",
+   "p": 0.002,
+   "how": "head coach"
+  },
+  {
    "from": "195",
    "to": "120",
    "role": "OC",
@@ -11187,6 +11281,48 @@
    "name": "Scott Isphording",
    "p": 0.002,
    "how": "follows HC"
+  },
+  {
+   "from": "41",
+   "to": "120",
+   "role": "HC",
+   "name": "Jason Candle",
+   "p": 0.002
+  },
+  {
+   "from": "41",
+   "to": "152",
+   "role": "HC",
+   "name": "Jason Candle",
+   "p": 0.002
+  },
+  {
+   "from": "41",
+   "to": "52",
+   "role": "HC",
+   "name": "Jason Candle",
+   "p": 0.002
+  },
+  {
+   "from": "21",
+   "to": "239",
+   "role": "HC",
+   "name": "Sean Lewis",
+   "p": 0.002
+  },
+  {
+   "from": "21",
+   "to": "2628",
+   "role": "HC",
+   "name": "Sean Lewis",
+   "p": 0.002
+  },
+  {
+   "from": "21",
+   "to": "52",
+   "role": "HC",
+   "name": "Sean Lewis",
+   "p": 0.002
   },
   {
    "from": "2426",
@@ -11220,45 +11356,24 @@
    "how": "head coach"
   },
   {
-   "from": "41",
-   "to": "120",
-   "role": "HC",
-   "name": "Jason Candle",
-   "p": 0.002
-  },
-  {
-   "from": "41",
-   "to": "152",
-   "role": "HC",
-   "name": "Jason Candle",
-   "p": 0.002
-  },
-  {
-   "from": "41",
+   "from": "2655",
    "to": "52",
    "role": "HC",
-   "name": "Jason Candle",
+   "name": "Will Hall",
    "p": 0.002
   },
   {
-   "from": "21",
+   "from": "2655",
    "to": "239",
    "role": "HC",
-   "name": "Sean Lewis",
+   "name": "Will Hall",
    "p": 0.002
   },
   {
-   "from": "21",
+   "from": "2655",
    "to": "2628",
    "role": "HC",
-   "name": "Sean Lewis",
-   "p": 0.002
-  },
-  {
-   "from": "21",
-   "to": "52",
-   "role": "HC",
-   "name": "Sean Lewis",
+   "name": "Will Hall",
    "p": 0.002
   },
   {
@@ -11287,7 +11402,7 @@
   },
   {
    "from": "2711",
-   "to": "2628",
+   "to": "239",
    "role": "DC",
    "name": "Greer Martini / Duane Vaughn",
    "p": 0.002,
@@ -11354,27 +11469,6 @@
    "name": "Lance Guidry",
    "p": 0.002,
    "how": "follows HC"
-  },
-  {
-   "from": "2655",
-   "to": "52",
-   "role": "HC",
-   "name": "Will Hall",
-   "p": 0.002
-  },
-  {
-   "from": "2655",
-   "to": "239",
-   "role": "HC",
-   "name": "Will Hall",
-   "p": 0.002
-  },
-  {
-   "from": "2655",
-   "to": "2628",
-   "role": "HC",
-   "name": "Will Hall",
-   "p": 0.002
   },
   {
    "from": "278",
@@ -11430,7 +11524,7 @@
   },
   {
    "from": "87",
-   "to": "2638",
+   "to": "2534",
    "role": "OC",
    "name": "Mike Denbrock",
    "p": 0.002,
@@ -11446,6 +11540,14 @@
   },
   {
    "from": "2641",
+   "to": "52",
+   "role": "OC",
+   "name": "Mack Leftwich",
+   "p": 0.002,
+   "how": "follows HC"
+  },
+  {
+   "from": "2641",
    "to": "239",
    "role": "OC",
    "name": "Mack Leftwich",
@@ -11454,11 +11556,11 @@
   },
   {
    "from": "2641",
-   "to": "52",
+   "to": "2534",
    "role": "OC",
    "name": "Mack Leftwich",
    "p": 0.002,
-   "how": "follows HC"
+   "how": "head coach"
   },
   {
    "from": "142",
@@ -11483,6 +11585,20 @@
    "how": "head coach"
   },
   {
+   "from": "26",
+   "to": "52",
+   "role": "HC",
+   "name": "Bob Chesney",
+   "p": 0.002
+  },
+  {
+   "from": "26",
+   "to": "152",
+   "role": "HC",
+   "name": "Bob Chesney",
+   "p": 0.002
+  },
+  {
    "from": "55",
    "to": "52",
    "role": "OC",
@@ -11515,20 +11631,6 @@
    "how": "follows HC"
   },
   {
-   "from": "26",
-   "to": "52",
-   "role": "HC",
-   "name": "Bob Chesney",
-   "p": 0.002
-  },
-  {
-   "from": "26",
-   "to": "152",
-   "role": "HC",
-   "name": "Bob Chesney",
-   "p": 0.002
-  },
-  {
    "from": "77",
    "to": "152",
    "role": "HC",
@@ -11555,6 +11657,14 @@
    "role": "HC",
    "name": "David Braun",
    "p": 0.002
+  },
+  {
+   "from": "309",
+   "to": "152",
+   "role": "OC",
+   "name": "Tim Leger",
+   "p": 0.002,
+   "how": "follows HC"
   },
   {
    "from": "58",
@@ -11722,7 +11832,7 @@
   },
   {
    "from": "228",
-   "to": "52",
+   "to": "152",
    "role": "HC",
    "name": "Dabo Swinney",
    "p": 0.002
@@ -11774,7 +11884,7 @@
   },
   {
    "from": "9",
-   "to": "2628",
+   "to": "239",
    "role": "HC",
    "name": "Kenny Dillingham",
    "p": 0.002
@@ -11828,14 +11938,6 @@
    "how": "follows HC"
   },
   {
-   "from": "2026",
-   "to": "52",
-   "role": "DC",
-   "name": "D. J. Smith",
-   "p": 0.002,
-   "how": "follows HC"
-  },
-  {
    "from": "57",
    "to": "152",
    "role": "HC",
@@ -11857,28 +11959,18 @@
    "p": 0.002
   },
   {
-   "from": "221",
-   "to": "2006",
-   "role": "DC",
-   "name": "Cory Sanders",
-   "p": 0.002,
-   "how": "head coach"
+   "from": "2440",
+   "to": "239",
+   "role": "HC",
+   "name": "Jeff Choate",
+   "p": 0.002
   },
   {
-   "from": "221",
-   "to": "152",
-   "role": "DC",
-   "name": "Cory Sanders",
-   "p": 0.002,
-   "how": "head coach"
-  },
-  {
-   "from": "2439",
+   "from": "2440",
    "to": "2628",
-   "role": "DC",
-   "name": "Paul Guenther",
-   "p": 0.002,
-   "how": "follows HC"
+   "role": "HC",
+   "name": "Jeff Choate",
+   "p": 0.002
   },
   {
    "from": "2439",
@@ -11890,7 +11982,7 @@
   },
   {
    "from": "2439",
-   "to": "52",
+   "to": "2628",
    "role": "DC",
    "name": "Paul Guenther",
    "p": 0.002,
@@ -11905,6 +11997,14 @@
   },
   {
    "from": "158",
+   "to": "2032",
+   "role": "OC",
+   "name": "Dana Holgorsen / Glenn Thomas",
+   "p": 0.002,
+   "how": "head coach"
+  },
+  {
+   "from": "158",
    "to": "2638",
    "role": "OC",
    "name": "Dana Holgorsen / Glenn Thomas",
@@ -11913,7 +12013,7 @@
   },
   {
    "from": "158",
-   "to": "2032",
+   "to": "2534",
    "role": "OC",
    "name": "Dana Holgorsen / Glenn Thomas",
    "p": 0.002,
@@ -11940,6 +12040,22 @@
    "role": "HC",
    "name": "Rhett Lashlee",
    "p": 0.002
+  },
+  {
+   "from": "221",
+   "to": "2006",
+   "role": "DC",
+   "name": "Cory Sanders",
+   "p": 0.002,
+   "how": "head coach"
+  },
+  {
+   "from": "221",
+   "to": "152",
+   "role": "DC",
+   "name": "Cory Sanders",
+   "p": 0.002,
+   "how": "head coach"
   },
   {
    "from": "12",
@@ -11972,6 +12088,14 @@
   },
   {
    "from": "239",
+   "to": "2534",
+   "role": "DC",
+   "name": "Joe Klanderman",
+   "p": 0.002,
+   "how": "head coach"
+  },
+  {
+   "from": "239",
    "to": "2628",
    "role": "DC",
    "name": "Joe Klanderman",
@@ -11985,20 +12109,6 @@
    "name": "Desmond Kitchings",
    "p": 0.002,
    "how": "follows HC"
-  },
-  {
-   "from": "2440",
-   "to": "2628",
-   "role": "HC",
-   "name": "Jeff Choate",
-   "p": 0.002
-  },
-  {
-   "from": "2440",
-   "to": "239",
-   "role": "HC",
-   "name": "Jeff Choate",
-   "p": 0.002
   },
   {
    "from": "5",
@@ -12033,6 +12143,13 @@
    "to": "120",
    "role": "HC",
    "name": "Matt Drinkall",
+   "p": 0.002
+  },
+  {
+   "from": "158",
+   "to": "52",
+   "role": "HC",
+   "name": "Matt Rhule",
    "p": 0.002
   },
   {
@@ -12116,7 +12233,7 @@
   },
   {
    "from": "275",
-   "to": "239",
+   "to": "152",
    "role": "HC",
    "name": "Luke Fickell",
    "p": 0.002
@@ -12124,6 +12241,13 @@
   {
    "from": "275",
    "to": "52",
+   "role": "HC",
+   "name": "Luke Fickell",
+   "p": 0.002
+  },
+  {
+   "from": "275",
+   "to": "239",
    "role": "HC",
    "name": "Luke Fickell",
    "p": 0.002
@@ -12137,14 +12261,14 @@
   },
   {
    "from": "258",
-   "to": "2628",
+   "to": "239",
    "role": "HC",
    "name": "Tony Elliott",
    "p": 0.002
   },
   {
    "from": "258",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Tony Elliott",
    "p": 0.002
@@ -12181,20 +12305,47 @@
    "how": "head coach"
   },
   {
-   "from": "145",
-   "to": "2638",
-   "role": "OC",
-   "name": "John David Baker / Cody Woodiel",
-   "p": 0.002,
-   "how": "head coach"
-  },
-  {
    "from": "259",
    "to": "152",
    "role": "DC",
    "name": "Brent Pry",
    "p": 0.002,
    "how": "head coach"
+  },
+  {
+   "from": "2305",
+   "to": "52",
+   "role": "HC",
+   "name": "Lance Leipold",
+   "p": 0.002
+  },
+  {
+   "from": "2305",
+   "to": "120",
+   "role": "HC",
+   "name": "Lance Leipold",
+   "p": 0.002
+  },
+  {
+   "from": "2305",
+   "to": "152",
+   "role": "HC",
+   "name": "Lance Leipold",
+   "p": 0.002
+  },
+  {
+   "from": "204",
+   "to": "2628",
+   "role": "HC",
+   "name": "Jamarcus Shephard",
+   "p": 0.002
+  },
+  {
+   "from": "204",
+   "to": "239",
+   "role": "HC",
+   "name": "Jamarcus Shephard",
+   "p": 0.002
   },
   {
    "from": "12",
@@ -12254,7 +12405,7 @@
   },
   {
    "from": "2711",
-   "to": "2628",
+   "to": "239",
    "role": "OC",
    "name": "Walt Bell",
    "p": 0.002,
@@ -12313,41 +12464,6 @@
    "how": "head coach"
   },
   {
-   "from": "2305",
-   "to": "52",
-   "role": "HC",
-   "name": "Lance Leipold",
-   "p": 0.002
-  },
-  {
-   "from": "2305",
-   "to": "120",
-   "role": "HC",
-   "name": "Lance Leipold",
-   "p": 0.002
-  },
-  {
-   "from": "2305",
-   "to": "152",
-   "role": "HC",
-   "name": "Lance Leipold",
-   "p": 0.002
-  },
-  {
-   "from": "204",
-   "to": "239",
-   "role": "HC",
-   "name": "Jamarcus Shephard",
-   "p": 0.002
-  },
-  {
-   "from": "204",
-   "to": "2628",
-   "role": "HC",
-   "name": "Jamarcus Shephard",
-   "p": 0.002
-  },
-  {
    "from": "55",
    "to": "52",
    "role": "DC",
@@ -12385,21 +12501,6 @@
    "role": "HC",
    "name": "Will Stein",
    "p": 0.002
-  },
-  {
-   "from": "96",
-   "to": "120",
-   "role": "HC",
-   "name": "Will Stein",
-   "p": 0.002
-  },
-  {
-   "from": "150",
-   "to": "120",
-   "role": "DC",
-   "name": "Jonathan Patke",
-   "p": 0.002,
-   "how": "follows HC"
   },
   {
    "from": "2305",
@@ -12424,28 +12525,18 @@
    "p": 0.002
   },
   {
-   "from": "201",
-   "to": "2638",
-   "role": "DC",
-   "name": "Todd Bates",
-   "p": 0.002,
-   "how": "head coach"
+   "from": "153",
+   "to": "120",
+   "role": "HC",
+   "name": "Bill Belichick",
+   "p": 0.002
   },
   {
-   "from": "201",
-   "to": "2628",
-   "role": "DC",
-   "name": "Todd Bates",
-   "p": 0.002,
-   "how": "head coach"
-  },
-  {
-   "from": "201",
-   "to": "2032",
-   "role": "DC",
-   "name": "Todd Bates",
-   "p": 0.002,
-   "how": "head coach"
+   "from": "153",
+   "to": "152",
+   "role": "HC",
+   "name": "Bill Belichick",
+   "p": 0.002
   },
   {
    "from": "245",
@@ -12465,14 +12556,14 @@
   },
   {
    "from": "221",
-   "to": "2628",
+   "to": "239",
    "role": "HC",
    "name": "Pat Narduzzi",
    "p": 0.002
   },
   {
    "from": "221",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Pat Narduzzi",
    "p": 0.002
@@ -12514,6 +12605,14 @@
    "how": "head coach"
   },
   {
+   "from": "8",
+   "to": "2534",
+   "role": "DC",
+   "name": "Ron Roberts / Deron Wilson",
+   "p": 0.002,
+   "how": "head coach"
+  },
+  {
    "from": "249",
    "to": "2628",
    "role": "DC",
@@ -12531,7 +12630,7 @@
   },
   {
    "from": "2439",
-   "to": "2628",
+   "to": "239",
    "role": "OC",
    "name": "Corey Dennis",
    "p": 0.002,
@@ -12539,7 +12638,7 @@
   },
   {
    "from": "2439",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "Corey Dennis",
    "p": 0.002,
@@ -12563,6 +12662,14 @@
   },
   {
    "from": "201",
+   "to": "2534",
+   "role": "OC",
+   "name": "Jason Witten",
+   "p": 0.002,
+   "how": "head coach"
+  },
+  {
+   "from": "201",
    "to": "2638",
    "role": "OC",
    "name": "Jason Witten",
@@ -12570,18 +12677,28 @@
    "how": "head coach"
   },
   {
-   "from": "153",
-   "to": "120",
-   "role": "HC",
-   "name": "Bill Belichick",
-   "p": 0.002
+   "from": "201",
+   "to": "2534",
+   "role": "DC",
+   "name": "Todd Bates",
+   "p": 0.002,
+   "how": "head coach"
   },
   {
-   "from": "153",
-   "to": "152",
-   "role": "HC",
-   "name": "Bill Belichick",
-   "p": 0.002
+   "from": "201",
+   "to": "2638",
+   "role": "DC",
+   "name": "Todd Bates",
+   "p": 0.002,
+   "how": "head coach"
+  },
+  {
+   "from": "201",
+   "to": "2628",
+   "role": "DC",
+   "name": "Todd Bates",
+   "p": 0.002,
+   "how": "head coach"
   },
   {
    "from": "333",
@@ -12593,7 +12710,7 @@
   },
   {
    "from": "333",
-   "to": "52",
+   "to": "2534",
    "role": "OC",
    "name": "Ryan Grubb",
    "p": 0.002,
@@ -12601,7 +12718,7 @@
   },
   {
    "from": "333",
-   "to": "344",
+   "to": "52",
    "role": "OC",
    "name": "Ryan Grubb",
    "p": 0.002,
@@ -12652,6 +12769,13 @@
    "how": "head coach"
   },
   {
+   "from": "103",
+   "to": "120",
+   "role": "HC",
+   "name": "Bill O'Brien",
+   "p": 0.002
+  },
+  {
    "from": "258",
    "to": "120",
    "role": "DC",
@@ -12676,14 +12800,6 @@
    "how": "head coach"
   },
   {
-   "from": "99",
-   "to": "2638",
-   "role": "OC",
-   "name": "Charlie Weis Jr. / Joe Cox",
-   "p": 0.002,
-   "how": "head coach"
-  },
-  {
    "from": "2",
    "to": "2032",
    "role": "OC",
@@ -12700,8 +12816,24 @@
    "how": "head coach"
   },
   {
+   "from": "2",
+   "to": "2534",
+   "role": "OC",
+   "name": "Joel Gordon / Kodi Burns",
+   "p": 0.002,
+   "how": "head coach"
+  },
+  {
    "from": "97",
    "to": "2032",
+   "role": "DC",
+   "name": "Mark Ivey / Steve Ellis",
+   "p": 0.002,
+   "how": "head coach"
+  },
+  {
+   "from": "97",
+   "to": "2534",
    "role": "DC",
    "name": "Mark Ivey / Steve Ellis",
    "p": 0.002,
@@ -12862,6 +12994,14 @@
   },
   {
    "from": "2628",
+   "to": "2534",
+   "role": "OC",
+   "name": "Gordon Sammis / A. J. Ricker",
+   "p": 0.002,
+   "how": "head coach"
+  },
+  {
+   "from": "2628",
    "to": "2638",
    "role": "OC",
    "name": "Gordon Sammis / A. J. Ricker",
@@ -12883,6 +13023,27 @@
    "name": "Mike Bobo",
    "p": 0.002,
    "how": "follows HC"
+  },
+  {
+   "from": "2247",
+   "to": "52",
+   "role": "HC",
+   "name": "Dell McGee",
+   "p": 0.002
+  },
+  {
+   "from": "2247",
+   "to": "152",
+   "role": "HC",
+   "name": "Dell McGee",
+   "p": 0.002
+  },
+  {
+   "from": "2247",
+   "to": "59",
+   "role": "HC",
+   "name": "Dell McGee",
+   "p": 0.002
   },
   {
    "from": "251",
@@ -12925,6 +13086,14 @@
    "how": "head coach"
   },
   {
+   "from": "142",
+   "to": "2534",
+   "role": "DC",
+   "name": "Corey Batoon",
+   "p": 0.002,
+   "how": "head coach"
+  },
+  {
    "from": "57",
    "to": "52",
    "role": "DC",
@@ -12942,6 +13111,14 @@
   },
   {
    "from": "197",
+   "to": "2534",
+   "role": "DC",
+   "name": "Skyler Cassity",
+   "p": 0.002,
+   "how": "head coach"
+  },
+  {
+   "from": "197",
    "to": "2638",
    "role": "DC",
    "name": "Skyler Cassity",
@@ -12949,32 +13126,28 @@
    "how": "head coach"
   },
   {
-   "from": "2247",
-   "to": "52",
-   "role": "HC",
-   "name": "Dell McGee",
-   "p": 0.002
+   "from": "239",
+   "to": "2534",
+   "role": "OC",
+   "name": "Jake Spavital",
+   "p": 0.002,
+   "how": "head coach"
   },
   {
-   "from": "2247",
+   "from": "2026",
    "to": "152",
-   "role": "HC",
-   "name": "Dell McGee",
-   "p": 0.002
+   "role": "OC",
+   "name": "Mike Anthony",
+   "p": 0.002,
+   "how": "follows HC"
   },
   {
-   "from": "2247",
-   "to": "59",
-   "role": "HC",
-   "name": "Dell McGee",
-   "p": 0.002
-  },
-  {
-   "from": "2247",
+   "from": "2026",
    "to": "120",
-   "role": "HC",
-   "name": "Dell McGee",
-   "p": 0.002
+   "role": "OC",
+   "name": "Mike Anthony",
+   "p": 0.002,
+   "how": "follows HC"
   },
   {
    "from": "96",
@@ -12983,30 +13156,6 @@
    "name": "Jay Bateman",
    "p": 0.002,
    "how": "head coach"
-  },
-  {
-   "from": "2026",
-   "to": "152",
-   "role": "OC",
-   "name": "Mike Anthony",
-   "p": 0.002,
-   "how": "follows HC"
-  },
-  {
-   "from": "2026",
-   "to": "120",
-   "role": "OC",
-   "name": "Mike Anthony",
-   "p": 0.002,
-   "how": "follows HC"
-  },
-  {
-   "from": "2026",
-   "to": "52",
-   "role": "OC",
-   "name": "Mike Anthony",
-   "p": 0.002,
-   "how": "follows HC"
   },
   {
    "from": "164",
@@ -13048,6 +13197,20 @@
    "how": "head coach"
   },
   {
+   "from": "183",
+   "to": "239",
+   "role": "HC",
+   "name": "Fran Brown",
+   "p": 0.002
+  },
+  {
+   "from": "183",
+   "to": "2628",
+   "role": "HC",
+   "name": "Fran Brown",
+   "p": 0.002
+  },
+  {
    "from": "2390",
    "to": "120",
    "role": "DC",
@@ -13089,7 +13252,7 @@
   },
   {
    "from": "2390",
-   "to": "2032",
+   "to": "2534",
    "role": "DC",
    "name": "Corey Hetherman",
    "p": 0.002,
@@ -13122,6 +13285,14 @@
   {
    "from": "2633",
    "to": "2032",
+   "role": "OC",
+   "name": "Joey Halzle",
+   "p": 0.002,
+   "how": "head coach"
+  },
+  {
+   "from": "2633",
+   "to": "2534",
    "role": "OC",
    "name": "Joey Halzle",
    "p": 0.002,
@@ -13134,20 +13305,6 @@
    "name": "Holmon Wiggins",
    "p": 0.002,
    "how": "head coach"
-  },
-  {
-   "from": "183",
-   "to": "239",
-   "role": "HC",
-   "name": "Fran Brown",
-   "p": 0.002
-  },
-  {
-   "from": "183",
-   "to": "2628",
-   "role": "HC",
-   "name": "Fran Brown",
-   "p": 0.002
   },
   {
    "from": "113",
@@ -13219,6 +13376,14 @@
   },
   {
    "from": "326",
+   "to": "2534",
+   "role": "OC",
+   "name": "Landon Keopple / Jordan Shoemaker",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "326",
    "to": "2638",
    "role": "OC",
    "name": "Landon Keopple / Jordan Shoemaker",
@@ -13258,6 +13423,14 @@
    "how": "head coach"
   },
   {
+   "from": "2348",
+   "to": "2534",
+   "role": "DC",
+   "name": "Luke Olson",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
    "from": "5",
    "to": "52",
    "role": "DC",
@@ -13291,7 +13464,7 @@
   },
   {
    "from": "204",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "Mitch Dahlen / Ryan Wallace",
    "p": 0.001,
@@ -13299,7 +13472,7 @@
   },
   {
    "from": "204",
-   "to": "2628",
+   "to": "239",
    "role": "OC",
    "name": "Mitch Dahlen / Ryan Wallace",
    "p": 0.001,
@@ -13323,7 +13496,7 @@
   },
   {
    "from": "2440",
-   "to": "2628",
+   "to": "239",
    "role": "DC",
    "name": "Kane Ioane",
    "p": 0.001,
@@ -13331,7 +13504,7 @@
   },
   {
    "from": "2440",
-   "to": "239",
+   "to": "2628",
    "role": "DC",
    "name": "Kane Ioane",
    "p": 0.001,
@@ -13402,14 +13575,6 @@
    "how": "head coach"
   },
   {
-   "from": "248",
-   "to": "239",
-   "role": "OC",
-   "name": "Slade Nagle",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
    "from": "167",
    "to": "2638",
    "role": "DC",
@@ -13419,7 +13584,7 @@
   },
   {
    "from": "197",
-   "to": "2628",
+   "to": "52",
    "role": "OC",
    "name": "Sean Brophy",
    "p": 0.001,
@@ -13427,7 +13592,7 @@
   },
   {
    "from": "197",
-   "to": "52",
+   "to": "2628",
    "role": "OC",
    "name": "Sean Brophy",
    "p": 0.001,
@@ -13451,6 +13616,14 @@
   },
   {
    "from": "197",
+   "to": "2534",
+   "role": "OC",
+   "name": "Sean Brophy",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "197",
    "to": "2638",
    "role": "OC",
    "name": "Sean Brophy",
@@ -13460,14 +13633,6 @@
   {
    "from": "197",
    "to": "2032",
-   "role": "OC",
-   "name": "Sean Brophy",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "197",
-   "to": "2628",
    "role": "OC",
    "name": "Sean Brophy",
    "p": 0.001,
@@ -13491,7 +13656,7 @@
   },
   {
    "from": "235",
-   "to": "2433",
+   "to": "2534",
    "role": "OC",
    "name": "Kevin Decker / David Weeks",
    "p": 0.001,
@@ -13499,7 +13664,7 @@
   },
   {
    "from": "235",
-   "to": "2638",
+   "to": "2433",
    "role": "OC",
    "name": "Kevin Decker / David Weeks",
    "p": 0.001,
@@ -13571,11 +13736,19 @@
   },
   {
    "from": "2132",
-   "to": "2638",
+   "to": "2534",
    "role": "OC",
    "name": "Pete Thomas / Nic Cardwell",
    "p": 0.001,
    "how": "head coach"
+  },
+  {
+   "from": "2751",
+   "to": "38",
+   "role": "DC",
+   "name": "Aaron Bohl",
+   "p": 0.001,
+   "how": "follows HC"
   },
   {
    "from": "2751",
@@ -13626,74 +13799,10 @@
    "how": "head coach"
   },
   {
-   "from": "26",
-   "to": "239",
-   "role": "DC",
-   "name": "Colin Hitschler",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "26",
-   "to": "2628",
-   "role": "DC",
-   "name": "Colin Hitschler",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "26",
-   "to": "52",
-   "role": "DC",
-   "name": "Colin Hitschler",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "26",
-   "to": "152",
-   "role": "DC",
-   "name": "Colin Hitschler",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "195",
-   "to": "52",
-   "role": "DC",
-   "name": "Kurt Mattix",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "195",
-   "to": "239",
-   "role": "DC",
-   "name": "Kurt Mattix",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "2426",
-   "to": "120",
+   "from": "2751",
+   "to": "38",
    "role": "OC",
-   "name": "Drew Cronic",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "2426",
-   "to": "152",
-   "role": "OC",
-   "name": "Drew Cronic",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "2426",
-   "to": "52",
-   "role": "OC",
-   "name": "Drew Cronic",
+   "name": "Christian Taylor",
    "p": 0.001,
    "how": "follows HC"
   },
@@ -13706,6 +13815,78 @@
    "how": "head coach"
   },
   {
+   "from": "26",
+   "to": "239",
+   "role": "DC",
+   "name": "Colin Hitschler",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "26",
+   "to": "2628",
+   "role": "DC",
+   "name": "Colin Hitschler",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "26",
+   "to": "52",
+   "role": "DC",
+   "name": "Colin Hitschler",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "26",
+   "to": "152",
+   "role": "DC",
+   "name": "Colin Hitschler",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "195",
+   "to": "52",
+   "role": "DC",
+   "name": "Kurt Mattix",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "195",
+   "to": "2628",
+   "role": "DC",
+   "name": "Kurt Mattix",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "2426",
+   "to": "120",
+   "role": "OC",
+   "name": "Drew Cronic",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "2426",
+   "to": "152",
+   "role": "OC",
+   "name": "Drew Cronic",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "2426",
+   "to": "52",
+   "role": "OC",
+   "name": "Drew Cronic",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
    "from": "252",
    "to": "52",
    "role": "OC",
@@ -13731,7 +13912,7 @@
   },
   {
    "from": "252",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "Aaron Roderick",
    "p": 0.001,
@@ -13747,7 +13928,7 @@
   },
   {
    "from": "252",
-   "to": "239",
+   "to": "2534",
    "role": "OC",
    "name": "Aaron Roderick",
    "p": 0.001,
@@ -13794,10 +13975,10 @@
    "how": "follows HC"
   },
   {
-   "from": "2390",
-   "to": "2032",
+   "from": "2335",
+   "to": "2534",
    "role": "OC",
-   "name": "Shannon Dawson",
+   "name": "Newland Isaac",
    "p": 0.001,
    "how": "head coach"
   },
@@ -13812,14 +13993,6 @@
   {
    "from": "2335",
    "to": "152",
-   "role": "OC",
-   "name": "Newland Isaac",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "2335",
-   "to": "2032",
    "role": "OC",
    "name": "Newland Isaac",
    "p": 0.001,
@@ -13906,7 +14079,7 @@
   },
   {
    "from": "97",
-   "to": "98",
+   "to": "2534",
    "role": "OC",
    "name": "Brian Brohm",
    "p": 0.001,
@@ -14007,7 +14180,7 @@
   },
   {
    "from": "77",
-   "to": "2638",
+   "to": "2534",
    "role": "OC",
    "name": "Chip Kelly",
    "p": 0.001,
@@ -14046,6 +14219,14 @@
    "how": "head coach"
   },
   {
+   "from": "309",
+   "to": "2534",
+   "role": "DC",
+   "name": "Jim Salgado",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
    "from": "2117",
    "to": "120",
    "role": "DC",
@@ -14071,7 +14252,7 @@
   },
   {
    "from": "2117",
-   "to": "2628",
+   "to": "239",
    "role": "DC",
    "name": "Sean Cronin",
    "p": 0.001,
@@ -14103,7 +14284,7 @@
   },
   {
    "from": "9",
-   "to": "2628",
+   "to": "239",
    "role": "DC",
    "name": "Brian Ward",
    "p": 0.001,
@@ -14159,11 +14340,19 @@
   },
   {
    "from": "202",
-   "to": "120",
+   "to": "152",
    "role": "DC",
    "name": "Josh Reardon / Mike Gray",
    "p": 0.001,
    "how": "follows HC"
+  },
+  {
+   "from": "202",
+   "to": "2534",
+   "role": "DC",
+   "name": "Josh Reardon / Mike Gray",
+   "p": 0.001,
+   "how": "head coach"
   },
   {
    "from": "202",
@@ -14207,7 +14396,7 @@
   },
   {
    "from": "251",
-   "to": "152",
+   "to": "120",
    "role": "DC",
    "name": "Will Muschamp",
    "p": 0.001,
@@ -14231,7 +14420,7 @@
   },
   {
    "from": "194",
-   "to": "2628",
+   "to": "239",
    "role": "OC",
    "name": "Arthur Smith / Keenan Bailey",
    "p": 0.001,
@@ -14239,7 +14428,7 @@
   },
   {
    "from": "194",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "Arthur Smith / Keenan Bailey",
    "p": 0.001,
@@ -14294,14 +14483,6 @@
    "how": "head coach"
   },
   {
-   "from": "2628",
-   "to": "2032",
-   "role": "DC",
-   "name": "Andy Avalos",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
    "from": "195",
    "to": "52",
    "role": "OC",
@@ -14311,11 +14492,25 @@
   },
   {
    "from": "195",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "Scott Isphording",
    "p": 0.001,
    "how": "follows HC"
+  },
+  {
+   "from": "41",
+   "to": "239",
+   "role": "HC",
+   "name": "Jason Candle",
+   "p": 0.001
+  },
+  {
+   "from": "21",
+   "to": "120",
+   "role": "HC",
+   "name": "Sean Lewis",
+   "p": 0.001
   },
   {
    "from": "2426",
@@ -14444,17 +14639,10 @@
    "how": "head coach"
   },
   {
-   "from": "41",
-   "to": "239",
+   "from": "2655",
+   "to": "152",
    "role": "HC",
-   "name": "Jason Candle",
-   "p": 0.001
-  },
-  {
-   "from": "21",
-   "to": "120",
-   "role": "HC",
-   "name": "Sean Lewis",
+   "name": "Will Hall",
    "p": 0.001
   },
   {
@@ -14563,18 +14751,19 @@
   },
   {
    "from": "2305",
-   "to": "2638",
+   "to": "2534",
    "role": "DC",
    "name": "D. K. McDonald",
    "p": 0.001,
    "how": "head coach"
   },
   {
-   "from": "2655",
-   "to": "152",
-   "role": "HC",
-   "name": "Will Hall",
-   "p": 0.001
+   "from": "2305",
+   "to": "2638",
+   "role": "DC",
+   "name": "D. K. McDonald",
+   "p": 0.001,
+   "how": "head coach"
   },
   {
    "from": "276",
@@ -14657,14 +14846,6 @@
    "how": "head coach"
   },
   {
-   "from": "2641",
-   "to": "2628",
-   "role": "OC",
-   "name": "Mack Leftwich",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
    "from": "254",
    "to": "52",
    "role": "OC",
@@ -14690,7 +14871,7 @@
   },
   {
    "from": "254",
-   "to": "2628",
+   "to": "239",
    "role": "OC",
    "name": "Kevin McGiven",
    "p": 0.001,
@@ -14698,7 +14879,7 @@
   },
   {
    "from": "254",
-   "to": "328",
+   "to": "2534",
    "role": "OC",
    "name": "Kevin McGiven",
    "p": 0.001,
@@ -14706,7 +14887,7 @@
   },
   {
    "from": "254",
-   "to": "2628",
+   "to": "328",
    "role": "OC",
    "name": "Kevin McGiven",
    "p": 0.001,
@@ -14754,7 +14935,7 @@
   },
   {
    "from": "77",
-   "to": "2638",
+   "to": "2534",
    "role": "DC",
    "name": "Tim McGarigle",
    "p": 0.001,
@@ -14769,38 +14950,6 @@
    "how": "head coach"
   },
   {
-   "from": "58",
-   "to": "52",
-   "role": "DC",
-   "name": "Josh Aldridge",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "58",
-   "to": "152",
-   "role": "DC",
-   "name": "Josh Aldridge",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "58",
-   "to": "120",
-   "role": "DC",
-   "name": "Josh Aldridge",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "58",
-   "to": "239",
-   "role": "DC",
-   "name": "Josh Aldridge",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
    "from": "41",
    "to": "120",
    "role": "OC",
@@ -14890,7 +15039,7 @@
   },
   {
    "from": "2393",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "Anthony Scelfo",
    "p": 0.001,
@@ -14922,7 +15071,7 @@
   },
   {
    "from": "228",
-   "to": "52",
+   "to": "152",
    "role": "DC",
    "name": "Tom Allen / Nick Eason",
    "p": 0.001,
@@ -14963,6 +15112,62 @@
    "name": "Luke Schleusner",
    "p": 0.001,
    "how": "head coach"
+  },
+  {
+   "from": "309",
+   "to": "2032",
+   "role": "OC",
+   "name": "Tim Leger",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "309",
+   "to": "2433",
+   "role": "OC",
+   "name": "Tim Leger",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "309",
+   "to": "2534",
+   "role": "OC",
+   "name": "Tim Leger",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "58",
+   "to": "52",
+   "role": "DC",
+   "name": "Josh Aldridge",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "58",
+   "to": "152",
+   "role": "DC",
+   "name": "Josh Aldridge",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "58",
+   "to": "120",
+   "role": "DC",
+   "name": "Josh Aldridge",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "58",
+   "to": "239",
+   "role": "DC",
+   "name": "Josh Aldridge",
+   "p": 0.001,
+   "how": "follows HC"
   },
   {
    "from": "48",
@@ -15061,7 +15266,7 @@
   },
   {
    "from": "142",
-   "to": "2638",
+   "to": "2534",
    "role": "OC",
    "name": "Chip Lindsey",
    "p": 0.001,
@@ -15069,7 +15274,7 @@
   },
   {
    "from": "142",
-   "to": "2628",
+   "to": "2638",
    "role": "OC",
    "name": "Chip Lindsey",
    "p": 0.001,
@@ -15101,7 +15306,7 @@
   },
   {
    "from": "252",
-   "to": "239",
+   "to": "2628",
    "role": "DC",
    "name": "Kelly Poppinga",
    "p": 0.001,
@@ -15133,7 +15338,7 @@
   },
   {
    "from": "9",
-   "to": "2628",
+   "to": "239",
    "role": "OC",
    "name": "Marcus Arroyo",
    "p": 0.001,
@@ -15197,7 +15402,7 @@
   },
   {
    "from": "204",
-   "to": "239",
+   "to": "2628",
    "role": "DC",
    "name": "Mike MacIntyre / Cort Dennison",
    "p": 0.001,
@@ -15205,7 +15410,7 @@
   },
   {
    "from": "204",
-   "to": "2628",
+   "to": "239",
    "role": "DC",
    "name": "Mike MacIntyre / Cort Dennison",
    "p": 0.001,
@@ -15226,22 +15431,6 @@
    "name": "Mike MacIntyre / Cort Dennison",
    "p": 0.001,
    "how": "follows HC"
-  },
-  {
-   "from": "309",
-   "to": "2032",
-   "role": "OC",
-   "name": "Tim Leger",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "309",
-   "to": "2433",
-   "role": "OC",
-   "name": "Tim Leger",
-   "p": 0.001,
-   "how": "head coach"
   },
   {
    "from": "356",
@@ -15277,9 +15466,25 @@
   },
   {
    "from": "356",
-   "to": "295",
+   "to": "2006",
    "role": "OC",
    "name": "Barry Lunney Jr.",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "2636",
+   "to": "2534",
+   "role": "OC",
+   "name": "Rick Bowie",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "2636",
+   "to": "2638",
+   "role": "OC",
+   "name": "Rick Bowie",
    "p": 0.001,
    "how": "head coach"
   },
@@ -15312,6 +15517,14 @@
    "to": "120",
    "role": "DC",
    "name": "Demetrius Sumler",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "2026",
+   "to": "52",
+   "role": "DC",
+   "name": "D. J. Smith",
    "p": 0.001,
    "how": "follows HC"
   },
@@ -15360,46 +15573,6 @@
    "p": 0.001
   },
   {
-   "from": "221",
-   "to": "120",
-   "role": "DC",
-   "name": "Cory Sanders",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "221",
-   "to": "2628",
-   "role": "DC",
-   "name": "Cory Sanders",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "221",
-   "to": "239",
-   "role": "DC",
-   "name": "Cory Sanders",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "221",
-   "to": "152",
-   "role": "DC",
-   "name": "Cory Sanders",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "221",
-   "to": "120",
-   "role": "DC",
-   "name": "Cory Sanders",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
    "from": "2348",
    "to": "2433",
    "role": "OC",
@@ -15441,6 +15614,14 @@
   },
   {
    "from": "2116",
+   "to": "2534",
+   "role": "OC",
+   "name": "Steve Cooper",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "2116",
    "to": "2032",
    "role": "OC",
    "name": "Steve Cooper",
@@ -15456,6 +15637,20 @@
    "how": "head coach"
   },
   {
+   "from": "2440",
+   "to": "52",
+   "role": "HC",
+   "name": "Jeff Choate",
+   "p": 0.001
+  },
+  {
+   "from": "2440",
+   "to": "120",
+   "role": "HC",
+   "name": "Jeff Choate",
+   "p": 0.001
+  },
+  {
    "from": "295",
    "to": "120",
    "role": "HC",
@@ -15477,12 +15672,12 @@
    "p": 0.001
   },
   {
-   "from": "2636",
-   "to": "2638",
-   "role": "OC",
-   "name": "Rick Bowie",
+   "from": "2439",
+   "to": "52",
+   "role": "DC",
+   "name": "Paul Guenther",
    "p": 0.001,
-   "how": "head coach"
+   "how": "follows HC"
   },
   {
    "from": "2439",
@@ -15502,6 +15697,14 @@
   },
   {
    "from": "2335",
+   "to": "2534",
+   "role": "DC",
+   "name": "Shawn Quinn",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "2335",
    "to": "152",
    "role": "DC",
    "name": "Shawn Quinn",
@@ -15511,14 +15714,6 @@
   {
    "from": "2335",
    "to": "120",
-   "role": "DC",
-   "name": "Shawn Quinn",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "2335",
-   "to": "295",
    "role": "DC",
    "name": "Shawn Quinn",
    "p": 0.001,
@@ -15589,14 +15784,6 @@
    "how": "follows HC"
   },
   {
-   "from": "158",
-   "to": "2433",
-   "role": "OC",
-   "name": "Dana Holgorsen / Glenn Thomas",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
    "from": "57",
    "to": "52",
    "role": "OC",
@@ -15627,6 +15814,14 @@
    "name": "Buster Faulkner",
    "p": 0.001,
    "how": "follows HC"
+  },
+  {
+   "from": "57",
+   "to": "2534",
+   "role": "OC",
+   "name": "Buster Faulkner",
+   "p": 0.001,
+   "how": "head coach"
   },
   {
    "from": "57",
@@ -15637,23 +15832,15 @@
    "how": "head coach"
   },
   {
-   "from": "57",
-   "to": "2638",
-   "role": "OC",
-   "name": "Buster Faulkner",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
    "from": "197",
-   "to": "2628",
+   "to": "52",
    "role": "HC",
    "name": "Eric Morris",
    "p": 0.001
   },
   {
    "from": "197",
-   "to": "52",
+   "to": "2628",
    "role": "HC",
    "name": "Eric Morris",
    "p": 0.001
@@ -15671,6 +15858,46 @@
    "role": "HC",
    "name": "Eric Morris",
    "p": 0.001
+  },
+  {
+   "from": "221",
+   "to": "120",
+   "role": "DC",
+   "name": "Cory Sanders",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "221",
+   "to": "239",
+   "role": "DC",
+   "name": "Cory Sanders",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "221",
+   "to": "2628",
+   "role": "DC",
+   "name": "Cory Sanders",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "221",
+   "to": "152",
+   "role": "DC",
+   "name": "Cory Sanders",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "221",
+   "to": "120",
+   "role": "DC",
+   "name": "Cory Sanders",
+   "p": 0.001,
+   "how": "head coach"
   },
   {
    "from": "12",
@@ -15714,7 +15941,7 @@
   },
   {
    "from": "12",
-   "to": "2032",
+   "to": "2534",
    "role": "OC",
    "name": "Seth Doege",
    "p": 0.001,
@@ -15722,7 +15949,7 @@
   },
   {
    "from": "238",
-   "to": "2628",
+   "to": "239",
    "role": "HC",
    "name": "Clark Lea",
    "p": 0.001
@@ -15764,14 +15991,6 @@
    "how": "head coach"
   },
   {
-   "from": "239",
-   "to": "2032",
-   "role": "DC",
-   "name": "Joe Klanderman",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
    "from": "258",
    "to": "152",
    "role": "OC",
@@ -15781,7 +16000,7 @@
   },
   {
    "from": "258",
-   "to": "2628",
+   "to": "239",
    "role": "OC",
    "name": "Desmond Kitchings",
    "p": 0.001,
@@ -15789,7 +16008,7 @@
   },
   {
    "from": "258",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "Desmond Kitchings",
    "p": 0.001,
@@ -15820,20 +16039,6 @@
    "how": "head coach"
   },
   {
-   "from": "2440",
-   "to": "52",
-   "role": "HC",
-   "name": "Jeff Choate",
-   "p": 0.001
-  },
-  {
-   "from": "2440",
-   "to": "120",
-   "role": "HC",
-   "name": "Jeff Choate",
-   "p": 0.001
-  },
-  {
    "from": "5",
    "to": "152",
    "role": "HC",
@@ -15853,59 +16058,6 @@
    "role": "HC",
    "name": "Alex Mortensen",
    "p": 0.001
-  },
-  {
-   "from": "2117",
-   "to": "152",
-   "role": "HC",
-   "name": "Matt Drinkall",
-   "p": 0.001
-  },
-  {
-   "from": "2117",
-   "to": "52",
-   "role": "HC",
-   "name": "Matt Drinkall",
-   "p": 0.001
-  },
-  {
-   "from": "2117",
-   "to": "2628",
-   "role": "HC",
-   "name": "Matt Drinkall",
-   "p": 0.001
-  },
-  {
-   "from": "2117",
-   "to": "120",
-   "role": "OC",
-   "name": "Jim Chapin / Derek Fulton",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "2117",
-   "to": "152",
-   "role": "OC",
-   "name": "Jim Chapin / Derek Fulton",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "2117",
-   "to": "52",
-   "role": "OC",
-   "name": "Jim Chapin / Derek Fulton",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "2117",
-   "to": "2628",
-   "role": "OC",
-   "name": "Jim Chapin / Derek Fulton",
-   "p": 0.001,
-   "how": "follows HC"
   },
   {
    "from": "2247",
@@ -15948,6 +16100,59 @@
    "how": "head coach"
   },
   {
+   "from": "2117",
+   "to": "152",
+   "role": "HC",
+   "name": "Matt Drinkall",
+   "p": 0.001
+  },
+  {
+   "from": "2117",
+   "to": "52",
+   "role": "HC",
+   "name": "Matt Drinkall",
+   "p": 0.001
+  },
+  {
+   "from": "2117",
+   "to": "239",
+   "role": "HC",
+   "name": "Matt Drinkall",
+   "p": 0.001
+  },
+  {
+   "from": "2117",
+   "to": "120",
+   "role": "OC",
+   "name": "Jim Chapin / Derek Fulton",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "2117",
+   "to": "152",
+   "role": "OC",
+   "name": "Jim Chapin / Derek Fulton",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "2117",
+   "to": "52",
+   "role": "OC",
+   "name": "Jim Chapin / Derek Fulton",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "2117",
+   "to": "239",
+   "role": "OC",
+   "name": "Jim Chapin / Derek Fulton",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
    "from": "166",
    "to": "2638",
    "role": "DC",
@@ -15971,14 +16176,14 @@
   },
   {
    "from": "130",
-   "to": "2628",
+   "to": "239",
    "role": "HC",
    "name": "Kyle Whittingham",
    "p": 0.001
   },
   {
    "from": "130",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Kyle Whittingham",
    "p": 0.001
@@ -16057,11 +16262,19 @@
   },
   {
    "from": "254",
-   "to": "2628",
+   "to": "239",
    "role": "DC",
    "name": "Colton Swan",
    "p": 0.001,
    "how": "follows HC"
+  },
+  {
+   "from": "254",
+   "to": "2534",
+   "role": "DC",
+   "name": "Colton Swan",
+   "p": 0.001,
+   "how": "head coach"
   },
   {
    "from": "254",
@@ -16072,10 +16285,58 @@
    "how": "head coach"
   },
   {
-   "from": "254",
-   "to": "166",
-   "role": "DC",
-   "name": "Colton Swan",
+   "from": "183",
+   "to": "120",
+   "role": "OC",
+   "name": "Jeff Nixon / Mike Johnson",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "183",
+   "to": "239",
+   "role": "OC",
+   "name": "Jeff Nixon / Mike Johnson",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "183",
+   "to": "2628",
+   "role": "OC",
+   "name": "Jeff Nixon / Mike Johnson",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "183",
+   "to": "152",
+   "role": "OC",
+   "name": "Jeff Nixon / Mike Johnson",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "183",
+   "to": "2006",
+   "role": "OC",
+   "name": "Jeff Nixon / Mike Johnson",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "183",
+   "to": "2032",
+   "role": "OC",
+   "name": "Jeff Nixon / Mike Johnson",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "183",
+   "to": "218",
+   "role": "OC",
+   "name": "Jeff Nixon / Mike Johnson",
    "p": 0.001,
    "how": "head coach"
   },
@@ -16098,14 +16359,6 @@
   {
    "from": "2567",
    "to": "2032",
-   "role": "OC",
-   "name": "Rob Likens / Garin Justice",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "2567",
-   "to": "2433",
    "role": "OC",
    "name": "Rob Likens / Garin Justice",
    "p": 0.001,
@@ -16150,14 +16403,14 @@
   },
   {
    "from": "8",
-   "to": "120",
+   "to": "152",
    "role": "HC",
    "name": "Ryan Silverfield",
    "p": 0.001
   },
   {
    "from": "2440",
-   "to": "2628",
+   "to": "239",
    "role": "OC",
    "name": "Brett Bartolone",
    "p": 0.001,
@@ -16165,7 +16418,7 @@
   },
   {
    "from": "2440",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "Brett Bartolone",
    "p": 0.001,
@@ -16186,6 +16439,14 @@
    "name": "Brett Bartolone",
    "p": 0.001,
    "how": "follows HC"
+  },
+  {
+   "from": "2636",
+   "to": "2534",
+   "role": "DC",
+   "name": "Jess Loepp",
+   "p": 0.001,
+   "how": "head coach"
   },
   {
    "from": "2636",
@@ -16298,7 +16559,7 @@
   },
   {
    "from": "145",
-   "to": "2628",
+   "to": "239",
    "role": "OC",
    "name": "John David Baker / Cody Woodiel",
    "p": 0.001,
@@ -16306,7 +16567,7 @@
   },
   {
    "from": "145",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "John David Baker / Cody Woodiel",
    "p": 0.001,
@@ -16370,7 +16631,7 @@
   },
   {
    "from": "158",
-   "to": "2628",
+   "to": "2534",
    "role": "DC",
    "name": "Rob Aurich",
    "p": 0.001,
@@ -16441,70 +16702,6 @@
    "how": "head coach"
   },
   {
-   "from": "183",
-   "to": "120",
-   "role": "OC",
-   "name": "Jeff Nixon / Mike Johnson",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "183",
-   "to": "239",
-   "role": "OC",
-   "name": "Jeff Nixon / Mike Johnson",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "183",
-   "to": "2628",
-   "role": "OC",
-   "name": "Jeff Nixon / Mike Johnson",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "183",
-   "to": "152",
-   "role": "OC",
-   "name": "Jeff Nixon / Mike Johnson",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "183",
-   "to": "2006",
-   "role": "OC",
-   "name": "Jeff Nixon / Mike Johnson",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "183",
-   "to": "2032",
-   "role": "OC",
-   "name": "Jeff Nixon / Mike Johnson",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "183",
-   "to": "349",
-   "role": "OC",
-   "name": "Jeff Nixon / Mike Johnson",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "275",
-   "to": "2628",
-   "role": "DC",
-   "name": "Mike Tressel",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
    "from": "275",
    "to": "152",
    "role": "DC",
@@ -16514,7 +16711,7 @@
   },
   {
    "from": "275",
-   "to": "239",
+   "to": "2628",
    "role": "DC",
    "name": "Mike Tressel",
    "p": 0.001,
@@ -16530,6 +16727,14 @@
   },
   {
    "from": "275",
+   "to": "239",
+   "role": "DC",
+   "name": "Mike Tressel",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "275",
    "to": "2032",
    "role": "DC",
    "name": "Mike Tressel",
@@ -16575,6 +16780,27 @@
    "name": "Jordan Peterson",
    "p": 0.001,
    "how": "head coach"
+  },
+  {
+   "from": "2305",
+   "to": "2628",
+   "role": "HC",
+   "name": "Lance Leipold",
+   "p": 0.001
+  },
+  {
+   "from": "204",
+   "to": "52",
+   "role": "HC",
+   "name": "Jamarcus Shephard",
+   "p": 0.001
+  },
+  {
+   "from": "204",
+   "to": "120",
+   "role": "HC",
+   "name": "Jamarcus Shephard",
+   "p": 0.001
   },
   {
    "from": "12",
@@ -16618,7 +16844,7 @@
   },
   {
    "from": "12",
-   "to": "2032",
+   "to": "2534",
    "role": "DC",
    "name": "Danny Gonzales",
    "p": 0.001,
@@ -16634,7 +16860,7 @@
   },
   {
    "from": "103",
-   "to": "2628",
+   "to": "239",
    "role": "OC",
    "name": "Bill O'Brien",
    "p": 0.001,
@@ -16642,7 +16868,7 @@
   },
   {
    "from": "103",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "Bill O'Brien",
    "p": 0.001,
@@ -16655,6 +16881,14 @@
    "name": "Bill O'Brien",
    "p": 0.001,
    "how": "follows HC"
+  },
+  {
+   "from": "326",
+   "to": "2534",
+   "role": "DC",
+   "name": "Will Windham / Matthew Gregg",
+   "p": 0.001,
+   "how": "head coach"
   },
   {
    "from": "326",
@@ -16698,7 +16932,7 @@
   },
   {
    "from": "356",
-   "to": "295",
+   "to": "2006",
    "role": "DC",
    "name": "Bobby Hauck",
    "p": 0.001,
@@ -16714,7 +16948,7 @@
   },
   {
    "from": "202",
-   "to": "120",
+   "to": "152",
    "role": "OC",
    "name": "Kevin Barbay / Ty Darlington",
    "p": 0.001,
@@ -16785,25 +17019,12 @@
    "how": "head coach"
   },
   {
-   "from": "2305",
-   "to": "2628",
-   "role": "HC",
-   "name": "Lance Leipold",
-   "p": 0.001
-  },
-  {
-   "from": "204",
-   "to": "52",
-   "role": "HC",
-   "name": "Jamarcus Shephard",
-   "p": 0.001
-  },
-  {
-   "from": "204",
-   "to": "120",
-   "role": "HC",
-   "name": "Jamarcus Shephard",
-   "p": 0.001
+   "from": "59",
+   "to": "2534",
+   "role": "DC",
+   "name": "Jason Semore",
+   "p": 0.001,
+   "how": "head coach"
   },
   {
    "from": "8",
@@ -16831,7 +17052,7 @@
   },
   {
    "from": "8",
-   "to": "2638",
+   "to": "2534",
    "role": "OC",
    "name": "Tim Cramsey",
    "p": 0.001,
@@ -16839,7 +17060,7 @@
   },
   {
    "from": "8",
-   "to": "2433",
+   "to": "2638",
    "role": "OC",
    "name": "Tim Cramsey",
    "p": 0.001,
@@ -16939,7 +17160,7 @@
   },
   {
    "from": "2483",
-   "to": "239",
+   "to": "2628",
    "role": "DC",
    "name": "Chris Hampton",
    "p": 0.001,
@@ -16947,7 +17168,7 @@
   },
   {
    "from": "2483",
-   "to": "2628",
+   "to": "239",
    "role": "DC",
    "name": "Chris Hampton",
    "p": 0.001,
@@ -16995,6 +17216,13 @@
   },
   {
    "from": "96",
+   "to": "120",
+   "role": "HC",
+   "name": "Will Stein",
+   "p": 0.001
+  },
+  {
+   "from": "96",
    "to": "52",
    "role": "HC",
    "name": "Will Stein",
@@ -17002,10 +17230,18 @@
   },
   {
    "from": "96",
-   "to": "2628",
+   "to": "239",
    "role": "HC",
    "name": "Will Stein",
    "p": 0.001
+  },
+  {
+   "from": "150",
+   "to": "120",
+   "role": "DC",
+   "name": "Jonathan Patke",
+   "p": 0.001,
+   "how": "follows HC"
   },
   {
    "from": "150",
@@ -17109,7 +17345,7 @@
   },
   {
    "from": "2305",
-   "to": "2638",
+   "to": "2534",
    "role": "OC",
    "name": "Andy Kotelnicki / Matt Lubick",
    "p": 0.001,
@@ -17117,7 +17353,7 @@
   },
   {
    "from": "2305",
-   "to": "2628",
+   "to": "2638",
    "role": "OC",
    "name": "Andy Kotelnicki / Matt Lubick",
    "p": 0.001,
@@ -17128,6 +17364,34 @@
    "to": "59",
    "role": "HC",
    "name": "Scott Frost",
+   "p": 0.001
+  },
+  {
+   "from": "24",
+   "to": "239",
+   "role": "HC",
+   "name": "Tavita Pritchard",
+   "p": 0.001
+  },
+  {
+   "from": "24",
+   "to": "2628",
+   "role": "HC",
+   "name": "Tavita Pritchard",
+   "p": 0.001
+  },
+  {
+   "from": "24",
+   "to": "120",
+   "role": "HC",
+   "name": "Tavita Pritchard",
+   "p": 0.001
+  },
+  {
+   "from": "24",
+   "to": "52",
+   "role": "HC",
+   "name": "Tavita Pritchard",
    "p": 0.001
   },
   {
@@ -17164,14 +17428,14 @@
   },
   {
    "from": "328",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Bronco Mendenhall",
    "p": 0.001
   },
   {
    "from": "328",
-   "to": "2628",
+   "to": "239",
    "role": "HC",
    "name": "Bronco Mendenhall",
    "p": 0.001
@@ -17287,36 +17551,18 @@
    "how": "follows HC"
   },
   {
-   "from": "201",
-   "to": "2628",
-   "role": "DC",
-   "name": "Todd Bates",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "201",
+   "from": "153",
    "to": "239",
-   "role": "DC",
-   "name": "Todd Bates",
-   "p": 0.001,
-   "how": "follows HC"
+   "role": "HC",
+   "name": "Bill Belichick",
+   "p": 0.001
   },
   {
-   "from": "201",
-   "to": "52",
-   "role": "DC",
-   "name": "Todd Bates",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "201",
-   "to": "120",
-   "role": "DC",
-   "name": "Todd Bates",
-   "p": 0.001,
-   "how": "follows HC"
+   "from": "153",
+   "to": "2628",
+   "role": "HC",
+   "name": "Bill Belichick",
+   "p": 0.001
   },
   {
    "from": "245",
@@ -17333,14 +17579,6 @@
    "name": "Lyle Hemphill / Elijah Robinson",
    "p": 0.001,
    "how": "follows HC"
-  },
-  {
-   "from": "245",
-   "to": "2032",
-   "role": "DC",
-   "name": "Lyle Hemphill / Elijah Robinson",
-   "p": 0.001,
-   "how": "head coach"
   },
   {
    "from": "183",
@@ -17384,7 +17622,7 @@
   },
   {
    "from": "183",
-   "to": "2032",
+   "to": "349",
    "role": "DC",
    "name": "Vince Kehres / John Scott Jr.",
    "p": 0.001,
@@ -17392,7 +17630,7 @@
   },
   {
    "from": "183",
-   "to": "218",
+   "to": "2032",
    "role": "DC",
    "name": "Vince Kehres / John Scott Jr.",
    "p": 0.001,
@@ -17504,7 +17742,7 @@
   },
   {
    "from": "135",
-   "to": "2006",
+   "to": "2534",
    "role": "DC",
    "name": "Danny Collins / Nick Monroe",
    "p": 0.001,
@@ -17558,42 +17796,6 @@
    "how": "head coach"
   },
   {
-   "from": "8",
-   "to": "2433",
-   "role": "DC",
-   "name": "Ron Roberts / Deron Wilson",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "24",
-   "to": "239",
-   "role": "HC",
-   "name": "Tavita Pritchard",
-   "p": 0.001
-  },
-  {
-   "from": "24",
-   "to": "2628",
-   "role": "HC",
-   "name": "Tavita Pritchard",
-   "p": 0.001
-  },
-  {
-   "from": "24",
-   "to": "120",
-   "role": "HC",
-   "name": "Tavita Pritchard",
-   "p": 0.001
-  },
-  {
-   "from": "24",
-   "to": "52",
-   "role": "HC",
-   "name": "Tavita Pritchard",
-   "p": 0.001
-  },
-  {
    "from": "249",
    "to": "52",
    "role": "DC",
@@ -17608,6 +17810,14 @@
    "name": "Matt Powledge / Bradley Dale Peveto",
    "p": 0.001,
    "how": "follows HC"
+  },
+  {
+   "from": "249",
+   "to": "2534",
+   "role": "DC",
+   "name": "Matt Powledge / Bradley Dale Peveto",
+   "p": 0.001,
+   "how": "head coach"
   },
   {
    "from": "249",
@@ -17642,6 +17852,27 @@
    "how": "head coach"
   },
   {
+   "from": "189",
+   "to": "120",
+   "role": "HC",
+   "name": "Eddie George",
+   "p": 0.001
+  },
+  {
+   "from": "189",
+   "to": "152",
+   "role": "HC",
+   "name": "Eddie George",
+   "p": 0.001
+  },
+  {
+   "from": "189",
+   "to": "52",
+   "role": "HC",
+   "name": "Eddie George",
+   "p": 0.001
+  },
+  {
    "from": "6",
    "to": "239",
    "role": "DC",
@@ -17763,7 +17994,7 @@
   },
   {
    "from": "201",
-   "to": "120",
+   "to": "152",
    "role": "OC",
    "name": "Jason Witten",
    "p": 0.001,
@@ -17780,10 +18011,34 @@
   {
    "from": "201",
    "to": "2628",
-   "role": "OC",
-   "name": "Jason Witten",
+   "role": "DC",
+   "name": "Todd Bates",
    "p": 0.001,
-   "how": "head coach"
+   "how": "follows HC"
+  },
+  {
+   "from": "201",
+   "to": "239",
+   "role": "DC",
+   "name": "Todd Bates",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "201",
+   "to": "52",
+   "role": "DC",
+   "name": "Todd Bates",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "201",
+   "to": "152",
+   "role": "DC",
+   "name": "Todd Bates",
+   "p": 0.001,
+   "how": "follows HC"
   },
   {
    "from": "344",
@@ -17820,6 +18075,14 @@
   {
    "from": "344",
    "to": "2032",
+   "role": "DC",
+   "name": "Zach Arnett",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "344",
+   "to": "2534",
    "role": "DC",
    "name": "Zach Arnett",
    "p": 0.001,
@@ -17832,28 +18095,6 @@
    "name": "Zach Arnett",
    "p": 0.001,
    "how": "head coach"
-  },
-  {
-   "from": "344",
-   "to": "2638",
-   "role": "DC",
-   "name": "Zach Arnett",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "153",
-   "to": "239",
-   "role": "HC",
-   "name": "Bill Belichick",
-   "p": 0.001
-  },
-  {
-   "from": "153",
-   "to": "2628",
-   "role": "HC",
-   "name": "Bill Belichick",
-   "p": 0.001
   },
   {
    "from": "153",
@@ -17937,14 +18178,6 @@
   },
   {
    "from": "103",
-   "to": "2628",
-   "role": "DC",
-   "name": "Ted Roof",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "103",
    "to": "239",
    "role": "DC",
    "name": "Ted Roof",
@@ -17953,6 +18186,14 @@
   },
   {
    "from": "103",
+   "to": "2628",
+   "role": "DC",
+   "name": "Ted Roof",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "103",
    "to": "152",
    "role": "DC",
    "name": "Ted Roof",
@@ -17988,27 +18229,6 @@
    "p": 0.001
   },
   {
-   "from": "189",
-   "to": "120",
-   "role": "HC",
-   "name": "Eddie George",
-   "p": 0.001
-  },
-  {
-   "from": "189",
-   "to": "152",
-   "role": "HC",
-   "name": "Eddie George",
-   "p": 0.001
-  },
-  {
-   "from": "189",
-   "to": "52",
-   "role": "HC",
-   "name": "Eddie George",
-   "p": 0.001
-  },
-  {
    "from": "62",
    "to": "239",
    "role": "HC",
@@ -18095,14 +18315,6 @@
   {
    "from": "2579",
    "to": "152",
-   "role": "OC",
-   "name": "Kendal Briles",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "2579",
-   "to": "2032",
    "role": "OC",
    "name": "Kendal Briles",
    "p": 0.001,
@@ -18111,6 +18323,14 @@
   {
    "from": "2579",
    "to": "2429",
+   "role": "OC",
+   "name": "Kendal Briles",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "2579",
+   "to": "2032",
    "role": "OC",
    "name": "Kendal Briles",
    "p": 0.001,
@@ -18198,7 +18418,7 @@
   },
   {
    "from": "221",
-   "to": "2628",
+   "to": "239",
    "role": "OC",
    "name": "Kade Bell",
    "p": 0.001,
@@ -18206,7 +18426,7 @@
   },
   {
    "from": "221",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "Kade Bell",
    "p": 0.001,
@@ -18291,6 +18511,14 @@
    "name": "Alex Grinch",
    "p": 0.001,
    "how": "follows HC"
+  },
+  {
+   "from": "2116",
+   "to": "2534",
+   "role": "DC",
+   "name": "Alex Grinch",
+   "p": 0.001,
+   "how": "head coach"
   },
   {
    "from": "2116",
@@ -18310,14 +18538,14 @@
   },
   {
    "from": "103",
-   "to": "2628",
+   "to": "239",
    "role": "HC",
    "name": "Bill O'Brien",
    "p": 0.001
   },
   {
    "from": "103",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Bill O'Brien",
    "p": 0.001
@@ -18339,14 +18567,6 @@
   },
   {
    "from": "258",
-   "to": "2628",
-   "role": "DC",
-   "name": "John Rudzinski",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "258",
    "to": "239",
    "role": "DC",
    "name": "John Rudzinski",
@@ -18355,7 +18575,15 @@
   },
   {
    "from": "258",
-   "to": "295",
+   "to": "2628",
+   "role": "DC",
+   "name": "John Rudzinski",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "258",
+   "to": "52",
    "role": "DC",
    "name": "John Rudzinski",
    "p": 0.001,
@@ -18402,6 +18630,14 @@
    "how": "head coach"
   },
   {
+   "from": "2229",
+   "to": "52",
+   "role": "OC",
+   "name": "Nick Coleman",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
    "from": "99",
    "to": "239",
    "role": "OC",
@@ -18458,14 +18694,6 @@
    "how": "follows HC"
   },
   {
-   "from": "2",
-   "to": "2638",
-   "role": "OC",
-   "name": "Joel Gordon / Kodi Burns",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
    "from": "97",
    "to": "120",
    "role": "DC",
@@ -18496,14 +18724,6 @@
    "name": "Mark Ivey / Steve Ellis",
    "p": 0.001,
    "how": "follows HC"
-  },
-  {
-   "from": "97",
-   "to": "2006",
-   "role": "DC",
-   "name": "Mark Ivey / Steve Ellis",
-   "p": 0.001,
-   "how": "head coach"
   },
   {
    "from": "2567",
@@ -18520,14 +18740,6 @@
    "name": "Maurice Crum Jr. / Rickey Hunley Jr.",
    "p": 0.001,
    "how": "follows HC"
-  },
-  {
-   "from": "2567",
-   "to": "2433",
-   "role": "DC",
-   "name": "Maurice Crum Jr. / Rickey Hunley Jr.",
-   "p": 0.001,
-   "how": "head coach"
   },
   {
    "from": "2306",
@@ -18547,7 +18759,7 @@
   },
   {
    "from": "2306",
-   "to": "2628",
+   "to": "2534",
    "role": "OC",
    "name": "Sean Gleeson",
    "p": 0.001,
@@ -18625,7 +18837,7 @@
   },
   {
    "from": "2509",
-   "to": "2006",
+   "to": "2534",
    "role": "DC",
    "name": "Kevin Kane",
    "p": 0.001,
@@ -18672,38 +18884,6 @@
    "how": "follows HC"
   },
   {
-   "from": "41",
-   "to": "120",
-   "role": "DC",
-   "name": "Ryan Manalac",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "41",
-   "to": "152",
-   "role": "DC",
-   "name": "Ryan Manalac",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "41",
-   "to": "52",
-   "role": "DC",
-   "name": "Ryan Manalac",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "41",
-   "to": "239",
-   "role": "DC",
-   "name": "Ryan Manalac",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
    "from": "2229",
    "to": "52",
    "role": "HC",
@@ -18732,12 +18912,32 @@
    "p": 0.001
   },
   {
-   "from": "2229",
+   "from": "2653",
    "to": "52",
-   "role": "OC",
-   "name": "Nick Coleman",
-   "p": 0.001,
-   "how": "follows HC"
+   "role": "HC",
+   "name": "Gerad Parker",
+   "p": 0.001
+  },
+  {
+   "from": "2653",
+   "to": "152",
+   "role": "HC",
+   "name": "Gerad Parker",
+   "p": 0.001
+  },
+  {
+   "from": "2653",
+   "to": "239",
+   "role": "HC",
+   "name": "Gerad Parker",
+   "p": 0.001
+  },
+  {
+   "from": "2653",
+   "to": "2628",
+   "role": "HC",
+   "name": "Gerad Parker",
+   "p": 0.001
   },
   {
    "from": "26",
@@ -18866,7 +19066,7 @@
   },
   {
    "from": "52",
-   "to": "2653",
+   "to": "2534",
    "role": "OC",
    "name": "Tim Harris Jr.",
    "p": 0.001,
@@ -18874,7 +19074,7 @@
   },
   {
    "from": "52",
-   "to": "2638",
+   "to": "2653",
    "role": "OC",
    "name": "Tim Harris Jr.",
    "p": 0.001,
@@ -18890,7 +19090,7 @@
   },
   {
    "from": "52",
-   "to": "2653",
+   "to": "2534",
    "role": "DC",
    "name": "Ernie Sims",
    "p": 0.001,
@@ -18898,7 +19098,7 @@
   },
   {
    "from": "52",
-   "to": "152",
+   "to": "2653",
    "role": "DC",
    "name": "Ernie Sims",
    "p": 0.001,
@@ -18941,40 +19141,32 @@
    "how": "head coach"
   },
   {
-   "from": "2628",
+   "from": "238",
+   "to": "52",
+   "role": "DC",
+   "name": "Steve Gregory",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "238",
+   "to": "152",
+   "role": "DC",
+   "name": "Steve Gregory",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "238",
+   "to": "120",
+   "role": "DC",
+   "name": "Steve Gregory",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "238",
    "to": "239",
-   "role": "OC",
-   "name": "Gordon Sammis / A. J. Ricker",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "238",
-   "to": "52",
-   "role": "DC",
-   "name": "Steve Gregory",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "238",
-   "to": "152",
-   "role": "DC",
-   "name": "Steve Gregory",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "238",
-   "to": "120",
-   "role": "DC",
-   "name": "Steve Gregory",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "238",
-   "to": "2628",
    "role": "DC",
    "name": "Steve Gregory",
    "p": 0.001,
@@ -18983,6 +19175,14 @@
   {
    "from": "238",
    "to": "2032",
+   "role": "DC",
+   "name": "Steve Gregory",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "238",
+   "to": "2534",
    "role": "DC",
    "name": "Steve Gregory",
    "p": 0.001,
@@ -18993,38 +19193,6 @@
    "to": "98",
    "role": "DC",
    "name": "Steve Gregory",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "238",
-   "to": "2638",
-   "role": "DC",
-   "name": "Steve Gregory",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "66",
-   "to": "2032",
-   "role": "DC",
-   "name": "Jesse Bobbit",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "66",
-   "to": "2638",
-   "role": "DC",
-   "name": "Jesse Bobbit",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "66",
-   "to": "2628",
-   "role": "DC",
-   "name": "Jesse Bobbit",
    "p": 0.001,
    "how": "head coach"
   },
@@ -19077,31 +19245,49 @@
    "how": "head coach"
   },
   {
-   "from": "2653",
-   "to": "52",
-   "role": "HC",
-   "name": "Gerad Parker",
-   "p": 0.001
+   "from": "41",
+   "to": "120",
+   "role": "DC",
+   "name": "Ryan Manalac",
+   "p": 0.001,
+   "how": "follows HC"
   },
   {
-   "from": "2653",
+   "from": "41",
    "to": "152",
-   "role": "HC",
-   "name": "Gerad Parker",
-   "p": 0.001
+   "role": "DC",
+   "name": "Ryan Manalac",
+   "p": 0.001,
+   "how": "follows HC"
   },
   {
-   "from": "2653",
+   "from": "41",
+   "to": "52",
+   "role": "DC",
+   "name": "Ryan Manalac",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "41",
    "to": "239",
-   "role": "HC",
-   "name": "Gerad Parker",
-   "p": 0.001
+   "role": "DC",
+   "name": "Ryan Manalac",
+   "p": 0.001,
+   "how": "follows HC"
   },
   {
-   "from": "2653",
+   "from": "2623",
    "to": "2628",
    "role": "HC",
-   "name": "Gerad Parker",
+   "name": "Casey Woods",
+   "p": 0.001
+  },
+  {
+   "from": "2623",
+   "to": "239",
+   "role": "HC",
+   "name": "Casey Woods",
    "p": 0.001
   },
   {
@@ -19121,6 +19307,30 @@
    "how": "follows HC"
   },
   {
+   "from": "66",
+   "to": "2032",
+   "role": "DC",
+   "name": "Jesse Bobbit",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "66",
+   "to": "2638",
+   "role": "DC",
+   "name": "Jesse Bobbit",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "66",
+   "to": "2534",
+   "role": "DC",
+   "name": "Jesse Bobbit",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
    "from": "127",
    "to": "152",
    "role": "HC",
@@ -19136,14 +19346,14 @@
   },
   {
    "from": "127",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Pat Fitzgerald",
    "p": 0.001
   },
   {
    "from": "127",
-   "to": "2628",
+   "to": "239",
    "role": "HC",
    "name": "Pat Fitzgerald",
    "p": 0.001
@@ -19166,7 +19376,7 @@
   },
   {
    "from": "127",
-   "to": "2638",
+   "to": "2534",
    "role": "DC",
    "name": "Joe Rossi / Max Bullough",
    "p": 0.001,
@@ -19188,14 +19398,14 @@
   },
   {
    "from": "2509",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Barry Odom",
    "p": 0.001
   },
   {
    "from": "2509",
-   "to": "2628",
+   "to": "239",
    "role": "HC",
    "name": "Barry Odom",
    "p": 0.001
@@ -19226,29 +19436,15 @@
   },
   {
    "from": "2393",
-   "to": "239",
+   "to": "2628",
    "role": "DC",
    "name": "Brian Stewart",
    "p": 0.001,
    "how": "follows HC"
   },
   {
-   "from": "2623",
-   "to": "2628",
-   "role": "HC",
-   "name": "Casey Woods",
-   "p": 0.001
-  },
-  {
-   "from": "2623",
-   "to": "239",
-   "role": "HC",
-   "name": "Casey Woods",
-   "p": 0.001
-  },
-  {
    "from": "264",
-   "to": "239",
+   "to": "2628",
    "role": "DC",
    "name": "Ryan Walters",
    "p": 0.001,
@@ -19256,7 +19452,7 @@
   },
   {
    "from": "264",
-   "to": "2628",
+   "to": "239",
    "role": "DC",
    "name": "Ryan Walters",
    "p": 0.001,
@@ -19296,7 +19492,7 @@
   },
   {
    "from": "264",
-   "to": "120",
+   "to": "2534",
    "role": "DC",
    "name": "Ryan Walters",
    "p": 0.001,
@@ -19343,6 +19539,13 @@
    "how": "head coach"
   },
   {
+   "from": "2247",
+   "to": "120",
+   "role": "HC",
+   "name": "Dell McGee",
+   "p": 0.001
+  },
+  {
    "from": "324",
    "to": "152",
    "role": "HC",
@@ -19365,7 +19568,7 @@
   },
   {
    "from": "2483",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "Jay Johnson",
    "p": 0.001,
@@ -19373,7 +19576,7 @@
   },
   {
    "from": "2483",
-   "to": "2628",
+   "to": "239",
    "role": "OC",
    "name": "Jay Johnson",
    "p": 0.001,
@@ -19429,7 +19632,7 @@
   },
   {
    "from": "251",
-   "to": "152",
+   "to": "120",
    "role": "OC",
    "name": "Kyle Flood / A. J. Milwee",
    "p": 0.001,
@@ -19516,24 +19719,8 @@
    "how": "head coach"
   },
   {
-   "from": "142",
-   "to": "2628",
-   "role": "DC",
-   "name": "Corey Batoon",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
    "from": "145",
    "to": "52",
-   "role": "DC",
-   "name": "Bryan Brown / Marcus Woodson",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "145",
-   "to": "2628",
    "role": "DC",
    "name": "Bryan Brown / Marcus Woodson",
    "p": 0.001,
@@ -19549,6 +19736,14 @@
   },
   {
    "from": "145",
+   "to": "2628",
+   "role": "DC",
+   "name": "Bryan Brown / Marcus Woodson",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "145",
    "to": "152",
    "role": "DC",
    "name": "Bryan Brown / Marcus Woodson",
@@ -19565,14 +19760,6 @@
   },
   {
    "from": "96",
-   "to": "52",
-   "role": "OC",
-   "name": "Joe Sloan",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "96",
    "to": "120",
    "role": "OC",
    "name": "Joe Sloan",
@@ -19581,7 +19768,15 @@
   },
   {
    "from": "96",
-   "to": "2628",
+   "to": "52",
+   "role": "OC",
+   "name": "Joe Sloan",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "96",
+   "to": "239",
    "role": "OC",
    "name": "Joe Sloan",
    "p": 0.001,
@@ -19605,7 +19800,7 @@
   },
   {
    "from": "96",
-   "to": "2006",
+   "to": "2534",
    "role": "OC",
    "name": "Joe Sloan",
    "p": 0.001,
@@ -19645,7 +19840,7 @@
   },
   {
    "from": "57",
-   "to": "2032",
+   "to": "2534",
    "role": "DC",
    "name": "Brad White",
    "p": 0.001,
@@ -19653,7 +19848,7 @@
   },
   {
    "from": "57",
-   "to": "152",
+   "to": "2032",
    "role": "DC",
    "name": "Brad White",
    "p": 0.001,
@@ -19661,7 +19856,7 @@
   },
   {
    "from": "197",
-   "to": "2628",
+   "to": "52",
    "role": "DC",
    "name": "Skyler Cassity",
    "p": 0.001,
@@ -19669,7 +19864,7 @@
   },
   {
    "from": "197",
-   "to": "52",
+   "to": "2628",
    "role": "DC",
    "name": "Skyler Cassity",
    "p": 0.001,
@@ -19692,16 +19887,16 @@
    "how": "follows HC"
   },
   {
-   "from": "197",
+   "from": "59",
    "to": "2032",
-   "role": "DC",
-   "name": "Skyler Cassity",
+   "role": "OC",
+   "name": "George Godsey / Chris Weinke",
    "p": 0.001,
    "how": "head coach"
   },
   {
    "from": "59",
-   "to": "2032",
+   "to": "2534",
    "role": "OC",
    "name": "George Godsey / Chris Weinke",
    "p": 0.001,
@@ -19716,14 +19911,6 @@
    "how": "head coach"
   },
   {
-   "from": "59",
-   "to": "2638",
-   "role": "OC",
-   "name": "George Godsey / Chris Weinke",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
    "from": "228",
    "to": "120",
    "role": "OC",
@@ -19749,23 +19936,95 @@
   },
   {
    "from": "228",
-   "to": "52",
+   "to": "152",
    "role": "OC",
    "name": "Chad Morris / Kyle Richardson / Matt Luke",
    "p": 0.001,
    "how": "follows HC"
   },
   {
-   "from": "96",
+   "from": "238",
+   "to": "52",
+   "role": "OC",
+   "name": "Tim Beck",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "238",
    "to": "152",
-   "role": "DC",
-   "name": "Jay Bateman",
+   "role": "OC",
+   "name": "Tim Beck",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "238",
+   "to": "120",
+   "role": "OC",
+   "name": "Tim Beck",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "238",
+   "to": "239",
+   "role": "OC",
+   "name": "Tim Beck",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "238",
+   "to": "2032",
+   "role": "OC",
+   "name": "Tim Beck",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "238",
+   "to": "2534",
+   "role": "OC",
+   "name": "Tim Beck",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "239",
+   "to": "2628",
+   "role": "OC",
+   "name": "Jake Spavital",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "239",
+   "to": "2638",
+   "role": "OC",
+   "name": "Jake Spavital",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "2026",
+   "to": "52",
+   "role": "OC",
+   "name": "Mike Anthony",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "2026",
+   "to": "239",
+   "role": "OC",
+   "name": "Mike Anthony",
    "p": 0.001,
    "how": "follows HC"
   },
   {
    "from": "96",
-   "to": "52",
+   "to": "152",
    "role": "DC",
    "name": "Jay Bateman",
    "p": 0.001,
@@ -19781,7 +20040,15 @@
   },
   {
    "from": "96",
-   "to": "2628",
+   "to": "52",
+   "role": "DC",
+   "name": "Jay Bateman",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "96",
+   "to": "239",
    "role": "DC",
    "name": "Jay Bateman",
    "p": 0.001,
@@ -19797,89 +20064,9 @@
   },
   {
    "from": "96",
-   "to": "2006",
+   "to": "2534",
    "role": "DC",
    "name": "Jay Bateman",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "238",
-   "to": "52",
-   "role": "OC",
-   "name": "Tim Beck",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "238",
-   "to": "152",
-   "role": "OC",
-   "name": "Tim Beck",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "238",
-   "to": "120",
-   "role": "OC",
-   "name": "Tim Beck",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "238",
-   "to": "2628",
-   "role": "OC",
-   "name": "Tim Beck",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "238",
-   "to": "2032",
-   "role": "OC",
-   "name": "Tim Beck",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "239",
-   "to": "2628",
-   "role": "OC",
-   "name": "Jake Spavital",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "239",
-   "to": "2638",
-   "role": "OC",
-   "name": "Jake Spavital",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "239",
-   "to": "2032",
-   "role": "OC",
-   "name": "Jake Spavital",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "2026",
-   "to": "239",
-   "role": "OC",
-   "name": "Mike Anthony",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "120",
-   "to": "2426",
-   "role": "DC",
-   "name": "Ted Monachino / Aazaar Abdul-Rahim",
    "p": 0.001,
    "how": "head coach"
   },
@@ -19893,7 +20080,15 @@
   },
   {
    "from": "120",
-   "to": "2006",
+   "to": "2426",
+   "role": "DC",
+   "name": "Ted Monachino / Aazaar Abdul-Rahim",
+   "p": 0.001,
+   "how": "head coach"
+  },
+  {
+   "from": "120",
+   "to": "218",
    "role": "DC",
    "name": "Ted Monachino / Aazaar Abdul-Rahim",
    "p": 0.001,
@@ -19943,7 +20138,7 @@
   },
   {
    "from": "120",
-   "to": "2426",
+   "to": "295",
    "role": "OC",
    "name": "Clint Trickett",
    "p": 0.001,
@@ -19951,7 +20146,7 @@
   },
   {
    "from": "120",
-   "to": "295",
+   "to": "2426",
    "role": "OC",
    "name": "Clint Trickett",
    "p": 0.001,
@@ -20014,6 +20209,13 @@
    "how": "follows HC"
   },
   {
+   "from": "183",
+   "to": "152",
+   "role": "HC",
+   "name": "Fran Brown",
+   "p": 0.001
+  },
+  {
    "from": "38",
    "to": "52",
    "role": "HC",
@@ -20043,14 +20245,6 @@
   },
   {
    "from": "275",
-   "to": "2628",
-   "role": "OC",
-   "name": "Jeff Grimes",
-   "p": 0.001,
-   "how": "follows HC"
-  },
-  {
-   "from": "275",
    "to": "152",
    "role": "OC",
    "name": "Jeff Grimes",
@@ -20059,7 +20253,7 @@
   },
   {
    "from": "275",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "Jeff Grimes",
    "p": 0.001,
@@ -20075,6 +20269,14 @@
   },
   {
    "from": "275",
+   "to": "239",
+   "role": "OC",
+   "name": "Jeff Grimes",
+   "p": 0.001,
+   "how": "follows HC"
+  },
+  {
+   "from": "275",
    "to": "2032",
    "role": "OC",
    "name": "Jeff Grimes",
@@ -20083,7 +20285,7 @@
   },
   {
    "from": "275",
-   "to": "2638",
+   "to": "2534",
    "role": "OC",
    "name": "Jeff Grimes",
    "p": 0.001,
@@ -20091,7 +20293,7 @@
   },
   {
    "from": "275",
-   "to": "120",
+   "to": "2638",
    "role": "OC",
    "name": "Jeff Grimes",
    "p": 0.001,
@@ -20147,7 +20349,7 @@
   },
   {
    "from": "135",
-   "to": "2006",
+   "to": "2534",
    "role": "OC",
    "name": "Greg Harbaugh Jr. / Eric Koehler",
    "p": 0.001,
@@ -20178,7 +20380,7 @@
   },
   {
    "from": "194",
-   "to": "2628",
+   "to": "239",
    "role": "DC",
    "name": "Matt Patricia / Tim Walton",
    "p": 0.001,
@@ -20186,7 +20388,7 @@
   },
   {
    "from": "194",
-   "to": "239",
+   "to": "2628",
    "role": "DC",
    "name": "Matt Patricia / Tim Walton",
    "p": 0.001,
@@ -20209,14 +20411,6 @@
    "how": "head coach"
   },
   {
-   "from": "2633",
-   "to": "2638",
-   "role": "OC",
-   "name": "Joey Halzle",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
    "from": "245",
    "to": "239",
    "role": "OC",
@@ -20239,21 +20433,6 @@
    "name": "Holmon Wiggins",
    "p": 0.001,
    "how": "head coach"
-  },
-  {
-   "from": "245",
-   "to": "2638",
-   "role": "OC",
-   "name": "Holmon Wiggins",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "183",
-   "to": "152",
-   "role": "HC",
-   "name": "Fran Brown",
-   "p": 0.001
   },
   {
    "from": "61",
@@ -20278,6 +20457,27 @@
    "name": "Glenn Schumann / Travaris Robinson",
    "p": 0.001,
    "how": "follows HC"
+  },
+  {
+   "from": "25",
+   "to": "239",
+   "role": "HC",
+   "name": "Tosh Lupoi",
+   "p": 0.001
+  },
+  {
+   "from": "25",
+   "to": "2628",
+   "role": "HC",
+   "name": "Tosh Lupoi",
+   "p": 0.001
+  },
+  {
+   "from": "25",
+   "to": "120",
+   "role": "HC",
+   "name": "Tosh Lupoi",
+   "p": 0.001
   },
   {
    "from": "25",
@@ -20336,35 +20536,6 @@
    "how": "follows HC"
   },
   {
-   "from": "248",
-   "to": "2628",
-   "role": "DC",
-   "name": "Austin Armstrong",
-   "p": 0.001,
-   "how": "head coach"
-  },
-  {
-   "from": "25",
-   "to": "239",
-   "role": "HC",
-   "name": "Tosh Lupoi",
-   "p": 0.001
-  },
-  {
-   "from": "25",
-   "to": "2628",
-   "role": "HC",
-   "name": "Tosh Lupoi",
-   "p": 0.001
-  },
-  {
-   "from": "25",
-   "to": "120",
-   "role": "HC",
-   "name": "Tosh Lupoi",
-   "p": 0.001
-  },
-  {
    "from": "2132",
    "to": "120",
    "role": "DC",
@@ -20398,7 +20569,7 @@
   },
   {
    "from": "2132",
-   "to": "2638",
+   "to": "2534",
    "role": "DC",
    "name": "Nate Woody / Cortney Braswell",
    "p": 0.001,
@@ -20493,14 +20664,6 @@
    "how": "head coach"
   },
   {
-   "from": "326",
-   "to": "2636",
-   "role": "OC",
-   "name": "Landon Keopple / Jordan Shoemaker",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
    "from": "2449",
    "to": "2032",
    "role": "DC",
@@ -20510,7 +20673,7 @@
   },
   {
    "from": "2449",
-   "to": "62",
+   "to": "2534",
    "role": "DC",
    "name": "Grant Olson",
    "p": 0,
@@ -20533,14 +20696,6 @@
    "how": "head coach"
   },
   {
-   "from": "2348",
-   "to": "2638",
-   "role": "DC",
-   "name": "Luke Olson",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
    "from": "5",
    "to": "2032",
    "role": "DC",
@@ -20550,7 +20705,7 @@
   },
   {
    "from": "5",
-   "to": "2638",
+   "to": "2534",
    "role": "DC",
    "name": "Todd Grantham",
    "p": 0,
@@ -20678,7 +20833,7 @@
   },
   {
    "from": "167",
-   "to": "2005",
+   "to": "2534",
    "role": "DC",
    "name": "Spence Nowinsky",
    "p": 0,
@@ -20710,7 +20865,7 @@
   },
   {
    "from": "2751",
-   "to": "62",
+   "to": "2534",
    "role": "DC",
    "name": "Aaron Bohl",
    "p": 0,
@@ -20734,9 +20889,25 @@
   },
   {
    "from": "2751",
-   "to": "62",
+   "to": "2534",
    "role": "OC",
    "name": "Christian Taylor",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2005",
+   "to": "2751",
+   "role": "OC",
+   "name": "Mike Thiessen",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2005",
+   "to": "2534",
+   "role": "OC",
+   "name": "Mike Thiessen",
    "p": 0,
    "how": "head coach"
   },
@@ -20793,22 +20964,6 @@
    "to": "349",
    "role": "OC",
    "name": "Drew Cronic",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2005",
-   "to": "2751",
-   "role": "OC",
-   "name": "Mike Thiessen",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2005",
-   "to": "167",
-   "role": "OC",
-   "name": "Mike Thiessen",
    "p": 0,
    "how": "head coach"
   },
@@ -20894,7 +21049,7 @@
   },
   {
    "from": "328",
-   "to": "239",
+   "to": "2628",
    "role": "DC",
    "name": "Nick Howell",
    "p": 0,
@@ -20902,7 +21057,7 @@
   },
   {
    "from": "328",
-   "to": "2628",
+   "to": "239",
    "role": "DC",
    "name": "Nick Howell",
    "p": 0,
@@ -21014,7 +21169,7 @@
   },
   {
    "from": "290",
-   "to": "2433",
+   "to": "295",
    "role": "OC",
    "name": "Ryan Aplin",
    "p": 0,
@@ -21030,17 +21185,9 @@
   },
   {
    "from": "2449",
-   "to": "62",
+   "to": "2534",
    "role": "OC",
    "name": "Dan Larson",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "309",
-   "to": "2638",
-   "role": "DC",
-   "name": "Jim Salgado",
    "p": 0,
    "how": "head coach"
   },
@@ -21070,7 +21217,7 @@
   },
   {
    "from": "189",
-   "to": "239",
+   "to": "2628",
    "role": "DC",
    "name": "Joe Bowden",
    "p": 0,
@@ -21166,7 +21313,7 @@
   },
   {
    "from": "36",
-   "to": "2005",
+   "to": "2534",
    "role": "OC",
    "name": "Pryce Tracy",
    "p": 0,
@@ -21174,7 +21321,7 @@
   },
   {
    "from": "36",
-   "to": "2751",
+   "to": "2005",
    "role": "OC",
    "name": "Pryce Tracy",
    "p": 0,
@@ -21214,7 +21361,7 @@
   },
   {
    "from": "127",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "Nick Sheridan",
    "p": 0,
@@ -21222,7 +21369,7 @@
   },
   {
    "from": "127",
-   "to": "2628",
+   "to": "239",
    "role": "OC",
    "name": "Nick Sheridan",
    "p": 0,
@@ -21238,7 +21385,7 @@
   },
   {
    "from": "127",
-   "to": "2638",
+   "to": "2534",
    "role": "OC",
    "name": "Nick Sheridan",
    "p": 0,
@@ -21277,14 +21424,6 @@
    "how": "head coach"
   },
   {
-   "from": "202",
-   "to": "2433",
-   "role": "DC",
-   "name": "Josh Reardon / Mike Gray",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
    "from": "48",
    "to": "218",
    "role": "OC",
@@ -21294,7 +21433,7 @@
   },
   {
    "from": "48",
-   "to": "295",
+   "to": "2534",
    "role": "OC",
    "name": "Terence Archer",
    "p": 0,
@@ -21302,7 +21441,7 @@
   },
   {
    "from": "48",
-   "to": "2426",
+   "to": "295",
    "role": "OC",
    "name": "Terence Archer",
    "p": 0,
@@ -21334,6 +21473,14 @@
   },
   {
    "from": "338",
+   "to": "2534",
+   "role": "DC",
+   "name": "Marc Mattioli",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "338",
    "to": "2032",
    "role": "DC",
    "name": "Marc Mattioli",
@@ -21349,10 +21496,18 @@
    "how": "head coach"
   },
   {
-   "from": "338",
+   "from": "2534",
    "to": "2638",
    "role": "DC",
-   "name": "Marc Mattioli",
+   "name": "Freddie Aughtry-Lindsay",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2534",
+   "to": "2032",
+   "role": "DC",
+   "name": "Freddie Aughtry-Lindsay",
    "p": 0,
    "how": "head coach"
   },
@@ -21366,7 +21521,7 @@
   },
   {
    "from": "2005",
-   "to": "167",
+   "to": "2534",
    "role": "DC",
    "name": "Steve Russ",
    "p": 0,
@@ -21398,7 +21553,7 @@
   },
   {
    "from": "2711",
-   "to": "2638",
+   "to": "2534",
    "role": "DC",
    "name": "Greer Martini / Duane Vaughn",
    "p": 0,
@@ -21486,7 +21641,7 @@
   },
   {
    "from": "235",
-   "to": "2433",
+   "to": "2534",
    "role": "DC",
    "name": "Lance Guidry",
    "p": 0,
@@ -21494,17 +21649,9 @@
   },
   {
    "from": "235",
-   "to": "2638",
-   "role": "DC",
-   "name": "Lance Guidry",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2305",
    "to": "2433",
    "role": "DC",
-   "name": "D. K. McDonald",
+   "name": "Lance Guidry",
    "p": 0,
    "how": "head coach"
   },
@@ -21589,30 +21736,6 @@
    "how": "head coach"
   },
   {
-   "from": "2084",
-   "to": "2006",
-   "role": "DC",
-   "name": "Brian Dougherty",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2084",
-   "to": "2032",
-   "role": "DC",
-   "name": "Brian Dougherty",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2084",
-   "to": "2309",
-   "role": "DC",
-   "name": "Brian Dougherty",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
    "from": "2653",
    "to": "52",
    "role": "DC",
@@ -21654,33 +21777,33 @@
   },
   {
    "from": "2653",
-   "to": "2638",
+   "to": "2534",
    "role": "DC",
    "name": "Dontae Wright / Nathan Burton",
    "p": 0,
    "how": "head coach"
   },
   {
-   "from": "58",
+   "from": "55",
+   "to": "2534",
+   "role": "OC",
+   "name": "Taylor Housewright",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "55",
    "to": "2032",
-   "role": "DC",
-   "name": "Josh Aldridge",
+   "role": "OC",
+   "name": "Taylor Housewright",
    "p": 0,
    "how": "head coach"
   },
   {
-   "from": "58",
-   "to": "2638",
-   "role": "DC",
-   "name": "Josh Aldridge",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "58",
-   "to": "2429",
-   "role": "DC",
-   "name": "Josh Aldridge",
+   "from": "55",
+   "to": "98",
+   "role": "OC",
+   "name": "Taylor Housewright",
    "p": 0,
    "how": "head coach"
   },
@@ -21705,150 +21828,6 @@
    "to": "2006",
    "role": "OC",
    "name": "Nunzio Campanile",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "55",
-   "to": "2032",
-   "role": "OC",
-   "name": "Taylor Housewright",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "55",
-   "to": "98",
-   "role": "OC",
-   "name": "Taylor Housewright",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "55",
-   "to": "2653",
-   "role": "OC",
-   "name": "Taylor Housewright",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "278",
-   "to": "23",
-   "role": "DC",
-   "name": "Nick Benedetto / Adam Breske",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "278",
-   "to": "2638",
-   "role": "DC",
-   "name": "Nick Benedetto / Adam Breske",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "278",
-   "to": "21",
-   "role": "DC",
-   "name": "Nick Benedetto / Adam Breske",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2393",
-   "to": "98",
-   "role": "OC",
-   "name": "Anthony Scelfo",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2393",
-   "to": "2032",
-   "role": "OC",
-   "name": "Anthony Scelfo",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2393",
-   "to": "2638",
-   "role": "OC",
-   "name": "Anthony Scelfo",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2623",
-   "to": "2628",
-   "role": "OC",
-   "name": "Mark Cala",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "2623",
-   "to": "239",
-   "role": "OC",
-   "name": "Mark Cala",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "2623",
-   "to": "52",
-   "role": "OC",
-   "name": "Mark Cala",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "2623",
-   "to": "120",
-   "role": "OC",
-   "name": "Mark Cala",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "2623",
-   "to": "2032",
-   "role": "OC",
-   "name": "Mark Cala",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2623",
-   "to": "2638",
-   "role": "OC",
-   "name": "Mark Cala",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2623",
-   "to": "166",
-   "role": "OC",
-   "name": "Mark Cala",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "167",
-   "to": "166",
-   "role": "OC",
-   "name": "Luke Schleusner",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "167",
-   "to": "2005",
-   "role": "OC",
-   "name": "Luke Schleusner",
    "p": 0,
    "how": "head coach"
   },
@@ -21886,6 +21865,14 @@
   },
   {
    "from": "242",
+   "to": "2534",
+   "role": "OC",
+   "name": "Vince Munch",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "242",
    "to": "2638",
    "role": "OC",
    "name": "Vince Munch",
@@ -21901,16 +21888,184 @@
    "how": "head coach"
   },
   {
-   "from": "242",
-   "to": "2433",
+   "from": "278",
+   "to": "23",
+   "role": "DC",
+   "name": "Nick Benedetto / Adam Breske",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "278",
+   "to": "2638",
+   "role": "DC",
+   "name": "Nick Benedetto / Adam Breske",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "278",
+   "to": "21",
+   "role": "DC",
+   "name": "Nick Benedetto / Adam Breske",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2084",
+   "to": "2006",
+   "role": "DC",
+   "name": "Brian Dougherty",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2084",
+   "to": "2032",
+   "role": "DC",
+   "name": "Brian Dougherty",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2084",
+   "to": "2309",
+   "role": "DC",
+   "name": "Brian Dougherty",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2393",
+   "to": "2534",
    "role": "OC",
-   "name": "Vince Munch",
+   "name": "Anthony Scelfo",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2393",
+   "to": "98",
+   "role": "OC",
+   "name": "Anthony Scelfo",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2393",
+   "to": "2032",
+   "role": "OC",
+   "name": "Anthony Scelfo",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2623",
+   "to": "2628",
+   "role": "OC",
+   "name": "Mark Cala",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "2623",
+   "to": "239",
+   "role": "OC",
+   "name": "Mark Cala",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "2623",
+   "to": "52",
+   "role": "OC",
+   "name": "Mark Cala",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "2623",
+   "to": "120",
+   "role": "OC",
+   "name": "Mark Cala",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "2623",
+   "to": "2534",
+   "role": "OC",
+   "name": "Mark Cala",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2623",
+   "to": "2032",
+   "role": "OC",
+   "name": "Mark Cala",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2623",
+   "to": "2638",
+   "role": "OC",
+   "name": "Mark Cala",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "167",
+   "to": "166",
+   "role": "OC",
+   "name": "Luke Schleusner",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "167",
+   "to": "2534",
+   "role": "OC",
+   "name": "Luke Schleusner",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "58",
+   "to": "2534",
+   "role": "DC",
+   "name": "Josh Aldridge",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "58",
+   "to": "2032",
+   "role": "DC",
+   "name": "Josh Aldridge",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "58",
+   "to": "2638",
+   "role": "DC",
+   "name": "Josh Aldridge",
    "p": 0,
    "how": "head coach"
   },
   {
    "from": "48",
    "to": "218",
+   "role": "DC",
+   "name": "Manny Rojas",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "48",
+   "to": "2534",
    "role": "DC",
    "name": "Manny Rojas",
    "p": 0,
@@ -21925,14 +22080,6 @@
    "how": "head coach"
   },
   {
-   "from": "48",
-   "to": "2426",
-   "role": "DC",
-   "name": "Manny Rojas",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
    "from": "2247",
    "to": "2032",
    "role": "OC",
@@ -22054,7 +22201,7 @@
   },
   {
    "from": "2572",
-   "to": "2653",
+   "to": "2534",
    "role": "OC",
    "name": "Kyle Cefalo",
    "p": 0,
@@ -22127,6 +22274,14 @@
   {
    "from": "2032",
    "to": "2433",
+   "role": "OC",
+   "name": "Garrett Altman",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2032",
+   "to": "2534",
    "role": "OC",
    "name": "Garrett Altman",
    "p": 0,
@@ -22141,6 +22296,54 @@
    "how": "head coach"
   },
   {
+   "from": "166",
+   "to": "239",
+   "role": "OC",
+   "name": "David Yost",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "166",
+   "to": "2628",
+   "role": "OC",
+   "name": "David Yost",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "166",
+   "to": "52",
+   "role": "OC",
+   "name": "David Yost",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "166",
+   "to": "120",
+   "role": "OC",
+   "name": "David Yost",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "166",
+   "to": "2638",
+   "role": "OC",
+   "name": "David Yost",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "166",
+   "to": "2534",
+   "role": "OC",
+   "name": "David Yost",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
    "from": "2433",
    "to": "239",
    "role": "OC",
@@ -22175,6 +22378,14 @@
   {
    "from": "2433",
    "to": "2032",
+   "role": "OC",
+   "name": "Jesse Montalto",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2433",
+   "to": "2534",
    "role": "OC",
    "name": "Jesse Montalto",
    "p": 0,
@@ -22183,14 +22394,6 @@
   {
    "from": "2433",
    "to": "2348",
-   "role": "OC",
-   "name": "Jesse Montalto",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2433",
-   "to": "2638",
    "role": "OC",
    "name": "Jesse Montalto",
    "p": 0,
@@ -22221,16 +22424,24 @@
    "how": "head coach"
   },
   {
-   "from": "309",
-   "to": "2638",
+   "from": "2636",
+   "to": "242",
    "role": "OC",
-   "name": "Tim Leger",
+   "name": "Rick Bowie",
    "p": 0,
    "how": "head coach"
   },
   {
    "from": "21",
    "to": "2638",
+   "role": "DC",
+   "name": "Demetrius Sumler",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "21",
+   "to": "2534",
    "role": "DC",
    "name": "Demetrius Sumler",
    "p": 0,
@@ -22239,14 +22450,6 @@
   {
    "from": "21",
    "to": "23",
-   "role": "DC",
-   "name": "Demetrius Sumler",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "21",
-   "to": "166",
    "role": "DC",
    "name": "Demetrius Sumler",
    "p": 0,
@@ -22302,6 +22505,14 @@
   },
   {
    "from": "2229",
+   "to": "2534",
+   "role": "DC",
+   "name": "Jovan Dewitt",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2229",
    "to": "2032",
    "role": "DC",
    "name": "Jovan Dewitt",
@@ -22311,14 +22522,6 @@
   {
    "from": "2229",
    "to": "2638",
-   "role": "DC",
-   "name": "Jovan Dewitt",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2229",
-   "to": "166",
    "role": "DC",
    "name": "Jovan Dewitt",
    "p": 0,
@@ -22335,14 +22538,6 @@
   {
    "from": "2459",
    "to": "152",
-   "role": "OC",
-   "name": "Quinn Sanders / Tony Petersen",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "2459",
-   "to": "52",
    "role": "OC",
    "name": "Quinn Sanders / Tony Petersen",
    "p": 0,
@@ -22358,6 +22553,14 @@
   },
   {
    "from": "2459",
+   "to": "52",
+   "role": "OC",
+   "name": "Quinn Sanders / Tony Petersen",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "2459",
    "to": "2638",
    "role": "OC",
    "name": "Quinn Sanders / Tony Petersen",
@@ -22374,7 +22577,7 @@
   },
   {
    "from": "2459",
-   "to": "2006",
+   "to": "2534",
    "role": "OC",
    "name": "Quinn Sanders / Tony Petersen",
    "p": 0,
@@ -22406,7 +22609,7 @@
   },
   {
    "from": "2309",
-   "to": "239",
+   "to": "2628",
    "role": "DC",
    "name": "Cherokee Valeria",
    "p": 0,
@@ -22433,54 +22636,6 @@
    "to": "2084",
    "role": "DC",
    "name": "Cherokee Valeria",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "166",
-   "to": "239",
-   "role": "OC",
-   "name": "David Yost",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "166",
-   "to": "2628",
-   "role": "OC",
-   "name": "David Yost",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "166",
-   "to": "52",
-   "role": "OC",
-   "name": "David Yost",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "166",
-   "to": "120",
-   "role": "OC",
-   "name": "David Yost",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "166",
-   "to": "2638",
-   "role": "OC",
-   "name": "David Yost",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "166",
-   "to": "2032",
-   "role": "OC",
-   "name": "David Yost",
    "p": 0,
    "how": "head coach"
   },
@@ -22542,7 +22697,7 @@
   },
   {
    "from": "2348",
-   "to": "2638",
+   "to": "2534",
    "role": "OC",
    "name": "Nathan Young",
    "p": 0,
@@ -22557,35 +22712,11 @@
    "how": "follows HC"
   },
   {
-   "from": "2116",
-   "to": "2653",
-   "role": "OC",
-   "name": "Steve Cooper",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
    "from": "295",
    "to": "239",
    "role": "HC",
    "name": "Ricky Rahne",
    "p": 0
-  },
-  {
-   "from": "2636",
-   "to": "242",
-   "role": "OC",
-   "name": "Rick Bowie",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2636",
-   "to": "2032",
-   "role": "OC",
-   "name": "Rick Bowie",
-   "p": 0,
-   "how": "head coach"
   },
   {
    "from": "2439",
@@ -22605,6 +22736,14 @@
   },
   {
    "from": "2655",
+   "to": "2534",
+   "role": "DC",
+   "name": "Tayler Polk / Nate Fuqua",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2655",
    "to": "2032",
    "role": "DC",
    "name": "Tayler Polk / Nate Fuqua",
@@ -22614,14 +22753,6 @@
   {
    "from": "2655",
    "to": "2433",
-   "role": "DC",
-   "name": "Tayler Polk / Nate Fuqua",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2655",
-   "to": "2638",
    "role": "DC",
    "name": "Tayler Polk / Nate Fuqua",
    "p": 0,
@@ -22661,6 +22792,14 @@
   },
   {
    "from": "98",
+   "to": "2534",
+   "role": "OC",
+   "name": "Bodie Reeder / Joe Bernardi",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "98",
    "to": "2032",
    "role": "OC",
    "name": "Bodie Reeder / Joe Bernardi",
@@ -22676,10 +22815,234 @@
    "how": "head coach"
   },
   {
-   "from": "98",
+   "from": "2032",
+   "to": "2433",
+   "role": "DC",
+   "name": "Griff McCarley",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2032",
+   "to": "2534",
+   "role": "DC",
+   "name": "Griff McCarley",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2032",
+   "to": "2638",
+   "role": "DC",
+   "name": "Griff McCarley",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2433",
+   "to": "239",
+   "role": "DC",
+   "name": "Troy Reffett",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "2433",
+   "to": "2628",
+   "role": "DC",
+   "name": "Troy Reffett",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "2433",
+   "to": "52",
+   "role": "DC",
+   "name": "Troy Reffett",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "2433",
+   "to": "152",
+   "role": "DC",
+   "name": "Troy Reffett",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "2433",
+   "to": "2032",
+   "role": "DC",
+   "name": "Troy Reffett",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2433",
+   "to": "2534",
+   "role": "DC",
+   "name": "Troy Reffett",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2433",
+   "to": "2348",
+   "role": "DC",
+   "name": "Troy Reffett",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "295",
+   "to": "120",
+   "role": "OC",
+   "name": "Kody Cook",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "295",
+   "to": "152",
+   "role": "OC",
+   "name": "Kody Cook",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "295",
+   "to": "52",
+   "role": "OC",
+   "name": "Kody Cook",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "295",
+   "to": "239",
+   "role": "OC",
+   "name": "Kody Cook",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "295",
+   "to": "2032",
+   "role": "OC",
+   "name": "Kody Cook",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "295",
+   "to": "2006",
+   "role": "OC",
+   "name": "Kody Cook",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "295",
+   "to": "2433",
+   "role": "OC",
+   "name": "Kody Cook",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "265",
+   "to": "2628",
+   "role": "OC",
+   "name": "Matt Miller",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "265",
+   "to": "239",
+   "role": "OC",
+   "name": "Matt Miller",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "265",
+   "to": "52",
+   "role": "OC",
+   "name": "Matt Miller",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "265",
+   "to": "120",
+   "role": "OC",
+   "name": "Matt Miller",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "265",
+   "to": "68",
+   "role": "OC",
+   "name": "Matt Miller",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "265",
    "to": "2638",
    "role": "OC",
-   "name": "Bodie Reeder / Joe Bernardi",
+   "name": "Matt Miller",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "265",
+   "to": "2534",
+   "role": "OC",
+   "name": "Matt Miller",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2247",
+   "to": "2653",
+   "role": "DC",
+   "name": "Cam Clark / John Haneline",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2247",
+   "to": "2433",
+   "role": "DC",
+   "name": "Cam Clark / John Haneline",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2117",
+   "to": "2006",
+   "role": "OC",
+   "name": "Jim Chapin / Derek Fulton",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2117",
+   "to": "2032",
+   "role": "OC",
+   "name": "Jim Chapin / Derek Fulton",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2117",
+   "to": "2711",
+   "role": "OC",
+   "name": "Jim Chapin / Derek Fulton",
    "p": 0,
    "how": "head coach"
   },
@@ -22740,230 +23103,6 @@
    "how": "head coach"
   },
   {
-   "from": "2032",
-   "to": "2433",
-   "role": "DC",
-   "name": "Griff McCarley",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2032",
-   "to": "2638",
-   "role": "DC",
-   "name": "Griff McCarley",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2433",
-   "to": "239",
-   "role": "DC",
-   "name": "Troy Reffett",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "2433",
-   "to": "2628",
-   "role": "DC",
-   "name": "Troy Reffett",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "2433",
-   "to": "52",
-   "role": "DC",
-   "name": "Troy Reffett",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "2433",
-   "to": "152",
-   "role": "DC",
-   "name": "Troy Reffett",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "2433",
-   "to": "2032",
-   "role": "DC",
-   "name": "Troy Reffett",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2433",
-   "to": "2348",
-   "role": "DC",
-   "name": "Troy Reffett",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2433",
-   "to": "2638",
-   "role": "DC",
-   "name": "Troy Reffett",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "295",
-   "to": "120",
-   "role": "OC",
-   "name": "Kody Cook",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "295",
-   "to": "152",
-   "role": "OC",
-   "name": "Kody Cook",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "295",
-   "to": "52",
-   "role": "OC",
-   "name": "Kody Cook",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "295",
-   "to": "239",
-   "role": "OC",
-   "name": "Kody Cook",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "295",
-   "to": "2032",
-   "role": "OC",
-   "name": "Kody Cook",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "295",
-   "to": "2006",
-   "role": "OC",
-   "name": "Kody Cook",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "295",
-   "to": "2433",
-   "role": "OC",
-   "name": "Kody Cook",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "265",
-   "to": "239",
-   "role": "OC",
-   "name": "Matt Miller",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "265",
-   "to": "2628",
-   "role": "OC",
-   "name": "Matt Miller",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "265",
-   "to": "52",
-   "role": "OC",
-   "name": "Matt Miller",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "265",
-   "to": "120",
-   "role": "OC",
-   "name": "Matt Miller",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "265",
-   "to": "68",
-   "role": "OC",
-   "name": "Matt Miller",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "265",
-   "to": "2638",
-   "role": "OC",
-   "name": "Matt Miller",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "265",
-   "to": "21",
-   "role": "OC",
-   "name": "Matt Miller",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2117",
-   "to": "2006",
-   "role": "OC",
-   "name": "Jim Chapin / Derek Fulton",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2117",
-   "to": "2032",
-   "role": "OC",
-   "name": "Jim Chapin / Derek Fulton",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2117",
-   "to": "2711",
-   "role": "OC",
-   "name": "Jim Chapin / Derek Fulton",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2247",
-   "to": "2653",
-   "role": "DC",
-   "name": "Cam Clark / John Haneline",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2247",
-   "to": "2433",
-   "role": "DC",
-   "name": "Cam Clark / John Haneline",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
    "from": "2572",
    "to": "52",
    "role": "DC",
@@ -23013,7 +23152,7 @@
   },
   {
    "from": "2572",
-   "to": "2653",
+   "to": "2534",
    "role": "DC",
    "name": "Joe Bolden",
    "p": 0,
@@ -23053,6 +23192,14 @@
   },
   {
    "from": "2623",
+   "to": "2534",
+   "role": "DC",
+   "name": "Jack Curtis",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2623",
    "to": "2032",
    "role": "DC",
    "name": "Jack Curtis",
@@ -23062,14 +23209,6 @@
   {
    "from": "2623",
    "to": "2638",
-   "role": "DC",
-   "name": "Jack Curtis",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2623",
-   "to": "166",
    "role": "DC",
    "name": "Jack Curtis",
    "p": 0,
@@ -23109,7 +23248,7 @@
   },
   {
    "from": "166",
-   "to": "2032",
+   "to": "2534",
    "role": "DC",
    "name": "Joe Morris",
    "p": 0,
@@ -23141,7 +23280,7 @@
   },
   {
    "from": "2050",
-   "to": "239",
+   "to": "2628",
    "role": "DC",
    "name": "Jeff Knowles",
    "p": 0,
@@ -23228,16 +23367,16 @@
    "how": "head coach"
   },
   {
-   "from": "2636",
-   "to": "2032",
-   "role": "DC",
-   "name": "Jess Loepp",
+   "from": "21",
+   "to": "2638",
+   "role": "OC",
+   "name": "Matt Johnson",
    "p": 0,
    "how": "head coach"
   },
   {
    "from": "21",
-   "to": "2638",
+   "to": "2534",
    "role": "OC",
    "name": "Matt Johnson",
    "p": 0,
@@ -23252,72 +23391,8 @@
    "how": "head coach"
   },
   {
-   "from": "21",
-   "to": "166",
-   "role": "OC",
-   "name": "Matt Johnson",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "98",
-   "to": "52",
-   "role": "DC",
-   "name": "Davis Merritt",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "98",
-   "to": "152",
-   "role": "DC",
-   "name": "Davis Merritt",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "98",
-   "to": "120",
-   "role": "DC",
-   "name": "Davis Merritt",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "98",
-   "to": "2628",
-   "role": "DC",
-   "name": "Davis Merritt",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "98",
-   "to": "2032",
-   "role": "DC",
-   "name": "Davis Merritt",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "98",
-   "to": "2638",
-   "role": "DC",
-   "name": "Davis Merritt",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "98",
-   "to": "2393",
-   "role": "DC",
-   "name": "Davis Merritt",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
    "from": "265",
-   "to": "239",
+   "to": "2628",
    "role": "DC",
    "name": "Trent Bray",
    "p": 0,
@@ -23325,7 +23400,7 @@
   },
   {
    "from": "265",
-   "to": "2628",
+   "to": "239",
    "role": "DC",
    "name": "Trent Bray",
    "p": 0,
@@ -23365,65 +23440,65 @@
   },
   {
    "from": "265",
-   "to": "21",
+   "to": "2534",
    "role": "DC",
    "name": "Trent Bray",
    "p": 0,
    "how": "head coach"
   },
   {
-   "from": "2429",
-   "to": "152",
-   "role": "DC",
-   "name": "Nate Faanes",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "2429",
+   "from": "2309",
    "to": "120",
-   "role": "DC",
-   "name": "Nate Faanes",
+   "role": "OC",
+   "name": "Clay Patterson",
    "p": 0,
    "how": "follows HC"
   },
   {
-   "from": "2429",
+   "from": "2309",
+   "to": "152",
+   "role": "OC",
+   "name": "Clay Patterson",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "2309",
    "to": "52",
-   "role": "DC",
-   "name": "Nate Faanes",
+   "role": "OC",
+   "name": "Clay Patterson",
    "p": 0,
    "how": "follows HC"
   },
   {
-   "from": "2429",
-   "to": "239",
-   "role": "DC",
-   "name": "Nate Faanes",
+   "from": "2309",
+   "to": "2628",
+   "role": "OC",
+   "name": "Clay Patterson",
    "p": 0,
    "how": "follows HC"
   },
   {
-   "from": "2429",
+   "from": "2309",
+   "to": "2006",
+   "role": "OC",
+   "name": "Clay Patterson",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2309",
    "to": "2032",
-   "role": "DC",
-   "name": "Nate Faanes",
+   "role": "OC",
+   "name": "Clay Patterson",
    "p": 0,
    "how": "head coach"
   },
   {
-   "from": "2429",
-   "to": "218",
-   "role": "DC",
-   "name": "Nate Faanes",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2429",
-   "to": "295",
-   "role": "DC",
-   "name": "Nate Faanes",
+   "from": "2309",
+   "to": "2084",
+   "role": "OC",
+   "name": "Clay Patterson",
    "p": 0,
    "how": "head coach"
   },
@@ -23517,7 +23592,7 @@
   },
   {
    "from": "103",
-   "to": "2032",
+   "to": "2006",
    "role": "OC",
    "name": "Bill O'Brien",
    "p": 0,
@@ -23526,14 +23601,6 @@
   {
    "from": "326",
    "to": "2032",
-   "role": "DC",
-   "name": "Will Windham / Matthew Gregg",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "326",
-   "to": "2636",
    "role": "DC",
    "name": "Will Windham / Matthew Gregg",
    "p": 0,
@@ -23573,6 +23640,14 @@
   },
   {
    "from": "242",
+   "to": "2534",
+   "role": "DC",
+   "name": "Jon Kay",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "242",
    "to": "2638",
    "role": "DC",
    "name": "Jon Kay",
@@ -23582,14 +23657,6 @@
   {
    "from": "242",
    "to": "2032",
-   "role": "DC",
-   "name": "Jon Kay",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "242",
-   "to": "2433",
    "role": "DC",
    "name": "Jon Kay",
    "p": 0,
@@ -23613,9 +23680,73 @@
   },
   {
    "from": "2711",
-   "to": "2638",
+   "to": "2534",
    "role": "OC",
    "name": "Walt Bell",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "98",
+   "to": "52",
+   "role": "DC",
+   "name": "Davis Merritt",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "98",
+   "to": "152",
+   "role": "DC",
+   "name": "Davis Merritt",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "98",
+   "to": "120",
+   "role": "DC",
+   "name": "Davis Merritt",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "98",
+   "to": "2628",
+   "role": "DC",
+   "name": "Davis Merritt",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "98",
+   "to": "2534",
+   "role": "DC",
+   "name": "Davis Merritt",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "98",
+   "to": "2032",
+   "role": "DC",
+   "name": "Davis Merritt",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "98",
+   "to": "2393",
+   "role": "DC",
+   "name": "Davis Merritt",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "202",
+   "to": "2534",
+   "role": "OC",
+   "name": "Kevin Barbay / Ty Darlington",
    "p": 0,
    "how": "head coach"
   },
@@ -23636,10 +23767,58 @@
    "how": "head coach"
   },
   {
-   "from": "202",
-   "to": "2433",
-   "role": "OC",
-   "name": "Kevin Barbay / Ty Darlington",
+   "from": "2429",
+   "to": "152",
+   "role": "DC",
+   "name": "Nate Faanes",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "2429",
+   "to": "120",
+   "role": "DC",
+   "name": "Nate Faanes",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "2429",
+   "to": "52",
+   "role": "DC",
+   "name": "Nate Faanes",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "2429",
+   "to": "239",
+   "role": "DC",
+   "name": "Nate Faanes",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "2429",
+   "to": "2032",
+   "role": "DC",
+   "name": "Nate Faanes",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2429",
+   "to": "2534",
+   "role": "DC",
+   "name": "Nate Faanes",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2429",
+   "to": "218",
+   "role": "DC",
+   "name": "Nate Faanes",
    "p": 0,
    "how": "head coach"
   },
@@ -23724,62 +23903,6 @@
    "how": "head coach"
   },
   {
-   "from": "2309",
-   "to": "120",
-   "role": "OC",
-   "name": "Clay Patterson",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "2309",
-   "to": "152",
-   "role": "OC",
-   "name": "Clay Patterson",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "2309",
-   "to": "52",
-   "role": "OC",
-   "name": "Clay Patterson",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "2309",
-   "to": "239",
-   "role": "OC",
-   "name": "Clay Patterson",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "2309",
-   "to": "2006",
-   "role": "OC",
-   "name": "Clay Patterson",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2309",
-   "to": "2032",
-   "role": "OC",
-   "name": "Clay Patterson",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2309",
-   "to": "2084",
-   "role": "OC",
-   "name": "Clay Patterson",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
    "from": "130",
    "to": "152",
    "role": "DC",
@@ -23790,6 +23913,14 @@
   {
    "from": "130",
    "to": "52",
+   "role": "DC",
+   "name": "Jay Hill",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "130",
+   "to": "239",
    "role": "DC",
    "name": "Jay Hill",
    "p": 0,
@@ -23798,14 +23929,6 @@
   {
    "from": "130",
    "to": "2628",
-   "role": "DC",
-   "name": "Jay Hill",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "130",
-   "to": "239",
    "role": "DC",
    "name": "Jay Hill",
    "p": 0,
@@ -23844,14 +23967,6 @@
    "how": "follows HC"
   },
   {
-   "from": "59",
-   "to": "2247",
-   "role": "DC",
-   "name": "Jason Semore",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
    "from": "8",
    "to": "52",
    "role": "OC",
@@ -23861,7 +23976,7 @@
   },
   {
    "from": "8",
-   "to": "120",
+   "to": "152",
    "role": "OC",
    "name": "Tim Cramsey",
    "p": 0,
@@ -23893,7 +24008,7 @@
   },
   {
    "from": "189",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "Greg Nosal",
    "p": 0,
@@ -23925,6 +24040,14 @@
   },
   {
    "from": "55",
+   "to": "2534",
+   "role": "DC",
+   "name": "Brian Williams",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "55",
    "to": "2032",
    "role": "DC",
    "name": "Brian Williams",
@@ -23934,14 +24057,6 @@
   {
    "from": "55",
    "to": "98",
-   "role": "DC",
-   "name": "Brian Williams",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "55",
-   "to": "2638",
    "role": "DC",
    "name": "Brian Williams",
    "p": 0,
@@ -23973,6 +24088,14 @@
   },
   {
    "from": "338",
+   "to": "2534",
+   "role": "OC",
+   "name": "Mitch Militello",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "338",
    "to": "2032",
    "role": "OC",
    "name": "Mitch Militello",
@@ -23982,14 +24105,6 @@
   {
    "from": "338",
    "to": "98",
-   "role": "OC",
-   "name": "Mitch Militello",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "338",
-   "to": "2638",
    "role": "OC",
    "name": "Mitch Militello",
    "p": 0,
@@ -24061,6 +24176,14 @@
   },
   {
    "from": "2655",
+   "to": "2534",
+   "role": "OC",
+   "name": "Russ Callaway",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2655",
    "to": "2032",
    "role": "OC",
    "name": "Russ Callaway",
@@ -24070,14 +24193,6 @@
   {
    "from": "2655",
    "to": "2433",
-   "role": "OC",
-   "name": "Russ Callaway",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2655",
-   "to": "2638",
    "role": "OC",
    "name": "Russ Callaway",
    "p": 0,
@@ -24181,7 +24296,7 @@
   },
   {
    "from": "2006",
-   "to": "239",
+   "to": "2628",
    "role": "DC",
    "name": "Tim Tibesar",
    "p": 0,
@@ -24261,7 +24376,7 @@
   },
   {
    "from": "66",
-   "to": "2006",
+   "to": "2534",
    "role": "OC",
    "name": "Tyler Roehl",
    "p": 0,
@@ -24277,19 +24392,11 @@
   },
   {
    "from": "8",
-   "to": "120",
+   "to": "152",
    "role": "DC",
    "name": "Ron Roberts / Deron Wilson",
    "p": 0,
    "how": "follows HC"
-  },
-  {
-   "from": "249",
-   "to": "2433",
-   "role": "DC",
-   "name": "Matt Powledge / Bradley Dale Peveto",
-   "p": 0,
-   "how": "head coach"
   },
   {
    "from": "2439",
@@ -24306,6 +24413,13 @@
    "name": "Corey Dennis",
    "p": 0,
    "how": "head coach"
+  },
+  {
+   "from": "189",
+   "to": "2628",
+   "role": "HC",
+   "name": "Eddie George",
+   "p": 0
   },
   {
    "from": "2084",
@@ -24365,29 +24479,22 @@
   },
   {
    "from": "103",
-   "to": "2006",
+   "to": "2032",
    "role": "DC",
    "name": "Ted Roof",
    "p": 0,
    "how": "head coach"
   },
   {
-   "from": "189",
-   "to": "239",
-   "role": "HC",
-   "name": "Eddie George",
-   "p": 0
-  },
-  {
    "from": "265",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Kirby Moore",
    "p": 0
   },
   {
    "from": "265",
-   "to": "2628",
+   "to": "239",
    "role": "HC",
    "name": "Kirby Moore",
    "p": 0
@@ -24431,14 +24538,6 @@
    "how": "follows HC"
   },
   {
-   "from": "2116",
-   "to": "2653",
-   "role": "DC",
-   "name": "Alex Grinch",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
    "from": "24",
    "to": "120",
    "role": "DC",
@@ -24456,7 +24555,7 @@
   },
   {
    "from": "328",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "Robert Anae",
    "p": 0,
@@ -24464,7 +24563,7 @@
   },
   {
    "from": "328",
-   "to": "2628",
+   "to": "239",
    "role": "OC",
    "name": "Robert Anae",
    "p": 0,
@@ -24504,9 +24603,57 @@
   },
   {
    "from": "328",
-   "to": "21",
+   "to": "2534",
    "role": "OC",
    "name": "Robert Anae",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2229",
+   "to": "152",
+   "role": "OC",
+   "name": "Nick Coleman",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "2229",
+   "to": "120",
+   "role": "OC",
+   "name": "Nick Coleman",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "2229",
+   "to": "239",
+   "role": "OC",
+   "name": "Nick Coleman",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "2229",
+   "to": "2534",
+   "role": "OC",
+   "name": "Nick Coleman",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2229",
+   "to": "2032",
+   "role": "OC",
+   "name": "Nick Coleman",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2229",
+   "to": "2638",
+   "role": "OC",
+   "name": "Nick Coleman",
    "p": 0,
    "how": "head coach"
   },
@@ -24552,6 +24699,14 @@
   },
   {
    "from": "2509",
+   "to": "2628",
+   "role": "OC",
+   "name": "Josh Henson",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "2509",
    "to": "239",
    "role": "OC",
    "name": "Josh Henson",
@@ -24560,11 +24715,11 @@
   },
   {
    "from": "2509",
-   "to": "2628",
+   "to": "2534",
    "role": "OC",
    "name": "Josh Henson",
    "p": 0,
-   "how": "follows HC"
+   "how": "head coach"
   },
   {
    "from": "2509",
@@ -24576,11 +24731,11 @@
   },
   {
    "from": "2509",
-   "to": "2638",
-   "role": "OC",
-   "name": "Josh Henson",
+   "to": "2628",
+   "role": "DC",
+   "name": "Kevin Kane",
    "p": 0,
-   "how": "head coach"
+   "how": "follows HC"
   },
   {
    "from": "2509",
@@ -24591,12 +24746,12 @@
    "how": "follows HC"
   },
   {
-   "from": "2509",
-   "to": "2628",
-   "role": "DC",
-   "name": "Kevin Kane",
+   "from": "58",
+   "to": "2534",
+   "role": "OC",
+   "name": "Tim Beck",
    "p": 0,
-   "how": "follows HC"
+   "how": "head coach"
   },
   {
    "from": "58",
@@ -24611,22 +24766,6 @@
    "to": "2638",
    "role": "OC",
    "name": "Tim Beck",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "58",
-   "to": "2429",
-   "role": "OC",
-   "name": "Tim Beck",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "151",
-   "to": "2429",
-   "role": "OC",
-   "name": "Jordan Davis",
    "p": 0,
    "how": "head coach"
   },
@@ -24640,6 +24779,14 @@
   },
   {
    "from": "151",
+   "to": "2429",
+   "role": "OC",
+   "name": "Jordan Davis",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "151",
    "to": "218",
    "role": "OC",
    "name": "Jordan Davis",
@@ -24647,26 +24794,10 @@
    "how": "head coach"
   },
   {
-   "from": "41",
-   "to": "349",
+   "from": "2226",
+   "to": "2534",
    "role": "DC",
-   "name": "Ryan Manalac",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "41",
-   "to": "218",
-   "role": "DC",
-   "name": "Ryan Manalac",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "41",
-   "to": "2006",
-   "role": "DC",
-   "name": "Ryan Manalac",
+   "name": "Brett Dewhurst",
    "p": 0,
    "how": "head coach"
   },
@@ -24683,62 +24814,6 @@
    "to": "2638",
    "role": "DC",
    "name": "Brett Dewhurst",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2226",
-   "to": "2429",
-   "role": "DC",
-   "name": "Brett Dewhurst",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2229",
-   "to": "152",
-   "role": "OC",
-   "name": "Nick Coleman",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "2229",
-   "to": "120",
-   "role": "OC",
-   "name": "Nick Coleman",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "2229",
-   "to": "239",
-   "role": "OC",
-   "name": "Nick Coleman",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
-   "from": "2229",
-   "to": "2032",
-   "role": "OC",
-   "name": "Nick Coleman",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2229",
-   "to": "2638",
-   "role": "OC",
-   "name": "Nick Coleman",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "2229",
-   "to": "166",
-   "role": "OC",
-   "name": "Nick Coleman",
    "p": 0,
    "how": "head coach"
   },
@@ -24792,11 +24867,57 @@
   },
   {
    "from": "2653",
-   "to": "2638",
+   "to": "2534",
    "role": "OC",
    "name": "Adam Austin",
    "p": 0,
    "how": "head coach"
+  },
+  {
+   "from": "164",
+   "to": "239",
+   "role": "DC",
+   "name": "Travis Johansen",
+   "p": 0,
+   "how": "follows HC"
+  },
+  {
+   "from": "41",
+   "to": "349",
+   "role": "DC",
+   "name": "Ryan Manalac",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "41",
+   "to": "218",
+   "role": "DC",
+   "name": "Ryan Manalac",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "41",
+   "to": "2006",
+   "role": "DC",
+   "name": "Ryan Manalac",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2623",
+   "to": "52",
+   "role": "HC",
+   "name": "Casey Woods",
+   "p": 0
+  },
+  {
+   "from": "2623",
+   "to": "120",
+   "role": "HC",
+   "name": "Casey Woods",
+   "p": 0
   },
   {
    "from": "66",
@@ -24831,14 +24952,6 @@
    "how": "follows HC"
   },
   {
-   "from": "164",
-   "to": "239",
-   "role": "DC",
-   "name": "Travis Johansen",
-   "p": 0,
-   "how": "follows HC"
-  },
-  {
    "from": "127",
    "to": "152",
    "role": "DC",
@@ -24856,7 +24969,7 @@
   },
   {
    "from": "127",
-   "to": "239",
+   "to": "2628",
    "role": "DC",
    "name": "Joe Rossi / Max Bullough",
    "p": 0,
@@ -24864,7 +24977,7 @@
   },
   {
    "from": "127",
-   "to": "2628",
+   "to": "239",
    "role": "DC",
    "name": "Joe Rossi / Max Bullough",
    "p": 0,
@@ -24900,6 +25013,14 @@
   },
   {
    "from": "2393",
+   "to": "2534",
+   "role": "DC",
+   "name": "Brian Stewart",
+   "p": 0,
+   "how": "head coach"
+  },
+  {
+   "from": "2393",
    "to": "98",
    "role": "DC",
    "name": "Brian Stewart",
@@ -24915,26 +25036,20 @@
    "how": "head coach"
   },
   {
-   "from": "2393",
+   "from": "2534",
    "to": "2638",
-   "role": "DC",
-   "name": "Brian Stewart",
+   "role": "OC",
+   "name": "Zack Patterson",
    "p": 0,
    "how": "head coach"
   },
   {
-   "from": "2623",
-   "to": "52",
-   "role": "HC",
-   "name": "Casey Woods",
-   "p": 0
-  },
-  {
-   "from": "2623",
-   "to": "120",
-   "role": "HC",
-   "name": "Casey Woods",
-   "p": 0
+   "from": "2534",
+   "to": "2032",
+   "role": "OC",
+   "name": "Zack Patterson",
+   "p": 0,
+   "how": "head coach"
   },
   {
    "from": "36",
@@ -24978,7 +25093,7 @@
   },
   {
    "from": "36",
-   "to": "2005",
+   "to": "2534",
    "role": "DC",
    "name": "Tyson Summers / Kenny McClendon",
    "p": 0,
@@ -24986,7 +25101,7 @@
   },
   {
    "from": "36",
-   "to": "2751",
+   "to": "2005",
    "role": "DC",
    "name": "Tyson Summers / Kenny McClendon",
    "p": 0,
@@ -25113,7 +25228,7 @@
   },
   {
    "from": "2429",
-   "to": "218",
+   "to": "2534",
    "role": "OC",
    "name": "Todd Fitch",
    "p": 0,
@@ -25121,7 +25236,7 @@
   },
   {
    "from": "2429",
-   "to": "295",
+   "to": "218",
    "role": "OC",
    "name": "Todd Fitch",
    "p": 0,
@@ -25190,14 +25305,6 @@
   {
    "from": "238",
    "to": "98",
-   "role": "OC",
-   "name": "Tim Beck",
-   "p": 0,
-   "how": "head coach"
-  },
-  {
-   "from": "238",
-   "to": "2638",
    "role": "OC",
    "name": "Tim Beck",
    "p": 0,
@@ -25299,7 +25406,7 @@
   },
   {
    "from": "2309",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Mark Carney",
    "p": 0
@@ -25401,7 +25508,7 @@
   },
   {
    "from": "2006",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Joe Moorhead",
    "p": 0
@@ -25422,7 +25529,7 @@
   },
   {
    "from": "2050",
-   "to": "239",
+   "to": "2628",
    "role": "HC",
    "name": "Mike Uremovich",
    "p": 0
@@ -25445,6 +25552,13 @@
   },
   {
    "from": "25",
+   "to": "52",
+   "role": "HC",
+   "name": "Tosh Lupoi",
+   "p": 0
+  },
+  {
+   "from": "25",
    "to": "239",
    "role": "OC",
    "name": "Jordan Somerville / Ike Hilliard",
@@ -25476,13 +25590,6 @@
    "how": "follows HC"
   },
   {
-   "from": "25",
-   "to": "52",
-   "role": "HC",
-   "name": "Tosh Lupoi",
-   "p": 0
-  },
-  {
    "from": "2459",
    "to": "120",
    "role": "HC",
@@ -25498,14 +25605,14 @@
   },
   {
    "from": "2459",
-   "to": "52",
+   "to": "2628",
    "role": "HC",
    "name": "Rob Harley",
    "p": 0
   },
   {
    "from": "2459",
-   "to": "2628",
+   "to": "52",
    "role": "HC",
    "name": "Rob Harley",
    "p": 0
@@ -25608,7 +25715,7 @@
   },
   {
    "from": "130",
-   "to": "2628",
+   "to": "239",
    "role": "OC",
    "name": "Jim Harding",
    "p": 0,
@@ -25616,7 +25723,7 @@
   },
   {
    "from": "130",
-   "to": "239",
+   "to": "2628",
    "role": "OC",
    "name": "Jim Harding",
    "p": 0,
