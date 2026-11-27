@@ -1094,6 +1094,21 @@
      ]
     },
     {
+     "term": "DoR",
+     "short": "Declare or Return: the money by going back to college less the money by declaring, for a draft prospect with eligibility left.",
+     "body": [
+      "Declare = the rookie deal + later earnings, averaged over where he goes from his xPick. Return = yNIL for the season + the same one draft later and a year older. Dollars are at this season's cap, later years count 0.97 a year. RET on the board means return pays more. It is what pays, not what he will do (that is Ret%).",
+      "Rookie deal: the 2026 slotted four-year totals, with the guaranteed share by pick from OverTheCap rookie deals and the rest counted at the odds he is still on a roster. Later earnings: every veteran contract of the 2011-15 drafts (1,270 picks) as a share of the cap, fit on pick, position and age. A year older at the same pick is -18% in later earnings (t = -3.7).",
+      "Pick spread, from each draft's last PFF board before the January deadline (2021-25): 798 declared prospects went undrafted 19% of the time, sd 0.87 in ln pick. 141 who went back were not drafted the next year 43% of the time, sd 1.39, and went 94% later at the same rank. Players who went back include the ones whose season went wrong, so that slide is the high end of what returning costs.",
+      "Break-even yNIL by xPick (WR / QB, $M): 10 24.6 / 52.7, 32 15.1 / 34.3, 50 10.8 / 24.9, 100 5.4 / 12.6, 150 2.6 / 6.5, 200 1.3 / 3.4. With no slide (next year's mean pick the same and the wider spread kept, the low end): 10 16.1 / 38.6, 32 7.2 / 19.5, 50 3.8 / 11.7, 100 0.2 / 2.5, 150 -1.2 / -1.3, 200 -1.9 / -3.0.",
+      "History, 626 underclassmen and seniors with a year left on the 2022-25 boards (NIL scaled to each season's market): DoR said return for 9%, and 17% returned. Of the 107 who returned, 57% were drafted the next year and 33% came out ahead of what declaring was worth (mean $21.7M with NIL against $24.2M)."
+     ],
+     "where": "CFB draft board",
+     "sports": [
+      "CFB"
+     ]
+    },
+    {
      "term": "Ret%",
      "short": "The chance a player is back in college next season instead of in the 2027 draft, 1 - P(declares).",
      "body": [

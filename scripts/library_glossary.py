@@ -1,6 +1,6 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Build research/library.json (then run scripts/library_build.py): ARKBOARD Process tab content (glossary + FV conversion charts)."""
-import json, os, re
+import json, math, os, re
 
 import pathlib
 ROOT = str(pathlib.Path(__file__).resolve().parent.parent)
@@ -26,6 +26,7 @@ _ND = ld('data/nil_deals.json')['deals']                       # reported deals 
 _nbm = lambda k: sum((lo + hi) / 2 for lo, hi in _NB[k]['teams'].values()) / len(_NB[k]['teams'])
 _VX = ld('data/nba_vorx_research.json')                         # VORX on rXPM (scripts/nba_vorx_research.py)             # rXPM team adjustment (scripts/nba_rxpm_research.py)
 _NT = ld('data/nba_trade_fit.json')                         # NBA draft-night trades (scripts/nba_draft_trades.py)
+_DR = ld('data/dor_fit.json')                              # DoR, declare or return in dollars (scripts/dor.py)
 _RP = ld('data/return_pay.json')                           # draft pay vs college pay in Return% (scripts/research/ret_pay_nov27/pay.py)
 _RD = ld('data/return_drivers.json')                       # Return% sweep + reported-return lock (scripts/return_drivers.py, return_news.py)
 _CL = {k: ld(f'scripts/research/coach_loyalty_nov27/results_{k}.json') for k in ('cbb', 'cfb', 'recruits_cfb', 'recruits_cbb')}   # coach loyalty tests
@@ -496,6 +497,22 @@ sections.append({'id': 'players', 'title': 'Player odds and projections', 'entri
       ['Declare is a logit on ln xPick and age on draft day. Ranked underclassmen declare about 94% of the time, seniors about 69% and RS seniors 100%.',
        'Picked is a log-normal around the mock xPick, with an SD that narrows toward the draft (PFF dated boards, 2020-26).'],
       'CFB board, draft board', ['CFB']),
+    (lambda f, t, k, r: E('DoR', 'Declare or Return: the money by going back to college less the money by declaring, for a draft prospect with eligibility left.',
+      [f"Declare = the rookie deal + later earnings, averaged over where he goes from his xPick. Return = yNIL for the season + the same one draft later and a year older. "
+       f"Dollars are at this season's cap, later years count {f['d']:.2f} a year. RET on the board means return pays more. It is what pays, not what he will do (that is Ret%).",
+       f"Rookie deal: the 2026 slotted four-year totals, with the guaranteed share by pick from OverTheCap rookie deals and the rest counted at the odds he is still on a roster. "
+       f"Later earnings: every veteran contract of the {f['later']['drafts'][0]}-{str(f['later']['drafts'][1])[2:]} drafts ({f['later']['n']:,} picks) as a share of the cap, fit on pick, position and age. "
+       f"A year older at the same pick is {f['later']['agePct']:.0f}% in later earnings (t = {f['later']['ageT']:.1f}).",
+       f"Pick spread, from each draft's last PFF board before the January deadline ({f['spread']['drafts'][0]}-{str(f['spread']['drafts'][-1])[2:]}): {f['spread']['declare']['n']} declared prospects went "
+       f"undrafted {100 * f['spread']['declare']['undrafted']:.0f}% of the time, sd {f['spread']['declare']['sd']:.2f} in ln pick. {f['spread']['return']['n']} who went back were not drafted the next year "
+       f"{100 * f['spread']['return']['undrafted']:.0f}% of the time, sd {f['spread']['return']['sd']:.2f}, and went {100 * (math.exp(f['spread']['return']['a'] - f['spread']['declare']['a']) - 1):.0f}% later at the same rank. "
+       f"Players who went back include the ones whose season went wrong, so that slide is the high end of what returning costs.",
+       "Break-even yNIL by xPick (WR / QB, $M): " + ', '.join(f"{x['xPick']} {x['breakEvenNil']:.1f} / {x['breakEvenNilQB']:.1f}" for x in t if x['xPick'] in (10, 32, 50, 100, 150, 200)) +
+       ". With no slide (next year's mean pick the same and the wider spread kept, the low end): " + ', '.join(f"{x['xPick']} {x['noSlide']:.1f} / {x['noSlideQB']:.1f}" for x in t if x['xPick'] in (10, 32, 50, 100, 150, 200)) + ".",
+       f"History, {k['n']} underclassmen and seniors with a year left on the {k['drafts'][0]}-{str(k['drafts'][-1])[2:]} boards (NIL scaled to each season's market): DoR said return for {100 * k['saysReturn']:.0f}%, and {100 * k['returned']:.0f}% returned. "
+       f"Of the {r['n']} who returned, {100 * r['drafted']:.0f}% were drafted the next year and {100 * r['beatDeclare']:.0f}% came out ahead of what declaring was worth "
+       f"(mean ${r['meanGot']:.1f}M with NIL against ${r['meanDeclareEV']:.1f}M)."],
+      'CFB draft board', ['CFB']))(_DR, _DR['table'], _DR['check'], _DR['check']['returners']),
     (lambda c, b, n, fails: E('Ret%', 'The chance a player is back in college next season instead of in the 2027 draft, 1 - P(declares).',
       [f"CFB uses the Draft% declare logit (ln xPick, age on draft day, by class group). Leaving one draft out on the 2021-25 fall PFF boards "
        f"({c['n']} prospects, without RS seniors and grads), log loss is {c['baselines']['live']:.3f}, compared to {c['baselines']['class']:.3f} for class only, "

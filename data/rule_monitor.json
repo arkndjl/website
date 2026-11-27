@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-27T19:18:50Z",
+ "asof": "2026-11-27T21:54:57Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -3066,19 +3066,19 @@
    "status": "on",
    "stopped": null,
    "n": 23,
-   "clvN": 20,
-   "clvRet": 0.0305,
-   "clvT": 1.25,
-   "days": 9,
-   "beat": 0.65,
-   "settled": 20,
-   "w": 12,
+   "clvN": 21,
+   "clvRet": 0.0329,
+   "clvT": 1.41,
+   "days": 10,
+   "beat": 0.667,
+   "settled": 21,
+   "w": 13,
    "l": 8,
-   "roi": 0.1144,
+   "roi": 0.1511,
    "week": {
-    "n": 6,
-    "clvRet": 0.0259,
-    "clvT": 0.5
+    "n": 7,
+    "clvRet": 0.0336,
+    "clvT": 0.76
    },
    "exp": {
     "clvRet": 0.1336,
@@ -3087,24 +3087,24 @@
     "n": 80
    },
    "vsExp": {
-    "gap": -0.1031,
-    "z": -4.22,
+    "gap": -0.1007,
+    "z": -4.31,
     "read": "below the backtest"
    },
    "check": {
-    "n": 21,
-    "window": 21,
-    "mean": 0.0301,
-    "t": 1.3,
-    "p": 0.8863,
-    "days": 10,
+    "n": 22,
+    "window": 22,
+    "mean": 0.0324,
+    "t": 1.45,
+    "p": 0.9117,
+    "days": 11,
     "sd": 0.1355,
-    "cusum": 0.48,
+    "cusum": 0.0,
     "cusumMax": 2.65,
     "h": 10.0,
     "rho": 0.306,
     "edge": {
-     "cusum": 1.03,
+     "cusum": 0.89,
      "cusumMax": 1.55,
      "h": 4.595
     },
@@ -3112,33 +3112,33 @@
     "why": "",
     "drift": {
      "mu1": 0.04,
-     "n": 21,
+     "n": 22,
      "sd": 0.1355,
      "rho": 0.306,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.951,
-     "info": 1.83,
-     "real": 0.123,
-     "realSe": 0.854,
+     "llr": -0.81,
+     "info": 1.92,
+     "real": 0.214,
+     "realSe": 0.825,
      "need": 68
     }
    },
    "drift": {
     "mu1": 0.04,
-    "n": 21,
+    "n": 22,
     "sd": 0.1355,
     "rho": 0.306,
     "lo": -2.944,
     "hi": 2.944,
     "state": "watching",
     "at": null,
-    "llr": -0.951,
-    "info": 1.83,
-    "real": 0.123,
-    "realSe": 0.854,
+    "llr": -0.81,
+    "info": 1.92,
+    "real": 0.214,
+    "realSe": 0.825,
     "need": 68,
     "path": [
      [
@@ -3190,6 +3190,11 @@
       "2026-11-26",
       21,
       -0.951
+     ],
+     [
+      "2026-11-27",
+      22,
+      -0.81
      ]
     ]
    }
@@ -4063,11 +4068,11 @@
    "sport": "cbb",
    "mk": "total",
    "label": "CBB total",
-   "n": 208,
-   "du": 133.25,
-   "clvRet": -0.0032,
-   "clvT": -0.25,
-   "flat": 0.0006,
+   "n": 209,
+   "du": 133.75,
+   "clvRet": -0.0029,
+   "clvT": -0.23,
+   "flat": 0.001,
    "adds": -0.0038,
    "expEdge": 0.0189,
    "basis": "backtest + live picks"
