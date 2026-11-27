@@ -1,10 +1,10 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-27T23:01:04Z",
+ "asof": "2026-11-27T23:05:50Z",
  "recenter": {
   "2026-11-27": 1.94,
-  "2026-11-28": 1.44
+  "2026-11-28": 1.41
  },
  "monitor": {
   "clocks": {
@@ -1281,19 +1281,19 @@
     }
    },
    "total | conf: B12": {
-    "n": 1,
-    "window": 1,
-    "mean": -0.005,
-    "t": null,
+    "n": 2,
+    "window": 2,
+    "mean": 0.1116,
+    "t": 0.96,
     "p": null,
-    "days": 1,
+    "days": 2,
     "sd": 0.1089,
-    "cusum": 0.24,
+    "cusum": 0.0,
     "cusumMax": 0.24,
     "h": 10.0,
     "rho": 0.078,
     "edge": {
-     "cusum": 0.11,
+     "cusum": 0.0,
      "cusumMax": 0.11,
      "h": 4.595
     },
@@ -1301,17 +1301,17 @@
     "why": "",
     "drift": {
      "mu1": 0.0202,
-     "n": 1,
+     "n": 2,
      "sd": 0.1089,
      "rho": 0.078,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -0.108,
-     "info": 0.03,
-     "real": -2.65,
-     "realSe": 5.389,
+     "llr": 0.245,
+     "info": 0.07,
+     "real": 4.062,
+     "realSe": 3.811,
      "need": 171
     }
    },
@@ -1808,30 +1808,30 @@
   "since": "2026-11-11T20:00:00Z",
   "why": "owner: paper until live picks beat the close (Nov 11 2026)",
   "pooled": {
-   "n": 421,
+   "n": 422,
    "days": 18,
-   "llr": -3.387,
+   "llr": -3.175,
    "lo": -2.944,
    "hi": 2.944,
    "state": "paused",
    "at": "2026-11-16",
    "sd": 0.12,
    "rho": 0.05,
-   "real": 0.04,
+   "real": 0.049,
    "realSe": 0.197,
-   "clvRet": -0.0049,
+   "clvRet": -0.0044,
    "evDU": 0.0225
   },
   "back": {
-   "n": 302,
-   "clvRet": 0.0082,
-   "t": 1.4,
+   "n": 303,
+   "clvRet": 0.0089,
+   "t": 1.48,
    "days": 15
   }
  },
  "model": {
   "asof": "2026-11-27T22:58:45Z",
-  "ageH": 0.0,
+  "ageH": 0.1,
   "stale": false
  },
  "picks": [],
@@ -1900,20 +1900,20 @@
  "withdrawn": [],
  "board": [
   {
-   "id": "401929172",
+   "id": "401924811",
    "sport": "cbb",
    "kick": "2026-11-28T20:30:00Z",
-   "home": "Boise State",
-   "away": "North Texas",
+   "home": "Hofstra",
+   "away": "Merrimack",
    "mk": "spread",
-   "side": "away",
-   "line": 15.5,
-   "price": -751.0,
-   "edge": 14.3,
-   "x": 4.0,
-   "why": "gap too big: a bad line",
-   "m": 1.2,
-   "tm": 155.3
+   "side": "home",
+   "line": 3.5,
+   "price": -131.0,
+   "edge": 6.9,
+   "x": 5.0,
+   "why": "no edge at -131",
+   "m": 10.4,
+   "tm": 123.4
   },
   {
    "id": "401920436",
@@ -1932,20 +1932,20 @@
    "tm": 150.9
   },
   {
-   "id": "401924811",
+   "id": "401917954",
    "sport": "cbb",
-   "kick": "2026-11-28T20:30:00Z",
-   "home": "Hofstra",
-   "away": "Merrimack",
+   "kick": "2026-11-28T21:00:00Z",
+   "home": "Furman",
+   "away": "Austin Peay",
    "mk": "spread",
-   "side": "home",
-   "line": 4.5,
-   "price": 105.0,
-   "edge": 5.9,
+   "side": "away",
+   "line": 20.5,
+   "price": -751.0,
+   "edge": 6.7,
    "x": 5.0,
-   "why": "no edge at +105",
-   "m": 10.4,
-   "tm": 123.4
+   "why": "no edge at -751",
+   "m": 13.8,
+   "tm": 152.0
   },
   {
    "id": "401927389",
@@ -1980,22 +1980,6 @@
    "tm": 146.5
   },
   {
-   "id": "401917954",
-   "sport": "cbb",
-   "kick": "2026-11-28T21:00:00Z",
-   "home": "Furman",
-   "away": "Austin Peay",
-   "mk": "spread",
-   "side": "home",
-   "line": 8.5,
-   "price": -137.0,
-   "edge": 5.3,
-   "x": 5.0,
-   "why": "no edge at -137",
-   "m": 13.8,
-   "tm": 152.0
-  },
-  {
    "id": "401926783",
    "sport": "cbb",
    "kick": "2026-11-28T03:30:00Z",
@@ -2012,6 +1996,22 @@
    "tm": 137.5
   },
   {
+   "id": "401911031",
+   "sport": "cbb",
+   "kick": "2026-11-28T19:00:00Z",
+   "home": "Southern Indiana",
+   "away": "Ball State",
+   "mk": "spread",
+   "side": "home",
+   "line": -3.5,
+   "price": 120.0,
+   "edge": 3.4,
+   "x": 3.5,
+   "why": "edge under 3.5 (inj: with)",
+   "m": -0.1,
+   "tm": 139.4
+  },
+  {
    "id": "401911380",
    "sport": "cbb",
    "kick": "2026-11-28T00:00:00Z",
@@ -2020,7 +2020,7 @@
    "mk": "spread",
    "side": "home",
    "line": 9.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 4.3,
    "x": 4.5,
    "why": "edge under 4.5 (line: 9-15)",
@@ -2056,7 +2056,7 @@
    "edge": 5.8,
    "x": 6.5,
    "why": "edge under 6.5 (side: under)",
-   "m": 5.4,
+   "m": 5.3,
    "tm": 152.7
   },
   {
@@ -2180,7 +2180,7 @@
    "mk": "spread",
    "side": "home",
    "line": 12.5,
-   "price": -103.0,
+   "price": 105.0,
    "edge": 3.5,
    "x": 4.5,
    "why": "edge under 4.5 (line: 9-15)",
@@ -2196,7 +2196,7 @@
    "mk": "total",
    "side": "under",
    "line": 141.5,
-   "price": -115.0,
+   "price": -150.0,
    "edge": 5.0,
    "x": 6.5,
    "why": "edge under 6.5 (side: under)",
@@ -2276,7 +2276,7 @@
    "mk": "total",
    "side": "under",
    "line": 157.5,
-   "price": -102.0,
+   "price": -113.0,
    "edge": 4.8,
    "x": 6.5,
    "why": "edge under 6.5 (side: under)",
@@ -2306,7 +2306,7 @@
    "side": "home",
    "line": -2.5,
    "price": -121.0,
-   "edge": 2.7,
+   "edge": 2.8,
    "ev": null,
    "units": 0.0,
    "home": "Alabama",
@@ -2473,7 +2473,7 @@
    "mk": "spread",
    "side": "home",
    "line": 9.5,
-   "price": -102.0,
+   "price": -100.0,
    "edge": 4.3,
    "ev": null,
    "units": 0.0,
@@ -2520,9 +2520,9 @@
   "401929172": {
    "mk": "spread",
    "side": "away",
-   "line": 15.5,
-   "price": -751.0,
-   "edge": 14.3,
+   "line": 3.5,
+   "price": -111.0,
+   "edge": 2.3,
    "ev": null,
    "units": 0.0,
    "home": "Boise State",
@@ -2617,7 +2617,7 @@
    "mk": "spread",
    "side": "home",
    "line": -1.5,
-   "price": -110.0,
+   "price": 120.0,
    "edge": 2.5,
    "ev": null,
    "units": 0.0,
@@ -2701,7 +2701,7 @@
    "mk": "total",
    "side": "under",
    "line": 141.5,
-   "price": -115.0,
+   "price": -150.0,
    "edge": 5.0,
    "ev": null,
    "units": 0.0,
@@ -2711,10 +2711,10 @@
   },
   "401917954": {
    "mk": "spread",
-   "side": "home",
-   "line": 8.5,
-   "price": -137.0,
-   "edge": 5.3,
+   "side": "away",
+   "line": 20.5,
+   "price": -751.0,
+   "edge": 6.7,
    "ev": null,
    "units": 0.0,
    "home": "Furman",
@@ -2796,9 +2796,9 @@
   "401924811": {
    "mk": "spread",
    "side": "home",
-   "line": 4.5,
-   "price": 105.0,
-   "edge": 5.9,
+   "line": 3.5,
+   "price": -131.0,
+   "edge": 6.9,
    "ev": null,
    "units": 0.0,
    "home": "Hofstra",
@@ -2845,7 +2845,7 @@
    "mk": "total",
    "side": "under",
    "line": 157.5,
-   "price": -102.0,
+   "price": -113.0,
    "edge": 4.8,
    "ev": null,
    "units": 0.0,
@@ -2878,11 +2878,11 @@
    "state": "under"
   },
   "401911031": {
-   "mk": "total",
-   "side": "under",
-   "line": 141.5,
-   "price": -108.0,
-   "edge": 2.1,
+   "mk": "spread",
+   "side": "home",
+   "line": -3.5,
+   "price": 120.0,
+   "edge": 3.4,
    "ev": null,
    "units": 0.0,
    "home": "Southern Indiana",
@@ -2929,7 +2929,7 @@
    "mk": "spread",
    "side": "home",
    "line": 12.5,
-   "price": -103.0,
+   "price": 105.0,
    "edge": 3.5,
    "ev": null,
    "units": 0.0,
@@ -2990,7 +2990,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 27964,
+  "snapshots": 28032,
   "buckets": [
    {
     "when": "24h+",
@@ -3003,11 +3003,11 @@
    },
    {
     "when": "6-24h",
-    "clvN": 5604,
-    "clvRet": -0.0061,
-    "clvT": -3.09,
-    "clv": 0.61,
-    "beat": 0.407,
+    "clvN": 5624,
+    "clvRet": -0.0051,
+    "clvT": -2.53,
+    "clv": 0.63,
+    "beat": 0.406,
     "still": 0.398
    },
    {
@@ -3021,12 +3021,12 @@
    },
    {
     "when": "<1h",
-    "clvN": 397,
+    "clvN": 401,
     "clvRet": -0.0475,
-    "clvT": -27.58,
+    "clvT": -27.85,
     "clv": -0.03,
-    "beat": 0.071,
-    "still": 0.836
+    "beat": 0.07,
+    "still": 0.838
    }
   ]
  },
@@ -21755,7 +21755,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-27T23:01:04Z",
+ "checked": "2026-11-27T23:05:50Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
