@@ -3970,7 +3970,7 @@
   // on top with their tag; the player standing in carries FILL-IN. Slots pack into the column count that gives the
   // biggest type, in chart order.
   var DC_LG = { cfb: 'CFB', cbb: 'CBB', nfl: 'NFL', nba: 'NBA', nhl: 'NHL', soccer: 'SOCCER' };
-  var DC_INJ = { out: 'O', doubtful: 'D', questionable: 'Q', probable: 'P', 'injured reserve': 'IR', suspension: 'SUSP', 'day-to-day': 'DTD' };
+  var DC_INJ = { dd: 'DTD', 'out (season)': 'OFS', out: 'O', doubtful: 'D', questionable: 'Q', probable: 'P', 'injured reserve': 'IR', suspension: 'SUSP', 'day-to-day': 'DTD' };
   function dcNum(v, f) {
     if (v == null) return '—';
     if (f === 'i') return String(Math.round(v));
@@ -4043,11 +4043,17 @@
             var tags = [], inj = p[3] ? DC_INJ[String(p[3]).toLowerCase()] || String(p[3]).toUpperCase() : '';
             if (inj) tags.push([inj, C.down]);
             if (p[4] === 'fill-in') tags.push(['FILL-IN', C.teal]);
-            g.font = ss + 'px ' + FONT; var tagW = tags.reduce(function (a, t) { return a + g.measureText(t[0]).width + ss * 0.6 + 10; }, 0);
-            g.font = fs + 'px ' + FONT; g.fillStyle = starter ? C.white : C.light;
-            var nroom = Math.max(fs * 3, room - tagW), nm = p[0];
-            if (g.measureText(nm).width > nroom) { var pw = String(nm).split(' '); if (pw.length > 1) nm = pw[0][0] + '. ' + surname(nm); }   // C. Beck before a cut name
-            nm = fit(g, nm, nroom); g.fillText(nm, nx, my);
+            // the name beside its tags: whole, then C. Beck, then Beck; a tag goes before the name is cut
+            var pw = String(p[0]).split(' '), forms = pw.length > 1 ? [p[0], pw[0][0] + '. ' + surname(p[0]), surname(p[0])] : [p[0]], nm = null, nroom = room;
+            for (;;) {
+              g.font = ss + 'px ' + FONT; var tagW = tags.reduce(function (a, t) { return a + g.measureText(t[0]).width + ss * 0.6 + 10; }, 0);
+              g.font = fs + 'px ' + FONT; nroom = Math.max(fs * 3, room - tagW);
+              nm = forms.filter(function (f) { return g.measureText(f).width <= nroom; })[0];
+              if (nm || !tags.length) break;
+              tags.pop();
+            }
+            g.fillStyle = starter ? C.white : C.light;
+            nm = nm || fit(g, forms[forms.length > 1 ? 1 : 0], nroom); g.fillText(nm, nx, my);
             var tgx = nx + g.measureText(nm).width + 12;
             g.font = ss + 'px ' + FONT;
             tags.forEach(function (t) {
