@@ -1,0 +1,268 @@
+{
+ "n": 48183,
+ "rates": {
+  "all (coach on file)": {
+   "n": 45941,
+   "transfer": 0.1506
+  },
+  "transfer in, came with head coach": {
+   "n": 194,
+   "transfer": 0.1443
+  },
+  "transfer in, came with a coach (HC or coordinator there)": {
+   "n": 226,
+   "transfer": 0.1504
+  },
+  "transfer in, did not": {
+   "n": 13313,
+   "transfer": 0.1486
+  },
+  "came with, coach stays": {
+   "n": 150,
+   "transfer": 0.14
+  },
+  "came with, coach leaves": {
+   "n": 44,
+   "transfer": 0.1591
+  },
+  "inherited": {
+   "n": 6827,
+   "transfer": 0.1838
+  },
+  "not inherited": {
+   "n": 39114,
+   "transfer": 0.1448
+  },
+  "coach leaves, tie": {
+   "n": 8256,
+   "transfer": 0.2145
+  },
+  "coach leaves, no tie": {
+   "n": 1003,
+   "transfer": 0.2443
+  },
+  "coach stays, tie": {
+   "n": 30762,
+   "transfer": 0.1257
+  },
+  "coach stays, no tie": {
+   "n": 5823,
+   "transfer": 0.1735
+  },
+  "new coordinator on his side": {
+   "n": 15175,
+   "transfer": 0.1587
+  }
+ },
+ "terms": {
+  "T1 came_with": {
+   "2024->25 fit, 2025->26 scored": {
+    "d": -4.9e-05,
+    "t": 0.98,
+    "tLevelAdj": 1.06,
+    "n": 24034,
+    "G": 265,
+    "coef": [
+     -0.329
+    ],
+    "auc_base": 0.7376,
+    "auc": 0.7378
+   },
+   "back": {
+    "d": -4.4e-05,
+    "t": 1.51,
+    "tLevelAdj": 1.66,
+    "n": 24149,
+    "G": 263,
+    "coef": [
+     -0.175
+    ],
+    "auc_base": 0.704,
+    "auc": 0.7041
+   }
+  },
+  "T1s came_with_staff": {
+   "2024->25 fit, 2025->26 scored": {
+    "d": -3.2e-05,
+    "t": 0.68,
+    "tLevelAdj": 0.78,
+    "n": 24034,
+    "G": 265,
+    "coef": [
+     -0.306
+    ],
+    "auc_base": 0.7376,
+    "auc": 0.7377
+   },
+   "back": {
+    "d": -2.8e-05,
+    "t": 1.52,
+    "tLevelAdj": 1.66,
+    "n": 24149,
+    "G": 263,
+    "coef": [
+     -0.1
+    ],
+    "auc_base": 0.704,
+    "auc": 0.704
+   }
+  },
+  "T2 yrs_hc": {
+   "2024->25 fit, 2025->26 scored": {
+    "d": 0.000565,
+    "t": -3.66,
+    "tLevelAdj": -3.76,
+    "n": 24034,
+    "G": 265,
+    "coef": [
+     -0.293
+    ],
+    "auc_base": 0.7376,
+    "auc": 0.7362
+   },
+   "back": {
+    "d": 0.000859,
+    "t": -3.18,
+    "tLevelAdj": -3.55,
+    "n": 24149,
+    "G": 263,
+    "coef": [
+     0.482
+    ],
+    "auc_base": 0.704,
+    "auc": 0.7024
+   }
+  },
+  "T3 inherited": {
+   "2024->25 fit, 2025->26 scored": {
+    "d": 1.1e-05,
+    "t": -0.31,
+    "tLevelAdj": -0.09,
+    "n": 24034,
+    "G": 265,
+    "coef": [
+     0.031
+    ],
+    "auc_base": 0.7376,
+    "auc": 0.7376
+   },
+   "back": {
+    "d": 5e-06,
+    "t": -0.3,
+    "tLevelAdj": -0.73,
+    "n": 24149,
+    "G": 263,
+    "coef": [
+     -0.014
+    ],
+    "auc_base": 0.704,
+    "auc": 0.704
+   }
+  },
+  "T4 hc_ten": {
+   "2024->25 fit, 2025->26 scored": {
+    "d": 0.000667,
+    "t": -2.25,
+    "tLevelAdj": -1.8,
+    "n": 24034,
+    "G": 265,
+    "coef": [
+     -0.165
+    ],
+    "auc_base": 0.7376,
+    "auc": 0.7365
+   },
+   "back": {
+    "d": 6.9e-05,
+    "t": -0.62,
+    "tLevelAdj": -2.32,
+    "n": 24149,
+    "G": 263,
+    "coef": [
+     0.086
+    ],
+    "auc_base": 0.704,
+    "auc": 0.7035
+   }
+  },
+  "T5 leave_x_tie": {
+   "2024->25 fit, 2025->26 scored": {
+    "d": -8.7e-05,
+    "t": 1.37,
+    "tLevelAdj": 1.41,
+    "n": 24034,
+    "G": 265,
+    "coef": [
+     0.099
+    ],
+    "auc_base": 0.7376,
+    "auc": 0.7378
+   },
+   "back": {
+    "d": 0.000104,
+    "t": -0.7,
+    "tLevelAdj": -0.69,
+    "n": 24149,
+    "G": 263,
+    "coef": [
+     0.297
+    ],
+    "auc_base": 0.704,
+    "auc": 0.7038
+   }
+  },
+  "T6 coord_new": {
+   "2024->25 fit, 2025->26 scored": {
+    "d": 1e-06,
+    "t": -0.0,
+    "tLevelAdj": -0.18,
+    "n": 24034,
+    "G": 265,
+    "coef": [
+     0.073
+    ],
+    "auc_base": 0.7376,
+    "auc": 0.7374
+   },
+   "back": {
+    "d": -6e-05,
+    "t": 0.82,
+    "tLevelAdj": 0.61,
+    "n": 24149,
+    "G": 263,
+    "coef": [
+     0.049
+    ],
+    "auc_base": 0.704,
+    "auc": 0.704
+   }
+  }
+ },
+ "follow": {
+  "first season under him": {
+   "n": 388,
+   "followed": 139,
+   "share": 0.358
+  },
+  "('all', 2024)": {
+   "n": 257,
+   "followed": 62,
+   "share": 0.241
+  },
+  "2+ seasons under him": {
+   "n": 342,
+   "followed": 106,
+   "share": 0.31
+  },
+  "came with him before": {
+   "n": 6,
+   "followed": 2,
+   "share": 0.333
+  },
+  "('all', 2025)": {
+   "n": 479,
+   "followed": 185,
+   "share": 0.386
+  }
+ }
+}

@@ -27,6 +27,8 @@ _VX = ld('data/nba_vorx_research.json')                         # VORX on rXPM (
 _NT = ld('data/nba_trade_fit.json')                         # NBA draft-night trades (scripts/nba_draft_trades.py)
 _RP = ld('data/return_pay.json')                           # draft pay vs college pay in Return% (scripts/research/ret_pay_nov27/pay.py)
 _RD = ld('data/return_drivers.json')                       # Return% sweep + reported-return lock (scripts/return_drivers.py, return_news.py)
+_CL = {k: ld(f'scripts/research/coach_loyalty_nov27/results_{k}.json') for k in ('cbb', 'cfb', 'recruits_cfb', 'recruits_cbb')}   # coach loyalty tests
+_CMF = ld('data/cbb_market_fit.json')['move']['test']
 _CD = ld('data/cbb_declare_fit.json')                      # CBB stay-or-declare (scripts/cbb_declare.py)
 _CX = ld('data/cbb_xpm_research.json')                     # CBB pXPM fit + tests (scripts/cbb_xpm.py, scripts/research/cbb_xpm_nov26)
 _AG = ld('data/recruit_age_research.json')                  # recruit age for the class (scripts/research/recruit_age_nov26)
@@ -533,8 +535,10 @@ sections.append({'id': 'players', 'title': 'Player odds and projections', 'entri
              for k, v in _RD['cbb']['stageB']['singles'].items() if not v['pass']]))),
     E('Transfer% (Xfer%)', 'The chance a player is on another FBS or FCS roster next season.',
       ['A ridge logit on the 2024-25 and 2025-26 cycles: class, production, role, recruit rank, record, P(HC change) and distance from home.',
-       'Out-of-time AUC is .738. Transfer% + stay + exit = 100%. It uses NIL-era data only (July 2021 on).'],
-      'CFB board, portal, team builder', ['CFB']),
+       'Out-of-time AUC is .738. Transfer% + stay + exit = 100%. It uses NIL-era data only (July 2021 on).',
+       f'Coach ties: in CBB the head coach\'s seasons at the school lower it (2025-26 held out t = {_CL["cbb"]["move"]["terms"]["T4 hc_ten"]["A"]["t"]}, log loss {_CMF["loglossRecal"]:.4f}, AUC {_CMF["auc"][1]:.3f}); in CFB the same term failed (t = {_CL["cfb"]["terms"]["T4 hc_ten"]["2024->25 fit, 2025->26 scored"]["t"]}).',
+       f'A transfer who came with his head coach moved again {100 * _CL["cbb"]["move"]["rates"]["transfer in, came with coach"]["moved"]:.1f}% of the time in CBB against {100 * _CL["cbb"]["move"]["rates"]["transfer in, did not"]["moved"]:.1f}% for other transfers (n = {_CL["cbb"]["move"]["rates"]["transfer in, came with coach"]["n"]}), and {100 * _CL["cfb"]["rates"]["transfer in, came with head coach"]["transfer"]:.1f}% against {100 * _CL["cfb"]["rates"]["transfer in, did not"]["transfer"]:.1f}% in CFB (n = {_CL["cfb"]["rates"]["transfer in, came with head coach"]["n"]}). Too few to pass held out (t = {_CL["cbb"]["move"]["terms"]["T1 came_with"]["A"]["t"]} CBB, {_CL["cfb"]["terms"]["T1 came_with"]["2024->25 fit, 2025->26 scored"]["t"]} CFB). Seasons under the coach, players he inherited and a coach leaving x the tie failed in both sports too.'],
+      'CFB board, portal, team builder; CBB portal', ['CFB', 'CBB']),
     E('FBS%', 'The chance an FCS player is on an FBS roster next season.',
       ['A logit on 2023-26 FCS-to-FBS moves: production, team strength, year in school and position. It is capped at 1 - Draft%.'],
       'CFB FCS board', ['CFB']),
@@ -1150,6 +1154,15 @@ for osec in _old.get('sections', []):
     if sec is None:
         continue
     sec['entries'] += [e for e in osec['entries'] if e['term'] not in _mine]
+# coach terms in the recruit model (scripts/research/coach_loyalty_nov27): one line on the carried ARK lean entry, rewritten each run
+_rl, _rb = _CL['recruits_cfb'], _CL['recruits_cbb']
+_cl_line = (f'Coach terms (CFB, classes 2022-26 held out): a school whose head coach is gone after the recruit\'s senior fall is picked less (t = {_rl["R4 late"]["t"]:.1f}, '
+            f'log loss {-_rl["base"]["ll"]:.3f} to {-_rl["R4 late"]["with"]["ll"]:.3f}). Head coach tenure passed alone (t = {_rl["R2 hc_ten"]["t"]:.1f}) but not in every class on top of that. '
+            f'Failed: a first-year coach (t = {_rl["R1 newhc"]["t"]:.1f}), a coach who came from a school on his list (t = {_rl["R3 hc_from_list"]["t"]:.1f}), and all four in CBB (t = {min(_rb[k]["t"] for k in ("R1 newhc", "R2 hc_ten", "R3 hc_from_list", "R4 late")):.1f} to {max(_rb[k]["t"] for k in ("R1 newhc", "R2 hc_ten", "R3 hc_from_list", "R4 late")):.1f}).')
+for sec in sections:
+    for e in sec['entries']:
+        if e['term'] == 'ARK lean (recruit commitment)':
+            e['body'] = [b for b in e['body'] if not b.startswith('Coach terms')] + [_cl_line]
 json.dump(lib, open(OUT, 'w'), indent=1, ensure_ascii=False)
 print('sections', len(sections), 'entries', sum(len(s['entries']) for s in sections), 'tables', len(fv_tables), 'problems', len(problems))
 for s in sections:

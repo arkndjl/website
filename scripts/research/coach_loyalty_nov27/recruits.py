@@ -24,56 +24,8 @@ NEW = ['newhc', 'hc_ten', 'hc_from', 'late']
 SCORED = range(2022, 2027)
 
 
-POSW = {'running back', 'defensive end', 'quarterback', 'cornerback', 'linebacker', 'offensive line', 'offensive tackle', 'wide receiver', 'safety', 'tight end',
-        'defensive tackle', 'defensive back', 'int', 'interim', 'center', 'guard', 'fullback', 'halfback', 'defensive line', 'tbd', 'vacant'}
-
-
-def ck(n):
-    """coach name key: the disambiguator ("(American football)") off, position words and placeholders dropped"""
-    import re
-    k = N.key(re.sub(r'\s*\(.*?\)', '', n or ''))
-    return None if (not k or k in POSW or len(k.split()) < 2) else k
-
-
-def keys(v):
-    return [k for k in (ck(n) for n in v or []) if k]
-
-
-def clean(staff):
-    """staff: {season: {tid: {'hc': [names], 'oc': [...], 'dc': [...]}}} -> the season-start head coach by continuity
-    (the name also there the season before, else the one there the season after, else the first listed)"""
-    out = defaultdict(dict)
-    ys = sorted(staff)
-    for y in ys:
-        for t, v in staff[y].items():
-            hc = keys(v.get('hc'))
-            if not hc: continue
-            prev = keys((staff.get(y - 1, {}).get(t) or {}).get('hc'))
-            nxt = keys((staff.get(y + 1, {}).get(t) or {}).get('hc'))
-            pick = next((n for n in hc if n in prev), None) or next((n for n in hc if n in nxt), None) or hc[0]
-            out[y][t] = {'hc': pick, 'co': set(keys((v.get('oc') or []) + (v.get('dc') or [])))}
-    return out
-
-
-def cfb_staff():
-    """FBS 2014-25 from the all-time coach file, then every FBS/FCS team 2021-26 from the season infoboxes"""
-    d = json.load(gzip.open(os.path.join(ROOT, 'scripts', 'data', 'coach_alltime_src.json.gz')))['cfb']
-    camp = json.load(open(os.path.join(ROOT, 'scripts', 'geo', 'recruit_campus.json')))['cfb']
-    alias = {'appalachianstate': 'appstate', 'louisianamonroe': 'ulmonroe', 'miamiohio': 'miamioh', 'middletennesseestate': 'middletennessee',
-             'samhoustonstate': 'samhouston', 'southernmississippi': 'southernmiss'}
-    ck = {}
-    for t, v in camp.items():
-        if v and v.get('name'): ck.setdefault(N.team_key(v['name']), t)
-    staff = defaultdict(dict)
-    for r in d['rows']:
-        if r['y'] < 2013: continue
-        k = N.team_key(d['teams'][r['t']]); tid = ck.get(k) or ck.get(alias.get(k))
-        if tid: staff[r['y']][tid] = {'hc': [c[0] for c in r['cs'] if len(c[0].split()) >= 2], 'oc': r.get('oc') or [], 'dc': r.get('dc') or []}
-    f = os.path.join(ROOT, 'scripts', 'data', 'cfb_staff_hist.json')
-    if os.path.exists(f):
-        for y, T in json.load(open(f)).items():
-            for t, v in T.items(): staff[int(y)][t] = v
-    return clean(staff)
+import cfb_staff as CS  # noqa: E402
+ck, keys, clean, cfb_staff = CS.ck, CS.keys, CS.clean, CS.load
 
 
 def cbb_staff():
@@ -124,7 +76,8 @@ def main(sp):
     dec = C.DECAY.get(sp, {}).get('list')
     start = C.YEARS[sp][0] + 3
     specs = {'base': kept, 'R1 newhc': kept + ['newhc'], 'R2 hc_ten': kept + ['hc_ten'], 'R3 hc_from_list': kept + ['hc_from'], 'R4 late': kept + ['late'],
-             'R1+R3': kept + ['newhc', 'hc_from']}
+             'R1+R3': kept + ['newhc', 'hc_from'], 'R2+R4': kept + ['hc_ten', 'late']}
+    if '--joint' in sys.argv: specs = {k: v for k, v in specs.items() if k in ('base', 'R2 hc_ten', 'R4 late', 'R2+R4')}
     res = {k: defaultdict(list) for k in specs}; coef = defaultdict(list); expo = defaultdict(list)
     for y in SCORED:
         Xt, yt, mt = C.build(sp, loc, cls, range(start, y), 'list', True); Xh, yh, _ = C.build(sp, loc, cls, [y], 'list', False)
@@ -148,6 +101,10 @@ def main(sp):
         if k == 'base': continue
         g = C.gate(res['base'], res[k]); g['with'] = C.summ(res[k]); g['coef'] = coef[k]; out[k] = g
         print(k, {a: (round(b, 5) if isinstance(b, float) else b) for a, b in g.items() if a not in ('with',)}, flush=True)
+    if 'R2+R4' in res and '--joint' in sys.argv:
+        out = {'R2+R4': out['R2+R4'], 'ten given late': C.gate(res['R4 late'], res['R2+R4']), 'late given ten': C.gate(res['R2 hc_ten'], res['R2+R4']), 'base': out['base']}
+        print({k: (round(v['gain'], 5), round(v['t'], 2), v['classesPos']) for k, v in out.items() if k != 'base'}, C.summ(res['R2+R4']))
+        json.dump(out, open(os.path.join(HERE, f'results_recruits_{sp}_joint.json'), 'w'), indent=1); return
     json.dump(out, open(os.path.join(HERE, f'results_recruits_{sp}.json'), 'w'), indent=1)
 
 

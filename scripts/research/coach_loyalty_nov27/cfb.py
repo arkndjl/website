@@ -4,7 +4,7 @@
 scripts/cfb_transfer_fit.py's live features.
 
     python3 scripts/cfb_transfer_fit.py                           # rows (scripts/.cache/transfer/rows.json)
-    python3 scripts/research/coach_loyalty_nov27/cfb_staff.py     # staff by season (scripts/data/cfb_staff_hist.json)
+    python3 scripts/cfb_staff.py                                   # staff by season (scripts/data/cfb_staff_hist.json)
     python3 scripts/research/coach_loyalty_nov27/cfb.py           # -> results_cfb.json here
 """
 import json
@@ -82,16 +82,8 @@ def ties(rows, on, st):
 
 
 def staff():
-    f = json.load(open(os.path.join(ROOT, 'scripts', 'data', 'cfb_staff_hist.json')))
-    raw = defaultdict(dict)
-    for y, Tm in f.items():
-        for t, v in Tm.items(): raw[int(y)][t] = v
-    st = RC.clean(raw)
-    for y, Tm in raw.items():
-        for t, v in Tm.items():
-            if t in st[y]:
-                st[y][t]['oc'] = set(RC.keys(v.get('oc'))); st[y][t]['dc'] = set(RC.keys(v.get('dc')))
-    return st
+    import cfb_staff as CS
+    return {y: v for y, v in CS.load().items() if y >= 2021}
 
 
 def main():

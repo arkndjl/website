@@ -18,6 +18,11 @@ classes (.75 a class). Failed there: top-tier / nearest school in his list, high
 Nov 17 2026 (scripts/research/recruit_visits_nov17/, as of the On3 commitment date - 30 days): CFB adds On3/Rivals
 visits (official, unofficial count, latest, last 90 days) and the expert picks' confidence-weighted share
 (scripts/recruit_on3_join.py). Failed: RPM % on top of those (CFB), every On3 term in CBB.
+
+Nov 27 2026 (scripts/research/coach_loyalty_nov27/, classes 2022-26 walk-forward): CFB adds `late`, a school whose head
+coach is gone after the recruit's senior fall (scripts/cfb_staff.py changed(); live: the coach today is not the one who
+started the season). Held: head coach tenure (passes alone, 3 of 5 classes on top of `late`). Failed: a new coach, a
+coach who came from a school on his list, and every coach term in CBB.
 """
 import csv, json, math, os, sys, time
 from collections import defaultdict
@@ -38,8 +43,9 @@ LIVE = (2027, 2028, 2029)
 BASE = ['pull', 'tier', 'gxt', 'gap']
 DIST = ['ld', 'inst', 'pipe', 'ld_tier', 'ld_g']
 MORE = ['conv', 'elo', 'delo']
+COACH = ['late']
 ON3_H = 30   # On3 visits / expert picks / RPM as of the commitment date - 30 days in training; live: everything to date
-EXTRA = {'cfb': {'list': ['conv', 'elo', 'delo', 'ov', 'luv', 'vlast', 'vrec', 'esh', 'eany']}}   # added to the kept terms of that sport's model
+EXTRA = {'cfb': {'list': ['conv', 'elo', 'delo', 'ov', 'luv', 'vlast', 'vrec', 'esh', 'eany', 'late']}}   # added to the kept terms of that sport's model
 DECAY = {'cfb': {'list': 0.75}}                      # weight of a training class, per class back from the newest
 SCHED = os.path.join(ROOT, 'scripts', '.cache', 'fvrefit', 'ros')
 LAM = 1.0
@@ -99,9 +105,10 @@ def elo_z(season):
     return out
 
 
-def school_stats(cls, y, loc, sp=None):
+def school_stats(cls, y, loc, sp=None, cls_y=None):
     """from classes y-3..y-1: signee count, tier (shrunk mean grade z), signees by home state, times listed by a
-    recruit; CFB: the program's Elo z of season y-1 and of season y-2"""
+    recruit; CFB: the program's Elo z of season y-1 and of season y-2, and the schools whose head coach is gone after
+    the senior fall of class cls_y (y when not given)"""
     n, s, bys, listed = defaultdict(int), defaultdict(float), defaultdict(int), defaultdict(int)
     for k in (y - 3, y - 2, y - 1):
         for x in cls.get(k, []):
@@ -110,11 +117,15 @@ def school_stats(cls, y, loc, sp=None):
     allm = sum(s.values()) / max(1, sum(n.values()))
     tier = {t: (s[t] + 5 * allm) / (n[t] + 5) for t in n}
     e1, e0 = (elo_z(y - 1), elo_z(y - 2)) if sp == 'cfb' else ({}, {})
-    return n, tier, bys, listed, e1, e0
+    late = {}
+    if sp == 'cfb':
+        import cfb_staff
+        late = cfb_staff.changed((cls_y or y) - 1)
+    return n, tier, bys, listed, e1, e0, late
 
 
 def feats(x, alts, st, loc):
-    n, tier, bys, listed, e1, e0 = st
+    n, tier, bys, listed, e1, e0, late = st
     F = []
     for t in alts:
         lat, lon, sst, _ = loc[t]
@@ -122,11 +133,11 @@ def feats(x, alts, st, loc):
         F.append([math.log1p(n.get(t, 0)), tr, x['g'] * tr, abs(x['g'] - tr), ld, float(sst == x['st']),
                   math.log1p(bys.get((t, x['st']), 0)), ld * tr, ld * x['g'],
                   math.log((n.get(t, 0) + 1) / (listed.get(t, 0) + 5)), e1.get(t, 0.0), e1.get(t, 0.0) - e0.get(t, e1.get(t, 0.0))]
-                 + ON3.alt_feats(x.get('ex'), t))
+                 + ON3.alt_feats(x.get('ex'), t) + [late.get(t, 0.0)])
     return np.array(F)
 
 
-COLS = BASE + DIST + MORE + ON3.COLS
+COLS = BASE + DIST + MORE + ON3.COLS + COACH
 
 
 def build(sp, loc, cls, years, mode, sample):
@@ -251,7 +262,7 @@ def live(sp, loc, cls, spec, refit=True):
         models[mode] = fit(X, yv, cols, w=[dec ** (last - y) for y, _ in meta] if dec else None)
     reopened = site_open(sp)   # ESPN still shows a school the recruit news says he left (a decommitment)
     for y in LIVE:
-        st = school_stats(cls, min(y, last + 1), loc, sp); active = [t for t in st[0] if t in loc]
+        st = school_stats(cls, min(y, last + 1), loc, sp, cls_y=y); active = [t for t in st[0] if t in loc]
         for x in cls.get(y, []):
             if x['chose'] and (y, N_key(x['name'])) not in reopened: continue
             mode = 'list' if len(x['list']) >= 3 else 'open'

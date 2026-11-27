@@ -1113,11 +1113,14 @@
      "short": "The chance a player is on another FBS or FCS roster next season.",
      "body": [
       "A ridge logit on the 2024-25 and 2025-26 cycles: class, production, role, recruit rank, record, P(HC change) and distance from home.",
-      "Out-of-time AUC is .738. Transfer% + stay + exit = 100%. It uses NIL-era data only (July 2021 on)."
+      "Out-of-time AUC is .738. Transfer% + stay + exit = 100%. It uses NIL-era data only (July 2021 on).",
+      "Coach ties: in CBB the head coach's seasons at the school lower it (2025-26 held out t = 2.89, log loss 0.8831, AUC 0.727); in CFB the same term failed (t = -2.25).",
+      "A transfer who came with his head coach moved again 16.9% of the time in CBB against 20.8% for other transfers (n = 124), and 14.4% against 14.9% in CFB (n = 194). Too few to pass held out (t = -0.91 CBB, 0.98 CFB). Seasons under the coach, players he inherited and a coach leaving x the tie failed in both sports too."
      ],
-     "where": "CFB board, portal, team builder",
+     "where": "CFB board, portal, team builder; CBB portal",
      "sports": [
-      "CFB"
+      "CFB",
+      "CBB"
      ]
     },
     {
@@ -1417,7 +1420,8 @@
       "A conditional logit over his ESPN recruitment list (3+ schools), fit walk-forward by class, with a recency weight of .75 a class (CFB).",
       "Terms: program pull and tier, grade × tier, hometown distance, home state, conversion rate (signed / listed) and on-field Elo (CFB).",
       "CFB also uses On3/Rivals visits (official, unofficial count, latest, last 90 days) and the confidence-weighted share of On3 expert picks. It is trained as of 30 days before each commitment, and live it uses everything to date.",
-      "Held out 2018-26 (CFB), log loss goes from 1.962 to 1.896 and top-1 from 30.4% to 32.3%. RPM % on top of the picks failed (CFB), and so did every On3 term (CBB). Leans above 80% have run about 10-20 points hot."
+      "Held out 2018-26 (CFB), log loss goes from 1.962 to 1.896 and top-1 from 30.4% to 32.3%. RPM % on top of the picks failed (CFB), and so did every On3 term (CBB). Leans above 80% have run about 10-20 points hot.",
+      "Coach terms (CFB, classes 2022-26 held out): a school whose head coach is gone after the recruit's senior fall is picked less (t = 6.8, log loss 1.927 to 1.924). Head coach tenure passed alone (t = 3.9) but not in every class on top of that. Failed: a first-year coach (t = 1.5), a coach who came from a school on his list (t = 1.1), and all four in CBB (t = -1.2 to 0.6)."
      ],
      "where": "CFB and CBB recruit class tabs",
      "sports": [
