@@ -136,9 +136,17 @@ def strength(a, b):
     if not ka or not kb: return 0
     if ka == kb or ka.replace(' ', '') == kb.replace(' ', ''): return 3      # De Vante / DeVante
     ta, tb = ka.split(), kb.split()
-    if len(ta) < 2 or len(tb) < 2: return 0
+    if len(ta) < 2 or len(tb) < 2:
+        # a mononym against a full name (Bremer / Gleison Bremer, Jonny / Jonny Otto): his first or last name, 4+
+        # letters, only trusted with the team
+        s, o = (ta, tb) if len(ta) < 2 else (tb, ta)
+        return 1 if len(o) >= 2 and len(s[0]) >= 4 and s[0] in (o[0], o[-1]) else 0
     f, l, g, m = ' '.join(ta[:-1]), ta[-1], ' '.join(tb[:-1]), tb[-1]
-    if l == m: return first_fits(f, g)
+    if l == m:
+        # one source drops a leading given name (Mehmet Zeki Çelik / Zeki Çelik): the shorter is the longer's tail,
+        # only trusted with the team
+        s_, o_ = (ta, tb) if len(ta) < len(tb) else (tb, ta)
+        return first_fits(f, g) or (1 if len(s_) < len(o_) and o_[-len(s_):] == s_ else 0)
     # one source keeps a two-part surname whole or joined (Smith-Njigba / Smith Njigba / SmithNjigba), or one of its
     # parts (Smith-Reed / Smith, Hayes-Davis / Hayes): a part alone is only trusted with the team
     if len(ta) == 3 and ' '.join(ta[1:]) == ' '.join(tb[1:]) and len(tb) == 3: return first_fits(ta[0], tb[0])
@@ -202,7 +210,7 @@ class Matcher:
     def __init__(self, rows, name='name', team='team', pos='pos', cls=None, id=None, sport='football', team_eq=None):
         self.rows, self.f, self.sport = list(rows), dict(name=name, team=team, pos=pos, cls=cls, id=id), sport
         self.team_eq = team_eq or same_team        # (wanted team, row's team) -> bool
-        self.by_key, self.by_last, self.by_id = {}, {}, {}
+        self.by_key, self.by_last, self.by_id, self.by_first = {}, {}, {}, {}
         for r in self.rows:
             n = self._get(r, 'name')
             if not n: continue
@@ -210,6 +218,7 @@ class Matcher:
             t = key(n).split()
             if t: self.by_last.setdefault(t[-1], []).append(r)
             if len(t) == 3: self.by_last.setdefault(t[1], []).append(r)      # a two-part surname under its first part too
+            if len(t) > 1: self.by_first.setdefault(t[0], []).append(r)      # for a mononym that is his first name
             i = self._get(r, 'id')
             if i not in (None, ''): self.by_id.setdefault(str(i), []).append(r)
         self.lasts = list(self.by_last)
@@ -232,6 +241,7 @@ class Matcher:
         last = t[-1]
         pool = list(self.by_last.get(last, []))
         if len(t) == 3: pool += self.by_last.get(t[1], [])
+        pool += self.by_first.get(t[0], []) if len(t) == 1 else self.by_key.get(t[0], [])     # mononyms (strength 1)
         if len(last) >= 6:
             for l2 in self.lasts:
                 if l2 != last and abs(len(l2) - len(last)) <= 1 and l2[:1] == last[:1] and _one_off(l2, last): pool += self.by_last[l2]
@@ -288,6 +298,11 @@ def _test():
     assert key('Brian Blades ll') == key('Brian Blades II') and strength('Sylvester Smith-Reed', 'Sylvester Smith') == 1
     assert strength('Will Holmes', 'William Holmes') == 2 and strength('Devin Jackson', 'Devon Jackson') == 1 and strength('Devin Henderson', 'Kevin Henderson') == 0
     assert strength('Bryce Underwood', 'Bryce Underwod') == 1 and strength('Jalen Smith', 'Jaylen Smith') == 1
+    assert strength('Mehmet Zeki Çelik', 'Zeki Çelik') == 1 and strength('Destiny Udogie', 'Iyenoma Destiny Udogie') == 1 and strength('Zeki Çelik', 'Zeki Mehmet Çelik') == 2
+    assert strength('Bremer', 'Gleison Bremer') == 1 and strength('Jonny Otto', 'Jonny') == 1 and strength('Rod', 'Rod Smith') == 0 and strength('Bremer', 'Pedro') == 0
+    m4 = Matcher([{'name': 'Gleison Bremer', 'team': 'Juventus'}, {'name': 'Jonny Otto', 'team': 'Alaves'}, {'name': 'Djené', 'team': 'Getafe'}])
+    assert m4.find('Bremer', 'Juventus')[1] == 'variant+team' and m4.find('Jonny', 'Alaves')[1] == 'variant+team' and m4.find('Bremer', 'Torino')[0] is None
+    assert m4.find('Djené Dakonam', 'Getafe')[1] == 'variant+team' and m4.find('Bremer')[0] is None
     diff = [('Josh Allen', 'Jordan Allen'), ('Chris Bell', 'Charles Bell'), ('Malik Brown', 'Malachi Brown'), ('AJ Green', 'AJ Greene'),
             ('Will Anderson', 'Wyatt Anderson'), ('Dan Jackson', 'Dante Jackson'), ('Dave Smith', 'Davion Smith'),
             ('Jalen Smith', 'Jaylen Smith')]

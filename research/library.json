@@ -1025,6 +1025,22 @@
      ]
     },
     {
+     "term": "GAR / SVAR on FotMob (soccer)",
+     "short": "The stand-in for soccer GAR and SVAR in a league where Understat is behind the results.",
+     "body": [
+      "GAR is built on Understat's on-pitch data. When its match files trail a league by a round, that league's rows move to FotMob's season lists, and move back when Understat is in step.",
+      "A ridge fit per position maps FotMob's rates a 90 (npxG, xA, finishing, chances created, shots, passing, defensive actions, match rating, keepers' goals prevented) and the side's xG for and against to the player's Understat value a 90. The GAR fit also reads his Understat value from the season before. Held out by season 2020-2026, r is 0.93 for GAR and 0.95 for SV.",
+      "Rate = w × the frozen Understat rate + (1 - w) × the FotMob estimate, and the total is the rate × FotMob's minutes. w = a × min / (min + k) on his frozen minutes. With three quarters of the matches seen, a is 0.8 for GAR and 0.6 for SV. With a quarter seen, 0.4 and 0.4. A player Understat never saw gets the FotMob estimate.",
+      "Test: Understat frozen at a quarter, half and three quarters of each season, scored on the full-season totals of 14,342 player-seasons. Frozen at three quarters, RMSE of SVAR is 0.70 for the frozen total, 0.49 for the frozen rate on current minutes and 0.40 for the blend (t -20.9, 6 of 6 seasons). GAR: 0.67, 0.43, 0.39 (t -18.4).",
+      "Frozen at a quarter, SVAR RMSE goes from 1.66 to 0.53, and the top 150's rank correlation with the final order from 0.40 to 0.85.",
+      "Blended into GAR while Understat is up, it adds nothing to next season (team R² 0.569 against 0.568, t 0.7), so it is only the fallback."
+     ],
+     "where": "Soccer GAR leaders, rookies, awards, xMV and projections in a league Understat trails",
+     "sports": [
+      "Soccer"
+     ]
+    },
+    {
      "term": "Yds+ / YOE (returners)",
      "short": "Kick and punt return yards over expected, shrunk.",
      "body": [

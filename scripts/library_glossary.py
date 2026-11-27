@@ -452,6 +452,24 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
                   'The team totals are the same either way, so GAR\'s split is kept.'])(json.load(open(os.path.join(ROOT, 'data', 'soccer_sv_fit.json'))),
                                                          json.load(open(os.path.join(ROOT, 'research', 'soccer_sv_shrink.json')))),
       'soccer GAR leaders, rookies, all-time players, transactions; conviction awards (Ballon d\'Or pool by SVAR)', ['Soccer']),
+    E('GAR / SVAR on FotMob (soccer)', 'The stand-in for soccer GAR and SVAR in a league where Understat is behind the results.',
+      (lambda G, q, h, z: ['GAR is built on Understat\'s on-pitch data. When its match files trail a league by a round, that league\'s rows move to FotMob\'s season lists, and move back when Understat is in step.',
+                  'A ridge fit per position maps FotMob\'s rates a 90 (npxG, xA, finishing, chances created, shots, passing, defensive actions, match rating, keepers\' goals prevented) and the side\'s xG for and against '
+                  'to the player\'s Understat value a 90. The GAR fit also reads his Understat value from the season before. Held out by season %d-%d, r is %.2f for GAR and %.2f for SV.'
+                  % (G['seasons'][0] - 1, G['seasons'][1], G['test']['r']['gar'], G['test']['r']['sv']),
+                  'Rate = w × the frozen Understat rate + (1 - w) × the FotMob estimate, and the total is the rate × FotMob\'s minutes. w = a × min / (min + k) on his frozen minutes. '
+                  'With three quarters of the matches seen, a is %.1f for GAR and %.1f for SV. With a quarter seen, %.1f and %.1f. A player Understat never saw gets the FotMob estimate.'
+                  % (G['blend']['gar']['0.75'][0], G['blend']['sv']['0.75'][0], G['blend']['gar']['0.25'][0], G['blend']['sv']['0.25'][0]),
+                  'Test: Understat frozen at a quarter, half and three quarters of each season, scored on the full-season totals of %s player-seasons. Frozen at three quarters, RMSE of SVAR is %.2f for the frozen total, '
+                  '%.2f for the frozen rate on current minutes and %.2f for the blend (t %.1f, %d of %d seasons). GAR: %.2f, %.2f, %.2f (t %.1f).'
+                  % (f"{q['n']:,}", q['rmse']['C0'], q['rmse']['C1'], q['rmse']['C3'], q['t_C3_vs_C1'], q['won_C3_vs_C1'], len(G['test']['seasons']),
+                     h['rmse']['C0'], h['rmse']['C1'], h['rmse']['C3'], h['t_C3_vs_C1']),
+                  'Frozen at a quarter, SVAR RMSE goes from %.2f to %.2f, and the top 150\'s rank correlation with the final order from %.2f to %.2f.'
+                  % (z['rmse']['C0'], z['rmse']['C3'], z['top150']['C0'], z['top150']['C3']),
+                  'Blended into GAR while Understat is up, it adds nothing to next season (team R² %.3f against %.3f, t %.1f), so it is only the fallback.'
+                  % (G['test']['blendUp']['r2Blend'], G['test']['blendUp']['r2Understat'], -G['test']['blendUp']['t'])])(
+          *(lambda G: (G, G['test']['freeze']['sv_0.75'], G['test']['freeze']['gar_0.75'], G['test']['freeze']['sv_0.25']))(json.load(open(os.path.join(ROOT, 'data', 'soccer_fm_gar_fit.json'))))),
+      'Soccer GAR leaders, rookies, awards, xMV and projections in a league Understat trails', ['Soccer']),
     E('Yds+ / YOE (returners)', 'Kick and punt return yards over expected, shrunk.',
       ['YOE is return yards minus the mean return from the same spot (5-yard bins, this season). It uses yards instead of EPA, since EPA doesn\'t repeat.'],
       'special teams tab on NFL and CFB pages', ['NFL', 'CFB']),

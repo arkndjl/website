@@ -52,9 +52,15 @@ window.arkName = window.arkName || (function (D) {
     if (!ka || !kb) return 0;
     if (ka === kb || ka.replace(/ /g, '') === kb.replace(/ /g, '')) return 3;
     var ta = ka.split(' '), tb = kb.split(' ');
-    if (ta.length < 2 || tb.length < 2) return 0;
+    if (ta.length < 2 || tb.length < 2) {   // a mononym against a full name (Bremer / Gleison Bremer): his first or last name, 4+ letters, only with the team
+      var s1 = ta.length < 2 ? ta : tb, o1 = ta.length < 2 ? tb : ta;
+      return o1.length >= 2 && s1[0].length >= 4 && (s1[0] === o1[0] || s1[0] === o1[o1.length - 1]) ? 1 : 0;
+    }
     var f = ta.slice(0, -1).join(' '), l = ta[ta.length - 1], g = tb.slice(0, -1).join(' '), m = tb[tb.length - 1];
-    if (l === m) return first(f, g);
+    if (l === m) {   // one source drops a leading given name (Mehmet Zeki Çelik / Zeki Çelik): the shorter is the longer's tail, only with the team
+      var s2 = ta.length < tb.length ? ta : tb, o2 = ta.length < tb.length ? tb : ta;
+      return first(f, g) || (s2.length < o2.length && o2.slice(-s2.length).join(' ') === s2.join(' ') ? 1 : 0);
+    }
     if (ta.length === 3 && tb.length === 3 && ta.slice(1).join(' ') === tb.slice(1).join(' ')) return first(ta[0], tb[0]);
     if (ta.length === 3 && ta[1] + ta[2] === m && ta[0] === g) return 3;
     if (tb.length === 3 && tb[1] + tb[2] === l && tb[0] === f) return 3;
@@ -80,7 +86,7 @@ window.arkName = window.arkName || (function (D) {
     var ka = k, na = ka.replace(/ /g, ''), ta = ka ? ka.split(' ') : [], la = ta[ta.length - 1] || '', ja = ta.length === 3 ? ta[1] + ta[2] : null;
     var v = pool.filter(function (p, i) {
       var x = ix[i];
-      if (!(x.k === ka || x.n === na || (ja !== null && ja === x.l) || (x.j !== null && x.j === la) || (la.length >= 6 && oneOff(la, x.l, 6)) || x.l === la || (ta.length === 3 && ta[1] === x.l) || (x.t.length === 3 && x.t[1] === la))) return false;
+      if (!(x.k === ka || x.n === na || (ja !== null && ja === x.l) || (x.j !== null && x.j === la) || (la.length >= 6 && oneOff(la, x.l, 6)) || x.l === la || (ta.length === 3 && ta[1] === x.l) || (x.t.length === 3 && x.t[1] === la) || (ta.length === 1 && x.t[0] === la) || (x.t.length === 1 && ta[0] === x.l))) return false;
       var s = strength(name, p.name); return atTeam(p) && (s >= 2 || (s === 1 && tk));
     });
     return v.length === 1 ? v : [];
