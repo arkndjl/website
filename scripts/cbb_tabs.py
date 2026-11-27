@@ -486,8 +486,10 @@ def main():
                          'bup': r1(xnow(s) - xnow(p)), 'minup': r1(s['mpg'] - p['mpg']), 'usgup': r1(s['usg'] - p['usg']),
                          'warup': r1(s['war'] - p['war'], 2), 'fvup': None, 'fv': r['fv'] if r else None, 'mp': s['mp'], 'pre': None, 'preL': ''})
     write('breakouts', {
-        'title': 'breakouts', 'key': 'xup', 'def': '',
-        'views': [['xup', 'xXPM up', 'live xXPM minus preseason xXPM'], ['over', 'XPM over x', 'XPM minus preseason xXPM'],
+        # standouts is a descriptive tab: it opens on what he has done (XPM to date against the preseason line), the
+        # projection's own move (xXPM up) is a view (Nov 27 2026, context rule)
+        'title': 'breakouts', 'key': 'over', 'def': '',
+        'views': [['over', 'XPM over x', 'XPM minus preseason xXPM'], ['xup', 'xXPM up', 'live xXPM minus preseason xXPM'],
                   ['minup', 'MPG up', 'minutes a game over last season'], ['usgup', 'USG up', 'usage over last season'], ['fvup', 'FV up', 'FV now minus preseason FV'],
                   ['warup', 'VORX up', 'VORX over the season before (2025-26)'], ['bup', 'XPM up', 'XPM over the season before (2025-26)']],
         'cols': [col('xup', 'xXPM up', 'projected XPM now (this season blended in by minutes) minus the preseason projection', 's1'),
