@@ -271,7 +271,7 @@
         (r.move ? '<span class="cfb__movechip">⇄' + esc(r.move) + '</span> could move to ' + esc(r.move) + (r.moveOdds != null ? ' (' + Math.round(r.moveOdds * 100) + '%)' : '') + ': ' + esc(r.moveWhy) + '.' : '') + '</p>' : '') +
       (multiOf(r).length ? '<p class="cfb__role"><span class="cfb__multichip">+' + esc(multiOf(r).map(function (m) { return m.pos; }).join('/')) + '</span> multi-position: ' + esc(multiLine(r)) + '.</p>' : '') +
       // mock sims (mockSims, scripts/cfb_teams.mjs): [P(round 1), 80% pick range low, high (null: past the last pick), likeliest team, its share]
-      (r.mk ? '<p class="cfb__role">Mock sims: round 1 ' + pct(r.mk[0]) + ', picks ' + r.mk[1] + '-' + (r.mk[2] == null ? 'UDFA' : r.mk[2]) + ' in 80% of simulated drafts, likeliest team ' + esc(r.mk[3]) + ' (' + pct(r.mk[4]) + ').</p>' : '') +
+      (r.mk ? '<p class="cfb__role">Mock sims: round 1 ' + pct(r.mk[0]) + ', ' + (r.mk[1] == null ? 'undrafted in 90%+ of simulated drafts' : 'picks ' + r.mk[1] + '-' + (r.mk[2] == null ? 'UDFA' : r.mk[2]) + ' in 80% of simulated drafts') + ', likeliest team ' + esc(r.mk[3]) + ' (' + pct(r.mk[4]) + ').</p>' : '') +
       (r.lock ? '<p class="cfb__role">' + lockChip(r) + ' ' + esc(lockLine(r)) + '</p>' : '') +
       (r.transferP != null ? '<p class="cfb__role"><span class="cfb__xchip">⇆ ' + pct(r.transferP) + '</span> Transfer%: ' + pct(r.transferP) + ' elsewhere next season, ' + pct(r.stayP || 0) + ' stay' +
         (1 - r.transferP - (r.stayP || 0) > 0.05 ? ', ' + pct(1 - r.transferP - (r.stayP || 0)) + ' exit (draft, eligibility)' : '') + '.' +

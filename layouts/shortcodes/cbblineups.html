@@ -38,7 +38,7 @@
 (function () {
   if (window.__arkLu) return; window.__arkLu = true;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function sg(v, d) { if (v == null) return '—'; return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(d == null ? 1 : d); }
+  function sg(v, d) { if (v == null) return '—'; var s = Math.abs(v).toFixed(d == null ? 1 : d); return (+s === 0 ? '' : v > 0 ? '+' : '−') + s; }
   function cl(v) { return v == null ? '' : v > 0 ? 'cfb__up' : v < 0 ? 'cfb__down' : ''; }
   function fold(s) { return String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
   function last(n) { var p = String(n).split(' '); var s = p[p.length - 1]; if (/^(jr\.?|sr\.?|ii|iii|iv|v)$/i.test(s) && p.length > 2) s = p[p.length - 2]; return s; }

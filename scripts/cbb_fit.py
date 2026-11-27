@@ -1195,7 +1195,7 @@ def main():
             r = ix[i]
             past.append([yr, k, r['name'], r['team'], r['conf'], r['yr'], r['ht'], int(fv[i]), bool(plus[i]), round(float(fvx[i]), 2),
                          round(r['p'], 4), int(r['yfull']) if r['last'] <= 2020 or r['yfull'] > 20 else None,
-                         (('peak XPM %+.1f, ' % r['xpm'] if r['yfull'] > 20 and r['xpm'] is not None else '') + r['role']) if r['last'] <= 2020 or r['yfull'] > 20 else None,
+                         (('peak XPM %+.1f, ' % (round(r['xpm'], 1) + 0.0) if r['yfull'] > 20 and r['xpm'] is not None else '') + r['role']) if r['last'] <= 2020 or r['yfull'] > 20 else None,
                          r['draft'], r['pick'], 1 if r['f']['newcomer'] else 0, POS3.get(r['brole'], 'F'), r['brole']])
     # calibration: on the training boards (out of fold), what the players graded at each FV went on to do
     cal = defaultdict(list)

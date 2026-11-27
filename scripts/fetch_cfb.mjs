@@ -1893,7 +1893,7 @@ const nth = n => n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd',
 function scoutReport(p) {
   const plus = [], minus = [], g = p.g;
   const pct = z => `${nth(Math.min(99, Math.max(1, Math.round(100 * phi(z)))))} pct ${g}`;   // z signed so + is good
-  const sg = (x, d) => (x >= 0 ? '+' : '') + x.toFixed(d), comp = x => `${sg(x, 2)} comp`;
+  const sg = (x, d) => { const t = x.toFixed(d); return +t === 0 ? '+' + (0).toFixed(d) : (x > 0 ? '+' : '') + t; }, comp = x => `${sg(x, 2)} comp`;
   const role = p.fv == null ? null : ROLE.find(([f]) => p.fv >= f)?.[1];
   const o = p.on3;
   // talent
@@ -3373,7 +3373,7 @@ if (tank) {
     const x = sims.players[`${k.name}|${k.school}`];
     k.sim = x ? { r1: x.r1, p1: x.p1, lo: x.lo, hi: x.hi, tm: x.tm, tp: x.tp } : null;
     const i = k.rep.lines.findIndex(([h]) => h === 'Slot');
-    k.rep.lines.splice(i + 1, 0, ['Sims', x ? `${x.p1 >= 0.005 ? `#1 overall ${pc(x.p1)}; ` : ''}round 1 ${pc(x.r1)}; picks ${x.lo}-${x.hi ?? 'UDFA'} in 80% of ${sims.sims} simulated drafts; likeliest team ${x.tm} (${pc(x.tp)}).`
+    k.rep.lines.splice(i + 1, 0, ['Sims', x ? `${x.p1 >= 0.005 ? `#1 overall ${pc(x.p1)}; ` : ''}round 1 ${pc(x.r1)}; ${x.lo == null ? `undrafted in 90%+ of` : `picks ${x.lo}-${x.hi ?? 'UDFA'} in 80% of`} ${sims.sims} simulated drafts; likeliest team ${x.tm} (${pc(x.tp)}).`
       : `drafted in under 1% of ${sims.sims} simulated drafts.`]);
   }
   console.log(`mock sims: ${sims.sims} drafts, board shock sd ${sims.sp}, ${Object.keys(sims.players).length} prospects drafted in 1%+`);

@@ -38,7 +38,7 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "fresh" "soccer_intl" "rows" (len .power) "about" (printf "Every full international since 1872 (martj42/international_results, ESPN). Attack and defence in log goals, learned match by match at a tournament weight; each side's expected goals also move with the gap in top-23 Transfermarkt value. Rating = expected goal margin against an average side of the top %d at a neutral ground." .topN)) -}}
+{{- partial "wintable-close.html" (dict "fresh" "soccer_intl" "rows" (len .power) "about" (printf "Every full international since 1872 (martj42/international_results, ESPN). Attack and defence in log goals, learned match by match at a tournament weight; each side's expected goals also move with the gap in top-23 Transfermarkt value. Rating = expected goal margin against an average side of the top %d at a neutral ground." (int .topN))) -}}
 {{- partial "teamjs.html" $ -}}
 {{- else if eq $view "games" -}}
 {{- $pred := ne ($.Get "sport" | default "") "" -}}

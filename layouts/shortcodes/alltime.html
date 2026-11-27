@@ -115,11 +115,12 @@
     <td class="cfb__num" data-l="Plays" data-v="{{ .pl }}">{{ .pl }}</td>
     {{- end }}{{ else }}{{ with .q }}{{ if $peak }}
     <td class="cfb__num" data-l="EPA/db" data-v="{{ .epa }}">{{ partial "num.html" (slice "%+.3f" .epa) }}</td>
-    <td class="cfb__num" data-l="CPOE" data-v="{{ .cpoe }}">{{ partial "num.html" (slice "%+.1f" .cpoe) }}</td>
+    {{- /* nflverse charts air yards from 2006: before it CPOE and aDOT are 0 or a stub, not a measurement */}}{{ $air := and (ge $r.y 2006) (ne .cpoe nil) }}
+    <td class="cfb__num{{ if not $air }} at-na{{ end }}" data-l="CPOE" data-v="{{ if $air }}{{ .cpoe }}{{ end }}">{{ if $air }}{{ partial "num.html" (slice "%+.1f" .cpoe) }}{{ else }}-{{ end }}</td>
     <td class="cfb__num" data-l="ANY/A" data-v="{{ .anya }}">{{ printf "%.2f" .anya }}</td>
     <td class="cfb__num" data-l="ANY/A+" data-v="{{ .anyx }}">{{ with .anyx }}{{ printf "%.0f" . }}{{ else }}-{{ end }}</td>
     <td class="cfb__num" data-l="Sack%" data-v="{{ .sk }}">{{ printf "%.1f" .sk }}</td>
-    <td class="cfb__num" data-l="aDOT" data-v="{{ .adot }}">{{ printf "%.1f" .adot }}</td>
+    <td class="cfb__num{{ if not $air }} at-na{{ end }}" data-l="aDOT" data-v="{{ if $air }}{{ .adot }}{{ end }}">{{ if and $air .adot }}{{ printf "%.1f" .adot }}{{ else }}-{{ end }}</td>
     <td class="cfb__num" data-l="INT%" data-v="{{ .int }}">{{ printf "%.1f" .int }}</td>
     <td class="cfb__num" data-l="Rush EPA" data-v="{{ .rush }}">{{ partial "num.html" (slice "%+.1f" .rush) }}</td>
     <td class="cfb__num" data-l="DB" data-v="{{ .db }}">{{ .db }}</td>

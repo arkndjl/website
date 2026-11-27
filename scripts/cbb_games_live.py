@@ -873,6 +873,8 @@ def build():
         d = C.et_date(g['date'])
         if d not in show or g['id'] not in proj:
             continue
+        if str(g['home']).startswith('-') or str(g['away']).startswith('-'):
+            continue                  # ESPN's "TBD" side of a bracket game (team id -1 / -2): no matchup to project yet
         m, tot, x, poss = proj[g['id']]
         px = NV.get(str(g['id']))
         if px:

@@ -14,7 +14,7 @@
   if (window.__arkRcWhy) return; window.__arkRcWhy = true;
   var SIGNEE = {{ .season }};
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function sgn(v, d) { return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(d); }
+  function sgn(v, d) { var s = Math.abs(v).toFixed(d); return (+s === 0 ? '' : v > 0 ? '+' : '−') + s; }
   document.addEventListener('click', function (e) {
     var t = e.target; if (!t.closest) return;
     var table = t.closest('table.cfbrc'); if (!table) return;
@@ -284,7 +284,7 @@
     <p><b>ARK stars</b> cuts, index score: 2★ {{ printf "%.1f" (index $si.cuts 0) }}, 3★ {{ printf "%.1f" (index $si.cuts 1) }}, 4★ {{ printf "%.1f" (index $si.cuts 2) }}, 5★ {{ printf "%.1f" (index $si.cuts 3) }}{{ with $si.elite }}, 5-star+ P(top 64) {{ mul .line 100 }}%+{{ end }} · half stars {{ range $i, $h := $si.half }}{{ if $i }}, {{ end }}{{ add $i 1 }}½ at {{ printf "%.1f" $h }}{{ end }}</p>
     <div class="wintable__scroll"><table class="cfb__table cfbrc">
       <thead><tr><th>Stars</th><th title="recruits a class at this ARK star, 2011-19 signees">A class</th><th title="drafted, held out">Drafted</th><th title="top-32 pick">Top 32</th><th title="top-64 pick">Top 64</th><th title="3+ NFL AV a season">Starter</th><th title="mean NFL outcome on the FV scale (undrafted = 20)">FV</th></tr></thead>
-      <tbody>{{ range $si.tiers }}<tr><td>{{ if gt .stars 5 }}<span class="cfbrc__glow">{{ end }}<span class="cfbrc__ark{{ if gt .stars 5 }} is-plus{{ end }}" style="--n:{{ cond (gt .stars 5) 5 .stars }}" role="img" aria-label="{{ cond (gt .stars 5) "5-star+" (printf "%d stars" .stars) }}"><i></i></span>{{ if gt .stars 5 }}<span class="cfbrc__plus" aria-hidden="true">+</span></span>{{ end }}</td><td class="cfb__num">{{ printf "%.0f" .perClass }}</td><td class="cfb__num">{{ math.Round (mul .drafted 100) }}%</td><td class="cfb__num">{{ math.Round (mul .top32 100) }}%</td><td class="cfb__num">{{ math.Round (mul .top64 100) }}%</td><td class="cfb__num">{{ math.Round (mul .starter 100) }}%</td><td class="cfb__num">{{ .fv }}</td></tr>{{ end }}</tbody>
+      <tbody>{{ range $si.tiers }}<tr><td>{{ if gt .stars 5 }}<span class="cfbrc__glow">{{ end }}<span class="cfbrc__ark{{ if gt .stars 5 }} is-plus{{ end }}" style="--n:{{ cond (gt .stars 5) 5 .stars }}" role="img" aria-label="{{ cond (gt .stars 5) "5-star+" (printf "%d stars" (int .stars)) }}"><i></i></span>{{ if gt .stars 5 }}<span class="cfbrc__plus" aria-hidden="true">+</span></span>{{ end }}</td><td class="cfb__num">{{ printf "%.0f" .perClass }}</td><td class="cfb__num">{{ math.Round (mul .drafted 100) }}%</td><td class="cfb__num">{{ math.Round (mul .top32 100) }}%</td><td class="cfb__num">{{ math.Round (mul .top64 100) }}%</td><td class="cfb__num">{{ math.Round (mul .starter 100) }}%</td><td class="cfb__num">{{ .fv }}</td></tr>{{ end }}</tbody>
     </table></div>
     {{- else }}
     {{- with $f.stars }}{{ $st := . }}{{ $sc := $st.schemes }}{{ $pk := index $sc $st.pick }}{{ $oth := index $sc (cond (eq $st.pick "band") "share" "band") }}{{ $ind := $sc.industry }}
