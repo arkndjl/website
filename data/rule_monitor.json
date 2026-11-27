@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-27T09:46:14Z",
+ "asof": "2026-11-27T12:08:34Z",
  "pre": {
   "registered": "2026-10-21",
   "window": 300,
@@ -3092,19 +3092,19 @@
     "read": "below the backtest"
    },
    "check": {
-    "n": 20,
-    "window": 20,
-    "mean": 0.0181,
-    "t": 0.86,
-    "p": 0.7938,
-    "days": 9,
+    "n": 21,
+    "window": 21,
+    "mean": 0.0301,
+    "t": 1.3,
+    "p": 0.8863,
+    "days": 10,
     "sd": 0.1355,
-    "cusum": 2.65,
+    "cusum": 0.48,
     "cusumMax": 2.65,
     "h": 10.0,
     "rho": 0.306,
     "edge": {
-     "cusum": 1.55,
+     "cusum": 1.03,
      "cusumMax": 1.55,
      "h": 4.595
     },
@@ -3112,17 +3112,17 @@
     "why": "",
     "drift": {
      "mu1": 0.04,
-     "n": 20,
+     "n": 21,
      "sd": 0.1355,
      "rho": 0.306,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": -1.475,
-     "info": 1.74,
-     "real": -0.196,
-     "realSe": 0.887,
+     "llr": -0.951,
+     "info": 1.83,
+     "real": 0.123,
+     "realSe": 0.854,
      "need": 68
     }
    },
@@ -3229,12 +3229,12 @@
     "read": "below the backtest"
    },
    "check": {
-    "n": 8,
-    "window": 8,
-    "mean": 0.0494,
-    "t": 1.52,
+    "n": 9,
+    "window": 9,
+    "mean": 0.0594,
+    "t": 2.06,
     "p": null,
-    "days": 6,
+    "days": 7,
     "sd": 0.1176,
     "cusum": 0.0,
     "cusumMax": 0.6,
@@ -3249,17 +3249,17 @@
     "why": "",
     "drift": {
      "mu1": 0.0466,
-     "n": 8,
+     "n": 9,
      "sd": 0.1176,
      "rho": 0.175,
      "lo": -2.944,
      "hi": 2.944,
      "state": "watching",
      "at": null,
-     "llr": 0.471,
-     "info": 1.26,
-     "real": 1.066,
-     "realSe": 0.918,
+     "llr": 0.83,
+     "info": 1.41,
+     "real": 1.257,
+     "realSe": 0.862,
      "need": 38
     }
    },
