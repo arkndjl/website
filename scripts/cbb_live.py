@@ -282,6 +282,27 @@ def write_prior(rows, cols, out):
 
 
 # ---------------------------------------------------------------- this season so far
+def merge_ids(by_p, board):
+    """one player whose games sit under two ids (Barttorvik's own id for the games in his file, another for the games
+    filled from ESPN): his rows go under one id, the board's when it has either, so he is one line and not a board row
+    plus an unboarded row (Isaiah Howard, Grambling: 1 + 4 games, Nov 2026). Same name key at the same team, and never
+    two rows on one date (those are two players)."""
+    by_nt = defaultdict(list)
+    for pid, rs in by_p.items():
+        g = max(rs, key=lambda g: g[C['date']])
+        by_nt[(D.norm(g[C['name']]), g[C['team']])].append(pid)
+    n = 0
+    for pids in by_nt.values():
+        if len(pids) < 2: continue
+        dates = [g[C['date']] for p in pids for g in by_p[p]]
+        if len(dates) != len(set(dates)): continue
+        keep = next((p for p in pids if p in board), max(pids, key=lambda p: len(by_p[p])))
+        for p in pids:
+            if p != keep: by_p[keep].extend(by_p.pop(p)); n += 1
+    if n: print(f'{n} ids merged into the same player\'s other id (same name and team, no shared game date)')
+    return n
+
+
 def season_to_date(prior):
     """Barttorvik's 2026-27 lines and game logs. Returns {pid: line}, {(name key, team): pid}, {team: games played}.
     Only players with a game this season count: before the opener the 2026-27 file still carries last season's lines."""
@@ -309,6 +330,7 @@ def season_to_date(prior):
         if g[C['year']] != SEASON: continue
         by_p[str(g[C['pid']])].append(g)
         team_dates[g[C['team']]].add((g[C['date']], g[C['muid']]))
+    merge_ids(by_p, {str(m['pid']) for m in prior.get('careers', []) if m.get('pid')})
     tg = {t: len(v) for t, v in team_dates.items()}
     last = max((g[C['date']] for g in games), default=None)
     official = {r['pid']: r for r in D.load_bt(SEASON)} if os.path.exists(adv) else {}

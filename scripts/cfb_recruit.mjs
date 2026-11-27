@@ -396,6 +396,21 @@ export async function reclassed(y, cl, load, news = readNews()) {
   }
   return out;
 }
+// ESPN lists some recruits twice in one class under two ids (Wyatt Powers 2029, 250 and 240 lb; Carlos Lopez 2029,
+// Coconut Creek and Bradenton after his move): the same name key, position and state within an inch of height is one
+// recruit. Kept: the committed record, then the graded one, the ranked one, the one with more offers.
+export function dedupeClass(cl) {
+  const by = {}, drop = new Set();
+  for (const c of cl) (by[`${key(c.name)}|${c.pos}|${c.state}`] ||= []).push(c);
+  const score = c => (c.tid ? 8 : 0) + (c.grade >= 60 ? 4 : 0) + (c.rank ? 2 : 0) + Math.min(1, (c.offers?.length || 0) / 100);
+  for (const v of Object.values(by)) {
+    if (v.length < 2 || !v[0].pos || !v[0].state) continue;
+    const s = v.slice().sort((a, b) => score(b) - score(a));
+    for (let i = 1; i < s.length; i++)
+      if (s[i].rid !== s[0].rid && (!s[i].ht || !s[0].ht || Math.abs(s[i].ht - s[0].ht) <= 1)) drop.add(s[i]);
+  }
+  return drop.size ? cl.filter(c => !drop.has(c)) : cl;
+}
 function readNews() {
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'recruit_news.json'), 'utf8')).cfb || []; } catch { return []; }
 }
@@ -484,7 +499,7 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
   const whyQueue = [];   // [output row, feature row, redshirt?]: filled once the reference signee is known
   const cfbdCover = {};  // class -> CFBD composite coverage (attachCfbd)
   const prep = async (y, fresh) => {
-    const raw = await reclassed(y, await espnClass(y, fresh, offline), y2 => espnClass(y2, false, offline)), moved = applyNews(raw, prog);
+    const raw = dedupeClass(await reclassed(y, await espnClass(y, fresh, offline), y2 => espnClass(y2, false, offline))), moved = applyNews(raw, prog);
     if (moved) console.error(`class ${y}: ${moved} commitment changes from recruit news`);
     const cl = enrich(raw, prog, hsN), comp = await rank247(y, 'composite', snap247, offline);
     if (comp.length) attach247(cl, comp);

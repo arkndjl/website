@@ -168,6 +168,31 @@ def check_public(out):
     return []
 
 
+def check_boards():
+    """warnings for a board that carries one team or one player twice: an FBS team on the CFB board that is not in the
+    team table (a source renamed it, e.g. Sam Houston State, and its roster split in two), and the same name at the
+    same team twice on the CBB board (one player under two game-log ids)"""
+    from collections import Counter
+    out = []
+    try:
+        d = json.load(open(os.path.join(ROOT, 'static', 'data', 'cfb-all.json'), encoding='utf-8'))
+        c = {k: i for i, k in enumerate(d['cols'])}
+        have = {t['team'] for t in json.load(open(os.path.join(ROOT, 'data', 'cfb_teams.json'), encoding='utf-8'))['teams']}
+        lost = Counter(r[c['team']] for r in d['rows'] if r[c['div']] == 'FBS' and r[c['team']] and r[c['team']] not in have)
+        out += [f'CFB board: {n} players at "{t}", an FBS team missing from data/cfb_teams.json (team alias in scripts/fetch_cfb.mjs?)'
+                for t, n in lost.items() if n >= 10]
+    except (OSError, ValueError, KeyError) as e:
+        out.append(f'CFB board team check unreadable ({e})')
+    try:
+        d = json.load(open(os.path.join(ROOT, 'static', 'data', 'cbb-all.json'), encoding='utf-8'))
+        c = {k: i for i, k in enumerate(d['cols'])}
+        dup = [k for k, n in Counter((r[c['name']], r[c['team']]) for r in d['rows']).items() if n > 1]
+        if dup: out.append(f'CBB board: {len(dup)} players listed twice at one team ({", ".join(f"{a}, {b}" for a, b in dup[:4])})')
+    except (OSError, ValueError, KeyError) as e:
+        out.append(f'CBB board duplicate check unreadable ({e})')
+    return out
+
+
 def check_hugo():
     hugo = shutil.which('hugo') or os.environ.get('HUGO')
     if not hugo: return ['hugo not found (set HUGO or put it on PATH)']
@@ -185,7 +210,7 @@ if __name__ == '__main__':
     e2, warns = check_sizes(); errs += e2 + check_pairs() + check_cbb_mean() + check_awards()
     e3, w3 = check_fv_scale(); errs += e3; warns += w3
     e4, w4 = check_1nt_sync(); errs += e4; warns += w4
-    warns += check_terms()
+    warns += check_terms() + check_boards()
     if '--hugo' in sys.argv[1:]: errs += check_teams() + check_moves()
     if '--hugo' in sys.argv[1:] and not errs: errs += check_hugo()
     for w in warns: print('warning:', w)

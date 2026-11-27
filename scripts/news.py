@@ -39,6 +39,7 @@ import os
 import re
 import sys
 import urllib.request
+from collections import Counter
 from zoneinfo import ZoneInfo
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -327,10 +328,16 @@ def fv_moves(state, today, now):
     for key, rel, path, idf, nf, tf, hash_ in FV_BOARDS:
         bk = key + ':' + '/'.join(path or ('',))
         cur, b_ = cur_all.setdefault(bk, {}), base_all.setdefault(bk, {})
-        for r in fv_rows(rel, path):
+        rows = fv_rows(rel, path)
+        # a player the board lists at two positions (a kicker who punts: K 48, P 34) is two ids, not one id whose two
+        # grades read as a move every day
+        twice = {p for p, n in Counter('|'.join(str(r.get(f)) for f in idf) for r in rows).items() if n > 1}
+        for r in rows:
             fv = r.get('fv')
             if not isinstance(fv, (int, float)) or isinstance(fv, bool): continue
             pid = '|'.join(str(r.get(f)) for f in idf)
+            if pid in twice: pid += '|%s' % r.get('pos')
+            if pid in cur: continue   # the same player twice at one position (a duplicated board row): the first row only
             if key in ('cfb', 'cbb') and fv < FV_FLOOR and not (base and pid in base.get(bk, {})): continue   # deep college rows: not tracked
             cur[pid] = fv
             b0 = r.get('w0') if base is None else base.get(bk, {}).get(pid)

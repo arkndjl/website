@@ -1200,8 +1200,11 @@ def fit(scorecard=False):
                                       r['sub_position'], None if pd.isna(r['height_in_cm']) else float(r['height_in_cm']), r['grp']]
                         for i, r in pp.iterrows()},
             'clubs': CLUBS}
+    # float NaN (a player with no position, a club with no league) is written as null: json.dump would print a bare NaN
+    nonan = lambda o: None if isinstance(o, float) and o != o else [nonan(x) for x in o] if isinstance(o, list) \
+        else {k: nonan(x) for k, x in o.items()} if isinstance(o, dict) else o
     with gzip.open(BASE, 'wt') as f:
-        json.dump(base, f, default=lambda o: None if pd.isna(o) else int(o))
+        json.dump(nonan(base), f, default=lambda o: None if pd.isna(o) else int(o), allow_nan=False)
     print('fit done', dt.datetime.now() - t0)
 
 
@@ -1290,6 +1293,7 @@ def build():
     A = pd.concat([b, A], ignore_index=True)
     A['club'] = pd.to_numeric(A.club, errors='coerce')
     R = pd.DataFrame(base['ratings'], columns=['club', 'season', 'r', 'a', 'b', 'comp'])
+    R['comp'] = R.comp.where(R.comp.notna(), np.nan)    # null or NaN in the base file: the same missing value
     V = pd.DataFrame(base['values'], columns=['player_id', 'date', 'mv'])
     V['date'] = pd.to_datetime(V.date)
     V = pd.concat([V, A[A.mv.notna() & A.season.eq(t)][['player_id', 'date', 'mv']]], ignore_index=True).sort_values('date')
@@ -1298,6 +1302,7 @@ def build():
     TG = pd.concat([tg_prev, team_games(G)], ignore_index=True)
     P = pd.DataFrame.from_dict(base['players'], orient='index', columns=['name', 'dob', 'position', 'sub_position', 'height_in_cm', 'grp'])
     P.index = P.index.astype(int)
+    for c in ('position', 'sub_position'): P[c] = P[c].where(P[c].notna(), np.nan)
     P['dob'] = pd.to_datetime(P.dob)
     # anyone new: birth date from lineup ages, then a profile for everyone who may be under 22
     seen = pd.Index(A[A.season.isin([t - 1, t])].player_id.unique())

@@ -701,6 +701,26 @@ def nfl_basis_save():
         fh.write('\n')
 
 
+def nfl_own_contract(cs, ax, y1):
+    """the newest of a player's own active contracts. cs = the same-name, same-position ones; when they belong to more
+    than one person (two Jordan Phillips, two Jonah Williams) only those whose date of birth agrees with the board age
+    (ax, at the basis season y1) count, and none when that cannot be told"""
+    def who(c):
+        g = c.get('gsis_id')
+        return g if g and g == g else ('dob', c.get('date_of_birth'))
+    if len({who(c) for c in cs}) > 1:
+        own = []
+        for c in cs:
+            try:
+                b = dt.datetime.strptime(c.get('date_of_birth') or '', '%B %d, %Y')
+            except (TypeError, ValueError):
+                continue
+            if ax is not None and abs((y1 + 0.67 - (b.year + b.timetuple().tm_yday / 365)) - ax) < 1.2:
+                own.append(c)
+        cs = own if len({who(c) for c in own}) == 1 else []
+    return max(cs, key=lambda c: int(c['year_signed'] or 0)) if cs else None
+
+
 def nfl_live():
     f = live_model('nfl')
     if not f:
@@ -728,7 +748,7 @@ def nfl_live():
         r = nfl_feats(p, prev.get(p['id']))
         x = price(f, forms, r, 0.0015, NFL_MAX) * cap
         cs = [c for c in act.get(NM.key(p['n']), []) if NM.pos_fits(c['position'], p['pos']) or OTC_POS.get(c['position']) == r['grp']]
-        c = max(cs, key=lambda c: int(c['year_signed'] or 0)) if len(cs) >= 1 else None
+        c = nfl_own_contract(cs, p.get('ax'), y1)
         q = cur.get(p['id'], {})
         apy = c['apy'] if c else None
         rows.append({'id': p['id'], 'n': p['n'], 'tm': q.get('t') or p['t'], 'pos': r['grp'], 'age': q.get('age') or p.get('age'),
