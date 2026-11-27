@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-27T23:37:36Z",
+ "asof": "2026-11-27T23:41:49Z",
  "recenter": {
   "week": 0.53
  },
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-27",
-  "ageH": -0.4,
+  "ageH": -0.3,
   "stale": false
  },
  "picks": [],
@@ -533,22 +533,6 @@
    "tm": 50.7
   },
   {
-   "id": "401860929",
-   "sport": "cfb",
-   "kick": "2026-11-28T23:30:00.000Z",
-   "home": "Washington State",
-   "away": "San Diego State",
-   "mk": "total",
-   "side": "over",
-   "line": 46.5,
-   "price": -121.0,
-   "edge": 1.0,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": 3.7,
-   "tm": 47.5
-  },
-  {
    "id": "401860926",
    "sport": "cfb",
    "kick": "2026-11-28T23:00:00.000Z",
@@ -675,6 +659,22 @@
    "why": "total market off",
    "m": -7.3,
    "tm": 56.1
+  },
+  {
+   "id": "401866474",
+   "sport": "cfb",
+   "kick": "2026-11-28T17:00:00.000Z",
+   "home": "Ball State",
+   "away": "Central Michigan",
+   "mk": "total",
+   "side": "under",
+   "line": 50.5,
+   "price": -116.0,
+   "edge": 4.0,
+   "x": null,
+   "why": "total market off",
+   "m": -3.2,
+   "tm": 46.5
   }
  ],
  "games": {
@@ -1123,16 +1123,16 @@
    "state": "under"
   },
   "401860929": {
-   "mk": "total",
-   "side": "over",
-   "line": 46.5,
-   "price": -121.0,
-   "edge": 1.0,
+   "mk": "spread",
+   "side": "home",
+   "line": 2.5,
+   "price": -131.0,
+   "edge": 1.2,
    "ev": null,
    "units": 0.0,
    "home": "Washington State",
    "away": "San Diego State",
-   "state": "under"
+   "state": "off"
   },
   "401864548": {
    "mk": "total",
@@ -1403,16 +1403,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 31560,
+  "snapshots": 31563,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 6408,
-    "clvRet": -0.0196,
-    "clvT": -11.76,
+    "clvRet": -0.0197,
+    "clvT": -11.79,
     "clv": 0.91,
     "beat": 0.443,
-    "still": 0.304
+    "still": 0.303
    },
    {
     "when": "6-24h",
@@ -6186,7 +6186,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-27T23:37:36Z",
+ "checked": "2026-11-27T23:41:49Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
