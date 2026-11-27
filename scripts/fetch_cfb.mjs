@@ -777,7 +777,18 @@ const RISER = { gap: 6, unranked: 55 };
 // On3's valued players better (r .66 -> .70, log RMSE unchanged), Nov 27 2026
 // FCS programs: no revenue sharing at almost every FCS school, so NIL is collective and booster money only,
 // ~$0.4M a program (an assumption, scaled like the FBS budgets by level: x e^(.3 z) on the FCS team SRS)
-const XNIL = { p4: 20e6, g5: 3e6, fcs: 0.4e6, fcsMove: 0.4, tilt: 0.3, k: 1.375 };
+const XNIL = { p4: 20e6, g5: 3e6, fcs: 0.4e6, fcsMove: 0.4, tilt: 0.3, k: 1.25, bench: 0.05 };
+// a program's budget pays its whole roster. Players the board no longer lists (carried rows) and ESPN backups get their
+// yNIL in writeAll (benchNil); the listed players split what that left on the last written board: 1 - the unlisted
+// players' share of the team's yNIL there, by division and team
+const NIL_BENCH = (() => {
+  const A = readCfbAll(ROOT), tot = {}, bench = {};
+  if (!A?.rows || A.asof < `${SEASON}-08-01`) return {};
+  const c = Object.fromEntries(A.cols.map((k, i) => [k, i]));
+  for (const r of A.rows) { const y = r[c.ynil]; if (!(y > 0)) continue; const k = `${r[c.div]}|${r[c.team]}`;
+    tot[k] = (tot[k] || 0) + y; if (r[c.carried] || r[c.src] === 'espn') bench[k] = (bench[k] || 0) + y; }
+  return Object.fromEntries(Object.keys(bench).map(k => [k, Math.min(0.6, bench[k] / tot[k])]));
+})();
 const NIL_BUDGET = (() => { try { const d = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nil_budgets.json'), 'utf8')).cfb; return d.season === SEASON ? d.teams : {}; } catch { return {}; } })();
 // FCS NIL discount at equal FV: FCS median xNIL / FBS median xNIL per 5-point FV tier (both with 3+ players),
 // overall = geometric mean of the tier ratios weighted by FCS players in the tier
@@ -1625,7 +1636,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       let pool = 0;
       for (const [tid, ps] of Object.entries(byTeam)) {
         const rep = NIL_BUDGET[ps[0].team];     // reported budget, $M low and high
-        const budget = rep ? (rep[0] + rep[1]) / 2 * 1e6 : (P4.has(ps[0].conf, ps[0].tid) ? XNIL.p4 : XNIL.g5) * Math.exp(XNIL.tilt * (tal[tid] - tm) / tsd);
+        const budget = (1 - (NIL_BENCH[`FBS|${ps[0].team}`] || 0)) * (rep ? (rep[0] + rep[1]) / 2 * 1e6 : (P4.has(ps[0].conf, ps[0].tid) ? XNIL.p4 : XNIL.g5) * Math.exp(XNIL.tilt * (tal[tid] - tm) / tsd));
         const w = ps.map(p => Math.exp(XNIL.k * dot(preF(p), bPre))), sw = w.reduce((a, b) => a + b, 0);
         ps.forEach((p, i) => { p.ynil = Math.round(budget * w[i] / sw / 1000) * 1000; pool += p.ynil; });
       }
@@ -1709,7 +1720,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     for (const p of players) if (p.fv != null && p.tid) (byTeam[p.tid] ||= []).push(p);
     let pool = 0;
     for (const ps of Object.values(byTeam)) {
-      const budget = XNIL.fcs * Math.exp(XNIL.tilt * (ps[0].lvl?.teamZ ?? 0));
+      const budget = (1 - (NIL_BENCH[`FCS|${ps[0].team}`] || 0)) * XNIL.fcs * Math.exp(XNIL.tilt * (ps[0].lvl?.teamZ ?? 0));
       const w = ps.map(p => Math.exp(XNIL.k * dot(preF(p), bPre))), sw = w.reduce((a, b) => a + b, 0);
       ps.forEach((p, i) => { p.ynil = Math.round(budget * w[i] / sw / 1000) * 1000; pool += p.ynil; });
     }
@@ -2632,6 +2643,33 @@ const carriedRows = now => {
     .map(r => ({ ...r, ...(r.age > 35 ? { age: null, ageEst: r.elig ? r1(18.4 + r.elig) : null } : {}),   // an impossible age kept from an older build
       carried: r.carried || PREV_ALL.asof, delta: null, ovr: null, star: ark.has(r.name) || ark.has(`${r.name}|${r.team}`) || null }));
 };
+// yNIL for a team's unlisted players, from the same budget as its listed ones (NIL_BENCH). A carried row keeps the
+// yNIL he had against his teammates' (moved by the median change of the listed players since that board), his xNIL
+// and zNIL in step with it. An ESPN backup is paid XNIL.bench x the median listed player at his position on the team
+// (held out on the College Sports Commission's pay percentiles, scripts/research/nil_nov27); no xNIL or zNIL: the
+// worth formula at a provisional grade did not beat the position median on backups graded later
+const benchNil = (now, kept, extra) => {
+  const key = r => `${r.div}|${r.team}`, med = v => { const s = [...v].sort((a, b) => a - b); return s.length ? (s[(s.length - 1) >> 1] + s[s.length >> 1]) / 2 : null; };
+  const live = {}, prev = new Map();
+  for (const r of now) if (r.ynil > 0) (live[key(r)] ||= []).push(r);
+  if (PREV_ALL?.rows) { const c = Object.fromEntries(PREV_ALL.cols.map((k, i) => [k, i]));
+    for (const a of PREV_ALL.rows) if (a[c.ynil] > 0 && !a[c.carried] && a[c.src] !== 'espn') prev.set(`${a[c.div]}|${a[c.team]}|${a[c.name]}|${a[c.pos]}`, a[c.ynil]); }
+  const by = {};
+  for (const r of kept) if (r.ynil > 0) ((by[key(r)] ||= { c: [], e: [] }).c).push(r);
+  for (const r of extra) if (r.pos !== 'K' && r.pos !== 'P') ((by[key(r)] ||= { c: [], e: [] }).e).push(r);
+  for (const [k, { c, e }] of Object.entries(by)) {
+    const ps = live[k]; if (!ps) { for (const r of c) r.xnil = r.ynil = r.znil = null; continue; }
+    const sh = NIL_BENCH[k] || 0, y0 = p => p.ynil / (1 - sh), B = ps.reduce((a, p) => a + y0(p), 0);
+    const S = med(ps.filter(p => prev.has(`${k}|${p.name}|${p.pos}`)).map(p => prev.get(`${k}|${p.name}|${p.pos}`) / y0(p))) ?? 1 - sh;
+    const all = med(ps.map(y0)), at = {};
+    for (const p of ps) (at[p.pos] ||= []).push(y0(p));
+    const wc = c.map(r => r.ynil / S), we = e.map(r => XNIL.bench * (med(at[r.pos] || []) ?? all));
+    const W = B + wc.reduce((a, b) => a + b, 0) + we.reduce((a, b) => a + b, 0), k1 = x => Math.round(x / 1000) * 1000;
+    c.forEach((r, i) => { const y = Math.max(1000, k1(B * wc[i] / W)), x = r.xnil != null ? k1(r.xnil * y / r.ynil) : null;
+      r.ynil = y; r.xnil = x; r.znil = x != null ? x - y : null; });
+    e.forEach((r, i) => { r.ynil = k1(B * we[i] / W) || null; });
+  }
+};
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 const PRIORS = path.join(ROOT, 'data', 'cfb_draft_priors.json');
 // pre-draft meetings by NFL team (scripts/nfl_meetings.py -> scripts/data/nfl_meetings/<draft year>.json, logged by the
@@ -2664,6 +2702,7 @@ const writeAll = () => {
   // ESPN backups (scripts/cfb_espn_backups.mjs): roster players the board doesn't grade, scored up from the 20 floor
   const extra = espnBackups([...now, ...kept], [{ div: 'FBS', ...espn }, { div: 'FCS', ...espnFcs }],
     { season: SEASON, stars: new Set(ARKLIST['college-football'] || []), recById: recruits, log: s => { if (!(writeAll.logged ||= new Set()).has(s)) console.log(s); writeAll.logged.add(s); } });
+  benchNil(now, kept, extra);
   // carried players rank in with the rest (board rank and position rank in FV order), in the file only
   // ESPN backups and carried rows: the FV outlook from the board fields they have
   // (from the grade, fvg; a row carried from a file written before the mean headline has its grade in fvx), then the
