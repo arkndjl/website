@@ -807,6 +807,93 @@ def conf_map(sport):
     return _CONF[sport]
 
 
+# Conference labels as they stood (Nov 27 2026 context audit). The segment fit used to label every past game with today's
+# conference map, a form the live board never sees for a team that has moved since (CBB: 481 of 5,284 games with an
+# open in 2024-25 read conference / non-conference against the game's own flag; CFB 2017-23 had Texas in the SEC and
+# the Pac-12 gone). A game in the history takes its own season's conferences and its own conference-game flag; a game
+# not in it (the season in progress) takes today's map. Independents and unmapped teams never make a conference game.
+# Pre-registered test (scripts/research/ctx_nov27/cross): rules tuned under each labelling, served on as-it-stood labels.
+# CBB 2025-26: +4.6 units of close value on 277 changed picks (slate t 3.3), on. CFB 2021-26: -1.1 on 173 (t -0.65;
+# spreads +1.3, totals -2.5), not shown better, so CFB stays on today's map until a retest.
+CONF_THEN = {'cbb'}               # sports whose fit rows take their own season's conferences
+CFB_CONF = {'American Athletic': 'The American', 'Mid-American': 'MAC', 'Mountain West': 'MWC', 'Conference USA': 'C-USA',
+            'FBS Independents': 'IND (FBS)'}
+P4_THEN = {'cfb': {'Pac-12': 2023}, 'cbb': {'P12': 2024}}     # a power conference through that season
+NO_CONF = {'other', 'FCS', 'IND (FBS)', 'Ind', None}
+_THEN = {}
+
+
+def conf_hist(sport):
+    """game id -> (home conference, away conference, conference game) as the game's own season had them"""
+    if sport in _THEN:
+        return _THEN[sport]
+    out = {}
+    try:
+        if sport == 'cfb':
+            d = json.load(gzip.open(os.path.join(HERE, 'data', 'cfb_hist_md.json.gz')))
+            for gs in d['games'].values():
+                for g in gs:
+                    c = [CFB_CONF.get(g.get(k + 'Conference'), g.get(k + 'Conference')) if g.get(k + 'Classification') == 'fbs' else 'FCS'
+                         for k in ('home', 'away')]
+                    out[str(g['id'])] = (c[0] or 'other', c[1] or 'other', bool(g.get('conferenceGame')))
+        elif sport == 'cbb':
+            now = {str(t['id']): t['conf'] for t in json.load(open(os.path.join(ROOT, 'data', 'cbb_games.json')))['power']}
+            by = {}
+            for g in json.load(gzip.open(os.path.join(HERE, 'data', 'cbb_games_hist.json.gz'))):
+                by.setdefault(g['season'], []).append(g)
+            for S, gs in by.items():
+                par = {}
+
+                def f(x):
+                    par.setdefault(x, x)
+                    while par[x] != x:
+                        par[x] = par[par[x]]
+                        x = par[x]
+                    return x
+                for g in gs:
+                    if g.get('conf'):
+                        par[f(g['home'])] = f(g['away'])
+                mem = {}
+                for t in list(par):
+                    mem.setdefault(f(t), []).append(t)
+                # each of the season's groups (4+ teams, as cbb_games.conferences) takes the name most of its members
+                # carry today; a name goes to one group a season, the one that holds the most of it (the 2023-24
+                # Pac-12 is P12, not a second B10)
+                pairs = []
+                for r, ts in mem.items():
+                    if len(ts) < 4:
+                        continue
+                    cnt = {}
+                    for t in ts:
+                        if now.get(t):
+                            cnt[now[t]] = cnt.get(now[t], 0) + 1
+                    pairs += [(-n, c, r) for c, n in cnt.items()]
+                name, used = {}, set()
+                for n, c, r in sorted(pairs):
+                    if r not in name and c not in used:
+                        name[r] = c
+                        used.add(c)
+                name = {r: name.get(r, 'other') for r in mem}
+                for g in gs:
+                    ch = name[f(g['home'])] if g['home'] in par else 'other'
+                    ca = name[f(g['away'])] if g['away'] in par else 'other'
+                    out[str(g['id'])] = (ch, ca, bool(g.get('conf')))
+    except (OSError, ValueError, KeyError) as e:
+        print('conf_hist', sport, 'not read:', e)
+    _THEN[sport] = out
+    return out
+
+
+def conf_then(sport, g, cm):
+    """(home conference, away conference, conference game) for a row: its own season's when the history has the game"""
+    then = sport in CONF_THEN
+    h = conf_hist(sport).get(str(g.get('id'))) if then and g.get('S') is not None else None
+    if h:
+        return h
+    ch, ca = cm.get(g.get('home'), 'FCS' if sport == 'cfb' else 'other'), cm.get(g.get('away'), 'FCS' if sport == 'cfb' else 'other')
+    return ch, ca, (ch == ca and (ch not in NO_CONF or not then))
+
+
 def seg_of(sport, g, mk, side, line):
     """{family: value} for a pick: the families every sport has, plus conference ones in college"""
     out = {}
@@ -839,11 +926,12 @@ def seg_of(sport, g, mk, side, line):
         out['total'] = 'low' if T < cut[0] else 'high' if T >= cut[1] else 'mid'
     cm = conf_map(sport)
     if cm:
-        ch, ca = cm.get(g.get('home'), 'FCS' if sport == 'cfb' else 'other'), cm.get(g.get('away'), 'FCS' if sport == 'cfb' else 'other')
-        hi = (ch in P4[sport]) + (ca in P4[sport])
+        ch, ca, cg = conf_then(sport, g, cm)
+        p4 = lambda c: c in P4[sport] or (sport in CONF_THEN and (g.get('S') or 9999) <= P4_THEN[sport].get(c, 0))
+        hi = p4(ch) + p4(ca)
         out['tier'] = ('power' if hi == 2 else 'mixed' if hi == 1 else ('G5' if sport == 'cfb' else 'mid-major'))
-        out['game'] = 'conference' if ch == ca else 'non-conference'
-        if ch == ca:
+        out['game'] = 'conference' if cg else 'non-conference'
+        if cg:
             out['conf'] = ch
     return out
 
