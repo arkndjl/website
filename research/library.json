@@ -492,7 +492,9 @@
       "xNIL = position price × on-field value (AV at FV, × playing time), shared within the P4 and G5 pools.",
       "yNIL splits each program's budget by a preseason index. The budget is the school's reported one: 68 P4 football programs (mean $27.2M) and 80 high-major basketball programs (mean $13.7M).",
       "Without a report it is assumed: $3M in the G5, $0.4M in the FCS, $1.2M for a mid-major and $0.25M for a low-major in basketball.",
-      "The budget pays the whole roster. A provisionally graded football backup is paid 5% of the median graded player at his position on the team, the share that matched the College Sports Commission's lower pay percentiles. He gets no xNIL or zNIL: the formula at a provisional grade did not beat the position median on backups graded later.",
+      "The budget pays the whole roster. A provisionally graded football backup is paid 5% of the median graded player at his position on the team, and a kicker or punter 20% of the team's median graded player, rising 10% per FV point. Both shares were set on the College Sports Commission's pay percentiles. Their xNIL shares the group's own pay by worth, so a backup's or a specialist's zNIL is against his group's going rate.",
+      "A reported deal (6 on file) moves the player half way from the model's number to the report: his yNIL when the deal is for this season, his xNIL when it was reported in the last year. It also enters the price fit, so a position's price follows the reports between On3's repricings. On3 moved toward each of the three reports it trailed.",
+      "A budget list from an earlier season is carried forward at the market's growth (11% a year).",
       "It isn't fit to On3 valuations, since those only move +18% per 10 FV. zNIL growth is 20% of each coach score.",
       "Checked against the College Sports Commission's pay percentiles by position, On3 valuations and reported deals.",
       "FCS players at an FBS-starter FV are priced at 40% of the FBS rate. CBB xNIL is minutes share × (BPM + 3) at the school's price."

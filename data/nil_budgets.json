@@ -1,5 +1,5 @@
 {
- "_readme": "Reported roster budgets by school, $M a season (low, high), revenue share plus NIL. Read by scripts/fetch_cfb.mjs (football yNIL) and scripts/cbb_recruit_fit.py / scripts/cbb_market.py (men's basketball yNIL): a listed school's budget is the midpoint, the others keep the level budget tilted by program strength. Refresh by hand when the next survey is published (football each September, basketball each October).",
+ "_readme": "Reported roster budgets by school, $M a season (low, high), revenue share plus NIL. Read by scripts/fetch_cfb.mjs (football yNIL) and scripts/cbb_recruit_fit.py / scripts/cbb_market.py (men's basketball yNIL): a listed school's budget is the midpoint, the others keep the level budget tilted by program strength. Refresh by hand when the next survey is published (football each September, basketball each October). growth: the market's yearly growth (Opendorse totals 2024-26, data/return_pay.json), used to carry a list forward until the next season's list is in.",
  "cfb": {
   "season": 2026,
   "source": "The Athletic, estimated football roster budgets for the 68 power-conference programs (Sep 16 2026)",
@@ -276,7 +276,8 @@
     27.0,
     31.0
    ]
-  }
+  },
+  "growth": 1.113
  },
  "cbb": {
   "season": 2027,
@@ -602,6 +603,7 @@
     12.1,
     15.0
    ]
-  }
+  },
+  "growth": 1.113
  }
 }

@@ -777,7 +777,17 @@ const RISER = { gap: 6, unranked: 55 };
 // On3's valued players better (r .66 -> .70, log RMSE unchanged), Nov 27 2026
 // FCS programs: no revenue sharing at almost every FCS school, so NIL is collective and booster money only,
 // ~$0.4M a program (an assumption, scaled like the FBS budgets by level: x e^(.3 z) on the FCS team SRS)
-const XNIL = { p4: 20e6, g5: 3e6, fcs: 0.4e6, fcsMove: 0.4, tilt: 0.3, k: 1.25, bench: 0.05 };
+const XNIL = { p4: 20e6, g5: 3e6, fcs: 0.4e6, fcsMove: 0.4, tilt: 0.3, k: 1.25, bench: 0.05,
+  spec: 0.2, specFv: 0.1, specBench: 0.01,     // kickers and punters: a graded one is paid spec x e^(specFv (FV - 37)) of the team's median listed player
+  deal: 0.5 };                                  // weight of a reported deal against the model's number (geometric)
+// reported deals (data/nil_deals.json, one row a report): the latest for a player on his team. A deal for this season
+// moves his yNIL, one reported in the last year moves his xNIL and the fit's target for him, each XNIL.deal of the way
+const NIL_DEALS = (() => { try { const out = new Map();
+  for (const d of JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nil_deals.json'), 'utf8')).deals.slice().sort((a, b) => (a.date < b.date ? -1 : 1)))
+    if (d.sport === 'cfb' && d.amount > 0) out.set(`${compact(d.player)}|${d.team}`, d);
+  return out; } catch { return new Map(); } })();
+const dealOf = p => NIL_DEALS.get(`${compact(p.name)}|${p.team}`) || null;
+const dealNow = (p, asof = new Date()) => { const d = dealOf(p); return d && d.season >= SEASON && (new Date(asof) - new Date(d.date)) / 864e5 <= 365 ? d : null; };
 // a program's budget pays its whole roster. Players the board no longer lists (carried rows) and ESPN backups get their
 // yNIL in writeAll (benchNil); the listed players split what that left on the last written board: 1 - the unlisted
 // players' share of the team's yNIL there, by division and team
@@ -786,10 +796,13 @@ const NIL_BENCH = (() => {
   if (!A?.rows || A.asof < `${SEASON}-08-01`) return {};
   const c = Object.fromEntries(A.cols.map((k, i) => [k, i]));
   for (const r of A.rows) { const y = r[c.ynil]; if (!(y > 0)) continue; const k = `${r[c.div]}|${r[c.team]}`;
-    tot[k] = (tot[k] || 0) + y; if (r[c.carried] || r[c.src] === 'espn') bench[k] = (bench[k] || 0) + y; }
+    tot[k] = (tot[k] || 0) + y; if (r[c.carried] || r[c.src] === 'espn' || r[c.pos] === 'K' || r[c.pos] === 'P') bench[k] = (bench[k] || 0) + y; }
   return Object.fromEntries(Object.keys(bench).map(k => [k, Math.min(0.6, bench[k] / tot[k])]));
 })();
-const NIL_BUDGET = (() => { try { const d = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nil_budgets.json'), 'utf8')).cfb; return d.season === SEASON ? d.teams : {}; } catch { return {}; } })();
+// a list from an earlier season is carried forward at the market's yearly growth until the new one is in
+const NIL_BUDGET = (() => { try { const d = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nil_budgets.json'), 'utf8')).cfb, yrs = SEASON - d.season;
+  if (yrs < 0 || yrs > 3) return {};
+  const f = (d.growth ?? 1) ** yrs; return Object.fromEntries(Object.entries(d.teams).map(([t, [lo, hi]]) => [t, [lo * f, hi * f]])); } catch { return {}; } })();
 // FCS NIL discount at equal FV: FCS median xNIL / FBS median xNIL per 5-point FV tier (both with 3+ players),
 // overall = geometric mean of the tier ratios weighted by FCS players in the tier
 const nilDiscount = (fcs, fbs) => {
@@ -1622,7 +1635,8 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     const nowF = (p, p4 = P4.has(p.conf, p.tid) ? 1 : 0) => { const f = (p.fv - 50) / 10; return [1, f, f * f, p4, ...dummies(p), p.g === 'QB' ? f : 0, Math.min(1, (p.playSnaps ?? 0) / 250)]; };
     const train = players.filter(p => p.fv != null && p.on3?.nil > 0);
     if (!FCS && train.length > 50) {
-      const y = train.map(p => Math.log(p.on3.nil));
+      // the fits' target: On3's valuation, moved toward a reported deal from the last year (On3 follows reports months later)
+      const y = train.map(p => { const d = dealNow(p); return Math.log(p.on3.nil) + (d ? XNIL.deal * Math.log(d.amount / p.on3.nil) : 0); });
       const bPre = ridge(train.map(preF), y), bNow = ridge(train.map(p => nowF(p)), y);
       const byTeam = {};
       for (const p of players) if (p.fv != null && p.tid) (byTeam[p.tid] ||= []).push(p);
@@ -1638,7 +1652,10 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
         const rep = NIL_BUDGET[ps[0].team];     // reported budget, $M low and high
         const budget = (1 - (NIL_BENCH[`FBS|${ps[0].team}`] || 0)) * (rep ? (rep[0] + rep[1]) / 2 * 1e6 : (P4.has(ps[0].conf, ps[0].tid) ? XNIL.p4 : XNIL.g5) * Math.exp(XNIL.tilt * (tal[tid] - tm) / tsd));
         const w = ps.map(p => Math.exp(XNIL.k * dot(preF(p), bPre))), sw = w.reduce((a, b) => a + b, 0);
-        ps.forEach((p, i) => { p.ynil = Math.round(budget * w[i] / sw / 1000) * 1000; pool += p.ynil; });
+        // a reported deal for this season: his share moves toward it, his teammates split the rest
+        const raw = w.map(x => budget * x / sw), fix = ps.map((p, i) => { const d = dealOf(p); return d && d.season === SEASON ? raw[i] * (d.amount / raw[i]) ** XNIL.deal : null; });
+        const fs_ = fix.reduce((a, x) => a + (x || 0), 0), rs = raw.reduce((a, x, i) => a + (fix[i] == null ? x : 0), 0), sc = fs_ < budget && rs > 0 ? (budget - fs_) / rs : 1;
+        ps.forEach((p, i) => { p.ynil = Math.round((fix[i] != null && sc !== 1 ? fix[i] : raw[i] * sc) / 1000) * 1000; pool += p.ynil; });
       }
       // two markets, each sharing its own programs' total pay (yNIL) by worth: Power 4 and Group of Five. A G5
       // player good enough to start at P4 (FV at or above the median P4 projected starter at his position) is
@@ -1686,7 +1703,11 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       // yNIL against On3's valuations (the fit's own target): mean and SD of log(yNIL / On3), the hover range on yNIL
       const yl = fitSet.map(p => Math.log(p.ynil / p.on3.nil)), yMu = yl.reduce((a, b) => a + b, 0) / yl.length;
       const ySd = Math.sqrt(yl.reduce((a, b) => a + (b - yMu) ** 2, 0) / yl.length);
-      for (const p of all) { p.xnil = Math.round(pr(p) / 1000) * 1000; p.znil = p.xnil - p.ynil; p.nilMkt = mkt(p); }
+      // a deal reported in the last year is a market price for him: xNIL moves toward it, the rest of his market keeps the pool whole
+      { const x0 = new Map(all.map(p => [p, pr(p)])), adj = new Map(), moved = { p4: 0, g5: 0 }, was = { p4: 0, g5: 0 }, sum = { p4: 0, g5: 0 };
+        for (const p of all) { const d = dealNow(p, asof), x = x0.get(p); sum[mkt(p)] += x; if (d && x > 0) { const v = x * (d.amount / x) ** XNIL.deal; adj.set(p, v); moved[mkt(p)] += v; was[mkt(p)] += x; } }
+        const sc = m => (sum[m] - was[m] > 0 && sum[m] > moved[m] ? (sum[m] - moved[m]) / (sum[m] - was[m]) : 1);
+        for (const p of all) { p.xnil = Math.round((adj.get(p) ?? x0.get(p) * sc(mkt(p))) / 1000) * 1000; p.znil = p.xnil - p.ynil; p.nilMkt = mkt(p); } }
       // the FBS curves for the FCS build: worth weight sums by market, pools, starter lines, coefficients
       const fvG5 = {};
       for (const [g, n] of Object.entries(STARTERS)) {
@@ -2643,32 +2664,46 @@ const carriedRows = now => {
     .map(r => ({ ...r, ...(r.age > 35 ? { age: null, ageEst: r.elig ? r1(18.4 + r.elig) : null } : {}),   // an impossible age kept from an older build
       carried: r.carried || PREV_ALL.asof, delta: null, ovr: null, star: ark.has(r.name) || ark.has(`${r.name}|${r.team}`) || null }));
 };
-// yNIL for a team's unlisted players, from the same budget as its listed ones (NIL_BENCH). A carried row keeps the
-// yNIL he had against his teammates' (moved by the median change of the listed players since that board), his xNIL
-// and zNIL in step with it. An ESPN backup is paid XNIL.bench x the median listed player at his position on the team
-// (held out on the College Sports Commission's pay percentiles, scripts/research/nil_nov27); no xNIL or zNIL: the
-// worth formula at a provisional grade did not beat the position median on backups graded later
+// yNIL for the players the pay split doesn't list, from the same budget as the listed ones (NIL_BENCH). A carried row
+// keeps the yNIL he had against his teammates' (moved by the median change of the listed players since that board), his
+// xNIL and zNIL in step with it. An ESPN backup is paid XNIL.bench x the median listed player at his position on the
+// team, a kicker or punter XNIL.spec x e^(XNIL.specFv (FV - 37)) x the team's median listed player (XNIL.specBench for
+// an ESPN backup); both held out on the College Sports Commission's pay percentiles (scripts/research/nil_nov27).
+// Their xNIL: each group's pay in a market (P4, G5, FCS) shared by worth (position price x AV at FV for backups, the
+// FV curve for specialists), so the group's zNIL sums to zero and reads who is paid over or under his group's rate
+const P4_CONFS = new Set(['SEC', 'Big Ten', 'Big 12', 'ACC']);
 const benchNil = (now, kept, extra) => {
   const key = r => `${r.div}|${r.team}`, med = v => { const s = [...v].sort((a, b) => a - b); return s.length ? (s[(s.length - 1) >> 1] + s[s.length >> 1]) / 2 : null; };
+  const spec = r => r.pos === 'K' || r.pos === 'P', k1 = x => Math.round(x / 1000) * 1000;
+  const kb = x => (x < 1e4 ? Math.max(100, Math.round(x / 100) * 100) : k1(x));     // small pay to the nearest $100
   const live = {}, prev = new Map();
-  for (const r of now) if (r.ynil > 0) (live[key(r)] ||= []).push(r);
+  for (const r of now) if (r.ynil > 0 && !spec(r)) (live[key(r)] ||= []).push(r);
   if (PREV_ALL?.rows) { const c = Object.fromEntries(PREV_ALL.cols.map((k, i) => [k, i]));
     for (const a of PREV_ALL.rows) if (a[c.ynil] > 0 && !a[c.carried] && a[c.src] !== 'espn') prev.set(`${a[c.div]}|${a[c.team]}|${a[c.name]}|${a[c.pos]}`, a[c.ynil]); }
-  const by = {};
-  for (const r of kept) if (r.ynil > 0) ((by[key(r)] ||= { c: [], e: [] }).c).push(r);
-  for (const r of extra) if (r.pos !== 'K' && r.pos !== 'P') ((by[key(r)] ||= { c: [], e: [] }).e).push(r);
-  for (const [k, { c, e }] of Object.entries(by)) {
-    const ps = live[k]; if (!ps) { for (const r of c) r.xnil = r.ynil = r.znil = null; continue; }
+  const by = {}, slot = r => (by[key(r)] ||= { c: [], e: [], s: [] });
+  for (const r of kept) if (r.ynil > 0 && !spec(r)) slot(r).c.push(r);
+  for (const r of extra) (spec(r) ? slot(r).s : slot(r).e).push(r);
+  for (const r of [...now, ...kept]) if (spec(r)) slot(r).s.push(r);
+  const posList = Object.keys(STARTERS), bNow = nilMarket?.bNow;
+  const posW = g => { const i = posList.indexOf(g === 'DT' ? 'DL' : g); return bNow && i > 0 ? Math.exp(bNow[3 + i]) : 1; };
+  const specW = r => (r.src === 'espn' ? XNIL.specBench / XNIL.spec : Math.exp(XNIL.specFv * ((r.fv ?? 37) - 37)));
+  const pools = {};      // market|group -> { y, w, rows }
+  for (const [k, { c, e, s }] of Object.entries(by)) {
+    const ps = live[k]; if (!ps) { for (const r of [...c, ...s]) r.xnil = r.ynil = r.znil = null; continue; }
     const sh = NIL_BENCH[k] || 0, y0 = p => p.ynil / (1 - sh), B = ps.reduce((a, p) => a + y0(p), 0);
     const S = med(ps.filter(p => prev.has(`${k}|${p.name}|${p.pos}`)).map(p => prev.get(`${k}|${p.name}|${p.pos}`) / y0(p))) ?? 1 - sh;
     const all = med(ps.map(y0)), at = {};
     for (const p of ps) (at[p.pos] ||= []).push(y0(p));
-    const wc = c.map(r => r.ynil / S), we = e.map(r => XNIL.bench * (med(at[r.pos] || []) ?? all));
-    const W = B + wc.reduce((a, b) => a + b, 0) + we.reduce((a, b) => a + b, 0), k1 = x => Math.round(x / 1000) * 1000;
+    const wc = c.map(r => r.ynil / S), we = e.map(r => XNIL.bench * (med(at[r.pos] || []) ?? all)), ws = s.map(r => XNIL.spec * specW(r) * all);
+    const W = B + [...wc, ...we, ...ws].reduce((a, b) => a + b, 0);
     c.forEach((r, i) => { const y = Math.max(1000, k1(B * wc[i] / W)), x = r.xnil != null ? k1(r.xnil * y / r.ynil) : null;
       r.ynil = y; r.xnil = x; r.znil = x != null ? x - y : null; });
-    e.forEach((r, i) => { r.ynil = k1(B * we[i] / W) || null; });
+    const m = ps[0].div === 'FCS' ? 'fcs' : P4_CONFS.has(ps[0].conf) || String(ps[0].tid) === '87' ? 'p4' : 'g5';
+    const put = (r, y, g, w) => { r.ynil = kb(y); r.xnil = r.znil = null; if (r.ynil) { const q = (pools[`${m}|${g}`] ||= { y: 0, w: 0, rows: [] }); q.y += r.ynil; q.w += w; q.rows.push([r, w]); } };
+    e.forEach((r, i) => put(r, B * we[i] / W, 'e', posW(r.pos) * (avOf(r.fv ?? 20) + avOf(30))));
+    s.forEach((r, i) => put(r, B * ws[i] / W, 's', specW(r)));
   }
+  for (const q of Object.values(pools)) for (const [r, w] of q.rows) { r.xnil = kb(q.y * w / q.w); r.znil = r.xnil - r.ynil; }
 };
 fs.mkdirSync(path.dirname(ALL_OUT), { recursive: true });
 const PRIORS = path.join(ROOT, 'data', 'cfb_draft_priors.json');

@@ -28,6 +28,7 @@ Board parity with the football recruit tabs (Oct 31 2026): ARK stars (the FV cut
 and xNIL (college value at the school's NIL price; xnil_price). The history keeps every recruit's D-I seasons and the
 On3 recruitment fields tested as drivers (offer interest, prep power, commitment timing), so --offline rebuilds it all.
 """
+import datetime
 import csv
 import gzip
 import json
@@ -84,7 +85,10 @@ LEVELS = {'HM': {'ACC', 'B10', 'B12', 'SEC', 'BE'}, 'MM': {'A10', 'MWC', 'WCC', 
 def _budgets():
     try:
         with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'nil_budgets.json')) as f:
-            return {t: (lo + hi) / 2 * 1e6 for t, (lo, hi) in json.load(f)['cbb']['teams'].items()}
+            d = json.load(f)['cbb']
+        # a list from an earlier season is carried forward at the market's yearly growth until the new one is in
+        now = datetime.date.today(); yrs = min(3, max(0, now.year + (now.month >= 7) - d['season']))
+        return {t: (lo + hi) / 2 * 1e6 * d.get('growth', 1) ** yrs for t, (lo, hi) in d['teams'].items()}
     except (OSError, ValueError, KeyError):
         return {}
 
