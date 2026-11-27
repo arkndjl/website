@@ -431,10 +431,21 @@ def alert(sport, R, prev):
     tok, repo = os.environ.get('GITHUB_TOKEN'), os.environ.get('GITHUB_REPOSITORY')
     if prev == 'alarm' or not tok or not repo:
         return
-    body = json.dumps({'title': f'Model monitor alarm: {sport}', 'labels': ['model-monitor'],
+    title = f'Model monitor alarm: {sport}'
+    hdr = {'Authorization': 'Bearer ' + tok, 'Accept': 'application/vnd.github+json', 'User-Agent': 'model-monitor'}
+    # one open issue a sport: a model that crosses the line and back each day (cbb, Nov 17-25) opened a new one every
+    # time it turned on, eight open at once. An issue still open already says it.
+    try:
+        q = urllib.request.Request(f'https://api.github.com/repos/{repo}/issues?state=open&labels=model-monitor&per_page=100', headers=hdr)
+        if any(i.get('title') == title for i in json.loads(urllib.request.urlopen(q, timeout=20).read())):
+            print('alarm issue already open', flush=True)
+            return
+    except Exception as e:          # the list could not be read: open it as before
+        print('open alarm issues not read:', e, flush=True)
+    body = json.dumps({'title': title, 'labels': ['model-monitor'],
                        'body': msg + '\n\nReport: data/model_monitor/' + sport + '.json (Predictions page, game models tab).'}).encode()
     req = urllib.request.Request(f'https://api.github.com/repos/{repo}/issues', data=body, method='POST',
-                                 headers={'Authorization': 'Bearer ' + tok, 'Accept': 'application/vnd.github+json', 'User-Agent': 'model-monitor'})
+                                 headers=hdr)
     try:
         urllib.request.urlopen(req, timeout=20).read()
         print('opened an issue for the alarm', flush=True)
