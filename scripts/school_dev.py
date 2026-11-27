@@ -325,9 +325,14 @@ def site():
     cf = json.load(open(os.path.join(RES, 'cfb.json')))['outcomes']
     T = {t['tid']: t for t in json.load(open(os.path.join(ROOT, 'data', 'cfb_teams.json')))['teams']}
     dr = {str(x['id']): x for x in one_per_id(cf['dr']['schoolsAll'], cf['dr']['hyper']['tau2'], cf['dr']['hyperNet']['tau2'])}
+    try:
+        prev = {r['id']: {'team': r['t'], 'logo': r.get('logo'), 'conf': r.get('conf')}
+                for r in json.load(open(os.path.join(ROOT, 'data', 'school_dev.json')))['cfb']['rows']}
+    except (OSError, ValueError, KeyError):
+        prev = {}
     rows = []
     for x in one_per_id(cf['fv']['schoolsAll'], cf['fv']['hyper']['tau2'], cf['fv']['hyperNet']['tau2']):
-        t = T.get(str(x['id']))
+        t = T.get(str(x['id'])) or prev.get(str(x['id']))   # a team the table lost for a run keeps its last row's name
         if not t: continue   # FBS teams on the board only
         d = dr.get(str(x['id']), {})
         rows.append({'id': str(x['id']), 't': t['team'], 'logo': t.get('logo'), 'conf': t.get('conf'), 'dev': round(x['u'], 2), 'se': round(x['se'], 2),
