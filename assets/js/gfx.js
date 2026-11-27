@@ -2549,6 +2549,170 @@
     return F.canvas;
   }
 
+  // ---- one school's recruiting class (16:9): the class numbers and position groups on the left, every commit on the
+  // right with his photo (initials when there is none), ARK stars, FV, Y1 FV, industry stars, the star gap and xNIL.
+  // Data: static/data/classes/<sport>.json (scripts/class_cards.py), opened from the class rankings dropdown. ----
+  function initials(n) { var w = String(n).replace(/[.']/g, '').split(/\s+/).filter(function (x) { return x && !/^(jr|sr|ii|iii|iv|v)$/i.test(x); }); return ((w[0] || '?')[0] + (w.length > 1 ? w[w.length - 1][0] : '')).toUpperCase(); }
+  function faceBox(g, img, x, y, w, h, name) {
+    g.fillStyle = C.dark; g.fillRect(x, y, w, h);
+    if (img) {
+      var s = Math.max(w / img.width, h / img.height), sw = w / s, sh = h / s, sm = g.imageSmoothingEnabled;
+      g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+      g.drawImage(img, (img.width - sw) / 2, 0, sw, sh, x, y, w, h); g.imageSmoothingEnabled = sm;
+    } else {
+      g.save(); g.font = Math.round(Math.min(w * 0.46, h * 0.5)) + 'px ' + FONT; g.textAlign = 'center'; g.fillStyle = C.lilac; g.fillText(initials(name), x + w / 2, y + h / 2 + 2); g.restore();
+    }
+    var t = Math.max(2, Math.round(Math.min(w, h) / 28));
+    g.fillStyle = C.light; g.fillRect(x, y, w, t); g.fillRect(x, y, t, h); g.fillStyle = '#16102a'; g.fillRect(x, y + h - t, w, t); g.fillRect(x + w - t, y, t, h);
+  }
+  function on3Photo(path, px) { return path ? loadPhoto('https://on3static.com/cdn-cgi/image/height=' + px + ',width=' + px + ',quality=85,fit=cover,gravity=top,format=auto/' + path) : Promise.resolve(null); }
+  function starGap(r) { if (r.s == null) return null; var v = Math.min(r.a, 5) - r.s; return [(v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v), v > 0 ? C.teal : v < 0 ? C.down : C.lilac]; }
+  // ARK stars in a cell of its own colour (cell = [x, y, w, h, fill]): a 5-star+ repaints its cell each step of the preview
+  function arkStars(g, a, x, cy, ss, sg, cell) {
+    var sy = Math.round(cy - ss / 2);
+    if (a > 5) {
+      plusStars(g, x, sy, ss, 0, sg);
+      (g.canvas._anim = g.canvas._anim || []).push(function (ph) { cell.fills.forEach(function (f) { g.fillStyle = f; g.fillRect(cell.x, cell.y, cell.w, cell.h); }); plusStars(g, x, sy, ss, ph, sg); });
+    } else for (var q = 0; q < 5; q++) pxStar(g, x + q * (ss + sg), sy, ss, a - q >= 1 ? 1 : a - q > 0 ? 0.5 : 0, PLAT);
+  }
+  var TINT = { ark: 'rgba(127,255,212,0.09)', ind: 'rgba(200,199,255,0.12)', nil: 'rgba(36,26,58,0.75)' };
+  async function buildClassCard(win, btn) {
+    var det = btn.closest('tr[class*="__detail"]'), tr = det && det.previousElementSibling, table = btn.closest('table[data-cls-src]'); if (!tr || !table) return null;
+    var src = table.getAttribute('data-cls-src'), yr = tr.getAttribute('data-yr'), team = txt(tr.querySelector('.cfb__team span') || tr.cells[1]);
+    var data = await (window.__arkClassData ? window.__arkClassData(src) : fetch(src).then(function (r) { return r.json(); }));
+    var Y = (data.y || {})[yr], d = Y && Y.t[team]; if (!d || !d.r.length) return null;
+    var F = await frame(2400, 1350, yr + ' ' + team + ' class', win.getAttribute('data-gfx-date'), tabLink(win));
+    var g = F.g, R = d.r.slice(0, 32), n = R.length, tiles = n <= 4;
+    F.canvas._name = (yr + '-' + team).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    var lim = tr.querySelector('img.cfb__logo'), logo = await loadImg(lim && lim.getAttribute('src'));
+    var photos = await Promise.all(R.map(function (r) { return on3Photo(r.i, tiles ? 640 : n <= 8 ? 320 : 160); }));
+    var scH = (txt(win.querySelector('thead th:nth-child(4)')) || 'CLASS').toUpperCase();
+    var LW = 520, pad = 20, X = F.x, Y0 = F.y, HH = F.h;
+
+    // ---- left: school, class rank and score, the counts, position groups ----
+    well(g, X, Y0, LW, HH);
+    var ls = 168, lx = X + pad, nx = lx + ls + 22, nw = LW - pad - (nx - X);
+    if (logo) drawLogo(g, logo, lx, Y0 + pad, ls, ls);
+    g.font = '56px ' + FONT; g.fillStyle = C.white;
+    var nl = wrap(g, team, nw).slice(0, 2), ny = Y0 + pad + (nl.length > 1 ? 34 : 58);
+    nl.forEach(function (t, i) { g.fillText(fit(g, t, nw), nx, ny + i * 58); });
+    g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, [d.conf, yr].filter(Boolean).join(' · '), nw), nx, ny + nl.length * 58 - 4);
+    var y = Y0 + pad + ls + 18, pw = (LW - 2 * pad - 12) / 2, ph = 150;
+    [['RANK', '#' + d.rk, 'of ' + Y.of], [scH, d.s.toFixed(1), '']].forEach(function (p, i) {
+      var px = X + pad + i * (pw + 12);
+      g.fillStyle = C.dark; g.fillRect(px, y, pw, ph); g.fillStyle = C.teal; g.fillRect(px, y + ph - 6, pw, 6);
+      g.font = '26px ' + FONT; g.fillStyle = C.lilac; g.fillText(p[0], px + 16, y + 26);
+      g.font = '88px ' + FONT; g.fillStyle = C.teal; g.fillText(p[1], px + 16, y + 92);
+      if (p[2]) { g.font = '26px ' + FONT; g.fillStyle = C.lilac; g.fillText(p[2], px + pw - 16 - g.measureText(p[2]).width, y + 26); }
+    });
+    y += ph + 12;
+    var T = [['COMMITS', String(d.n), C.white], ['5', String(d.a6), PT[1], 2], ['5', String(d.a5), C.white, 1], ['4', String(d.a4), C.white, 1],
+      ['AVG xFV', d.avg != null ? d.avg.toFixed(1) : '–', C.white], ['TOP END', d.te ? '#' + d.te : '–', C.white], ['DEPTH', d.dp ? '#' + d.dp : '–', C.white], ['xNIL', d.x ? money(d.x) : '–', C.white]];
+    var tw = (LW - 2 * pad - 3 * 8) / 4, th = 100;
+    T.forEach(function (t, i) {
+      var tx = X + pad + (i % 4) * (tw + 8), ty = y + Math.floor(i / 4) * (th + 8), mid = tx + tw / 2;
+      g.fillStyle = t[3] ? TINT.nil : 'rgba(200,199,255,0.10)'; g.fillRect(tx, ty, tw, th);
+      g.font = '46px ' + FONT; g.fillStyle = t[3] && t[1] === '0' ? 'rgba(200,199,255,0.4)' : t[2]; g.fillText(t[1], Math.round(mid - g.measureText(t[1]).width / 2), ty + 38);
+      g.font = '24px ' + FONT; g.fillStyle = t[3] === 2 ? PT[1] : C.lilac;
+      if (t[3]) {   // 5 [star] + in pixels
+        var w0 = g.measureText(t[0]).width, pwd = t[3] === 2 ? g.measureText('+').width + 2 : 0, x0 = Math.round(mid - (w0 + 25 + pwd) / 2);
+        g.fillText(t[0], x0, ty + 78); pxStar(g, x0 + w0 + 4, ty + 78 - 12, 21, 1, PLAT); if (pwd) g.fillText('+', x0 + w0 + 27, ty + 78);
+      } else g.fillText(t[0], Math.round(mid - g.measureText(t[0]).width / 2), ty + 78);
+    });
+    y += 2 * th + 8 + 18;
+    // position groups: commits, FV points as a bar against the class's biggest group, mean FV
+    var G = d.g || [], gx = X + pad, gw = LW - 2 * pad, top = Math.max.apply(null, G.map(function (q) { return q[2]; }).concat([1]));
+    g.font = '24px ' + FONT; g.fillStyle = C.lilac; g.fillText('POS', gx, y + 14);
+    var c1 = gx + 108, c3 = gx + gw, bx0 = gx + 168, bw0 = gw - 168 - 96;
+    g.fillText('N', c1 + 34 - g.measureText('N').width, y + 14); g.fillText('FV PTS', bx0, y + 14); g.fillText('AVG', c3 - g.measureText('AVG').width, y + 14);
+    y += 34;
+    var gh = Math.max(24, Math.min(46, Math.floor((Y0 + HH - pad - y) / Math.max(1, G.length)))), gf = Math.min(32, gh - 6);
+    G.forEach(function (q, i) {
+      var gy = y + i * gh + gh / 2;
+      if (i % 2 === 0) { g.fillStyle = 'rgba(36,26,58,0.45)'; g.fillRect(gx - 6, y + i * gh, gw + 12, gh); }
+      g.font = gf + 'px ' + FONT; g.fillStyle = C.teal; g.fillText(q[0], gx, gy);
+      g.fillStyle = C.white; var ct = String(q[1]); g.fillText(ct, c1 + 34 - g.measureText(ct).width, gy);
+      var bh = Math.max(8, Math.round(gh * 0.36)), bl = Math.max(6, Math.round(bw0 * Math.max(0, q[2]) / top / 6) * 6);
+      g.fillStyle = C.dark; g.fillRect(bx0, Math.round(gy - bh / 2), bw0, bh); g.fillStyle = C.teal; g.fillRect(bx0, Math.round(gy - bh / 2), Math.min(bw0, bl), bh);
+      g.fillStyle = C.lilac; var av = q[3].toFixed(1); g.fillText(av, c3 - g.measureText(av).width, gy);
+    });
+
+    // ---- right: the commits ----
+    var RX = X + LW + 24, RW = F.w - LW - 24;
+    function sub(r, wide) { return [r.h, !R.some(function (q) { return !q.w; }) ? String(r.w) : null, r.hs, (wide || !r.hs) ? r.o : null].filter(Boolean); }
+    if (tiles) {
+      var gp = 20, cw = Math.min(700, Math.floor((RW - (n - 1) * gp) / n)), x0 = RX + Math.round((RW - (n * cw + (n - 1) * gp)) / 2);
+      R.forEach(function (r, i) {
+        var cx = x0 + i * (cw + gp), ip = 22, iw = cw - 2 * ip, fh = Math.min(Math.round(iw * 0.92), HH - 612), cy = Y0 + ip;
+        well(g, cx, Y0, cw, HH);
+        faceBox(g, photos[i], cx + ip, cy, iw, fh, r.n); cy += fh + 22;
+        var nf = cw >= 500 ? 54 : 44; g.font = nf + 'px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, r.n, iw), cx + ip, cy + nf / 2); cy += nf + 16;
+        var ss = cw >= 500 ? 42 : 35, sg = 6;
+        arkStars(g, r.a, cx + ip, cy + ss / 2 + 4, ss, sg, { x: cx + ip - 8, y: cy - 6, w: iw + 8, h: ss + 20, fills: [C.well] }); cy += ss + 26;
+        var lf = cw >= 500 ? 34 : 30; g.font = lf + 'px ' + FONT;
+        g.fillStyle = C.teal; g.fillText(r.p, cx + ip, cy + lf / 2); var pw2 = g.measureText(r.p).width + 18;
+        g.fillStyle = C.lilac; g.fillText(fit(g, [r.h, r.w ? r.w + ' lb' : null].filter(Boolean).join(' · '), iw - pw2), cx + ip + pw2, cy + lf / 2); cy += lf + 12;
+        [r.hs, r.o].filter(Boolean).forEach(function (t) { g.fillText(fit(g, t, iw), cx + ip, cy + lf / 2); cy += lf + 12; });
+        // FV and Y1 FV, then industry stars, the gap and xNIL, pinned to the bottom
+        var h1 = 132, h2 = 104, by = Y0 + HH - ip - h1 - h2 - 10, gapd = starGap(r);
+        function cell(x, yy, w, h, lab, val, col, tint, lead, big) {
+          g.fillStyle = lead ? C.dark : tint; g.fillRect(x, yy, w, h); if (lead) { g.fillStyle = C.teal; g.fillRect(x, yy + h - 6, w, 6); }
+          g.font = '26px ' + FONT; g.fillStyle = C.lilac; g.fillText(lab, x + 14, yy + 24);
+          g.font = big + 'px ' + FONT; while (big > 24 && g.measureText(val).width > w - 24) { big -= 2; g.font = big + 'px ' + FONT; }
+          g.fillStyle = col; g.fillText(val, x + 14, yy + 24 + (h - 24) / 2 + 2);
+        }
+        var w2 = (iw - 10) / 2, w3 = (iw - 20) / 3, vs = cw >= 500 ? 64 : 52;
+        cell(cx + ip, by, w2, h1, 'FV', String(r.f), C.teal, TINT.ark, 1, 88); cell(cx + ip + w2 + 10, by, w2, h1, 'Y1 FV', String(r.y), C.white, TINT.ark, 0, 88);
+        cell(cx + ip, by + h1 + 10, w3, h2, 'IND', r.s == null ? '–' : r.s + (r.sp ? '+' : ''), C.white, TINT.ind, 0, vs);
+        cell(cx + ip + w3 + 10, by + h1 + 10, w3, h2, 'Δ★', gapd ? gapd[0] : '–', gapd ? gapd[1] : C.lilac, TINT.ind, 0, vs);
+        cell(cx + ip + 2 * (w3 + 10), by + h1 + 10, w3, h2, 'xNIL', r.x ? money(r.x) : '–', C.white, TINT.nil, 0, vs);
+      });
+      return F.canvas;
+    }
+    var cols = n <= 8 ? 1 : 2, per = Math.ceil(n / cols), cg = 20, cw2 = Math.floor((RW - (cols - 1) * cg) / cols), hh = 46, rg = 6;
+    var rh = Math.min(190, Math.floor((HH - hh - (per - 1) * rg) / per)), s = Math.min(rh / 56, cw2 / 814);
+    var P = function (v) { return Math.round(v * s); }, sc = Math.min(s, 1.6), Q = function (v) { return Math.round(v * sc); };   // one wide column: the number cells stop growing, the name takes the room
+    var ss2 = Math.max(14, Math.floor(21 * sc / 7) * 7), sg2 = Math.max(2, Q(3)), stW = 5 * (ss2 + sg2) + Q(26);
+    // columns right to left: [header, width, group]
+    var CW = [['xNIL', Q(90), 'nil'], ['Δ★', Q(58), 'ind'], ['IND', Q(54), 'ind'], ['Y1 FV', Q(72), 'ark'], ['FV', Q(58), 'ark'], ['ARK', stW, 'ark']];
+    var hf = Math.min(30, Math.max(20, P(20)));
+    for (var c = 0; c < cols; c++) {
+      var cx0 = RX + c * (cw2 + cg), right = cx0 + cw2 - P(6), hx = right;
+      g.font = hf + 'px ' + FONT;
+      CW.forEach(function (k) { g.fillStyle = k[2] === 'ark' ? C.teal : C.lilac; g.fillText(k[0], Math.round(hx - k[1] / 2 - g.measureText(k[0]).width / 2), Y0 + hh / 2 - 2); hx -= k[1]; });
+      g.fillStyle = C.lilac; g.fillText('COMMIT', cx0 + P(8), Y0 + hh / 2 - 2);
+    }
+    R.forEach(function (r, i) {
+      var c = Math.floor(i / per), x = RX + c * (cw2 + cg), y2 = Y0 + hh + (i % per) * (rh + rg), mid = y2 + rh / 2;
+      well(g, x, y2, cw2, rh);
+      var fs = rh - 2 * Math.max(4, P(4)), fx = x + P(8);
+      faceBox(g, photos[i], fx, Math.round(mid - fs / 2), fs, fs, r.n);
+      // the number cells, right-aligned under their headers
+      var right = x + cw2 - P(6), cx = right, ct = y2 + Math.max(4, P(5)), ch = rh - 2 * Math.max(4, P(5)), gapd = starGap(r);
+      var vals = [[r.x ? money(r.x) : '–', C.white], gapd || ['–', 'rgba(200,199,255,0.4)'], [r.s == null ? '–' : r.s + (r.sp ? '+' : ''), r.s == null ? 'rgba(200,199,255,0.4)' : C.white], [String(r.y), C.white], [String(r.f), C.teal]];
+      CW.forEach(function (k, j) {
+        var bx = cx - k[1] + 2, bw = k[1] - 4, lead = k[0] === 'FV';
+        if (j === 5) {
+          var fills = [C.well, TINT.ark]; fills.forEach(function (f) { g.fillStyle = f; g.fillRect(bx, ct, bw, ch); });
+          arkStars(g, r.a, bx + Q(8), mid, ss2, sg2, { x: bx, y: ct, w: bw, h: ch, fills: fills });
+        } else {
+          g.fillStyle = lead ? C.dark : TINT[k[2]]; g.fillRect(bx, ct, bw, ch);
+          if (lead) { g.fillStyle = C.teal; g.fillRect(bx, ct + ch - Math.max(3, P(3)), bw, Math.max(3, P(3))); }
+          g.font = Math.round((lead ? 32 : j === 0 || j === 1 ? 25 : 28) * Math.min(s, 1.7)) + 'px ' + FONT; g.fillStyle = vals[j][1];
+          g.fillText(vals[j][0], Math.round(cx - k[1] / 2 - g.measureText(vals[j][0]).width / 2), mid + 1);
+        }
+        cx -= k[1];
+      });
+      // name over position, size and where he is from
+      var tx = fx + fs + P(12), room = cx - P(8) - tx, l1 = y2 + Math.round(rh * 0.32), l2 = y2 + Math.round(rh * 0.74);
+      g.font = P(28) + 'px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, r.n, room), tx, l1);
+      g.font = P(21) + 'px ' + FONT; g.fillStyle = C.teal; g.fillText(r.p, tx, l2);
+      var pw3 = g.measureText(r.p).width + P(10), parts = sub(r, cols === 1);
+      g.fillStyle = C.lilac; g.fillText(fit(g, parts.join(' · '), room - pw3), tx + pw3, l2);
+    });
+    return F.canvas;
+  }
+
   async function buildRank(win, btn) {
     var d = JSON.parse(win.getAttribute('data-gfx-rank') || '{}'), teams = (d.teams || []).slice(0, 25);
     if (!teams.length) return null;
@@ -4464,7 +4628,7 @@
       if (mode === 'logboard') { var lb = await buildBoard(win, btn); if (lb) preview(lb, 'arklog-scoreboard'); return; }
       if (mode === 'sheet') { var sc = await buildSheet(win, btn); if (sc) preview(sc, 'arkboard-process-' + String(JSON.parse(btn.getAttribute('data-gfx-sheet') || '{}').sport || 'sport').toLowerCase()); return; }
       if (mode === 'watch') { var wc = await buildWatch(win, btn); if (wc) preview(wc, 'arkboard-games-to-watch'); return; }
-      var canvas = mode === 'term' ? await buildTerm(win, btn) : mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn) : mode === 'bracket' ? await buildBracket(win, btn) : mode === 'pickem' ? await buildPickem(win, btn) : mode === 'perf' ? await buildPerf(win, btn) : mode === 'depth' ? await buildDepth(win, btn)
+      var canvas = mode === 'term' ? await buildTerm(win, btn) : mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'class' ? await buildClassCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn) : mode === 'bracket' ? await buildBracket(win, btn) : mode === 'pickem' ? await buildPickem(win, btn) : mode === 'perf' ? await buildPerf(win, btn) : mode === 'depth' ? await buildDepth(win, btn)
         : mode === 'lz-social' ? await buildSocial(win, btn) : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
         : mode === 'esea-summary' ? await buildEseaSummary(win, btn)
         : mode === 'esea-bracket' ? await buildEseaBracket(win, btn)
@@ -4474,7 +4638,7 @@
         if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
         if (mode === 'term') { preview(canvas, 'arkboard-process-' + (btn.hasAttribute('data-gfx-wide') ? 'wide-' : '') + ((JSON.parse(btn.getAttribute('data-gfx-term') || '{}').t) || 'term').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
         if (mode === 'rq') { preview(canvas, 'arkboard-research-' + ((JSON.parse(btn.getAttribute('data-gfx-rq') || '{}').id) || 'card').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 60)); return; }
-        var name = mode === 'depth' ? 'arkboard-depth-' + (((win.__dcTeam || {}).n) || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'perf' ? 'arkboard-arklist-' + ((win.__arkPerf || {}).sport || 'all').replace(/^college-/, '') + '-' + ((win.__arkPerf || {}).day || 'latest') : mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' || mode === 'bracket' || mode === 'pickem' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        var name = mode === 'class' ? 'arkboard-class-' + (canvas._name || 'school') : mode === 'depth' ? 'arkboard-depth-' + (((win.__dcTeam || {}).n) || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'perf' ? 'arkboard-arklist-' + ((win.__arkPerf || {}).sport || 'all').replace(/^college-/, '') + '-' + ((win.__arkPerf || {}).day || 'latest') : mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' || mode === 'bracket' || mode === 'pickem' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
     } catch (err) {

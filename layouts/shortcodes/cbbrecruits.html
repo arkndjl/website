@@ -127,7 +127,8 @@
 
 {{- else if eq $view "teams" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "class rankings") "icon" "basketball" "filter" "Conf" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Pts,Commits,NBA%,Class xNIL" "gfxDate" $date "gfxMax" "25") -}}
-<table class="cfb__table cbbrc-teams">
+{{ partial "classdrop.html" . }}
+<table class="cfb__table cbbrc-teams" data-cls-src="{{ "data/classes/cbb.json" | relURL }}">
   <thead><tr>
     <th>RK</th><th>Team</th><th title="conference">Conf</th>
     <th class="cfb__g" title="the class's FV points: each commit's FV above the 20 floor, summed">Pts</th>

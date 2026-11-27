@@ -67,10 +67,12 @@ jobs:
         continue-on-error: true
         run: python3 scripts/recruit_wikidata.py cbb
       - name: Grade the classes
-        run: python3 scripts/cbb_recruit_fit.py --offline
+        run: |
+          python3 scripts/cbb_recruit_fit.py --offline
+          python3 scripts/class_cards.py   # each school's class for the class rankings dropdown + classGFX
       - name: Commit if anything changed
         run: |
-          files="data/cbb_recruits.json scripts/data/recruit_age_cbb.json scripts/data/recruit_wikidata_dob.json"
+          files="data/cbb_recruits.json static/data/classes/cbb.json scripts/data/recruit_age_cbb.json scripts/data/recruit_wikidata_dob.json"
           git add $files
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
