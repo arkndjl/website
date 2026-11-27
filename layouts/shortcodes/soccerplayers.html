@@ -57,7 +57,7 @@
         {{- else }}
         <th data-sort="svar" data-num title="SVAR = SV over replacement, season total, in goals (GAR scale): SV x 90s played. this season only">SVAR</th>
         {{- end }}
-        <th data-sort="pos" class="cfb__g" title="position (most common start): GK, D, M, F">Pos</th>
+        <th data-sort="pos" class="cfb__g" title="position, most common start: GK, FB, CB, DM, CM, AM, W, ST (GK, D, M, F where he has no start); the number is his rank at it">Pos</th>
         <th data-sort="team" class="nbaxpm__team">Team</th>
         <th data-sort="age" data-num title="age today (past seasons: at season's end)">Age</th>
         <th data-sort="mp" data-num class="nbaxpm__ph" title="matches played (starts)">MP</th>
@@ -74,7 +74,7 @@
         <th data-sort="ch" data-num title="xGChain: xG of every possession he touched">xGChain</th>
         <th data-sort="bu" data-num title="xGBuildup: xGChain without his shots and key passes">xGBuild</th>
         {{- else }}
-        <th data-sort="gar" data-num class="cfb__g" title="goals above replacement (the regulars of bottom-three sides at his position), on one scale across the big five: his league's strength counts">GAR</th>
+        <th data-sort="gar" data-num class="cfb__g" title="goals above replacement (the regulars of bottom-three sides at his position, less sides that collapsed), on one scale across the big five: his league's strength counts">GAR</th>
         <th data-sort="sv" data-num title="SV (season value) = this season's goals over replacement a 90: team xG for and against with him on, xGBuildup, keepers' goals saved vs xG faced and finishing (goals less npxG), both shrunk by split-half reliability, and a this-season xG plus-minus, at GAR's weights; league strength in; replacement = bottom-three regulars. this season only">SV</th>
         <th data-sort="off" data-num title="attack part of GAR before replacement: his npxG, xA and xGBuildup at their weights">Off</th>
         <th data-sort="def" data-num title="defence part before replacement: team xG against with him on (keepers: goals saved vs xG faced)">Def</th>
@@ -214,7 +214,7 @@
         return p.min >= need(p) && (!pos || p.pos === pos) && (!team || p.team === team) && (!nat || p.nat === nat) && (lg === 'all' || (lg ? p.lg === lg : !p.more));
       }).sort(function (a, b) { return (b[KEY] == null ? -1e9 : b[KEY]) - (a[KEY] == null ? -1e9 : a[KEY]) || b.min - a.min; });
       var pr = {};
-      list.forEach(function (p, i) { p['rk' + KEY] = i + 1; p['pr' + KEY] = (pr[p.pos] = (pr[p.pos] || 0) + 1); });
+      list.forEach(function (p, i) { p['rk' + KEY] = i + 1; var lb = p.role || p.pos; p['pr' + KEY] = (pr[lb] = (pr[lb] || 0) + 1); });
       // ±: the weekly snapshot is SVAR (the value view's key), so the move is SVAR rank then against SVAR rank now, within the same rows
       var wl = list.filter(function (p) { return !p.more; });
       wl.slice().sort(function (a, b) { return (b.svar == null ? -1e9 : b.svar) - (a.svar == null ? -1e9 : a.svar); }).forEach(function (p, i) { p.rkw = i + 1; });
@@ -238,7 +238,7 @@
       var gfxRow = function (p) {
         var head = '<tr><td class="cfb__rk">' + p['rk' + KEY] + '</td><td class="cfb__name">' + face(p) + flag(p.nat) + '<b>' + esc(p.n) + '</b>' + medals(p) + ' <span class="cfb__dim nbaxpm__tm">' + lgo(p) + esc(p.team) + ' · ' + LG[p.lg] + '</span></td>' + (p.more && wkf && !stats ? __wk.none : (stats ? (p.nx90 == null && wkf ? __wk.none : __wk.rk(p, wkf, 'npxG+xA /90', null, p.nx90)) : __wk.rk(p, wkf, 'SVAR', null, p.svar)));
         var key = stats ? '<td class="cfb__num nbaxpm__v is-key">' + fx(p.nx90, 2) + '</td>' : '<td class="cfb__num nbaxpm__v is-key">' + sg(p.svar) + '</td>';
-        var ctx = '<td class="cfb__g">' + esc(p.pos || '–') + '<span class="cfb__dim">' + p['pr' + KEY] + '</span></td><td class="nbaxpm__team" style="white-space: nowrap">' + lgo(p) + esc(p.team) + '</td><td class="cfb__num">' + (p.age != null ? p.age.toFixed(1) : '<span class="cfb__dim">–</span>') + '</td>' +
+        var ctx = '<td class="cfb__g">' + esc(p.role || p.pos || '–') + '<span class="cfb__dim">' + p['pr' + KEY] + '</span></td><td class="nbaxpm__team" style="white-space: nowrap">' + lgo(p) + esc(p.team) + '</td><td class="cfb__num">' + (p.age != null ? p.age.toFixed(1) : '<span class="cfb__dim">–</span>') + '</td>' +
           '<td class="cfb__num nbaxpm__ph">' + p.mp + (p.st !== '' ? ' <span class="cfb__dim">(' + p.st + ')</span>' : '') + '</td><td class="cfb__num nbaxpm__ph">' + p.min + '</td>';
         var mid = stats
           ? '<td class="cfb__num cfb__g">' + p.g + '</td><td class="cfb__num">' + fx(p.xg, 1) + '</td><td class="cfb__num">' + fx(p.npxg, 1) + '</td><td class="cfb__num">' + p.a + '</td><td class="cfb__num">' + fx(p.xa, 1) + '</td>' +

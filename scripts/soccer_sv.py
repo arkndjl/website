@@ -207,7 +207,7 @@ def attach(S, rows, out, LS):
         r = by.get((o['p'], o['team']))
         if r is None:
             continue
-        v = value(r, F) + lg_adj(r, F, LS) - F['repl'][r['pos']]
+        v = value(r, F) + lg_adj(r, F, LS) - P.repl_of(r, F)
         o['sv'] = round(v, 3)
         o['svar'] = round(v * r['min'] / 90, 2)
 

@@ -855,7 +855,12 @@
       "a spell's npxG a 90 on the attacking side's players (offence) and the defending side's (defence), with league-season and home terms.",
       "Offence is shrunk toward his xG + xA a 90 over the window, and defence toward 0.",
       "Replacement for each position is the regulars (900+ minutes) on the bottom three sides by goal difference of each finished league-season,",
-      "pooled. League strength counts. Held out R² is .686 (.673 before the plus-minus; nested test t = -2.97, 9/11 seasons).",
+      "pooled, less the sides that collapsed (second-half points a match under .6 and below their first half; 42 of 180, Nov 27 2026).",
+      "Their regulars sat .02 a 90 under the rest of the bottom three. Without them the line sits closer to what free signings and academy",
+      "call-ups (t -7.3, 11/11 seasons) and promoted sides' regulars (t -3.3, 9/11) produce the next season up, held out. Season to season the line",
+      "moves .010 to .018 a 90 by position, 0.3 to 0.5 GAR for a 30-match regular. Lines by role (FB, CB, DM, CM, AM, W, ST) matched promoted",
+      "sides better (t -7.4) but not free signings (6/11), so the line stays GK, D, M, F; the board shows the role.",
+      "League strength counts. Held out R² is .686 (.673 before the plus-minus; nested test t = -2.97, 9/11 seasons).",
       "PAR = GAR × points per goal of difference (.626).",
       "1Y P20/P80 come from held-out projection residuals in five bands of season share. Left-out seasons hit .200 and .800 (3Y .201, .800).",
       "aGAR/90 (first seasons) = GAR/90 minus .0032 a year of age over 21. It ranks the next two seasons better than GAR/90, .664 compared to .654, t = -2.66."
@@ -1016,7 +1021,7 @@
      "body": [
       "It uses GAR's weights on this season's inputs only: on-pitch xG for and against, on minus off, npxG, xGBuildup, and an xG plus-minus over this season's spells alone (GAR's spans three seasons). The xG part is scaled ×0.943 so a side's players add up to its xG difference (R² 0.97).",
       "Finishing (goals minus npxG) and keepers' goals saved against xG faced are shrunk toward the league average by min / (min + k), with k 40,000 minutes for saves and 6,000 for finishing, from split-half reliability within a season (odd against even matches: r 0.045 for saves and 0.120 for finishing, with no player prior). A side's players then add up to its goal difference with R² 0.890 over 1170 team-seasons 2014-2026 (GAR on the same seasons 0.879).",
-      "Replacement is the xG part of the bottom-three sides' regulars (GK -0.127, D -0.080, M -0.041, F -0.007 a 90), with finishing and saves at league average. League strength is ×0.058 a goal of club rating.",
+      "Replacement is the xG part of the bottom-three sides' regulars, less sides that collapsed (GK -0.123, D -0.075, M -0.036, F -0.004 a 90), with finishing and saves at league average. League strength is ×0.058 a goal of club rating.",
       "Weights fit on the same season (team goal difference, or first half to second half) could not split a side's xG between its players. The team totals are the same either way, so GAR's split is kept."
      ],
      "where": "soccer GAR leaders, rookies, all-time players, transactions; conviction awards (Ballon d'Or pool by SVAR)",
