@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-27T18:08:06Z",
+ "asof": "2026-11-27T18:11:51Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -52,7 +52,7 @@
  },
  "model": {
   "asof": "2026-11-27T15:29:46Z",
-  "ageH": 2.6,
+  "ageH": 2.7,
   "stale": false
  },
  "picks": [],
@@ -124,6 +124,22 @@
    "tm": 43.5
   },
   {
+   "id": "2026_12_NYJ_MIA",
+   "sport": "nfl",
+   "kick": "2026-11-29T18:00:00Z",
+   "home": "MIA",
+   "away": "NYJ",
+   "mk": "total",
+   "side": "over",
+   "line": 39.5,
+   "price": -123.0,
+   "edge": 3.2,
+   "x": null,
+   "why": "total market off",
+   "m": -3.4,
+   "tm": 42.7
+  },
+  {
    "id": "2026_12_WAS_ARI",
    "sport": "nfl",
    "kick": "2026-11-29T21:25:00Z",
@@ -154,22 +170,6 @@
    "why": "spread market off",
    "m": 9.6,
    "tm": 41.8
-  },
-  {
-   "id": "2026_12_NYJ_MIA",
-   "sport": "nfl",
-   "kick": "2026-11-29T18:00:00Z",
-   "home": "MIA",
-   "away": "NYJ",
-   "mk": "total",
-   "side": "over",
-   "line": 40.5,
-   "price": -105.0,
-   "edge": 2.2,
-   "x": null,
-   "why": "total market off",
-   "m": -3.4,
-   "tm": 42.7
   },
   {
    "id": "2026_12_LV_CLE",
@@ -220,6 +220,22 @@
    "tm": 45.4
   },
   {
+   "id": "2026_12_NO_CIN",
+   "sport": "nfl",
+   "kick": "2026-11-29T18:00:00Z",
+   "home": "CIN",
+   "away": "NO",
+   "mk": "total",
+   "side": "over",
+   "line": 48.5,
+   "price": -123.0,
+   "edge": 1.7,
+   "x": null,
+   "why": "total market off",
+   "m": 11.1,
+   "tm": 50.2
+  },
+  {
    "id": "2026_12_CAR_TB",
    "sport": "nfl",
    "kick": "2026-12-01T01:15:00Z",
@@ -234,22 +250,6 @@
    "why": "spread market off",
    "m": 3.8,
    "tm": 44.0
-  },
-  {
-   "id": "2026_12_NO_CIN",
-   "sport": "nfl",
-   "kick": "2026-11-29T18:00:00Z",
-   "home": "CIN",
-   "away": "NO",
-   "mk": "total",
-   "side": "over",
-   "line": 49.5,
-   "price": -103.0,
-   "edge": 0.7,
-   "x": null,
-   "why": "total market off",
-   "m": 11.1,
-   "tm": 50.2
   }
  ],
  "games": {
@@ -292,9 +292,9 @@
   "2026_12_NO_CIN": {
    "mk": "total",
    "side": "over",
-   "line": 49.5,
-   "price": -103.0,
-   "edge": 0.7,
+   "line": 48.5,
+   "price": -123.0,
+   "edge": 1.7,
    "ev": null,
    "units": 0.0,
    "home": "CIN",
@@ -316,9 +316,9 @@
   "2026_12_NYJ_MIA": {
    "mk": "total",
    "side": "over",
-   "line": 40.5,
-   "price": -105.0,
-   "edge": 2.2,
+   "line": 39.5,
+   "price": -123.0,
+   "edge": 3.2,
    "ev": null,
    "units": 0.0,
    "home": "MIA",
@@ -450,15 +450,15 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 6863,
+  "snapshots": 6867,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 2680,
+    "clvN": 2681,
     "clvRet": -0.0345,
     "clvT": -22.42,
     "clv": 0.27,
-    "beat": 0.315,
+    "beat": 0.314,
     "still": 0.547
    },
    {
@@ -2866,7 +2866,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-27T18:08:06Z",
+ "checked": "2026-11-27T18:11:51Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
