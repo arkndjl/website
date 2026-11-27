@@ -892,6 +892,9 @@ def espn_pool(lg, S):
     return pool
 
 
+LEFT_BLEND, LEFT_G0 = ('pass_y', 'scrim', 'td', 'sacks'), 8
+
+
 def football_draw(teams, per_left, sport):
     def teams_draw(rng):
         return team_draws(teams, rng)
@@ -908,6 +911,13 @@ def football_draw(teams, per_left, sport):
         for k, kind in per_left:
             rate = c['f'][k] / gn
             if LEFT_K and (c.get('prev') or {}).get(k) is not None: rate = (c['f'][k] + LEFT_K * c['prev'][k]) / (gn + LEFT_K)
+            if not SEASON_ONLY and k in LEFT_BLEND and 'p17' in c['f']:
+                # games left at the predictive rate: this season's rate a team game blended with last season's by
+                # LEFT_G0 games, no last season = 85% of this one (held out 2016-25 from week 9: t -9.4, 10 of 10
+                # seasons, each of the four stats better; scripts/research/ctx_nov27/nfl/r4_awards.py). Conviction
+                # (SEASON_ONLY) and the college draw keep this season's own rate
+                prior = c['f'].get('p17_' + k) if c['f']['p17'] else None
+                rate = (rate * gn + (.85 * rate if prior is None else prior) * LEFT_G0) / (gn + LEFT_G0)
             mu = rate * gr
             sdv = math.sqrt(max(mu, 0)) if kind == 'count' else .3 * mu
             f[k] = c['f'][k] + (gauss(rng, mu, abs(sdv)) if k == 'svar' else max(gauss(rng, mu, sdv), 0))
@@ -1097,6 +1107,8 @@ def nfl_enrich(fit, cands, tmap, S):
         f.update(prev_gp=float((pv.get(c['id']) or {}).get('gene.gamesPlayed') or 0), prev_yds=q['yds'],
                  prev_def=q['sacks'] + q['dint'], prev_ap=float(ap.get(NM.key(c['n']), 0)),
                  prev_dpoy=float(dpw.get(NM.key(c['n']), 0)), drank=float(rk.get(ab, 16)))
+        f['p17'] = 1.0 if f['prev_gp'] > 0 else 0.0          # last season's line a team game, for the games-left rate
+        for k in LEFT_BLEND: f['p17_' + k] = q[k] / 17
 
 
 nfl_enrich.games = []
