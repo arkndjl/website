@@ -118,3 +118,9 @@
   recruit). Nothing else is typed: the next board runs move the player's yNIL / xNIL half way to the report (`NIL_DEALS` in
   `scripts/fetch_cfb.mjs`, `scripts/cbb_market.py`), `scripts/transactions.py` and `scripts/recruit_news.py` list it in the
   transactions and recruit transactions tabs (`k: "nil"`), and `scripts/news.py` posts it. School budgets are `data/nil_budgets.json`.
+- `scripts/nil_deal_scan.py` (recruit news workflow, every 3 hours) adds rows from headlines (`auto: 1`): NIL or revenue share, a
+  dollar amount, one board player, his school or a unique graded name, a national outlet or two outlets, $8M a season at most.
+  The rest wait in `scripts/data/nil_deal_candidates.json`. A new false match gets a case in its `--test` and a pattern in `NOT`.
+- Football position pay (`XNIL.pos` in `scripts/fetch_cfb.mjs`) and the basketball mid- and low-major levels (`XNIL` in
+  `scripts/cbb_recruit_fit.py`) are set on the College Sports Commission's yearly pay report (`scripts/research/nil_nov27/pos2.py`,
+  `cbb_levels.py`): redo both when a new report is out.

@@ -779,7 +779,13 @@ const RISER = { gap: 6, unranked: 55 };
 // ~$0.4M a program (an assumption, scaled like the FBS budgets by level: x e^(.3 z) on the FCS team SRS)
 const XNIL = { p4: 20e6, g5: 3e6, fcs: 0.4e6, fcsMove: 0.4, tilt: 0.3, k: 1.25, bench: 0.05,
   spec: 0.2, specFv: 0.1, specBench: 0.01,     // kickers and punters: a graded one is paid spec x e^(specFv (FV - 37)) of the team's median listed player
-  deal: 0.5 };                                  // weight of a reported deal against the model's number (geometric)
+  deal: 0.5,                                    // weight of a reported deal against the model's number (geometric)
+  // position pay against the College Sports Commission's percentiles (log; Noah, Nov 27 2026): On3 prices running backs,
+  // receivers, tight ends and the defensive line above what schools report paying. Each is moved to the other positions'
+  // level against the report, the defensive line scored with linebackers (schools list edge players as either), team
+  // totals held; solved on the power conferences (scripts/research/nil_nov27/pos2.py), refit when the yearly report is out
+  pos: { RB: -0.55, WR: -0.26, TE: -0.31, DL: -0.41, EDGE: -0.41 } };
+const posPay = g => XNIL.pos[g] ?? 0;
 // reported deals (data/nil_deals.json, one row a report): the latest for a player on his team. A deal for this season
 // moves his yNIL, one reported in the last year moves his xNIL and the fit's target for him, each XNIL.deal of the way
 const NIL_DEALS = (() => { try { const out = new Map();
@@ -1651,7 +1657,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       for (const [tid, ps] of Object.entries(byTeam)) {
         const rep = NIL_BUDGET[ps[0].team];     // reported budget, $M low and high
         const budget = (1 - (NIL_BENCH[`FBS|${ps[0].team}`] || 0)) * (rep ? (rep[0] + rep[1]) / 2 * 1e6 : (P4.has(ps[0].conf, ps[0].tid) ? XNIL.p4 : XNIL.g5) * Math.exp(XNIL.tilt * (tal[tid] - tm) / tsd));
-        const w = ps.map(p => Math.exp(XNIL.k * dot(preF(p), bPre))), sw = w.reduce((a, b) => a + b, 0);
+        const w = ps.map(p => Math.exp(XNIL.k * dot(preF(p), bPre) + posPay(p.g))), sw = w.reduce((a, b) => a + b, 0);
         // a reported deal for this season: his share moves toward it, his teammates split the rest
         const raw = w.map(x => budget * x / sw), fix = ps.map((p, i) => { const d = dealOf(p); return d && d.season === SEASON ? raw[i] * (d.amount / raw[i]) ** XNIL.deal : null; });
         const fs_ = fix.reduce((a, x) => a + (x || 0), 0), rs = raw.reduce((a, x, i) => a + (fix[i] == null ? x : 0), 0), sc = fs_ < budget && rs > 0 ? (budget - fs_) / rs : 1;
@@ -1672,7 +1678,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       // curve) plus a floor (AV at FV 30) so a depth player is worth something, x playing time (half for
       // being on the roster, half for snaps)
       const mkt = p => isP4(p) || p.fv >= (fvP4[p.g] ?? 99) ? 'p4' : 'g5';
-      const posTerm = p => { const v = nowF(p, 0); return dot(v.slice(4, 4 + posList.length - 1), bNow.slice(4, 4 + posList.length - 1)) + (p.g === 'QB' ? bNow[4 + posList.length - 1] * (p.fv - 50) / 10 : 0); };
+      const posTerm = p => { const v = nowF(p, 0); return dot(v.slice(4, 4 + posList.length - 1), bNow.slice(4, 4 + posList.length - 1)) + (p.g === 'QB' ? bNow[4 + posList.length - 1] * (p.fv - 50) / 10 : 0) + posPay(p.g); };
       // on-field value, three candidates, kept by fit to On3's valuations (log RMSE, players with an On3 value):
       //   fv:      expected NFL AV at his FV x playing time (above)
       //   sav:     this season's college AV (p.sav, scripts/cfb_av.mjs) rescaled to the avOf units, falling back to
@@ -1719,7 +1725,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
       nilMarket = { bPre, bNow, fvP4, fvG5, pools, zs, valueKey, savK, price: { p4: pools.p4 / zs.p4, g5: pools.g5 / zs.g5 } };
       // perWar: the market's price of one college WAR a season (a position-average player), P4 and G5
       nilFit = { n: train.length, yN: yl.length, yBias: Math.round(yMu * 100) / 100, ySd: Math.round(ySd * 100) / 100, value: valueKey, perWar: { p4: Math.round(pools.p4 / zs.p4 / CWAR_PER_AV / 1000) * 1000, g5: Math.round(pools.g5 / zs.g5 / CWAR_PER_AV / 1000) * 1000 }, valueTest, savN: withSav.length, pool: Math.round(pool), fvP4, kNow: Math.round(kNow * 100) / 100, rmseLog: Math.round(Math.sqrt(best / train.length) * 100) / 100,
-        pre: bPre.map(x => Math.round(x * 1000) / 1000), now: bNow.map(x => Math.round(x * 1000) / 1000) };
+        pos: XNIL.pos, pre: bPre.map(x => Math.round(x * 1000) / 1000), now: bNow.map(x => Math.round(x * 1000) / 1000) };
     }
   }
 
@@ -1733,7 +1739,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     const dot = (a, b) => a.reduce((s, x, i) => s + x * b[i], 0), dummies = p => posList.slice(1).map(g => (p.g === g ? 1 : 0));
     const preF = p => { const z = p.zPre ?? 0; return [1, z, z * z, 0, ...dummies(p), p.g === 'QB' ? z : 0,
       Math.min(1, (p.marcelPreW ?? 0) / 1500), -1, p.rec?.rating != null ? (p.rec.rating - 0.85) / 0.04 : -1]; };
-    const posTerm = p => dot(dummies(p), bNow.slice(4, 4 + nd)) + (p.g === 'QB' ? bNow[4 + nd] * (p.fv - 50) / 10 : 0);
+    const posTerm = p => dot(dummies(p), bNow.slice(4, 4 + nd)) + (p.g === 'QB' ? bNow[4 + nd] * (p.fv - 50) / 10 : 0) + posPay(p.g);
     // the same on-field value the FBS fit kept (nilFit.value)
     const avNow = p => (valueKey === 'ev' ? p.eav ?? avOf(p.fv) : valueKey !== 'fv' && savK != null && p.sav != null ? savK * Math.max(0, p.sav) : avOf(p.fv));
     const worth = p => Math.exp(posTerm(p)) * (avNow(p) + avOf(30)) * (valueKey === 'savRaw' ? 1 : 0.5 + 0.5 * Math.min(1, (p.playSnaps ?? 0) / 250));
@@ -1742,7 +1748,7 @@ function build({ pfn, on3, espn, manual, dobStore = {}, recruits = {}, recByName
     let pool = 0;
     for (const ps of Object.values(byTeam)) {
       const budget = (1 - (NIL_BENCH[`FCS|${ps[0].team}`] || 0)) * XNIL.fcs * Math.exp(XNIL.tilt * (ps[0].lvl?.teamZ ?? 0));
-      const w = ps.map(p => Math.exp(XNIL.k * dot(preF(p), bPre))), sw = w.reduce((a, b) => a + b, 0);
+      const w = ps.map(p => Math.exp(XNIL.k * dot(preF(p), bPre) + posPay(p.g))), sw = w.reduce((a, b) => a + b, 0);
       ps.forEach((p, i) => { p.ynil = Math.round(budget * w[i] / sw / 1000) * 1000; pool += p.ynil; });
     }
     const all = Object.values(byTeam).flat(), mkt = p => p.fv >= (fvP4[p.g] ?? 99) ? 'p4' : p.fv >= (fvG5[p.g] ?? 99) ? 'g5' : 'fcs';
@@ -2685,7 +2691,7 @@ const benchNil = (now, kept, extra) => {
   for (const r of extra) (spec(r) ? slot(r).s : slot(r).e).push(r);
   for (const r of [...now, ...kept]) if (spec(r)) slot(r).s.push(r);
   const posList = Object.keys(STARTERS), bNow = nilMarket?.bNow;
-  const posW = g => { const i = posList.indexOf(g === 'DT' ? 'DL' : g); return bNow && i > 0 ? Math.exp(bNow[3 + i]) : 1; };
+  const posW = g => { const i = posList.indexOf(g === 'DT' ? 'DL' : g); return (bNow && i > 0 ? Math.exp(bNow[3 + i]) : 1) * Math.exp(posPay(g === 'DT' ? 'DL' : g)); };
   const specW = r => (r.src === 'espn' ? XNIL.specBench / XNIL.spec : Math.exp(XNIL.specFv * ((r.fv ?? 37) - 37)));
   const pools = {};      // market|group -> { y, w, rows }
   for (const [k, { c, e, s }] of Object.entries(by)) {

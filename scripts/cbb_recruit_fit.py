@@ -79,9 +79,11 @@ REP_BPM = -3.0
 LEVELS = {'HM': {'ACC', 'B10', 'B12', 'SEC', 'BE'}, 'MM': {'A10', 'MWC', 'WCC', 'Amer', 'MVC', 'P12'}}
 # Men's basketball NIL budgets a program, per season (revenue share and collective). High-majors: the reported budget
 # by school (data/nil_budgets.json: CBS Sports' roster spending tiers, the midpoint; a school on that list is priced as
-# a high-major whatever its league, so Gonzaga), XNIL['HM'] their mean for a recruit with no school yet. Mid- and
-# low-majors: an assumption (no school-level reports, and On3 values none of their players, so nothing to test a change
-# on), tilted by program strength (x e^(.3 z), normalized within the level) as the football ones in fetch_cfb.mjs XNIL
+# a high-major whatever its league, so Gonzaga), XNIL['HM'] their mean for a recruit with no school yet. Mid-majors:
+# $2.3M, The Athletic's coach survey, kept on the College Sports Commission's men's basketball pay percentiles outside
+# the power conferences (90th and 75th percentile within 1% of the report; at $1.2M both ran 40% under). Low-majors:
+# $0.25M (the survey's $525K put the median player at three times the reported one). Both tilted by program strength
+# (x e^(.3 z), normalized within the level) as the football ones in fetch_cfb.mjs XNIL. scripts/research/nil_nov27/cbb_levels.py
 def _budgets():
     try:
         with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'nil_budgets.json')) as f:
@@ -106,7 +108,7 @@ def budget_of(team):
         import names as _N
         _BKEY = ({_N.team_key(t): v for t, v in BUDGET.items()}, _N)
     return _BKEY[0].get(_BKEY[1].team_key(team))
-XNIL = {'HM': round(sum(BUDGET.values()) / len(BUDGET), -5) if BUDGET else 6e6, 'MM': 1.2e6, 'LM': 0.25e6, 'tilt': 0.3}
+XNIL = {'HM': round(sum(BUDGET.values()) / len(BUDGET), -5) if BUDGET else 6e6, 'MM': 2.3e6, 'LM': 0.25e6, 'tilt': 0.3}
 
 
 def college_value(min_per, bpm):
