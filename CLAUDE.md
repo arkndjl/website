@@ -138,14 +138,9 @@
 
 ## DoR (Declare or Return)
 
-- A decision metric in dollars (what pays more), separate from Ret% (what he will do). `scripts/dor.py` fits it by hand
-  (rookie deal, later earnings by pick/position/age from OverTheCap contracts, pick spreads of declarers and returners from the
-  PFF boards) and writes `data/dor_fit.json`; `dorOf` in `scripts/cfb_teams.mjs` reads its grid on every board write (`dor`,
-  `dorD` columns). Refit after each draft and when the rookie scale in `scripts/cfb_declare_econ.py` is updated.
-
-## NIL deals ledger
-
-- A confirmed NIL deal is one row in `data/nil_deals.json` (player, team, season, amount for that season, date, source; `cls` for a
-  recruit). Nothing else is typed: the next board runs move the player's yNIL / xNIL half way to the report (`NIL_DEALS` in
-  `scripts/fetch_cfb.mjs`, `scripts/cbb_market.py`), `scripts/transactions.py` and `scripts/recruit_news.py` list it in the
-  transactions and recruit transactions tabs (`k: "nil"`), and `scripts/news.py` posts it. School budgets are `data/nil_budgets.json`.
+- A decision metric in dollars (what pays more on average), separate from Ret% (what he will do). `scripts/dor.py` is fit by
+  hand (needs the CBB kit and `scripts/xaav.py`'s Basketball-Reference cache) and writes `data/dor_fit.json`: rookie deal and
+  later earnings by pick and draft age (NFL from OverTheCap contracts, NBA from salary history), pick spread from players with no
+  choice (CFB grads, CBB seniors). The return side holds draft stock level; returners' own record is the downside case on Process,
+  never the model (they are a selected sample). `dorOf` in `scripts/cfb_teams.mjs` and `nba_dor` (read by `scripts/cbb_tabs.py`)
+  write `dor` / `dorD` on the draft boards. Refit after each draft and when the rookie scale in `scripts/cfb_declare_econ.py` moves.
