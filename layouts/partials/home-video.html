@@ -42,12 +42,20 @@
       <div class="hvid__modes" role="group" aria-label="channel">
         <button type="button" data-ch="" aria-pressed="true">all</button>
         {{- range $chs }}<button type="button" data-ch="{{ .k }}" aria-pressed="false">{{ .n }}</button>{{ end }}
+        {{- with site.Data.arkmixes_upcoming }}<button type="button" data-ch="upcoming" aria-pressed="false">upcoming</button>{{ end }}
       </div>
       <ol class="hvid__list">
         {{- range $i, $x := . }}
         <li data-ch="{{ .k }}"><a href="https://www.youtube.com/watch?v={{ .id }}" data-vid="{{ .id }}" data-n="{{ .n }}" data-k="{{ .k }}" data-d="{{ (time.AsTime (int (div .pub 1000))).Format "Jan 2 2006" }}"{{ if eq $i 0 }} class="is-on"{{ end }} rel="noopener"><span class="hvid__no"></span><span class="hvid__t">{{ .t }}</span><b class="hvid__ch hvid__ch--{{ .k }}">{{ if eq .k "laursen" }}L111{{ else }}ARK{{ end }}</b></a></li>
         {{- end }}
       </ol>
+      {{- with site.Data.arkmixes_upcoming }}
+      <ol class="hvid__list hvid__up" hidden>
+        {{- range $i, $x := . }}
+        <li><span class="hvid__no">{{ printf "%02d" (add $i 1) }}</span><span class="hvid__t">{{ .n }} ARKMIX</span>{{ if .tb }}<b class="hvid__ch hvid__ch--arkndjl">THROWBACK</b>{{ end }}</li>
+        {{- end }}
+      </ol>
+      {{- end }}
     </div>
   </div>
   <div class="win__status"><span>{{ range $i, $c := $chs }}{{ if $i }} · {{ end }}<a href="https://www.youtube.com/@{{ .h }}/videos" target="_blank" rel="noopener">@{{ .h }} ↗</a>{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
@@ -104,6 +112,8 @@
 .hvid__list{flex:1;min-height:0;max-height:178px;overflow-y:auto;list-style:none;margin:0;padding:2px;font-size:.78em;
   background:var(--hv-ink);box-shadow:inset 2px 2px 0 #000,inset -2px -2px 0 var(--hv-mid),0 0 0 2px var(--hv-ink);scrollbar-width:thin;scrollbar-color:var(--hv-mid) var(--hv-ink)}
 .hvid__list li{margin:0;padding:0}
+.hvid__list[hidden]{display:none}
+.hvid__up li{display:flex;align-items:center;gap:6px;padding:2px 4px;color:var(--hv-lil);white-space:nowrap}
 .hvid__list li::before{content:none!important}
 .hvid__list a{display:flex;align-items:center;gap:6px;padding:2px 4px;color:var(--hv-lil);text-decoration:none;white-space:nowrap}
 .hvid__list a:hover,.hvid__list a:focus-visible{background:#2a2050;outline:none}
@@ -156,7 +166,7 @@
     if (i.playerState != null) { if (i.playerState === 0 && st.s !== 0) { st.s = 0; step(1, true); } st.s = i.playerState; }
     draw();
   });
-  function rows() { return Array.prototype.filter.call(w.querySelectorAll('.hvid__list li'), function (li) { return !li.hidden; }); }
+  function rows() { return Array.prototype.filter.call(w.querySelectorAll('.hvid__list:not(.hvid__up) li'), function (li) { return !li.hidden; }); }
   function load(a, auto) {
     w.querySelectorAll('.hvid__list a.is-on').forEach(function (x) { x.classList.remove('is-on'); }); a.classList.add('is-on');
     var t = a.querySelector('.hvid__t').textContent;
@@ -189,7 +199,9 @@
   function pick(b) {
     ch = b.getAttribute('data-ch'); var n = 0;
     w.querySelectorAll('.hvid__modes button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-    w.querySelectorAll('.hvid__list li').forEach(function (li) { var ok = !ch || li.getAttribute('data-ch') === ch; li.hidden = !ok; if (ok) li.querySelector('.hvid__no').textContent = ('0' + (++n)).slice(-2); });
+    var up = ch === 'upcoming', vl = w.querySelector('.hvid__list:not(.hvid__up)'), ul = w.querySelector('.hvid__up');
+    if (ul) { ul.hidden = !up; vl.hidden = up; }
+    w.querySelectorAll('.hvid__list:not(.hvid__up) li').forEach(function (li) { var ok = up || !ch || li.getAttribute('data-ch') === ch; li.hidden = !ok; if (ok) li.querySelector('.hvid__no').textContent = ('0' + (++n)).slice(-2); });
   }
   w.querySelector('.hvid__modes').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) pick(b); });
   pick(w.querySelector('.hvid__modes button'));
