@@ -42,3 +42,14 @@ Batch of 4 primary tests, Holm at .05 over the primaries.
 ## Not retested (settled; conditions unchanged)
 Next up pXPM gap (t 1.42, Nov 26), award voter models (PR #1201), xAAV on pXPM (worse), G League call-up features,
 aging inside the game prior on its own, team adjustment inside pXPM, HAPM / LUMA blends, k / weights of pXPM.
+
+## Addendum (written after T3 and T4 ran, before T3b was scored)
+T4 showed the 1Y / 3Y get worse when XPM (proj) is rebuilt on the pXPM prior (t -4.1 / -4.9 at season end), so the T3
+swap cannot ship as registered: the 1Y / 3Y are consumers of XPM (proj) and the ship rule protects them.
+### T3b XPM (proj) on its own target, in season
+- Candidate: XPM (proj) = pXPM prior blended with XPM to date (k refit, T3), for the Proj column, interval and surplus only;
+  the 1Y / 3Y keep the live-prior XPM (proj) they were fit on.
+- Target: rest-of-season XPM implied by the harness's simulated partial seasons (nba_proj3y_research.inputs draws, same
+  draws in both arms): (season XPM x MP - to date XPM x MP to date) / MP left, squared error weighted by MP left,
+  at f = .1, .2, .35, .5, .75; 100+ MP left.
+- Pass: paired t >= 2 (players as units) at every f and a majority of seasons at every f. Counts in the Holm batch.
