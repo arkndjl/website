@@ -1287,7 +1287,7 @@
       var title = txt(w2 && w2.querySelector('.win__title-text')).replace(/_$/, '').split('::')[0].trim();
       if (PC_XSKIP.test(tab) || PC_XSKIP.test(title) || !title || seen[title]) return;
       var hc = pcHeads(t), hs = hc.map(txt), k = pcNameAt(hs); if (k < 0) return;
-      var rs = pcRows(t), r = rs.find(function (x) { return nk(pcName(x, k)) === key; }); if (!r) return;
+      var rs = t.__gfxN > 5000 ? pcRows(t) : pcAll(t), r = rs.find(function (x) { return nk(pcName(x, k)) === key; }); if (!r) return;   // every row, not the page on screen (a board past 5,000 rows is too slow to build for a side band)
       var ti = hs.findIndex(function (h) { return TEAM_COL.test(h); });
       if (ti >= 0 && mine.length) { var th = tk(pcCell(r.cells[ti]).t); if (th.length && !th.some(function (x) { return mine.indexOf(x) >= 0; })) return; }
       var items = [];
