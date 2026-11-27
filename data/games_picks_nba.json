@@ -1,7 +1,7 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-27T04:34:24Z",
+ "asof": "2026-11-27T04:40:34Z",
  "recenter": {
   "2026-11-27": 1.33
  },
@@ -327,7 +327,7 @@
   }
  },
  "model": {
-  "asof": "2026-11-27T04:30:53Z",
+  "asof": "2026-11-27T04:36:30Z",
   "ageH": 0.1,
   "stale": false
  },
@@ -392,7 +392,7 @@
    "mk": "total",
    "side": "under",
    "line": 222.5,
-   "price": -116.0,
+   "price": -112.0,
    "edge": 4.9,
    "x": 6.5,
    "why": "edge under 6.5 (total: mid)",
@@ -432,22 +432,6 @@
    "tm": 222.6
   },
   {
-   "id": "401909334",
-   "sport": "nba",
-   "kick": "2026-11-28T02:30:00Z",
-   "home": "UTAH",
-   "away": "DEN",
-   "mk": "spread",
-   "side": "home",
-   "line": -10.5,
-   "price": -126.0,
-   "edge": 2.4,
-   "x": 5.0,
-   "why": "edge under 5 (role: dog)",
-   "m": -8.1,
-   "tm": 231.2
-  },
-  {
    "id": "401909331",
    "sport": "nba",
    "kick": "2026-11-28T01:30:00Z",
@@ -462,6 +446,22 @@
    "why": "edge under 6.5 (side: over)",
    "m": 4.2,
    "tm": 224.3
+  },
+  {
+   "id": "401909334",
+   "sport": "nba",
+   "kick": "2026-11-28T02:30:00Z",
+   "home": "UTAH",
+   "away": "DEN",
+   "mk": "total",
+   "side": "over",
+   "line": 228.5,
+   "price": -121.0,
+   "edge": 2.7,
+   "x": 6.5,
+   "why": "edge under 6.5 (side: over)",
+   "m": -8.1,
+   "tm": 231.2
   },
   {
    "id": "401909332",
@@ -565,7 +565,7 @@
    "mk": "total",
    "side": "under",
    "line": 222.5,
-   "price": -116.0,
+   "price": -112.0,
    "edge": 4.9,
    "ev": null,
    "units": 0.0,
@@ -610,11 +610,11 @@
    "state": "under"
   },
   "401909334": {
-   "mk": "spread",
-   "side": "home",
-   "line": -10.5,
-   "price": -126.0,
-   "edge": 2.4,
+   "mk": "total",
+   "side": "over",
+   "line": 228.5,
+   "price": -121.0,
+   "edge": 2.7,
    "ev": null,
    "units": 0.0,
    "home": "UTAH",
@@ -698,7 +698,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 5979,
+  "snapshots": 5988,
   "buckets": [
    {
     "when": "24h+",
@@ -711,12 +711,12 @@
    },
    {
     "when": "6-24h",
-    "clvN": 1310,
-    "clvRet": -0.0153,
-    "clvT": -4.57,
+    "clvN": 1315,
+    "clvRet": -0.0154,
+    "clvT": -4.62,
     "clv": 0.49,
-    "beat": 0.466,
-    "still": 0.377
+    "beat": 0.465,
+    "still": 0.379
    },
    {
     "when": "1-6h",
@@ -7373,7 +7373,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-27T04:34:24Z",
+ "checked": "2026-11-27T04:40:34Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
