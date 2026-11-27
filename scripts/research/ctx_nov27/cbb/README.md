@@ -68,3 +68,33 @@ minutes share x (BPM + 3)) follow the same verdict and stay on BPM.
   (needs dated game logs: extend `scripts/cbb_live_backtest.py` checkpoints with target = next-season rXPM).
 - Game model absences: frozen pXPM as the prior in `avail(prior=..., pk=...)` and as the value in `pre_out`, through
   `scripts/cbb_inseason_research.py` and the game walk (needs Barttorvik game logs 2017-26), then `cbb_games.py --fit`, `--rules`.
+
+# Round 2 (port round)
+
+Scripts `r1_awards_rate.py`, `r1b_newcomers.py`, `r2_xxpm_prior.py`, `r3_xgap.py`, `r4_prior_leak.py`. R1 / R1b need
+Barttorvik game logs ({year}_all_advgames.json.gz, 2016-26, about 11 MB each) in $BTLOG (not committed).
+
+| item | swap | target | before -> after | t | folds | result |
+|---|---|---|---|---|---|---|
+| R1 (P2) awards games-left rate | prior last season's BPM -> preseason pXPM, K 300 | rest-of-season game BPM, 20+ minute returners at the 5th-20th team game, 2017-26 | MSE 7.347 -> 6.540; top 100 by BPM to date 7.349 -> 7.100 | 17.2 (top 3.1) | 10/10 (top 8/10) | PASS |
+| R1 secondary, shipped form | same with K 600 (the walk's pick in 9/9 seasons) | same | 7.347 -> 6.345 (walked 6.377); top 100 6.113 | 25.2 (top 8.6) | 9/9 (top 10/10) | shipped |
+| R1b newcomer prior (bug, not pre-registered) | own BPM to date, no shrink -> a prior at K 300 (floor: flat mean) | same pool, no line the season before | 12.52 -> 8.92 | 25.2 | 9/9 | fixed (prior = preseason xXPM) |
+| R2 (P3) xXPM: last season's rXPM + VORX beside pXPM, BPM, WAA | reduced harness | next-season team R2 of returners, 2012->13 ... 2024->25 | .7849 -> .7853 (player RMSE 2.4332 -> 2.4322) | 1.56 | 8/13 | FAIL (tie) |
+| R3 (P5/P1) backup xGap terms refit on the pXPM grade | shipped a, b, c -> walk-forward refit | two-season gap, 2,586 held pairs | MSE 13.157 -> 13.248; refit b .500 (was .481), c 1.265 (was 1.279) | -4.4 | 4/12 | FAIL, terms not stale |
+
+- R1 shipped in `scripts/awards.py` cbb(): returners' prior = the board's frozen pXPM at KPX 600; newcomers = preseason
+  xXPM (xb0) at K 300 (the part labelled 'BPM' it read is gone, so their prior was their own line). Conviction draws
+  are unchanged (checked: same output). On today's board the Wooden race goes Coleman 44%, Tanner 12% -> Tanner 16%,
+  Coleman 15%. `python3 scripts/awards.py cbb` rewrites data/awards.json (not committed here: every sport shares the file).
+  DPOY's D-BPM prior is untested (the board has no D-pXPM column).
+- P4: avail() and pre_out() run on the logs to date in the fit (cbb_games.py:1401, 1419) and live
+  (cbb_games_live.py:530-531): one form. The roster prior's history rows read pXPM from the frozen coefficients; against
+  the walk-forward pXPM the next-season RMSE differs by .008 at most, either sign (r4.json, r .999): no leak to fix.
+- P5: fit files against the Nov 26 rebuild. Refit on or after it: cbb_fit (xXPM block), cbb_market_fit, cbb_next_fit,
+  cbb_breakout_fit. Read BPM only, so not touched by the rebuild: awards_fit, cbb_declare_fit, cbb_lowdiv, school_dev,
+  cbb_ceiling_fit, cbb_freshman_bo_fit. Older and reading the rebuilt number: backup_age.json cbb (R3: same terms) and
+  cbb_live_fit.json kb (Nov 3, the xXPM blend weight 583 / 259 minutes, fit on the old xBPM): R1's grid puts the best
+  weight of a pXPM prior at 600 minutes, so 583 stands; the full refit is `python3 scripts/cbb_link.py` then
+  `python3 scripts/cbb_live_backtest.py` (careers cache + game logs).
+- P6: next up's rate column is xXPM (the board's projection, freshmen included) in place of the shrunk BPM; the bar
+  (Best) and CEIL stay in BPM, the model's units.

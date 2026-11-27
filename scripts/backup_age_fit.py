@@ -103,10 +103,14 @@ def pro_pairs(S, key, team, grp, shape, nxt, val, use, age, k, repl, w, mn, grad
     return out
 
 
-def cbb_pairs(path):
+def cbb_pairs(path, px=False):
     """the live CBB grade (scripts/backup_watch.py cbb_grade): BPM this season and last at half weight, by minutes,
-    shrunk to -6 with 240 minutes; backup and starter need 60 minutes, a gap of 1 BPM"""
+    shrunk to -6 with 240 minutes; backup and starter need 60 minutes, a gap of 1 BPM. px: last season's slot carries
+    his pXPM after that season (board form, point in time: scripts/cbb_xpm_hist.py), as the live grade has since Nov 26
+    2026; the target stays BPM. Off: scripts/research/ctx_nov27/cbb/r3_xgap.py, the terms refit on those pairs come out the
+    same (b .481 -> .500, c 1.279 -> 1.265) and do not beat the shipped ones held out"""
     import pandas as pd
+    import cbb_xpm_hist as XH
     d = pd.read_csv(path, usecols=['pid', 'team', 'year', 'cls', 'gp', 'min_per', 'bpm', 'guard', 'big'])
     d = d.dropna(subset=['bpm', 'min_per', 'cls', 'gp'])
     K, REP, W, MN, GAP = 240.0, -6.0, (1.0, 0.5), 60.0, 1.0
@@ -119,7 +123,8 @@ def cbb_pairs(path):
         for j, w in enumerate(W):
             x = by.get((pid, y - j))
             if x:
-                num += w * x[0] * x[1]; den += w * x[1]; mins += x[1]
+                v = XH.get(pid, y - j, 'px2', x[0]) if px and j == 1 else x[0]
+                num += w * v * x[1]; den += w * x[1]; mins += x[1]
         return (num + K * REP) / (den + K), mins
 
     def fut(pid, y):

@@ -65,6 +65,7 @@ def board(sport):
             rows.append({'name': r[ix['name']], 'team': r[ix['team']], 'pos': r[ix['pos']], 'id': eid,
                          'cls': r[ix['cls']], 'fv': r[ix['fv']],
                          'mpg': (now or {}).get('mpg') if sport == 'cbb' else None,                  # usage: minutes a game this season
+                         'xx': r[ix['xbpm']] if sport == 'cbb' and 'xbpm' in ix else None,           # rate: xXPM, the board's projection
                          'splus': sp.get(id(r)),                                                    # rate: Stat+ (100 = average at the position)
                          'snp': round(100 * sn, 1) if sport == 'cfb' and isinstance(sn, (int, float)) else None})   # usage: share of team snaps
         if sport == 'cbb' and os.path.exists(os.path.join(ROOT, 'static', 'data', 'cbb-intl.json')):   # international prospects
@@ -170,6 +171,10 @@ def convert(sport):
         lb, tt, f = BEST[sport]
         cols.append({'k': 'best', 'l': 'Best', 't': tt, 'f': f, 'ph': 1, 'num': 1})
     views = ([['e', 'EDGE', 'BO% minus the odds his status alone gives']] if SF else []) + [['p', 'BO%', 'breakout odds next season']]
+    # CBB: the rate beside the odds is xXPM (the predictive pick where freshmen are in the table; Nov 27 2026, context
+    # rule), not the file's shrunk BPM; the bar and the ceiling stay on BPM, the model's own units
+    CBX = sport == 'cbb' and M is not None
+    if CBX and src.get('cur'): src['cur'] = {'lab': 'xXPM', 't': 'projected XPM this season', 'dec': 1}
     for k, m in (('x', src.get('cur')), ('xc', src.get('ceil'))):     # current value and its usage-up ceiling
         if m:
             cols.append({'k': k, 'l': m['lab'], 't': m['t'], 'f': str(m.get('dec', 1)), 'ph': 1, 'num': 1})
@@ -191,6 +196,7 @@ def convert(sport):
              'lo': r.get('lo'), 'sub': r.get('sub') or '', 'p': None if r.get('p') is None else round(100 * r['p'], 1),
              'u': r.get('u'), 'sig': ' · '.join(r.get('sig') or []), 'best': r.get('best'), 'x': r.get('x'),
              'xc': r.get('xc'), 'e': edge(r)}
+        if CBX: o['x'] = None
         if M is not None:
             m, _ = M.find(o['n'], team=o['tm'], pos=o['pos'] or None,
                           id=str(r.get('id') or '') or None if sport == 'cfb' else None)   # CBB rows carry Barttorvik ids
@@ -198,6 +204,7 @@ def convert(sport):
                 for k in ('fv', 'pxp', 'xpm', 'mpg', 'splus', 'snp', 'snpg', 'pg90'):
                     if m.get(k) is not None:
                         o[k] = m[k]
+                if CBX: o['x'] = m.get('xx')
                 if m.get('cls'):
                     o['yr'] = m['cls']
         if sport == 'cfb' and r.get('cls') and not o.get('yr'):
