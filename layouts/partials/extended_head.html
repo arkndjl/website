@@ -15,7 +15,7 @@
 <script>(function(f){Number.prototype.toFixed=function(d){var s=f.call(this,d);return /^-0(\.0+)?$/.test(s)?s.slice(1):s;};})(Number.prototype.toFixed);</script>
 {{- /* weekly moves on the player boards (scripts/board_moves.py: each row's w0 = its metric as of the file's wkFrom,
        the last weekly post day, scripts/rank_moves.py POST). __wk.show(win, from) hides the column when the view has no week (past seasons). __wk.rank(list, rank field, view field) re-ranks the rows in view by w0 (or wx[view field], a side view's base) (rank then, within the filters); __wk.rk(p, from, label,
-       fmt) is that rank change as a cell; __wk.fv(now, w0, from) is the FV change as a cell. No w0 while from is set = new. */}}
+       fmt) is that rank change as a cell; __wk.pos(wk, wr, w0, from) is an FV board's rank change as a cell (wk places moved, wr the rank then); __wk.fv(now, w0, from) the FV change. No w0 while from is set = new. */}}
 <script>window.__wk=window.__wk||(function(){function day(f){var m='Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' '),d=String(f||'').split('-');return d.length===3?m[+d[1]-1]+' '+(+d[2]):'';}
 function td(h,v,t){return '<td class="cfb__num cfb__wk" data-v="'+v+'"'+(t?' title="'+t+'"':'')+'>'+h+'</td>';}
 function arrow(d,x){return d>0?'<span class="cfb__up">▲'+x+'</span>':d<0?'<span class="cfb__down">▼'+x+'</span>':'<span class="cfb__dim">–</span>';}
@@ -25,6 +25,7 @@ show:function(win,from){var t=win.querySelector('th[data-sort="wk"]');if(t)t.hid
 rank:function(list,rf,wf){rf=rf||'rk';list.forEach(function(p){p.wb=typeof wf==='function'?wf(p):wf?(p.wx||{})[wf]:p.w0;if(p.wb===undefined)p.wb=null;});var s=list.filter(function(p){return p.wb!=null;}).sort(function(a,b){return b.wb-a.wb;});s.forEach(function(p,i){p.wr=i>0&&s[i-1].wb===p.wb?s[i-1].wr:i+1;});list.forEach(function(p){if(p.wb==null)p.wr=null;p.wk=p.wr==null?null:p.wr-p[rf];});},
 rk:function(p,from,label,fmt,now){if(!from)return '';var w=p.wb===undefined?p.w0:p.wb;if(w==null||p.wr==null)return fresh(from);var d=p.wk,v=now==null?null:now-w;
 return td(arrow(d,Math.abs(d)),d,day(from)+': #'+p.wr+(v==null?'':', '+label+' '+(v>=0?'+':'')+(fmt?fmt(v):v.toFixed(2))));},
+pos:function(wk,wr,w0,from){if(!from)return '';if(wr==null||wk==null)return fresh(from);return td(arrow(wk,Math.abs(wk)),wk,day(from)+': #'+wr+(w0==null?'':', FV '+Math.round(w0)));},
 fv:function(now,w0,from,label){if(!from)return '';if(now==null)return none;if(w0==null)return fresh(from);var d=Math.round(now-w0);return td(arrow(d,Math.abs(d)),d,day(from)+': '+(label||'FV')+' '+w0);}};})();</script>
 <script>/* RK follows the sort: __rr(rows in sorted order, rank field, dir, the column's best-first dir, value getter) numbers them 1, 2, 3… best first (a flipped sort counts down from the other end); no value = – */
 window.__rr=function(list,f,dir,best,get){function ok(p){var v=get(p);return v!=null&&v!==''&&v===v;}var n=list.filter(ok).length,i=0;list.forEach(function(p){p[f]=ok(p)?(dir===best?++i:n-i++):'–';});};</script>

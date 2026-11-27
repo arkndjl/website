@@ -1,12 +1,12 @@
-{{- /* weekly FV change cell (scripts/board_moves.py): FV now minus w0, the grade as of .from (the last weekly post day, scripts/rank_moves.py POST); the hover
-       gives the date and the FV then; no w0 = new to the board. Nothing when the board has no week yet.
-       dict "r" row "from" wkFrom date ("fv" field, default fv) */ -}}
+{{- /* weekly move cell on an FV board (scripts/board_moves.py): wk = places moved on the board since .from (the last weekly post
+       day, scripts/rank_moves.py POST; + = up), wr = the rank then; the hover gives the date, the rank then and the FV then; no wr = new
+       to the board. Nothing when the board has no week yet. dict "r" row "from" wkFrom date ("fv" field, default fv) */ -}}
 {{- $r := .r -}}
 {{- with .from -}}
 {{- $f := (time .).Format "Jan 2" -}}
 {{- $now := index $r ($.fv | default "fv") -}}
-{{- if and $r.w0 $now -}}{{- $dv := sub (math.Round $now) (math.Round $r.w0) | int -}}
-<td class="cfb__num cfb__wk" data-v="{{ $dv }}" title="{{ $f }}: FV {{ math.Round $r.w0 }}">{{ if gt $dv 0 }}<span class="cfb__up">▲{{ $dv }}</span>{{ else if lt $dv 0 }}<span class="cfb__down">▼{{ sub 0 $dv }}</span>{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
+{{- if and $r.wr (ne $r.wk nil) -}}{{- $dv := int $r.wk -}}
+<td class="cfb__num cfb__wk" data-v="{{ $dv }}" title="{{ $f }}: #{{ $r.wr }}{{ with $r.w0 }}, FV {{ math.Round . }}{{ end }}">{{ if gt $dv 0 }}<span class="cfb__up">▲{{ $dv }}</span>{{ else if lt $dv 0 }}<span class="cfb__down">▼{{ sub 0 $dv }}</span>{{ else }}<span class="cfb__dim">–</span>{{ end }}</td>
 {{- else if $now -}}<td class="cfb__num cfb__wk" data-v="" title="not on the board {{ $f }}"><span class="cfb__new">new</span></td>
 {{- else -}}<td class="cfb__num cfb__wk" data-v=""><span class="cfb__dim">·</span></td>
 {{- end -}}

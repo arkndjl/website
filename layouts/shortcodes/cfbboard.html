@@ -24,7 +24,7 @@
 {{- $upCol := eq $preset "fcs" }}{{ $draftCol := eq $preset "d27" }}{{ $yrOn := in (slice "" "fbs" "fcs") $preset -}}
 {{- $s := 2026 }}{{ with $d }}{{ $s = int .season }}{{ end -}}
 <div class="win cfb{{ with .Get "class" }} {{ . }}{{ end }}" data-cfb="{{ $id }}" data-cfb-src="{{ "data/cfb-all.json" | relURL }}" data-arklist="{{ jsonify (index (site.Data.arklist | default dict) "college-football" | default slice) }}"{{ with $preset }} data-cfb-preset="{{ . }}"{{ end }}{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}
-     data-gfx-cols="{{ if eq $preset "war" }}RK,Player,XV,Pos,School,Class,Age,WAA,WAR,FV{{ else if eq $preset "nil" }}RK,Player,xNIL,Pos,School,Class,yNIL,zNIL,FV{{ else }}RK,Player,FV,Δ,Pos,School,Class,Age,{{ if eq $preset "fcs" }}FBS%{{ else }}xNIL{{ end }}{{ end }}"{{ if $upCol }} data-cfb-up{{ end }}{{ if $draftCol }} data-cfb-draft{{ end }}{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
+     data-gfx-cols="{{ if eq $preset "war" }}RK,Player,XV,Pos,School,Class,Age,WAA,WAR,FV{{ else if eq $preset "nil" }}RK,Player,xNIL,Pos,School,Class,yNIL,zNIL,FV{{ else }}RK,Player,FV,±,Pos,School,Class,Age,{{ if eq $preset "fcs" }}FBS%{{ else }}xNIL{{ end }}{{ end }}"{{ if $upCol }} data-cfb-up{{ end }}{{ if $draftCol }} data-cfb-draft{{ end }}{{ with $d }} data-gfx-date="updated {{ lower ((time .asof).Format "Jan 2, 2006") }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ .Get "title" | default "cfb_board.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -110,7 +110,7 @@
           "pos" (slice "" (print "position + rank at position by " (cond (eq $preset "war") "XV" (cond (eq $preset "nil") "xNIL" "FV")) " (QB3 = 3rd QB); sorts by position, then rank") "Pos")
           "team" (slice "" "" "School")
           "fv" (slice "" "" "FV")
-          "delta" (slice "cfb__now" (print "Δ = FV change since the last Wednesday post" $since ". new = not on the board then") "Δ")
+          "delta" (slice "cfb__now" (print "± = rank change on the board since the last Wednesday post" $since ". new = not on the board then") "±")
           "stat" (slice "cfb__now" "Stat+ = 100 + 25 z; z = position all-in-one score this season (PFN QB+, RB+, WR+, TE+, OLi, EDGE+, DT+, LB+, CB+, SAF+; K+, P+ by percentile) vs snap-weighted position mean, FBS or FCS. hover: source score, snaps" "Stat+")
           "cons" (slice "cfb__now" "consensus = median rank across 10 boards (PFN, CBS, ESPN, James Foster, NBC, The Athletic, Yahoo, Tankathon, PFF, Kiper top 25). FV += .5 sqrt(min(n,9)/9) (FVcons - FV); FVcons = 80 - 8.7 ln(rank / 2.7) past rank 27 (FV 60), 60 + 5.8 ln(27 / rank) above it (rank 1 = 79); n = boards ranking the player" "CON")
           "draft" (slice "cfb__now" "Draft% = P(declares) x P(picked in 2027 draft). declares: by xPick and age on draft day (ranked underclassmen 94%, seniors 69%; a younger senior with a year left stays more), RS seniors and grads 100% (fit 2024-25 fall boards). picked: log-normal around mock xPick (consensus + model value), SD narrows toward the draft (fit on PFF dated boards, 2020-26 drafts). K, P: 1.83 and 2.0 a year (2015-26), FV order. non-specialists sum to 246 (257 picks less ~3% D2, D3, abroad, less K/P). blank: not draft eligible" "Draft%")

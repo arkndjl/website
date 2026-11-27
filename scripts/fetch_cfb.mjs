@@ -2563,10 +2563,15 @@ const merged = () => {
   return e;
 };
 const everyone = merged();
+// the move is in rank, not in the grade (Noah, Nov 26 2026): the player's place by FV among everyone graded then against
+// his place by FV among everyone graded now (the snapshots hold FV only, so players level on FV share a place; + = up)
+const placeBy = fvs => { const v = fvs.filter(x => x != null).sort((a, b) => b - a);
+  return x => { let lo = 0, hi = v.length; while (lo < hi) { const m = (lo + hi) >> 1; if (v[m] > x) lo = m + 1; else hi = m; } return lo + 1; }; };
+const placeThen = base ? placeBy(Object.values(base.fv)) : null, placeNow = placeBy(everyone.map(r => r.fv));
 for (const r of everyone) {
   const was = base?.fv[key(r)];
   // FCS players are new to the snapshots: no movers for them until a snapshot carries them
-  r.delta = base && r.fv != null && (r.div !== 'FCS' || base.fcs) ? (was == null ? 'new' : r.fv - was) : null;
+  r.delta = base && r.fv != null && (r.div !== 'FCS' || base.fcs) ? (was == null ? 'new' : placeThen(was) - placeNow(r.fv)) : null;
 }
 hist.snapshots = hist.snapshots.filter(h => h.date !== BOARD_DAY);
 hist.snapshots.push({ date: BOARD_DAY, v: MODEL_VERSION, fcs: true, fv: Object.fromEntries(everyone.filter(r => r.fv != null).map(r => [key(r), r.fv])) });
@@ -2898,9 +2903,10 @@ if (kp.rows.length) {
   const snap = hist.snapshots.at(-1); snap.kp = true;
   for (const r of kp.rows) {
     r.div = 'FBS'; const was = base?.fv[key(r)];
-    r.delta = base?.kp ? (was == null ? 'new' : r.fv - was) : null;
     snap.fv[key(r)] = r.fv;
   }
+  const kpNow = placeBy(Object.values(snap.fv));
+  for (const r of kp.rows) { const was = base?.fv[key(r)]; r.delta = base?.kp ? (was == null ? 'new' : placeThen(was) - kpNow(r.fv)) : null; }
   fs.writeFileSync(HISTORY, JSON.stringify(hist) + '\n');
   out.all = [...out.all.filter(r => r.pos !== 'K' && r.pos !== 'P'), ...kp.rows].sort((a, b) => (b.fv ?? -1) - (a.fv ?? -1) || (b.fvx ?? b.fv) - (a.fvx ?? a.fv) || (b.comp ?? 0) - (a.comp ?? 0));
   out.all.forEach((r, i) => { r.ovr = i + 1; });

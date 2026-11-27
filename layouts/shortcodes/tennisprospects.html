@@ -17,7 +17,7 @@
 {{- if eq $view "board" -}}
 {{- $t := index $d $tour -}}
 {{- $rows := $t.board -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%s :: under-22 big board" $tl)) "icon" "tennis" "filter" "nation@nat,Tag" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,Δ,Age,W-L,Rank,Elo" "gfxDate" $date "gfxMax" "32") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (printf "%s :: under-22 big board" $tl)) "icon" "tennis" "filter" "nation@nat,Tag" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,FV,±,Age,W-L,Rank,Elo" "gfxDate" $date "gfxMax" "32") -}}
 <table class="cfb__table hk sp" data-pd-kind="tn-board" data-pd-src="{{ (resources.FromString (printf "data/tennis-prospects-%s.json" $tour) (jsonify $rows)).RelPermalink }}">
   <thead><tr>
     <th>RK</th><th>Player</th><th class="cfb__g" title="future value, 20-80: the mean outcome for a player with this profile (steps of 1), stretched at the top">FV</th>{{ partial "wkth.html" (dict "from" $t.wkFrom) }}
