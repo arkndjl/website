@@ -40,6 +40,9 @@ _AGB, _AGF = _AG['cbb'], _AG['cfb']
 _CS = ld('data/class_score_research.json')                   # class score: top end vs depth against results (scripts/research/class_score_nov26)
 _CSF, _CSB = _CS['cfb'], _CS['cbb']
 _AS = ld('data/arkstars_research.json')                     # 5-star+ tests (scripts/research/arkstars_nov26)
+_AH = ld('data/arkstars_hist_research.json')                # past classes' ARK stars (scripts/arkstars_hist.py --test)
+_AHT = _AH['thin']['tests'][_AH['thin']['pick']]
+_AHC = [v['graded'] for v in _AH['counts'].values()]
 _ASF, _ASB = _AS['cfb'], _AS['cbb']
 _STF = ld('data/cfb_recruit_retarget.json')['stars']        # CFB star cuts, 5-star+ model and held-out tiers
 _STB = ld('data/cbb_recruits.json')['model']['stars']       # CBB star cuts and the 5-star+ sweep
@@ -177,8 +180,14 @@ sections.append({'id': 'fv', 'title': 'FV and grades', 'entries': [
       [f"CFB is cut on the recruit index (expected NFL outcome, 2011-19 classes). A class holds about {_STF['tiers'][1]['perClass']:.0f} five-stars, {_STF['tiers'][2]['perClass']:.0f} four-stars and {_STF['tiers'][3]['perClass']:.0f} three-stars.",
        'Share drafted in CFB, held out: ' + ', '.join(f"{'5-star+' if x['stars'] > 5 else str(x['stars']) + '-star'} {_pc(x['drafted'])}" for x in _STF['tiers']) + '.',
        'CBB is cut on FV. 5 = 2+ NBA seasons as a starter, 4 = reached the NBA, 3 = a D-I starter at BPM +3, 2 = played D-I, 1 = did not.',
-       'There are half stars inside each tier. The arrow is ARK stars minus industry stars.'],
-      'Recruits tabs; recruit cards', ['CFB', 'CBB']),
+       'There are half stars inside each tier. The arrow is ARK stars minus industry stars.',
+       f"Past classes are graded back to 2008, so a college player carries his high school grade (HS). A CFB class has {min(_AHC):,} to {max(_AHC):,} graded recruits, from ESPN's class lists, the 247 composite and On3's team commit lists.",
+       f"A recruit off ESPN's signee list with no ESPN grade gets a correction to his draft odds. Fit on {_AH['thin']['fitOn'][0]}-{str(_AH['thin']['fitOn'][1])[2:]}, tested forward on {_AH['thin']['forward'][0]}-{str(_AH['thin']['forward'][1])[2:]} ({_AH['thin']['nForward']:,} recruits): t = {_AHT['t']:.2f} by recruit, {_AHT['tSchool']:.2f} clustered by school.",
+       'Share drafted in the ' + f"{_AH['thin']['forward'][0]}-{str(_AH['thin']['forward'][1])[2:]}" + ' classes against expected: ' + ', '.join(f"{x['k']:g}-star {100 * x['drafted']:.1f}% ({100 * x['expected']:.1f}%)" for x in _AH['tiers']['forward']['tiers'][:4]) + '.',
+       f"Reading a lone service's grade on the industry scale failed (t = {_AH['lone']['tSchool']:.2f} clustered by school), so it is not used.",
+       'A player no source lists is a 1-star. Kickers, punters and long snappers get no grade.',
+       'CBB past classes read the rank to stars curve at the recruit\'s industry rank. No rank is a 1-star.'],
+      'Recruits tabs; recruit cards; HS column on the portal tabs', ['CFB', 'CBB']),
     E('5-star+', 'The tier above five stars, for recruits at even odds or better of the top pro outcome.',
       [f"CFB: a five-star with a 50%+ chance of a top-64 pick. There are about {_STF['tiers'][0]['perClass']:.0f} a class. Held out, {_pc(_STF['tiers'][0]['top64'])} went top 64 and {_pc(_STF['tiers'][0]['drafted'])} were drafted (plain five-stars {_pc(_STF['tiers'][1]['top64'])} and {_pc(_STF['tiers'][1]['drafted'])}).",
        f"The chance reads the recruit index, the log industry rank and the industry rating past 95. Held out by class {_ASF['classes'][0]}-{str(_ASF['classes'][1])[2:]}: school-clustered t = {_ASF['E1']['t']:.2f}, {_ASF['E1']['won']} classes. The {_ASF['forwardClass']} class has {_ASF['forward']['new'][1]} of {_ASF['forward']['new'][0]} top-64.",

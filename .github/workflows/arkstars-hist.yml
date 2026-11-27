@@ -1,0 +1,60 @@
+# High school ARK stars for every college player (HS column on the portal, transfer watch and re-signed tabs;
+# static/data/arkstars-cfb.json and arkstars-cbb.json). Weekly: On3's team commit lists (scripts/on3_commits.mjs, headless
+# Chromium) for the classes from this season's freshmen on, folded into the packs by scripts/arkstars_hist.py --update
+# (the older classes keep their rows and take the new lists' transfers). After a board run: the join only, from the
+# committed packs. No CFBD calls.
+name: arkstars hist
+
+on:
+  schedule:
+    - cron: "23 9 * * 2"
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["cfb board", "cbb board", "cbb boards"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: arkstars-hist
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: pip install -q numpy requests
+      - name: On3 team commit lists
+        if: github.event_name != 'workflow_run'
+        continue-on-error: true
+        timeout-minutes: 50
+        env:
+          ON3_WORKERS: "6"
+        run: |
+          npm i --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+          Y=$(python3 -c "import json; print(json.load(open('static/data/cfb-all.json'))['asof'][:4])")
+          ON3_TEAMS=scripts/data/arkstars_on3_teams.json ON3_EXTRA=scripts/data/arkstars_on3_extra.json \
+            node scripts/on3_commits.mjs football $Y $((Y + 3)) --fcs
+          node scripts/on3_commits.mjs basketball $Y $((Y + 2))
+      - name: Packs
+        if: github.event_name != 'workflow_run'
+        run: python3 scripts/arkstars_hist.py --update
+      - name: Join only
+        if: github.event_name == 'workflow_run'
+        run: python3 scripts/arkstars_hist.py
+      - name: Commit if anything changed
+        run: |
+          python3 scripts/data_push.py -m "Update the high school ARK stars ($(date -u +%Y-%m-%d))" \
+            -- scripts/data/arkstars_hist_cfb.json.gz scripts/data/arkstars_hist_cbb.json.gz scripts/data/cfb_hometowns.json.gz static/data/arkstars-cfb.json static/data/arkstars-cbb.json data/arkstars_hs.json

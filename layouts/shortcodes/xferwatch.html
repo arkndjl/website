@@ -9,6 +9,7 @@
 {{- $w := index site.Data (printf "%s_watch" $sport) -}}
 {{- $icon := cond (eq $sport "cbb") "basketball" "football" -}}
 {{- $lvl := cond (eq $sport "cbb") "D-I" "FBS/FCS" -}}
+{{- $sp := $sport -}}{{- $hs := (index (site.Data.arkstars_hs | default dict) $sport | default dict).by | default dict -}}
 {{- define "partials/xw-pct" -}}{{- if lt . 0.005 }}&lt;1{{ else if lt . 0.1 }}{{ partial "num.html" (slice "%.1f" (mul . 100)) }}{{ else }}{{ partial "num.html" (slice "%.0f" (mul . 100)) }}{{ end }}%{{- end -}}
 {{- with $w -}}
 {{- if and (eq $view "players") .live .players -}}
@@ -16,7 +17,7 @@
 <table class="cfb__table xw">
   <thead><tr><th>RK</th><th>Player</th>
     <th title="future value: projected peak on the 20-80 scale (50 = average regular); the rank">FV</th>
-    <th>Pos</th><th>Cls</th><th>Team</th><th title="conference">Conf</th>
+    <th>Pos</th><th>Cls</th><th title="ARK stars as a high school recruit">HS</th><th>Team</th><th title="conference">Conf</th>
     <th title="Transfer% = P(on another {{ $lvl }} roster next season)">Xfer%</th>
     <th title="Lean = likeliest school, P(lands there | he transfers)">Lean</th>
     <th title="2nd likeliest school, P(lands there | he transfers)">2nd</th>
@@ -30,6 +31,7 @@
     <td class="fv xw__sub" data-l="FV" data-v="{{ .fv }}">{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ . }}</span>{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td>{{ replaceRE "^DL$" "DT" .pos }}</td>
     <td>{{ .cls | default "—" }}</td>
+    <td data-l="HS" data-v="{{ index $hs (printf "%s|%s" .name .team) | default 0 }}">{{ partial "hsark.html" (dict "sport" $sp "name" .name "team" .team) }}</td>
     <td class="xw__team" data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
     <td>{{ .conf | default "—" }}</td>
     <td class="cfb__num is-key" data-l="Xfer%" data-v="{{ .tp }}"><b class="{{ if ge .tp 0.5 }}cfb__down{{ end }}">{{ partial "num.html" (slice "%.0f" (mul .tp 100)) }}%</b></td>

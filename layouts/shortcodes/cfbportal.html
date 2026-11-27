@@ -5,10 +5,11 @@
        the board at the destination, with FV; and each team's net, expected college WAR a season by FV (AV at FV x
        the college WAR rate, data/cfb_war_backtest.json) in minus out, over the graded players who moved. */ -}}
 {{- $k := site.Data.cfb_war_backtest.constants.cwarPerAv -}}
+{{- $hs := (site.Data.arkstars_hs | default dict).cfb.by | default dict -}}
 {{- with site.Data.cfb_portal -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "transfer portal") "filter" "Pos,To,From" "tab" ($.Get "tab") "gfxCols" "Player,FV,Pos,From,To" "gfxDate" (lower ((time .asof).Format "Jan 2, 2006"))) -}}
 <table class="cfb__table">
-  <thead><tr><th>Player</th><th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th><th>Pos</th><th>From</th><th>To</th><th>Class</th><th title="247 stars as a transfer">Stars</th></tr></thead>
+  <thead><tr><th>Player</th><th title="future value: projected peak on the 20-80 scale (50 = average regular)">FV</th><th>Pos</th><th>From</th><th>To</th><th>Class</th><th title="ARK stars as a high school recruit">HS</th><th title="247 stars as a transfer">Stars</th></tr></thead>
   <tbody>
   {{- range .moves }}
   <tr>
@@ -18,6 +19,7 @@
     <td data-v="{{ .from }}"><span class="cfb__team">{{ with .fromLogo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .from }}</span></span></td>
     <td data-v="{{ .to }}"><span class="cfb__team">{{ with .toLogo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .to | default "—" }}</span></span></td>
     <td>{{ .cls | default "—" }}</td>
+    <td data-v="{{ index $hs (printf "%s|%s" .name (.team | default .to)) | default 0 }}">{{ partial "hsark.html" (dict "sport" "cfb" "name" .name "team" (.team | default .to)) }}</td>
     <td class="cfb__num">{{ .stars | default "—" }}</td>
   </tr>
   {{- end }}
