@@ -107,6 +107,13 @@ def cfb_rows():
         # rating: the 247 composite where it has one, else ESPN's grade on the composite's scale (fit below)
         rows.append({'school': r['team'], 'cls': r['cls'] if r.get('cls') else r.get('year'), 'grp': r['g'], 'gr': gr, 'comp': comp,
                      'prog': r.get('eloZ'), 'level': r.get('level'), 'y': {'fv': float(r['rfv']), 'dr': 1.0 if r['drafted'] else 0.0}, 'name': r['name'], 'tid': r.get('tid')})
+    # one school, one key: a team id's most common spelling (the pull has App State and Appalachian State, UMass and
+    # Massachusetts, four more: each was estimated as two schools)
+    sp = defaultdict(lambda: defaultdict(int))
+    for r in rows:
+        if r['tid']: sp[r['tid']][r['school']] += 1
+    for r in rows:
+        if r['tid']: r['school'] = max(sp[r['tid']], key=sp[r['tid']].get)
     # ESPN grade -> composite scale on rows with both (linear), unranked (grade < 60) at the floor
     both = [(r['gr'], r['comp']) for r in rows if r['gr'] >= 60 and r['comp'] > 0]
     a, b = np.polyfit([x for x, _ in both], [y for _, y in both], 1)
@@ -291,6 +298,25 @@ def coach_name(slug):
     return ' '.join(fix(x) for x in w)
 
 
+def one_per_id(schools, tau2, tau2n):
+    """research rows of one school under two spellings (App State / Appalachian State, the same team id) as one row:
+    each row's precision W and mean come back out of its shrunk effect and se (u = m tau2 / (tau2 + 1/W),
+    se2 = 1 / (W + 1/tau2)), the precisions add, and the pooled mean is shrunk again; counts and sums add"""
+    by = defaultdict(list)
+    for x in schools: by[str(x['id'])].append(x)
+    out = []
+    for v in by.values():
+        if len(v) == 1: out.append(v[0]); continue
+        W = [max(1e-9, 1 / x['se'] ** 2 - 1 / tau2) for x in v]
+        m = [x['u'] * (tau2 + 1 / w) / tau2 for x, w in zip(v, W)]
+        mn = [x['uNet'] * (tau2n + 1 / w) / tau2n for x, w in zip(v, W)]
+        Ws = sum(W)
+        out.append({**max(v, key=lambda x: x['n']), 'u': sum(a * w for a, w in zip(m, W)) / Ws * tau2 / (tau2 + 1 / Ws),
+                    'uNet': sum(a * w for a, w in zip(mn, W)) / Ws * tau2n / (tau2n + 1 / Ws), 'se': math.sqrt(1 / (Ws + 1 / tau2)),
+                    'n': sum(x['n'] for x in v), 'sumY': sum(x['sumY'] for x in v), 'sumE': sum(x['sumE'] for x in v)})
+    return out
+
+
 def site():
     """data/school_dev.json for the Development tabs: CFB on the NFL FV delta, CBB on the college BPM delta (the NBA FV
     delta failed), with the CBB head coach's own BPM delta (any school, 2014 on)."""
@@ -298,12 +324,12 @@ def site():
     out = {'asof': __import__('datetime').date.today().isoformat()}
     cf = json.load(open(os.path.join(RES, 'cfb.json')))['outcomes']
     T = {t['tid']: t for t in json.load(open(os.path.join(ROOT, 'data', 'cfb_teams.json')))['teams']}
-    dr = {x['school']: x for x in cf['dr']['schoolsAll']}
+    dr = {str(x['id']): x for x in one_per_id(cf['dr']['schoolsAll'], cf['dr']['hyper']['tau2'], cf['dr']['hyperNet']['tau2'])}
     rows = []
-    for x in cf['fv']['schoolsAll']:
+    for x in one_per_id(cf['fv']['schoolsAll'], cf['fv']['hyper']['tau2'], cf['fv']['hyperNet']['tau2']):
         t = T.get(str(x['id']))
         if not t: continue   # FBS teams on the board only
-        d = dr.get(x['school'], {})
+        d = dr.get(str(x['id']), {})
         rows.append({'id': str(x['id']), 't': t['team'], 'logo': t.get('logo'), 'conf': t.get('conf'), 'dev': round(x['u'], 2), 'se': round(x['se'], 2),
                      'net': round(x['uNet'], 2), 'raw': round((x['sumY'] - x['sumE']) / x['n'], 2), 'n': x['n'],
                      'dr': int(round(d.get('sumY', 0))), 'xdr': round(d.get('sumE', 0), 1)})
