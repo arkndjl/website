@@ -37,3 +37,20 @@ reported as PASS (proxy) with the rerun command, a fail as FAIL.
 - Game model QB-out charge on multi-season QB value: scripts/cfb_qb_backup.mjs grid prevW {0, .5}, Oct 29: tune picks 0.
   pSV/60 (three seasons, shrink to the mean) is the same idea; rerun needs scripts/.cache/cfb/qb_epa.json.gz.
 - XV in the game prior, builder, xNIL (Oct 16, PR #236-238): tie or worse. Marcel on cWAR (Nov 24 P1): worse.
+
+# Round 2 addendum (written before scoring)
+
+## P2 CFB predictive awards: games-left rate
+Mismatch: scripts/awards.py football_draw runs the games left at this season's raw box rate a game (descriptive). The CFB
+voter models read box lines, so the same-scale predictive rate is the box rate shrunk to the player's own last-season rate:
+rate = (stat to date + K x last season's rate a game) / (games + K), K = 4 games, pre-set, not tuned. A player with no line
+last season keeps the raw rate.
+Harness: `python3 scripts/awards_asof.py cfb` (the consumer's own: 2005-25, checkpoints 25 / 50 / 75%, Heisman, Maxwell,
+Walter Camp, O'Brien, leave-one-season-out voter fit, same seeds), base vs `--leftk=4`. --sims=1000 for both (CPU cap).
+Target: log loss of the eventual winner (floor as the harness). Paired by season (mean over that season's rows).
+PASS = t over seasons <= -2 (one-sided p < .05; one candidate in this family) AND seasons better >= 13 of 21 AND the 75%
+checkpoint alone not worse.
+
+## P1 CFB xGap own fit
+Planned: own a / b / c on the WAA gap, two seasons on, from PFN history. Feasibility is checked first (does PFN history list
+backups and classes); no outcome is read in that check.
