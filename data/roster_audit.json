@@ -1,5 +1,5 @@
 {
- "asof": "2026-11-27T00:46Z",
+ "asof": "2026-11-27T01:13Z",
  "sports": {
   "cbb": {
    "by_file": {
@@ -296,15 +296,15 @@
      "rows": 2171
     },
     "static/data/nfl-fantasy.json": {
-     "flags": 4,
+     "flags": 5,
      "rows": 629
     },
     "static/data/nfl-war.json": {
-     "flags": 79,
+     "flags": 80,
      "rows": 1862
     },
     "static/data/pctl-nfl.json": {
-     "flags": 77,
+     "flags": 78,
      "rows": 1790
     },
     "static/data/personnel/nfl.json": {
@@ -1432,6 +1432,24 @@
      "pos": "WR",
      "rotowire": "FA",
      "site": "ARI"
+    },
+    {
+     "d": "2026-11-26",
+     "field": "t",
+     "file": "static/data/nfl-war.json",
+     "flag": "practice",
+     "head": "Reverts to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-26",
+      "head": "Reverts to practice squad",
+      "kind": "practice"
+     },
+     "pid": "18919",
+     "player": "Brennan Presley",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "LA"
     },
     {
      "d": "2026-11-16",
@@ -3918,6 +3936,24 @@
      "site": "ARI"
     },
     {
+     "d": "2026-11-26",
+     "field": "tm",
+     "file": "static/data/pctl-nfl.json",
+     "flag": "practice",
+     "head": "Reverts to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-26",
+      "head": "Reverts to practice squad",
+      "kind": "practice"
+     },
+     "pid": "18919",
+     "player": "Brennan Presley",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "LA"
+    },
+    {
      "d": "2026-11-16",
      "field": "tm",
      "file": "static/data/pctl-nfl.json",
@@ -4368,6 +4404,24 @@
      "site": "LAC"
     },
     {
+     "d": "2026-11-26",
+     "field": "t",
+     "file": "static/data/nfl-fantasy.json",
+     "flag": "practice",
+     "head": "Reverts to practice squad",
+     "kind": "practice",
+     "move": {
+      "d": "2026-11-26",
+      "head": "Reverts to practice squad",
+      "kind": "practice"
+     },
+     "pid": "18919",
+     "player": "Brennan Presley",
+     "pos": "WR",
+     "rotowire": "FA",
+     "site": "LA"
+    },
+    {
      "d": "2026-11-16",
      "field": "t",
      "file": "static/data/nfl-fantasy.json",
@@ -4405,7 +4459,7 @@
     }
    ],
    "joined": 0,
-   "players": 2322,
+   "players": 2323,
    "rows": 8166
   },
   "nhl": {
