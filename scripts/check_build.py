@@ -160,13 +160,22 @@ def check_moves():
     return board_moves.check()
 
 
+def check_public(out):
+    """The built site: /index.xml is the articles feed, not every page's body (it was 12 MB, Nov 27)."""
+    rss = os.path.join(out, 'index.xml')
+    if not os.path.exists(rss): return ['public/index.xml (the RSS feed) is missing']
+    if os.path.getsize(rss) > 2 ** 20: return [f'public/index.xml is {os.path.getsize(rss) / 2 ** 20:.1f} MiB: the feed lists articles with a summary (layouts/_default/rss.xml)']
+    return []
+
+
 def check_hugo():
     hugo = shutil.which('hugo') or os.environ.get('HUGO')
     if not hugo: return ['hugo not found (set HUGO or put it on PATH)']
     out = tempfile.mkdtemp(prefix='gate-')
     try:
         r = subprocess.run([hugo, '--quiet', '-d', out], cwd=ROOT, capture_output=True, text=True)
-        return [] if r.returncode == 0 else ['hugo build failed:\n' + (r.stderr or r.stdout)[-3000:]]
+        if r.returncode != 0: return ['hugo build failed:\n' + (r.stderr or r.stdout)[-3000:]]
+        return check_public(out)
     finally:
         shutil.rmtree(out, ignore_errors=True)
 
