@@ -1,0 +1,3061 @@
+{
+ "groups": {
+  "gen": {
+   "term": "Table abbreviations",
+   "short": "The short labels that show up on tables in every sport.",
+   "sports": []
+  },
+  "fb": {
+   "term": "Football abbreviations",
+   "short": "The short labels on the NFL and college football tables.",
+   "sports": [
+    "NFL",
+    "CFB"
+   ]
+  },
+  "bk": {
+   "term": "Basketball abbreviations",
+   "short": "The short labels on the NBA and college basketball tables.",
+   "sports": [
+    "NBA",
+    "CBB"
+   ]
+  },
+  "hk": {
+   "term": "Hockey abbreviations",
+   "short": "The short labels on the NHL and hockey prospect tables.",
+   "sports": [
+    "NHL"
+   ]
+  },
+  "sc": {
+   "term": "Soccer abbreviations",
+   "short": "The short labels on the soccer tables.",
+   "sports": [
+    "Soccer"
+   ]
+  },
+  "tn": {
+   "term": "Tennis abbreviations",
+   "short": "The short labels on the tennis tables.",
+   "sports": [
+    "Tennis"
+   ]
+  },
+  "cs": {
+   "term": "Counter-Strike abbreviations",
+   "short": "The short labels on the CS2, 1NT and LAURSEN_111 tables.",
+   "sports": [
+    "CS2"
+   ]
+  }
+ },
+ "alias": {
+  "TRANSFER%": "Transfer%",
+  "W–L": "W-L",
+  "+/−": "+/-",
+  "STARS": "ARK",
+  "GMSC": "GmSc",
+  "GmSc/36": "GmSc",
+  "RATING": "RTG",
+  "Rating": "RTG",
+  "D-I%": "D-1%",
+  "XPM 3Y": "3Y XPM",
+  "VORX 3Y": "VORX",
+  "G-XG": "G-xG",
+  "Kelly%": "Kelly %",
+  "XFV": "xFV",
+  "TVE": "TvE",
+  "IN20": "In20",
+  "GSAX/GP": "GSAx",
+  "XGI": "xGI",
+  "ON% +2": "On%",
+  "XG+XA": "xG+xA",
+  "Save %": "SV%",
+  "PXP/60": "pXP/60",
+  "RXP/60": "rXP/60",
+  "PSV/60": "pSV/60",
+  "P/90": "p/90",
+  "EPA/db": "EPA/DB",
+  "RECTD": "RecTD",
+  "Sack%": "SACK%",
+  "Snap%": "SNAP%"
+ },
+ "terms": {
+  "FV": {
+   "n": "Future Value",
+   "d": "A 20-80 grade on what he becomes at his peak. 50 is an average regular, 60 a plus player, 70 a star.",
+   "g": "FV (future value)",
+   "inline": true
+  },
+  "xFV": {
+   "n": "Expected FV",
+   "d": "A recruit's FV with the chance he never gets on the field counted in.",
+   "g": "Recruit FV / xFV",
+   "inline": true
+  },
+  "Y1 FV": {
+   "n": "Year 1 FV",
+   "d": "The grade he would carry at the end of his first college season if he plays.",
+   "g": "Recruit FV / xFV"
+  },
+  "MFV": {
+   "n": "Model FV",
+   "d": "The model's grade before the consensus boards are blended in.",
+   "g": "CFB FV model"
+  },
+  "PRE FV": {
+   "n": "Pre-draft FV",
+   "d": "His grade on the prospect board when he was drafted.",
+   "g": "FV (future value)"
+  },
+  "ARK": {
+   "n": "ARK",
+   "d": "My own rating. On recruits it is ARK stars, on teams it is the ARK Ranking.",
+   "g": "ARK Ranking",
+   "by": {
+    "college-football": {
+     "n": "ARK stars",
+     "d": "My star rating, cut on what past recruits with the same profile became.",
+     "g": "ARK stars"
+    },
+    "college-basketball": {
+     "n": "ARK stars",
+     "d": "My star rating, cut on what past recruits with the same profile became.",
+     "g": "ARK stars"
+    },
+    "tennis": {
+     "n": "Tennis ARK",
+     "d": "His win chance against the average top-50 player in a best of three.",
+     "g": "Tennis ARK"
+    },
+    "tennis-prospects": {
+     "n": "Tennis ARK",
+     "d": "His win chance against the average top-50 player in a best of three.",
+     "g": "Tennis ARK"
+    },
+    "counter-strike": {
+     "n": "CS2 ARK",
+     "d": "The team's series win chance against the average top-20 team.",
+     "g": "CS2 ARK"
+    }
+   },
+   "part": false,
+   "when": [
+    {
+     "m": "ranking rating|points a game",
+     "n": "ARK rating",
+     "d": "The team's rating in the ARK Ranking.",
+     "g": "ARK Ranking"
+    }
+   ]
+  },
+  "5-STAR+": {
+   "n": "Five-star plus",
+   "d": "The tier above five stars, for recruits at even odds or better of the top pro outcome.",
+   "g": "5-star+"
+  },
+  "WAR": {
+   "n": "Wins Above Replacement",
+   "d": "The wins he adds over a replacement-level player.",
+   "g": "NFL WAR",
+   "inline": true,
+   "by": {
+    "college-football": {
+     "d": "The wins he adds over a replacement starter in a 12-game college season.",
+     "g": "College WAR"
+    },
+    "nfl": {
+     "d": "The wins he adds over a replacement player, season to date.",
+     "g": "NFL WAR"
+    },
+    "nhl": {
+     "d": "The wins he has added over a replacement player this season, at goal value.",
+     "g": "NHL WAR"
+    },
+    "hockey-prospects": {
+     "d": "The wins he adds over a replacement NHL player.",
+     "g": "NHL WAR"
+    },
+    "tennis": {
+     "d": "The wins he adds over a replacement-level tour player.",
+     "g": "Tennis ARK"
+    }
+   }
+  },
+  "College WAR": {
+   "n": "College Wins Above Replacement",
+   "d": "The wins he adds over a replacement starter in a 12-game season.",
+   "g": "College WAR"
+  },
+  "NFL WAR": {
+   "n": "NFL Wins Above Replacement",
+   "d": "The wins he adds over a replacement player in the NFL.",
+   "g": "NFL WAR",
+   "by": {
+    "college-football": {
+     "d": "The NFL WAR a season a player with his grade goes on to post, busts counted.",
+     "g": "CFB FV model"
+    }
+   }
+  },
+  "WAA": {
+   "n": "Wins Above Average",
+   "d": "WAR measured against an average starter at his position instead of a replacement.",
+   "g": "WAA",
+   "inline": true,
+   "by": {
+    "college-basketball": {
+     "d": "The wins he adds over an average D-I player.",
+     "g": "CBB VORX / WAA"
+    }
+   }
+  },
+  "XV": {
+   "n": "Cross Value",
+   "d": "WAR with his quality read from the parts of the stat line that track winning.",
+   "g": "XV",
+   "inline": true
+  },
+  "AV": {
+   "n": "Approximate Value",
+   "d": "One number for a season at any position, on Pro Football Reference's method.",
+   "g": "NFL WAR",
+   "by": {
+    "college-football": {
+     "n": "Season AV",
+     "d": "His on-field value for a college season: snap share, position weight and quality.",
+     "g": "Season AV (college)"
+    }
+   }
+  },
+  "xWAR": {
+   "n": "Expected WAR",
+   "d": "The WAR his rate coming into the week says he should post on his snaps.",
+   "g": "Standouts (NFL)"
+  },
+  "+WAR": {
+   "n": "WAR over expected",
+   "d": "His WAR minus the WAR he was expected to post.",
+   "g": "Standouts (NFL)",
+   "by": {
+    "college-football": {
+     "n": "WAR added",
+     "d": "The college WAR a season the roster adds from redshirts and the incoming class.",
+     "g": "Talent / TvE"
+    }
+   }
+  },
+  "Stat+": {
+   "n": "Stat plus",
+   "d": "A production index. 100 is average at his position and 25 points is one standard deviation.",
+   "g": "Stat+",
+   "inline": true,
+   "by": {
+    "college-basketball": {
+     "d": "His XPM against his position. 100 is average and 25 points is one standard deviation.",
+     "g": "Stat+ (CBB)"
+    }
+   }
+  },
+  "xNIL": {
+   "n": "Expected NIL",
+   "d": "What he is worth on the NIL market right now.",
+   "g": "xNIL / yNIL / zNIL",
+   "inline": true
+  },
+  "yNIL": {
+   "n": "Estimated NIL pay",
+   "d": "What I estimate he was paid entering the season.",
+   "g": "xNIL / yNIL / zNIL",
+   "inline": true
+  },
+  "zNIL": {
+   "n": "NIL value change",
+   "d": "xNIL minus yNIL. Above zero means he is worth more than he is paid.",
+   "g": "xNIL / yNIL / zNIL",
+   "inline": true
+  },
+  "XPM": {
+   "n": "Cross Plus-Minus",
+   "d": "Points per 100 possessions he adds over an average player.",
+   "g": "XPM",
+   "inline": true,
+   "by": {
+    "college-basketball": {
+     "d": "Points per 100 possessions he adds over an average D-I player.",
+     "g": "rXPM (CBB)"
+    }
+   }
+  },
+  "rXPM": {
+   "n": "Cross Plus-Minus",
+   "d": "XPM for the season as played. It is the same number as XPM.",
+   "g": "XPM",
+   "inline": true,
+   "by": {
+    "college-basketball": {
+     "g": "rXPM (CBB)"
+    }
+   }
+  },
+  "pXPM": {
+   "n": "Predictive XPM",
+   "d": "His projected XPM for next season, from three seasons shrunk and aged.",
+   "g": "pXPM (predictive XPM)",
+   "inline": true,
+   "by": {
+    "college-basketball": {
+     "d": "His projected XPM, from three seasons of box lines plus team and recruit rating.",
+     "g": "pXPM (CBB)"
+    }
+   }
+  },
+  "xXPM": {
+   "n": "Expected XPM",
+   "d": "The XPM I project for him, freshmen and transfers included.",
+   "g": "xXPM",
+   "inline": true,
+   "by": {
+    "nba": {
+     "d": "The NBA XPM I expect from him over the next three seasons if he plays.",
+     "g": "G League NBA% / 500% / xVORX"
+    }
+   }
+  },
+  "O-XPM": {
+   "n": "Offensive XPM",
+   "d": "The offensive half of his XPM.",
+   "g": "XPM",
+   "by": {
+    "college-basketball": {
+     "g": "rXPM (CBB)"
+    }
+   }
+  },
+  "D-XPM": {
+   "n": "Defensive XPM",
+   "d": "The defensive half of his XPM.",
+   "g": "XPM",
+   "by": {
+    "college-basketball": {
+     "g": "rXPM (CBB)"
+    }
+   }
+  },
+  "O-PXPM": {
+   "n": "Offensive pXPM",
+   "d": "The offensive half of his projected XPM.",
+   "g": "pXPM (CBB)"
+  },
+  "D-PXPM": {
+   "n": "Defensive pXPM",
+   "d": "The defensive half of his projected XPM.",
+   "g": "pXPM (CBB)"
+  },
+  "AXPM": {
+   "n": "Age-adjusted XPM",
+   "d": "XPM with a credit for being young, since young players keep improving.",
+   "g": "XPM"
+  },
+  "1Y XPM": {
+   "n": "One-year XPM",
+   "d": "His projected XPM next season, given he plays.",
+   "g": "1Y / 3Y XPM"
+  },
+  "3Y XPM": {
+   "n": "Three-year XPM",
+   "d": "His projected XPM over the next three seasons.",
+   "g": "1Y / 3Y XPM"
+  },
+  "XPM (proj)": {
+   "n": "Projected XPM",
+   "d": "His XPM to date blended with his preseason prior by minutes.",
+   "g": "XPM (proj)"
+  },
+  "1Y": {
+   "n": "One-year projection",
+   "d": "His projected value next season.",
+   "g": "P20 / P50 / P80 projections",
+   "by": {
+    "nba": {
+     "g": "1Y / 3Y XPM"
+    },
+    "nhl": {
+     "g": "Exit hurdle (NHL / NBA 3Y)"
+    },
+    "tennis": {
+     "d": "His projected ARK in 12 months.",
+     "g": "Tennis ARK"
+    },
+    "nfl": {
+     "g": "NFL WAR"
+    }
+   }
+  },
+  "3Y": {
+   "n": "Three-year projection",
+   "d": "His projected value over the next three seasons, with the chance he is out of the league counted.",
+   "g": "Exit hurdle (NHL / NBA 3Y)",
+   "by": {
+    "nba": {
+     "g": "1Y / 3Y XPM"
+    },
+    "nfl": {
+     "g": "NFL WAR"
+    }
+   }
+  },
+  "VORX": {
+   "n": "Value Over Replacement XPM",
+   "d": "The wins he adds over a replacement player, from XPM and minutes.",
+   "g": "VORX",
+   "inline": true,
+   "by": {
+    "college-basketball": {
+     "d": "The wins he adds over a replacement D-I player, from XPM and minutes.",
+     "g": "CBB VORX / WAA"
+    }
+   }
+  },
+  "xVORX": {
+   "n": "Expected VORX",
+   "d": "The NBA wins over replacement a season I expect from him over the next three.",
+   "g": "G League NBA% / 500% / xVORX"
+  },
+  "BPM": {
+   "n": "Box Plus-Minus",
+   "d": "Points per 100 possessions over an average player, estimated from the box score.",
+   "g": "XPM",
+   "by": {
+    "college-basketball": {
+     "g": "rXPM (CBB)"
+    }
+   }
+  },
+  "GBPM": {
+   "n": "Game BPM",
+   "d": "Barttorvik's BPM for a single game.",
+   "g": "rXPM (CBB)"
+  },
+  "DPM": {
+   "n": "Daily Plus-Minus",
+   "d": "databallr's plus-minus, one of the two halves of XPM.",
+   "g": "XPM"
+  },
+  "MD": {
+   "n": "Matchup Difficulty",
+   "d": "How much the players he guards usually score. Higher means tougher assignments.",
+   "g": "MD / PAOE (matchups)",
+   "only": [
+    "nba",
+    "arklist"
+   ]
+  },
+  "PAOE": {
+   "n": "Points Allowed Over Expected",
+   "d": "What his matchups scored on him minus what they usually score. Below zero is good defense.",
+   "g": "MD / PAOE (matchups)"
+  },
+  "GmSc": {
+   "n": "Game Score",
+   "d": "Hollinger's one-number box score for a single game.",
+   "g": "Game Score"
+  },
+  "Surplus": {
+   "n": "Surplus value",
+   "d": "What his projected play is worth minus what he is paid, over the years left on his deal.",
+   "g": "Contract value (surplus)"
+  },
+  "xAAV": {
+   "n": "Expected AAV",
+   "d": "The yearly salary he would sign for as a free agent today.",
+   "g": "xAAV",
+   "inline": true
+  },
+  "xTerm": {
+   "n": "Expected term",
+   "d": "The contract length, in years, he would sign for as a free agent today.",
+   "g": "xTerm"
+  },
+  "pWAR": {
+   "n": "Projected WAR",
+   "d": "The WAR I project for him, with each part weighted by how well it carries to next season.",
+   "g": "pWAR / HPM",
+   "inline": true
+  },
+  "HPM": {
+   "n": "Hockey Plus-Minus",
+   "d": "Projected goals per 60 minutes he adds over an average player.",
+   "g": "pWAR / HPM",
+   "inline": true
+  },
+  "GSAx": {
+   "n": "Goals Saved Above Expected",
+   "d": "The goals a goalie stopped beyond what the shots he faced should have produced.",
+   "g": "GSAx",
+   "inline": true
+  },
+  "NHLe": {
+   "n": "NHL equivalent",
+   "d": "His points translated to a full NHL season at his league's strength.",
+   "g": "NHLe"
+  },
+  "NHLe+": {
+   "n": "NHLe plus",
+   "d": "NHLe against drafted prospects of his age and position. 100 is average.",
+   "g": "NHLe"
+  },
+  "GAR": {
+   "n": "Goals Above Replacement",
+   "d": "The goals he adds over a replacement player, on one scale across leagues.",
+   "g": "GAR (soccer, senior)",
+   "inline": true,
+   "by": {
+    "nhl": {
+     "d": "The goals he adds over a replacement player.",
+     "g": "NHL WAR"
+    }
+   }
+  },
+  "aGAR": {
+   "n": "Age-adjusted GAR",
+   "d": "GAR with a credit for being young.",
+   "g": "GAR (soccer, senior)"
+  },
+  "tGAR": {
+   "n": "Team-share GAR",
+   "d": "A prospect's share of his club's strength by minutes, in goals above replacement.",
+   "g": "tGAR (soccer prospects)",
+   "inline": true
+  },
+  "PAR": {
+   "n": "Points Above Replacement",
+   "d": "GAR turned into league points.",
+   "g": "GAR (soccer, senior)"
+  },
+  "xMV": {
+   "n": "Expected Market Value",
+   "d": "What I estimate he is worth in EUR millions, with no market price used.",
+   "g": "xMV",
+   "inline": true,
+   "by": {
+    "counter-strike": {
+     "d": "The prize money he adds over a replacement player across two seasons.",
+     "g": "xMV / xTV / team value (CS2)"
+    }
+   }
+  },
+  "xTV": {
+   "n": "Expected Transfer Value",
+   "d": "His xMV priced on reported buyouts.",
+   "g": "xMV / xTV / team value (CS2)"
+  },
+  "p/90": {
+   "n": "Predictive value per 90",
+   "d": "His SV rate over this season and the two before, shrunk. The best read on next season.",
+   "g": "p/90 (soccer)"
+  },
+  "Elo": {
+   "n": "Elo rating",
+   "d": "A rating built from results. 1500 is average and beating better opponents moves it more.",
+   "g": "Elo",
+   "by": {
+    "tennis": {
+     "g": "Elo / Elo+ (tennis)"
+    },
+    "tennis-prospects": {
+     "g": "Elo / Elo+ (tennis)"
+    }
+   }
+  },
+  "Elo+": {
+   "n": "Elo plus",
+   "d": "His Elo against players his own age. 100 is average and 25 points is one standard deviation.",
+   "g": "Elo / Elo+ (tennis)"
+  },
+  "SPW+": {
+   "n": "Serve Points Won plus",
+   "d": "Serve points won over an average top-100 player, adjusted for who he played.",
+   "g": "SPW+ / RPW+ / xHold / xBreak"
+  },
+  "RPW+": {
+   "n": "Return Points Won plus",
+   "d": "Return points won over an average top-100 player, adjusted for who he played.",
+   "g": "SPW+ / RPW+ / xHold / xBreak"
+  },
+  "xHold": {
+   "n": "Expected hold",
+   "d": "How often he would hold serve against an average top-100 returner.",
+   "g": "SPW+ / RPW+ / xHold / xBreak"
+  },
+  "xBreak": {
+   "n": "Expected break",
+   "d": "How often he would break an average top-100 server.",
+   "g": "SPW+ / RPW+ / xHold / xBreak"
+  },
+  "RWA": {
+   "n": "Round Win Added",
+   "d": "The round win % he adds per round. Zero is an average tier-1 starter.",
+   "g": "RWA (CS2)",
+   "inline": true
+  },
+  "SV": {
+   "n": "Season Value",
+   "d": "What he has been worth this season alone, over a replacement player. Points a game in football, goals a 90 in soccer.",
+   "g": "SV (NFL QBs)",
+   "inline": true,
+   "by": {
+    "nfl": {
+     "d": "His points a game over a replacement player, from this season alone.",
+     "g": "SV (NFL QBs)"
+    },
+    "college-football": {
+     "d": "His points a game over a replacement player, from this season alone.",
+     "g": "SV (CFB QBs, skill players)"
+    },
+    "soccer": {
+     "d": "His goals a 90 over a replacement player, from this season alone.",
+     "g": "SV / SVAR (soccer)"
+    },
+    "tennis": {
+     "d": "His WAR for this calendar year alone.",
+     "g": "Tennis ARK"
+    }
+   }
+  },
+  "SVAR": {
+   "n": "Season Value Above Replacement",
+   "d": "SV added up over the season and turned into wins.",
+   "g": "SVAR",
+   "inline": true,
+   "by": {
+    "soccer": {
+     "d": "SV added up over his minutes: the season's goals over replacement.",
+     "g": "SV / SVAR (soccer)"
+    }
+   }
+  },
+  "pSV/60": {
+   "n": "Predictive SV per 60",
+   "d": "His SV per 60 plays over three seasons, shrunk. The best read on next season.",
+   "g": "SV (CFB QBs, skill players)"
+  },
+  "rXP/60": {
+   "n": "Points over average per 60",
+   "d": "The points of margin he adds over an average regular at his spot, per 60 snaps this season.",
+   "g": "Most predictive and most descriptive metric (by sport)"
+  },
+  "pXP/60": {
+   "n": "Predictive points per 60",
+   "d": "His points over an average regular per 60 snaps across three seasons, shrunk.",
+   "g": "Most predictive and most descriptive metric (by sport)"
+  },
+  "Yds+": {
+   "n": "Yards plus",
+   "d": "Return yards over expected, shrunk for sample.",
+   "g": "Yds+ / YOE (returners)",
+   "by": {
+    "college-football": {
+     "d": "Yards over expected, shrunk for sample.",
+     "g": "Yds+ / YOE (returners)"
+    }
+   }
+  },
+  "YOE": {
+   "n": "Yards Over Expected",
+   "d": "Return yards minus the average return from the same spot.",
+   "g": "Yds+ / YOE (returners)"
+  },
+  "DEV": {
+   "n": "Development",
+   "d": "What his recruits became over what their rankings predicted.",
+   "g": "Development (school / coach)"
+  },
+  "Draft%": {
+   "n": "Draft chance",
+   "d": "The chance he declares and gets picked in the next draft.",
+   "g": "Draft%"
+  },
+  "Ret%": {
+   "n": "Return chance",
+   "d": "The chance he is back in college next season instead of in the draft.",
+   "g": "Ret%"
+  },
+  "Transfer%": {
+   "n": "Transfer chance",
+   "d": "The chance he is on another roster next season.",
+   "g": "Transfer% (Xfer%)"
+  },
+  "Xfer%": {
+   "n": "Transfer chance",
+   "d": "The chance he is on another roster next season.",
+   "g": "Transfer% (Xfer%)"
+  },
+  "LAND%": {
+   "n": "Landing chance",
+   "d": "The chance he picks this school if he moves.",
+   "g": "Transfer% (Xfer%)",
+   "by": {
+    "college-basketball": {
+     "g": "Transfer landing (CBB): distance from home"
+    }
+   }
+  },
+  "FBS%": {
+   "n": "FBS chance",
+   "d": "The chance an FCS player is on an FBS roster next season.",
+   "g": "FBS%"
+  },
+  "D-1%": {
+   "n": "D-I chance",
+   "d": "The chance he is on a D-I roster next season.",
+   "g": "D-1%",
+   "when": [
+    {
+     "m": "year 1|played",
+     "d": "The chance he plays D-I in his first year.",
+     "g": "Recruit FV / xFV"
+    }
+   ]
+  },
+  "Dec%": {
+   "n": "Declare chance",
+   "d": "The chance he leaves school for this draft.",
+   "g": "Dec%"
+  },
+  "P20": {
+   "n": "20th percentile",
+   "d": "The low end of his projection. One outcome in five lands below it.",
+   "g": "P20 / P50 / P80 projections"
+  },
+  "P50": {
+   "n": "Median",
+   "d": "The middle of his projection. Half of outcomes land on each side.",
+   "g": "P20 / P50 / P80 projections"
+  },
+  "P80": {
+   "n": "80th percentile",
+   "d": "The high end of his projection. One outcome in five lands above it.",
+   "g": "P20 / P50 / P80 projections"
+  },
+  "P(win)": {
+   "n": "Chance to win",
+   "d": "His chance of winning the award.",
+   "g": "Award odds"
+  },
+  "P(lead)": {
+   "n": "Chance to lead",
+   "d": "How often he finishes first in the pool on this season's value alone.",
+   "g": "Award odds"
+  },
+  "P(team)": {
+   "n": "Chance to make the team",
+   "d": "His chance of landing on the all-league team.",
+   "g": "Award odds"
+  },
+  "Pred": {
+   "n": "Predictive",
+   "d": "The predictive view: the voter model, with the market blended in where there is one.",
+   "g": "Award odds",
+   "when": [
+    {
+     "m": "mock",
+     "n": "Predictive mock",
+     "d": "His pick in the predictive mock.",
+     "g": "Three mocks"
+    },
+    {
+     "m": "held-out",
+     "n": "Predicted",
+     "d": "What the model predicted on players it never saw.",
+     "g": "FV scorecard"
+    }
+   ]
+  },
+  "Conv": {
+   "n": "Conviction",
+   "d": "The conviction view: this season's value alone, no voters and no market.",
+   "g": "Award odds",
+   "when": [
+    {
+     "m": "mock",
+     "n": "Conviction mock",
+     "d": "His pick in the conviction mock, which runs on the model alone.",
+     "g": "Three mocks"
+    }
+   ]
+  },
+  "BO%": {
+   "n": "Breakout odds",
+   "d": "The chance of his first season at a quality bar next season.",
+   "g": "Next up (breakout odds)"
+  },
+  "EDGE": {
+   "n": "Edge",
+   "d": "The model minus the market.",
+   "g": "Edge / gap",
+   "when": [
+    {
+     "m": "bo%|breakout|status",
+     "d": "His breakout odds minus the odds his draft slot or star rating alone would give him.",
+     "g": "Next up (breakout odds)"
+    }
+   ]
+  },
+  "CEIL": {
+   "n": "Ceiling",
+   "d": "An 80th percentile season at one workload tier up.",
+   "g": "Next up tiers (usage scaling)"
+  },
+  "GAP": {
+   "n": "Gap",
+   "d": "The backup's value minus the starter's.",
+   "g": "Backup watch / xGap",
+   "part": false,
+   "when": [
+    {
+     "m": "xaav",
+     "d": "What he would sign for today minus what he makes.",
+     "g": "xAAV"
+    },
+    {
+     "m": "became",
+     "d": "What he became minus the grade he was given.",
+     "g": "FV scorecard"
+    },
+    {
+     "m": "transfermarkt|xmv",
+     "d": "My value minus the market value.",
+     "g": "xMV"
+    }
+   ]
+  },
+  "xGap": {
+   "n": "Expected gap",
+   "d": "The gap between backup and starter projected over the next two seasons.",
+   "g": "Backup watch / xGap"
+  },
+  "NBA%": {
+   "n": "NBA chance",
+   "d": "The chance he plays in the NBA.",
+   "g": "Tier chances (NBA%, NHL%, Top%, Reg%, Star%)",
+   "by": {
+    "nba": {
+     "g": "G League NBA% / 500% / xVORX"
+    }
+   }
+  },
+  "NHL%": {
+   "n": "NHL chance",
+   "d": "The chance he has an NHL career.",
+   "g": "Tier chances (NBA%, NHL%, Top%, Reg%, Star%)"
+  },
+  "Reg%": {
+   "n": "Regular chance",
+   "d": "The chance he becomes a regular.",
+   "g": "Tier chances (NBA%, NHL%, Top%, Reg%, Star%)",
+   "by": {
+    "nba": {
+     "g": "G League NBA% / 500% / xVORX"
+    }
+   }
+  },
+  "Star%": {
+   "n": "Star chance",
+   "d": "The chance he becomes a star.",
+   "g": "Tier chances (NBA%, NHL%, Top%, Reg%, Star%)"
+  },
+  "Top%": {
+   "n": "Top-flight chance",
+   "d": "The chance he becomes a regular in a top flight or better.",
+   "g": "Tier chances (NBA%, NHL%, Top%, Reg%, Star%)"
+  },
+  "50+%": {
+   "n": "FV 50+ chance",
+   "d": "The chance he reaches a 50 outcome or better: a long-term starter.",
+   "g": "Tier chances (NBA%, NHL%, Top%, Reg%, Star%)"
+  },
+  "T100%": {
+   "n": "Top-100 chance",
+   "d": "The chance he peaks as about a top-100 player.",
+   "g": "Tennis FV model"
+  },
+  "T50%": {
+   "n": "Top-50 chance",
+   "d": "The chance he peaks as about a top-50 player.",
+   "g": "Tennis FV model"
+  },
+  "T12%": {
+   "n": "Top-12 chance",
+   "d": "The chance he peaks as about a top-12 player.",
+   "g": "Tennis FV model"
+  },
+  "xPick": {
+   "n": "Expected pick",
+   "d": "Where I expect him to be drafted.",
+   "g": "xPick"
+  },
+  "xSlot": {
+   "n": "Expected slot",
+   "d": "The draft slot his board rank points to by June.",
+   "g": "xSlot (hockey)"
+  },
+  "Trade%": {
+   "n": "Trade chance",
+   "d": "The chance this pick changes hands on draft night.",
+   "g": "Trades"
+  },
+  "CON": {
+   "n": "Consensus",
+   "d": "His median rank across the public draft boards.",
+   "g": "xPick"
+  },
+  "Cons": {
+   "n": "Consensus",
+   "d": "His rank across the public boards.",
+   "g": "xPick",
+   "part": false
+  },
+  "BB": {
+   "n": "Big board",
+   "d": "His rank on my draft-eligible big board.",
+   "g": "FV (future value)"
+  },
+  "TvE": {
+   "n": "Talent versus Elo",
+   "d": "How the team plays against what its talent predicts. Above zero is playing over its talent.",
+   "g": "Talent / TvE"
+  },
+  "TALENT": {
+   "n": "Talent",
+   "d": "The value of the projected starters by their grades.",
+   "g": "Talent / TvE",
+   "by": {
+    "college-basketball": {
+     "g": "Returning / talent (CBB)"
+    }
+   },
+   "only": [
+    "college-football",
+    "college-basketball",
+    "arkranking"
+   ]
+  },
+  "RTG": {
+   "n": "Rating",
+   "d": "The model's rating for the team. Higher is better.",
+   "g": "ARK Ranking",
+   "by": {
+    "college-football": {
+     "d": "Points against an average FBS team on a neutral field.",
+     "g": "CFB rating"
+    },
+    "college-basketball": {
+     "d": "Points against an average D-I team on a neutral floor.",
+     "g": "CBB rating"
+    },
+    "nfl": {
+     "d": "Points against an average team on a neutral field.",
+     "g": "NFL rating"
+    },
+    "nba": {
+     "d": "Points against an average team on a neutral floor.",
+     "g": "NBA rating"
+    },
+    "nhl": {
+     "d": "Goals against an average team on neutral ice.",
+     "g": "NHL rating"
+    },
+    "soccer": {
+     "d": "Goals a match against an average big-five club on neutral ground.",
+     "g": "Soccer rating"
+    },
+    "1nt": {
+     "n": "ARK Rating",
+     "d": "A player rating where 1.00 is a league-average player.",
+     "a": "cs"
+    },
+    "laursen_111": {
+     "n": "ARK Rating",
+     "d": "A player rating where 1.00 is a league-average player.",
+     "a": "cs"
+    }
+   },
+   "when": [
+    {
+     "m": "vrs",
+     "n": "VRS points",
+     "d": "Valve's ranking points.",
+     "a": "cs"
+    },
+    {
+     "m": "100 possessions",
+     "d": "Points per 100 possessions.",
+     "a": "bk"
+    },
+    {
+     "m": "srs",
+     "n": "Rating",
+     "d": "Points a game against an average team, adjusted for schedule.",
+     "g": "All-time teams and players"
+    }
+   ],
+   "part": false
+  },
+  "RTG+": {
+   "n": "Rating plus",
+   "d": "A team's rating against its own season. 100 is average and 25 points is one standard deviation.",
+   "g": "All-time teams and players"
+  },
+  "OFF+": {
+   "n": "Offense plus",
+   "d": "Offense against that season's league. 100 is average.",
+   "g": "All-time teams and players"
+  },
+  "DEF+": {
+   "n": "Defense plus",
+   "d": "Defense against that season's league. 100 is average.",
+   "g": "All-time teams and players"
+  },
+  "UNADJ": {
+   "n": "Unadjusted",
+   "d": "The number as played, before the era adjustment.",
+   "g": "All-time teams and players"
+  },
+  "WAX": {
+   "n": "Wins Above Expectation",
+   "d": "A coach's wins over what his program does under other coaches.",
+   "g": "All-time coaches"
+  },
+  "CWAR": {
+   "n": "Coach WAR",
+   "d": "A coach's wins over a replacement coach.",
+   "g": "All-time coaches"
+  },
+  "CT": {
+   "n": "Conference titles",
+   "d": "Conference titles, weighted by how hard the conference was.",
+   "g": "All-time coaches",
+   "by": {
+    "counter-strike": {
+     "n": "Counter-Terrorist side",
+     "d": "The defending side.",
+     "g": "",
+     "a": "cs"
+    },
+    "1nt": {
+     "n": "Counter-Terrorist side",
+     "d": "The defending side.",
+     "g": "",
+     "a": "cs"
+    },
+    "laursen_111": {
+     "n": "Counter-Terrorist side",
+     "d": "The defending side.",
+     "g": "",
+     "a": "cs"
+    }
+   }
+  },
+  "NT": {
+   "n": "National titles",
+   "d": "National titles, weighted by how hard the field was.",
+   "g": "All-time coaches"
+  },
+  "Leave%": {
+   "n": "Leave chance",
+   "d": "The chance he is not in this job next season.",
+   "g": "Staff score / coach pay"
+  },
+  "GQ": {
+   "n": "Game Quality",
+   "d": "A 0-100 score for how good and how close a game should be.",
+   "g": "Games to watch (W)"
+  },
+  "xW": {
+   "n": "Expected wins",
+   "d": "Wins so far plus the simulated wins in the games left.",
+   "g": "Season odds"
+  },
+  "xW-xL": {
+   "n": "Expected record",
+   "d": "The record so far plus the simulated games left.",
+   "g": "Season odds"
+  },
+  "xPts": {
+   "n": "Expected points",
+   "d": "Points so far plus the simulated points in the games left.",
+   "g": "Season odds"
+  },
+  "xGD": {
+   "n": "Expected goal difference",
+   "d": "The mean final goal difference across the simulated seasons.",
+   "g": "Season odds"
+  },
+  "CFP": {
+   "n": "College Football Playoff",
+   "d": "The 12-team playoff, and the committee that seeds it.",
+   "g": "CFP odds"
+  },
+  "Kelly %": {
+   "n": "Kelly stake",
+   "d": "The share of the bankroll the Kelly rule stakes on the pick.",
+   "g": "Kelly %"
+  },
+  "Kelly": {
+   "n": "Kelly stake",
+   "d": "The share of the bankroll the Kelly rule stakes on the pick.",
+   "g": "Kelly %"
+  },
+  "CLV": {
+   "n": "Closing Line Value",
+   "d": "How much better the pick's price was than the closing line.",
+   "g": "Close / CLV / Worth at close"
+  },
+  "DU": {
+   "n": "Dengler Units",
+   "d": "The stake in units, sized by Kelly.",
+   "g": "Kelly %"
+  },
+  "LEAN": {
+   "n": "ARK lean",
+   "d": "The likeliest landing spot, and the chance.",
+   "g": "ARK lean (recruit commitment)",
+   "when": [
+    {
+     "m": "transfers",
+     "g": "Transfer% (Xfer%)"
+    },
+    {
+     "m": "head job|hired",
+     "g": "Staff score / coach pay"
+    }
+   ]
+  },
+  "TOP END": {
+   "n": "Top end",
+   "d": "The class score from its best few commits.",
+   "g": "Class score"
+  },
+  "DEPTH": {
+   "n": "Depth",
+   "d": "The class score from the commits past its best few.",
+   "g": "Class score"
+  },
+  "±": {
+   "n": "Change",
+   "d": "The rank change since the last weekly post.",
+   "a": "gen",
+   "part": false,
+   "when": [
+    {
+     "m": "signing",
+     "d": "The change since he signed."
+    },
+    {
+     "m": "kills|duels|differential",
+     "n": "Plus-minus",
+     "d": "Won minus lost."
+    }
+   ]
+  },
+  "Δ": {
+   "n": "Change",
+   "d": "The change since the last weekly post.",
+   "a": "gen",
+   "when": [
+    {
+     "m": "minus mean|beat the grade",
+     "d": "What he became minus the grade he was given.",
+     "g": "FV scorecard"
+    }
+   ],
+   "part": false
+  },
+  "RK": {
+   "n": "Rank",
+   "d": "His rank inside the filters you have on.",
+   "a": "gen"
+  },
+  "POS": {
+   "n": "Position",
+   "d": "His position.",
+   "a": "gen",
+   "part": false,
+   "when": [
+    {
+     "m": "finishing|simulated|league-phase",
+     "n": "Finishing position",
+     "d": "The mean finishing place across the simulated seasons.",
+     "g": "Season odds"
+    }
+   ]
+  },
+  "GP": {
+   "n": "Games Played",
+   "d": "Games he has played.",
+   "a": "gen",
+   "part": false
+  },
+  "G": {
+   "n": "Games",
+   "d": "Games played.",
+   "a": "gen",
+   "part": false,
+   "when": [
+    {
+     "m": "goal",
+     "n": "Goals",
+     "d": "Goals scored."
+    },
+    {
+     "m": "match",
+     "n": "Matches",
+     "d": "Matches played."
+    }
+   ]
+  },
+  "MP": {
+   "n": "Minutes Played",
+   "d": "Minutes he has played.",
+   "a": "gen",
+   "part": false,
+   "when": [
+    {
+     "m": "match",
+     "n": "Matches Played",
+     "d": "Matches he has played."
+    }
+   ]
+  },
+  "MIN": {
+   "n": "Minutes",
+   "d": "Minutes he has played.",
+   "a": "gen",
+   "part": false
+  },
+  "MPG": {
+   "n": "Minutes Per Game",
+   "d": "Minutes he plays a game.",
+   "a": "gen"
+  },
+  "W-L": {
+   "n": "Won-Lost",
+   "d": "The record, wins first.",
+   "a": "gen"
+  },
+  "W%": {
+   "n": "Win percentage",
+   "d": "The share of games won.",
+   "a": "gen"
+  },
+  "PCT": {
+   "n": "Percentile",
+   "d": "Where he sits against everyone on the board. 99 is the top.",
+   "a": "gen",
+   "when": [
+    {
+     "m": "field goal|extra point|kick|made",
+     "n": "Percentage",
+     "d": "The share made."
+    },
+    {
+     "m": "win",
+     "n": "Win percentage",
+     "d": "The share of games won."
+    }
+   ]
+  },
+  "CONF": {
+   "n": "Conference",
+   "d": "His team's conference.",
+   "a": "gen",
+   "part": false,
+   "when": [
+    {
+     "m": "title",
+     "n": "Conference title",
+     "d": "The chance of winning the conference.",
+     "g": "Season odds"
+    }
+   ]
+  },
+  "DIV": {
+   "n": "Division",
+   "d": "The team's division.",
+   "a": "gen",
+   "part": false
+  },
+  "NAT": {
+   "n": "Nationality",
+   "d": "His country.",
+   "a": "gen",
+   "part": false,
+   "when": [
+    {
+     "m": "rank",
+     "n": "National rank",
+     "d": "His national rank as a recruit."
+    }
+   ]
+  },
+  "HT": {
+   "n": "Height",
+   "d": "His height.",
+   "a": "gen",
+   "part": false
+  },
+  "HT / WT": {
+   "n": "Height and weight",
+   "d": "His height and weight.",
+   "a": "gen"
+  },
+  "YR": {
+   "n": "Year",
+   "d": "His class year.",
+   "a": "gen",
+   "part": false,
+   "when": [
+    {
+     "m": "job",
+     "n": "Years",
+     "d": "Seasons in the job."
+    }
+   ]
+  },
+  "CLS": {
+   "n": "Class",
+   "d": "His class year.",
+   "a": "gen"
+  },
+  "PROJ": {
+   "n": "Projection",
+   "d": "What the model projects.",
+   "a": "gen",
+   "part": false,
+   "when": [
+    {
+     "m": "seed",
+     "n": "Projected seed",
+     "d": "The seed in the projected bracket.",
+     "g": "Season odds"
+    },
+    {
+     "m": "xpm",
+     "n": "Projected XPM",
+     "d": "His XPM to date blended with his preseason prior by minutes.",
+     "g": "XPM (proj)"
+    },
+    {
+     "m": "score|goals",
+     "n": "Projected score",
+     "d": "The score the model projects.",
+     "g": "Game projection"
+    }
+   ]
+  },
+  "ADJ": {
+   "n": "Adjusted",
+   "d": "The number after the opponent adjustment.",
+   "a": "gen",
+   "part": false
+  },
+  "RAW": {
+   "n": "Raw",
+   "d": "The number as played, before any adjustment or shrink.",
+   "a": "gen",
+   "part": false
+  },
+  "SHRUNK": {
+   "n": "Shrunk",
+   "d": "Pulled toward average when the sample is small.",
+   "a": "gen",
+   "part": false
+  },
+  "N": {
+   "n": "Sample size",
+   "d": "How many are behind the number.",
+   "a": "gen",
+   "part": false
+  },
+  "t": {
+   "n": "t statistic",
+   "d": "How far the result is from chance. Past 2 is unlikely to be luck.",
+   "a": "gen",
+   "part": false
+  },
+  "R²": {
+   "n": "R squared",
+   "d": "The share of the outcome the model explains. 1 is all of it.",
+   "a": "gen"
+  },
+  "AUC": {
+   "n": "Area Under the Curve",
+   "d": "How well the model sorts the yes cases above the no cases. .5 is a coin flip and 1 is perfect.",
+   "a": "gen"
+  },
+  "RMSE": {
+   "n": "Root Mean Squared Error",
+   "d": "The typical miss, with big misses counted more. Lower is better.",
+   "a": "gen"
+  },
+  "OOS": {
+   "n": "Out of sample",
+   "d": "Tested on data the model never saw.",
+   "a": "gen",
+   "part": false
+  },
+  "SD": {
+   "n": "Standard deviation",
+   "d": "The typical spread around the average.",
+   "a": "gen",
+   "part": false
+  },
+  "LY": {
+   "n": "Last year",
+   "d": "Last season's number.",
+   "a": "gen",
+   "part": false
+  },
+  "O/U": {
+   "n": "Over/Under",
+   "d": "The market total.",
+   "a": "gen"
+  },
+  "Mkt": {
+   "n": "Market",
+   "d": "The market price.",
+   "a": "gen",
+   "part": false
+  },
+  "ML": {
+   "n": "Moneyline",
+   "d": "The price on a team to win outright.",
+   "a": "gen"
+  },
+  "ROI": {
+   "n": "Return on Investment",
+   "d": "Profit as a share of the money staked.",
+   "a": "gen"
+  },
+  "SOS": {
+   "n": "Strength of Schedule",
+   "d": "How hard the opponents have been.",
+   "a": "gen"
+  },
+  "SRS": {
+   "n": "Simple Rating System",
+   "d": "Point margin adjusted for schedule.",
+   "a": "gen"
+  },
+  "INJ": {
+   "n": "Injuries",
+   "d": "The points the current injuries cost the team.",
+   "a": "gen"
+  },
+  "OT": {
+   "n": "Overtime",
+   "d": "The chance the game goes past regulation.",
+   "a": "gen",
+   "part": false
+  },
+  "SF": {
+   "n": "Semi-final",
+   "d": "The chance of reaching the semi-final.",
+   "a": "gen"
+  },
+  "QF": {
+   "n": "Quarter-final",
+   "d": "The chance of reaching the quarter-final.",
+   "a": "gen"
+  },
+  "EPA": {
+   "n": "Expected Points Added",
+   "d": "How much a play moved the points his team should score on the drive.",
+   "a": "fb",
+   "inline": true
+  },
+  "aEPA": {
+   "n": "Adjusted EPA",
+   "d": "EPA a play, adjusted for the defenses he faced.",
+   "a": "fb"
+  },
+  "EPA/PLAY": {
+   "n": "EPA per play",
+   "d": "Expected points added on an average play.",
+   "a": "fb"
+  },
+  "EPA/DB": {
+   "n": "EPA per dropback",
+   "d": "Expected points added per pass, sack or scramble.",
+   "a": "fb"
+  },
+  "EPA/RUN": {
+   "n": "EPA per run",
+   "d": "Expected points added per run.",
+   "a": "fb"
+  },
+  "EPA/TGT": {
+   "n": "EPA per target",
+   "d": "Expected points added per pass thrown his way.",
+   "a": "fb"
+  },
+  "EPA SG": {
+   "n": "EPA from shotgun",
+   "d": "EPA a play from the shotgun.",
+   "a": "fb"
+  },
+  "EPA UC": {
+   "n": "EPA under center",
+   "d": "EPA a play from under center.",
+   "a": "fb"
+  },
+  "EPA PA": {
+   "n": "EPA on play action",
+   "d": "EPA a dropback with a play fake.",
+   "a": "fb"
+  },
+  "CPOE": {
+   "n": "Completion Percentage Over Expected",
+   "d": "His completion rate against what the throws he attempted usually complete.",
+   "a": "fb"
+  },
+  "PROE": {
+   "n": "Pass Rate Over Expected",
+   "d": "How much more the offense throws than the situation calls for.",
+   "a": "fb"
+  },
+  "aDOT": {
+   "n": "Average Depth of Target",
+   "d": "How far downfield his average throw travels in the air.",
+   "a": "fb"
+  },
+  "ANY/A": {
+   "n": "Adjusted Net Yards per Attempt",
+   "d": "Pass yards per attempt with touchdowns added and interceptions and sacks taken out.",
+   "a": "fb"
+  },
+  "ANY/A+": {
+   "n": "ANY/A plus",
+   "d": "ANY/A against that season's quarterbacks. 100 is average.",
+   "a": "fb"
+  },
+  "AY/A": {
+   "n": "Adjusted Yards per Attempt",
+   "d": "Pass yards per attempt with touchdowns added and interceptions taken out.",
+   "a": "fb"
+  },
+  "AY": {
+   "n": "Adjusted Yards",
+   "d": "Scrimmage yards with touchdowns added and fumbles taken out.",
+   "a": "fb",
+   "part": false
+  },
+  "AY+": {
+   "n": "Adjusted Yards plus",
+   "d": "Adjusted yards against that season's starters at the position. 100 is average.",
+   "a": "fb"
+  },
+  "TAY/P": {
+   "n": "Total Adjusted Yards per Play",
+   "d": "A quarterback's adjusted pass and rush yards per play.",
+   "a": "fb"
+  },
+  "TAY/P+": {
+   "n": "TAY/P plus",
+   "d": "TAY/P against that season's quarterbacks. 100 is average.",
+   "a": "fb"
+  },
+  "QBR": {
+   "n": "Total QBR",
+   "d": "ESPN's 0-100 quarterback rating, adjusted for opponent.",
+   "a": "fb"
+  },
+  "SR": {
+   "n": "Success Rate",
+   "d": "The share of plays that gained what the down and distance needed.",
+   "a": "fb"
+  },
+  "SR%": {
+   "n": "Success Rate",
+   "d": "The share of plays that gained what the down and distance needed.",
+   "a": "fb"
+  },
+  "EXPL%": {
+   "n": "Explosive play rate",
+   "d": "The share of plays that are passes of 20+ yards or runs of 10+.",
+   "a": "fb"
+  },
+  "3D%": {
+   "n": "Third down rate",
+   "d": "The share of third downs converted.",
+   "a": "fb"
+  },
+  "RZ TD%": {
+   "n": "Red zone touchdown rate",
+   "d": "The share of drives inside the 20 that end in a touchdown.",
+   "a": "fb"
+  },
+  "PTS/DR": {
+   "n": "Points per drive",
+   "d": "Points scored on an average drive.",
+   "a": "fb"
+  },
+  "Y/P": {
+   "n": "Yards per play",
+   "d": "Yards gained on an average play.",
+   "a": "fb"
+  },
+  "Y/A": {
+   "n": "Yards per attempt",
+   "d": "Pass yards per throw.",
+   "a": "fb"
+  },
+  "Y/C": {
+   "n": "Yards per carry",
+   "d": "Rush yards per carry.",
+   "a": "fb"
+  },
+  "Y/R": {
+   "n": "Yards per reception",
+   "d": "Receiving yards per catch.",
+   "a": "fb"
+  },
+  "CMP%": {
+   "n": "Completion percentage",
+   "d": "The share of his passes that were caught.",
+   "a": "fb"
+  },
+  "ATT": {
+   "n": "Attempts",
+   "d": "Pass attempts.",
+   "a": "fb"
+  },
+  "DB": {
+   "n": "Dropbacks",
+   "d": "Passes, sacks and scrambles.",
+   "a": "fb",
+   "part": false,
+   "when": [
+    {
+     "m": "cb and s|defensive back",
+     "n": "Defensive backs",
+     "d": "The corners and safeties."
+    }
+   ]
+  },
+  "CAR": {
+   "n": "Carries",
+   "d": "Rush attempts.",
+   "a": "fb"
+  },
+  "TGT": {
+   "n": "Targets",
+   "d": "Passes thrown his way.",
+   "a": "fb"
+  },
+  "REC": {
+   "n": "Receptions",
+   "d": "Catches.",
+   "a": "fb",
+   "when": [
+    {
+     "m": "won|lost|record|wins|losses",
+     "n": "Record",
+     "d": "Wins and losses, with draws where the sport has them.",
+     "a": "gen"
+    },
+    {
+     "m": "rank",
+     "n": "Recruit rank",
+     "d": "His national rank as a recruit."
+    }
+   ]
+  },
+  "YDS": {
+   "n": "Yards",
+   "d": "Yards gained.",
+   "a": "fb"
+  },
+  "TD": {
+   "n": "Touchdowns",
+   "d": "Touchdowns scored.",
+   "a": "fb"
+  },
+  "TD%": {
+   "n": "Touchdown rate",
+   "d": "Touchdown passes per attempt.",
+   "a": "fb"
+  },
+  "INT": {
+   "n": "Interceptions",
+   "d": "Passes picked off.",
+   "a": "fb",
+   "when": [
+    {
+     "m": "interrupting",
+     "n": "Interrupting",
+     "d": "Goals added by tackles, interceptions and blocks.",
+     "a": "sc"
+    }
+   ]
+  },
+  "INT%": {
+   "n": "Interception rate",
+   "d": "Interceptions per attempt.",
+   "a": "fb"
+  },
+  "RTD": {
+   "n": "Rushing touchdowns",
+   "d": "Touchdowns on the ground.",
+   "a": "fb"
+  },
+  "RecTD": {
+   "n": "Receiving touchdowns",
+   "d": "Touchdown catches.",
+   "a": "fb"
+  },
+  "RECYDS": {
+   "n": "Receiving yards",
+   "d": "Yards on catches.",
+   "a": "fb"
+  },
+  "SCRIM": {
+   "n": "Scrimmage yards",
+   "d": "Rush and receiving yards together.",
+   "a": "fb"
+  },
+  "FUM": {
+   "n": "Fumbles",
+   "d": "Fumbles lost.",
+   "a": "fb"
+  },
+  "SACK%": {
+   "n": "Sack rate",
+   "d": "Sacks per dropback.",
+   "a": "fb"
+  },
+  "SCK": {
+   "n": "Sacks",
+   "d": "Sacks.",
+   "a": "fb"
+  },
+  "TFL": {
+   "n": "Tackles For Loss",
+   "d": "Tackles behind the line.",
+   "a": "fb"
+  },
+  "TKL": {
+   "n": "Tackles",
+   "d": "Tackles.",
+   "a": "fb"
+  },
+  "FF": {
+   "n": "Forced Fumbles",
+   "d": "Fumbles he knocked loose.",
+   "a": "fb"
+  },
+  "PD": {
+   "n": "Passes Defensed",
+   "d": "Passes he broke up.",
+   "a": "fb"
+  },
+  "QBH": {
+   "n": "QB Hits",
+   "d": "Hits on the quarterback.",
+   "a": "fb"
+  },
+  "TA/G": {
+   "n": "Takeaways per game",
+   "d": "Turnovers forced a game.",
+   "a": "fb"
+  },
+  "TO/G": {
+   "n": "Giveaways per game",
+   "d": "Turnovers lost a game.",
+   "a": "fb"
+  },
+  "SNAP%": {
+   "n": "Snap share",
+   "d": "The share of his team's snaps he played.",
+   "a": "fb"
+  },
+  "SG%": {
+   "n": "Shotgun rate",
+   "d": "The share of snaps from the shotgun.",
+   "a": "fb"
+  },
+  "UC%": {
+   "n": "Under center rate",
+   "d": "The share of snaps from under center.",
+   "a": "fb"
+  },
+  "PA%": {
+   "n": "Play action rate",
+   "d": "The share of dropbacks with a play fake.",
+   "a": "fb"
+  },
+  "RPO%": {
+   "n": "Run-Pass Option rate",
+   "d": "The share of plays that are run-pass options.",
+   "a": "fb"
+  },
+  "NH%": {
+   "n": "No-huddle rate",
+   "d": "The share of snaps without a huddle.",
+   "a": "fb"
+  },
+  "ST": {
+   "n": "Special Teams",
+   "d": "Kicking, punting and returns, in points.",
+   "a": "fb",
+   "part": false
+  },
+  "FG": {
+   "n": "Field Goals",
+   "d": "Field goals made and tried.",
+   "a": "fb",
+   "part": false
+  },
+  "FG+": {
+   "n": "Field goal points over expected",
+   "d": "Points from his kicks over what an average kicker makes from the same spots.",
+   "a": "fb"
+  },
+  "XP": {
+   "n": "Extra Points",
+   "d": "Extra points made and tried.",
+   "a": "fb",
+   "part": false
+  },
+  "xPct": {
+   "n": "Expected percentage",
+   "d": "The make rate an average kicker has on the same kicks.",
+   "a": "fb"
+  },
+  "KO": {
+   "n": "Kickoffs",
+   "d": "Kickoff value against an average kickoff.",
+   "a": "fb",
+   "part": false
+  },
+  "KO+": {
+   "n": "Kickoff points over expected",
+   "d": "Points saved by his kickoffs against an average kickoff.",
+   "a": "fb"
+  },
+  "KR": {
+   "n": "Kick Returns",
+   "d": "Kick return value over an average return.",
+   "a": "fb",
+   "part": false
+  },
+  "PR": {
+   "n": "Punt Returns",
+   "d": "Punt return value over an average return.",
+   "a": "fb",
+   "part": false
+  },
+  "TB": {
+   "n": "Touchbacks",
+   "d": "Kicks downed in the end zone.",
+   "a": "fb",
+   "part": false
+  },
+  "TB%": {
+   "n": "Touchback rate",
+   "d": "The share of kickoffs that are touchbacks.",
+   "a": "fb"
+  },
+  "In20": {
+   "n": "Inside the 20",
+   "d": "Punts that pin the return team inside its own 20.",
+   "a": "fb"
+  },
+  "NoRet": {
+   "n": "Not returned",
+   "d": "The share of punts with no return.",
+   "a": "fb"
+  },
+  "RetY": {
+   "n": "Return yards allowed",
+   "d": "Yards allowed on an average return.",
+   "a": "fb"
+  },
+  "LNG": {
+   "n": "Long",
+   "d": "His longest play.",
+   "a": "fb"
+  },
+  "COV": {
+   "n": "Coverage",
+   "d": "What the coverage units hold returns to against expected.",
+   "a": "fb",
+   "part": false
+  },
+  "BLK": {
+   "n": "Blocks",
+   "d": "Blocked kicks.",
+   "a": "fb",
+   "by": {
+    "college-basketball": {
+     "d": "Blocked shots.",
+     "a": "bk"
+    },
+    "nba": {
+     "d": "Blocked shots."
+    }
+   }
+  },
+  "APY": {
+   "n": "Average Per Year",
+   "d": "The yearly value of his contract.",
+   "a": "fb"
+  },
+  "AP": {
+   "n": "Associated Press poll",
+   "d": "The AP Top 25.",
+   "a": "fb",
+   "part": false
+  },
+  "FBS": {
+   "n": "Football Bowl Subdivision",
+   "d": "The top level of college football.",
+   "a": "fb"
+  },
+  "FCS": {
+   "n": "Football Championship Subdivision",
+   "d": "The second level of Division I football.",
+   "a": "fb"
+  },
+  "WAR/17": {
+   "n": "WAR per 17 games",
+   "d": "His WAR at a full-season pace.",
+   "g": "NFL WAR"
+  },
+  "WAA/17": {
+   "n": "WAA per 17 games",
+   "d": "His WAA at a full-season pace.",
+   "g": "WAA"
+  },
+  "WAR/1k": {
+   "n": "WAR per 1,000",
+   "d": "His WAR per 1,000 snaps, or per 1,000 minutes in hockey, shrunk for sample.",
+   "g": "Backup watch / xGap"
+  },
+  "WAA/FS": {
+   "n": "WAA per full season",
+   "d": "His WAA if he played every snap.",
+   "g": "WAA"
+  },
+  "WAA/FT": {
+   "n": "WAA at full time",
+   "d": "His WAA a season at a full-time snap share, shrunk for sample.",
+   "g": "Backup watch / xGap"
+  },
+  "AV WAR": {
+   "n": "AV WAR",
+   "d": "WAR built from approximate value.",
+   "g": "NFL WAR"
+  },
+  "SV/100": {
+   "n": "SV per 100 snaps",
+   "d": "A defender's points over replacement per 100 snaps.",
+   "g": "SV (NFL skill players, defenders)"
+  },
+  "PPG": {
+   "n": "Points Per Game",
+   "d": "Points he scores a game.",
+   "a": "bk",
+   "by": {
+    "nhl": {
+     "n": "Power Play Goals",
+     "d": "Goals scored on the power play.",
+     "a": "hk"
+    }
+   }
+  },
+  "RPG": {
+   "n": "Rebounds Per Game",
+   "d": "Rebounds a game.",
+   "a": "bk"
+  },
+  "PTS": {
+   "n": "Points",
+   "d": "Points.",
+   "a": "bk",
+   "by": {
+    "nhl": {
+     "d": "Goals plus assists for a skater, standings points for a team."
+    },
+    "hockey-prospects": {
+     "d": "Goals plus assists."
+    },
+    "soccer": {
+     "d": "League points."
+    }
+   },
+   "part": false,
+   "when": [
+    {
+     "m": "over replacement|over expected",
+     "d": "Points of value over the baseline, not points scored."
+    }
+   ]
+  },
+  "REB": {
+   "n": "Rebounds",
+   "d": "Rebounds.",
+   "a": "bk"
+  },
+  "AST": {
+   "n": "Assists",
+   "d": "Assists.",
+   "a": "bk"
+  },
+  "STL": {
+   "n": "Steals",
+   "d": "Steals.",
+   "a": "bk"
+  },
+  "TS%": {
+   "n": "True Shooting percentage",
+   "d": "Points per shooting chance, with threes and free throws counted.",
+   "a": "bk"
+  },
+  "EFG%": {
+   "n": "Effective Field Goal percentage",
+   "d": "Field goal percentage with a three counted as one and a half makes.",
+   "a": "bk"
+  },
+  "2P%": {
+   "n": "Two-point percentage",
+   "d": "The share of his twos that go in.",
+   "a": "bk"
+  },
+  "3P%": {
+   "n": "Three-point percentage",
+   "d": "The share of his threes that go in.",
+   "a": "bk"
+  },
+  "3P": {
+   "n": "Three-pointers",
+   "d": "Threes made and tried.",
+   "a": "bk"
+  },
+  "3PA": {
+   "n": "Three-point attempts",
+   "d": "Threes tried.",
+   "a": "bk"
+  },
+  "3PA%": {
+   "n": "Three-point attempt rate",
+   "d": "The share of shots taken from three.",
+   "a": "bk"
+  },
+  "FT%": {
+   "n": "Free throw percentage",
+   "d": "The share of his free throws that go in.",
+   "a": "bk"
+  },
+  "FTR": {
+   "n": "Free Throw Rate",
+   "d": "Free throws tried per field goal attempt.",
+   "a": "bk"
+  },
+  "FT/FGA": {
+   "n": "Free throws per field goal attempt",
+   "d": "Free throws made per shot tried.",
+   "a": "bk"
+  },
+  "USG": {
+   "n": "Usage",
+   "d": "The share of his team's possessions he finishes while on the floor.",
+   "a": "bk"
+  },
+  "USG%": {
+   "n": "Usage rate",
+   "d": "The share of his team's possessions he finishes while on the floor.",
+   "a": "bk"
+  },
+  "AST%": {
+   "n": "Assist rate",
+   "d": "The share of teammates' baskets he assisted while on the floor.",
+   "a": "bk"
+  },
+  "ORB%": {
+   "n": "Offensive rebound rate",
+   "d": "The share of available offensive rebounds grabbed.",
+   "a": "bk"
+  },
+  "TOV%": {
+   "n": "Turnover rate",
+   "d": "Turnovers per 100 possessions.",
+   "a": "bk"
+  },
+  "TO%": {
+   "n": "Turnover rate",
+   "d": "Turnovers per 100 plays.",
+   "a": "bk"
+  },
+  "STL%": {
+   "n": "Steal rate",
+   "d": "The share of opponent possessions he ends with a steal.",
+   "a": "bk"
+  },
+  "BLK%": {
+   "n": "Block rate",
+   "d": "The share of opponent twos he blocks.",
+   "a": "bk"
+  },
+  "ORTG": {
+   "n": "Offensive Rating",
+   "d": "Points scored per 100 possessions.",
+   "a": "bk"
+  },
+  "DRTG": {
+   "n": "Defensive Rating",
+   "d": "Points allowed per 100 possessions.",
+   "a": "bk"
+  },
+  "SNET": {
+   "n": "Shrunk net rating",
+   "d": "A lineup's net rating pulled toward average when it has played little.",
+   "a": "bk"
+  },
+  "ON-OFF": {
+   "n": "On-off",
+   "d": "The team's net rating with him on the floor minus with him off.",
+   "a": "bk"
+  },
+  "SON-OFF": {
+   "n": "Shrunk on-off",
+   "d": "On-off pulled toward zero when the sample is small.",
+   "a": "bk"
+  },
+  "ADJO": {
+   "n": "Adjusted Offense",
+   "d": "Points per 100 possessions, adjusted for opponent and venue.",
+   "a": "bk"
+  },
+  "ADJD": {
+   "n": "Adjusted Defense",
+   "d": "Points allowed per 100 possessions, adjusted for opponent and venue.",
+   "a": "bk"
+  },
+  "PACE": {
+   "n": "Pace",
+   "d": "Possessions a game.",
+   "a": "bk",
+   "only": [
+    "nba",
+    "college-basketball",
+    "arkranking"
+   ],
+   "part": false
+  },
+  "POSS": {
+   "n": "Possessions",
+   "d": "Possessions played.",
+   "a": "bk"
+  },
+  "NIL": {
+   "n": "Name, Image and Likeness",
+   "d": "What college players are paid.",
+   "g": "xNIL / yNIL / zNIL"
+  },
+  "TOI": {
+   "n": "Time On Ice",
+   "d": "Minutes he has played.",
+   "a": "hk"
+  },
+  "TOI/G": {
+   "n": "Time On Ice per game",
+   "d": "Minutes he plays a game.",
+   "a": "hk"
+  },
+  "xG": {
+   "n": "Expected Goals",
+   "d": "The goals an average finisher scores from the same shots.",
+   "a": "hk",
+   "inline": true,
+   "by": {
+    "soccer": {
+     "a": "sc"
+    },
+    "soccer-prospects": {
+     "a": "sc"
+    }
+   }
+  },
+  "xGF": {
+   "n": "Expected Goals For",
+   "d": "The goals his team's shots should produce.",
+   "a": "hk"
+  },
+  "xGA": {
+   "n": "Expected Goals Against",
+   "d": "The goals the shots his team allows should produce.",
+   "a": "hk",
+   "by": {
+    "soccer": {
+     "a": "sc"
+    }
+   }
+  },
+  "XGF/60": {
+   "n": "Expected Goals For per 60",
+   "d": "Expected goals for per 60 minutes.",
+   "a": "hk"
+  },
+  "XGA/60": {
+   "n": "Expected Goals Against per 60",
+   "d": "Expected goals against per 60 minutes.",
+   "a": "hk"
+  },
+  "HDXGF": {
+   "n": "High-Danger Expected Goals For",
+   "d": "Expected goals from the best scoring areas, per 60 minutes.",
+   "a": "hk"
+  },
+  "HDXGA": {
+   "n": "High-Danger Expected Goals Against",
+   "d": "Expected goals allowed from the best scoring areas, per 60 minutes.",
+   "a": "hk"
+  },
+  "CF/60": {
+   "n": "Corsi For per 60",
+   "d": "Shot attempts for per 60 minutes.",
+   "a": "hk"
+  },
+  "CA/60": {
+   "n": "Corsi Against per 60",
+   "d": "Shot attempts against per 60 minutes.",
+   "a": "hk"
+  },
+  "GF/60": {
+   "n": "Goals For per 60",
+   "d": "Goals scored per 60 minutes.",
+   "a": "hk"
+  },
+  "GA/60": {
+   "n": "Goals Against per 60",
+   "d": "Goals allowed per 60 minutes.",
+   "a": "hk"
+  },
+  "GF/G": {
+   "n": "Goals For per game",
+   "d": "Goals scored a game.",
+   "a": "hk"
+  },
+  "GA/G": {
+   "n": "Goals Against per game",
+   "d": "Goals allowed a game.",
+   "a": "hk"
+  },
+  "GAR/60": {
+   "n": "GAR per 60",
+   "d": "Goals above replacement per 60 minutes.",
+   "g": "NHL WAR"
+  },
+  "PP%": {
+   "n": "Power Play percentage",
+   "d": "The share of power plays that end in a goal.",
+   "a": "hk"
+  },
+  "PK%": {
+   "n": "Penalty Kill percentage",
+   "d": "The share of penalties killed without a goal.",
+   "a": "hk"
+  },
+  "SHG": {
+   "n": "Shorthanded Goals",
+   "d": "Goals scored while a man down.",
+   "a": "hk"
+  },
+  "SHGA": {
+   "n": "Shorthanded Goals Against",
+   "d": "Goals allowed while on the power play.",
+   "a": "hk"
+  },
+  "PIM/G": {
+   "n": "Penalty Minutes per game",
+   "d": "Penalty minutes a game.",
+   "a": "hk"
+  },
+  "OPP/G": {
+   "n": "Power play opportunities per game",
+   "d": "Power plays drawn a game.",
+   "a": "hk"
+  },
+  "TSH/G": {
+   "n": "Times Shorthanded per game",
+   "d": "Penalties taken a game.",
+   "a": "hk"
+  },
+  "FIN/G": {
+   "n": "Finishing per game",
+   "d": "Goals minus expected goals a game.",
+   "a": "hk"
+  },
+  "+/-": {
+   "n": "Plus-minus",
+   "d": "Scored minus allowed.",
+   "a": "hk",
+   "part": false,
+   "by": {
+    "nhl": {
+     "d": "Goals for minus goals against while he is on the ice."
+    },
+    "hockey-prospects": {
+     "d": "Goals for minus goals against while he is on the ice."
+    }
+   }
+  },
+  "P/GP": {
+   "n": "Points per game",
+   "d": "Goals plus assists a game.",
+   "a": "hk"
+  },
+  "A": {
+   "n": "Assists",
+   "d": "Assists.",
+   "a": "hk",
+   "part": false
+  },
+  "xA": {
+   "n": "Expected Assists",
+   "d": "The expected goals of the shots his passes set up.",
+   "a": "sc",
+   "inline": true
+  },
+  "npxG": {
+   "n": "Non-Penalty Expected Goals",
+   "d": "Expected goals with penalties left out.",
+   "a": "sc",
+   "inline": true
+  },
+  "xGChain": {
+   "n": "xG Chain",
+   "d": "The expected goals of every possession he touched.",
+   "a": "sc"
+  },
+  "xGBuild": {
+   "n": "xG Buildup",
+   "d": "xG Chain without his own shots and key passes.",
+   "a": "sc"
+  },
+  "PSXG": {
+   "n": "Post-Shot Expected Goals",
+   "d": "Expected goals judged after the shot is struck, so placement counts. It grades keepers.",
+   "a": "sc"
+  },
+  "G+": {
+   "n": "Goals Added",
+   "d": "The goals his every action adds over an average player at his position.",
+   "a": "sc"
+  },
+  "G+A": {
+   "n": "Goals plus Assists",
+   "d": "Goals and assists together.",
+   "a": "sc"
+  },
+  "G-xG": {
+   "n": "Goals minus xG",
+   "d": "Finishing above or below expected. It is noisy.",
+   "a": "sc"
+  },
+  "GD": {
+   "n": "Goal Difference",
+   "d": "Goals scored minus goals allowed.",
+   "a": "sc"
+  },
+  "GF": {
+   "n": "Goals For",
+   "d": "Goals scored.",
+   "a": "sc"
+  },
+  "GA": {
+   "n": "Goals Against",
+   "d": "Goals allowed.",
+   "a": "sc"
+  },
+  "GAR/90": {
+   "n": "GAR per 90",
+   "d": "Goals above replacement per 90 minutes.",
+   "g": "GAR (soccer, senior)"
+  },
+  "KP": {
+   "n": "Key Passes",
+   "d": "Passes that lead to a shot.",
+   "a": "sc"
+  },
+  "BC": {
+   "n": "Big Chances",
+   "d": "Chances a player is expected to score.",
+   "a": "sc"
+  },
+  "SI%": {
+   "n": "Shot Involvement",
+   "d": "The share of his team's shots he took or set up while on the pitch.",
+   "g": "Next up tiers (usage scaling)"
+  },
+  "xGI": {
+   "n": "Expected Goal Involvement",
+   "d": "xG plus xA.",
+   "a": "sc"
+  },
+  "MV": {
+   "n": "Market Value",
+   "d": "His Transfermarkt value.",
+   "a": "sc"
+  },
+  "TM": {
+   "n": "Transfermarkt",
+   "d": "His Transfermarkt market value, in EUR millions.",
+   "a": "sc"
+  },
+  "BTTS": {
+   "n": "Both Teams To Score",
+   "d": "The chance both sides score.",
+   "a": "sc"
+  },
+  "O2.5": {
+   "n": "Over 2.5",
+   "d": "The chance of three or more goals.",
+   "a": "sc"
+  },
+  "UCL": {
+   "n": "UEFA Champions League",
+   "d": "The chance of a Champions League place.",
+   "a": "sc"
+  },
+  "REL": {
+   "n": "Relegation",
+   "d": "The chance of going down.",
+   "a": "sc"
+  },
+  "KM/90": {
+   "n": "Kilometres per 90",
+   "d": "Distance covered per 90 minutes.",
+   "a": "sc"
+  },
+  "/90": {
+   "n": "Per 90",
+   "d": "The rate per 90 minutes.",
+   "a": "sc",
+   "part": false
+  },
+  "/96": {
+   "n": "Per 96",
+   "d": "The rate per 96 minutes, a full MLS match with stoppage time.",
+   "a": "sc"
+  },
+  "SPW": {
+   "n": "Serve Points Won",
+   "d": "The share of his serve points he wins.",
+   "a": "tn"
+  },
+  "RPW": {
+   "n": "Return Points Won",
+   "d": "The share of return points he wins.",
+   "a": "tn"
+  },
+  "PA": {
+   "n": "Points Added",
+   "d": "Points won per 100 over an average top-100 player against the same opponents.",
+   "g": "Tennis ARK",
+   "part": false,
+   "only": [
+    "tennis",
+    "tennis-prospects"
+   ]
+  },
+  "rPA": {
+   "n": "Regressed Points Added",
+   "d": "PA over the last 52 weeks, shrunk for sample.",
+   "g": "Tennis ARK"
+  },
+  "DR": {
+   "n": "Dominance Ratio",
+   "d": "Return points won divided by serve points lost. Above 1 means he wins more points than he loses.",
+   "a": "tn",
+   "part": false,
+   "only": [
+    "tennis",
+    "tennis-prospects"
+   ]
+  },
+  "DF": {
+   "n": "Double Faults",
+   "d": "Double faults per serve point.",
+   "a": "tn",
+   "part": false,
+   "only": [
+    "tennis",
+    "tennis-prospects"
+   ]
+  },
+  "ACE": {
+   "n": "Aces",
+   "d": "Aces per serve point.",
+   "a": "tn"
+  },
+  "BP CONV": {
+   "n": "Break Points Converted",
+   "d": "The share of his break chances he takes.",
+   "a": "tn"
+  },
+  "BP SAVED": {
+   "n": "Break Points Saved",
+   "d": "The share of break points against him he saves.",
+   "a": "tn"
+  },
+  "13WK": {
+   "n": "13 weeks",
+   "d": "His Elo change over the last 13 weeks.",
+   "g": "Elo / Elo+ (tennis)"
+  },
+  "K/D": {
+   "n": "Kills per Death",
+   "d": "Kills divided by deaths. Above 1 means he wins more fights than he loses.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "ADR": {
+   "n": "Average Damage per Round",
+   "d": "The damage he deals in an average round.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "KPR": {
+   "n": "Kills Per Round",
+   "d": "Kills in an average round.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "DPR": {
+   "n": "Deaths Per Round",
+   "d": "Deaths in an average round.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "KAST": {
+   "n": "Kill, Assist, Survive or Trade",
+   "d": "The share of rounds where he got a kill, an assist, survived or was traded.",
+   "a": "cs"
+  },
+  "HS%": {
+   "n": "Headshot percentage",
+   "d": "The share of his kills that were headshots.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "UDR": {
+   "n": "Utility Damage per Round",
+   "d": "Grenade damage in an average round.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "VRS": {
+   "n": "Valve Regional Standings",
+   "d": "Valve's own team ranking, which decides Major invites.",
+   "a": "cs"
+  },
+  "HLTV": {
+   "n": "HLTV",
+   "d": "The main Counter-Strike stats site, and its player rating.",
+   "a": "cs"
+  },
+  "ESEA": {
+   "n": "ESEA League",
+   "d": "The open league ladder that leads up toward the pro tier.",
+   "a": "cs"
+  },
+  "PUG": {
+   "n": "Pick-up game",
+   "d": "A matchmaking game with random teammates, not a team match.",
+   "a": "cs"
+  },
+  "Bo3": {
+   "n": "Best of three",
+   "d": "A series of up to three maps.",
+   "a": "cs"
+  },
+  "T%": {
+   "n": "T-side win rate",
+   "d": "The share of attacking rounds won.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "CT%": {
+   "n": "CT-side win rate",
+   "d": "The share of defending rounds won.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "T1%": {
+   "n": "Tier-1 chance",
+   "d": "The chance he plays 20+ maps at S-tier events within a year.",
+   "g": "CS2 prospect FV"
+  },
+  "xPrize": {
+   "n": "Expected prize money",
+   "d": "The prize money a year a five with this rating should win.",
+   "g": "xMV / xTV / team value (CS2)"
+  },
+  "ARK O": {
+   "n": "ARK offense",
+   "d": "The offense's rating in the ARK Ranking, in points per 100 possessions.",
+   "g": "CBB rating"
+  },
+  "ARK D": {
+   "n": "ARK defense",
+   "d": "The defense's rating in the ARK Ranking, in points allowed per 100 possessions.",
+   "g": "CBB rating"
+  },
+  "On xGD": {
+   "n": "On-pitch xG difference",
+   "d": "His team's expected goal difference per 90 with him on the pitch.",
+   "g": "GAR (soccer, senior)"
+  },
+  "On%": {
+   "n": "Chance to play",
+   "d": "The chance he is on the board with snaps next season.",
+   "g": "Recruit FV / xFV"
+  },
+  "xDrafted": {
+   "n": "Expected drafted",
+   "d": "How many of the signees their ratings say get drafted.",
+   "g": "Development (school / coach)"
+  },
+  "xNBA": {
+   "n": "Expected NBA players",
+   "d": "The NBA chances on the roster added up.",
+   "g": "Returning / talent (CBB)"
+  },
+  "VOR": {
+   "n": "Value Over Replacement",
+   "d": "His fantasy projection minus a replacement starter's at his position.",
+   "g": "NFL fantasy VOR"
+  },
+  "DD 25/50": {
+   "n": "Drawdown",
+   "d": "The chance the bankroll falls 25% or 50% from its peak.",
+   "g": "Growth / DD 25/50"
+  },
+  "X": {
+   "n": "Pick rule",
+   "d": "How far the model has to be from the line before it is a pick.",
+   "g": "Pick rule (X)",
+   "part": false
+  },
+  "b": {
+   "n": "Market softness",
+   "d": "The share of the gap between my number and the line that came true.",
+   "g": "Close predictor",
+   "part": false
+  },
+  "ATS": {
+   "n": "Against The Spread",
+   "d": "The record against the point spread.",
+   "a": "gen"
+  },
+  "P/L": {
+   "n": "Profit and Loss",
+   "d": "Units won or lost.",
+   "a": "gen"
+  },
+  "EV": {
+   "n": "Expected Value",
+   "d": "The average return of the bet at its price.",
+   "a": "gen",
+   "part": false
+  },
+  "MAE": {
+   "n": "Mean Absolute Error",
+   "d": "The average miss. Lower is better.",
+   "a": "gen"
+  },
+  "LL": {
+   "n": "Log Loss",
+   "d": "A score for win chances that punishes confident misses. Lower is better.",
+   "a": "gen"
+  },
+  "FDR": {
+   "n": "False Discovery Rate",
+   "d": "The share of passing tests expected to be flukes.",
+   "a": "gen"
+  },
+  "q": {
+   "n": "q-value",
+   "d": "The p-value after correcting for running many tests.",
+   "a": "gen",
+   "part": false
+  },
+  "z": {
+   "n": "z-score",
+   "d": "How many standard deviations from average.",
+   "a": "gen",
+   "part": false
+  },
+  "ET": {
+   "n": "Eastern Time",
+   "d": "Times are US Eastern.",
+   "a": "gen",
+   "part": false
+  },
+  "ETA": {
+   "n": "Estimated arrival",
+   "d": "When he is expected in the league.",
+   "a": "gen"
+  },
+  "ROS": {
+   "n": "Rest Of Season",
+   "d": "The games still to play.",
+   "a": "gen"
+  },
+  "W": {
+   "n": "Wins",
+   "d": "Games won.",
+   "a": "gen",
+   "by": {
+    "games": {
+     "n": "Watch score",
+     "d": "A 0-100 score for how much a game is worth watching.",
+     "g": "Games to watch (W)"
+    }
+   },
+   "part": false,
+   "when": [
+    {
+     "m": "watch|0-100",
+     "n": "Watch score",
+     "d": "A 0-100 score for how much a game is worth watching.",
+     "g": "Games to watch (W)"
+    },
+    {
+     "m": "weight",
+     "n": "Weight",
+     "d": "The weight on this season's grade."
+    }
+   ]
+  },
+  "L": {
+   "n": "Losses",
+   "d": "Games lost.",
+   "a": "gen",
+   "part": false
+  },
+  "L10": {
+   "n": "Last 10",
+   "d": "The record over the last ten games.",
+   "a": "gen"
+  },
+  "GB": {
+   "n": "Games Back",
+   "d": "How far behind first place.",
+   "a": "gen"
+  },
+  "PF": {
+   "n": "Points For",
+   "d": "Points scored.",
+   "a": "gen"
+  },
+  "LG": {
+   "n": "League",
+   "d": "His league.",
+   "a": "gen",
+   "part": false
+  },
+  "1 seed": {
+   "n": "One seed",
+   "d": "The chance of the top seed.",
+   "a": "gen"
+  },
+  "Div%": {
+   "n": "Division chance",
+   "d": "The chance of winning the division.",
+   "a": "gen"
+  },
+  "WC1": {
+   "n": "First wild card",
+   "d": "The chance of the first wild card seed.",
+   "a": "gen"
+  },
+  "WC2": {
+   "n": "Second wild card",
+   "d": "The chance of the second wild card seed.",
+   "a": "gen"
+  },
+  "PO": {
+   "n": "Play-off",
+   "d": "The chance of finishing in the play-off places.",
+   "a": "gen",
+   "part": false
+  },
+  "R16": {
+   "n": "Round of 16",
+   "d": "The chance of reaching the round of 16.",
+   "a": "gen"
+  },
+  "R32": {
+   "n": "Round of 32",
+   "d": "The chance of reaching the round of 32.",
+   "a": "gen"
+  },
+  "S16": {
+   "n": "Sweet 16",
+   "d": "The chance of reaching the Sweet 16.",
+   "a": "bk"
+  },
+  "E8": {
+   "n": "Elite Eight",
+   "d": "The chance of reaching the Elite Eight.",
+   "a": "bk"
+  },
+  "F4": {
+   "n": "Final Four",
+   "d": "The chance of reaching the Final Four.",
+   "a": "bk"
+  },
+  "SB": {
+   "n": "Super Bowl",
+   "d": "The chance of winning the Super Bowl.",
+   "a": "fb"
+  },
+  "PPR": {
+   "n": "Points Per Reception",
+   "d": "Fantasy scoring that gives a point for each catch.",
+   "a": "fb"
+  },
+  "QB": {
+   "n": "Quarterback",
+   "d": "The quarterback spot.",
+   "a": "fb",
+   "part": false
+  },
+  "RB": {
+   "n": "Running back",
+   "d": "The running backs.",
+   "a": "fb",
+   "part": false
+  },
+  "WR/TE": {
+   "n": "Wide receivers and tight ends",
+   "d": "The pass catchers.",
+   "a": "fb"
+  },
+  "OL": {
+   "n": "Offensive line",
+   "d": "The offensive line.",
+   "a": "fb",
+   "part": false
+  },
+  "DL": {
+   "n": "Defensive line",
+   "d": "The defensive line and edge rushers.",
+   "a": "fb",
+   "part": false
+  },
+  "LB": {
+   "n": "Linebacker",
+   "d": "The linebackers.",
+   "a": "fb",
+   "part": false
+  },
+  "K/P": {
+   "n": "Kickers and punters",
+   "d": "The kicking specialists.",
+   "a": "fb"
+  },
+  "Big%": {
+   "n": "Big throw rate",
+   "d": "Deep completions on hard throws, per dropback.",
+   "a": "fb"
+  },
+  "Blitz%": {
+   "n": "Blitz rate",
+   "d": "The share of dropbacks that see a blitz.",
+   "a": "fb"
+  },
+  "Heavy%": {
+   "n": "Heavy box rate",
+   "d": "The share of runs into a box of eight or more.",
+   "a": "fb"
+  },
+  "Light%": {
+   "n": "Light box rate",
+   "d": "The share of runs into a box of six or fewer.",
+   "a": "fb"
+  },
+  "Motion%": {
+   "n": "Motion rate",
+   "d": "The share of plays with motion before the snap.",
+   "a": "fb"
+  },
+  "Pistol%": {
+   "n": "Pistol rate",
+   "d": "The share of snaps from the pistol.",
+   "a": "fb",
+   "only": [
+    "nfl",
+    "college-football"
+   ]
+  },
+  "Screen%": {
+   "n": "Screen rate",
+   "d": "The share of dropbacks that are screens.",
+   "a": "fb"
+  },
+  "247": {
+   "n": "247Sports",
+   "d": "His 247Sports rank.",
+   "a": "fb",
+   "part": false
+  },
+  "On3": {
+   "n": "On3",
+   "d": "His On3 number.",
+   "a": "fb",
+   "part": false
+  },
+  "RIV": {
+   "n": "Rivals",
+   "d": "His Rivals rank.",
+   "a": "fb",
+   "part": false
+  },
+  "PRA": {
+   "n": "Points, Rebounds and Assists",
+   "d": "The three added together.",
+   "a": "bk"
+  },
+  "3PM": {
+   "n": "Three-pointers made",
+   "d": "Threes made.",
+   "a": "bk"
+  },
+  "FG%": {
+   "n": "Field goal percentage",
+   "d": "The share of his shots that go in.",
+   "a": "bk"
+  },
+  "STL+BLK": {
+   "n": "Steals plus blocks",
+   "d": "Steals and blocks together.",
+   "a": "bk"
+  },
+  "Min%": {
+   "n": "Minutes share",
+   "d": "The share of his team's minutes he plays.",
+   "a": "bk"
+  },
+  "Starter%": {
+   "n": "Starter chance",
+   "d": "The chance he has 2+ seasons as an NBA starter.",
+   "g": "Tier chances (NBA%, NHL%, Top%, Reg%, Star%)"
+  },
+  "Drafted%": {
+   "n": "Drafted chance",
+   "d": "The chance he is picked in the simulated drafts.",
+   "g": "Mock sims"
+  },
+  "+VORX": {
+   "n": "VORX added",
+   "d": "The VORX over what was expected.",
+   "g": "VORX"
+  },
+  "P/60": {
+   "n": "Points per 60",
+   "d": "Goals plus assists per 60 minutes.",
+   "a": "hk"
+  },
+  "P/82": {
+   "n": "Points per 82",
+   "d": "Goals plus assists at a full-season pace.",
+   "a": "hk"
+  },
+  "OTL": {
+   "n": "Overtime Losses",
+   "d": "Losses past regulation, worth one point.",
+   "a": "hk"
+  },
+  "PTS%": {
+   "n": "Points percentage",
+   "d": "The share of available standings points won.",
+   "a": "hk",
+   "by": {
+    "soccer": {
+     "a": "sc"
+    }
+   }
+  },
+  "GAA": {
+   "n": "Goals Against Average",
+   "d": "Goals a goalie allows per 60 minutes.",
+   "a": "hk"
+  },
+  "PIM": {
+   "n": "Penalty Minutes",
+   "d": "Minutes spent in the box.",
+   "a": "hk"
+  },
+  "xG+xA": {
+   "n": "xG plus xA",
+   "d": "Expected goals and expected assists together.",
+   "a": "sc"
+  },
+  "xGA-GA": {
+   "n": "xGA minus GA",
+   "d": "Expected goals against minus goals against. It is goalkeeping and luck.",
+   "a": "sc"
+  },
+  "SV%": {
+   "n": "Save percentage",
+   "d": "The share of shots a goalie stops.",
+   "a": "hk"
+  }
+ }
+}
