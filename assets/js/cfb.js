@@ -200,7 +200,7 @@
       cons: td('cfb__num cfb__now', r.cons == null ? dim : '<span title="#' + r.consRk + ' on the consensus board · ' + r.consN + ' of 10 boards">' + f1(r.cons) + '</span>'),
       draft: td('cfb__num cfb__now', r.draftP == null ? dim : r.draftP < 0.005 ? '<span class="cfb__dim">&lt;1%</span>' : Math.min(99, Math.round(r.draftP * 100)) + '%'),
       ret: td('cfb__num cfb__now', r.retP == null ? dim : r.retP < 0.005 ? '<span class="cfb__dim">&lt;1%</span>' : Math.min(99, Math.round(r.retP * 100)) + '%'),
-      dor: td('cfb__num cfb__now', r.dor == null ? dim : '<span class="cfb__dor' + (r.dor > 0 ? ' cfb__dor--r' : '') + '" title="' + (r.dor > 0 ? 'return' : 'declare') + ' +$' + Math.abs(r.dor).toFixed(Math.abs(r.dor) < 10 ? 1 : 0) + 'M · declare $' + (+r.dorD).toFixed(1) + 'M · return $' + (r.dorD + r.dor).toFixed(1) + 'M">' + (r.dor > 0 ? 'RET' : 'DEC') + '</span>'),
+      dec: td('cfb__num cfb__now', r.dec == null ? dim : '<span class="cfb__dec cfb__dec--' + (r.decE ? 'e' : r.dec > 0 ? 'c' : 'd') + '" title="risk-adjusted: ' + (r.dec > 0 ? 'college' : 'declare') + ' +$' + Math.abs(r.dec).toFixed(Math.abs(r.dec) < 10 ? 1 : 0) + 'M' + (r.decM != null ? ' · on average: ' + (r.decM > 0 ? 'college' : 'declare') + ' +$' + Math.abs(r.decM).toFixed(Math.abs(r.decM) < 10 ? 1 : 0) + 'M' : '') + (r.decD != null ? ' · declaring is worth $' + (+r.decD).toFixed(1) + 'M for sure' : '') + '">' + (r.decE ? 'Even' : r.dec > 0 ? 'College' : 'Declare') + '</span>'),
       up: td('cfb__num cfb__now', r.up != null ? '<span' + (r.moveUp ? ' class="cfb__upv"' : '') + '>' + Math.round(r.up * 100) + '%</span>' : dim),
       xfer: td('cfb__num cfb__now', xferCell(r)),
       xnil: td('cfb__num cfb__now', r.xnil ? '<span class="cfb__nil">' + money(r.xnil) + '</span>' : dim),
@@ -296,7 +296,7 @@
     team: function (r) { return r.team; }, cls: function (r) { return r.elig; },
     age: function (r) { return r.age != null ? r.age : r.ageEst; }, ht: function (r) { return inches(r.ht) || null; }, mht: function (r) { return r.mz ? r.mz[0] : null; },
     cons: function (r) { return r.cons; }, stat: statOf, xnil: function (r) { return r.xnil; }, ynil: function (r) { return r.ynil; }, znil: function (r) { return r.znil; },
-    up: function (r) { return r.up; }, draft: function (r) { return r.draftP; }, ret: function (r) { return r.retP; }, dor: function (r) { return r.dor; }, xfer: function (r) { return r.transferP; },
+    up: function (r) { return r.up; }, draft: function (r) { return r.draftP; }, ret: function (r) { return r.retP; }, dec: function (r) { return r.dec; }, xfer: function (r) { return r.transferP; },
     snaps: function (r) { return r.snapShare != null ? r.snapShare : null; }, war: function (r) { return r.war; }, waa: function (r) { return r.waa; }, waafs: waaFs, xv: function (r) { return r.xv; },
   };
 

@@ -1095,15 +1095,18 @@
      ]
     },
     {
-     "term": "DoR",
-     "short": "Declare or Return: the money by going back to college less the money by declaring, for a draft prospect with eligibility left.",
+     "term": "DEC",
+     "short": "Declare, Even, College: what another year in college is worth to a draft prospect less what declaring is worth, with Even when the model cannot tell the two apart.",
      "body": [
-      "Declare = the rookie deal + later earnings, averaged over where he goes from his xPick (CBB: his consensus rank). Return = yNIL for the season + the same draft value one year older. Dollars are at this season's cap, later years count 0.97 a year. RET on the board means return pays more. It is what pays on average, not what he will do (that is Ret%).",
-      "The return side holds his draft stock where it is, so going back costs a year and pays yNIL. A board ranks him for this draft, so a young player who develops can beat that, and one who gets hurt falls under it. Who went back is not a fair sample of either (the ones told they would go late stay), so their record is shown below and not used. These are means, and a few long careers carry them.",
+      "Declare = the rookie deal + later earnings over where he goes from his xPick (CBB: his consensus rank). College = yNIL for the season + the same draft value one year older. Dollars are at this season's cap, later years count 0.97 a year. It is what is worth more to him, not what he will do (that is Ret%).",
+      "Each side is a certainty equivalent: the sure amount he would trade the gamble for, with log utility over $2M (what a college graduate earns outside the sport) plus the outcome. A player gets one career and cannot spread the risk, so a sure yNIL counts for more than the same dollars spread over a few long careers. The outcome spread is the pick spread times how far later earnings land from the fit at that pick, from the same drafts as the fit (NBA: the 2011-14 drafts, 187 picks and 237 undrafted prospects). The hover keeps the edge on plain averages.",
+      "Even: the edge is inside one standard error, from yNIL's error (log error 0.49 CFB, 0.65 CBB against On3) and the age term's. On the 2022-25 CFB boards 35% were Even, on the CBB boards 37%.",
+      "Three readings against who went back, CFB (626 prospects, 17% returned) / CBB (212, 34%). Average: says college for 0% / 0%, AUC inside rank thirds 0.46 / 0.66. Median: says college for 34% / 63%, AUC inside rank thirds 0.55 / 0.75. Certainty equivalent: says college for 33% / 62%, AUC inside rank thirds 0.56 / 0.74. The average sends almost nobody back, so the board uses the certainty equivalent. Returned by verdict, CFB: Declare 9%, Even 26%, College 29%. CBB: 10%, 23%, 65%.",
+      "The college side holds his draft stock where it is, so going back costs a year and pays yNIL. A young player who develops can beat that, and one who gets hurt falls under it. Who went back is not a fair sample of either (the ones told they would go late stay), so their record is shown below and not used.",
       "NFL rookie deal: the 2026 slotted four-year totals, with the guaranteed share by pick from OverTheCap rookie deals and the rest counted at the odds he is still on a roster. Later earnings: every veteran contract of the 2011-15 drafts (1,270 picks) as a share of the cap, fit on pick, position and age. A year older at the same pick is -18% in later earnings (t = -3.7). NBA: salary in seasons 1-4 by pick (2011-22 drafts, 569 college picks) and from season 5 on (2008-14, 335 picks); a year older is -19% (t = -2.7). Undrafted prospects on ESPN's final board made $1.1M in seasons 1-4 and 28% drew an NBA salary.",
       "Pick spread, from players with no choice: 151 redshirt seniors and grads on each draft's last PFF board before the January deadline (2021-25; 30% undrafted, sd 0.78 in ln pick) and 39 seniors on the No Ceilings midseason board (2022-26; 33% undrafted, sd 0.61). Early entrants who left went undrafted 19% (all declared, CFB) and 9% (CBB) of the time: they left knowing more than the board.",
-      "Break-even yNIL, CFB by xPick (WR / QB, $M): 10 10.8 / 25.3, 32 6.9 / 16.3, 50 5.4 / 12.8, 100 3.4 / 8.0, 150 2.4 / 5.6, 200 1.8 / 4.2, 300 1.2 / 2.6. CBB by consensus rank (age 20): 5 34.3, 14 19.4, 30 10.2, 50 5.8, 60 4.5, 80 3.0, 100 2.1.",
-      "The returners' record, CFB 2022-25 boards: 107 went back, 57% were drafted the next year and 41% came out ahead of what declaring was worth (mean $21.2M with NIL scaled to that season's market, against $19.7M). CBB 2022-26: 19 returners with a draft or an exit the next year (33 went back again), 47% drafted, 32% ahead ($30.6M against $37.5M). Break-even yNIL on that record, CFB (WR / QB): 10 15.5 / 37.4, 32 7.5 / 19.5, 100 1.9 / 5.4, 200 -0.6 / -0.8."
+      "Break-even yNIL, CFB by xPick (WR certainty equivalent / QB / WR on averages, $M): 10 5.0 / 8.6 / 10.8, 32 2.3 / 3.6 / 6.9, 50 1.5 / 2.3 / 5.4, 100 0.7 / 1.0 / 3.4, 150 0.4 / 0.6 / 2.4, 200 0.3 / 0.4 / 1.8, 300 0.2 / 0.2 / 1.2. CBB by consensus rank (age 20, certainty equivalent / averages): 5 9.8 / 34.3, 14 1.9 / 19.4, 30 0.5 / 10.2, 50 0.2 / 5.8, 60 0.1 / 4.5, 80 0.1 / 3.0, 100 0.1 / 2.1. With $1M or $4M outside the sport in place of $2M the CFB break-even at xPick 32 is 2.1 or 2.5.",
+      "The returners' record, CFB 2022-25 boards: 107 went back, 57% were drafted the next year and 41% came out ahead of what declaring was worth on average (mean $21.2M with NIL scaled to that season's market, against $19.7M). CBB 2022-26: 19 returners with a draft or an exit the next year (33 went back again), 47% drafted, 32% ahead ($30.6M against $37.5M)."
      ],
      "where": "CFB draft board, CBB draft board",
      "sports": [
@@ -1431,6 +1434,23 @@
       "Soccer",
       "Tennis",
       "CS2"
+     ]
+    },
+    {
+     "term": "DoR",
+     "short": "Declare or Return: the money by going back to college less the money by declaring, for a draft prospect with eligibility left.",
+     "body": [
+      "Declare = the rookie deal + later earnings, averaged over where he goes from his xPick (CBB: his consensus rank). Return = yNIL for the season + the same draft value one year older. Dollars are at this season's cap, later years count 0.97 a year. RET on the board means return pays more. It is what pays on average, not what he will do (that is Ret%).",
+      "The return side holds his draft stock where it is, so going back costs a year and pays yNIL. A board ranks him for this draft, so a young player who develops can beat that, and one who gets hurt falls under it. Who went back is not a fair sample of either (the ones told they would go late stay), so their record is shown below and not used. These are means, and a few long careers carry them.",
+      "NFL rookie deal: the 2026 slotted four-year totals, with the guaranteed share by pick from OverTheCap rookie deals and the rest counted at the odds he is still on a roster. Later earnings: every veteran contract of the 2011-15 drafts (1,270 picks) as a share of the cap, fit on pick, position and age. A year older at the same pick is -18% in later earnings (t = -3.7). NBA: salary in seasons 1-4 by pick (2011-22 drafts, 569 college picks) and from season 5 on (2008-14, 335 picks); a year older is -19% (t = -2.7). Undrafted prospects on ESPN's final board made $1.1M in seasons 1-4 and 28% drew an NBA salary.",
+      "Pick spread, from players with no choice: 151 redshirt seniors and grads on each draft's last PFF board before the January deadline (2021-25; 30% undrafted, sd 0.78 in ln pick) and 39 seniors on the No Ceilings midseason board (2022-26; 33% undrafted, sd 0.61). Early entrants who left went undrafted 19% (all declared, CFB) and 9% (CBB) of the time: they left knowing more than the board.",
+      "Break-even yNIL, CFB by xPick (WR / QB, $M): 10 10.8 / 25.3, 32 6.9 / 16.3, 50 5.4 / 12.8, 100 3.4 / 8.0, 150 2.4 / 5.6, 200 1.8 / 4.2, 300 1.2 / 2.6. CBB by consensus rank (age 20): 5 34.3, 14 19.4, 30 10.2, 50 5.8, 60 4.5, 80 3.0, 100 2.1.",
+      "The returners' record, CFB 2022-25 boards: 107 went back, 57% were drafted the next year and 41% came out ahead of what declaring was worth (mean $21.2M with NIL scaled to that season's market, against $19.7M). CBB 2022-26: 19 returners with a draft or an exit the next year (33 went back again), 47% drafted, 32% ahead ($30.6M against $37.5M). Break-even yNIL on that record, CFB (WR / QB): 10 15.5 / 37.4, 32 7.5 / 19.5, 100 1.9 / 5.4, 200 -0.6 / -0.8."
+     ],
+     "where": "CFB draft board, CBB draft board",
+     "sports": [
+      "CFB",
+      "CBB"
      ]
     },
     {

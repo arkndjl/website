@@ -136,14 +136,16 @@
   recruit news workflow) from files already in the repo; headline and transaction rows are kept in
   `scripts/data/player_moves_hist.json.gz`. A new kind of move needs a label in `MV_LAB` (gfx.js).
 
-## DoR (Declare or Return)
+## DEC (Declare, Even, College; was DoR)
 
-- A decision metric in dollars (what pays more on average), separate from Ret% (what he will do). `scripts/dor.py` is fit by
-  hand (needs the CBB kit and `scripts/xaav.py`'s Basketball-Reference cache) and writes `data/dor_fit.json`: rookie deal and
-  later earnings by pick and draft age (NFL from OverTheCap contracts, NBA from salary history), pick spread from players with no
-  choice (CFB grads, CBB seniors). The return side holds draft stock level; returners' own record is the downside case on Process,
-  never the model (they are a selected sample). `dorOf` in `scripts/cfb_teams.mjs` and `nba_dor` (read by `scripts/cbb_tabs.py`)
-  write `dor` / `dorD` on the draft boards. Refit after each draft and when the rookie scale in `scripts/cfb_declare_econ.py` moves.
+- A decision metric in dollars (what is worth more to him), separate from Ret% (what he will do). Board values are Declare / Even /
+  College (Noah, Nov 27); never "DoR", "DTR", "Return" or "Toss Up". `scripts/dec.py` is fit by hand (needs the CBB kit and
+  `scripts/xaav.py`'s Basketball-Reference cache) and writes `data/dec_fit.json`: rookie deal and later earnings by pick and draft
+  age (NFL from OverTheCap contracts, NBA from salary history), pick spread from players with no choice (CFB grads, CBB seniors),
+  outcome bins by pick. Each side is a certainty equivalent (log utility); Even = the edge is inside one standard error; the mean
+  edge stays in the hover. The college side holds draft stock level; returners' own record is the downside case on Process, never
+  the model (they are a selected sample). `decOf` in `scripts/cfb_teams.mjs` and `nba_dec` (read by `scripts/cbb_tabs.py`) write
+  `dec` / `decD` / `decM` / `decE` on the draft boards. Refit after each draft and when the rookie scale in `scripts/cfb_declare_econ.py` moves.
 
 ## NIL deals ledger
 

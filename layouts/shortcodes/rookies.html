@@ -67,7 +67,7 @@
     function logo(u) { return u ? '<img class="cfb__logo cfb__logo--in" src="' + esc(u) + '" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
     function fmt(x, f, r) {
       if (x == null || x === '') return f === 's' ? '' : DASH;
-      if (f === 'dor') return '<span class="cfb__dor' + (x > 0 ? ' cfb__dor--r' : '') + '" title="' + (x > 0 ? 'return' : 'declare') + ' +$' + Math.abs(x).toFixed(Math.abs(x) < 10 ? 1 : 0) + 'M' + (r && r.dorD != null ? ' · declare $' + (+r.dorD).toFixed(1) + 'M · return $' + (r.dorD + x).toFixed(1) + 'M' : '') + '">' + (x > 0 ? 'RET' : 'DEC') + '</span>';
+      if (f === 'dec') return '<span class="cfb__dec cfb__dec--' + ((r && r.decE) ? 'e' : x > 0 ? 'c' : 'd') + '" title="risk-adjusted: ' + (x > 0 ? 'college' : 'declare') + ' +$' + Math.abs(x).toFixed(Math.abs(x) < 10 ? 1 : 0) + 'M' + (r && r.decM != null ? ' · on average: ' + (r.decM > 0 ? 'college' : 'declare') + ' +$' + Math.abs(r.decM).toFixed(Math.abs(r.decM) < 10 ? 1 : 0) + 'M' : '') + (r && r.decD != null ? ' · declaring is worth $' + (+r.decD).toFixed(1) + 'M for sure' : '') + '">' + ((r && r.decE) ? 'Even' : x > 0 ? 'College' : 'Declare') + '</span>';
       if (f === 's') return '<span class="cfb__dim">' + esc(x) + '</span>';
       if (f === 't') return esc(x);
       if (f === 'i') return Math.round(x).toLocaleString();

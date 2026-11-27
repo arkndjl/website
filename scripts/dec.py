@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""DoR (Declare or Return): the money on each side of the stay-or-go decision for a draft-eligible college player with
-eligibility left. A decision model (what pays more), not Ret% (what he will do).
+"""DEC (Declare, Even, College; was DoR): what each side of the stay-or-go decision is worth to a draft-eligible college
+player with eligibility left. A decision model (what is worth more), not Ret% (what he will do).
 
-    python3 scripts/dor.py          # NFL / CFB fit + history check -> data/dor_fit.json (read by scripts/cfb_teams.mjs dorOf)
+    python3 scripts/dec.py          # NFL / CFB + NBA / CBB fits and history checks -> data/dec_fit.json (scripts/cfb_teams.mjs decOf, scripts/cbb_tabs.py)
 
-  declare  E over the pick spread from his xPick of [ rookie deal + d^4 x later earnings ]
-  return   college pay for the season (yNIL) + d x the same draft value one year older
-  DoR      return - declare, in dollars at this season's cap (+ = return pays more)
+  declare  the rookie deal + d^4 x later earnings, over the pick spread from his xPick and the spread of earnings at a pick
+  college  college pay for the season (yNIL) + d x the same draft value one year older
+  DEC      college - declare as certainty equivalents (log utility over W0 + the outcome), dollars at this season's cap.
+           Even when the edge is inside one standard error (yNIL's error and the age term's). The mean edge rides along.
 
 The return side holds his draft stock where it is: no expected rise or fall, so going back costs a year (the age term
 on later earnings and the discount) and pays yNIL. Who went back is not a fair sample of what going back does (the
@@ -36,7 +37,7 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
-OUT = os.path.join(ROOT, 'data', 'dor_fit.json')
+OUT = os.path.join(ROOT, 'data', 'dec_fit.json')
 CAP = 301.2            # $M, 2026
 D = 0.97
 LAST = 257
@@ -49,6 +50,48 @@ GRP = {'QB': 'QB', 'LT': 'OL', 'RT': 'OL', 'LG': 'OL', 'RG': 'OL', 'C': 'OL', 'T
 GROUPS = ['QB', 'OL', 'WR', 'TE', 'RB', 'EDGE', 'DL', 'LB', 'CB', 'S', 'ST']
 Z = np.linspace(-3.5, 3.5, 71); W = np.exp(-Z ** 2 / 2); W /= W.sum()
 LX = np.round(np.linspace(0, 7.2, 37), 3)     # ln xPick grid, pick 1 to ~1340
+W0 = 2.0               # $M he earns without the sport: a bachelor's lifetime earnings (Georgetown CEW median $2.8M, less the discount). 1 and 4 are in the fit as a check
+K = 16                 # outcome bins the boards read
+SIG = {'cfb': 0.49, 'cbb': 0.65}     # log error of yNIL against On3's valuations (scripts/research/nil_nov27)
+
+
+def qbins(r, n=25):
+    """n equal slices of a sample of ratios (actual / fit), each slice's mean, scaled to mean 1"""
+    r = np.sort(np.asarray(r, float)); q = np.array([c.mean() for c in np.array_split(r, min(n, len(r)))])
+    return q / q.mean() if q.mean() > 0 else np.ones(len(q))
+
+
+def tobins(w, r, e, k=K):
+    """nodes (weight, rookie part, later part) -> k bins by total value, [weight, mean rookie, mean later]"""
+    o = np.argsort(r + D ** 4 * e); w, r, e = w[o], r[o], e[o]; c = np.cumsum(w) - w / 2; ix = np.minimum(k - 1, (c / w.sum() * k).astype(int)); out = []
+    for i in range(k):
+        m = ix == i; ww = w[m].sum()
+        out.append([float(ww), float(w[m] @ r[m] / ww), float(w[m] @ e[m] / ww)] if ww > 0 else [0.0, 0.0, 0.0])
+    return out
+
+
+def wmed(w, v):
+    o = np.argsort(v); c = np.cumsum(w[o]); return float(v[o][np.searchsorted(c, c[-1] / 2)])
+
+
+def sides(B, x, ageB, nil, d=D, w0=W0):
+    """B = bins or nodes [[w, rookie, later], ...] at the grid's age; x = years over that age. -> (ce edge, ce declare, mean edge, mean declare, median edge)"""
+    B = np.asarray(B, float); w, r, e = B[:, 0] / B[:, 0].sum(), B[:, 1], B[:, 2]
+    vd = r + d ** 4 * e * math.exp(ageB * x); vr = nil + d * (r + d ** 4 * e * math.exp(ageB * (x + 1)))
+    ce = lambda v: math.exp(float(w @ np.log(w0 + v))) - w0
+    return ce(vr) - ce(vd), ce(vd), float(w @ vr - w @ vd), float(w @ vd), wmed(w, vr) - wmed(w, vd)
+
+
+def verdict(B, x, ageB, ageSE, nil, sig, d=D):
+    """[ce edge (+ = college), ce declare, mean edge, even?]: even when the edge is inside one standard error, from the error in yNIL and in the age term"""
+    c = sides(B, x, ageB, nil, d); f = lambda b, n: sides(B, x, b, n, d)[0]
+    se = math.hypot((f(ageB, nil * math.exp(sig)) - f(ageB, nil * math.exp(-sig))) / 2, (f(ageB + ageSE, nil) - f(ageB - ageSE, nil)) / 2)
+    return [round(c[0], 2), round(c[1], 2), round(c[2], 2), int(abs(c[0]) < se), round(se, 2)]
+
+
+def interp(G, key, lx):
+    L = G['lx']; lx = min(max(lx, L[0]), L[-1]); i = max(1, next(j for j, v in enumerate(L) if v >= lx)); t = (lx - L[i - 1]) / (L[i] - L[i - 1])
+    return (1 - t) * np.asarray(key[i - 1], float) + t * np.asarray(key[i], float)
 
 
 def load(name, file):
@@ -122,6 +165,10 @@ def nfl_value(out):
              'ageT': round(float(b[3] / se[3]), 2), 'p2': [round(float(x), 4) for x in b2],
              'byRound': []}
     lp = np.array([r[0] for r in rows]); fit = np.exp(X @ b)
+    RB = [(0, 32), (33, 64), (65, 100), (101, 140), (141, 180), (181, 262)]
+    Q = [qbins(y[(lp >= math.log(a)) & (lp <= math.log(c) + 1e-9)] / fit[(lp >= math.log(a)) & (lp <= math.log(c) + 1e-9)]) for a, c in ((max(1, a), c) for a, c in RB)]
+    QU = qbins([earned(cs, cs[0]['dy']) for cs in P.values() if not cs[0]['pick'] and 2011 <= cs[0]['dy'] <= 2015])       # undrafted signees
+    out['_q'] = (np.log([c + 0.5 for _, c in RB]), Q, QU)
     for a, c in ((1, 10), (11, 32), (33, 64), (65, 100), (101, 140), (141, 180), (181, 220), (221, 262)):
         m = (lp >= math.log(a)) & (lp <= math.log(c)); later['byRound'].append({'picks': f'{a}-{c}', 'n': int(m.sum()), 'mean': round(float(y[m].mean()), 1), 'fit': round(float(fit[m].mean()), 1),
                                                                                   'any': round(float((y[m] > 0).mean()), 3)})
@@ -292,10 +339,34 @@ def nba(out):
         rd, ed = ev(TDn, lx, age); rr, er = ev(T or TDn, lx, age + 1)
         vd = rd + D ** 4 * ed; vr = nil + D * (rr + D ** 4 * er); return vr - vd, vd, vr
     LXN = np.round(np.linspace(0, math.log(100), 24), 3)
+    # outcome spread: drafts 2011-14, where both the first four seasons and the later ones are on record, as ratios to the fit
+    NB = [(1, 14), (15, 30), (31, 45), (46, 60)]; J = [p for p in P if 2011 <= p['y'] <= 2014]
+    def pairs(S, fr, fl):
+        a = np.array([[p['rk'] / fr(p), p['late'] / fl(p)] for p in S]); return a / np.maximum(a.mean(0), 1e-9)
+    QN = [pairs([p for p in J if p['pick'] and a <= p['pick'] <= c], lambda p: float(rookie(math.log(p['pick']))), lambda p: float(late(math.log(p['pick']), p['age'] or am))) for a, c in NB]
+    QUN = pairs([p for p in J if not p['pick']], lambda p: 1.0, lambda p: 1.0)
+    def nodes(lx, T=None):
+        T = T or TDn; s = T['a'] + T['b'] * lx + T['sd'] * Z; w, r, e = [], [], []
+        for z, wz in zip(s, W):
+            if z <= lim:
+                l = max(z, 0.0); q = QN[next(i for i, (_, c) in enumerate(NB) if math.exp(l) <= c + 0.5)]
+                w += [wz / len(q)] * len(q); r += list(float(rookie(l)) * q[:, 0]); e += list(float(late(l, 20.5)) * q[:, 1])
+            else:
+                w += [wz / len(QUN)] * len(QUN); r += list(UDN['rookie'] * QUN[:, 0]); e += list(UDN['later'] * math.exp(bl[3] * (20.5 - am)) * QUN[:, 1])
+        return np.array(w), np.array(r), np.array(e)
+    def solve(f):
+        lo, hi = 0.0, 400.0
+        for _ in range(50):
+            m = (lo + hi) / 2; lo, hi = (m, hi) if f(m) < 0 else (lo, m)
+        return round(hi, 2)
+    bece = lambda p, k=0, w0=W0: (lambda B: solve(lambda n: sides(B, -0.5, float(bl[3]), n, w0=w0)[k]))(np.column_stack(nodes(math.log(p))))
     V['spread'] = {'declare': TDn, 'slide': TRn, 'earlyEntrants': TAll, 'drafts': sorted({r['year'] for r in ranked})}
-    V['grid'] = {'lx': [float(x) for x in LXN], 'age0': 20.5, 'ageB': round(float(bl[3]), 4), 'ageMean': round(am, 2), 'udLater': UDN['later'],
-                 'dec': [[round(v, 3) for v in ev(TDn, x, 20.5)] for x in LXN]}
-    V['table'] = [{'rank': p, 'declare': round(dor(math.log(p), 20, 0)[1], 2), 'breakEvenNil': round(-dor(math.log(p), 20, 0)[0], 2),
+    V['grid'] = {'lx': [float(x) for x in LXN], 'age0': 20.5, 'ageB': round(float(bl[3]), 4), 'ageSE': round(float(sl[3]), 4), 'ageMean': round(am, 2), 'udLater': UDN['later'],
+                 'dec': [[round(v, 3) for v in ev(TDn, x, 20.5)] for x in LXN],
+                 'bins': [[[round(v, 4) for v in t] for t in tobins(*nodes(x))] for x in LXN]}
+    V['spreadN'] = {'drafts': [2011, 2014], 'n': int(sum(len(q) for q in QN)), 'undrafted': int(len(QUN))}
+    V['table'] = [{'rank': p, 'declare': round(dor(math.log(p), 20, 0)[1], 2), 'declareCE': round(sides(np.column_stack(nodes(math.log(p))), -0.5, float(bl[3]), 0)[1], 2),
+                   'breakEvenNil': round(-dor(math.log(p), 20, 0)[0], 2), 'ce': bece(p), 'ceW1': bece(p, 0, 1.0), 'ceW4': bece(p, 0, 4.0), 'median': bece(p, 4),
                    'slide': round(-dor(math.log(p), 20, 0, TRn)[0], 2)} for p in (1, 5, 10, 14, 20, 30, 40, 50, 60, 80, 100)]
     for t in V['table']: print(t)
 
@@ -307,6 +378,8 @@ def nba(out):
         hm = seas[r['pid']][r['year']]['conf'] in HM
         r['nil'] = 1e-6 * math.exp(Sh['a'] + Sh['b'] * r['lx'] + Sh['hm'] * hm) * PAY.NILM[r['year']] / PAY.NILM[2026]
         r['edge'], r['vd'], r['vr'] = dor(r['lx'], r['age'], r['nil'])
+        B = np.column_stack(nodes(r['lx'])); c = sides(B, r['age'] - 20.5, float(bl[3]), r['nil']); r['ce'], r['med'] = c[0], c[4]
+        r['even'] = verdict(B, r['age'] - 20.5, float(bl[3]), float(sl[3]), r['nil'], SIG['cbb'])[3]
     def real(pk, age): return float(rookie(math.log(pk)) + D ** 4 * late(math.log(pk), age)) if pk else UDN['rookie'] + D ** 4 * UDN['later'] * math.exp(bl[3] * (age - am))
     R = [r for r in ret if (lambda n: not (n and not n['left']))(byp.get((r['pid'], r['year'] + 1)))]      # returners whose next year ended in a draft or an exit
     for r in R: r['got'] = r['nil'] + D * real(outcome(r['pid'], r['year'] + 1), r['age'] + 1)
@@ -320,18 +393,39 @@ def nba(out):
                                 'beatDeclare': round(float(np.mean([r['got'] > r['vd'] for r in R])), 3)},
                   'bands': band(ranked, lambda s: {'saysReturn': round(float(np.mean([r['edge'] > 0 for r in s])), 3), 'returned': round(float(np.mean([1 - r['left'] for r in s])), 3),
                                                    'medianEdge': round(float(np.median([r['edge'] for r in s])), 2)})}
-    print(json.dumps(V['check'], indent=1))
+    V['check']['readings'] = readings(ranked, lambda r: 1 - r['left'])
+    print(json.dumps(V['check']['readings'], indent=1))
     out['nba'] = V
 
 
-def nba_dor(rank, age, ynil, fit=None):
-    """[return - declare, declare] in $M for a college player at consensus rank `rank`, `age` on draft night, `ynil` dollars (scripts/cbb_tabs.py)"""
-    fit = fit or json.load(open(OUT))
-    G = fit['nba']['grid']; d = fit['d']
+def auc(x, y):
+    x = np.asarray(x, float); y = np.asarray(y); o = np.argsort(x); rk = np.empty(len(x)); rk[o] = np.arange(1, len(x) + 1)
+    for v in np.unique(x): m = x == v; rk[m] = rk[m].mean()
+    n1 = y.sum(); n0 = len(y) - n1
+    return float((rk[y == 1].sum() - n1 * (n1 + 1) / 2) / (n1 * n0))
+
+
+def readings(H, ret):
+    """which reading of the edge lines up with what players did: share it sends to college, AUC against who went back, and the same inside rank thirds"""
+    y = np.array([ret(r) for r in H]); lx = np.array([r['lx'] for r in H]); cut = np.quantile(lx, [1 / 3, 2 / 3]); th = np.searchsorted(cut, lx); o = {'n': len(H), 'returned': round(float(y.mean()), 3)}
+    for k in ('edge', 'med', 'ce'):
+        e = np.array([r[k] for r in H]); rel = e / np.array([max(r['vd'], 0.05) for r in H])
+        o[{'edge': 'mean', 'med': 'median', 'ce': 'ce'}[k]] = {'saysCollege': round(float((e > 0).mean()), 3), 'returnedWhenCollege': round(float(y[e > 0].mean()), 3) if (e > 0).any() else None,
+            'returnedWhenDeclare': round(float(y[e <= 0].mean()), 3), 'auc': round(auc(e, y), 3), 'aucRel': round(auc(rel, y), 3),
+            'aucInThirds': round(float(np.mean([auc(e[th == i], y[th == i]) for i in range(3) if 0 < y[th == i].sum() < (th == i).sum()])), 3)}
+    ev = np.array([r['even'] for r in H]); e = np.array([r['ce'] for r in H])
+    o['even'] = {'share': round(float(ev.mean()), 3), 'returned': round(float(y[ev == 1].mean()), 3) if ev.any() else None,
+                 'returnedCollege': round(float(y[(ev == 0) & (e > 0)].mean()), 3) if ((ev == 0) & (e > 0)).any() else None, 'nCollege': int(((ev == 0) & (e > 0)).sum()),
+                 'returnedDeclare': round(float(y[(ev == 0) & (e <= 0)].mean()), 3)}
+    return o
+
+
+def nba_dec(rank, age, ynil, fit=None):
+    """[edge, declare, mean edge, even?, se] in $M for a college player at consensus rank `rank`, `age` on draft night, `ynil` dollars (scripts/cbb_tabs.py).
+    edge = college - declare as certainty equivalents; + = college"""
+    fit = fit or json.load(open(OUT)); G = fit['nba']['grid']
     if rank is None or age is None or ynil is None or rank > 100: return None
-    r, e = (float(np.interp(math.log(max(1, rank)), G['lx'], [v[k] for v in G['dec']])) for k in (0, 1))
-    x = age - G['age0']; dec = r + d ** 4 * e * math.exp(G['ageB'] * x); ret = ynil / 1e6 + d * (r + d ** 4 * e * math.exp(G['ageB'] * (x + 1)))
-    return [round(ret - dec, 2), round(dec, 2)]
+    return verdict(interp(G, G['bins'], math.log(max(1, rank))), age - G['age0'], G['ageB'], G['ageSE'], ynil / 1e6, fit['sig']['cbb'], fit['d'])
 
 
 def main():
@@ -361,13 +455,36 @@ def main():
         rd, ed = ev(TD, lx, grp, age); rr, er = ev(T or TD, lx, grp, age + 1)
         vd = rd + D ** 4 * ed; vr = nil + D * (rr + D ** 4 * er)
         return vr - vd, vd, vr
+    QL, Q, QU = out.pop('_q')
+    def nodes(lx, grp, T=None):
+        """every outcome at age 22: pick node x where his later earnings fall around the fit (and, undrafted, whether he signs)"""
+        T = T or TD; s = T['a'] + T['b'] * lx + T['sd'] * Z; w, r, e = [], [], []
+        for z, wz in zip(s, W):
+            if z <= lim:
+                l = max(z, 0.0); q = Q[min(len(Q) - 1, int(np.searchsorted(QL, l)))]; rk = float(rookie(np.array(l))); lt = float(late(np.array(l), grp, 22))
+                w += [wz / len(q)] * len(q); r += [rk] * len(q); e += list(lt * q)
+            else:
+                sg = math.exp(-UD['fade'] * (z - lim))
+                w += [wz * sg / len(QU)] * len(QU) + [wz * (1 - sg)]; r += [UD['rookie']] * len(QU) + [0.0]; e += list(UD['later'] * QU) + [0.0]
+        return np.array(w), np.array(r), np.array(e)
     # the grid the board reads: by group, at age 22 on draft day; the age term scales the later part
     b = out['later']['b']
-    out['grid'] = {'lx': [float(x) for x in LX], 'age0': 22, 'ageB': b[3],
-                   'dec': {g: [[round(v, 3) for v in ev(TD, x, g, 22)] for x in LX] for g in GROUPS}}
+    ASE = out['later']['se'][3]
+    out['w0'] = W0; out['sig'] = SIG
+    out['grid'] = {'lx': [float(x) for x in LX], 'age0': 22, 'ageB': b[3], 'ageSE': ASE,
+                   'dec': {g: [[round(v, 3) for v in ev(TD, x, g, 22)] for x in LX] for g in GROUPS},
+                   'bins': {g: [[[round(v, 4) for v in t] for t in tobins(*nodes(x, g))] for x in LX] for g in GROUPS}}
+    def solve(f):                # the yNIL where f crosses zero, $M
+        lo, hi = 0.0, 400.0
+        for _ in range(50):
+            m = (lo + hi) / 2; lo, hi = (m, hi) if f(m) < 0 else (lo, m)
+        return round(hi, 2)
+    def bece(p, g, w0=W0): B = np.column_stack(nodes(math.log(p), g)); return solve(lambda n: sides(B, -0.5, b[3], n, w0=w0)[0])
+    def bemed(p, g): B = np.column_stack(nodes(math.log(p), g)); return solve(lambda n: sides(B, -0.5, b[3], n)[4])
     be = lambda p, g, T=None: round(-dor(math.log(p), g, 21.5, 0, T)[0], 2)
-    out['table'] = [{'xPick': p, 'declare': round(dor(math.log(p), 'WR', 21.5, 0)[1], 2), 'breakEvenNil': be(p, 'WR'), 'breakEvenNilQB': be(p, 'QB'),
-                     'slide': be(p, 'WR', TR), 'slideQB': be(p, 'QB', TR)} for p in (1, 5, 10, 20, 32, 50, 75, 100, 150, 200, 300, 500)]
+    out['table'] = [{'xPick': p, 'declare': round(dor(math.log(p), 'WR', 21.5, 0)[1], 2), 'declareCE': round(sides(np.column_stack(nodes(math.log(p), 'WR')), -0.5, b[3], 0)[1], 2),
+                     'breakEvenNil': be(p, 'WR'), 'breakEvenNilQB': be(p, 'QB'), 'ce': bece(p, 'WR'), 'ceQB': bece(p, 'QB'), 'ceW1': bece(p, 'WR', 1.0), 'ceW4': bece(p, 'WR', 4.0),
+                     'median': bemed(p, 'WR'), 'slide': be(p, 'WR', TR), 'slideQB': be(p, 'QB', TR)} for p in (1, 5, 10, 20, 32, 50, 75, 100, 150, 200, 300)]
     for t in out['table']: print(t)
 
     # ---- history check, NIL era fall boards
@@ -381,6 +498,8 @@ def main():
         r['nil'] = 1e-6 * math.exp(S['a'] + S['b'] * r['lx'] + S['qb'] * (r['pos'] == 'QB') + (S['fcs'] if r['fcs'] else 0 if r['p4'] else S['g5'])) * PAY.NILM[r['draft']] / PAY.NILM[2026]
         r['ageD'] -= 0.5      # nflverse draft age is whole years: the fit's age runs half a year under the age on draft day
         r['edge'], r['vd'], r['vr'] = dor(r['lx'], r['grp'], r['ageD'], r['nil'])
+        B = np.column_stack(nodes(r['lx'], r['grp'])); c = sides(B, r['ageD'] - 22, b[3], r['nil']); r['ce'], r['med'] = c[0], c[4]
+        r['even'] = verdict(B, r['ageD'] - 22, b[3], ASE, r['nil'], SIG['cfb'])[3]
     def realized(r, key, age):
         l = math.log(r[key]) if r[key] else None
         return float(rookie(np.array(l)) + D ** 4 * late(np.array(l), r['grp'], age)) if l is not None else UD['rookie'] + D ** 4 * UD['later'] * math.exp(AGEB * (age - 22))
@@ -403,6 +522,7 @@ def main():
            'declarers': {'n': len(Dd), 'meanEV': round(float(np.mean([r['vd'] for r in Dd])), 2), 'meanGot': round(float(np.mean([r['got'] for r in Dd])), 2)},
            'bands': band(H, lambda s: {'saysReturn': round(float(np.mean([r['edge'] > 0 for r in s])), 3), 'returned': round(float(np.mean([1 - r['declared'] for r in s])), 3),
                                        'medianEdge': round(float(np.median([r['edge'] for r in s])), 2)})}
+    chk['readings'] = readings(H, lambda r: 1 - r['declared'])
     out['check'] = chk; print(json.dumps(chk, indent=1))
     nba(out)
     json.dump(out, open(OUT, 'w'), indent=1)
