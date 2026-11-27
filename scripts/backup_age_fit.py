@@ -14,7 +14,7 @@ leaves the league or the team's data counts at replacement). Model: target = a +
 season is predicted by pairs whose two-season target was complete before it; scored against gap alone (paired squared
 errors, t). Coefficients shipped are the full-sample fit.
 
-  nba     static/data/nba-xpm/ (XPM; age in years)
+  nba     static/data/nba-xpm/ (the grade is pXPM, the target XPM; age in years)
   nhl     static/data/nhl-war/ (HPM; age in years)
   soccer  static/data/soccer-war/ (GAR a 90; age from the Transfermarkt birth dates, scripts/data/soccer_mv_link)
   cbb     the CBB research seasons (BPM, which the history has; the age gap is the class gap, Fr 1 .. Sr 4, the
@@ -61,8 +61,9 @@ def rate(by, pid, ys, w, val, use, k, r):
     return (num + k * r) / (den + k)
 
 
-def pro_pairs(S, key, team, grp, shape, nxt, val, use, age, k, repl, w, mn):
-    """[(season, gap, age gap, two-season future gap)] for one sport's seasons S"""
+def pro_pairs(S, key, team, grp, shape, nxt, val, use, age, k, repl, w, mn, grade=None):
+    """[(season, gap, age gap, two-season future gap)] for one sport's seasons S. grade(row): the backup watch's own
+    grade where it is not the weighted seasons (NBA: the board's pXPM, point in time in each season's file)"""
     by = {y: {key(p): p for p in d['players']} for y, d in S.items()}
     gof = {}
     for d in S.values():
@@ -74,6 +75,8 @@ def pro_pairs(S, key, team, grp, shape, nxt, val, use, age, k, repl, w, mn):
         if y - len(w) + 1 not in S or y + H >= last:
             continue
         g = lambda pid: rate(by, pid, [y - j for j in range(len(w))], w, val, use, k(gof[pid]), repl(y, gof[pid]))
+        if grade:
+            g = lambda pid, g0=g: grade(by[y][pid]) if grade(by[y][pid]) is not None else g0(pid)
         f = lambda pid: rate(by, pid, [y + j for j in range(1, H + 1)], [1] * H, val, use, k(gof[pid]), repl(y, gof[pid]))
         rooms = {}
         for p in S[y]['players']:
@@ -165,6 +168,8 @@ def fit(P, start_after=4):
     d = np.array(e1) - np.array(e0)
     X = np.c_[np.ones(len(P)), P[:, 1:3]]
     b = np.linalg.lstsq(X, P[:, 3], rcond=None)[0]
+    if np.mean(e1) > np.mean(e0):          # the age gap makes the held-out seasons worse (NBA on pXPM, which is already aged): gap alone
+        b = np.r_[np.linalg.lstsq(X[:, :2], P[:, 3], rcond=None)[0], 0.0]
     sd = float(P[:, 1].std())
     return {'n': len(P), 'held': len(d), 'seasons': [int(ys[0]), int(ys[-1])], 'mse_gap': round(float(np.mean(e0)), 6),
             'mse_age': round(float(np.mean(e1)), 6), 't': round(float(d.mean() / (d.std(ddof=1) / math.sqrt(len(d)))), 2),
@@ -280,7 +285,8 @@ def main():
                              grp=lambda p: {'PG': 'G', 'SG': 'G', 'SF': 'F', 'PF': 'F', 'C': 'C'}.get(p['pos'].split('-')[0], 'F'),
                              shape={'G': 2, 'F': 2, 'C': 1}, nxt={'G': ['G', 'F'], 'F': ['F', 'C', 'G'], 'C': ['C', 'F']},
                              val=lambda p: p.get('xpm'), use=lambda p: p['mp'], age=lambda p, y: p.get('age'),
-                             k=lambda g: 500, repl=lambda y, g: VORX_REP, w=(1, .5, .25), mn=50))
+                             k=lambda g: 500, repl=lambda y, g: VORX_REP, w=(1, .5, .25), mn=50,
+                             grade=lambda p: p.get('sxpm')))     # the backup watch grades by pXPM (Nov 27 2026)
     nhl = seasons('nhl-war')
     F['nhl'] = fit(pro_pairs(nhl, key=lambda p: p['id'], team=lambda p: p['tm'], grp=lambda p: p['pos'],
                              shape={'C': 1, 'L': 1, 'R': 1, 'D': 2, 'G': 1}, nxt={},

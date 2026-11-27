@@ -12,9 +12,10 @@ NFL     ESPN's depth charts (offense and base defense; no specialists). The star
         (static/data/nfl-war.json), shrunk toward replacement (0) with NFL_K snaps, per 1,000 snaps. A backup needs
         NFL_MIN snaps to be listed: with none, the grade is the shrink target, not a measure of him.
 NBA     ESPN's depth charts (PG, SG, SF, PF, C). Starter = first at each slot; a non-starter listed 2nd or 3rd at a slot
-        backs up that slot's starter (his highest listing). The grade is pXPM (XPM from static/data/nba-xpm/): this season's
-        minutes, last season's at half weight and the one before at a quarter (NBA_W: a starter back from a lost
-        season keeps his line), shrunk to NBA_REPL with NBA_K weighted minutes. A backup needs NBA_MIN minutes.
+        backs up that slot's starter (his highest listing). The grade is the board's pXPM (sxpm in static/data/nba-xpm/,
+        scripts/nba_xpm.py pxpm: this season and the two before at 1 / .35 / .1, 200 minutes of his role's mean, aged a
+        year); a starter with no line this season takes last season's pXPM, and one out two seasons his older seasons
+        (NBA_W) shrunk to NBA_REPL with NBA_K minutes. A backup needs NBA_MIN minutes (over the three seasons).
 NHL     ESPN's depth charts, even strength only (C, LW, RW, LD, RD, G; the power-play and penalty-kill units are
         skipped). Starter = first at each slot (the first-line player, the starting goalie); 2nd and 3rd names are the
         second and third lines and the backup goalie. The grade is HPM (static/data/nhl-war/, goals a 60 above average):
@@ -355,13 +356,15 @@ def nba():
     cur, acc = S[0], {}
     for j, (d, w) in enumerate(zip(S, NBA_W)):
         for p in d['players']:
-            if p.get('xpm') is None:
+            if p.get('xpm') is None or p.get('pr'):     # a row on the prior has no minutes: his last season's pXPM stands
                 continue
             a = acc.setdefault(p['id'], {'n': p['n'], 'tm': p['tm'], 'num': 0.0, 'den': 0.0, 'mp': 0,
                                          'age': p['age'] + j if p.get('age') is not None else None})   # this season's age
             a['num'] += w * p['mp'] * p['xpm']; a['den'] += w * p['mp']; a['mp'] += p['mp']
+            if j < 2 and 'px' not in a and p.get('sxpm') is not None:
+                a['px'] = p['sxpm']                     # the board's pXPM: this season's row, else last season's (a projection of this one)
     for p in cur['players']:          # this season's team
-        acc[p['id']]['tm'] = p['tm']
+        if p['id'] in acc: acc[p['id']]['tm'] = p['tm']
     P = list(acc.values())
     M = NM.Matcher(P, name='n', team='tm', pos=None, sport='basketball')
 
@@ -369,7 +372,10 @@ def nba():
         p, _ = M.find(nm, team=t)
         if p is None:
             return {'g': NBA_REPL, 'n': 0}          # no NBA minutes yet (a rookie): the shrink target
-        return {'g': round((p['num'] + NBA_K * NBA_REPL) / (p['den'] + NBA_K), 2), 'n': p['mp'], 'age': p['age']}
+        # pXPM (nba_xpm.pxpm; Nov 27 2026, scripts/research/ctx_nov27/nba: next-season XPM RMSE 1.301 -> 1.185, t 13.0,
+        # 15/15 seasons; backups t 3.9). No line in the last two seasons: the older seasons shrunk to replacement
+        g = p['px'] if 'px' in p else (p['num'] + NBA_K * NBA_REPL) / (p['den'] + NBA_K)
+        return {'g': round(g, 2), 'n': p['mp'], 'age': p['age']}
     charts = espn_depth('basketball/nba')
     rows, n = depth_rows(charts, grade, lambda a: NBA_TEAM.get(a, a), need=NBA_MIN, league='basketball/nba')
     write_depth('nba', {'season': cur['season'], 'label': cur['label'], 'asof': cur['asof'][:10], 'grade': 'pXPM', 'use': 'MP',
