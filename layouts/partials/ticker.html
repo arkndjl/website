@@ -16,6 +16,8 @@
 {{- $nt := (site.Data.ticker | default dict).nt }}
 {{- $tk := cond $home ($.Site.Data.ticker | default dict) dict }}
 {{- if and (or $tk $news $nt) (not .Params.noTicker) }}
+{{- /* the sprite prints once per page through page.Store, which the pages of a paginated list share: clear it so /page/2/ gets its icons too */ -}}
+{{- page.Store.Delete "nwicons" }}
 {{- partial "newsicons.html" . }}
 {{- $links := dict "knicks" "/arkboard/nba/" "rangers" "/arkboard/nhl/" "ravens" "/arkboard/nfl/" "barcelona" "/arkboard/soccer/" }}
 <aside class="tick{{ if not $home }} tick--news{{ end }}" aria-label="{{ if $home }}next games and news{{ else }}news{{ end }}">
