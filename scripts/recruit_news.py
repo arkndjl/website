@@ -129,7 +129,7 @@ def gnews(q, timeout=25):
         except (AttributeError, ValueError):
             continue
         title = re.sub(r'\s+-\s+[^-]+$', '', raw).strip() if pub and raw.endswith(pub) else raw.strip()
-        out.append({'title': title, 'date': when.strftime('%Y-%m-%d'), 'url': link.group(1).strip() if link else None})
+        out.append({'title': title, 'date': when.strftime('%Y-%m-%d'), 'url': link.group(1).strip() if link else None, 'pub': pub})
     return out
 
 

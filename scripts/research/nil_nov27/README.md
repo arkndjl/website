@@ -135,3 +135,36 @@ Coverage: kickers and punters had no NIL. Paid XNIL.spec .20 x e^(.10 (FV - 37))
 (ESPN backups .01): CSC kicker and punter percentiles log rmse 1.53 blank to .40; fit on kickers and scored on punters
 .49 (blank 1.50), the reverse .48 (blank 1.55). Backups' and specialists' xNIL: the group's pay in its market shared
 by worth (zNIL sums to zero in the group); there is no outside anchor for it. Small pay is kept to the nearest $100.
+
+## Noah's calls (Nov 27, fourth pass)
+
+Basketball mid- and low-major levels (`cbb_levels.py`). The Commission's school report has men's basketball outside
+the power conferences (n 3,667 rostered players; 90th percentile $165,000, 75th $50,000, median $8,500, a quarter
+unpaid). The board's players outside the four power conferences, log error at the 90th / 75th / median:
+
+| mid-major | low-major | rmse | 90th | 75th | median |
+|---|---|---|---|---|---|
+| $1.2M | $0.25M (before) | .451 | -.50 | -.45 | +.39 |
+| $2.3M | $0.525M (The Athletic's survey) | .671 | +.06 | +.25 | +1.13 |
+| $2.3M | $0.25M (shipped) | .226 | .00 | .00 | +.39 |
+| $1.2M | $0.525M | .629 | -.25 | -.03 | +1.06 |
+
+The mid-major survey level passes, the low-major one fails (the median player would be paid three times the report).
+
+Football position pay (`pos.py`, `pos2.py`), Noah's call to follow what schools report over On3. A log offset on RB,
+WR, TE and DL / EDGE, team totals held, solved so each sits at the other positions' mean error against the
+Commission's power-conference percentiles. The defensive line is scored with linebackers: the board has 1,322 P4 DL
+and EDGE against the report's 1,060 defensive linemen, 795 linebackers against 858. Offsets RB -.55, WR -.26, TE -.31,
+DL / EDGE -.41.
+
+| | CSC A4 | CSC non-A4 (not solved on) | spread of position errors | On3 rmse | On3 r | deals rmse | ESPN starters |
+|---|---|---|---|---|---|---|---|
+| before | .644 | .477 | .207 | .476 | .688 | .62 | .30 |
+| offsets | .599 | .447 | .109 | .510 | .669 | .62 | .33 |
+
+On3 by position after: RB -.42, TE -.20, DL -.15, EDGE -.08, WR -.05, QB +.13, OL +.16, CB +.20, LB +.21, S +.22.
+Solved without pooling the front seven the DL offset was -.73 (On3 DL -.42): the listing difference, not pay.
+
+Headline scanner (`scripts/nil_deal_scan.py`): 30 days of Google News on Nov 27, 267 items, 12 with NIL and a dollar
+amount, none a new confirmed deal (valuations, questions, budgets, opinion pieces); the one it read as a deal
+(a $12M multi-year total in an opinion headline) is now rejected twice over (opinion pattern, $8M cap).
