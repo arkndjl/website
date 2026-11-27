@@ -636,7 +636,7 @@ def declare_odds(pool):
         x = {'const': 1, 'So': o['cls'] == 'So', 'Jr': o['cls'] == 'Jr', 'nil': 1, 'covid': 0, 'e24': 1}
         z = sum(b * (x[c] if c in x else (f[c] - A['mu'][c]) / A['sd'][c]) for c, b in zip(A['cols'], A['b']))
         if p['nboards'] and B['ship']:
-            z = B['b'][0] + B['b'][1] * z + B['b'][2] * -math.log(min(p['cons'], B['depth'])) + B['b'][3]
+            z = B['b'][0] + B['b'][1] * z + B['b'][2] * -math.log(min(p['cons'], B['depth'])) + B['b'][3] + (B['b'][4] if len(B['b']) > 4 else 0)     # ranked, and the board stage's 2024+ step
         p['declare'] = 1 / (1 + math.exp(-z))
 
 

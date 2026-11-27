@@ -528,7 +528,12 @@ sections.append({'id': 'players', 'title': 'Player odds and projections', 'entri
        f"CBB uses class, era (NIL 2022+, COVID 2021, the 2024+ step), recruit rank and BPM shrunk by minutes. Walk-forward 2023-26, "
        f"log loss is {_CD['held']['logLoss']:.3f}, compared to {_CD['base']['logLoss']:.3f} for class and era (t = {_CD['held']['t']:.1f}). "
        f"The 2024+ step is t = {b['stageA']['singles']['e24']['t']:.1f}, {b['stageA']['singles']['e24']['won']}/{b['stageA']['singles']['e24']['of']}. "
-       f"With the midseason board on top, leaving one draft out 2022-26, board-listed players are {b['stageB']['shippedRanked']:.3f} compared to {b['stageB']['rateRanked']:.3f} for the base rate.",
+       f"With the midseason board on top, leaving one draft out 2022-26, board-listed players are {_CD['stageB']['rankedOnly']['B']:.3f} compared to {b['stageB']['rateRanked']:.3f} for the base rate. "
+       f"The board stage carries its own 2024+ step, shipped under the gate: {_CD['stageB']['step']['lodo']['seasonsWon']}/{_CD['stageB']['step']['lodo']['of']} drafts leaving one out "
+       f"(t = {_CD['stageB']['step']['lodo']['t']:.1f}), t = {_CD['stageB']['step']['walkForward']['t']:.1f} walking forward. Board ranks 31-60 in 2025-26: "
+       f"{100 * [x for x in _CD['stageB']['step']['bands'] if x['ranks'] == '31-60' and x['era'] == '2025-26'][0]['left']:.0f}% left, the model says "
+       f"{100 * [x for x in _CD['stageB']['step']['bands'] if x['ranks'] == '31-60' and x['era'] == '2025-26'][0]['model']:.0f}% "
+       f"({100 * [x for x in _CD['stageB']['step']['bands'] if x['ranks'] == '31-60' and x['era'] == '2025-26'][0]['before']:.0f}% before the step).",
        *([f"CBB reported return: {n['cbb']['kinds']['return']['n']} players, {100 * n['cbb']['kinds']['return']['declared']:.0f}% left "
           f"(the model said {100 * n['cbb']['kinds']['return']['model']:.0f}%), t = {n['cbb']['kinds']['return']['t']:.1f}, "
           f"{n['cbb']['kinds']['return']['cyclesWon']}/{n['cbb']['kinds']['return']['cycles']}. It {'passed' if n['cbb']['kinds']['return']['pass'] else 'failed'}."]
@@ -540,7 +545,7 @@ sections.append({'id': 'players', 'title': 'Player odds and projections', 'entri
         f"{b['onTop']['gap']['won']}/{b['onTop']['gap']['of']}), but it is the year level and not the player: beside a 2024+ step it is "
         f"t = {b['besideStep']['gap']['t']:.1f}, and walking forward t = {b['walkForward']['gap']['t']:.1f}. It didn't ship. Board ranks "
         f"{bd[0]['picks']}: {100 * bd[0]['left']:.0f}% left in {bd[0]['era']} (n = {bd[0]['n']}) and {100 * bd[1]['left']:.0f}% in {bd[1]['era']} "
-        f"(n = {bd[1]['n']}; the model said {100 * bd[1]['model']:.0f}%).")(
+        f"(n = {bd[1]['n']}; the model said {100 * bd[1]['model']:.0f}% then).")(
            _RP['cfb'], _RP['cbb']['stageB'], [x for x in _RP['cbb']['stageB']['bands'] if x['picks'] == '31-60'])],
       'CFB draft board, CBB draft board', ['CFB', 'CBB']))(
         _RD['cfb'], _RD['cbb'], _RD.get('news', {}),
