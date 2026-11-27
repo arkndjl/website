@@ -208,16 +208,16 @@ def main():
         promo = set(json.loads((ROOT / "data" / "esea_board_research.json").read_text()).get("promoted") or [])
     except (OSError, ValueError):
         promo = set()
-    board, names = [], {}
+    board, tname = [], {}   # not `names`: that is the shared matcher module pval() keys nicknames with
     for x in E["matches"]:
         for g in ("f1", "f2"):
             if x[g].get("id"):
-                names[x[g]["id"]] = x[g].get("name")
+                tname[x[g]["id"]] = x[g].get("name")
     for tid, (rg, dv, ros) in latest.items():
         s = five(ros, rt, sn1, rg, dv)
         teams[tid] = {"w": 1 + sum(v > arkz(s) for v in lad1), "t": tier(s, rg), "s": round(s, 1)}
         if f"{rg} {dv}" in promo and tid != ME:
-            board.append(dict(teams[tid], id=tid, n=names.get(tid) or tid, rg=rg, div=dv, ros=[q[1] for q in ros]))
+            board.append(dict(teams[tid], id=tid, n=tname.get(tid) or tid, rg=rg, div=dv, ros=[q[1] for q in ros]))
     pts = [x for x in (point(w, keep[w]) for w in weeks) if x]
     now = point((today + dt.timedelta(days=1)).isoformat(), rt)
     # the weekly world rank on today's ladder: the raw rank against each week's own VRS ladder is not comparable over time
