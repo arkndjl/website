@@ -116,7 +116,7 @@
           "cons" (slice "cfb__now" "consensus = median rank across 10 boards (PFN, CBS, ESPN, James Foster, NBC, The Athletic, Yahoo, Tankathon, PFF, Kiper top 25). FV += .5 sqrt(min(n,9)/9) (FVcons - FV); FVcons = 80 - 8.7 ln(rank / 2.7) past rank 27 (FV 60), 60 + 5.8 ln(27 / rank) above it (rank 1 = 79); n = boards ranking the player" "CON")
           "draft" (slice "cfb__now" "Draft% = P(declares) x P(picked in 2027 draft). declares: by xPick and age on draft day (ranked underclassmen 94%, seniors 69%; a younger senior with a year left stays more), RS seniors and grads 100% (fit 2024-25 fall boards). picked: log-normal around mock xPick (consensus + model value), SD narrows toward the draft (fit on PFF dated boards, 2020-26 drafts). K, P: 1.83 and 2.0 a year (2015-26), FV order. non-specialists sum to 246 (257 picks less ~3% D2, D3, abroad, less K/P). blank: not draft eligible" "Draft%")
           "ret" (slice "cfb__now" "Ret% = P(back in college next season instead of the 2027 draft) = 1 - P(declares). out of eligibility (RS seniors, grads): 0. outside the draft pool (no consensus rank, FV under 45 underclassmen): blank" "Ret%")
-          "dec" (slice "cfb__now" "DEC = declare, even or college: what another year in college is worth (yNIL + the same draft value a year older) less what declaring is worth (rookie deal + later earnings over the pick spread), each as the sure amount he would trade the gamble for, $ at this season's cap. Even = inside the model's error. players with a year of eligibility left. hover: the edge, and the edge on average" "DEC")
+          "dect" (slice "cfb__now" "DECT = declare, even, college or transfer: the one worth most to him. college = yNIL + the same draft value a year older, transfer = the same on xNIL (the open market), declare = rookie deal + later earnings over the pick spread, each as the sure amount he would trade the gamble for, $ at this season's cap. Even = the top two are inside the model's error. players with a year of eligibility left. hover: the edges" "DECT")
           "up" (slice "cfb__now" "FBS% = P(on an FBS roster next season), FCS players. logit fit on 2023-26 FCS-to-FBS moves: production, team strength, year in school, position; conference, recruiting reorder only. 2nd-4th years highest, 5th-years lowest. cap: 1 - Draft%" "FBS%")
           "xfer" (slice "cfb__now" "Transfer% = P(on another FBS or FCS roster next season). logit fit on 2024-25, 2025-26 cycles (ESPN rosters, CFBD portal check): class, production, role, recruiting rank, team record, P(head-coach change), P4 / G5 / FCS, distance from home. Transfer% + stay + exit (draft, eligibility) = 100%. hover: stay odds, top factors" "Xfer%")
           "xnil" (slice "cfb__now" "xNIL = expected open-market NIL value now: FV, position, role; fit on On3 valuations; priced in the reachable market (P4, G5, FCS). FCS players: FBS fit" "xNIL")
@@ -129,16 +129,16 @@
           "snaps" (slice "cfb__now" "Snap% = share of the team's snaps this season (the snap share in WAR); hover: snaps" "Snap%")
         -}}
         {{- /* context after the key: pos team cls age ht mht snaps (spelled out in each $order: append of a slice does not flatten on Hugo 0.147) */ -}}
-        {{- $mkt := slice -}}{{ if $draftCol }}{{ $mkt = $mkt | append "cons" "draft" "ret" "dec" }}{{ end }}{{ if $upCol }}{{ $mkt = $mkt | append "up" }}{{ end -}}
+        {{- $mkt := slice -}}{{ if $draftCol }}{{ $mkt = $mkt | append "cons" "draft" "ret" "dect" }}{{ end }}{{ if $upCol }}{{ $mkt = $mkt | append "up" }}{{ end -}}
         {{- $order := slice }}{{ $gs := slice -}}
         {{- if eq $preset "war" -}}
           {{- $order = slice "rk" "name" "xv" "pos" "team" "cls" "age" "ht" "mht" "snaps" "waa" "war" "waafs" "fv" "delta" "stat" "xfer" "xnil" "ynil" "znil" }}{{ $gs = slice "xv" "pos" "waa" "fv" "xfer" -}}
         {{- else if eq $preset "nil" -}}
           {{- $order = slice "rk" "name" "xnil" "pos" "team" "cls" "age" "ht" "mht" "snaps" "ynil" "znil" "fv" "delta" "stat" "war" "xfer" }}{{ $gs = slice "xnil" "pos" "ynil" "fv" "xfer" -}}
         {{- else -}}
-          {{- $order = slice "rk" "name" "fv" "delta" "pos" "team" "cls" "age" "ht" "mht" "snaps" "stat" "war" }}{{ if $draftCol }}{{ $order = $order | append "cons" "draft" "ret" "dec" }}{{ end }}{{ if $upCol }}{{ $order = $order | append "up" }}{{ end }}{{ $order = $order | append "xfer" "xnil" "ynil" "znil" }}{{ $gs = slice "fv" "pos" "stat" (index ($mkt | append "xfer") 0) -}}
+          {{- $order = slice "rk" "name" "fv" "delta" "pos" "team" "cls" "age" "ht" "mht" "snaps" "stat" "war" }}{{ if $draftCol }}{{ $order = $order | append "cons" "draft" "ret" "dect" }}{{ end }}{{ if $upCol }}{{ $order = $order | append "up" }}{{ end }}{{ $order = $order | append "xfer" "xnil" "ynil" "znil" }}{{ $gs = slice "fv" "pos" "stat" (index ($mkt | append "xfer") 0) -}}
         {{- end -}}
-        {{- $num := slice "rk" "waa" "war" "waafs" "xv" "fv" "delta" "stat" "cons" "draft" "ret" "dec" "up" "xfer" "xnil" "ynil" "znil" "cls" "age" "ht" "mht" "snaps" -}}
+        {{- $num := slice "rk" "waa" "war" "waafs" "xv" "fv" "delta" "stat" "cons" "draft" "ret" "dect" "up" "xfer" "xnil" "ynil" "znil" "cls" "age" "ht" "mht" "snaps" -}}
         {{- $sort0 := cond (eq $preset "war") "xv" (cond (eq $preset "nil") "xnil" "rk") -}}
         {{- range $order }}{{ $t := index $th . }}{{ $c := trim (print (index $t 0) (cond (in $gs .) " cfb__g" "")) " " }}
         <th data-sort="{{ . }}"{{ if in $num . }} data-num{{ end }}{{ with $c }} class="{{ . }}"{{ end }}{{ if eq . $sort0 }} aria-sort="{{ cond (eq . "rk") "ascending" "descending" }}"{{ end }}{{ with index $t 1 }} title="{{ . }}"{{ end }}>{{ index $t 2 }}</th>

@@ -1394,36 +1394,46 @@ export const declareOdds = (p, xPick, asof = new Date(), year) => {
   const gap = a != null ? Math.max(-2, Math.min(2, a + Math.max(0, draftDay(y) - t) / 864e5 / 365.25 - d.age0)) : 0;
   return 1 / (1 + Math.exp(-(d.a + d.b * Math.log(xPick) + d.age * gap)));
 };
-// DEC (Declare, Even, College; scripts/dec.py -> data/dec_fit.json): college = yNIL + d x the same draft value a year older
-// (his stock held where it is), declare = the rookie deal + d^4 x later earnings, each as a certainty equivalent (log
-// utility over w0 + the outcome) across the fit's outcome bins [weight, rookie, later] by position group at age 22
-// (nflverse whole-year draft age, half a year under the age on draft day); the age term scales the later part.
-// Even = the edge is inside one standard error (yNIL's log error and the age term's).
-// Returns [college - declare, declare, mean college - declare, even] in $M at this season's cap.
-let DEC = null;
-try { DEC = JSON.parse(fs.readFileSync(new URL('../data/dec_fit.json', import.meta.url))); if (!DEC.grid?.bins) DEC = null; } catch { DEC = null; }
-const DEC_MAX = 400;      // past the boards the pick spread was fit on (PFF's go about 240 deep): blank
-const DEC_GRP = { QB: 'QB', OL: 'OL', WR: 'WR', TE: 'TE', RB: 'RB', EDGE: 'EDGE', DL: 'DL', LB: 'LB', CB: 'CB', S: 'S', K: 'ST', P: 'ST' };
-export const decSides = (B, x, ageB, nil, d, w0) => {
+// DECT (Declare, Even, College, Transfer; scripts/dect.py -> data/dect_fit.json): college = yNIL + d x the same draft
+// value a year older (his stock held where it is), transfer = the same on xNIL (the open market), declare = the rookie
+// deal + d^4 x later earnings, each as a certainty equivalent (log utility over w0 + the outcome) across the fit's
+// outcome bins [weight, rookie, later] by position group at age 22 (nflverse whole-year draft age, half a year under
+// the age on draft day); the age term scales the later part. Even = the top two are inside one standard error
+// (against declare: yNIL's log error and the age term's; college against transfer: the width of the school budgets).
+// Returns [better of college and transfer - declare, declare, the same edge on means, label D/E/C/T, the Even pair,
+// transfer - college] in $M at this season's cap.
+let DECT = null;
+try { DECT = JSON.parse(fs.readFileSync(new URL('../data/dect_fit.json', import.meta.url))); if (!DECT.grid?.bins || !DECT.gap) DECT = null; } catch { DECT = null; }
+const DECT_MAX = 400;      // past the boards the pick spread was fit on (PFF's go about 240 deep): blank
+const DECT_GRP = { QB: 'QB', OL: 'OL', WR: 'WR', TE: 'TE', RB: 'RB', EDGE: 'EDGE', DL: 'DL', LB: 'LB', CB: 'CB', S: 'S', K: 'ST', P: 'ST' };
+export const dectSides = (B, x, ageB, nil, d, w0) => {      // [ce stay, ce declare, mean stay, mean declare]
   const W = B.reduce((s, b) => s + b[0], 0), d4 = d ** 4; let ld = 0, lr = 0, md = 0, mr = 0;
   for (const [w, r, e] of B) {
     const vd = r + d4 * e * Math.exp(ageB * x), vr = nil + d * (r + d4 * e * Math.exp(ageB * (x + 1)));
     ld += w / W * Math.log(w0 + vd); lr += w / W * Math.log(w0 + vr); md += w / W * vd; mr += w / W * vr;
   }
-  return [Math.exp(lr) - Math.exp(ld), Math.exp(ld) - w0, mr - md];
+  return [Math.exp(lr) - w0, Math.exp(ld) - w0, mr, md];
 };
-export const decOf = (p, xPick, asof = new Date(), year, fit = DEC) => {
-  const g = DEC_GRP[p.pos], a = p.age ?? p.ageEst;
-  if (!fit || !g || a == null || !(xPick > 0) || xPick > DEC_MAX || p.ynil == null) return null;
+export const dectVerdict = (B, x, G, nilC, nilT, sig, gap, d, w0) => {
+  const f = (n, b = G.ageB) => dectSides(B, x, b, n, d, w0), c0 = f(0), V = { D: c0[1], C: f(nilC)[0] }, N = { C: nilC };
+  if (nilT != null) { V.T = f(nilT)[0]; N.T = nilT; }
+  const o = Object.keys(V).sort((a, b) => V[b] - V[a]), [a, b] = o; let se;
+  if (a === 'D' || b === 'D') {
+    const k = a === 'D' ? b : a, e = (n, bb) => { const v = f(n, bb); return v[0] - v[1]; };
+    se = Math.hypot((e(N[k] * Math.exp(sig)) - e(N[k] * Math.exp(-sig))) / 2, (e(N[k], G.ageB + G.ageSE) - e(N[k], G.ageB - G.ageSE)) / 2);
+  } else se = Math.abs(f(N[a] * Math.exp(gap))[0] - f(N[a] * Math.exp(-gap))[0]) / 2;
+  const even = V[a] - V[b] < se, st = V.T != null && V.T > V.C ? 'T' : 'C', r2 = v => Math.round(v * 100) / 100;
+  return [r2(V[st] - V.D), r2(V.D), r2(f(N[st])[2] - c0[3]), even ? 'E' : a, even ? [a, b].sort().join('') : '', V.T != null ? r2(V.T - V.C) : null];
+};
+export const dectOf = (p, xPick, asof = new Date(), year, fit = DECT) => {
+  const g = DECT_GRP[p.pos], a = p.age ?? p.ageEst;
+  if (!fit || !g || a == null || !(xPick > 0) || xPick > DECT_MAX || p.ynil == null) return null;
   const G = fit.grid, lx = Math.max(G.lx[0], Math.min(G.lx.at(-1), Math.log(xPick)));
   const i = Math.max(1, G.lx.findIndex(v => v >= lx)), w = (lx - G.lx[i - 1]) / (G.lx[i] - G.lx[i - 1]);
   const B = G.bins[g][i - 1].map((b, k) => b.map((v, j) => v + w * (G.bins[g][i][k][j] - v)));
   const t = new Date(asof), y = year ?? (t.getUTCMonth() >= 4 ? t.getUTCFullYear() + 1 : t.getUTCFullYear());
-  const x = a + Math.max(0, draftDay(y) - t) / 864e5 / 365.25 - 0.5 - G.age0, nil = p.ynil / 1e6, sg = fit.sig.cfb;
-  const f = (b, n) => decSides(B, x, b, n, fit.d, fit.w0), c = f(G.ageB, nil);
-  const se = Math.hypot((f(G.ageB, nil * Math.exp(sg))[0] - f(G.ageB, nil * Math.exp(-sg))[0]) / 2, (f(G.ageB + G.ageSE, nil)[0] - f(G.ageB - G.ageSE, nil)[0]) / 2);
-  const r2 = v => Math.round(v * 100) / 100;
-  return [r2(c[0]), r2(c[1]), r2(c[2]), Math.abs(c[0]) < se ? 1 : 0];
+  const x = a + Math.max(0, draftDay(y) - t) / 864e5 / 365.25 - 0.5 - G.age0;
+  return dectVerdict(B, x, G, p.ynil / 1e6, p.xnil != null ? p.xnil / 1e6 : null, fit.sig.cfb, fit.gap.cfb, fit.d, fit.w0);
 };
 // the likely entrants for a mock: a prospect more likely to stay in school than declare sits out, except that the
 // group still sends its expected number (the sum of its odds), the best by xPick, so the class isn't drafted as if
@@ -1460,9 +1470,9 @@ export function draftOdds(rows, priors = DEFAULT_PRIORS) {
   // Ret% = 1 - declareOdds: back in school instead of the draft (out of eligibility: 0; outside the pool: blank)
   for (const p of rows) if (p.draft27) p.retP = p.elig >= 5 || /^RS-Sr|Gr/.test(p.cls || '') ? 0 : null;
   for (const p of pool) p.retP = Math.round((1 - declareOdds(p, p._x, asof, P.draftYear)) * 1000) / 1000;
-  // DEC (decOf): for prospects with a year of eligibility left, college less declare (certainty equivalents), the mean edge and the Even flag
-  for (const p of rows) if (p.draft27) { p.dec = p.decD = p.decM = p.decE = null; delete p.dor; delete p.dorD; }
-  for (const p of pool) if (p.retP > 0) { const v = decOf(p, p._x, asof, P.draftYear); if (v) [p.dec, p.decD, p.decM, p.decE] = v; }
+  // DECT (dectOf): for prospects with a year of eligibility left, the side worth most (certainty equivalents), its edge over declaring, the mean edge
+  for (const p of rows) if (p.draft27) { p.dect = p.dectL = p.dectD = p.dectM = p.dectP = p.dectT = null; for (const k of ['dor', 'dorD', 'dec', 'decD', 'decM', 'decE']) delete p[k]; }
+  for (const p of pool) if (p.retP > 0) { const v = dectOf(p, p._x, asof, P.draftYear); if (v) [p.dect, p.dectD, p.dectM, p.dectL, p.dectP, p.dectT] = v; }
   for (const p of pool) { delete p._dv; delete p._mRk; delete p._x; }
   for (const [pos, n] of Object.entries(SPECIALISTS)) {
     const sp = rows.filter(p => p.draft27 && p.pos === pos && p.fv != null && p.elig >= 4).sort((a, b) => grade(b) - grade(a) || (b.kp ?? 0) - (a.kp ?? 0));

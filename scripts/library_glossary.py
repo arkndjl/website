@@ -28,7 +28,7 @@ _NPOS = ', '.join(f'{g} {round((math.exp(v) - 1) * 100):+d}%' for g, v in ld('da
 _nbm = lambda k: sum((lo + hi) / 2 for lo, hi in _NB[k]['teams'].values()) / len(_NB[k]['teams'])
 _VX = ld('data/nba_vorx_research.json')                         # VORX on rXPM (scripts/nba_vorx_research.py)             # rXPM team adjustment (scripts/nba_rxpm_research.py)
 _NT = ld('data/nba_trade_fit.json')                         # NBA draft-night trades (scripts/nba_draft_trades.py)
-_DR = ld('data/dec_fit.json')                              # DEC, declare / even / college in dollars (scripts/dec.py)
+_DR = ld('data/dect_fit.json')                             # DECT, declare / even / college / transfer in dollars (scripts/dect.py)
 _RP = ld('data/return_pay.json')                           # draft pay vs college pay in Return% (scripts/research/ret_pay_nov27/pay.py)
 _RD = ld('data/return_drivers.json')                       # Return% sweep + reported-return lock (scripts/return_drivers.py, return_news.py)
 _CL = {k: ld(f'scripts/research/coach_loyalty_nov27/results_{k}.json') for k in ('cbb', 'cfb', 'recruits_cfb', 'recruits_cbb')}   # coach loyalty tests
@@ -500,20 +500,27 @@ sections.append({'id': 'players', 'title': 'Player odds and projections', 'entri
       ['Declare is a logit on ln xPick and age on draft day. Ranked underclassmen declare about 94% of the time, seniors about 69% and RS seniors 100%.',
        'Picked is a log-normal around the mock xPick, with an SD that narrows toward the draft (PFF dated boards, 2020-26).'],
       'CFB board, draft board', ['CFB']),
-    (lambda f, t, k, r, n, q, qn: E('DEC', 'Declare, Even, College: what another year in college is worth to a draft prospect less what declaring is worth, with Even when the model cannot tell the two apart.',
-      [f"Declare = the rookie deal + later earnings over where he goes from his xPick (CBB: his consensus rank). College = yNIL for the season + the same draft value one year older. "
+    (lambda f, t, k, r, n, q, qn: E('DECT', 'Declare, Even, College, Transfer: which is worth most to a draft prospect with eligibility left, with Even when the model cannot tell the top two apart.',
+      [f"Declare = the rookie deal + later earnings over where he goes from his xPick (CBB: his consensus rank). College = yNIL for the season + the same draft value one year older. Transfer = the same with xNIL, his price on the open market, in place of yNIL. "
        f"Dollars are at this season's cap, later years count {f['d']:.2f} a year. It is what is worth more to him, not what he will do (that is Ret%).",
        f"Each side is a certainty equivalent: the sure amount he would trade the gamble for, with log utility over ${f['w0']:.0f}M (what a college graduate earns outside the sport) plus the outcome. "
        "A player gets one career and cannot spread the risk, so a sure yNIL counts for more than the same dollars spread over a few long careers. "
        f"The outcome spread is the pick spread times how far later earnings land from the fit at that pick, from the same drafts as the fit "
        f"(NBA: the {qn['drafts'][0]}-{str(qn['drafts'][1])[2:]} drafts, {qn['n']} picks and {qn['undrafted']} undrafted prospects). The hover keeps the edge on plain averages.",
-       f"Even: the edge is inside one standard error, from yNIL's error (log error {f['sig']['cfb']:.2f} CFB, {f['sig']['cbb']:.2f} CBB against On3) and the age term's. "
+       f"Even: the top two are inside one standard error. Against declare that is yNIL's error (log error {f['sig']['cfb']:.2f} CFB, {f['sig']['cbb']:.2f} CBB against On3) and the age term's. "
+       f"College against transfer it is the width of the reported school budgets (log {f['gap']['cfb']:.2f} CFB, {f['gap']['cbb']:.2f} CBB). "
        f"On the {k['drafts'][0]}-{str(k['drafts'][-1])[2:]} CFB boards {100 * q['even']['share']:.0f}% were Even, on the CBB boards {100 * n['check']['readings']['even']['share']:.0f}%.",
        f"Three readings against who went back, CFB ({q['n']} prospects, {100 * q['returned']:.0f}% returned) / CBB ({n['check']['readings']['n']}, {100 * n['check']['readings']['returned']:.0f}%). "
        + ' '.join(f"{lab}: says college for {100 * q[key]['saysCollege']:.0f}% / {100 * n['check']['readings'][key]['saysCollege']:.0f}%, AUC inside rank thirds {q[key]['aucInThirds']:.2f} / {n['check']['readings'][key]['aucInThirds']:.2f}."
                   for lab, key in (('Average', 'mean'), ('Median', 'median'), ('Certainty equivalent', 'ce'))) +
        f" The average sends almost nobody back, so the board uses the certainty equivalent. Returned by verdict, CFB: Declare {100 * q['even']['returnedDeclare']:.0f}%, Even {100 * q['even']['returned']:.0f}%, "
        f"College {100 * q['even']['returnedCollege']:.0f}%. CBB: {100 * n['check']['readings']['even']['returnedDeclare']:.0f}%, {100 * n['check']['readings']['even']['returned']:.0f}%, {100 * n['check']['readings']['even']['returnedCollege']:.0f}%.",
+       (lambda x, c: f"Transfer carries no draft cost. Of {c['n']:,} returning CBB prospects in the {c['seasons'][0]}-{str(c['seasons'][1])[2:]} seasons, {c['moved']} moved; {100 * c['draftedMoved']:.0f}% of them were drafted later "
+        f"against {100 * c['draftedStayed']:.0f}% of those who stayed, and with production, rank, age and height held the move is worth nothing either way (t = {c['t']:.1f}). CFB has no roster history to test yet. "
+        f"xNIL is what the market pays, and a school can match it, so Transfer reads as underpaid where he is as much as it reads as leave. "
+        f"On the CBB boards ({x['n']} prospects with a known next year: {100 * x['did']['D']:.0f}% declared, {100 * x['did']['C']:.0f}% stayed, {100 * x['did']['T']:.0f}% transferred) "
+        + ' '.join(f"{lab} ({x['byVerdict'][key]['n']}): {100 * x['byVerdict'][key]['D']:.0f}% / {100 * x['byVerdict'][key]['C']:.0f}% / {100 * x['byVerdict'][key]['T']:.0f}%." for lab, key in (('Declare', 'D'), ('Even', 'E'), ('College', 'C'), ('Transfer', 'T')) if key in x['byVerdict'])
+        + " Only mid-major prospects had a market price above their own school's in that history, so the Transfer row is small.")(n['transfer'], n['transfer']['cost']),
        "The college side holds his draft stock where it is, so going back costs a year and pays yNIL. A young player who develops can beat that, and one who gets hurt falls under it. "
        "Who went back is not a fair sample of either (the ones told they would go late stay), so their record is shown below and not used.",
        f"NFL rookie deal: the 2026 slotted four-year totals, with the guaranteed share by pick from OverTheCap rookie deals and the rest counted at the odds he is still on a roster. "
