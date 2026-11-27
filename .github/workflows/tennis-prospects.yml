@@ -48,7 +48,9 @@ jobs:
     needs: gate
     if: needs.gate.outputs.go == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    # the grade step ran 48 minutes on Nov 22 and 40 on Nov 25 (one Tennis Abstract page a second when the three-day
+    # cache turns over); at 50 the job is cancelled and the day's board is not committed
+    timeout-minutes: 80
     steps:
       - uses: actions/checkout@v4
         with:
