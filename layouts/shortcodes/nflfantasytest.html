@@ -63,8 +63,8 @@
     <td class="cfb__num nflwar__war is-key">{{ partial "num.html" (slice "%.0f%%" (mul $h.hitFlag 100)) }}</td>
     <td class="cfb__num">{{ partial "num.html" (slice "%.0f%%" (mul $h.hitRest 100)) }}</td>
     <td class="cfb__num">{{ printf "%.1fx" (div $h.hitFlag $h.hitRest) }}</td>
-    <td class="cfb__num">{{ printf "%+.1f / %+.1f" $h.riseFlag $h.riseRest }}</td>
-    <td class="cfb__num">{{ printf "%+.1f / %+.1f" $h.vsProjFlag $h.vsProjRest }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%+.1f" $h.riseFlag) }} / {{ partial "num.html" (slice "%+.1f" $h.riseRest) }}</td>
+    <td class="cfb__num">{{ partial "num.html" (slice "%+.1f" $h.vsProjFlag) }} / {{ partial "num.html" (slice "%+.1f" $h.vsProjRest) }}</td>
     <td class="cfb__num">{{ printf "%.2f / %.2f" $h.aucModel $h.aucProj }}</td>
     <td class="cfb__num">{{ with $pm }}{{ printf "%.2f / %.2f" .rJob .rProj }}{{ end }}</td>
   </tr>
