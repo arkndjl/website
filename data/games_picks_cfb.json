@@ -1,7 +1,7 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-27T15:30:46Z",
+ "asof": "2026-11-27T15:34:36Z",
  "recenter": {
   "week": 0.53
  },
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-27",
-  "ageH": -8.5,
+  "ageH": -8.4,
   "stale": false
  },
  "picks": [],
@@ -549,22 +549,6 @@
    "tm": 50.7
   },
   {
-   "id": "401871082",
-   "sport": "cfb",
-   "kick": "2026-11-28T19:00:00.000Z",
-   "home": "Florida International",
-   "away": "Sam Houston",
-   "mk": "total",
-   "side": "over",
-   "line": 41.5,
-   "price": -116.0,
-   "edge": 2.0,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": 14.5,
-   "tm": 43.5
-  },
-  {
    "id": "401864548",
    "sport": "cfb",
    "kick": "2026-11-29T02:00:00.000Z",
@@ -675,6 +659,22 @@
    "why": "total market off",
    "m": 1.1,
    "tm": 53.6
+  },
+  {
+   "id": "401866474",
+   "sport": "cfb",
+   "kick": "2026-11-28T17:00:00.000Z",
+   "home": "Ball State",
+   "away": "Central Michigan",
+   "mk": "total",
+   "side": "under",
+   "line": 50.5,
+   "price": -116.0,
+   "edge": 4.6,
+   "x": null,
+   "why": "total market off",
+   "m": -3.2,
+   "tm": 45.9
   }
  ],
  "games": {
@@ -802,7 +802,7 @@
    "mk": "spread",
    "side": "away",
    "line": 35.5,
-   "price": -121.0,
+   "price": -119.0,
    "edge": 0.8,
    "ev": null,
    "units": 0.0,
@@ -1375,16 +1375,16 @@
    "state": "off"
   },
   "401871082": {
-   "mk": "total",
-   "side": "over",
-   "line": 41.5,
-   "price": -116.0,
-   "edge": 2.0,
+   "mk": "spread",
+   "side": "home",
+   "line": 10.5,
+   "price": -131.0,
+   "edge": 4.0,
    "ev": null,
    "units": 0.0,
    "home": "Florida International",
    "away": "Sam Houston",
-   "state": "under"
+   "state": "off"
   },
   "401871083": {
    "mk": "total",
@@ -1511,16 +1511,16 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 31204,
+  "snapshots": 31208,
   "buckets": [
    {
     "when": "24h+",
     "clvN": 6380,
-    "clvRet": -0.021,
-    "clvT": -12.61,
-    "clv": 0.88,
-    "beat": 0.421,
-    "still": 0.327
+    "clvRet": -0.022,
+    "clvT": -13.2,
+    "clv": 0.86,
+    "beat": 0.414,
+    "still": 0.334
    },
    {
     "when": "6-24h",
@@ -6294,7 +6294,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-27T15:30:46Z",
+ "checked": "2026-11-27T15:34:36Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
