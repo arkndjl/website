@@ -1,0 +1,80 @@
+{{- /* NIL agencies, college football or basketball (scripts/agencies.py -> data/agencies_board.json):
+       sport="cfb"|"cbb", view="board" (one row an agency) or view="clients" (one row a represented player or recruit).
+       zNIL = xNIL - yNIL of the agency's college clients: above zero they are worth more than they are paid. zNIL* = the mean
+       shrunk toward every represented player's mean by n / (n + k). Recruits carry FV, ARK stars and xNIL only. */ -}}
+{{- $sp := .Get "sport" | default "cfb" -}}
+{{- $D := index (site.Data.agencies_board | default dict) "sports" | default dict -}}
+{{- with index $D $sp -}}
+{{- $fit := .fit -}}
+{{- $icon := cond (eq $sp "cbb") "basketball" "football" -}}
+{{- $date := lower ((time ($.Site.Data.agencies_board.asof | default "2026-11-27")).Format "Jan 2, 2006") -}}
+{{- if eq ($.Get "view") "clients" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "agency clients") "icon" $icon "filter" "Agency,Pos,Kind" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Agency,Pos,Team,FV,zNIL" "gfxDate" $date "gfxMax" "25") -}}
+<table class="cfb__table agency">
+  <thead><tr><th>RK</th><th>Player</th><th>Agency</th><th>Pos</th><th>Team</th><th title="college player or the recruiting class">Kind</th>
+    <th title="future value (recruits: expected FV)">FV</th><th>xNIL</th><th>yNIL</th><th>zNIL</th><th title="high school ARK stars">ARK</th>
+    <th title="how sure the source is: high = the agency's own page or a named report">Conf</th><th title="source and its date">Src</th></tr></thead>
+  <tbody>
+  {{- range $i, $c := .clients }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td><b>{{ .name }}</b></td>
+    <td class="agency__name" data-l="Agency">{{ .agency }}{{ with .agent }} <span class="cfb__dim">{{ . }}</span>{{ end }}</td>
+    <td>{{ .pos }}</td>
+    <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team | default "uncommitted" }}</span></td>
+    <td>{{ if eq .kind "recruit" }}{{ .cls }}{{ else }}college{{ end }}</td>
+    <td class="cfb__num" data-l="FV" data-v="{{ .fv }}">{{ with .fv }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ math.Round . }}</span>{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-l="xNIL" data-v="{{ .x }}">{{ with .x }}{{ partial "nil.html" . }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-l="yNIL" data-v="{{ .y }}">{{ with .y }}{{ partial "nil.html" . }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num is-key" data-l="zNIL" data-v="{{ .z }}">{{ if ne .z nil }}{{ partial "znil.html" .z }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-l="ARK" data-v="{{ .ark }}">{{ with .ark }}{{ $lbl := cond (gt . 5.0) "5-star+" (printf "%g ARK stars" .) }}<span class="cfbrc__ark{{ if gt . 5.0 }} is-plus{{ end }}" style="--n:{{ cond (gt . 5.0) 5.0 . }}" data-n="{{ . }}" role="img" aria-label="{{ $lbl }}" title="{{ $lbl }}"><i></i></span>{{ else }}—{{ end }}</td>
+    <td class="agency__conf is-{{ .conf }}">{{ .conf }}</td>
+    <td>{{ with .src }}<a href="{{ . }}" rel="noopener nofollow" target="_blank" title="{{ $c.date }}">{{ (urls.Parse .).Host | replaceRE `^www\.` "" }}</a>{{ end }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len .clients) "fresh" "agencies_board" "about" "One row a player a source names an agency for (agency page, announcement or report), with the source and its date. Family = a relative handles his deals; None = a source says he has no agent. Players no source names are left out.") -}}
+{{- else -}}
+{{- $rows := .agencies -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "agencies") "icon" $icon "tab" ($.Get "tab") "gfxCols" "RK,Agency,zNIL*,Clients,zNIL,FV sum" "gfxDate" $date "gfxMax" "25") -}}
+<p class="agency__bar"><button type="button" class="cfb__btn" data-gfx data-gfx-mode="agencyboard" data-gfx-sport="{{ $sp }}" title="agency board PNG, 16:9">GFX 16:9</button></p>
+<script type="application/json" id="agency-data-{{ $sp }}">{{ dict "sport" $sp "fit" $fit "agencies" $rows "clients" .clients "date" $date | jsonify | safeJS }}</script>
+<table class="cfb__table agency">
+  <thead><tr><th>RK</th><th>Agency</th>
+    <th title="zNIL* = mean client zNIL shrunk toward the mean of every represented player: (sum + k x mean) / (n + k), k = {{ $fit.k }}. Above zero its clients are worth more than they are paid; below zero they are paid more than they are worth">zNIL*</th>
+    <th title="represented players and recruits">Clients</th><th title="college players / recruits">Col / Rec</th>
+    <th title="sum of college clients' zNIL">zNIL</th><th title="mean college client zNIL, not shrunk">zNIL/pl</th>
+    <th title="sum zNIL / sum yNIL">zNIL%</th>
+    <th title="sum of college clients' xNIL">xNIL</th><th title="sum of college clients' yNIL">yNIL</th><th title="sum of recruits' xNIL">Rec xNIL</th>
+    <th title="sum of every client's FV (recruits: expected FV)">FV sum</th><th title="best client FV">Top FV</th>
+    <th title="mean high school ARK stars">ARK</th><th title="clients with 5-star+">5★+</th>
+    <th title="share of rows from the agency's own page or a named report">High%</th><th title="top three clients by FV">Top</th><th></th></tr></thead>
+  <tbody>
+  {{- range $i, $a := $rows }}
+  <tr>
+    <td class="cfb__rk">{{ if or (eq .agency "Family") (eq .agency "None") }}—{{ else }}{{ add $i 1 }}{{ end }}</td>
+    <td class="agency__name"><b>{{ .agency }}</b></td>
+    <td class="cfb__num is-key" data-l="zNIL*" data-v="{{ .zShr }}">{{ if ne .zShr nil }}<b>{{ partial "znil.html" .zShr }}</b>{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .n }}">{{ .n }}</td>
+    <td class="cfb__num">{{ .nCol }} / {{ .nRec }}</td>
+    <td class="cfb__num" data-v="{{ .z }}">{{ if ne .z nil }}{{ partial "znil.html" .z }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .zMean }}">{{ if ne .zMean nil }}{{ partial "znil.html" .zMean }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .zPct }}">{{ if ne .zPct nil }}<span class="{{ if ge .zPct 0.0 }}cfb__up{{ else }}cfb__down{{ end }}">{{ if ge .zPct 0.0 }}+{{ end }}{{ partial "num.html" (slice "%.0f" (mul .zPct 100)) }}%</span>{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .x }}">{{ with .x }}{{ partial "nil.html" . }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .y }}">{{ with .y }}{{ partial "nil.html" . }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .recX }}">{{ with .recX }}{{ partial "nil.html" . }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .fv }}">{{ with .fv }}{{ partial "num.html" (slice "%.0f" .) }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .fvTop }}">{{ with .fvTop }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ math.Round . }}</span>{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .ark }}">{{ with .ark }}{{ partial "num.html" (slice "%.1f" .) }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .ark5 }}">{{ .ark5 }}</td>
+    <td class="cfb__num" data-v="{{ .high }}">{{ partial "num.html" (slice "%.0f" (mul .high 100)) }}%</td>
+    <td class="agency__top">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ index $p 0 }} <span class="cfb__dim">{{ index $p 1 }}</span>{{ end }}</td>
+    <td><button type="button" class="cfb__btn cfb__cardbtn" data-gfx data-gfx-mode="agency" data-gfx-sport="{{ $sp }}" data-gfx-i="{{ $i }}" title="agency card PNG, 16:9">GFX</button></td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "fresh" "agencies_board" "about" (printf "Agencies by their college clients' zNIL (xNIL - yNIL), shrunk by n / (n + k), k = %v, toward the mean of %v represented players (%s). Family and None are listed last for comparison. Low-confidence rows count for talent, not zNIL." $fit.k $fit.nZ (partial "nil.html" $fit.mu | plainify))) -}}
+{{- end -}}
+{{- end -}}

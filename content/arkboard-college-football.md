@@ -11,7 +11,7 @@ cover = "/og/college-football.png"
 
 {{< winpane title="football_prospects.exe :: CFB 2026-27" icon="football" sprite="px/hero-football" status="PFN · On3 · ESPN · CFBD · Rotoballer" class="winpane--art" />}}
 
-{{< wintabs groups="players:board,leaders,standouts,awards,all-time players,ARKLIST|rosters:depth chart,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,units,talent,all-time|market:portal,NIL,coaches|recruits:classes,class rankings,recruit transactions|draft:draft board,mock draft|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
+{{< wintabs groups="players:board,leaders,standouts,awards,all-time players,ARKLIST|rosters:depth chart,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,units,talent,all-time|market:portal,NIL,agencies,coaches|recruits:classes,class rankings,recruit transactions|draft:draft board,mock draft|model:fv model,recruit model,all-time FV" side="true" label="College Football views" >}}
 {{< cfbboard title="CFB 2026-27 :: 2027 draft board" tab="draft board" preset="d27" >}}
 {{< cfbboard title="ARKLIST :: starred players" tab="ARKLIST" preset="star" >}}
 {{< wintabs tab="awards" tabs="predictive awards,conviction awards" sub="true" label="awards views" >}}
@@ -159,6 +159,14 @@ cover = "/og/college-football.png"
 {{< cfbboard title="NIL" tab="NIL" preset="nil" >}}
 {{< lazytab tab="team NIL" >}}
 {{< cfbnil title="team NIL" tab="team NIL" >}}
+{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="agencies" tabs="agencies,agency clients" sub="true" label="agencies views" >}}
+{{< lazytab tab="agencies" >}}
+{{< agencies sport="cfb" title="NIL agencies" tab="agencies" >}}
+{{< /lazytab >}}
+{{< lazytab tab="agency clients" >}}
+{{< agencies sport="cfb" view="clients" title="agency clients" tab="agency clients" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
 {{< wintabs tab="coaches" tabs="staff,coaching jobs,coach pay,all-time coaches" sub="true" label="coaches views" >}}

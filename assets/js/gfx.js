@@ -1561,6 +1561,16 @@
       pxBar(g, cx + pad, ly, cwi - 2 * pad, bh, it.prob, C.lilac);
     });
   }
+  // ---- the player's NIL agency (scripts/agencies.py -> static/data/agencies.json): name key -> [team key, agency, confidence, kind]
+  var AG_DATA = {};
+  async function pcAgency(name, team, recruit) {
+    var sp = MV_SPORT[SITE.split('/').pop()], nk = window.arkName; if ((sp !== 'cfb' && sp !== 'cbb') || !nk || !name) return '';
+    var d = await (AG_DATA[sp] || (AG_DATA[sp] = fetch('{{ "data/agencies.json" | relURL }}').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })));
+    var L = d && d[sp] && d[sp][nk.key(name)]; if (!L) return '';
+    var tk = team ? nk.teamKey(String(team).split('/').pop().trim()) : '';
+    var hit = L.filter(function (e) { return (recruit ? e[3] === 'recruit' : e[3] !== 'recruit') && (!tk || !e[0] || e[0] === tk); });
+    return hit.length === 1 ? hit[0][1] + (hit[0][2] === 'low' ? ' (?)' : '') : '';
+  }
   // ---- moves (scripts/player_moves.py -> static/data/moves/<sport>.json): commitments, flips, visits, portal moves and pro
   // transactions, fetched on the first card. A recruit keeps the rows of his class; anyone else the chain of teams ending at his.
   var MV_DATA = {}, MV_SPORT = { cfb: 'cfb', cbb: 'cbb', nfl: 'nfl', nba: 'nba', nhl: 'nhl', hockey: 'nhl', soccer: 'soccer', u22: 'soccer' };
@@ -1680,6 +1690,7 @@
       if (pc != null) stats.push({ h: 'Y1 BOARD PCTL', t: String(pc), prob: pc });
       if (ct(/^xnil$/i)) stats.push({ h: 'xNIL Y1', t: ct(/^xnil$/i) });
     }
+    var agR = await pcAgency(name, team, true); if (agR) stats.push({ h: 'AGENCY', t: agR });
     var parts = why && why.rows ? why.rows.map(function (r) { return [r[0], +r[1]]; }).filter(function (p) { return p[0] && isFinite(p[1]) && Math.abs(p[1]) >= 0.05; }).sort(function (a, b) { return Math.abs(b[1]) - Math.abs(a[1]); }).slice(0, 10) : [];
     var wt = txt(win.querySelector('.win__title-text')).replace(/_$/, '').trim(), base = wt.split('::')[0].trim(); if (/^[a-z0-9]/.test(base)) base = SITE.split('/').pop().toUpperCase() + ' ' + base;
     var F = await frame(2160, 2700, base + ' :: ' + name, win.getAttribute('data-gfx-date'), tabLink(win));
@@ -1824,6 +1835,7 @@
     var pk = row.getAttribute('data-pk'), link = tabLink(win);
     if (pk && /#/.test(link)) link += ':p=' + pk;
     else if (win.getAttribute('data-cbb') && window.__arkCbbPid && row.hasAttribute('data-i') && window.__arkCbbRecs) { var rec = window.__arkCbbRecs[+row.getAttribute('data-i')]; if (rec) link = SITE + '#' + win.getAttribute('data-cbb') + ':p=' + window.__arkCbbPid(rec); }
+    var agy = await pcAgency(name, rc && rc.o ? '' : team, !!(rc && rc.c)); if (agy) info.push(['Agency', agy]);
     mvs = await pcMoves(win, name, { team: rc && rc.o ? '' : team }); var mvH = pcMovesH(mvs); compH += mvH;
     var F = await frame(2160, 2700 + compH, base + ' :: ' + name, win.getAttribute('data-gfx-date'), link);
     var g = F.g, x = F.x + 40, y = F.y + 70, w = F.w - 80, top = y, bottom = F.y + F.h - 30;
@@ -4617,6 +4629,84 @@
     return F.canvas;
   }
 
+  // ---- NIL agencies (layouts/shortcodes/agencies.html, data from scripts/agencies.py): the agency card and the board, 16:9.
+  // zNIL = xNIL - yNIL: teal above zero (clients worth more than they are paid), pink below (paid more than they are worth) ----
+  function agData(sp) { var el = document.getElementById('agency-data-' + sp); try { return el ? JSON.parse(el.textContent) : null; } catch (e) { return null; } }
+  function zMoney(n) { return n == null ? '—' : (n >= 0 ? '+' : '−') + money(Math.abs(n)); }
+  function agTile(g, x, y, w, h, lab, val, col) {
+    well(g, x, y, w, h);
+    g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, lab, w - 40), x + 20, y + 38);
+    var fs = Math.min(84, h - 70); g.font = fs + 'px ' + FONT; while (fs > 36 && g.measureText(val).width > w - 40) { fs -= 4; g.font = fs + 'px ' + FONT; }
+    g.fillStyle = col || C.white; g.fillText(val, x + 20, y + 38 + (h - 38) / 2 + 4);
+  }
+  async function buildAgency(win, btn) {
+    var D = agData(btn.getAttribute('data-gfx-sport')); if (!D) return null;
+    var a = D.agencies[+btn.getAttribute('data-gfx-i')]; if (!a) return null;
+    var lab = D.sport === 'cbb' ? 'CBB' : 'CFB';
+    var F = await frame(2400, 1350, 'ARKBOARD ' + lab + ' :: AGENCIES :: ' + a.agency, D.date, SITE + '#agencies');
+    var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, gap = 24, lw = Math.round(w * 0.42), rx = x + lw + gap, rw = w - lw - gap;
+    // left: the name and the numbers
+    var ns = 96; g.font = ns + 'px ' + FONT; while (ns > 48 && g.measureText(a.agency).width > lw - 20) { ns -= 4; g.font = ns + 'px ' + FONT; }
+    g.fillStyle = C.teal; g.fillText(fit(g, a.agency, lw - 20), x + 10, y + ns * 0.6);
+    var rk = D.agencies.filter(function (r) { return r.zShr != null && r.agency !== 'Family' && r.agency !== 'None'; }).indexOf(a);
+    g.font = '36px ' + FONT; g.fillStyle = C.lilac;
+    g.fillText(fit(g, [rk >= 0 ? '#' + (rk + 1) + ' zNIL*' : '', a.n + ' clients', a.nCol + ' college', a.nRec + (a.nRec === 1 ? ' recruit' : ' recruits')].filter(Boolean).join(' · '), lw - 20), x + 10, y + ns * 1.2 + 20);
+    var ty = y + ns * 1.2 + 60, th = Math.round((y + h - ty - 2 * gap) / 3), tw = Math.round((lw - 2 * gap) / 3);
+    var zc = function (v) { return v == null ? C.white : v >= 0 ? C.teal : C.down; };
+    var T = [['zNIL*', zMoney(a.zShr), zc(a.zShr)], ['zNIL', zMoney(a.z), zc(a.z)], ['zNIL%', a.zPct == null ? '—' : (a.zPct >= 0 ? '+' : '−') + Math.abs(Math.round(a.zPct * 100)) + '%', zc(a.zPct)],
+      ['xNIL', a.x == null ? '—' : money(a.x)], ['yNIL', a.y == null ? '—' : money(a.y)], ['REC xNIL', a.recX == null ? '—' : money(a.recX)],
+      ['FV SUM', a.fv == null ? '—' : String(Math.round(a.fv))], ['ARK', a.ark == null ? '—' : a.ark.toFixed(1)], ['5-STAR+', String(a.ark5 || 0)]];
+    T.forEach(function (t, i) { agTile(g, x + (i % 3) * (tw + gap), ty + Math.floor(i / 3) * (th + gap), tw, th, t[0], t[1], t[2]); });
+    // right: the clients by FV
+    var L = (D.clients || []).filter(function (c) { return c.agency === a.agency; }).sort(function (p, q) { return (q.fv || 0) - (p.fv || 0); });
+    well(g, rx, y, rw, h);
+    var n = Math.min(L.length, 14), hh = 56, rh = n ? Math.min(78, Math.floor((h - hh - 24) / n)) : 78, fsz = Math.round(rh * 0.5);
+    var cols = [['PLAYER', rx + 30 + rh], ['POS', rx + rw * 0.47], ['TEAM', rx + rw * 0.57], ['FV', rx + rw * 0.79], ['zNIL', rx + rw - 30]];
+    g.font = '28px ' + FONT; g.fillStyle = C.lilac;
+    cols.forEach(function (c, i) { g.textAlign = i === cols.length - 1 ? 'right' : 'left'; g.fillText(c[0], c[1], y + 36); }); g.textAlign = 'left';
+    var imgs = await Promise.all(L.slice(0, n).map(function (c) { return c.logo ? loadImg(c.logo) : null; }));
+    L.slice(0, n).forEach(function (c, k) {
+      var cy = y + hh + k * rh + rh / 2;
+      if (k % 2) { g.fillStyle = 'rgba(200,199,255,0.06)'; g.fillRect(rx + 12, cy - rh / 2, rw - 24, rh); }
+      if (imgs[k]) drawLogo(g, imgs[k], rx + 24, cy - rh * 0.4, rh * 0.8, rh * 0.8);
+      g.font = fsz + 'px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, c.name, cols[1][1] - cols[0][1] - 20), cols[0][1], cy);
+      g.fillStyle = C.lilac; g.fillText(fit(g, c.pos || '', cols[2][1] - cols[1][1] - 12), cols[1][1], cy);
+      g.fillText(fit(g, c.kind === 'recruit' ? String(c.cls) + ' ' + (c.team ? c.team : 'open') : (c.team || ''), cols[3][1] - cols[2][1] - 16), cols[2][1], cy);
+      if (c.fv != null) chip(g, cols[3][1], cy, String(Math.round(c.fv)), Math.round(fsz * 0.9), c.fv);
+      g.textAlign = 'right'; g.fillStyle = zc(c.z); g.fillText(zMoney(c.z), cols[4][1], cy); g.textAlign = 'left';
+    });
+    if (L.length > n) { g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.textAlign = 'right'; g.fillText('+' + (L.length - n) + ' more', rx + rw - 30, y + h - 18); g.textAlign = 'left'; }
+    return F.canvas;
+  }
+  async function buildAgencyBoard(win, btn) {
+    var D = agData(btn.getAttribute('data-gfx-sport')); if (!D) return null;
+    var lab = D.sport === 'cbb' ? 'CBB' : 'CFB';
+    var R = D.agencies.filter(function (r) { return r.agency !== 'Family' && r.agency !== 'None'; }).slice(0, 12);
+    var F = await frame(2400, 1350, 'ARKBOARD ' + lab + ' :: NIL AGENCIES', D.date, SITE + '#agencies');
+    var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, hh = 60, n = R.length, rh = n ? Math.min(96, Math.floor((h - hh - 10) / n)) : 96, fsz = Math.round(rh * 0.46);
+    well(g, x, y, w, h);
+    var cols = [['#', x + 30, 'l'], ['AGENCY', x + 110, 'l'], ['zNIL*', x + w * 0.47, 'r'], ['CLIENTS', x + w * 0.55, 'r'], ['zNIL', x + w * 0.65, 'r'], ['FV SUM', x + w * 0.73, 'r'], ['ARK', x + w * 0.79, 'r'], ['TOP CLIENTS', x + w * 0.81, 'l']];
+    g.font = '30px ' + FONT; g.fillStyle = C.lilac;
+    cols.forEach(function (c) { g.textAlign = c[2] === 'r' ? 'right' : 'left'; g.fillText(c[0], c[1], y + 38); }); g.textAlign = 'left';
+    var logos = await Promise.all(R.map(function (r) { return Promise.all((r.top || []).map(function (p) { return p[3] ? loadImg(p[3]) : null; })); }));
+    R.forEach(function (r, k) {
+      var cy = y + hh + k * rh + rh / 2, zc = r.zShr == null ? C.white : r.zShr >= 0 ? C.teal : C.down;
+      g.fillStyle = k % 2 ? 'rgba(200,199,255,0.06)' : 'rgba(0,0,0,0)'; g.fillRect(x + 12, cy - rh / 2, w - 24, rh);
+      g.font = fsz + 'px ' + FONT; g.fillStyle = k < 3 ? C.teal : C.lilac; g.fillText(String(k + 1), cols[0][1], cy);
+      g.fillStyle = C.white; g.fillText(fit(g, r.agency, cols[2][1] - cols[1][1] - 200), cols[1][1], cy);
+      g.textAlign = 'right';
+      g.fillStyle = zc; g.font = Math.round(fsz * 1.15) + 'px ' + FONT; g.fillText(zMoney(r.zShr), cols[2][1], cy);
+      g.font = fsz + 'px ' + FONT; g.fillStyle = C.white; g.fillText(String(r.n), cols[3][1], cy);
+      g.fillStyle = r.z == null ? C.white : r.z >= 0 ? C.teal : C.down; g.fillText(zMoney(r.z), cols[4][1], cy);
+      g.fillStyle = C.white; g.fillText(r.fv == null ? '—' : String(Math.round(r.fv)), cols[5][1], cy);
+      g.fillText(r.ark == null ? '—' : r.ark.toFixed(1), cols[6][1], cy);
+      g.textAlign = 'left';
+      var lx = cols[7][1], ls = Math.round(rh * 0.62);
+      (r.top || []).forEach(function (p, j) { var im = logos[k][j]; if (im) drawLogo(g, im, lx, cy - ls / 2, ls, ls); lx += ls + 10; });
+    });
+    return F.canvas;
+  }
+
   document.addEventListener('click', async function (e) {
     var btn = e.target.closest('[data-gfx]'); if (!btn) return;
     var win = btn.closest('.win'); if (!win) return;
@@ -4627,6 +4717,7 @@
       if (mode === 'log') { var lc = await buildLog(win, btn); if (lc) { var lk = JSON.parse(btn.getAttribute('data-gfx-log') || '{}'); preview(lc, 'arklog-' + String(lk.id || lk.n || 'row')); } return; }
       if (mode === 'logboard') { var lb = await buildBoard(win, btn); if (lb) preview(lb, 'arklog-scoreboard'); return; }
       if (mode === 'sheet') { var sc = await buildSheet(win, btn); if (sc) preview(sc, 'arkboard-process-' + String(JSON.parse(btn.getAttribute('data-gfx-sheet') || '{}').sport || 'sport').toLowerCase()); return; }
+      if (mode === 'agency' || mode === 'agencyboard') { var ac = mode === 'agency' ? await buildAgency(win, btn) : await buildAgencyBoard(win, btn); if (ac) { var ad = agData(btn.getAttribute('data-gfx-sport')) || {}; preview(ac, 'arkboard-' + (ad.sport || '') + '-' + (mode === 'agency' ? 'agency-' + String(((ad.agencies || [])[+btn.getAttribute('data-gfx-i')] || {}).agency || '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'agencies')); } return; }
       if (mode === 'watch') { var wc = await buildWatch(win, btn); if (wc) preview(wc, 'arkboard-games-to-watch'); return; }
       var canvas = mode === 'term' ? await buildTerm(win, btn) : mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'class' ? await buildClassCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn) : mode === 'bracket' ? await buildBracket(win, btn) : mode === 'pickem' ? await buildPickem(win, btn) : mode === 'perf' ? await buildPerf(win, btn) : mode === 'depth' ? await buildDepth(win, btn)
         : mode === 'lz-social' ? await buildSocial(win, btn) : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)

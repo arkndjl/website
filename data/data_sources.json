@@ -27,7 +27,8 @@
       { "n": "James Howell's college football scores", "u": "https://www.jhowell.net/cf/scores/ScoresIndex.htm", "w": "every major-college game since 1869 (score, site, conference game, bowl / title game) for the all-time coaches ratings" },
       { "n": "Wikipedia season infoboxes", "u": "https://en.wikipedia.org/wiki/2026_NCAA_Division_I_FBS_football_season", "w": "offensive and defensive coordinators and scheme labels for each FBS team (scripts/cfb_coord_sync.py)" },
       { "n": "WalterFootball prospect meetings", "u": "https://walterfootball.com/ProspectMeetingsByTeam2026.php", "w": "pre-draft team meetings by NFL team (top-30 visits, private workouts, combine), logged with dates (scripts/nfl_meetings.py); research input, not yet in the mock" },
-      { "n": "SportsDataverse ESPN player box and schedules", "u": "https://github.com/sportsdataverse/sportsdataverse-data", "w": "per-game player lines and schedules 2005-25 for the award races' as-of backtest (scripts/awards_asof.py cfb)" }
+      { "n": "SportsDataverse ESPN player box and schedules", "u": "https://github.com/sportsdataverse/sportsdataverse-data", "w": "per-game player lines and schedules 2005-25 for the award races' as-of backtest (scripts/awards_asof.py cfb)" },
+      { "n": "Agency client pages and NIL reports", "u": "https://www.jordansportsgroup.co/college-athletes", "w": "which agency represents a player or recruit (agency client lists such as Jordan Sports Group; On3, ESPN, SI and Front Office Sports signing reports), one row a player with its source and date" }
     ]},
     { "name": "NFL", "sources": [
       { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news, injury status and estimated return, roster moves, transactions log (trades and the draft picks in them)" },
@@ -62,7 +63,8 @@
       { "n": "US Department of Education, Equity in Athletics (EADA)", "u": "https://ope.ed.gov/athletics/", "w": "men's basketball program expenses and revenue by school and academic year, 2013-14 on (scripts/eada_pull.py -> scripts/data/eada_mbb.json.gz); an input of the coach pay model" },
       { "n": "Bracket Matrix", "u": "https://www.bracketmatrix.com/", "w": "the live bracketologist consensus (average seed, brackets naming each team), logged daily in season for the committee model's season-end score (scripts/cbb_bracket_matrix.py); not shown on any page" },
       { "n": "sportsdataverse (hoopR) ESPN box scores and play-by-play", "u": "https://github.com/sportsdataverse/sportsdataverse-data/releases", "w": "dated player box scores and rim / dunk attempts for past seasons, 2013 on (scripts/cbb_box_hist.py); research input" },
-      { "n": "FIBA youth event rosters (on file)", "u": "https://www.fiba.basketball/", "w": "birth dates of players who appeared at FIBA youth events 2011-25 (scripts/data/fiba_dob.json.gz), used by scripts/cbb_dob.py when the birth year agrees with Barttorvik's" }
+      { "n": "FIBA youth event rosters (on file)", "u": "https://www.fiba.basketball/", "w": "birth dates of players who appeared at FIBA youth events 2011-25 (scripts/data/fiba_dob.json.gz), used by scripts/cbb_dob.py when the birth year agrees with Barttorvik's" },
+      { "n": "Agency client pages and NIL reports", "u": "https://www.jordansportsgroup.co/college-athletes", "w": "which agency represents a player or recruit (agency client lists such as Jordan Sports Group; On3, ESPN, SI and Front Office Sports signing reports), one row a player with its source and date" }
     ]},
     { "name": "NBA", "sources": [
       { "n": "NBA G League Stats", "u": "https://stats.gleague.nba.com/", "w": "G League season totals (1Y / 3Y G League term); player seasons since 2005-06 (box and advanced, regular season and Showcase Cup) for G League call-up odds; team rosters (birth dates) and the two-way contract list" },

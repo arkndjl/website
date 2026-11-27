@@ -11,7 +11,7 @@ cover = "/og/college-basketball.png"
 
 {{< winpane title="basketball_prospects.exe :: CBB 2026-27" icon="basketball" sprite="px/hero-basketball" status="daily in season · Barttorvik · On3 · 247 · ESPN" class="winpane--art" />}}
 
-{{< wintabs groups="players:board,leaders,standouts,awards,all-time players,ARKLIST|rosters:depth chart,lineups,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,units,talent,all-time|market:portal,NIL,coaches|recruits:classes,class rankings,recruit transactions|draft:draft board,mock draft|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
+{{< wintabs groups="players:board,leaders,standouts,awards,all-time players,ARKLIST|rosters:depth chart,lineups,returning,transactions|games:games,game table,top performers|teams:ARK Ranking,units,talent,all-time|market:portal,NIL,agencies,coaches|recruits:classes,class rankings,recruit transactions|draft:draft board,mock draft|model:fv model,recruit model,past boards,all-time FV" side="true" label="College Basketball views" >}}
 {{< wintabs tab="board" tabs="all,international" sub="true" label="board views" >}}
 {{< cbbboard title="CBB 2026-27" tab="all" >}}
 {{< lazytab tab="international" >}}
@@ -177,6 +177,14 @@ cover = "/og/college-basketball.png"
 {{< /lazytab >}}
 {{< lazytab tab="team NIL" >}}
 {{< cbbnil view="teams" title="team NIL" tab="team NIL" >}}
+{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="agencies" tabs="agencies,agency clients" sub="true" label="agencies views" >}}
+{{< lazytab tab="agencies" >}}
+{{< agencies sport="cbb" title="NIL agencies" tab="agencies" >}}
+{{< /lazytab >}}
+{{< lazytab tab="agency clients" >}}
+{{< agencies sport="cbb" view="clients" title="agency clients" tab="agency clients" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
 {{< wintabs tab="coaches" tabs="staff,coaching jobs,coach pay,all-time coaches" sub="true" label="coaches views" >}}
