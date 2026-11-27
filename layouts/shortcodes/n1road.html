@@ -149,7 +149,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('[data-n1r]
     {{- range $tiers }}{{ $t := . }}
     <span class="h-l">{{ .l }}</span>
     {{- range $i, $h := $hist }}<span class="h-c{{ if eq $h.d $t.k }} is-h{{ end }}" title="S{{ $h.s }} · {{ $h.div }} · {{ $h.w }}–{{ $h.l }}{{ with $h.mv }} · {{ if eq . "up" }}promoted{{ else }}relegated{{ end }}{{ end }}"></span>{{ end }}
-    {{- range $y := seq 1 10 }}{{ $sh := index (index $st $y) $t.k | default 0 }}<span class="h-c{{ if eq $y 1 }} is-sep{{ end }}{{ if eq $t.k "Out" }} is-out{{ end }}" title="{{ add 2026 $y }} start · {{ $t.l }} {{ printf "%.1f" (mul $sh 100) }}%">{{ if gt $sh 0.0 }}<i style="opacity:{{ printf "%.2f" (add 0.08 (mul $sh 0.92)) }}"></i>{{ end }}</span>{{ end }}
+    {{- range $y := seq 1 10 }}{{ $sh := index (index $st $y) $t.k | default 0.0 }}<span class="h-c{{ if eq $y 1 }} is-sep{{ end }}{{ if eq $t.k "Out" }} is-out{{ end }}" title="{{ add 2026 $y }} start · {{ $t.l }} {{ printf "%.1f" (mul $sh 100) }}%">{{ if gt $sh 0.0 }}<i style="opacity:{{ printf "%.2f" (add 0.08 (mul $sh 0.92)) }}"></i>{{ end }}</span>{{ end }}
     {{- end }}
     <span class="h-l"></span>
     {{- range $i, $h := $hist }}<span class="h-x{{ if eq $i (sub $nh 1) }} is-now{{ end }}">{{ $h.s }}</span>{{ end }}
