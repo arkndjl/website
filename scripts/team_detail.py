@@ -97,9 +97,9 @@ def players(sport):
         ids = (_load(os.path.join(ROOT, 'data', 'soccer_logos.json')) or {}).get('espn', {})
         for p in (_latest('soccer-war') or {}).get('players', []):
             t = ids.get(p['team'])
-            if t and p.get('gar') is not None:
-                by[t].append((p['gar'], [p['n'], p['pos'], round(p['gar'], 2), f"{p['g']} G, {p['a']} A in {p['min']} min"]))
-        return 'GAR', _top(by)
+            if t and p.get('svar') is not None:            # a season list: SVAR, the season-only value (not GAR's three-season plus-minus)
+                by[t].append((p['svar'], [p['n'], p['pos'], round(p['svar'], 2), f"{p['g']} G, {p['a']} A in {p['min']} min"]))
+        return 'SVAR', _top(by)
     return '', {}
 
 
