@@ -53,3 +53,19 @@ swap cannot ship as registered: the 1Y / 3Y are consumers of XPM (proj) and the 
   draws in both arms): (season XPM x MP - to date XPM x MP to date) / MP left, squared error weighted by MP left,
   at f = .1, .2, .35, .5, .75; 100+ MP left.
 - Pass: paired t >= 2 (players as units) at every f and a majority of seasons at every f. Counts in the Holm batch.
+
+## Round 2 (port round), written before scoring
+### P2 awards games-left rate (scripts/awards.py nba_races x_rest / d_rest: c['sx'], the Nov 4 shrink)
+- Candidate A (primary): pXPM form on the to-date line (to-date minutes at 1, the two seasons before at .35 / .1, k 200 to the
+  role mean, aging term as the board's sxpm carries it). B: the same without aging (the rest of this season, not the next).
+- Harness: scripts/awards_asof.py inputs (in-repo boxes, 2019-2026, shares .25 / .5 / .75, the 'box' stand-in for XPM to
+  date, ridge fit leaving the season out). Target: the rest-of-season stand-in XPM (same ridge on the box line after the
+  checkpoint), 200+ minutes left, squared error weighted by minutes left; total and defense.
+- Pass: paired t >= 2 pooled (players as units) and a majority of seasons, on the total; defense no worse. Then the guard:
+  winner log loss of the as-of races no worse (run only if the rate passes).
+### P3 season-only rXPM / VORX of prior seasons beside the prior in the 1Y / 3Y
+- Live H4 already carries the two seasons before as box XPM (d1, d2, reliability-weighted). A: d1 / d2 on rXPM (txpm) instead.
+  B: H4 + the two prior seasons' VORX (vorx on rXPM, per 82 team games).
+- Harness and target as T4 (leave one season out, 1,000+ window minutes), every f. Pass: t >= 2 at f 1 on the 1Y or 3Y,
+  neither target worse (t > -2) at any f, majority of seasons.
+### P4 / P5: code and fit-date checks; a refit only where the fit's input changed after the fit.
