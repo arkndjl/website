@@ -443,8 +443,9 @@ def nfl_qb_attach(P, Q):
         if not c: continue
         _, _, _, att, cm, yd, td, it, sk, sky, ay, pe, cpoe, re_, car, ry = c[0]
         db = att + sk
-        r['q'] = dict(epa=round(pe / db, 3), cpoe=round(cpoe, 1), anya=round((yd + 20 * td - 45 * it - sky) / db, 2), sk=round(100 * sk / db, 1),
-                      adot=round(ay / att, 1), int=round(100 * it / att, 1), rush=round(re_, 1), db=int(db))
+        air = r['y'] >= 2006   # nflverse charts air yards from 2006: before it the CPOE and air-yards columns are 0 or a stub
+        r['q'] = dict(epa=round(pe / db, 3), cpoe=round(cpoe, 1) if air else None, anya=round((yd + 20 * td - 45 * it - sky) / db, 2), sk=round(100 * sk / db, 1),
+                      adot=round(ay / att, 1) if air else None, int=round(100 * it / att, 1), rush=round(re_, 1), db=int(db))
         if r['y'] in lg: r['q']['anyx'] = round(100 + 25 * (r['q']['anya'] - lg[r['y']][0]) / lg[r['y']][1])
     for r in P['career']:
         if r['y0'] >= 1999:
