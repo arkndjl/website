@@ -254,7 +254,7 @@ def main():
              'gp': 30, 'age': p.get('age')}
         cc = 1 - jobs.get(p['team'], {}).get('stay', 0.85)
         tr = bool((p.get('last') or {}).get('team')) and (p.get('last') or {}).get('team') != p['team']
-        full = M.feats_move(r, srs_now.get(p['team']), p.get('conf') in HM, p['minrk'], tr, cc, 0.0)
+        full = M.feats_move(r, srs_now.get(p['team']), p.get('conf') in HM, p['minrk'], tr, cc, 0.0, ten=(CO.get(p['team']) or {}).get('ten'))
         feats.append(pick(full, mv['feats'], M.MOVE_F))
     PR = mnl_score(mv, feats)
     # the draft: a 2027 mock pick or a listed returner's declare odds put a floor under "gone"
