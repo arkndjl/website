@@ -51,7 +51,8 @@ def load():
 
 
 def save(sport):
-    with open(STATE.format(sport), 'w') as f: json.dump(load()[sport], f, separators=(',', ':'), sort_keys=True)
+    d = load()[sport]      # read before the file is opened for writing (an unloaded state would be read back empty)
+    with open(STATE.format(sport), 'w') as f: json.dump(d, f, separators=(',', ':'), sort_keys=True)
 
 
 def observe(sport, key, age, cls, name, on=None):

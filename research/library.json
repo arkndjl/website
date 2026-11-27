@@ -490,8 +490,10 @@
      "short": "xNIL is what a player is worth on the NIL market now, yNIL is his estimated pay entering the season, and zNIL = xNIL - yNIL.",
      "body": [
       "xNIL = position price × on-field value (AV at FV, × playing time), shared within the P4 and G5 pools.",
-      "yNIL splits each program's budget by a preseason index (about $20M a program in the P4, $3M in the G5 and $0.4M in the FCS).",
+      "yNIL splits each program's budget by a preseason index. The budget is the school's reported one: 68 P4 football programs (mean $27.2M) and 80 high-major basketball programs (mean $13.7M).",
+      "Without a report it is assumed: $3M in the G5, $0.4M in the FCS, $1.2M for a mid-major and $0.25M for a low-major in basketball.",
       "It isn't fit to On3 valuations, since those only move +18% per 10 FV. zNIL growth is 20% of each coach score.",
+      "Checked against the College Sports Commission's pay percentiles by position, On3 valuations and reported deals.",
       "FCS players at an FBS-starter FV are priced at 40% of the FBS rate. CBB xNIL is minutes share × (BPM + 3) at the school's price."
      ],
      "where": "CFB board, team talent, team builder, fv to xNIL charts; CBB recruits",
