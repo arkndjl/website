@@ -1,0 +1,64 @@
+{
+ "h1_team_builder": {
+  "rmse_now": 2.57,
+  "rmse_raw_plus_dev": 3.414,
+  "rmse_cand": 2.443,
+  "t": 29.59,
+  "k": 11,
+  "n": 11,
+  "guard_rmse_now": 2.39,
+  "guard_rmse_cand": 2.294,
+  "guard_t": 14.46,
+  "guard_k": 11
+ },
+ "h2_serve_form": {
+  "rows_emulated": 5055,
+  "new_mu": -1.53,
+  "move": {
+   "n": 5047,
+   "ll_now": 0.8988,
+   "ll_cand": 0.8862,
+   "t": 6.44,
+   "auc_now": 0.704,
+   "auc_cand": 0.725,
+   "mean_p_move_now": 0.227,
+   "mean_p_move_cand": 0.235,
+   "moved": 0.27
+  },
+  "land": {
+   "n": 1362,
+   "ll_now": 5.478,
+   "ll_cand": 5.419,
+   "t": 7.46,
+   "top10_now": 0.153,
+   "top10_cand": 0.165
+  }
+ },
+ "h3_lowdiv_arrival": {
+  "n": 3739,
+  "keep": [
+   "bs",
+   "cls"
+  ],
+  "r_bpm_rxpm_shrunk": 0.9984,
+  "mse_bpm": 1.9442,
+  "mse_rxpm": 1.9739,
+  "t": -0.45,
+  "dev_bpm": 0.4894,
+  "dev_rxpm": 0.4989,
+  "t_dev": -1.08,
+  "k": 3,
+  "folds": 8
+ },
+ "holm": {
+  "m": 4,
+  "pass": [
+   "h1",
+   "h2a",
+   "h2b"
+  ],
+  "fail": [
+   "h3"
+  ]
+ }
+}
