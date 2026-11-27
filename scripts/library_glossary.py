@@ -28,6 +28,7 @@ _NPOS = ', '.join(f'{g} {round((math.exp(v) - 1) * 100):+d}%' for g, v in ld('da
 _nbm = lambda k: sum((lo + hi) / 2 for lo, hi in _NB[k]['teams'].values()) / len(_NB[k]['teams'])
 _VX = ld('data/nba_vorx_research.json')                         # VORX on rXPM (scripts/nba_vorx_research.py)             # rXPM team adjustment (scripts/nba_rxpm_research.py)
 _NT = ld('data/nba_trade_fit.json')                         # NBA draft-night trades (scripts/nba_draft_trades.py)
+_AGY = ld('data/agencies_board.json')['sports']               # NIL agencies (scripts/agencies.py)
 _DR = ld('data/dect_fit.json')                             # DECT, declare / even / college / transfer in dollars (scripts/dect.py)
 _RP = ld('data/return_pay.json')                           # draft pay vs college pay in Return% (scripts/research/ret_pay_nov27/pay.py)
 _RD = ld('data/return_drivers.json')                       # Return% sweep + reported-return lock (scripts/return_drivers.py, return_news.py)
@@ -273,6 +274,13 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
        'Checked against the College Sports Commission\'s pay percentiles by position, On3 valuations and reported deals.',
        'FCS players at an FBS-starter FV are priced at 40% of the FBS rate. CBB xNIL is minutes share × (BPM + 3) at the school\'s price.'],
       'CFB board, team talent, team builder, fv to xNIL charts; CBB recruits', ['CFB', 'CBB']),
+    E('NIL agencies', 'Agencies ranked by their college clients\' zNIL, with the talent they represent.',
+      ['Each client is one row in a ledger, named by the agency\'s own client page, an announcement or a report, with the source and its date. Family means a relative handles his deals and None means a source says he has no agent. A player no source names is left out.',
+       f'zNIL* is the mean zNIL of the agency\'s college clients pulled toward the mean of every represented player: (sum + k × mean) / (n + k). k is the spread of clients inside an agency over the spread between agencies, held at 8 or more until eight agencies have three or more clients: {_AGY["cfb"]["fit"]["k"]:g} in football and {_AGY["cbb"]["fit"]["k"]:g} in basketball.',
+       'Above zero the clients are worth more on the market than they are paid, so the agency has put them where they can play. Below zero they are paid more than they are worth, so the agency has got them paid.',
+       'Recruits count toward talent (FV, ARK stars, xNIL) but not zNIL, since they have no yNIL yet. Low-confidence rows count toward talent only.',
+       f'On file now: {len(_AGY["cfb"]["clients"])} football and {len(_AGY["cbb"]["clients"])} basketball players and recruits, {len(_AGY["cfb"]["agencies"])} and {len(_AGY["cbb"]["agencies"])} agencies.'],
+      'CFB and CBB agencies tabs, player and recruit cards', ['CFB', 'CBB']),
     E('Season AV (college)', 'A college player\'s on-field value for a season: snap share × position weight × quality.',
       ['Quality = Stat+ z + .5 badge z + .25 FV z. Team R² against 2026 SRS is .63, compared to .44 for summed FV value.',
        'It is used for the cost of college injuries and for team value. NFL value stays on AV at FV.'],

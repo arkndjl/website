@@ -5339,3 +5339,9 @@ a.tick__g--nw:hover .tick__me { color: #fff; }
 .cfb__table tr.cfb__detail .clsd__t .cfb__num { text-align: right; }
 .cfb__table tr.cfb__detail .clsd__t tr { cursor: default; }
 .cfb__table tr.cfb__detail .clsd__t tr:hover { background: none; }
+/* NIL agencies tab (layouts/shortcodes/agencies.html) */
+.agency__bar { margin: 6px 8px; display: flex; justify-content: flex-end; }
+.agency__name { white-space: nowrap; }
+.agency__top { min-width: 14em; }
+.agency__conf.is-high { color: #7fffd4; } .agency__conf.is-medium { color: #c8c7ff; } .agency__conf.is-low { color: #ff9ec7; }
+@media (max-width: 700px) { .agency__top { min-width: 10em; } .agency__name { white-space: normal; min-width: 8em; } }

@@ -173,3 +173,17 @@
 - A table shows it with `{{ partial "hsark.html" (dict "sport" "cfb" "name" .name "team" .team) }}` under an `HS` header
   (portal, transfer watch, re-signed). No source lists him = 1 star; specialists get no grade. A change to how thin rows are
   graded must pass the forward test (fit 2011-19, test 2020-21) before it ships.
+
+## NIL agencies (market > agencies, CFB and CBB)
+
+- `data/agencies.json` is the ledger: one row a player or recruit and source (agency, agent, scope, source URL, date,
+  confidence high / medium / low). "Family" = a relative handles his deals, "None" = a source says he has no agent. Never
+  guessed: a player no source names stays out, and a named agent with no named firm stays out. Agency spellings are folded by
+  `ALIAS` in `scripts/agencies.py`.
+- `scripts/agencies.py` joins the ledger to the boards through the shared name matcher and writes `data/agencies_board.json`
+  (the agencies and agency clients subtabs, `layouts/shortcodes/agencies.html`) and `static/data/agencies.json` (the agency
+  line on player and recruit cards, `pcAgency` in gfx.js); process-refresh.yml reruns it. `--test` after a change.
+- zNIL = xNIL - yNIL as everywhere: above zero the clients are worth more than they are paid (the agency found them the right
+  place), below zero they are paid more than they are worth (the agency got them paid). zNIL* = (sum + k x mean of all
+  represented players) / (n + k), k by method of moments. Recruits count for talent only. GFX: `buildAgency` (one agency) and
+  `buildAgencyBoard` (the board), both 16:9.
