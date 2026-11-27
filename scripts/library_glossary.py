@@ -25,6 +25,7 @@ _NB = ld('data/nil_budgets.json')                           # reported roster bu
 _nbm = lambda k: sum((lo + hi) / 2 for lo, hi in _NB[k]['teams'].values()) / len(_NB[k]['teams'])
 _VX = ld('data/nba_vorx_research.json')                         # VORX on rXPM (scripts/nba_vorx_research.py)             # rXPM team adjustment (scripts/nba_rxpm_research.py)
 _NT = ld('data/nba_trade_fit.json')                         # NBA draft-night trades (scripts/nba_draft_trades.py)
+_RP = ld('data/return_pay.json')                           # draft pay vs college pay in Return% (scripts/research/ret_pay_nov27/pay.py)
 _RD = ld('data/return_drivers.json')                       # Return% sweep + reported-return lock (scripts/return_drivers.py, return_news.py)
 _CD = ld('data/cbb_declare_fit.json')                      # CBB stay-or-declare (scripts/cbb_declare.py)
 _CX = ld('data/cbb_xpm_research.json')                     # CBB pXPM fit + tests (scripts/cbb_xpm.py, scripts/research/cbb_xpm_nov26)
@@ -509,7 +510,15 @@ sections.append({'id': 'players', 'title': 'Player odds and projections', 'entri
           f"(the model said {100 * n['cbb']['kinds']['return']['model']:.0f}%), t = {n['cbb']['kinds']['return']['t']:.1f}, "
           f"{n['cbb']['kinds']['return']['cyclesWon']}/{n['cbb']['kinds']['return']['cycles']}. It {'passed' if n['cbb']['kinds']['return']['pass'] else 'failed'}."]
          if n.get('cbb', {}).get('kinds', {}).get('return', {}).get('n') else []),
-       "Failed on top of the live model in both sports (each one was tried in both): " + fails + "."],
+       "Failed on top of the live model in both sports (each one was tried in both): " + fails + ".",
+       (lambda c, b, bd: f"Draft pay in dollars (first-year cash over the pick spread against college pay, each scaled to its year's salary cap and NIL "
+        f"market) failed in CFB (t = {c['onTop']['econ1p']['t']:.1f} as a log ratio, {c['onTop']['gap']['t']:.1f} as a dollar gap, "
+        f"{c['drafts'][0]}-{str(c['drafts'][-1])[2:]} boards). In CBB the dollar gap passes leaving one draft out (t = {b['onTop']['gap']['t']:.1f}, "
+        f"{b['onTop']['gap']['won']}/{b['onTop']['gap']['of']}), but it is the year level and not the player: beside a 2024+ step it is "
+        f"t = {b['besideStep']['gap']['t']:.1f}, and walking forward t = {b['walkForward']['gap']['t']:.1f}. It didn't ship. Board ranks "
+        f"{bd[0]['picks']}: {100 * bd[0]['left']:.0f}% left in {bd[0]['era']} (n = {bd[0]['n']}) and {100 * bd[1]['left']:.0f}% in {bd[1]['era']} "
+        f"(n = {bd[1]['n']}; the model said {100 * bd[1]['model']:.0f}%).")(
+           _RP['cfb'], _RP['cbb']['stageB'], [x for x in _RP['cbb']['stageB']['bands'] if x['picks'] == '31-60'])],
       'CFB draft board, CBB draft board', ['CFB', 'CBB']))(
         _RD['cfb'], _RD['cbb'], _RD.get('news', {}),
         ', '.join(dict.fromkeys(
