@@ -1,9 +1,9 @@
 {
  "sport": "cfb",
  "name": "college football",
- "asof": "2026-11-27T13:59:08Z",
+ "asof": "2026-11-27T14:09:48Z",
  "recenter": {
-  "week": 0.52
+  "week": 0.51
  },
  "monitor": {
   "clocks": {
@@ -269,7 +269,7 @@
  },
  "model": {
   "asof": "2026-11-27",
-  "ageH": -10.0,
+  "ageH": -9.8,
   "stale": false
  },
  "picks": [],
@@ -387,22 +387,6 @@
    "why": "edge under 7.5 (side: over)",
    "m": -3.6,
    "tm": 46.4
-  },
-  {
-   "id": "401856756",
-   "sport": "cfb",
-   "kick": "2026-11-28T00:30:00.000Z",
-   "home": "Texas A&M",
-   "away": "Texas",
-   "mk": "total",
-   "side": "over",
-   "line": 40.5,
-   "price": -121.0,
-   "edge": 3.6,
-   "x": 7.5,
-   "why": "edge under 7.5 (side: over)",
-   "m": -14,
-   "tm": 44.1
   },
   {
    "id": "401856762",
@@ -675,6 +659,22 @@
    "why": "total market off",
    "m": 1.1,
    "tm": 53.6
+  },
+  {
+   "id": "401864549",
+   "sport": "cfb",
+   "kick": "2026-11-27T20:30:00.000Z",
+   "home": "San Jos\u00e9 State",
+   "away": "North Dakota State",
+   "mk": "spread",
+   "side": "away",
+   "line": -7.5,
+   "price": -116.0,
+   "edge": 4.8,
+   "x": null,
+   "why": "spread market off",
+   "m": -12.3,
+   "tm": 43.6
   }
  ],
  "games": {
@@ -751,16 +751,16 @@
    "state": "under"
   },
   "401856756": {
-   "mk": "total",
-   "side": "over",
-   "line": 40.5,
-   "price": -121.0,
-   "edge": 3.6,
+   "mk": "spread",
+   "side": "away",
+   "line": -10.5,
+   "price": -116.0,
+   "edge": 3.5,
    "ev": null,
    "units": 0.0,
    "home": "Texas A&M",
    "away": "Texas",
-   "state": "under"
+   "state": "off"
   },
   "401856765": {
    "mk": "total",
@@ -1257,9 +1257,9 @@
   "401864549": {
    "mk": "spread",
    "side": "away",
-   "line": -8.5,
-   "price": -112.0,
-   "edge": 3.8,
+   "line": -7.5,
+   "price": -116.0,
+   "edge": 4.8,
    "ev": null,
    "units": 0.0,
    "home": "San Jos\u00e9 State",
@@ -1511,25 +1511,25 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 31161,
+  "snapshots": 31169,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 6371,
-    "clvRet": -0.0219,
-    "clvT": -13.12,
-    "clv": 0.86,
-    "beat": 0.415,
-    "still": 0.333
+    "clvN": 6374,
+    "clvRet": -0.0223,
+    "clvT": -13.36,
+    "clv": 0.85,
+    "beat": 0.413,
+    "still": 0.327
    },
    {
     "when": "6-24h",
-    "clvN": 722,
-    "clvRet": -0.0572,
-    "clvT": -22.45,
+    "clvN": 724,
+    "clvRet": -0.0577,
+    "clvT": -22.56,
     "clv": 0.11,
-    "beat": 0.213,
-    "still": 0.586
+    "beat": 0.21,
+    "still": 0.587
    },
    {
     "when": "1-6h",
@@ -6294,7 +6294,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-27T13:59:08Z",
+ "checked": "2026-11-27T14:09:48Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
