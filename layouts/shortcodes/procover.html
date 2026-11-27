@@ -1,0 +1,69 @@
+{{- /* Process > Overview: the chain of tabs with counts, the test tallies from the log, each sport's describe and predict
+       pick, the gate entries' one-liners, and the newest tests. All of it is read from data/library.json "overview"
+       (scripts/library_build.py) and data/arklog.json (scripts/arklog.py); nothing is typed here.
+       {{< procover tab="overview" >}} */ -}}
+{{- $o := site.Data.library.overview -}}
+{{- $l := site.Data.arklog -}}
+{{- $btns := `<span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>` | safeHTML -}}
+{{- $vlab := dict "s" "shipped" "m" "part shipped" "f" "failed" -}}
+<div class="desk libgrid proc" data-tab="{{ .Get "tab" }}">
+<div class="win proc__wide">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>chain.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="proc__chain">
+    {{- range $o.chain }}
+    <a class="proc__node" href="#{{ .t | urlize }}"><b>{{ .n }}</b><span>{{ .t }}</span><i>{{ .u }}</i></a>
+    {{- end }}
+  </div>
+  <a class="proc__gate" href="#testing"><span>testing</span><b>{{ $l.tests }}</b><i>tests</i><b class="is-s">{{ $l.shipped }}</b><i>shipped</i><b class="is-m">{{ $l.mixed }}</b><i>part shipped</i><b class="is-f">{{ $l.failed }}</b><i>failed</i></a>
+  <div class="win__status"><span>{{ $o.terms }} terms · {{ $o.studies }} studies · {{ lang.FormatNumber 0 $l.changes }} changes logged</span><span>since {{ dateFormat "Jan 2 2006" $l.first }}</span></div>
+</div>
+<div class="win">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>describe / predict<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="libfv__wrap"><table class="libfv proc__lead">
+    <thead><tr><th>sport</th><th title="the metric that best explains a season's results, held out">describe</th><th title="the metric that best predicts the next season, held out">predict</th></tr></thead>
+    <tbody>
+    {{- range $o.sheets }}{{ $sp := .sport }}{{ with .lead }}
+    <tr><th>{{ $sp }}</th>
+      <td title="{{ .dfull }}"><div class="proc__cell"><span class="proc__m">{{ .describe }}</span>{{ with .dn }}<span class="proc__r"><i style="width:{{ mul (float .) 100 | math.Round }}%"></i></span><span class="proc__n">{{ . }}</span>{{ end }}</div></td>
+      <td title="{{ .pfull }}"><div class="proc__cell"><span class="proc__m">{{ .predict }}</span>{{ with .pn }}<span class="proc__r"><i style="width:{{ mul (float .) 100 | math.Round }}%"></i></span><span class="proc__n">{{ . }}</span>{{ end }}</div></td></tr>
+    {{- end }}{{ end }}
+    </tbody>
+  </table></div>
+  <p class="rq__bar libstudy__bar"><a class="cfb__btn rq__link" href="#g-most-predictive-and-most-descriptive-metric-by-sport">test</a><a class="cfb__btn rq__link" href="#sports">sports</a></p>
+  <div class="win__status"><span>held-out R²</span><span></span></div>
+</div>
+<div class="win">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>tests by week<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="libstudy__body">
+    <div class="libstudy__chart">{{ $l.svg.weeks | safeHTML }}
+      <p class="libstudy__legend"><span class="lc-key lc-k0">shipped</span><span class="lc-key lc-k2">part shipped</span><span class="lc-key lc-k4">failed</span></p></div>
+  </div>
+  <p class="rq__bar libstudy__bar"><a class="cfb__btn rq__link" href="{{ "arklog/" | relURL }}">ARKLOG</a><a class="cfb__btn rq__link" href="{{ "arklog/" | relURL }}#scoreboard">scoreboard</a></p>
+  <div class="win__status"><span>{{ $l.tests }} tests</span><span>{{ with $o.ledger }}ledger: {{ .keep }} kept · {{ .watch }} watch · {{ .drop }} dropped{{ end }}</span></div>
+</div>
+<div class="win">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>gate.txt<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <dl class="proc__gates">
+    {{- range first 7 $o.gate }}
+    <dt><a href="#{{ .id }}">{{ .t }}</a></dt><dd>{{ .s }}</dd>
+    {{- end }}
+  </dl>
+  <p class="rq__bar libstudy__bar"><a class="cfb__btn rq__link" href="#testing">testing</a></p>
+</div>
+<div class="win">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>latest tests<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <ol class="proclog__rows proclog__rows--mini">
+    {{- range first 8 (where $l.latest "sec" "ARKBOARD") }}
+    <li class="plrow plrow--{{ .v }}"><a class="plrow__head" href="{{ "arklog/" | relURL }}#log-{{ .n }}">
+      <span class="plrow__date">{{ dateFormat "Jan 2" .d }}</span>
+      <span class="plrow__title">{{ .t }}</span>
+      <span class="plrow__eff">{{ .x }}</span>
+      <span class="plrow__v">{{ index $vlab .v }}</span>
+    </a></li>
+    {{- end }}
+  </ol>
+  <p class="rq__bar libstudy__bar"><a class="cfb__btn rq__link" href="{{ "arklog/" | relURL }}">ARKLOG</a></p>
+  <div class="win__status"><span>updated {{ dateFormat "Jan 2 2006" $l.asof }}</span><span></span></div>
+</div>
+</div>
+{{- partial "js.html" "arklog" -}}

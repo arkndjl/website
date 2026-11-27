@@ -1,4 +1,4 @@
-{{- /* Process > Glossary/Methodology: one section of data/library.json (research/library.json via scripts/library_build.py).
+{{- /* Process > Metrics / Models / Data (the glossary and methodology tabs): one section of data/library.json (research/library.json via scripts/library_build.py).
        {{< libglossary tab="FV" section="fv" >}}   entries of that section as term windows, each with a GFX card (gfx.js buildTerm; visual from data/glossary_gfx.json).
        {{< libglossary tab="FV scales" fv="true" >}} the FV conversion tables, one window per board. */ -}}
 {{- $sec := .Get "section" -}}
@@ -23,12 +23,17 @@
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-library"/></svg>{{ .term }}<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
   <div class="libterm__body">
     <p class="libterm__short">{{ .short }}</p>
+    {{- with .charts }}<div class="libterm__figs">{{ range . }}<figure class="libstudy__chart libterm__fig">
+      {{- with .svg }}{{ . | safeHTML }}{{ end }}
+      {{- with .tiles }}<div class="proc__tiles">{{ range . }}<div class="proc__tile"><i>{{ index . 0 }}</i><b>{{ index . 1 }}</b>{{ with index . 2 }}<span>{{ . }}</span>{{ end }}</div>{{ end }}</div>{{ end }}
+      {{- with .note }}<figcaption>{{ . }}</figcaption>{{ end }}</figure>{{ end }}</div>{{ end }}
     {{- with .body }}<ul class="libterm__lines">{{ range . }}<li>{{ . }}</li>{{ end }}</ul>{{ end }}
   </div>
   {{- $gid := partial "glossid.html" .term }}
   {{- $card := merge (dict "t" .term "s" .short "sp" (.sports | default slice) "id" $gid) (index site.Data.glossary_gfx .term | default dict) }}
   <p class="rq__bar libstudy__bar">
-    <button type="button" class="cfb__btn" data-gfx data-gfx-mode="term" data-gfx-term="{{ jsonify $card }}" title="glossary card PNG, 16:9 for X">GFX card</button>
+    <button type="button" class="cfb__btn" data-gfx data-gfx-mode="term" data-gfx-term="{{ jsonify $card }}" title="glossary card PNG{{ if $card.x }}, 3:4{{ else }}, 16:9 for X{{ end }}">GFX card</button>
+    {{- if $card.x }}<button type="button" class="cfb__btn" data-gfx data-gfx-mode="term" data-gfx-wide="1" data-gfx-term="{{ jsonify $card }}" title="glossary card PNG, 16:9 for X">GFX 16:9</button>{{ end }}
     <a class="cfb__btn rq__link" href="#{{ $gid }}" title="link to this term">link</a>
   </p>
   <div class="win__status"><span>{{ with .sports }}{{ delimit . " · " }}{{ end }}</span><span>{{ .where }}</span></div>

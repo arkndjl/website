@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Writes the Reference (Glossary/Methodology) entry for all-time coaches into research/library.json from the numbers
+"""Writes the Process glossary entry for all-time coaches into research/library.json from the numbers
 in data/coach_alltime.json, then rerun scripts/library_build.py.
 
     python3 scripts/coach_alltime_ref.py && python3 scripts/library_build.py

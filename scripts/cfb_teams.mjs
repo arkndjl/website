@@ -1394,23 +1394,24 @@ export const declareOdds = (p, xPick, asof = new Date(), year) => {
   const gap = a != null ? Math.max(-2, Math.min(2, a + Math.max(0, draftDay(y) - t) / 864e5 / 365.25 - d.age0)) : 0;
   return 1 / (1 + Math.exp(-(d.a + d.b * Math.log(xPick) + d.age * gap)));
 };
-// DoR (Declare or Return, scripts/dor.py -> data/dor_fit.json): return = yNIL + d x next year's draft a year older,
-// declare = this year's draft, each the rookie deal + d^4 x later earnings over the pick spread from xPick. The fit's
+// DoR (Declare or Return, scripts/dor.py -> data/dor_fit.json): return = yNIL + d x the same draft value a year older
+// (his stock held where it is), declare = the rookie deal + d^4 x later earnings over the pick spread from xPick. The fit's
 // grids are by position group at age 22 (nflverse whole-year draft age, half a year under the age on draft day); the
 // age term scales the later part. Returns [return - declare, declare] in $M at this season's cap.
 let DOR = null;
 try { DOR = JSON.parse(fs.readFileSync(new URL('../data/dor_fit.json', import.meta.url))); if (!DOR.grid) DOR = null; } catch { DOR = null; }
+const DOR_MAX = 400;      // past the boards the pick spread was fit on (PFF's go about 240 deep): blank
 const DOR_GRP = { QB: 'QB', OL: 'OL', WR: 'WR', TE: 'TE', RB: 'RB', EDGE: 'EDGE', DL: 'DL', LB: 'LB', CB: 'CB', S: 'S', K: 'ST', P: 'ST' };
 export const dorOf = (p, xPick, asof = new Date(), year, fit = DOR) => {
   const g = DOR_GRP[p.pos], a = p.age ?? p.ageEst;
-  if (!fit || !g || a == null || !(xPick > 0) || p.ynil == null) return null;
+  if (!fit || !g || a == null || !(xPick > 0) || xPick > DOR_MAX || p.ynil == null) return null;
   const G = fit.grid, lx = Math.max(G.lx[0], Math.min(G.lx.at(-1), Math.log(xPick)));
   const i = Math.max(1, G.lx.findIndex(v => v >= lx)), w = (lx - G.lx[i - 1]) / (G.lx[i] - G.lx[i - 1]);
   const at = T => [0, 1].map(k => T[g][i - 1][k] + w * (T[g][i][k] - T[g][i - 1][k]));
   const t = new Date(asof), y = year ?? (t.getUTCMonth() >= 4 ? t.getUTCFullYear() + 1 : t.getUTCFullYear());
   const x = a + Math.max(0, draftDay(y) - t) / 864e5 / 365.25 - 0.5 - G.age0, d = fit.d, d4 = d ** 4;
-  const [rd, ed] = at(G.dec), [rr, er] = at(G.ret);
-  const dec = rd + d4 * ed * Math.exp(G.ageB * x), ret = p.ynil / 1e6 + d * (rr + d4 * er * Math.exp(G.ageB * (x + 1)));
+  const [rd, ed] = at(G.dec);
+  const dec = rd + d4 * ed * Math.exp(G.ageB * x), ret = p.ynil / 1e6 + d * (rd + d4 * ed * Math.exp(G.ageB * (x + 1)));
   return [Math.round((ret - dec) * 100) / 100, Math.round(dec * 100) / 100];
 };
 // the likely entrants for a mock: a prospect more likely to stay in school than declare sits out, except that the

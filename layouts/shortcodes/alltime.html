@@ -1,7 +1,7 @@
 {{- /* All-time team-seasons and players (scripts/alltime.py, data/alltime.json). sport="cfb|cbb|nfl|nba|nhl|hkp|soccer|cs2|atp|wta"
        list="teams|offense|defense" (team-seasons, era-adjusted: 100 + 25 SD over that season's league) or "peak|career" (players);
        group="qbs" (NFL, CFB: the QB lists, with QB columns; NFL's default players lists then hold everyone else).
-       Method on Process (Glossary/Methodology). Mobile: the cfbp cards (name + key number, season under it, the rest labelled). */ -}}
+       Method on Process. Mobile: the cfbp cards (name + key number, season under it, the rest labelled). */ -}}
 {{- $sp := $.Get "sport" -}}{{- $L := $.Get "list" | default "teams" -}}
 {{- $D := index site.Data.alltime $sp -}}
 {{- $asof := lower ((time site.Data.alltime.asof).Format "Jan 2, 2006") -}}

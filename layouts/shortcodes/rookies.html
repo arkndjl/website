@@ -65,8 +65,9 @@
     // ph / lo: photo and team-logo URLs from scripts/rookies.py; no photo, or one that fails, shows the neutral frame
     function face(u) { return '<span class="pxframe pxframe--row"><img src="' + esc(u || '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
     function logo(u) { return u ? '<img class="cfb__logo cfb__logo--in" src="' + esc(u) + '" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
-    function fmt(x, f) {
+    function fmt(x, f, r) {
       if (x == null || x === '') return f === 's' ? '' : DASH;
+      if (f === 'dor') return '<span class="cfb__dor' + (x > 0 ? ' cfb__dor--r' : '') + '" title="' + (x > 0 ? 'return' : 'declare') + ' +$' + Math.abs(x).toFixed(Math.abs(x) < 10 ? 1 : 0) + 'M' + (r && r.dorD != null ? ' · declare $' + (+r.dorD).toFixed(1) + 'M · return $' + (r.dorD + x).toFixed(1) + 'M' : '') + '">' + (x > 0 ? 'RET' : 'DEC') + '</span>';
       if (f === 's') return '<span class="cfb__dim">' + esc(x) + '</span>';
       if (f === 't') return esc(x);
       if (f === 'i') return Math.round(x).toLocaleString();
@@ -189,7 +190,7 @@
           if (c.k === 'dl') return '<td class="cfb__num">' + (r.dl == null ? DASH : fmt(r.dl, 's0')) + '</td>';
           if (c.k === 'hw') return '<td class="' + c.cls + '">' + (r.hw ? esc(r.hw) : DASH) + '</td>';
           if (c.k === 'age') return '<td class="cfb__num ' + c.cls + '">' + (r.age == null ? '' : r.ageEst ? '~' + r.age.toFixed(1) : r.age % 1 ? r.age.toFixed(1) : r.age) + '</td>';
-          return '<td class="cfb__num ' + c.cls + '">' + fmt(r[c.k], c.f) + '</td>';
+          return '<td class="cfb__num ' + c.cls + '">' + fmt(r[c.k], c.f, r) + '</td>';
         }).join('') + '</tr>';
       };
       body.innerHTML = list.slice(page * PER, page * PER + PER).map(gfxRow).join('');
