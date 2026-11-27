@@ -142,7 +142,7 @@
   Declare / Even / College / Transfer (Noah, Nov 27); never "DoR", "DTR", "DEC", "Return", "Equal" or "Toss Up". `scripts/dect.py`
   is fit by hand (needs the CBB kit and `scripts/xaav.py`'s Basketball-Reference cache) and writes `data/dect_fit.json`: rookie
   deal and later earnings by pick and draft age (NFL from OverTheCap contracts, NBA from salary history), pick spread from players
-  with no choice (CFB grads, CBB seniors), outcome bins by pick. College = yNIL + the same draft value a year older, Transfer = the
+  with no choice (CFB grads, CBB seniors), outcome bins by pick. College = xNIL x the school's pay per market dollar (roster yNIL / xNIL) + the same draft value a year older, Transfer = the
   same on xNIL; each side is a certainty equivalent (log utility); Even = the top two are inside one standard error; the mean edge
   stays in the hover. Returners' own record is the downside case on Process, never the model (they are a selected sample).
   `dectOf` in `scripts/cfb_teams.mjs` and `nba_dect` (read by `scripts/cbb_tabs.py`) write `dect` / `dectL` / `dectD` / `dectM` /
