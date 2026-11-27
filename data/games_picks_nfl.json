@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-27T15:53:17Z",
+ "asof": "2026-11-27T16:45:46Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -52,7 +52,7 @@
  },
  "model": {
   "asof": "2026-11-27T15:29:46Z",
-  "ageH": 0.4,
+  "ageH": 1.3,
   "stale": false
  },
  "picks": [],
@@ -84,7 +84,7 @@
    "mk": "spread",
    "side": "home",
    "line": -5.5,
-   "price": -107.0,
+   "price": -109.0,
    "edge": 7.9,
    "x": null,
    "why": "spread market off",
@@ -99,9 +99,9 @@
    "away": "DEN",
    "mk": "total",
    "side": "over",
-   "line": 37.5,
-   "price": -103.0,
-   "edge": 4.4,
+   "line": 36.5,
+   "price": -123.0,
+   "edge": 5.4,
    "x": null,
    "why": "total market off",
    "m": -4.1,
@@ -122,22 +122,6 @@
    "why": "total market off",
    "m": 6.5,
    "tm": 43.5
-  },
-  {
-   "id": "2026_12_NYJ_MIA",
-   "sport": "nfl",
-   "kick": "2026-11-29T18:00:00Z",
-   "home": "MIA",
-   "away": "NYJ",
-   "mk": "total",
-   "side": "over",
-   "line": 39.5,
-   "price": -121.0,
-   "edge": 3.2,
-   "x": null,
-   "why": "total market off",
-   "m": -3.4,
-   "tm": 42.7
   },
   {
    "id": "2026_12_WAS_ARI",
@@ -172,6 +156,22 @@
    "tm": 41.8
   },
   {
+   "id": "2026_12_NYJ_MIA",
+   "sport": "nfl",
+   "kick": "2026-11-29T18:00:00Z",
+   "home": "MIA",
+   "away": "NYJ",
+   "mk": "total",
+   "side": "over",
+   "line": 40.5,
+   "price": -105.0,
+   "edge": 2.2,
+   "x": null,
+   "why": "total market off",
+   "m": -3.4,
+   "tm": 42.7
+  },
+  {
    "id": "2026_12_LV_CLE",
    "sport": "nfl",
    "kick": "2026-11-30T01:20:00Z",
@@ -180,12 +180,28 @@
    "mk": "total",
    "side": "over",
    "line": 39.5,
-   "price": -119.0,
+   "price": -112.0,
    "edge": 2.0,
    "x": null,
    "why": "total market off",
    "m": 5.5,
    "tm": 41.5
+  },
+  {
+   "id": "2026_12_TEN_JAX",
+   "sport": "nfl",
+   "kick": "2026-11-29T18:00:00Z",
+   "home": "JAX",
+   "away": "TEN",
+   "mk": "spread",
+   "side": "home",
+   "line": 13.5,
+   "price": -126.0,
+   "edge": 1.9,
+   "x": null,
+   "why": "spread market off",
+   "m": 15.4,
+   "tm": 46.9
   },
   {
    "id": "2026_12_SEA_SF",
@@ -196,28 +212,12 @@
    "mk": "total",
    "side": "over",
    "line": 43.5,
-   "price": -114.0,
+   "price": -112.0,
    "edge": 1.9,
    "x": null,
    "why": "total market off",
    "m": 2.9,
    "tm": 45.4
-  },
-  {
-   "id": "2026_12_TEN_JAX",
-   "sport": "nfl",
-   "kick": "2026-11-29T18:00:00Z",
-   "home": "JAX",
-   "away": "TEN",
-   "mk": "total",
-   "side": "under",
-   "line": 48.5,
-   "price": -123.0,
-   "edge": 1.6,
-   "x": null,
-   "why": "total market off",
-   "m": 15.4,
-   "tm": 46.9
   },
   {
    "id": "2026_12_CAR_TB",
@@ -256,9 +256,9 @@
   "2026_12_DEN_PIT": {
    "mk": "total",
    "side": "over",
-   "line": 37.5,
-   "price": -103.0,
-   "edge": 4.4,
+   "line": 36.5,
+   "price": -123.0,
+   "edge": 5.4,
    "ev": null,
    "units": 0.0,
    "home": "PIT",
@@ -305,7 +305,7 @@
    "mk": "spread",
    "side": "home",
    "line": -5.5,
-   "price": -107.0,
+   "price": -109.0,
    "edge": 7.9,
    "ev": null,
    "units": 0.0,
@@ -316,9 +316,9 @@
   "2026_12_NYJ_MIA": {
    "mk": "total",
    "side": "over",
-   "line": 39.5,
-   "price": -121.0,
-   "edge": 3.2,
+   "line": 40.5,
+   "price": -105.0,
+   "edge": 2.2,
    "ev": null,
    "units": 0.0,
    "home": "MIA",
@@ -326,11 +326,11 @@
    "state": "off"
   },
   "2026_12_TEN_JAX": {
-   "mk": "total",
-   "side": "under",
-   "line": 48.5,
-   "price": -123.0,
-   "edge": 1.6,
+   "mk": "spread",
+   "side": "home",
+   "line": 13.5,
+   "price": -126.0,
+   "edge": 1.9,
    "ev": null,
    "units": 0.0,
    "home": "JAX",
@@ -353,7 +353,7 @@
    "mk": "total",
    "side": "over",
    "line": 43.5,
-   "price": -114.0,
+   "price": -112.0,
    "edge": 1.9,
    "ev": null,
    "units": 0.0,
@@ -377,7 +377,7 @@
    "mk": "total",
    "side": "over",
    "line": 39.5,
-   "price": -119.0,
+   "price": -112.0,
    "edge": 2.0,
    "ev": null,
    "units": 0.0,
@@ -450,13 +450,13 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 6843,
+  "snapshots": 6853,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 2677,
+    "clvN": 2680,
     "clvRet": -0.0345,
-    "clvT": -22.39,
+    "clvT": -22.42,
     "clv": 0.27,
     "beat": 0.315,
     "still": 0.547
@@ -2866,7 +2866,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-27T15:53:17Z",
+ "checked": "2026-11-27T16:45:46Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
