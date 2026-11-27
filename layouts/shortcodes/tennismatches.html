@@ -65,7 +65,8 @@
               var c = byId[comp.id]; if (!c) return;
               var st = comp.status.type; if (st.state === 'pre') return;
               var p = comp.competitors || []; if (p.length !== 2) return;
-              var sets = (p[0].linescores || []).map(function (s, i) { return s.value + '-' + ((p[1].linescores || [])[i] || {}).value; }).join(' ');
+              var gm = function (s) { var v = parseInt(s && s.value, 10); return isNaN(v) ? 0 : v; };   // ESPN's numbers only: this goes into innerHTML
+              var sets = (p[0].linescores || []).map(function (s, i) { return gm(s) + '-' + gm((p[1].linescores || [])[i]); }).join(' ');
               var el = c.querySelector('[data-live]');
               el.innerHTML = '<b class="games__livetag' + (st.state === 'post' ? ' is-final' : '') + '">' + (st.state === 'post' ? 'FINAL' : 'LIVE') + '</b> ' + sets;
               el.hidden = false;
