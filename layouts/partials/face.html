@@ -1,4 +1,9 @@
 {{- /* A player's photo in a row frame: (dict "u" url) with url "" for none. No photo, or one that fails to load, shows
-       the neutral frame (static/img/face.svg) so names stay lined up. Lazy, no referrer. */ -}}
-<span class="pxframe pxframe--row"><img src="{{ .u | default "/img/face.svg" }}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='/img/face.svg'"></span>
+       the neutral frame (static/img/face.svg) so names stay lined up. Lazy, no referrer.
+       A row frame is about 30px wide, so a full-size source is asked for at row size: the NFL CDN's unsized upload
+       (4 MB PNG, 0.85 MB WebP each) gets w_96, and an ESPN full headshot (200 KB) goes through ESPN's resizer. */ -}}
+{{- $u := .u | default "" -}}
+{{- $u = replaceRE `(static\.www\.nfl\.com/image/(?:upload|private)/f_auto,q_auto)/league/` "$1,w_96/league/" $u -}}
+{{- $u = replaceRE `^https://a\.espncdn\.com(/i/headshots/[^?]+\.png)$` "https://a.espncdn.com/combiner/i?img=$1&w=96&h=70&scale=crop" $u -}}
+<span class="pxframe pxframe--row"><img src="{{ $u | default "/img/face.svg" }}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='/img/face.svg'"></span>
 {{- /**/ -}}

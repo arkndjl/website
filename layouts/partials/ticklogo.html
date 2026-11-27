@@ -1,0 +1,15 @@
+{{- /* The src of a 20px ticker logo, at 40px. The ticker is on every page, and its logos were the largest part of a plain
+       page's weight: ESPN's 500px team logos (50-150 KB each, about 1 MB on a home page view) go through ESPN's own resizer;
+       the site's own 256px PNGs (/img/nfl, /img/nba, /img/nhl, /img/cfb/logos: about 0.5 MB a page) are resized by Hugo
+       (static/img is mounted as assets/img in hugo.toml). Anything else is returned as it is. Context: the logo URL. */ -}}
+{{- $u := . -}}
+{{- if hasPrefix $u "/img/" -}}
+  {{- if strings.HasSuffix $u ".png" -}}
+    {{- with resources.Get (strings.TrimPrefix "/" $u) -}}
+      {{- if gt .Width 40 }}{{ $u = (.Resize "40x").RelPermalink }}{{ end -}}
+    {{- end -}}
+  {{- end -}}
+{{- else -}}
+  {{- $u = replaceRE `^https://a\.espncdn\.com(/i/teamlogos/[^?]+\.png)$` "https://a.espncdn.com/combiner/i?img=$1&w=40&h=40" $u -}}
+{{- end -}}
+{{- return $u -}}

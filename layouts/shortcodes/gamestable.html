@@ -16,7 +16,7 @@
       "t" (float .total) "T" $g.total "final" nil "gq" (partial "gq.html" (dict "a" (index $pc.cfb (string $g.home.id)) "b" (index $pc.cfb (string $g.away.id)) "p" $g.pHome))) }}
 {{- end }}{{ end }}{{ end -}}
 {{- with site.Data.nfl_games }}{{ range .games }}
-{{- $rows = $rows | append (dict "sp" "NFL" "kick" .kick "id" .id "h" .home "a" .away "hl" (printf "/img/nfl/%s.png" (lower .home)) "al" (printf "/img/nfl/%s.png" (lower .away)) "neutral" .neutral
+{{- $rows = $rows | append (dict "sp" "NFL" "kick" (.kick | default (printf "%sT18:00:00Z" .date)) "tba" (not .kick) "id" .id "h" .home "a" .away "hl" (printf "/img/nfl/%s.png" (lower .home)) "al" (printf "/img/nfl/%s.png" (lower .away)) "neutral" .neutral
       "m" .margin "L" .line "p" .pHome "hs" .hs "as" .as "t" .total "T" .tline "final" .final "gq" (partial "gq.html" (dict "a" (index (index $pc "nfl") (string .home)) "b" (index (index $pc "nfl") (string .away)) "p" .pHome))) }}
 {{- end }}{{ end -}}
 {{- with site.Data.cbb_games }}{{ range .games }}
@@ -89,7 +89,7 @@
     <td class="cfb__num" data-v="{{ .units }}">{{ $u := float .units }}{{ if eq .state "pick" }}<b>{{ $u }}</b>{{ else }}<span class="cfb__dim">0 {{ .state }}</span>{{ end }}</td>
     <td class="cfb__num" data-v="{{ .edge | default 0 }}">{{ partial "gamespick-bet.html" . }} <span class="cfb__dim">{{ with .edge }}{{ partial "num.html" (slice "%.1f" (float .)) }}{{ if eq $r.sp "Tennis" }}%{{ else }} pts{{ end }}{{ end }}</span></td>
     {{- else }}<td class="cfb__num" data-v=""><span class="cfb__dim">—</span></td><td class="cfb__num" data-v="0"><span class="cfb__dim">—</span></td>{{ end }}
-    <td class="cfb__num" data-v="{{ $k.Unix }}">{{ $k.Format "Mon Jan 2 3:04 PM" }}</td>
+    <td class="cfb__num" data-v="{{ $k.Unix }}">{{ if .tba }}{{ $k.Format "Mon Jan 2" }}{{ else }}{{ $k.Format "Mon Jan 2 3:04 PM" }}{{ end }}</td>
     {{- if .ml1 }}
     <td class="cfb__num" data-v="{{ .ml1 }}" title="model's fair moneyline, no vig">{{ $fav }} {{ if gt (float .ml1) 0.0 }}+{{ end }}{{ .ml1 }}</td>
     {{- else }}

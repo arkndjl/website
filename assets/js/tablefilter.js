@@ -189,7 +189,7 @@
       });
       if (id && location.hash.split(':')[0] === '#' + id && location.hash.indexOf(':') > 0) {
         var want = {};
-        location.hash.slice(id.length + 2).split('&').forEach(function (kv) { var i = kv.indexOf('='); if (i > 0) want[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1)); });
+        location.hash.slice(id.length + 2).split('&').forEach(function (kv) { var i = kv.indexOf('='); if (i > 0) { try { want[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1)); } catch (e) {} } });   // a mangled link must not stop the other tables
         if (want.q) bar.elements.q.value = want.q;
         sels.forEach(function (x) { var v = want[(x.key || slug(heads[x.c]))]; if (v != null && [].some.call(x.el.options, function (o) { return o.value === v; })) x.el.value = v; });
         if (ageSel && want.age) ageSel.value = want.age;

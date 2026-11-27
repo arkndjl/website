@@ -16,6 +16,8 @@
 {{- $nt := (site.Data.ticker | default dict).nt }}
 {{- $tk := cond $home ($.Site.Data.ticker | default dict) dict }}
 {{- if and (or $tk $news $nt) (not .Params.noTicker) }}
+{{- /* the sprite prints once per page through page.Store, which the pages of a paginated list share: clear it so /page/2/ gets its icons too */ -}}
+{{- page.Store.Delete "nwicons" }}
 {{- partial "newsicons.html" . }}
 {{- $links := dict "knicks" "/arkboard/nba/" "rangers" "/arkboard/nhl/" "ravens" "/arkboard/nfl/" "barcelona" "/arkboard/soccer/" }}
 <aside class="tick{{ if not $home }} tick--news{{ end }}" aria-label="{{ if $home }}next games and news{{ else }}news{{ end }}">
@@ -48,7 +50,7 @@
         {{- end }}
         {{- if not .games }}
         <span class="tick__g tick__g--off">
-          <span class="tick__l1">{{ with .logo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span class="tick__me">{{ .label }}</span></span>
+          <span class="tick__l1">{{ with .logo }}<img class="tick__logo" src="{{ partial "ticklogo.html" . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span class="tick__me">{{ .label }}</span></span>
           <span class="tick__l2"><span class="tick__when">offseason</span></span>
         </span>
         {{- end }}
@@ -61,9 +63,9 @@
       <a class="tick__g tick__g--nw" href="{{ .href }}">
         <span class="tick__l1">
           <svg class="tick__ic" aria-hidden="true"><use href="#nw-{{ .cat }}"/></svg>
-          {{- with .logo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
+          {{- with .logo }}<img class="tick__logo" src="{{ partial "ticklogo.html" . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
           <span class="tick__opp">{{ .t }}</span>
-          {{- with .logo2 }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
+          {{- with .logo2 }}<img class="tick__logo" src="{{ partial "ticklogo.html" . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
         </span>
         <span class="tick__l2">
           <span class="tick__me">{{ .tag }}</span>
@@ -286,7 +288,7 @@
       <a class="tick__g tick__g--nt" href="/1nt/" data-at="{{ .at }}" data-h="{{ $h }}" data-nt="{{ .id }}" data-bo="{{ .bo }}">
         <span class="tick__l1">
           <span class="tick__ha">vs</span>
-          {{- with .oppLogo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
+          {{- with .oppLogo }}<img class="tick__logo" src="{{ partial "ticklogo.html" . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
           <span class="tick__opp">{{ .opp }}</span>
           {{- with .oppRank }}<span class="tick__note">#{{ . }}</span>{{ end -}}
         </span>
@@ -303,10 +305,10 @@
 {{- define "partials/inline/tick-team.html" }}
         <a class="tick__g" data-key="{{ $.t.key }}"{{ with .href }} href="{{ . }}"{{ end }} data-at="{{ $.g.at }}" data-h="{{ $.t.hours }}" data-id="{{ $.g.id }}" data-sport="{{ $.t.sport }}" data-path="{{ $.t.path }}"{{ with $.g.lg }} data-lg="{{ . }}"{{ end }} data-home="{{ if $.g.home }}1{{ else }}0{{ end }}"{{ with $.g.live }} data-live="{{ jsonify . }}"{{ end }}{{ if $.i }} hidden{{ end }}>
           <span class="tick__l1">
-            {{- with $.t.logo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
+            {{- with $.t.logo }}<img class="tick__logo" src="{{ partial "ticklogo.html" . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
             <span class="tick__me">{{ $.t.label }}</span>
             <span class="tick__ha">{{ if $.g.neutral }}vs{{ else if $.g.home }}vs{{ else }}@{{ end }}</span>
-            {{- with $.g.oppLogo }}<img class="tick__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
+            {{- with $.g.oppLogo }}<img class="tick__logo" src="{{ partial "ticklogo.html" . }}" alt="" width="20" height="20" loading="lazy">{{ end -}}
             <span class="tick__opp">{{ $.g.opp }}</span>
           </span>
           <span class="tick__l2">

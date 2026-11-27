@@ -26,7 +26,9 @@
   {{- $tiles = $tiles | append (dict "l" "STARTING QBS" "v" (printf "%s vs %s" .aqb .hqb) "s" (printf "%s at %s" .away .home)) }}
   {{- $tiles = $tiles | append (dict "l" "ELO" "v" (printf "%s %v, %s %v" .away .elo.away .home .elo.home) "s" (printf "%s by %v" (cond (ge .elo.home .elo.away) .home .away) (math.Abs (sub .elo.home .elo.away)))) }}
   {{- if $pred }}{{ with .ml }}{{ $tiles = $tiles | append (dict "l" "MARKET MONEYLINE" "v" (printf "%s %s, %s %s" $g.away .away $g.home .home) "s" (printf "model %.0f%% %s" (mul (math.Max $g.pHome (sub 1 $g.pHome)) 100) (cond (ge $g.pHome 0.5) $g.home $g.away))) }}{{ end }}{{ end }}
-  {{- $one := dict "lg" "NFL" "date" (printf "week %v" $d.week) "k" (printf "%s ET" ((time.In "America/New_York" (time .kick)).Format "Mon Jan 2 · 3:04 PM")) "p" .pHome "tiles" $tiles
+  {{- /* a kickoff the league has not set yet (late-season flex games: kick "" from nfl_games.py) shows the day alone */}}
+  {{- $kk := printf "%s · time TBA" ((time .date).Format "Mon Jan 2") }}{{ with .kick }}{{ $kk = printf "%s ET" ((time.In "America/New_York" (time .)).Format "Mon Jan 2 · 3:04 PM") }}{{ end }}
+  {{- $one := dict "lg" "NFL" "date" (printf "week %v" $d.week) "k" $kk "p" .pHome "tiles" $tiles
         "a" (dict "n" .away "l" (printf "/img/nfl/%s.png" (lower .away)) "rec" (index $d.rec .away | default "0-0") "r" (index $prk .away | default false))
         "h" (dict "n" .home "l" (printf "/img/nfl/%s.png" (lower .home)) "rec" (index $d.rec .home | default "0-0") "r" (index $prk .home | default false)) }}
   <article class="games__card" data-id="{{ .espn }}" data-kick="{{ .kick }}" data-m="{{ .margin }}" data-home="{{ .home }}" data-away="{{ .away }}" data-gfx-one="{{ $one | jsonify }}">
@@ -37,7 +39,7 @@
         <span class="cfb__dim">{{ index $d.rec $t | default "0-0" }} · Elo {{ index $g.elo $side }} · {{ index $g (cond $i "hqb" "aqb") }}</span>
       </div>
       {{- end }}
-      <p class="games__meta">{{ with .kick }}{{ (time.In "America/New_York" (time .)).Format "Mon Jan 2 · 3:04 PM" }}{{ else }}{{ (time .date).Format "Mon Jan 2" }} · {{ .time }}{{ end }} ET · {{ .stadium }}{{ if .neutral }} · neutral{{ end }}{{ if .div }} · division{{ end }}<button type="button" class="cfb__btn games__gfx" data-gfx data-gfx-mode="game" data-gfx-name="{{ .away }} at {{ .home }}" title="graphic: this game">GFX</button></p>
+      <p class="games__meta">{{ $kk }} · {{ .stadium }}{{ if .neutral }} · neutral{{ end }}{{ if .div }} · division{{ end }}<button type="button" class="cfb__btn games__gfx" data-gfx data-gfx-mode="game" data-gfx-name="{{ .away }} at {{ .home }}" title="graphic: this game">GFX</button></p>
     </header>
     <p class="games__live" data-live{{ if not .final }} hidden{{ end }}>{{ with .final }}<b class="games__livetag is-final">FINAL</b> {{ $g.away }} <b>{{ .away }}</b> · {{ $g.home }} <b>{{ .home }}</b>{{ end }}</p>
     <div class="games__model">

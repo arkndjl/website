@@ -1209,7 +1209,7 @@
   function pcBig(src) {
     if (!src || /\/img\/face\.svg/.test(src)) return null;
     if (/on3static\.com\/cdn-cgi\/image\//.test(src)) return src.replace(/\/cdn-cgi\/image\/[^/]+\//, '/cdn-cgi/image/height=640,width=560,quality=85,fit=cover,gravity=top,format=auto/');   // On3 recruit photos: portrait crop at card size
-    return src.replace(/([?&])w=\d+&h=\d+/, '$1w=700&h=509').replace(/\/w_\d+\//, '/w_600/').replace(/\/portrait\/(medium|small)\//, '/portrait/big/').replace(/([?&])width=\d+/, '$1width=600');
+    return src.replace(/([?&])w=\d+&h=\d+/, '$1w=700&h=509').replace(/([\/,])w_\d+\//, '$1w_600/').replace(/\/portrait\/(medium|small)\//, '/portrait/big/').replace(/([?&])width=\d+/, '$1width=600');
   }
   function pcBadges(els) {
     var out = [], seen = {};
