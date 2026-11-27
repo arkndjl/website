@@ -192,7 +192,7 @@ def main():
             n = r['nba']; mature = r['last'] <= 2020   # six NBA seasons or more (the fit's outcome window)
             out.append({'name': r['name'], 'season': yr, 'team': r['team'], 'pos': F.POS3.get(r['brole'], 'F'), 'cls': r['yr'],
                         'fvx': round(r['fvx'], 2), 'fv': FS.fv_of('cbbx', r['fvx']), 'out': int(r['y']) if mature else None,
-                        'role': ((('peak XPM %+.1f, ' % n['peakXpm']) if r['y'] > 20 and n.get('peakXpm') is not None else '') + n['role']) if mature else None,
+                        'role': ((('peak XPM %+.1f, ' % (round(n['peakXpm'], 1) + 0.0)) if r['y'] > 20 and n.get('peakXpm') is not None else '') + n['role']) if mature else None,
                         'pick': n.get('pick') or None, 'draft': n.get('draft') or None, 'status': None if r['final'] else 'college',
                         'june': round(math.exp(-r['f']['lr'])) if r['f']['on'] else None})
     out += intl_rows()
@@ -231,7 +231,7 @@ def intl_rows():
         fvx = float(np.clip(F.FLOOR + (bk[F.fold_of(r['pid'])] if r['oof'] else b) * (r['e'] - F.FLOOR), F.FLOOR, 80.0))
         mature = r['year'] <= 2020
         out.append({'name': r['name'], 'season': r['year'], 'team': r['club'], 'pos': r['pos'], 'cls': 'Intl', 'fvx': round(fvx, 2), 'fv': FS.fv_of('cbbx', fvx),
-                    'out': int(r['y']) if mature else None, 'role': (('peak XPM %+.1f' % r['xpm']) if r['xpm'] is not None and r['y'] > 20 else 'non-NBA') if mature else None,
+                    'out': int(r['y']) if mature else None, 'role': (('peak XPM %+.1f' % (round(r['xpm'], 1) + 0.0)) if r['xpm'] is not None and r['y'] > 20 else 'non-NBA') if mature else None,
                     'pick': None, 'draft': r['year'], 'status': None, 'june': round(r['june']) if r['june'] < 150 else None})
     print('internationals', len(out), 'line b', round(b, 3))
     return out

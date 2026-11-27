@@ -14,7 +14,7 @@
   // the provisional badge (partials/prov.html, the same on every board); why = the tooltip's reason
   var PROV = {{ partial "prov.html" (dict "why" "@@") | jsonify }};
   function prov(why) { return PROV.replace('@@', esc(why)); }
-  function sgn(x) { return (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(+x).toFixed(1); }
+  function sgn(x) { var s = Math.abs(+x).toFixed(1); return (+s === 0 ? '' : x > 0 ? '+' : '−') + s; }
   function inches(h) { var m = /^(\d)\D+(\d+(?:\.\d+)?)/.exec(h || ''); return m ? m[1] * 12 + +m[2] : ''; }
   // measured height (barefoot, quarter inches) and weight with the listing and source mix on hover (scripts/measure.py)
   function ftin(x) { var q = Math.round(x * 4) / 4, ft = Math.floor(q / 12), i = q - 12 * ft; return ft + "' " + (+i.toFixed(2)) + '"'; }

@@ -80,7 +80,7 @@
   }
   function logo(src) { return '<img class="cfb__logo cfb__logo--in" src="' + src + '" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> '; }
   function pct(x) { return x == null ? '<span class="cfb__dim">–</span>' : (100 * x < 1 ? '<1' : 100 * x > 99 ? '>99' : Math.round(100 * x)); }
-  function sg(x) { return x == null ? '<span class="cfb__dim">–</span>' : '<span' + (x < 0 ? ' class="cfb__down"' : '') + '>' + (x > 0 ? '+' : '') + x.toFixed(1) + '</span>'; }
+  function sg(x) { if (x == null) return '<span class="cfb__dim">–</span>'; var r = +x.toFixed(1); return '<span' + (r < 0 ? ' class="cfb__down"' : '') + '>' + (r > 0 ? '+' : '') + (r || 0).toFixed(1) + '</span>'; }
   function chips() { [].forEach.call(bar.querySelectorAll('[data-view]'), function (c) { var on = c.dataset.view === view; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
   function readHash() {
     var h = __hp(win), e = bar.elements;

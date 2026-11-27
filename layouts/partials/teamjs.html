@@ -10,7 +10,7 @@
   if (window.__arkTd) return; window.__arkTd = true;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function pc(x) { return x == null ? '—' : x < 0.005 ? '&lt;1%' : x >= 0.995 ? '&gt;99%' : Math.round(x * 100) + '%'; }
-  function sgn(x, d) { return (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(+x).toFixed(d == null ? 1 : d); }
+  function sgn(x, d) { var s = Math.abs(+x).toFixed(d == null ? 1 : d); return (+s === 0 ? '' : x > 0 ? '+' : '−') + s; }   // never "−0.0"
   function f1(x) { return x == null ? '—' : (+x).toFixed(1); }
   var FULL = {{ site.Data.pro_team_names | default dict | jsonify | safeJS }};   // NFL/NBA/NHL abbreviation -> full name (the team GFX card)
   function txt(h) { return String(h).replace(/<[^>]*>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'); }

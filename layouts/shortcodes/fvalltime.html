@@ -46,7 +46,7 @@
     {{- if in (slice "cfb" "cbb" "hockey") $sport }}<td class="cfb__num">{{ with .pick }}{{ $r.draft }} #{{ . }}{{ else }}{{ if eq $r.status "college" }}{{ else }}<span class="cfb__dim">undrafted</span>{{ end }}{{ end }}</td>{{ end }}
     <td class="fvat__x cfb__dim">
       {{- if eq $sport "cfb" }}{{ with .av }}{{ partial "num.html" (slice "%.1f" (float .)) }} AV/season{{ end }}{{ with .pb }} · {{ . }} PB{{ end }}{{ with .ap }} · {{ . }} AP{{ end }}
-      {{- else if eq $sport "cbb" }}{{ .role }}
+      {{- else if eq $sport "cbb" }}{{ replace (.role | default "") "XPM -0.0" "XPM +0.0" }}
       {{- else if eq $sport "hockey" }}{{ with .gp }}{{ . }} GP{{ end }}{{ with .peak }} · {{ partial "num.html" (slice "%.1f" (float .)) }} WAR{{ end }}{{ with .gpeak }} · {{ partial "num.html" (slice "%+.0f" (float .)) }} GSAx{{ end }}
       {{- else if eq $sport "soccer" }}{{ .age }}
       {{- else }}{{ with .pkr }}No. {{ . }}{{ end }}{{ end }}</td>
