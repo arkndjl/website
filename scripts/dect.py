@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""DEC (Declare, Even, College; was DoR): what each side of the stay-or-go decision is worth to a draft-eligible college
-player with eligibility left. A decision model (what is worth more), not Ret% (what he will do).
+"""DECT (Declare, Even, College, Transfer; was DEC, before that DoR): what each way out of the stay-or-go decision is
+worth to a draft-eligible college player with eligibility left. A decision model (what is worth more), not Ret% or
+Transfer% (what he will do).
 
-    python3 scripts/dec.py          # NFL / CFB + NBA / CBB fits and history checks -> data/dec_fit.json (scripts/cfb_teams.mjs decOf, scripts/cbb_tabs.py)
+    python3 scripts/dect.py         # NFL / CFB + NBA / CBB fits and history checks -> data/dect_fit.json (scripts/cfb_teams.mjs dectOf, scripts/cbb_tabs.py)
 
-  declare  the rookie deal + d^4 x later earnings, over the pick spread from his xPick and the spread of earnings at a pick
-  college  college pay for the season (yNIL) + d x the same draft value one year older
-  DEC      college - declare as certainty equivalents (log utility over W0 + the outcome), dollars at this season's cap.
-           Even when the edge is inside one standard error (yNIL's error and the age term's). The mean edge rides along.
+  declare   the rookie deal + d^4 x later earnings, over the pick spread from his xPick and the spread of earnings at a pick
+  college   pay at his school for the season (yNIL) + d x the same draft value one year older
+  transfer  pay on the open market (xNIL) + d x the same draft value one year older. No draft cost for the move: the
+            test for one (CBB returners who transferred against those who stayed) is in the fit and is not there
+  DECT      the one worth most as a certainty equivalent (log utility over W0 + the outcome), dollars at this season's
+            cap. Even when the top two are inside one standard error: against declare, yNIL's error and the age
+            term's; college against transfer, the width of the reported school budgets. The mean edge rides along.
 
 The return side holds his draft stock where it is: no expected rise or fall, so going back costs a year (the age term
 on later earnings and the discount) and pays yNIL. Who went back is not a fair sample of what going back does (the
@@ -37,7 +41,7 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
-OUT = os.path.join(ROOT, 'data', 'dec_fit.json')
+OUT = os.path.join(ROOT, 'data', 'dect_fit.json')
 CAP = 301.2            # $M, 2026
 D = 0.97
 LAST = 257
@@ -87,6 +91,29 @@ def verdict(B, x, ageB, ageSE, nil, sig, d=D):
     c = sides(B, x, ageB, nil, d); f = lambda b, n: sides(B, x, b, n, d)[0]
     se = math.hypot((f(ageB, nil * math.exp(sig)) - f(ageB, nil * math.exp(-sig))) / 2, (f(ageB + ageSE, nil) - f(ageB - ageSE, nil)) / 2)
     return [round(c[0], 2), round(c[1], 2), round(c[2], 2), int(abs(c[0]) < se), round(se, 2)]
+
+
+def sig_gap():
+    """how far a school's pay can sit from the market's: half the log width of the reported roster budgets (data/nil_budgets.json), by sport"""
+    d = json.load(open(os.path.join(ROOT, 'data', 'nil_budgets.json')))
+    return {k: round(float(np.mean([math.log(hi / lo) / 2 for lo, hi in d[k]['teams'].values() if lo > 0])), 3) for k in ('cfb', 'cbb')}
+
+
+def verdict4(B, x, ageB, ageSE, nilC, nilT, sig, gap, d=D, w0=W0):
+    """[edge, ce declare, mean edge, label, pair, transfer - college]: label D / C / T = the side worth most, E = the top two inside one
+    standard error (pair names them). edge = the better of college and transfer less declare; nilT None = no market price, college only"""
+    B = np.asarray(B, float)
+    def val(n, b=ageB): c = sides(B, x, b, n, d, w0); return c[0] + c[1], c[2] + c[3]         # ce and mean of staying on pay n
+    c0 = sides(B, x, ageB, 0.0, d, w0); V = {'D': c0[1], 'C': val(nilC)[0]}; N = {'C': nilC}
+    if nilT is not None: V['T'] = val(nilT)[0]; N['T'] = nilT
+    o = sorted(V, key=lambda k: -V[k]); a, b_ = o[0], o[1]
+    if 'D' in (a, b_):
+        k = b_ if a == 'D' else a; f = lambda bb, n: sides(B, x, bb, n, d, w0)[0]
+        se = math.hypot((f(ageB, N[k] * math.exp(sig)) - f(ageB, N[k] * math.exp(-sig))) / 2, (f(ageB + ageSE, N[k]) - f(ageB - ageSE, N[k])) / 2)
+    else: se = abs(val(N[a] * math.exp(gap))[0] - val(N[a] * math.exp(-gap))[0]) / 2
+    even = V[a] - V[b_] < se; st = 'T' if 'T' in V and V['T'] > V['C'] else 'C'
+    return [round(V[st] - V['D'], 2), round(V['D'], 2), round(val(N[st])[1] - c0[3], 2), 'E' if even else a, ''.join(sorted((a, b_))) if even else '',
+            round(V['T'] - V['C'], 2) if 'T' in V else None]
 
 
 def interp(G, key, lx):
@@ -394,6 +421,25 @@ def nba(out):
                   'bands': band(ranked, lambda s: {'saysReturn': round(float(np.mean([r['edge'] > 0 for r in s])), 3), 'returned': round(float(np.mean([1 - r['left'] for r in s])), 3),
                                                    'medianEdge': round(float(np.median([r['edge'] for r in s])), 2)})}
     V['check']['readings'] = readings(ranked, lambda r: 1 - r['left'])
+    # ---- transfer: who moved, whether the move cost draft stock, and the four-way verdict on the same boards
+    GAPN = sig_gap()['cbb']
+    def nxt(r): n = seas[r['pid']].get(r['year'] + 1); return None if n is None else int(n['team'] != seas[r['pid']][r['year']]['team'])
+    for r in ranked:
+        r['moved'] = None if r['left'] else nxt(r); hm = seas[r['pid']][r['year']]['conf'] in HM
+        r['nilX'] = 1e-6 * math.exp(Sh['a'] + Sh['b'] * r['lx'] + Sh['hm']) * PAY.NILM[r['year']] / PAY.NILM[2026]            # the market: a high-major's price for him
+        r['lab'] = verdict4(np.column_stack(nodes(r['lx'])), r['age'] - 20.5, float(bl[3]), float(sl[3]), r['nil'], None if hm else r['nilX'], SIG['cbb'], GAPN)[3]      # a high-major's market price is his own school's level here: no second price
+        r['did'] = 'D' if r['left'] else None if r['moved'] is None else 'T' if r['moved'] else 'C'
+    K = [r for r in ranked if r['did']]
+    tab = {l: {'n': sum(r['lab'] == l for r in K), **{k: round(float(np.mean([r['did'] == k for r in K if r['lab'] == l])), 3) for k in 'DCT'}} for l in 'DECT' if any(r['lab'] == l for r in K)}
+    # the cost of a move: every returning prospect in the declare model's rows since the 2021 rule (transfer and play at once), drafted in a later year or not
+    A = [r for r in rows if not r['left'] and 2021 <= r['year'] <= 2024 and (r['year'] + 1) in seas[r['pid']]]
+    for r in A: r['mv'] = int(seas[r['pid']][r['year'] + 1]['team'] != seas[r['pid']][r['year']]['team']); r['later'] = int(any(num(q['nba_draft']) and num(q['nba_draft']) > r['year'] for q in seas[r['pid']].values()))
+    XA = np.array([[1, r['bpm'], r['rank'], r['age'], r['ht'], r['mv']] for r in A], float); XA[:, 1:5] = (XA[:, 1:5] - XA[:, 1:5].mean(0)) / XA[:, 1:5].std(0); ya = np.array([r['later'] for r in A], float)
+    ba = logit(XA, ya, 1e-4); pa = 1 / (1 + np.exp(-XA @ ba)); sa = np.sqrt(np.diag(np.linalg.inv((XA * (pa * (1 - pa))[:, None]).T @ XA + 1e-4 * np.eye(6))))
+    V['transfer'] = {'gap': GAPN, 'n': len(K), 'did': {k: round(float(np.mean([r['did'] == k for r in K])), 3) for k in 'DCT'}, 'byVerdict': tab,
+                     'cost': {'n': len(A), 'moved': int(sum(r['mv'] for r in A)), 'draftedLater': int(ya.sum()), 'draftedMoved': round(float(np.mean([r['later'] for r in A if r['mv']])), 4),
+                              'draftedStayed': round(float(np.mean([r['later'] for r in A if not r['mv']])), 4), 'b': round(float(ba[5]), 3), 't': round(float(ba[5] / sa[5]), 2), 'seasons': [2021, 2024]}}
+    print(json.dumps(V['transfer'], indent=1))
     print(json.dumps(V['check']['readings'], indent=1))
     out['nba'] = V
 
@@ -420,12 +466,12 @@ def readings(H, ret):
     return o
 
 
-def nba_dec(rank, age, ynil, fit=None):
-    """[edge, declare, mean edge, even?, se] in $M for a college player at consensus rank `rank`, `age` on draft night, `ynil` dollars (scripts/cbb_tabs.py).
-    edge = college - declare as certainty equivalents; + = college"""
+def nba_dect(rank, age, ynil, xnil=None, fit=None):
+    """verdict4 for a college player at consensus rank `rank`, `age` on draft night, `ynil` / `xnil` dollars (scripts/cbb_tabs.py)"""
     fit = fit or json.load(open(OUT)); G = fit['nba']['grid']
     if rank is None or age is None or ynil is None or rank > 100: return None
-    return verdict(interp(G, G['bins'], math.log(max(1, rank))), age - G['age0'], G['ageB'], G['ageSE'], ynil / 1e6, fit['sig']['cbb'], fit['d'])
+    return verdict4(interp(G, G['bins'], math.log(max(1, rank))), age - G['age0'], G['ageB'], G['ageSE'], ynil / 1e6, xnil / 1e6 if xnil is not None else None,
+                    fit['sig']['cbb'], fit['gap']['cbb'], fit['d'], fit['w0'])
 
 
 def main():
@@ -470,7 +516,7 @@ def main():
     # the grid the board reads: by group, at age 22 on draft day; the age term scales the later part
     b = out['later']['b']
     ASE = out['later']['se'][3]
-    out['w0'] = W0; out['sig'] = SIG
+    out['w0'] = W0; out['sig'] = SIG; GAP = out['gap'] = sig_gap()
     out['grid'] = {'lx': [float(x) for x in LX], 'age0': 22, 'ageB': b[3], 'ageSE': ASE,
                    'dec': {g: [[round(v, 3) for v in ev(TD, x, g, 22)] for x in LX] for g in GROUPS},
                    'bins': {g: [[[round(v, 4) for v in t] for t in tobins(*nodes(x, g))] for x in LX] for g in GROUPS}}

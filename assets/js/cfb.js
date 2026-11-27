@@ -200,7 +200,7 @@
       cons: td('cfb__num cfb__now', r.cons == null ? dim : '<span title="#' + r.consRk + ' on the consensus board · ' + r.consN + ' of 10 boards">' + f1(r.cons) + '</span>'),
       draft: td('cfb__num cfb__now', r.draftP == null ? dim : r.draftP < 0.005 ? '<span class="cfb__dim">&lt;1%</span>' : Math.min(99, Math.round(r.draftP * 100)) + '%'),
       ret: td('cfb__num cfb__now', r.retP == null ? dim : r.retP < 0.005 ? '<span class="cfb__dim">&lt;1%</span>' : Math.min(99, Math.round(r.retP * 100)) + '%'),
-      dec: td('cfb__num cfb__now', r.dec == null ? dim : '<span class="cfb__dec cfb__dec--' + (r.decE ? 'e' : r.dec > 0 ? 'c' : 'd') + '" title="risk-adjusted: ' + (r.dec > 0 ? 'college' : 'declare') + ' +$' + Math.abs(r.dec).toFixed(Math.abs(r.dec) < 10 ? 1 : 0) + 'M' + (r.decM != null ? ' · on average: ' + (r.decM > 0 ? 'college' : 'declare') + ' +$' + Math.abs(r.decM).toFixed(Math.abs(r.decM) < 10 ? 1 : 0) + 'M' : '') + (r.decD != null ? ' · declaring is worth $' + (+r.decD).toFixed(1) + 'M for sure' : '') + '">' + (r.decE ? 'Even' : r.dec > 0 ? 'College' : 'Declare') + '</span>'),
+      dect: td('cfb__num cfb__now', r.dect == null ? dim : (function (o) { var L = { D: 'Declare', E: 'Even', C: 'College', T: 'Transfer' }, m = function (v) { return '$' + Math.abs(v).toFixed(Math.abs(v) < 10 ? 1 : 0) + 'M'; }, l = o.dectL || 'E', s = o.dectT != null && o.dectT > 0 ? 'transfer' : 'college', t = []; if (l === 'E' && o.dectP) t.push('even: ' + o.dectP.split('').map(function (k) { return L[k].toLowerCase(); }).join(' / ')); t.push('risk-adjusted: ' + (o.dect > 0 ? s + ' +' : 'declare +') + m(o.dect) + (o.dect > 0 ? ' over declaring' : ' over ' + s)); if (o.dectM != null) t.push('on average: ' + (o.dectM > 0 ? s : 'declare') + ' +' + m(o.dectM)); if (o.dectT != null) t.push('transfer ' + (o.dectT >= 0 ? '+' : '-') + m(o.dectT) + ' on college'); if (o.dectD != null) t.push('declaring is worth ' + m(o.dectD) + ' for sure'); return '<span class="cfb__dect cfb__dect--' + l.toLowerCase() + '" title="' + t.join(' · ') + '">' + L[l] + '</span>'; })(r)),
       up: td('cfb__num cfb__now', r.up != null ? '<span' + (r.moveUp ? ' class="cfb__upv"' : '') + '>' + Math.round(r.up * 100) + '%</span>' : dim),
       xfer: td('cfb__num cfb__now', xferCell(r)),
       xnil: td('cfb__num cfb__now', r.xnil ? '<span class="cfb__nil">' + money(r.xnil) + '</span>' : dim),
@@ -296,7 +296,7 @@
     team: function (r) { return r.team; }, cls: function (r) { return r.elig; },
     age: function (r) { return r.age != null ? r.age : r.ageEst; }, ht: function (r) { return inches(r.ht) || null; }, mht: function (r) { return r.mz ? r.mz[0] : null; },
     cons: function (r) { return r.cons; }, stat: statOf, xnil: function (r) { return r.xnil; }, ynil: function (r) { return r.ynil; }, znil: function (r) { return r.znil; },
-    up: function (r) { return r.up; }, draft: function (r) { return r.draftP; }, ret: function (r) { return r.retP; }, dec: function (r) { return r.dec; }, xfer: function (r) { return r.transferP; },
+    up: function (r) { return r.up; }, draft: function (r) { return r.draftP; }, ret: function (r) { return r.retP; }, dect: function (r) { return r.dect; }, xfer: function (r) { return r.transferP; },
     snaps: function (r) { return r.snapShare != null ? r.snapShare : null; }, war: function (r) { return r.war; }, waa: function (r) { return r.waa; }, waafs: waaFs, xv: function (r) { return r.xv; },
   };
 

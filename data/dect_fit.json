@@ -1,5 +1,5 @@
 {
- "_readme": "python3 scripts/dec.py          # NFL / CFB + NBA / CBB fits and history checks -> data/dec_fit.json (scripts/cfb_teams.mjs decOf, scripts/cbb_tabs.py)",
+ "_readme": "python3 scripts/dect.py         # NFL / CFB + NBA / CBB fits and history checks -> data/dect_fit.json (scripts/cfb_teams.mjs dectOf, scripts/cbb_tabs.py)",
  "cap": 301.2,
  "d": 0.97,
  "groups": [
@@ -322,6 +322,10 @@
  "sig": {
   "cfb": 0.49,
   "cbb": 0.65
+ },
+ "gap": {
+  "cfb": 0.084,
+  "cbb": 0.11
  },
  "grid": {
   "lx": [
@@ -35581,26 +35585,26 @@
    2024,
    2025
   ],
-  "saysReturn": 0.002,
+  "saysReturn": 0.003,
   "returned": 0.171,
   "returnedWhenSaysReturn": 0.0,
-  "nSaysReturn": 1,
+  "nSaysReturn": 2,
   "returnedWhenSaysDeclare": 0.171,
   "returners": {
    "n": 107,
    "drafted": 0.57,
    "meanDeclareEV": 19.73,
-   "meanGot": 21.23,
-   "meanNil": 0.55,
+   "meanGot": 21.24,
+   "meanNil": 0.56,
    "beatDeclare": 0.411,
-   "medianGain": -4.63,
+   "medianGain": -4.64,
    "pickUp": 0.467,
    "bands": [
     {
      "xPick": "1-32",
      "n": 3,
      "declareEV": 60.62,
-     "got": 37.37,
+     "got": 37.35,
      "beat": 0.333,
      "drafted": 1.0
     },
@@ -35608,7 +35612,7 @@
      "xPick": "33-100",
      "n": 22,
      "declareEV": 33.9,
-     "got": 32.48,
+     "got": 32.51,
      "beat": 0.273,
      "drafted": 0.818
     },
@@ -35616,7 +35620,7 @@
      "xPick": "101-400",
      "n": 82,
      "declareEV": 14.43,
-     "got": 17.62,
+     "got": 17.63,
      "beat": 0.451,
      "drafted": 0.488
     }
@@ -35640,48 +35644,48 @@
     "n": 198,
     "saysReturn": 0.0,
     "returned": 0.111,
-    "medianEdge": -4.76
+    "medianEdge": -4.78
    },
    {
     "xPick": "101-400",
     "n": 327,
-    "saysReturn": 0.003,
+    "saysReturn": 0.006,
     "returned": 0.251,
-    "medianEdge": -1.44
+    "medianEdge": -1.43
    }
   ],
   "readings": {
    "n": 626,
    "returned": 0.171,
    "mean": {
-    "saysCollege": 0.002,
+    "saysCollege": 0.003,
     "returnedWhenCollege": 0.0,
     "returnedWhenDeclare": 0.171,
     "auc": 0.627,
-    "aucRel": 0.564,
-    "aucInThirds": 0.461
+    "aucRel": 0.567,
+    "aucInThirds": 0.459
    },
    "median": {
-    "saysCollege": 0.335,
-    "returnedWhenCollege": 0.267,
-    "returnedWhenDeclare": 0.123,
-    "auc": 0.686,
-    "aucRel": 0.693,
-    "aucInThirds": 0.553
+    "saysCollege": 0.334,
+    "returnedWhenCollege": 0.268,
+    "returnedWhenDeclare": 0.122,
+    "auc": 0.691,
+    "aucRel": 0.695,
+    "aucInThirds": 0.559
    },
    "ce": {
     "saysCollege": 0.334,
-    "returnedWhenCollege": 0.254,
-    "returnedWhenDeclare": 0.129,
-    "auc": 0.689,
-    "aucRel": 0.692,
-    "aucInThirds": 0.556
+    "returnedWhenCollege": 0.258,
+    "returnedWhenDeclare": 0.127,
+    "auc": 0.691,
+    "aucRel": 0.693,
+    "aucInThirds": 0.558
    },
    "even": {
-    "share": 0.351,
-    "returned": 0.255,
-    "returnedCollege": 0.288,
-    "nCollege": 73,
+    "share": 0.359,
+    "returned": 0.253,
+    "returnedCollege": 0.294,
+    "nCollege": 68,
     "returnedDeclare": 0.09
    }
   }
@@ -38074,7 +38078,7 @@
     "again": 33,
     "drafted": 0.474,
     "meanDeclareEV": 37.55,
-    "meanGot": 30.58,
+    "meanGot": 30.6,
     "beatDeclare": 0.316
    },
    "bands": [
@@ -38090,14 +38094,14 @@
      "n": 58,
      "saysReturn": 0.0,
      "returned": 0.276,
-     "medianEdge": -11.76
+     "medianEdge": -11.75
     },
     {
      "rank": "31-60",
      "n": 99,
      "saysReturn": 0.0,
      "returned": 0.556,
-     "medianEdge": -4.77
+     "medianEdge": -4.75
     }
    ],
    "readings": {
@@ -38108,32 +38112,80 @@
      "returnedWhenCollege": null,
      "returnedWhenDeclare": 0.34,
      "auc": 0.817,
-     "aucRel": 0.743,
+     "aucRel": 0.748,
      "aucInThirds": 0.662
     },
     "median": {
-     "saysCollege": 0.632,
+     "saysCollege": 0.642,
      "returnedWhenCollege": 0.493,
-     "returnedWhenDeclare": 0.077,
+     "returnedWhenDeclare": 0.066,
      "auc": 0.808,
-     "aucRel": 0.823,
-     "aucInThirds": 0.753
+     "aucRel": 0.824,
+     "aucInThirds": 0.751
     },
     "ce": {
-     "saysCollege": 0.618,
-     "returnedWhenCollege": 0.466,
-     "returnedWhenDeclare": 0.136,
+     "saysCollege": 0.637,
+     "returnedWhenCollege": 0.467,
+     "returnedWhenDeclare": 0.117,
      "auc": 0.769,
-     "aucRel": 0.814,
+     "aucRel": 0.815,
      "aucInThirds": 0.737
     },
     "even": {
-     "share": 0.373,
-     "returned": 0.228,
-     "returnedCollege": 0.649,
-     "nCollege": 74,
-     "returnedDeclare": 0.102
+     "share": 0.392,
+     "returned": 0.265,
+     "returnedCollege": 0.64,
+     "nCollege": 75,
+     "returnedDeclare": 0.037
     }
+   }
+  },
+  "transfer": {
+   "gap": 0.11,
+   "n": 192,
+   "did": {
+    "D": 0.729,
+    "C": 0.177,
+    "T": 0.094
+   },
+   "byVerdict": {
+    "D": {
+     "n": 42,
+     "D": 1.0,
+     "C": 0.0,
+     "T": 0.0
+    },
+    "E": {
+     "n": 79,
+     "D": 0.848,
+     "C": 0.127,
+     "T": 0.025
+    },
+    "C": {
+     "n": 59,
+     "D": 0.458,
+     "C": 0.305,
+     "T": 0.237
+    },
+    "T": {
+     "n": 12,
+     "D": 0.333,
+     "C": 0.5,
+     "T": 0.167
+    }
+   },
+   "cost": {
+    "n": 1367,
+    "moved": 391,
+    "draftedLater": 177,
+    "draftedMoved": 0.1125,
+    "draftedStayed": 0.1363,
+    "b": 0.066,
+    "t": 0.33,
+    "seasons": [
+     2021,
+     2024
+    ]
    }
   }
  }
