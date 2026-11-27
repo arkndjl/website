@@ -1162,6 +1162,8 @@
   // a percentile bar in pixel blocks: 20 cells of 5 points, lit to the value
   function pxBar(g, x, y, w, h, pct, col) {
     var n = 20, gap = Math.max(3, Math.round(h / 4)), cw = (w - (n - 1) * gap) / n, lit = Math.round(pct / 5);
+  // a signed Contract is the contract surplus (NBA contract value), a graded number: it stays a tile, never a fact under the name
+  function pcFact(h, t) { return PC_INFO.test(h) && !(/^contract$/i.test(h) && /^[+−-]\d/.test(t)); }
     for (var k = 0; k < n; k++) { g.fillStyle = k < lit ? col : C.dark; g.fillRect(Math.round(x + k * (cw + gap)), y, Math.ceil(cw), h); }
   }
   // percentile tiers, judged the good way round (lower-is-better columns flipped): 90+, 70-89, 30-69, 10-29, under 10.
@@ -1172,7 +1174,7 @@
   // never on a player card: GAP / xGAP (value minus market or starter, read as noise on a card) and the weekly move
   var PC_DROP = /^(gap|xgap|±|\+\/-|δ|Δ)$/i;
   var PC_SKIP = /^(rk|#|pick|spot|tm)$/i, PC_SUB = /^(pos|position|team|school|club|org|league|lg|conf|class|yr|year|season|plays|tag|stage)$/i;
-  var PC_NOPCT = /^(rank|cons|xslot|vrs|ht|wt|ht \/ wt|range|w-l|rec|season line|plays|tag|contract|yrs|last|form|roster|stage)$/i;
+  var PC_NOPCT = /^(rank|cons|xslot|vrs|ht|wt|ht \/ wt|hand-ht\/wt|eta|acq\/\$|stat|range|w-l|rec|season line|plays|tag|contract|yrs|last|form|roster|stage)$/i;   // baseball's mixed cells (S-6'1/180, an ETA year, DRFT/$8.2m, 128 wRC+ beside a 3.20 ERA) are not numbers to rank
   var PC_MARKS = '.gfx-off, .cfb__star, .cfb__carried, .cfb__warin, .cfb__riser, .cfb__injchip, .injtag, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__multichip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more, .nflwar__col, .nflwar__tm, .nflwar__rook, .esea-flag, .nbaxpm__tm, svg, img';
   function pcRows(table) { return [].slice.call(table.tBodies[0].rows).filter(function (r) { return !r.hidden && getComputedStyle(r).display !== 'none' && !r.classList.contains('cfb__detail') && r.cells.length > 2; }); }
   // boards that render one page of a longer list hand over every filtered row (table.__gfxAll, built off the page by the
@@ -1185,7 +1187,11 @@
     var hc = [].slice.call(table.tHead.rows[0].cells), vis = hc.filter(function (h) { return !h.hidden; }), r0 = pcRows(table)[0];
     return r0 && vis.length < hc.length && r0.cells.length === vis.length ? vis : hc;
   }
-  function pcNameAt(heads) { return heads.findIndex(function (h) { return /^(player|goalie|qb|recruit|prospect|name)$/i.test(h); }); }
+  // a position cell down to the position: the small print and the rank at position (G3) go; a span that only wraps
+  // the position (a recruit QB's "QB ·pro") stays
+  function pcPosTrim(c) { c.querySelectorAll('.cfb__dim').forEach(function (e) { e.remove(); }); c.querySelectorAll('span').forEach(function (e) { if (!/[a-z]/i.test(e.textContent)) e.remove(); }); }
+  // a team table's QB or Goalie column is a team number or the team's starter, never a player row: no player card from it
+  function pcNameAt(heads) { return isTeamTable(heads.filter(function (h) { return h !== "±"; })) ? -1 : heads.findIndex(function (h) { return /^(player|goalie|qb|recruit|prospect|name)$/i.test(h); }); }
   // a cell's main text and its small print (the dim splits: raw XPM, 80% range, position rank)
   function pcCell(c) {
     if (!c) return { t: '', sub: '' };
@@ -1200,6 +1206,8 @@
     var v = c && c.getAttribute('data-v');
     if (v != null && v !== '' && isFinite(+v)) return +v;
     if (!t || /\d\s*-\s*\d/.test(t)) return null;
+    // a cell that reads as a label (T1, <=Jul 24, S-6'1/180, DRFT/$8.2m) is no number to rank, whatever it sorts by
+    if (t && !/^\s*[<>~≤≥#]?\s*[+−–-]?\s*[$€£]?\.?\d/.test(t)) return null;
     var m = String(t).replace(/−/g, '-').replace(/,/g, '').match(/[-+]?\d+(\.\d+)?/); if (!m) return null;
     var n = +m[0], s = String(t).toLowerCase();
     if (/\d\s*m\b/.test(s)) n *= 1e6; else if (/\d\s*k\b/.test(s)) n *= 1e3;
@@ -1295,7 +1303,7 @@
         var lc = h.toLowerCase();
         if (i === k || i === ti || !h || shown[lc] || PC_SKIP.test(h) || PC_DROP.test(h) || PC_SUB.test(h) || FV_COL.test(h) || (hc[i] && hc[i].hidden) || !r.cells[i] || r.cells[i].hidden) return;
         var c = pcCell(r.cells[i]); if (c.t === '—' || c.t.length > 12) return;
-        var n = PC_NOPCT.test(h) || PC_INFO.test(h) ? null : pcNum(r.cells[i], c.t), pct = null;
+        var n = PC_NOPCT.test(h) || pcFact(h, c.t) ? null : pcNum(r.cells[i], c.t), pct = null;
         if (n != null) {
           var vals = pcAll(t).map(function (x) { var cc = x.cells[i]; return cc ? pcNum(cc, pcCell(cc).t) : null; }).filter(function (v) { return v != null; });
           if (vals.length >= 5) pct = pcPct(vals, n);
@@ -1444,7 +1452,7 @@
       var lc = h.toLowerCase(), isTeam = /^team$/i.test(h) && two;
       if (i === k || !h || (shown[lc] && !isTeam) || /^(rk|#|tm)$/i.test(h) || PC_DROP.test(h) || (PC_SUB.test(h) && !isTeam) || FV_COL.test(h) || (hc[i] && hc[i].hidden) || !row.cells[i] || row.cells[i].hidden) return;
       var c = pcCell(row.cells[i]); if (c.t === '—' || pcDash(c.t) || c.t.length > 16) return;
-      var n = PC_NOPCT.test(h) || PC_INFO.test(h) || PC_SKIP.test(h) || PC_ORD.test(h) || isTeam ? null : pcNum(row.cells[i], c.t), pct = null;
+      var n = PC_NOPCT.test(h) || pcFact(h, c.t) || PC_SKIP.test(h) || PC_ORD.test(h) || isTeam ? null : pcNum(row.cells[i], c.t), pct = null;
       if (n != null) {
         var vals = pcAll(t).map(function (x) { var cc = x.cells[i]; return cc ? pcNum(cc, pcCell(cc).t) : null; }).filter(function (v) { return v != null; });
         if (vals.length >= 5) pct = pcPct(vals, n);
@@ -1640,7 +1648,7 @@
     var cn = function (re) { var c = cv(re), v = c ? parseFloat(c.getAttribute('data-v')) : NaN; return isFinite(v) ? v : null; };
     var D = null, why = null; try { D = JSON.parse(row.getAttribute('data-d') || 'null'); why = D ? D.why : JSON.parse(row.getAttribute('data-why') || 'null'); } catch (e) {}
     var cbb = !!D, open = !!rc.o, nameC = cells[nameI >= 0 ? nameI : 1], name = nameC && nameC.querySelector('button.cfb__who, b') ? pcName(row, nameI >= 0 ? nameI : 1) : nameC ? pcCell(nameC).t : '';
-    var posI = gi(POS_COL), pOf = function (r) { var c = r.cells[posI]; if (!c) return ''; c = c.cloneNode(true); c.querySelectorAll('.cfb__dim, span').forEach(function (e) { e.remove(); }); return txt(c); };
+    var posI = gi(POS_COL), pOf = function (r) { var c = r.cells[posI]; if (!c) return ''; c = c.cloneNode(true); pcPosTrim(c); return txt(c); };
     var posT = posI >= 0 ? pOf(row) : '', team = open ? '' : ct(TEAM_COL), conf = open ? '' : ct(/^conf$/i);
     var fv = cbb ? D.fv : cn(/^xfv/i), alt = cbb ? (D.y1fv != null ? ['Y1 FV', D.y1fv] : D.fvIf != null ? ['IF NBA', D.fvIf] : null) : (cn(/^y1 fv$/i) != null ? ['Y1 FV', cn(/^y1 fv$/i)] : null);
     if (fv == null) return null;
@@ -1758,7 +1766,7 @@
     var rc = null; try { rc = JSON.parse(row.getAttribute('data-rc') || 'null'); } catch (e) {}
     if (rc && rc.o) team = 'uncommitted';   // the team cell holds a lean, which the STARS · PICKS band draws
     var rcI = await rcItems(rc);
-    var posC = posI >= 0 && cells[posI] && cells[posI].cloneNode(true); if (posC) posC.querySelectorAll('.cfb__dim, span').forEach(function (e) { e.remove(); });
+    var posC = posI >= 0 && cells[posI] && cells[posI].cloneNode(true); if (posC) pcPosTrim(posC);
     var ageI = isYouth(win) ? gi(AGE_COL) : -1, ageT = ageI >= 0 && cells[ageI] ? pcCell(cells[ageI]).t : '';
     if (!/\d/.test(ageT)) { ageI = -1; ageT = ''; }
     var playsI = gi(/^plays$/i);
@@ -1788,7 +1796,7 @@
         if (vals.length >= 5) pct = pcPct(vals, n);
       }
       // context columns (age, games, minutes, size, contract) are facts, not grades: a strip under the name, no percentile
-      if (PC_INFO.test(h)) { info.push([capHead(h), c.t]); return; }
+      if (pcFact(h, c.t)) { info.push([capHead(h), c.t]); return; }
       var good = pct == null || PD_NEUTRAL.test(h) ? null : PD_LOWER.test(h) ? 100 - pct : pct;
       tiles.push(pcProb({ i: i, h: h, t: c.t, sub: c.sub, color: c.color, pct: pct, good: good, tip: hcells[i] ? hcells[i].getAttribute('title') : '' }));
     });
@@ -1805,7 +1813,7 @@
       }
     }
     // the headline: the board's FV, else the sorted column (or the first graded number), in a plaque at the top right
-    var hasFv = !!(fvT && fvT !== '—');
+    var hasFv = !!(fvT && !pcDash(fvT));   // any dash (soccer's seniors carry "–"): the sorted stat takes the plaque
     var feat = tiles.find(function (t) { return t.i === sortI; }) || (!hasFv ? tiles.find(function (t) { return t.pct != null && t.prob == null; }) : null);
     if (feat && !hasFv) tiles.splice(tiles.indexOf(feat), 1); else if (feat) feat.key = true;
     var wt = txt(win.querySelector('.win__title-text')).replace(/_$/, '').trim();
@@ -1821,8 +1829,8 @@
     photoFrame(g, photo, x, y - 60, 370, 400);   // no headshot: the frame keeps its place with the pixel silhouette
     // his place in the view, and among the rows at his position
     var posT = posC ? txt(posC) : '', place = '#' + (at + 1) + ' of ' + rows.length, posPlace = '';
-    if (posT && posI >= 0 && rows.length <= 3000 && at >= 0) {
-      var pk0 = 0, pn = 0, pOf = function (r) { var c = r.cells[posI]; if (!c) return ''; c = c.cloneNode(true); c.querySelectorAll('.cfb__dim, span').forEach(function (e) { e.remove(); }); return txt(c); };
+    if (posT && posI >= 0 && rows.length <= 30000 && at >= 0) {
+      var pk0 = 0, pn = 0, pOf = function (r) { var c = r.cells[posI]; if (!c) return ''; c = c.cloneNode(true); pcPosTrim(c); return txt(c); };
       rows.forEach(function (r, k) { if (pOf(r) === posT) { pn++; if (k < at) pk0++; } });
       if (pn >= 3 && pn < rows.length) posPlace = posT + ' #' + (pk0 + 1) + ' of ' + pn;
     }
@@ -1885,7 +1893,7 @@
         if (pcDash(it.t)) return false;
         var ks = words(it.h).map(function (q) { return q + '|' + it.t; }); ks.push(String(it.h).toLowerCase() + '|' + it.t);
         if (ks.some(function (q) { return had[q]; })) return false;
-        if (b.compact && !b.src && (PC_INFO.test(it.h) || /^pct$/i.test(it.h))) { if (PC_INFO.test(it.h) && !info.some(function (f) { return f[0] === capHead(it.h); })) info.push([capHead(it.h), it.t]); return false; }
+        if (b.compact && !b.src && (pcFact(it.h, it.t) || /^pct$/i.test(it.h))) { if (pcFact(it.h, it.t) && !info.some(function (f) { return f[0] === capHead(it.h); })) info.push([capHead(it.h), it.t]); return false; }
         ks.forEach(function (q) { had[q] = 1; }); return true;
       });
       // shares of one whole (NBA position: PF 46%, SF 37% ...): each cell's bar is its share
@@ -1981,7 +1989,7 @@
   // his place in the view, the ranges a cell carries (80% range, raw value) and the FV chip's note, then the badges and a
   // percentile breakdown of every number. Template text only.
   var PD_NEUTRAL = /^(str|age|g|gp|mp|min|toi|snaps|plays|share|wt\. gp|ht|wt|ht \/ wt|class|yr|yrs|salary|contract|season|gap|xgap|starter|st .*|w-l|rec|range|tag|stage|last|form|roster|pick|rd|vs cons|nhl gp|peak|out|value|tm|xmv|sh|kp|g-xg)$/i;
-  var PD_LOWER = /^(rank|cons|xslot|vrs|ga|gaa|riv|nat)$/i;   // riv, nat: recruit national ranks
+  var PD_LOWER = /^(rank|cons|xslot|vrs|ga|gaa|riv|nat|sack%|int%|fum)$/i;   // riv, nat: recruit national ranks; sack%, int%: QB tables only; fum: returners
   function pdOwn(table) {   // a table that builds its own dropdown
     return table.matches('.cfbm:not(.cbbm), .cfbrc, [data-pd-kind], [data-td-kind]') || !!table.closest('[data-cfb], [data-cbb], [data-esea]') ||
       !!table.querySelector('tbody .cfb__who, tbody .cfbst__more');
