@@ -29,8 +29,8 @@
   }
   function load() {
     if (loading) return loading;
-    ITEMS = [];
-    var site = fetch(SITE).then(function (r) { return r.json(); });
+    ITEMS = []; nPlayers = 0;
+    var site = fetch(SITE).then(function (r) { if (!r.ok) throw new Error('index ' + r.status); return r.json(); });
     var play = fetch(PLAY).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
     loading = site.then(function (S) {
       S.rows.forEach(function (r) { add(r.g, r.t, r.s, r.u, r.i, 50); });
@@ -38,13 +38,15 @@
         if (!P) return;
         var pages = S.pages || {};
         P.rows.forEach(function (r) {
-          var b = P.boards[r[0]], pg = pages[b[0]]; if (!pg) return;   // a page that no longer exists (or a draft) drops its rows
+          var b = P.boards[r[0]], pg = b && pages[b[0]]; if (!pg) return;   // a page that no longer exists (or a draft) drops its rows
           var q = 'q=' + encodeURIComponent(r[6] || r[1]) + (r[5] ? '&p=' + encodeURIComponent(r[5]) : '');
           add(b[2] === 't' ? 't' : 'p', r[1], (r[2] ? r[2] + ' · ' : '') + pg[1], pg[0] + '#' + slug(b[1]) + ':' + q, r[3] >= 0 ? P.imgs[r[3]] : pg[2], r[4]);
           nPlayers++;
         });
       });
     }).then(function () { return ITEMS; });
+    // a failed load (offline, a deploy in flight) is not kept: the next keystroke fetches the index again
+    loading.catch(function () { loading = null; ITEMS = null; });
     return loading;
   }
 
@@ -135,7 +137,7 @@
         list.innerHTML = (top.length ? top.map(function (h) { return row(h[1], v, true); }).join('') : '<span class="srch__none">0 results</span>') +
           '<a class="srch__row srch__all" href="' + PAGE + '?q=' + encodeURIComponent(v.trim()) + '"><svg class="srch__ico" aria-hidden="true"><use href="#icon-search"/></svg><span class="srch__txt"><span class="srch__t">all results</span></span><span class="srch__g">' + hits.length.toLocaleString() + '</span></a>';
         list.hidden = false; sel = -1; input.setAttribute('aria-expanded', 'true');
-      });
+      }).catch(function () { last = ''; });
     }
     input.addEventListener('focus', function () { load(); if (input.value) { last = ''; draw(); } });
     input.addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(draw, 70); });
@@ -167,8 +169,10 @@
       var p = new URLSearchParams(); if (input.value.trim()) p.set('q', input.value.trim()); if (only) p.set('g', only);
       history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : ''));
     }
+    function failed() { status.textContent = 'load failed; type again to retry.'; }
     function draw() {
       var v = input.value;
+      if (!ITEMS) { status.textContent = 'loading index'; load().then(draw, failed); return; }
       if (!fold(v)) { out.innerHTML = ''; chips.innerHTML = ''; status.textContent = ITEMS.length.toLocaleString() + ' indexed'; save(); return; }
       var hits = search(v), by = {}, order = [];
       hits.forEach(function (h) { var g = h[1].g; if (!by[g]) { by[g] = []; order.push(g); } by[g].push(h[1]); });
@@ -191,7 +195,7 @@
     input.addEventListener('input', function () { clearTimeout(timer); more = {}; timer = setTimeout(draw, 90); });
     root.querySelector('form').addEventListener('submit', function (e) { e.preventDefault(); clearTimeout(timer); draw(); input.blur(); });
     status.textContent = 'loading index';
-    load().then(draw);
+    load().then(draw, failed);
     if (!input.value) input.focus();
   }
 
