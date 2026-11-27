@@ -89,6 +89,18 @@ def xpm_of(fv, cuts):
     return pts[-1][1]
 
 
+def px_next(p):
+    """what he projects to be next season, the level Transfer%, landing and the team builder read: pXPM after this
+    season (the board's pxn, scripts/cbb_live.py pxn_of: the form those fits were trained on, cbb_market_fit.rate), else
+    his frozen pXPM (the same form through last season), else xXPM. None when the row has none of the three.
+    scripts/research/ctx_nov27/cbb: served xXPM, which is mostly raw XPM by March, the held-out Transfer% log loss was
+    .8988 against .8862 on this form (t 6.4) and the builder's next-season RMSE 2.570 against 2.443 (11/11 pairs)"""
+    for k in ('pxn', 'pxpm', 'xbpm'):
+        if p.get(k) is not None:
+            return p[k]
+    return None
+
+
 def load_players():
     d = json.load(open(ALL))
     c = d['cols']
@@ -232,7 +244,7 @@ def main():
             p['minrk'] = i + 1
     feats = []
     for p in P:
-        r = {'bpm': p.get('xbpm'), 'min_per': p['min'] * 100, 'usg': p['usg'], 'yr': p.get('cls') or 'Fr', 'rg_lrk': p['lrk'], 'hti': p['hti'],
+        r = {'bpm': px_next(p), 'min_per': p['min'] * 100, 'usg': p['usg'], 'yr': p.get('cls') or 'Fr', 'rg_lrk': p['lrk'], 'hti': p['hti'],
              'gp': 30, 'age': p.get('age')}
         cc = 1 - jobs.get(p['team'], {}).get('stay', 0.85)
         tr = bool((p.get('last') or {}).get('team')) and (p.get('last') or {}).get('team') != p['team']
@@ -475,7 +487,7 @@ def main():
     import names as NMK
     for p in pool:
         o = p['team']
-        r = {'bpm': p.get('xbpm')}
+        r = {'bpm': px_next(p)}
         # every other D-I team (the fit's choice set: a mover is on another team's roster)
         ts = [t for t in teams if t != o]
         hl = home_by_cls.get((NMK.key(p['name']), (p.get('rec') or {}).get('cls')))
@@ -517,9 +529,12 @@ def main():
     dev = fit['dev']
 
     def nxt(p, to=None):
-        """next-season BPM: projected BPM + the NIL-era change by class. No level step for a transfer: Barttorvik's BPM
+        """next-season value: pXPM after this season (px_next; fit to next season, so the class step is inside it), and
+        for a row with neither pXPM, xXPM + the NIL-era change by class. No level step for a transfer: Barttorvik's BPM
         is schedule-adjusted and credits team strength (movers gain ~1.0 BPM per 10 points of SRS stepped up, fit 'step'),
         so a step would count the new team's strength twice in the rotation sum"""
+        if p.get('pxn') is not None or p.get('pxpm') is not None:
+            return px_next(p)
         return (p.get('xbpm') or REP_BPM) + dev.get(p.get('cls') or 'Fr', 0.5)
 
     def rate(bpms):
