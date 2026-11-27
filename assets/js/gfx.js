@@ -3535,7 +3535,7 @@
     }
     return F.canvas;
   }
-  // a glossary term (Process > Glossary/Methodology): the term, its formula, and one picture of its scale
+  // a glossary term (Process): the term, its formula, and one picture of its scale
   // (data/glossary_gfx.json: ab, name, f lines, scale {lo,hi,ticks,mark}, parts [[label,w]], bars [[label,v]] + unit + bl, n + nl)
   // explainer card (portrait 3:4, data/glossary_gfx.json entries with x: 1, built by scripts/glossary_gfx.py):
   // head (term + what it stands for + sports), WHAT / USE lines, formula, held-out test vs similar metrics,
@@ -3730,7 +3730,7 @@
   async function buildTerm(win, btn) {
     var d; try { d = JSON.parse(btn.getAttribute('data-gfx-term') || '{}'); } catch (e) { return null; }
     if (!d.t) return null;
-    if (d.x) return buildExplain(d);
+    if (d.x) return btn.hasAttribute('data-gfx-wide') ? buildWide(d) : buildExplain(d);
     var F = await frame(2400, 1350, 'ARKBOARD PROCESS :: GLOSSARY', '', 'arkndjl.net/process' + (d.id ? '#' + d.id : ''));
     var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 40;
     var ab = d.ab || String(d.t).replace(/\s*\(.*$/, ''), name = d.name || ((/\(([^)]*)\)/.exec(d.t) || [])[1]) || '';
@@ -3848,12 +3848,246 @@
     });
     return F.canvas;
   }
+  // ---- ARKLOG and Process cards, all 16:9 (2400 x 1350) for X ----
+  var VCOL = { s: '#7fffd4', m: '#cf9bff', f: '#ff9ec7', w: '#c8c7ff' }, VLAB = { s: 'SHIPPED', m: 'PART SHIPPED', f: 'FAILED', w: 'WEAK EVIDENCE' };
+  function pnum(v) { return String(v).replace(/^(-?)0\./, '$1.').replace('-', '−'); }
+  function tag(g, x, y, t, bg, fg, sz) {   // a pixel tag; returns its width
+    sz = sz || 40; g.font = sz + 'px ' + FONT; var w = Math.round(g.measureText(t).width) + 40, h = sz + 24;
+    g.fillStyle = bg; g.fillRect(x, y, w, h); bevel(g, x, y, w, h, true, 4);
+    g.fillStyle = fg; g.fillText(t, x + 20, y + h / 2 + 1); return w;
+  }
+  // one ARKLOG row (assets/js/arklog.js card()): the change, its verdict, the held-out number before and after, the lines of the record
+  async function buildLog(win, btn) {
+    var d; try { d = JSON.parse(btn.getAttribute('data-gfx-log') || '{}'); } catch (e) { return null; }
+    if (!d.t) return null;
+    var study = d.k === 'study', key = study ? d.id : d.n;
+    var F = await frame(2400, 1350, 'ARKLOG' + (d.sec ? ' :: ' + String(d.sec).toUpperCase() : ''), String(d.d || '').replace(/,? \d+:\d+.*$/, ''), 'arkndjl.net/arklog' + (key ? '#log-' + key : ''));
+    var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 40;
+    // head: tags, then the title in the largest of 88/72/56 px that fits three lines
+    var tags = (d.sp || []).slice(0, 4).map(function (s) { return String(s).toUpperCase(); }), vt = study ? (d.v === 'w' ? 'STUDY · WEAK' : 'STUDY') : VLAB[d.v] || String(d.ar || '').toUpperCase();
+    var ts = 88, tl;
+    for (; ts >= 56; ts -= 16) { g.font = ts + 'px ' + FONT; tl = wrap(g, d.t, w - 2 * pad); if (tl.length <= 3) break; }
+    if (ts < 56) { ts = 56; g.font = ts + 'px ' + FONT; tl = wrap(g, d.t, w - 2 * pad).slice(0, 3); }
+    var hh = pad + 64 + 28 + tl.length * ts * 1.25 + pad - 8;
+    well(g, x, y, w, hh);
+    var tx = x + pad; tags.forEach(function (t) { tx += tag(g, tx, y + pad, t, C.title, C.white) + 12; });
+    if (d.ar && !study && d.sec === 'ARKBOARD') { g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(String(d.ar).toUpperCase(), tx + 8, y + pad + 33); }
+    if (vt) { g.font = '40px ' + FONT; var vw = Math.round(g.measureText(vt).width) + 40; tag(g, x + w - pad - vw, y + pad, vt, VCOL[d.v] || C.lilac, C.dark); }
+    g.font = ts + 'px ' + FONT; g.fillStyle = C.white;
+    tl.forEach(function (t, i) { g.fillText(fit(g, t, w - 2 * pad), x + pad, y + pad + 64 + 28 + ts * 0.6 + i * ts * 1.25); });
+    var top = y + hh + 24, bh = y + h - top;
+    var num = !!(d.e || d.tt != null), sw = num ? Math.round(w * 0.4) : 0, lw = w - sw - (num ? 24 : 0);
+    // left: the answer (a study) or the lines of the record, each with its side of the gate as a pixel bar
+    well(g, x, top, lw, bh);
+    var lines = study ? [['', d.a || '']] : (d.l || []).slice(0, 4);
+    if (!lines.length) lines = [['', d.x || '']];
+    var fs = study ? 80 : 48, lay;
+    var layout = function () { g.font = fs + 'px ' + FONT; var per = Math.max(1, Math.floor((bh - 2 * pad) / (fs * 1.3) / lines.length)); lay = lines.map(function (l) { var ww = wrap(g, l[1], lw - 2 * pad - 28); if (ww.length > per) { ww = ww.slice(0, per); ww[per - 1] = fit(g, ww[per - 1] + ' …', lw - 2 * pad - 28); } return [l[0], ww]; }); return lay.reduce(function (a, l) { return a + l[1].length * fs * 1.3 + 20; }, -20); };
+    var need = layout(); while (fs > 36 && lines.some(function (l, i) { return wrap(g, l[1], lw - 2 * pad - 28).length > lay[i][1].length; })) { fs -= 4; need = layout(); }
+    var ly = top + Math.max(pad, (bh - need) / 2);
+    lay.forEach(function (l) {
+      var lh = l[1].length * fs * 1.3;
+      g.fillStyle = VCOL[l[0]] || C.lilac; g.fillRect(x + pad, Math.round(ly + 4), 8, Math.round(lh - 8));
+      g.font = fs + 'px ' + FONT; g.fillStyle = study ? C.teal : C.white;
+      l[1].forEach(function (t, i) { g.fillText(t, x + pad + 28, ly + fs * 0.65 + i * fs * 1.3); });
+      ly += lh + 20;
+    });
+    if (!num) return F.canvas;
+    // right: the held-out number, before over after, and the t
+    var sx = x + lw + 24; well(g, sx, top, sw, bh);
+    var cy = top + pad, cw = sw - 2 * pad;
+    g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('HELD OUT', sx + pad, cy + 20); cy += 72;
+    if (d.e) {
+      var a = parseFloat(String(d.e[1]).replace(/[,%+]/g, '')), b = parseFloat(String(d.e[2]).replace(/[,%+]/g, '')), good = d.e[3] === 1, col = good ? C.teal : d.e[3] === 0 ? C.down : C.lilac;
+      g.font = '72px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, String(d.e[0]).toUpperCase(), cw), sx + pad, cy + 36); cy += 110;
+      var lo = Math.min(a, b), hi = Math.max(a, b), base = lo > 0 && (hi - lo) < 0.35 * hi ? lo - (hi - lo) * 1.5 : Math.min(0, lo), span = (hi - base) || 1;
+      g.font = '72px ' + FONT; var vw2 = Math.max(g.measureText(pnum(d.e[1])).width, g.measureText(pnum(d.e[2])).width) + 28, bw = cw - 150 - vw2;
+      [['WAS', a, d.e[1], '#9a8cc4', C.lilac], ['NOW', b, d.e[2], col, col]].forEach(function (r, i) {
+        var mid = cy + 60 + i * 150, len = Math.max(16, Math.round(bw * (r[1] - base) / span / 8) * 8);
+        g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(r[0], sx + pad, mid);
+        g.fillStyle = r[3]; g.fillRect(sx + pad + 150, mid - 40, len, 80); g.fillStyle = C.dark; g.fillRect(sx + pad + 150, mid + 32, len, 8);
+        g.font = '72px ' + FONT; g.fillStyle = r[4]; g.fillText(pnum(r[2]), sx + pad + 150 + len + 24, mid);
+      });
+      cy += 320;
+    }
+    if (d.tt != null) {
+      var big = d.e ? 112 : 224, tt = 't = ' + pnum(d.tt); g.font = big + 'px ' + FONT;
+      while (big > 64 && g.measureText(tt).width > cw) { big -= 16; g.font = big + 'px ' + FONT; }
+      var ty = d.e ? Math.min(cy + big * 0.6, top + bh - pad - big * 0.5) : top + bh / 2 + 20;
+      g.fillStyle = d.v === 'f' ? C.down : C.teal; g.fillText(tt, sx + pad, ty);
+    }
+    return F.canvas;
+  }
+  // stacked pixel rows: rows [[label, {shipped, mixed, failed}]] in one well
+  function stackRows(g, x, y, w, h, title, rows, keys) {
+    var pad = 36; well(g, x, y, w, h);
+    g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(title.toUpperCase(), x + pad, y + pad + 16);
+    var top = y + pad + 64, rh = Math.min(96, (y + h - pad - top) / Math.max(1, rows.length)), fs = rh >= 80 ? 48 : 40;
+    g.font = fs + 'px ' + FONT;
+    var lab = Math.max.apply(null, rows.map(function (r) { return g.measureText(r[0]).width; }).concat([0])) + 28;
+    var tot = rows.map(function (r) { return keys.reduce(function (a, k) { return a + (r[1][k[0]] || 0); }, 0); }), mx = Math.max.apply(null, tot.concat([1]));
+    var vw = g.measureText(String(mx)).width + 28, bw = w - 2 * pad - lab - vw;
+    rows.forEach(function (r, i) {
+      var mid = top + i * rh + rh / 2, bx = x + pad + lab, bhh = Math.max(16, Math.round(rh * 0.5 / 8) * 8);
+      g.font = fs + 'px ' + FONT; g.fillStyle = C.white; g.fillText(r[0], x + pad, mid);
+      keys.forEach(function (k) {
+        var n = r[1][k[0]] || 0; if (!n) return; var len = Math.max(8, Math.round(bw * n / mx / 8) * 8);
+        g.fillStyle = k[1]; g.fillRect(bx, Math.round(mid - bhh / 2), len - 4, bhh); g.fillStyle = C.dark; g.fillRect(bx, Math.round(mid + bhh / 2) - 4, len - 4, 4);
+        bx += len;
+      });
+      g.fillStyle = C.lilac; g.fillText(String(tot[i]), bx + 16, mid);
+    });
+  }
+  // ARKLOG scoreboard (layouts/shortcodes/arklogboard.html): the tallies, tests by sport and by area
+  async function buildBoard(win, btn) {
+    var d; try { d = JSON.parse(btn.getAttribute('data-gfx-board') || '{}'); } catch (e) { return null; }
+    if (!d.tests) return null;
+    var day = ''; try { day = new Date(d.asof).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'America/New_York' }); } catch (e) {}
+    var F = await frame(2400, 1350, 'ARKLOG :: SCOREBOARD', day, 'arkndjl.net/arklog#scoreboard');
+    var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, gap = 24;
+    var tiles = [['CHANGES', d.changes, C.white], ['TESTS', d.tests, C.white], ['SHIPPED', d.shipped, VCOL.s], ['PART SHIPPED', d.mixed, VCOL.m], ['FAILED', d.failed, VCOL.f], ['STUDIES', d.studies, C.white]];
+    var tw = (w - gap * (tiles.length - 1)) / tiles.length, th = 280;
+    tiles.forEach(function (t, i) {
+      var tx = Math.round(x + i * (tw + gap)); well(g, tx, y, Math.round(tw), th);
+      g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(t[0], tx + 32, y + 56);
+      g.font = '144px ' + FONT; g.fillStyle = t[2]; g.fillText(Number(t[1]).toLocaleString('en-US'), tx + 32, y + 176);
+    });
+    var top = y + th + gap, bh = y + h - top, half = (w - gap) / 2, K = [['shipped', VCOL.s], ['mixed', VCOL.m], ['failed', VCOL.f]];
+    stackRows(g, x, top, Math.round(half), bh, 'tests by sport', d.sport || [], K);
+    stackRows(g, Math.round(x + half + gap), top, Math.round(half), bh, 'tests by area', d.area || [], K);
+    return F.canvas;
+  }
+  // a sport's Process sheet (layouts/shortcodes/procsports.html): its describe and predict pick with held-out R², test tallies, terms by tab
+  async function buildSheet(win, btn) {
+    var d; try { d = JSON.parse(btn.getAttribute('data-gfx-sheet') || '{}'); } catch (e) { return null; }
+    if (!d.sport) return null;
+    var F = await frame(2400, 1350, 'ARKBOARD PROCESS :: ' + String(d.sport).toUpperCase(), '', 'arkndjl.net/process#sheet-' + String(d.sport).toLowerCase());
+    var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 40, gap = 24, L = d.lead, lg = d.log || {};
+    var hw = Math.round(w * 0.3), HH = L ? 420 : 300;
+    well(g, x, y, hw, HH);
+    var as = 224; g.font = as + 'px ' + FONT; while (as > 96 && g.measureText(d.sport).width > hw - 2 * pad) { as -= 16; g.font = as + 'px ' + FONT; }
+    g.fillStyle = C.teal; g.fillText(d.sport, x + pad, y + HH / 2 - 30);
+    g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(d.n + ' TERMS · ' + d.studies + (d.studies === 1 ? ' STUDY' : ' STUDIES'), x + pad, y + HH - pad - 16);
+    var rx = x + hw + gap, rw = w - hw - gap;
+    if (L) {
+      var cw = (rw - gap) / 2;
+      [['DESCRIBE', L.describe, L.dn], ['PREDICT', L.predict, L.pn]].forEach(function (c, i) {
+        var cx = Math.round(rx + i * (cw + gap)); well(g, cx, y, Math.round(cw), HH);
+        g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(c[0], cx + pad, y + pad + 16);
+        var ms = 112, ml; for (; ms >= 56; ms -= 8) { g.font = ms + 'px ' + FONT; ml = wrap(g, c[1], cw - 2 * pad); if (ml.length <= 2) break; }
+        g.fillStyle = C.white; ml.slice(0, 2).forEach(function (t, k) { g.fillText(fit(g, t, cw - 2 * pad), cx + pad, y + pad + 80 + ms * 0.6 + k * ms * 1.15); });
+        if (c[2]) {
+          var by = y + HH - pad - 72, v = parseFloat(c[2]), bw = cw - 2 * pad - 260, len = Math.max(8, Math.round(bw * Math.min(1, Math.abs(v)) / 8) * 8);
+          g.fillStyle = C.dark; g.fillRect(cx + pad, by, bw, 56); g.fillStyle = C.teal; g.fillRect(cx + pad, by, len, 56);
+          g.font = '64px ' + FONT; g.fillStyle = C.teal; g.fillText('R² ' + pnum(c[2]), cx + pad + bw + 24, by + 30);
+        }
+      });
+    } else well(g, rx, y, rw, HH);
+    var top = y + HH + gap, bh = y + h - top, tw2 = Math.round(w * 0.3);
+    // tests on the left, terms by tab on the right
+    well(g, x, top, tw2, bh);
+    g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText('TESTS', x + pad, top + pad + 16);
+    var rows = [['SHIPPED', lg.s || 0, VCOL.s], ['PART SHIPPED', lg.m || 0, VCOL.m], ['FAILED', lg.f || 0, VCOL.f]], rh = (bh - pad - 80 - pad) / 3;
+    rows.forEach(function (r, i) {
+      var mid = top + pad + 80 + i * rh + rh / 2; g.font = '112px ' + FONT; g.fillStyle = r[2]; g.fillText(String(r[1]), x + pad, mid);
+      var nw = g.measureText('000').width + 24; g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(r[0], x + pad + nw, mid + 6);
+    });
+    var gx = x + tw2 + gap, gw = w - tw2 - gap, G = (d.groups || []).slice(0, 8);
+    well(g, gx, top, gw, bh);
+    var grh = Math.min(92, (bh - 2 * pad) / Math.max(1, G.length)), gfs = grh >= 80 ? 44 : 36, gy = top + (bh - grh * G.length) / 2;
+    g.font = gfs + 'px ' + FONT; var labW = Math.max.apply(null, G.map(function (r) { return g.measureText(String(r.tab).toUpperCase()).width; }).concat([0])) + 32;
+    G.forEach(function (r, i) {
+      var mid = gy + i * grh + grh / 2;
+      if (i % 2 === 0) { g.fillStyle = 'rgba(200,199,255,0.06)'; g.fillRect(gx + 8, Math.round(mid - grh / 2), gw - 16, Math.round(grh)); }
+      g.font = gfs + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText(String(r.tab).toUpperCase(), gx + pad, mid);
+      g.fillStyle = C.teal; g.textAlign = 'right'; g.fillText(String(r.n), gx + gw - pad, mid); g.textAlign = 'left';
+      g.fillStyle = C.white; g.fillText(fit(g, (r.top || []).join(' · '), gw - 2 * pad - labW - 90), gx + pad + labW, mid);
+    });
+    return F.canvas;
+  }
+  // an explainer term as a 16:9 card (the 3:4 card is buildExplain): term, what, use and formula on the left,
+  // the held-out test against similar metrics over the top five on the right
+  async function buildWide(d) {
+    var F = await frame(2400, 1350, 'ARKBOARD PROCESS :: GLOSSARY', '', 'arkndjl.net/process' + (d.id ? '#' + d.id : ''));
+    var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 36, gap = 24, lw = Math.round(w * 0.5), rx = x + lw + gap, rw = w - lw - gap;
+    var cap = function (t, X, Y, col) { g.font = '32px ' + FONT; g.fillStyle = col || C.lilac; g.fillText(String(t).toUpperCase(), X, Y); };
+    var num = function (v, dec, sign) { if (typeof v === 'string') return v; v = +v; var s = dec == null ? (Math.abs(v) >= 10 ? (Math.round(v * 10) / 10).toString() : (Math.round(v * 1000) / 1000).toString()) : v.toFixed(dec); s = s.replace(/^(-?)0\./, '$1.').replace('-', '−'); return sign && v > 0 ? '+' + s : s; };
+    // left top: the term and what it stands for
+    var ab = d.ab || String(d.t).replace(/\s*\(.*$/, ''), HH = 330, as = 192;
+    well(g, x, y, lw, HH);
+    for (; as > 80; as -= 16) { g.font = as + 'px ' + FONT; if (g.measureText(ab).width <= lw - 2 * pad) break; }
+    g.fillStyle = C.teal; g.font = as + 'px ' + FONT; g.fillText(fit(g, ab, lw - 2 * pad), x + pad, y + 44 + as * 0.5);
+    g.font = '48px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, String(d.stands || '').toUpperCase(), lw - 2 * pad), x + pad, y + HH - 48);
+    // left middle: what / use
+    var cy = y + HH + gap, LW = 130, lines = [];
+    g.font = '40px ' + FONT;
+    [['what', d.what], ['use', d.use]].forEach(function (r) { if (r[1]) lines.push([r[0], wrap(g, r[1], lw - 2 * pad - LW).slice(0, 3)]); });
+    var lh = 54, wh = 2 * pad + lines.reduce(function (a, r) { return a + r[1].length * lh + 18; }, -18);
+    well(g, x, cy, lw, wh);
+    var ly = cy + pad + 24;
+    lines.forEach(function (r) { cap(r[0], x + pad, ly); g.font = '40px ' + FONT; g.fillStyle = C.white; r[1].forEach(function (t, i) { g.fillText(t, x + pad + LW, ly + i * lh); }); ly += r[1].length * lh + 18; });
+    cy += wh + gap;
+    // left bottom: the formula
+    var fh = y + h - cy, fl = d.f || [], fs = 64;
+    well(g, x, cy, lw, fh); cap('formula', x + pad, cy + pad + 10);
+    g.font = fs + 'px ' + FONT; while (fs > 36 && (fl.some(function (t) { return g.measureText(t).width > lw - 2 * pad; }) || fl.length * fs * 1.3 > fh - 2 * pad - 50)) { fs -= 4; g.font = fs + 'px ' + FONT; }
+    var fy = cy + pad + 50 + (fh - 2 * pad - 50 - fl.length * fs * 1.3) / 2 + fs * 0.65;
+    g.fillStyle = C.white; fl.forEach(function (t, i) { g.fillText(fit(g, t, lw - 2 * pad), x + pad, fy + i * fs * 1.3); });
+    // right top: the test
+    var T = d.test, TP = d.top, th = T ? (TP && TP.rows ? Math.round(h * 0.46) : h) : 0;
+    if (T) {
+      well(g, rx, y, rw, th);
+      cap('test' + (T.rows ? ' · ' + (T.lo ? 'lower is better' : 'higher is better') : ''), rx + pad, y + pad + 10, C.teal);
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, T.t || '', rw - 2 * pad), rx + pad, y + pad + 56);
+      var t0 = y + pad + 96, foot = T.n ? 52 : 0, avail = y + th - pad - foot - t0;
+      if (T.tiles) {
+        var tt = T.tiles, tw = (rw - 2 * pad - gap * (tt.length - 1)) / tt.length;
+        tt.forEach(function (r, i) {
+          var tx = rx + pad + i * (tw + gap); g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(String(r[0]).toUpperCase(), tx, t0 + 24);
+          g.font = '144px ' + FONT; g.fillStyle = C.teal; g.fillText(String(r[1]).replace('-', '−'), tx, t0 + avail / 2 + 20);
+          if (r[2]) { g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(r[2], tx, t0 + avail - 16); }
+        });
+      } else {
+        var R = T.rows || [], rh = Math.min(104, avail / Math.max(1, R.length)), fz = rh >= 88 ? 48 : 40; g.font = fz + 'px ' + FONT;
+        var labW = Math.min((rw - 2 * pad) * 0.5, Math.max.apply(null, R.map(function (r) { return g.measureText(r[0]).width; }).concat([0])) + 24);
+        var vals = R.map(function (r) { return num(r[1], Math.abs(+r[1]) < 1 ? 3 : null) + (T.unit === '%' ? '%' : ''); }), valW = Math.max.apply(null, vals.map(function (t) { return g.measureText(t).width; }).concat([0])) + 24;
+        var bx = rx + pad + labW, bw = rw - 2 * pad - labW - valW, mx = Math.max.apply(null, R.map(function (r) { return Math.abs(+r[1]); }).concat([1e-9]));
+        var mn = T.lo ? Math.min.apply(null, R.map(function (r) { return +r[1]; })) * 0.9 : 0;
+        R.forEach(function (r, i) {
+          var mid = t0 + i * rh + rh / 2, len = Math.max(8, Math.round(bw * (Math.abs(+r[1]) - mn) / (mx - mn || 1) / 8) * 8);
+          g.font = fz + 'px ' + FONT; g.fillStyle = r[2] ? C.white : C.lilac; g.fillText(fit(g, r[0], labW - 12), rx + pad, mid);
+          g.fillStyle = r[2] ? C.teal : '#9a8cc4'; g.fillRect(bx, Math.round(mid - rh * 0.22), len, Math.round(rh * 0.44));
+          g.fillStyle = C.dark; g.fillRect(bx, Math.round(mid + rh * 0.22) - 4, len, 4);
+          g.fillStyle = r[2] ? C.teal : C.lilac; g.fillText(vals[i], bx + len + 14, mid);
+        });
+      }
+      if (T.n) { g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, T.n, rw - 2 * pad), rx + pad, y + th - pad - 4); }
+    }
+    // right bottom: the top five
+    if (TP && TP.rows && TP.rows.length) {
+      var py = y + (T ? th + gap : 0), ph = y + h - py, TR = TP.rows.slice(0, T ? 5 : 10);
+      well(g, rx, py, rw, ph); cap(fit(g, TP.t || '', rw - 2 * pad), rx + pad, py + pad + 10, C.teal);
+      var p0 = py + pad + 48, prh = Math.min(84, (ph - (p0 - py) - pad) / TR.length), pf = prh >= 72 ? 44 : 36;
+      g.font = pf + 'px ' + FONT;
+      var tv = TR.map(function (r) { return num(r[3], TP.dec, TP.sign) + (TP.unit === '%' ? '%' : ''); }), vcol = Math.max.apply(null, tv.map(function (t) { return g.measureText(t).width; })) + 24;
+      TR.forEach(function (r, i) {
+        var mid = p0 + i * prh + prh / 2;
+        if (i % 2 === 0) { g.fillStyle = 'rgba(200,199,255,0.06)'; g.fillRect(rx + 8, Math.round(mid - prh / 2), rw - 16, Math.round(prh)); }
+        g.font = pf + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText(String(i + 1), rx + pad, mid);
+        var sub = [r[1], r[2]].filter(Boolean).join(' · '), sw2 = g.measureText(sub).width + 24, room = rw - 2 * pad - 72 - vcol - sw2;
+        g.fillStyle = C.white; g.fillText(fit(g, r[0], room), rx + pad + 72, mid);
+        g.fillStyle = C.lilac; g.textAlign = 'right'; g.fillText(sub, rx + rw - pad - vcol, mid);
+        g.fillStyle = C.teal; g.fillText(tv[i], rx + rw - pad, mid); g.textAlign = 'left';
+      });
+    }
+    return F.canvas;
+  }
   // a #rq-<id> (research) or #g-<term> (glossary) link: open the tabs around it, then scroll to it
   function rqFromHash() {
-    var h = location.hash.slice(1); try { h = decodeURIComponent(h); } catch (e) {} if (!/^(rq|g)-/.test(h)) return;
+    var h = location.hash.slice(1); try { h = decodeURIComponent(h); } catch (e) {} if (!/^(rq|g|sheet)-/.test(h)) return;
     var el = document.getElementById(h);
-    if (!el && /^g-/.test(h)) {   // a glossary term in a closed lazy tab: open that tab (below), scroll once it has loaded
-      var ix = document.getElementById('libgidx'), tab; try { tab = JSON.parse(ix.textContent)[h]; } catch (e) { tab = null; }
+    if (!el && /^(g|sheet)-/.test(h)) {   // a glossary term or sport sheet in a closed lazy tab: open that tab (below), scroll once it has loaded
+      var ix = document.getElementById('libgidx'), tab; try { tab = /^sheet-/.test(h) ? 'sports' : JSON.parse(ix.textContent)[h]; } catch (e) { tab = null; }
       el = tab && [].filter.call(document.querySelectorAll('[data-tab]'), function (x) { return x.getAttribute('data-tab') === tab; })[0];
       if (!el) return;
       document.addEventListener('ark:lazy', function once() { var t = document.getElementById(h); if (t) { document.removeEventListener('ark:lazy', once); setTimeout(function () { t.scrollIntoView({ block: 'start' }); }, 30); } });
@@ -4226,6 +4460,9 @@
     try {
       var mode = btn.getAttribute('data-gfx-mode');
       if (mode === 'news') { var nc = await buildNews(win, btn); if (nc) preview(nc, 'arkndjl-news-' + btn.getAttribute('data-gfx-day')); return; }
+      if (mode === 'log') { var lc = await buildLog(win, btn); if (lc) { var lk = JSON.parse(btn.getAttribute('data-gfx-log') || '{}'); preview(lc, 'arklog-' + String(lk.id || lk.n || 'row')); } return; }
+      if (mode === 'logboard') { var lb = await buildBoard(win, btn); if (lb) preview(lb, 'arklog-scoreboard'); return; }
+      if (mode === 'sheet') { var sc = await buildSheet(win, btn); if (sc) preview(sc, 'arkboard-process-' + String(JSON.parse(btn.getAttribute('data-gfx-sheet') || '{}').sport || 'sport').toLowerCase()); return; }
       if (mode === 'watch') { var wc = await buildWatch(win, btn); if (wc) preview(wc, 'arkboard-games-to-watch'); return; }
       var canvas = mode === 'term' ? await buildTerm(win, btn) : mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn) : mode === 'bracket' ? await buildBracket(win, btn) : mode === 'pickem' ? await buildPickem(win, btn) : mode === 'perf' ? await buildPerf(win, btn) : mode === 'depth' ? await buildDepth(win, btn)
         : mode === 'lz-social' ? await buildSocial(win, btn) : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
@@ -4235,7 +4472,7 @@
       if (canvas) {
         var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : SITE === 'arkndjl.net/laursen_111' ? 'laursen-111-' : 'arkboard-';
         if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
-        if (mode === 'term') { preview(canvas, 'arkboard-process-' + ((JSON.parse(btn.getAttribute('data-gfx-term') || '{}').t) || 'term').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
+        if (mode === 'term') { preview(canvas, 'arkboard-process-' + (btn.hasAttribute('data-gfx-wide') ? 'wide-' : '') + ((JSON.parse(btn.getAttribute('data-gfx-term') || '{}').t) || 'term').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
         if (mode === 'rq') { preview(canvas, 'arkboard-research-' + ((JSON.parse(btn.getAttribute('data-gfx-rq') || '{}').id) || 'card').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 60)); return; }
         var name = mode === 'depth' ? 'arkboard-depth-' + (((win.__dcTeam || {}).n) || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'perf' ? 'arkboard-arklist-' + ((win.__arkPerf || {}).sport || 'all').replace(/^college-/, '') + '-' + ((win.__arkPerf || {}).day || 'latest') : mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' || mode === 'bracket' || mode === 'pickem' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);

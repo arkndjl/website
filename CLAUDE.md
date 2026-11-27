@@ -22,21 +22,49 @@
 
 ## ARKBOARD Process (was "Reference", before that "Library")
 
-- The ARKBOARD section with Research, Glossary/Methodology and Data Sources tabs is **Process** (Noah, Nov 17 2026): page
-  `content/arkboard-process.md`, URL `/arkboard/process/`, short link `arkndjl.net/process`, menu identifier
-  `arkboard-process`. Never call it "Library" (that is ARKLIBRARY), "Lab", "Reference" or "ARKPROCESS". `/reference`, `/library`,
-  `/lab`, `/arkboard/reference/`, `/arkboard/library/` and `/arkboard/lab/` redirect to it in `static/_redirects`. The page is
-  written by `scripts/library_build.py` (Research + Glossary/Methodology from `data/library.json`, then Data Sources); rerun it
-  rather than hand-editing. Glossary numbers are read from the live fit files in `scripts/library_glossary.py` (never typed in), and
-  `.github/workflows/process-refresh.yml` reruns both scripts after every board/refit workflow (Noah, Nov 19: always auto-refresh).
+- The ARKBOARD section that holds the method is **Process** (Noah, Nov 17 2026): page `content/arkboard-process.md`, URL
+  `/arkboard/process/`, short link `arkndjl.net/process`, menu identifier `arkboard-process`. Never call it "Library" (that is
+  ARKLIBRARY), "Lab", "Reference" or "ARKPROCESS". `/reference`, `/library`, `/lab`, `/arkboard/reference/`,
+  `/arkboard/library/` and `/arkboard/lab/` redirect to it in `static/_redirects`.
+- Side strip (Nov 27): Overview (overview, sports) | Metrics (FV, FV scales, player value, player odds) | Models (team ratings,
+  game models, drafts and mocks, testing) | Research | Data (data sources, data and names, abbreviations). The page is written by
+  `scripts/library_build.py` from `data/library.json`; rerun it rather than hand-editing. A new glossary section goes in SIDE
+  and GLOSS_TAB there; the gate terms (held out, walk-forward, ship gate, ledger) are moved into "testing" by METHOD.
+  Overview (`procover.html`) and the sport sheets (`procsports.html`) read `data/library.json` "overview"; the charts in a
+  term's window are drawn from its GFX card data (`entry_charts`). Nothing on the page is typed in.
+- Glossary numbers are read from the live fit files in `scripts/library_glossary.py` (never typed in), and
+  `.github/workflows/process-refresh.yml` reruns the scripts after every board/refit workflow (Noah, Nov 19: always auto-refresh).
 - Glossary GFX cards: every term window has a GFX card button (`assets/js/gfx.js` buildTerm, link `arkndjl.net/process#g-<term>`).
   `data/glossary_gfx.json` is written by `scripts/glossary_gfx.py` (rerun after a season file or refit): compact cards from
-  `research/glossary_gfx_base.json` (16:9, formula + one picture) and explainer cards (3:4: stands for, what, use, formula,
+  `research/glossary_gfx_base.json` (16:9, formula + one picture) and explainer cards (3:4, and 16:9 from the "GFX 16:9" button, `buildWide`: stands for, what, use, formula,
   held-out test vs similar metrics, distribution/calibration, top 10 from the site's data) from its EXPLAIN builders. Keys =
   the term exactly as in `data/library.json`; a term with no entry gets the plain card. Test numbers come from backtest files
   only, reported as they are even when ours does not win.
 - Data Sources tab: `{{< datasources >}}` reads `data/data_sources.json`. A new fetcher that pulls from a new outside
   source adds the source there (name, link, what the site takes from it).
+
+## ARKLOG (/arklog/, menu "ARKLOG", was "site data")
+
+- The dated record of every change on the whole site (ARKBOARD, 1NT, LAURSEN_111, ST. CLAIRE, ARKLIBRARY, site) plus the site
+  data tabs (traffic, build, data). `scripts/arklog.py` reads the merged pull requests (cache `scripts/data/arklog_prs.json.gz`)
+  into `static/data/arklog.json` (rows, `assets/js/arklog.js`) and `data/arklog.json` (tallies and charts for the scoreboard and
+  the Process overview); process-refresh.yml reruns it. Never hand-write a row. A row read wrong is fixed in
+  `research/arklog_fix.json` (`{"<pr>": {"hide": true}}` or any row field). `python3 scripts/arklog.py --test` after a parser change.
+- A pull request description is the log entry. A model or metric test says what was tested, the held-out number before and
+  after ("R² .643 to .732"), the t ("t = 2.1") and "Shipped" or "Failed" on its own line, in Noah's voice (below).
+- Hidden pages (Franchise Fantasy, the ST. CLAIRE style guide) never appear in the log (`OUT` in arklog.py).
+- Process updates: one post a month ("Process #N: ... / <month> updates"), front matter `series = "process"` and
+  `month = "YYYY-MM"`, listed by ARKLOG > updates. It covers every section of the site that month: models and metrics,
+  features, bug fixes, 1NT, ST. CLAIRE, videos and articles released, social data, site data, with site screenshots and
+  charts. Start from `python3 scripts/arklog.py --month YYYY-MM`.
+- GFX: log row card (`buildLog`), scoreboard (`buildBoard`), sport sheet (`buildSheet`) in `assets/js/gfx.js`.
+
+## Voice (ARKLOG, articles, Process)
+
+- Everything published is in Noah's voice (Noah, Nov 27): plain full sentences, numbers stated as they came out, failures
+  included. No LLM phrasing or formatting (dashes as punctuation, bold lead-ins, "not just X but Y", rhetorical questions,
+  summary closers), no advertising or marketing, no taglines. Ask Noah for writing samples when unsure; the posts
+  `introducing-xpm` and `introducing-cbb-xpm` are the reference.
 
 ## Copy: no intros or descriptive blurbs
 
@@ -45,7 +73,7 @@
   let the page speak for itself. When unsure, cut.
 - A note on how a table is built goes in the `about` of `wintable-close.html`, which is only the status bar's hover
   title, never a visible paragraph. Column meanings go in `<th title>` tooltips.
-- Method prose lives only in Process (Glossary/Methodology). Model and backtest tabs on sport pages show tables,
+- Method prose lives only in Process. Model and backtest tabs on sport pages show tables,
   formulas and numbers, no explanatory paragraphs or "how it works" windows (Noah, Nov 2). Kept: Process text,
   article bodies, source attributions in status bars, résumé content on about/contact.
 
@@ -62,7 +90,7 @@
   holds a page's own reading (WAR on `/arkboard/nfl/` is NFL WAR) and `when` one picked by the header's own note (`m`, a
   regex: G is goals when the note says goals); `only` limits a key to the pages listed. `alias` maps other spellings to a key; `"part": false`
   keeps a short word (ON, G, ST) from matching inside longer labels.
-- Labels with no glossary term of their own are listed under Process > Glossary/Methodology > abbreviations, written from
+- Labels with no glossary term of their own are listed under Process > Data > abbreviations, written from
   `data/terms.json` by `scripts/library_glossary.py` (rerun it and `scripts/library_build.py` after a change; `python3 scripts/check_terms.py` checks every link).
 
 ## ARKBOARD tabs

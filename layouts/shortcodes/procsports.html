@@ -1,0 +1,35 @@
+{{- /* Process > Overview > sports: one sheet per sport. Its describe and predict pick, every glossary term tagged with the
+       sport grouped by tab (links to the terms), its studies, and its test tallies from the log. Built from
+       data/library.json "overview.sheets" (scripts/library_build.py). The GFX button draws the sheet 16:9 (gfx.js buildSheet).
+       {{< procsports tab="sports" >}} */ -}}
+{{- $btns := `<span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>` | safeHTML -}}
+<div class="desk libgrid proc" data-tab="{{ .Get "tab" }}">
+{{- range site.Data.library.overview.sheets }}
+<div class="win procsheet" id="sheet-{{ .sport | lower }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>{{ .sport | lower }}.sheet<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="libterm__body">
+    {{- with .lead }}
+    <div class="proc__tiles">
+      <div class="proc__tile" title="{{ .dfull }}"><i>describe</i><b>{{ .describe }}</b>{{ with .dn }}<span>R² {{ . }}</span>{{ end }}</div>
+      <div class="proc__tile" title="{{ .pfull }}"><i>predict</i><b>{{ .predict }}</b>{{ with .pn }}<span>R² {{ . }}</span>{{ end }}</div>
+    </div>
+    {{- end }}
+    {{- range .groups }}
+    <p class="procsheet__grp"><a class="procsheet__tab" href="#{{ .tab | urlize }}">{{ .tab }}</a>{{ range .terms }}<a class="procsheet__term" href="#{{ .id }}">{{ .t }}</a>{{ end }}</p>
+    {{- end }}
+    {{- with .studies }}
+    <p class="procsheet__grp"><a class="procsheet__tab" href="#all-studies">research</a>{{ range . }}<a class="procsheet__term" href="#rq-{{ .id }}">{{ .q }}</a>{{ end }}</p>
+    {{- end }}
+  </div>
+  {{- $g := slice }}{{ range .groups }}{{ $g = $g | append (dict "tab" .tab "n" (len .terms) "top" (apply (first 4 .terms) "index" "." "t")) }}{{ end }}
+  {{- $card := dict "sport" .sport "lead" .lead "log" .log "groups" $g "n" .nterms "studies" (len .studies) }}
+  <p class="rq__bar libstudy__bar">
+    <button type="button" class="cfb__btn" data-gfx data-gfx-mode="sheet" data-gfx-sheet="{{ jsonify $card }}" title="sport sheet PNG, 16:9 for X">GFX card</button>
+    <a class="cfb__btn rq__link" href="{{ "arklog/" | relURL }}#log:{{ .sport }}" title="this sport's rows in ARKLOG">ARKLOG</a>
+    <a class="cfb__btn rq__link" href="#sheet-{{ .sport | lower }}" title="link to this sheet">link</a>
+  </p>
+  <div class="win__status"><span>{{ .nterms }} terms · {{ len .studies }} {{ cond (eq (len .studies) 1) "study" "studies" }}</span><span>{{ with .log }}{{ if .all }}{{ .s }} shipped · {{ .m }} part · {{ .f }} failed{{ end }}{{ end }}</span></div>
+</div>
+{{- end }}
+</div>
+{{- partial "js.html" "gfx" -}}

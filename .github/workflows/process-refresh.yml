@@ -1,7 +1,8 @@
-# Regenerates ARKBOARD Process (Research, Glossary/Methodology, Data Sources) from the live fit files after the board and
+# Regenerates ARKBOARD Process (Overview, Metrics, Models, Research, Data) and ARKLOG from the live fit files after the board and
 # refit workflows: scripts/library_glossary.py reads the fits (fv_scale, cbb_live_fit, hockey fit, board counts) into
 # research/library.json, scripts/library_build.py writes data/library.json and content/arkboard-process.md. Never hand-edit
-# those numbers (Noah, Nov 19 2026). Then the glossary GFX cards (scripts/glossary_gfx.py). Commits only when something changed.
+# those numbers (Noah, Nov 19 2026). Then the glossary GFX cards (scripts/glossary_gfx.py). ARKLOG (scripts/arklog.py) reads
+# the newest merged pull requests into static/data/arklog.json and data/arklog.json. Commits only when something changed.
 name: process refresh
 
 on:
@@ -14,6 +15,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: read
 
 concurrency:
   group: process-refresh
@@ -28,16 +30,22 @@ jobs:
         with:
           ref: main
       - name: Rebuild Process from the live fits
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           python3 scripts/library_glossary.py
+          # ARKLOG first: the Process overview prints its tallies. A failed fetch rebuilds from the cache.
+          python3 scripts/arklog.py --fetch || python3 scripts/arklog.py
           python3 scripts/library_build.py
       # the glossary GFX cards (scripts/glossary_gfx.py -> data/glossary_gfx.json): top 10s and distributions from the
       # season files, test numbers from the backtest files; stdlib, reads the repo only
       - name: Glossary GFX cards
-        run: python3 scripts/glossary_gfx.py
+        run: |
+          python3 scripts/glossary_gfx.py
+          python3 scripts/library_build.py   # the term windows draw the cards' pictures
       - name: Commit if anything changed
         run: |
-          git add research/library.json data/library.json content/arkboard-process.md data/glossary_gfx.json
+          git add research/library.json data/library.json content/arkboard-process.md data/glossary_gfx.json static/data/arklog.json data/arklog.json scripts/data/arklog_prs.json.gz
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes
