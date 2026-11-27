@@ -104,3 +104,10 @@
 - Moves on every player card come from `static/data/moves/<sport>.json`, written by `scripts/player_moves.py` (rerun by the
   recruit news workflow) from files already in the repo; headline and transaction rows are kept in
   `scripts/data/player_moves_hist.json.gz`. A new kind of move needs a label in `MV_LAB` (gfx.js).
+
+## DoR (Declare or Return)
+
+- A decision metric in dollars (what pays more), separate from Ret% (what he will do). `scripts/dor.py` fits it by hand
+  (rookie deal, later earnings by pick/position/age from OverTheCap contracts, pick spreads of declarers and returners from the
+  PFF boards) and writes `data/dor_fit.json`; `dorOf` in `scripts/cfb_teams.mjs` reads its grid on every board write (`dor`,
+  `dorD` columns). Refit after each draft and when the rookie scale in `scripts/cfb_declare_econ.py` is updated.
