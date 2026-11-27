@@ -1,0 +1,144 @@
+{
+ "asof": "2026-11-27",
+ "lockbox": "nothing on or after 2026-11-11",
+ "tests": [
+  {
+   "id": "T1",
+   "swap": "CS2 series model player term: fit on series-day ratings (the serve form) instead of month-start ratings",
+   "target": "held series log loss, Jul 2025 - Nov 10 2026",
+   "n": 15975,
+   "ll": {
+    "B month fit, month score": 0.5954,
+    "C month fit, day score (live)": 0.59476,
+    "A day fit, day score": 0.5946
+   },
+   "llTop50": {
+    "B": 0.64854,
+    "C": 0.64852,
+    "A": 0.64862
+   },
+   "A_vs_C": {
+    "all": {
+     "d": -0.00016,
+     "t_month": 0.47,
+     "months": "10/17",
+     "t_row": -1.48
+    },
+    "top50": {
+     "d": 0.0001,
+     "t_month": 0.05,
+     "months": "8/17",
+     "t_row": 0.73
+    }
+   },
+   "A_vs_B": {
+    "all": {
+     "d": -0.00081,
+     "t_month": -0.62,
+     "months": "10/17",
+     "t_row": -2.13
+    },
+    "top50": {
+     "d": 8e-05,
+     "t_month": 0.41,
+     "months": "8/17",
+     "t_row": 0.19
+    }
+   },
+   "weights": {
+    "B": {
+     "top": [
+      0.4493,
+      0.2412,
+      0.7494,
+      3.3333
+     ],
+     "rest": [
+      0.8944,
+      0.1426,
+      0.7573,
+      3.741
+     ]
+    },
+    "A": {
+     "top": [
+      0.4151,
+      0.2491,
+      0.7509,
+      3.395
+     ],
+     "rest": [
+      0.8441,
+      0.1433,
+      0.7061,
+      4.0802
+     ]
+    }
+   },
+   "zCorr": 0.9737,
+   "result": "alignment shipped under prereg rule 2 (tie on A vs C, A vs B t -0.62, top-50 guard +0.05 / +0.41)",
+   "refit_gate": {
+    "n": 15975,
+    "coverage": 0.908,
+    "w": {
+     "top": [
+      0.4151,
+      0.2491,
+      0.7509,
+      3.395
+     ],
+     "rest": [
+      0.8441,
+      0.1433,
+      0.7061,
+      4.0802
+     ]
+    },
+    "all": {
+     "n": 15975,
+     "ll0": 0.6086,
+     "ll1": 0.5946,
+     "t": -11.55
+    },
+    "top50": {
+     "n": 1759,
+     "ll0": 0.6533,
+     "ll1": 0.6486,
+     "t": -2.06
+    }
+   }
+  }
+ ],
+ "rule_fixes": [
+  {
+   "id": "R1",
+   "what": "CS2 RAR on the last year's own lines (no decay, no shrink) + tier lift",
+   "file": "scripts/cs2_players.py",
+   "effect": {
+    "rows": 400,
+    "r_old_new": 0.9871,
+    "mean_abs_change_rounds": 7.2
+   }
+  },
+  {
+   "id": "R2",
+   "what": "1NT season player rankings sorted and led by season RWA (esea_rwa.json seasonAll)",
+   "files": [
+    "scripts/esea_rwa.py",
+    "layouts/shortcodes/esea.html"
+   ],
+   "rerun": "esea.yml"
+  },
+  {
+   "id": "R3",
+   "what": "team RWA tooltip says career",
+   "file": "layouts/shortcodes/esea.html"
+  }
+ ],
+ "leads": [
+  "L1 1NT season sim / stakes on the preview logit",
+  "L2 1NT power rank with team RWA",
+  "L3 tennis all-time season value on SV",
+  "L4 league log is all lockbox (starts 2026-11-16)"
+ ]
+}
