@@ -1465,7 +1465,7 @@ function pickReport(k, { p, needs: scored, dup, room: ctxRoom = [], top = 0, rep
   // a pick already traded (before the draft, a real deal)
   if (k.via) lines.push(['Pick', `${k.via} R${k.round}${k.cond ? ' (conditional)' : ''}; to ${k.viaTo}${k.deal ? `; ${k.deal} trade` : '; pick trade'}.`]);
   // slot: expected pick, market, our board
-  let slot = conv ? `model board #${k.mRk} (model FV ${k.fvM}), pick ${k.pick}; cons ${k.cons != null ? `#${k.cons}` : 'unranked'}; BB #${k.bb}`
+  let slot = conv ? `${k.mRk != null ? `model board #${k.mRk} (model FV ${k.fvM})` : `model FV ${k.fvM}`}, pick ${k.pick}; cons ${k.cons != null ? `#${k.cons}` : 'unranked'}; BB #${k.bb}`
     : `xPick ${k.xPick}, pick ${k.pick}; cons ${k.cons != null ? `#${k.cons} (${p.consN || 1}/10 boards)` : 'unranked'}; BB #${k.bb}`;
   if (conv) { if (k.pick < k.mRk - 5) slot += `; ${k.mRk - k.pick} ahead of model rank${ni >= 0 ? ' (need)' : ''}`; }
   else if (k.pick < 0.67 * k.xPick && k.pick < k.xPick - 5) slot += `; ${k.xPick - k.pick} ahead of xPick${ni >= 0 ? ' (need)' : ''}`;
