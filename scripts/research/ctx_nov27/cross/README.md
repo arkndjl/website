@@ -112,3 +112,50 @@ That per-sport reading is mine: say so if the conjunction was meant and the CBB 
 - close_model.py fits totals on the raw model total and today's conference tiers; the picks use recentred totals.
   Table only, but its "plain gap rule" comparison is on a different form than the live rule.
 - Tennis all-time on season SV (tennis lens message): needs the alltime_pull tennis cache.
+
+# Round 2 (port round)
+
+## Tests
+
+| swap | target | before -> after | t | k/n | result |
+|---|---|---|---|---|---|
+| T2 close predictor CBB tier cells: today's map -> the season's own | held-out squared error of close - open (2021, 2024-26), held rows on as-it-stood tiers | spread 35,064.2 -> 35,056.9; total 78,737.7 -> 78,715.3. Guard (clvRet of E > 0 bets) +2.32% -> +2.31%, +3.53% -> +3.50% (se .17 / .14) | spread -1.17, total -3.05 | 2/2 | PASS, shipped |
+| T2 CFB tier cells: same | same, 2021-26 | spread 23,504.4 -> 23,506.0; total 24,695.8 -> 24,690.9 | +0.08, -1.71 | 1/2 | FAIL (spread not better): CFB stays |
+| T3 tennis all-time on season SV (rule fix; gate = era_check under the era-blind 95% line) | KL of top-100 decade share | ATP peak .049 -> .026 (line .063), career .014 -> .023; WTA peak .061 -> .043, career .012 -> .024 | - | 4/4 lists pass | PASS, switched |
+
+## Shipped
+
+- scripts/close_model.py: TIER_THEN = {'cbb'} (tier from games_picks.conf_hist); data/close_fit.json refit
+  (`python3 scripts/close_model.py --fit`). Table only (closefit shortcode).
+- scripts/alltime.py tennis_players: season value = SV (the year's wins over what a replacement player, the year's
+  101st-150th by year-end Elo, would win against the same opponents), z against the year's #20 SV in SDs of the top
+  100. Columns SV+ and SV (was Elo+ and peak Elo). New `--snap --tennis` flag; snapshot and data/alltime.json atp / wta
+  blocks regenerated (other sports' blocks left as committed). scripts/alltime_ref.py text edited, NOT run.
+  For Noah: SV is a volume stat. WTA careers: Serena Williams 3rd -> 9th (short schedules), Virginia Wade 4th; ATP:
+  Federer passes Djokovic, Lendl 3rd; peak seasons now McEnroe 1984, Federer 2006, Vilas 1977; Evert 1975, Graf 1989.
+- scripts/transaction_values.py + layouts/shortcodes/transactions.html: NHL rows show pWAR beside WAR this season (the
+  second slot was empty; a move is read forward). data/transactions/values.json regenerated.
+
+## Inventory, the parts not reached in round 1
+
+| consumer | file:line | ctx | input | verdict |
+|---|---|---|---|---|
+| Weekly board moves | scripts/board_moves.py:51-64 BOARDS | follows the board | cbb fv, nfl xv, nba vorx, nhl war, soccer svar, nbaproj pxpm, cs2 rwa, prospects fv | OK: each tracks its board's lead |
+| Board moves, other views | board_moves.py EXTRA | - | nfl pxp, nba txpm / sxpm, nhl pwar / p3 / hpm | OK |
+| Player badges (all sports) | scripts/<sport>_badges.py, layouts/partials/badges.html | P (by design) | one stat regressed by volume, shown only if it predicts next season beyond the board value | OK, display only (read at docstring + memory level, backtests not rerun) |
+| Unit badges | scripts/unit_badges.py | P | midseason unit value held toward half of last season, tested on rest of season | OK (a predictive badge; the prior is by design) |
+| Player moves | scripts/player_moves.py:246 | events | recruit ARK + xFV on recruit rows | OK |
+| Mock shared code | scripts/mock_noise_backtest.py, mock_roster_backtest.py, mock_fall_curve_backtest.py | P | board rank -> pick curve, need terms | OK |
+| Transactions NHL | scripts/transaction_values.py:103 | P (a move) | WAR to date only | DISPLAY, fixed (pWAR added) |
+| Transactions NFL / NBA / soccer | transaction_values.py:84-120 | P (a move) | WAR + SVAR; XPM + VORX; GAR + SVAR, all this season | DISPLAY lead: pXP/60, pXPM, p/90 as the second number (not changed: both slots are taken, Noah's call) |
+| GFX CFB player card VALUE band | assets/js/gfx.js:1102-1103 | D (this season) | order Stat+, WAR, WAA, XV | DISPLAY: put the XV cell first (XV, WAR, WAA, Stat+) |
+| GFX player card, NBA | assets/js/gfx.js:1808-1815 | both | VORX tile unshifted first on every NBA card, predictive tables too | DISPLAY: on a predictive table (projections, next up, contract value) unshift pXPM (xp.sxpm); VORX stays on season tables |
+| GFX CBB team plan | assets/js/gfx.js:743-751 (and layouts/shortcodes/cbbbuilder.html:48-51) | P (next season) | rotation sorted by `bpm`, header 'BPM' | DISPLAY: header to 'xXPM' if the CBB lens's builder now writes the XPM form under `bpm`; else leave |
+| GFX recruit card | assets/js/gfx.js:1645 buildRCard | P | FV, Y1 FV, predictions | OK by CLAUDE.md, not re-read |
+
+Not read line by line: buildDepth, buildTeamCard, buildRank, buildPerf, buildWatch (gfx.js 2159-4171).
+
+## Analogues
+
+- As-it-stood conference labels: passed for CBB twice (segments, close tiers), failed for CFB twice. Nothing left to port.
+- Season-only all-time value: tennis done; the other all-time lists already read season value.
