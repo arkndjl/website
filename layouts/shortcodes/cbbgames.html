@@ -7,13 +7,15 @@
 {{- $d := . -}}
 {{- /* market lines, moneylines, the model-vs-line sort and the record against the line show only on Predictions (shortcode called with sport=) */}}
 {{- $pred := ne ($.Get "sport" | default "") "" -}}
+{{- /* a bracket game whose opponent ESPN has not named yet (team "TBD", id -1 / -2) has no matchup to project */ -}}
+{{- $games := (where (where .games "home.n" "ne" "TBD") "away.n" "ne" "TBD") -}}
 {{- $pk := dict }}{{ if eq ($.Get "picks") "true" }}{{ with site.Data.games_picks_cbb }}{{ range .picks }}{{ $pk = merge $pk (dict (string .id) .) }}{{ end }}{{ end }}{{ end }}
 <div class="win games cbbgames"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}{{ with $.Get "sport" }} data-sport="{{ . }}"{{ end }} data-gfx-date="{{ lower ((time .asof).Format "Jan 2, 2006") }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ $.Get "title" | default "games" }}{{ with .dates }} :: {{ range $i, $x := . }}{{ if $i }}, {{ end }}{{ lower ((time $x).Format "Jan 2") }}{{ end }}{{ end }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
-  {{- if .games }}
+  {{- if $games }}
   <form class="cfb__bar" data-cbbg-bar hidden onsubmit="return false" aria-label="filter the games">
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="team or conference" autocomplete="off"></label>
     <label class="cfb__field"><span>day</span><select name="day"><option value="">both</option>{{ range .dates }}<option value="{{ . }}">{{ lower ((time .).Format "Mon Jan 2") }}</option>{{ end }}</select></label>
@@ -22,7 +24,7 @@
     <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="games" title="graphic: first 8 games shown, current sort, 4:5">GFX</button>
   </form>
   <div class="games__grid">
-  {{- range .games }}{{ $g := . }}
+  {{- range $games }}{{ $g := . }}
   {{- $ph := mul .pHome 100 }}{{ $H := .home }}{{ $A := .away }}
   {{- $model := partial "nflline.html" (dict "m" .margin "home" $H.ab "away" $A.ab) }}
   {{- $pick := index $pk (string .id) }}
@@ -73,7 +75,7 @@
   {{- else }}
   <div class="cfbm__body"><p class="cfb__dim">no games in the next few days.</p></div>
   {{- end }}
-  <div class="win__status"><span><span data-cbbg-count>{{ len .games }} games</span>{{ if and $pred (add .ats.w .ats.l) }} · model ATS {{ .ats.w }}-{{ .ats.l }} this season, 1+ pt off the line{{ end }}</span><span {{ partial "fresh-attrs.html" "cbb_games" | safeHTMLAttr }}>updated {{ lower ((time .asof).Format "Jan 2, 3:04 PM") }} UTC</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span><span data-cbbg-count>{{ len $games }} games</span>{{ if and $pred (add .ats.w .ats.l) }} · model ATS {{ .ats.w }}-{{ .ats.l }} this season, 1+ pt off the line{{ end }}</span><span {{ partial "fresh-attrs.html" "cbb_games" | safeHTMLAttr }}>updated {{ lower ((time .asof).Format "Jan 2, 3:04 PM") }} UTC</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 <script>
 (function () {

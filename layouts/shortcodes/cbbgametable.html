@@ -1,7 +1,9 @@
 {{- /* College basketball game table: the next two slates (data/cbb_games.json) as one sortable table: model line
        (the market line and the difference are on Predictions), win probability, projected score and total, final. */ -}}
 {{- with site.Data.cbb_games -}}
-{{- $hasFinal := false }}{{ range .games }}{{ if .final }}{{ $hasFinal = true }}{{ end }}{{ end }}
+{{- /* a bracket game whose opponent ESPN has not named yet (team "TBD") has no matchup to project */ -}}
+{{- $games := (where (where .games "home.n" "ne" "TBD") "away.n" "ne" "TBD") -}}
+{{- $hasFinal := false }}{{ range $games }}{{ if .final }}{{ $hasFinal = true }}{{ end }}{{ end }}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "game table") "icon" "basketball" "filter" "Day,Conf" "tab" ($.Get "tab") "gfxCols" "Matchup,Tip,Model,Win %,Proj." "gfxDate" (lower ((time .asof).Format "Jan 2, 2006")) "gfxMax" "16") -}}
 <table class="cfb__table cfbg">
   <thead><tr>
@@ -13,7 +15,7 @@
     {{ if $hasFinal }}<th>Final</th>{{ end }}<th>Day</th><th title="conference">Conf</th>
   </tr></thead>
   <tbody>
-  {{- $pc := partialCached "gqpct.html" "cbb" "cbb" }}{{ $gs := slice }}{{ range .games }}{{ $gs = $gs | append (dict "g" . "q" (partial "gq.html" (dict "a" (index $pc (string .home.id)) "b" (index $pc (string .away.id)) "p" .pHome))) }}{{ end }}
+  {{- $pc := partialCached "gqpct.html" "cbb" "cbb" }}{{ $gs := slice }}{{ range $games }}{{ $gs = $gs | append (dict "g" . "q" (partial "gq.html" (dict "a" (index $pc (string .home.id)) "b" (index $pc (string .away.id)) "p" .pHome))) }}{{ end }}
   {{- range $x := sort $gs "q" "desc" }}{{ $q := $x.q }}{{ with $x.g }}{{ $g := . }}{{ $H := .home }}{{ $A := .away }}
   {{- $fav := cond (ge .pHome 0.5) $H.ab $A.ab }}{{ $fp := cond (ge .pHome 0.5) .pHome (sub 1 .pHome) }}
   <tr>
@@ -33,5 +35,5 @@
   {{- end }}{{ end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "fresh" "cbb_games" "rows" (len .games)) -}}
+{{- partial "wintable-close.html" (dict "fresh" "cbb_games" "rows" (len $games)) -}}
 {{- end -}}
