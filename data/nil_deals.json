@@ -1,0 +1,71 @@
+{
+ "_readme": "Reported NIL / revenue-share deals, one row a report (amount in USD for the season named; a range is entered at its midpoint). Read by scripts/fetch_cfb.mjs (NIL_DEALS): a deal for this season moves the player's yNIL, one reported in the last year moves his xNIL and the price fit's target for him, each half way (geometric). Add a row when a deal is reported; the board picks it up on its next run.",
+ "deals": [
+  {
+   "sport": "cfb",
+   "player": "Darian Mensah",
+   "team": "Miami",
+   "pos": "QB",
+   "season": 2026,
+   "amount": 7000000,
+   "date": "2026-08-11",
+   "kind": "portal",
+   "source": "ESPN (GM survey), On3"
+  },
+  {
+   "sport": "cfb",
+   "player": "Drew Mestemaker",
+   "team": "Oklahoma State",
+   "pos": "QB",
+   "season": 2026,
+   "amount": 3600000,
+   "date": "2026-01-05",
+   "kind": "portal",
+   "source": "On3, ESPN ($7.5M over two years; $3.5M a year)"
+  },
+  {
+   "sport": "cfb",
+   "player": "Sam Leavitt",
+   "team": "LSU",
+   "pos": "QB",
+   "season": 2026,
+   "amount": 5000000,
+   "date": "2026-02-25",
+   "kind": "portal",
+   "source": "On3 via SI, ESPN ($4M to $6M)"
+  },
+  {
+   "sport": "cfb",
+   "player": "Jordan Seaton",
+   "team": "LSU",
+   "pos": "OL",
+   "season": 2026,
+   "amount": 3250000,
+   "date": "2026-05-07",
+   "kind": "portal",
+   "source": "On3, ESPN"
+  },
+  {
+   "sport": "cfb",
+   "player": "Cam Coleman",
+   "team": "Texas",
+   "pos": "WR",
+   "season": 2026,
+   "amount": 3000000,
+   "date": "2026-08-27",
+   "kind": "portal",
+   "source": "On3"
+  },
+  {
+   "sport": "cfb",
+   "player": "Kamario Taylor",
+   "team": "Mississippi State",
+   "pos": "QB",
+   "season": 2027,
+   "amount": 7500000,
+   "date": "2026-11-25",
+   "kind": "re-sign",
+   "source": "On3; confirmed by the school's statement"
+  }
+ ]
+}

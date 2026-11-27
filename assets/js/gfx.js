@@ -646,7 +646,7 @@
     g.fillStyle = ink; g.fillText(t, x + size * 0.3, cy);
     return tw;
   }
-  function money(n) { return n >= 1e6 ? '$' + (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + 'M' : '$' + Math.round(n / 1e3) + 'K'; }
+  function money(n) { return n >= 1e6 ? '$' + (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + 'M' : (n >= 1e3 || !n ? '$' + Math.round(n / 1e3) + 'K' : '$' + Math.round(n)); }
 
   // ---- player card: from a scouting report (button carries data-gfx-i, the record index) ----
   // ---- coach card: photo, role and team, score, the role's numbers and scheme percentiles (staff tab) ----

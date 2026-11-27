@@ -81,3 +81,57 @@ The formula does not beat the naive value, and the naive value is only right for
 blank. The FV slope of pay within provisional players was tested too (.018 log per FV point in P4): no change in any
 score, dropped. CBB has no analogue: its budget loop already covers the whole roster (newcomers on the freshman
 projection).
+
+## Premiums, market tracking, budgets by year, coverage (same day, third pass)
+
+Top-end and scarce-position premiums (`prem.py`, `prem2.py`, `rec.py`, `rec2.py`). yNIL split with the team total held:
+
+| | CSC A4 | On3 rmse | On3 r | deals rmse | top yNIL |
+|---|---|---|---|---|---|
+| shipped | .642 | .484 | .673 | .71 | $9.8M |
+| every QB x e^.30 | .651 | .487 | .707 | .70 | $12.2M |
+| starting QB x e^.30 | .634 | .485 | .711 | .70 | $12.4M |
+| convex (listed players' exponent 1.1) | .637 | .489 | .690 | .71 | $11.8M |
+
+No score moves by more than .01: fail. CSC top quantiles (q .75+), model against actual: QB -.11, LB +.08, OL +.19,
+TE +.43, DL +.46, WR +.51, RB +.65. The model is not short at the top or at QB; it overpays the top RB, WR, TE and DL
+(repricing those from CSC failed against On3 in the first pass). CBB (27 On3 players): slope of log(On3 / yNIL) on FV
+-.008, no position pattern: fail.
+
+Recruits (95 of the 2027 class with an On3 high-school valuation): xNIL carries no position. QB recruits sit .50 under
+On3 (n 9, se .12). The college board's position prices on recruit xNIL, no parameter fit on recruits:
+
+| position term | sd | rmse | r | P(rmse better) |
+|---|---|---|---|---|
+| none | .500 | .520 | .39 | |
+| half, fit coefficients | .462 | .492 | .50 | .99 |
+| full, fit coefficients | .466 | .503 | .52 | .76 |
+| half, board medians (the form the build can use) | .466 | .501 | .49 | .92 |
+
+Mixed: the weight is picked in sample, the buildable form's interval crosses zero, and The Athletic's ranges (five-star
+QB $750K to $1M, top-150 QB not starting $300K to $400K) fit the unadjusted numbers ($960K, $380K to $550K) better than
+the adjusted ones ($1.46M, $570K to $830K). Not shipped.
+
+Market tracking (`on3_history_pull.py`, `on3_history.py`, `on3_vs_deals.py`): 371 players' daily On3 valuations, Nov 24
+2025 to Nov 27 2026. On3 moves in steps: 553 changes in a year, 314 of them in July 2026, none since August. The July
+step by position: QB +.47, EDGE +.42, LB +.39, S +.39, RB +.37, WR +.35, IOL +.26, CB +.25, OT +.21, DL +.17. The board
+refits its position prices on On3 at every run, so it follows On3 the same day, but On3 itself is months behind.
+Reports lead it: the three deals reported above the player's On3 value (Mestemaker Jan, Leavitt Feb, Seaton May) were
+each followed by On3 moving toward the report (.43 of 1.19, .11 of .40, .88 of .88 in logs; about half the gap on
+average). Kamario Taylor: On3 $1.5M, reported $7.5M on Nov 25. A position-level deal signal could not be tested (two
+positions with reports before July).
+
+Shipped: `data/nil_deals.json`; a report moves the player half way (geometric) from the model's number: yNIL when the
+deal is for this season, xNIL when reported in the last year, and the price fit's target for him. Forward check on the
+five 2026 deals against On3's later value, yNIL log rmse .60 to .28.
+
+Budgets by year and overspend (`bud.py`): paying each listed school the top of its reported range, CSC .642 to .682,
+On3 bias +.01 to +.08: fail (the official total sits under the reported budgets as it is). Team mean On3 residual
+against log budget r -.61 (22 teams): On3 scales less with the budget than pay shares do. Shipped: a list from an
+earlier season carries forward at the market's growth (11% a year, Opendorse 2024-26) in place of falling back to
+the flat levels.
+
+Coverage: kickers and punters had no NIL. Paid XNIL.spec .20 x e^(.10 (FV - 37)) x the team's median listed player
+(ESPN backups .01): CSC kicker and punter percentiles log rmse 1.53 blank to .40; fit on kickers and scored on punters
+.49 (blank 1.50), the reverse .48 (blank 1.55). Backups' and specialists' xNIL: the group's pay in its market shared
+by worth (zNIL sums to zero in the group); there is no outside anchor for it. Small pay is kept to the nearest $100.

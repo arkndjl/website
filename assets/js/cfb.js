@@ -30,7 +30,7 @@
   var PROV = {{ partial "prov.html" (dict "why" "@@") | jsonify }};
   function prov(why) { return PROV.replace('@@', esc(why)); }
   function zmoney(n) { return (n < 0 ? '−' : '+') + money(Math.abs(n)); }
-  function money(n) { return n >= 1e6 ? '$' + (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + 'M' : '$' + Math.round(n / 1e3) + 'K'; }
+  function money(n) { return n >= 1e6 ? '$' + (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + 'M' : n >= 1e3 || n === 0 ? '$' + Math.round(n / 1e3) + 'K' : '$' + Math.round(n); }
   function inches(h) { var m = /^(\d)\D+(\d+(?:\.\d+)?)/.exec(h || ''); return m ? m[1] * 12 + +m[2] : ''; }
   var dim = '<span class="cfb__dim">—</span>';
   // ESPN headshots through ESPN's image resizer (small for the list)

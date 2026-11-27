@@ -22,6 +22,7 @@ _HKEPT = ', '.join(dict.fromkeys(_HKN.get(k, k) for k in _HKF['kept'] if k != 'l
 _NX = ld('data/nba_proj3y_fit.json')['exit']['res']['1.0']
 _RX = ld('data/nba_rxpm_research.json')['metrics']
 _NB = ld('data/nil_budgets.json')                           # reported roster budgets by school (yNIL)
+_ND = ld('data/nil_deals.json')['deals']                       # reported deals (yNIL, xNIL, the price fit)
 _nbm = lambda k: sum((lo + hi) / 2 for lo, hi in _NB[k]['teams'].values()) / len(_NB[k]['teams'])
 _VX = ld('data/nba_vorx_research.json')                         # VORX on rXPM (scripts/nba_vorx_research.py)             # rXPM team adjustment (scripts/nba_rxpm_research.py)
 _NT = ld('data/nba_trade_fit.json')                         # NBA draft-night trades (scripts/nba_draft_trades.py)
@@ -252,7 +253,9 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
       ['xNIL = position price × on-field value (AV at FV, × playing time), shared within the P4 and G5 pools.',
        f'yNIL splits each program\'s budget by a preseason index. The budget is the school\'s reported one: {len(_NB["cfb"]["teams"])} P4 football programs (mean ${_nbm("cfb"):.1f}M) and {len(_NB["cbb"]["teams"])} high-major basketball programs (mean ${_nbm("cbb"):.1f}M).',
        'Without a report it is assumed: $3M in the G5, $0.4M in the FCS, $1.2M for a mid-major and $0.25M for a low-major in basketball.',
-       'The budget pays the whole roster. A provisionally graded football backup is paid 5% of the median graded player at his position on the team, the share that matched the College Sports Commission\'s lower pay percentiles. He gets no xNIL or zNIL: the formula at a provisional grade did not beat the position median on backups graded later.',
+       'The budget pays the whole roster. A provisionally graded football backup is paid 5% of the median graded player at his position on the team, and a kicker or punter 20% of the team\'s median graded player, rising 10% per FV point. Both shares were set on the College Sports Commission\'s pay percentiles. Their xNIL shares the group\'s own pay by worth, so a backup\'s or a specialist\'s zNIL is against his group\'s going rate.',
+       f'A reported deal ({len(_ND)} on file) moves the player half way from the model\'s number to the report: his yNIL when the deal is for this season, his xNIL when it was reported in the last year. It also enters the price fit, so a position\'s price follows the reports between On3\'s repricings. On3 moved toward each of the three reports it trailed.',
+       f'A budget list from an earlier season is carried forward at the market\'s growth ({(_NB["cfb"].get("growth", 1) - 1) * 100:.0f}% a year).',
        'It isn\'t fit to On3 valuations, since those only move +18% per 10 FV. zNIL growth is 20% of each coach score.',
        'Checked against the College Sports Commission\'s pay percentiles by position, On3 valuations and reported deals.',
        'FCS players at an FBS-starter FV are priced at 40% of the FBS rate. CBB xNIL is minutes share × (BPM + 3) at the school\'s price.'],
