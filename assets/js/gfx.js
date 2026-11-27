@@ -10,15 +10,18 @@
   // the sport's short link (static/_redirects): /cfb -> /arkboard/college-football/, the hash carried through
   var SITE = 'arkndjl.net/' + ([[/^\/1nt/i, '1nt'], [/^\/laursen_111/i, 'laursen_111'], [/college-football/, 'cfb'], [/college-basketball/, 'cbb'], [/arkboard\/nfl/, 'nfl'], [/arkboard\/nba/, 'nba'],
     [/arkboard\/nhl/, 'nhl'], [/hockey-prospects/, 'hockey'], [/soccer-prospects/, 'u22'], [/arkboard\/soccer/, 'soccer'], [/arkboard\/baseball/, 'baseball'], [/arkboard\/counter-strike/, 'cs2'],
-    [/arkboard\/predictions/, 'picks'], [/arkboard\/arklist/, 'arklist'], [/arkboard\/process/, 'process'], [/./, 'arkboard']].filter(function (x) { return x[0].test(location.pathname); })[0][1]);
+    [/arkboard\/predictions/, 'picks'], [/arkboard\/arklist/, 'arklist'], [/arkboard\/process/, 'process'],
+    // a board with no short link (tennis, ARKRANKING, games) prints its own path, so the #tab on the card opens
+    [/^\/arkboard\/[a-z0-9-]+\/?$/, location.pathname.replace(/^\/|\/$/g, '')], [/./, 'arkboard']].filter(function (x) { return x[0].test(location.pathname); })[0][1]);
   // the short link a graphic prints: the sport's short path plus the tab it came from (#<tab>), or a player (#<board>:p=<key>)
   function tabLink(win) { var t = win && win.closest('[data-tab]'); t = t && t.getAttribute('data-tab'); return SITE + (t && !/(1nt|laursen_111)$/.test(SITE) ? '#' + String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : ''); }
   function txt(el) { return (el && el.textContent || '').replace(/\s+/g, ' ').trim(); }
   // a photo from another site (ESPN, Wikimedia) loads with CORS so the canvas can still be saved
   // On3 recruit photos come through the site's own /api/photo (worker/site.js): On3's CDN sends CORS headers unreliably
+  var IMG_WAIT = 8000;   // a photo or logo host that never answers: the card is drawn without it, not left waiting
   function loadPhoto(src) {
     if (src) src = src.replace(/^https:\/\/on3static\.com\/(?=cdn-cgi\/image\/)/, '/api/photo/');
-    return new Promise(function (res) { if (!src) return res(null); var i = new Image(); i.crossOrigin = 'anonymous'; i.onload = function () { res(i); }; i.onerror = function () { res(null); }; i.src = src; });
+    return new Promise(function (res) { if (!src) return res(null); var i = new Image(); i.crossOrigin = 'anonymous'; i.onload = function () { res(i); }; i.onerror = function () { res(null); }; setTimeout(function () { res(null); }, IMG_WAIT); i.src = src; });
   }
   // an on-theme picture frame: raised bevel, a dark inner line, the photo cover-cropped from the top
   function photoFrame(g, img, x, y, w, h) {
@@ -46,7 +49,7 @@
   }
   // an image from another site loads with CORS, so a hotlinked logo can't taint the canvas and block the save (no CORS: no logo)
   function loadImg(src) {
-    return new Promise(function (res) { if (!src) return res(null); var i = new Image(); if (new URL(src, location.href).origin !== location.origin) i.crossOrigin = 'anonymous'; i.onload = function () { res(i); }; i.onerror = function () { res(null); }; i.src = src; });
+    return new Promise(function (res) { if (!src) return res(null); var i = new Image(); if (new URL(src, location.href).origin !== location.origin) i.crossOrigin = 'anonymous'; i.onload = function () { res(i); }; i.onerror = function () { res(null); }; setTimeout(function () { res(null); }, IMG_WAIT); i.src = src; });
   }
   function capHead(h) { return /^x[A-Z]/.test(h) || /^NHLe$/.test(h) ? h : h.toUpperCase(); }   // xNIL keeps its x, NHLe its e
   function bevel(g, x, y, w, h, raised, t) {
@@ -1159,11 +1162,11 @@
   // place in the view; every other column is a tile with where the value sits among the rows in view (pNN, 0 = lowest).
   // context columns a card shows as a fact strip under the name (no percentile tile)
   var PC_INFO = /^(age|g|gp|gs|mp|min|toi|snaps|ht|wt|ht \/ wt|yrs|salary|contract|nhl gp|wt\. gp|starts|w-l)$/i;
+  // a signed Contract is the contract surplus (NBA contract value), a graded number: it stays a tile, never a fact under the name
+  function pcFact(h, t) { return PC_INFO.test(h) && !(/^contract$/i.test(h) && /^[+−-]\d/.test(t)); }
   // a percentile bar in pixel blocks: 20 cells of 5 points, lit to the value
   function pxBar(g, x, y, w, h, pct, col) {
     var n = 20, gap = Math.max(3, Math.round(h / 4)), cw = (w - (n - 1) * gap) / n, lit = Math.round(pct / 5);
-  // a signed Contract is the contract surplus (NBA contract value), a graded number: it stays a tile, never a fact under the name
-  function pcFact(h, t) { return PC_INFO.test(h) && !(/^contract$/i.test(h) && /^[+−-]\d/.test(t)); }
     for (var k = 0; k < n; k++) { g.fillStyle = k < lit ? col : C.dark; g.fillRect(Math.round(x + k * (cw + gap)), y, Math.ceil(cw), h); }
   }
   // percentile tiers, judged the good way round (lower-is-better columns flipped): 90+, 70-89, 30-69, 10-29, under 10.
@@ -1203,11 +1206,11 @@
     return { t: t || '—', sub: sub, color: col ? (col.classList.contains('cfb__up') ? C.teal : C.down) : null };
   }
   function pcNum(c, t) {
+    // a cell that reads as a label (T1, <=Jul 24, S-6'1/180, DRFT/$8.2m) is no number to rank, whatever it sorts by
+    if (t && !/^\s*[<>~≤≥#]?\s*[+−–-]?\s*[$€£]?\.?\d/.test(t)) return null;
     var v = c && c.getAttribute('data-v');
     if (v != null && v !== '' && isFinite(+v)) return +v;
     if (!t || /\d\s*-\s*\d/.test(t)) return null;
-    // a cell that reads as a label (T1, <=Jul 24, S-6'1/180, DRFT/$8.2m) is no number to rank, whatever it sorts by
-    if (t && !/^\s*[<>~≤≥#]?\s*[+−–-]?\s*[$€£]?\.?\d/.test(t)) return null;
     var m = String(t).replace(/−/g, '-').replace(/,/g, '').match(/[-+]?\d+(\.\d+)?/); if (!m) return null;
     var n = +m[0], s = String(t).toLowerCase();
     if (/\d\s*m\b/.test(s)) n *= 1e6; else if (/\d\s*k\b/.test(s)) n *= 1e3;
@@ -1526,7 +1529,7 @@
     if (rc.a) items.push({ h: 'ARK', stars: rc.a, col: PLAT });
     items.push({ h: 'INDUSTRY', stars: rc.s || 0, plus: !!rc.p, col: C.lilac });
     if (rc.e) items.push({ h: 'EXPERTS', t: rc.e[0], sub: rc.e[1] + ' of ' + rc.e[2], prob: rc.e[1] / rc.e[2] * 100, img: await logo(rc.e[3]) });
-    if (rc.r) items.push({ h: 'ON3 RPM', t: rc.r[0], sub: Math.round(rc.r[1]) + '%', prob: rc.r[1], img: await logo(rc.r[2]) });
+    if (rc.r) items.push({ h: 'ON3 RPM', t: rc.r[0], sub: Math.round(rc.r[1]) + '%', prob: rc.r[1], img: await logo(rc.r[2] || (rc.l && rc.l[0] === rc.r[0] && rc.l[2]) || (rc.e && rc.e[0] === rc.r[0] && rc.e[3])) });   // CBB's RPM leader carries no logo id: the lean's or the experts' when they name the same school
     if (rc.l) items.push({ h: 'ARK LEAN', t: rc.l[0], sub: rc.l[1] + '%', prob: rc.l[1], img: await logo(rc.l[2]) });
     return items;
   }
@@ -1970,19 +1973,19 @@
     if (badges.length) { y += 6; cardRule(g, x, y, w, 'BADGES'); y += 50; y += badgeRows(g, badges, x, y, w); }
     if (repH) {
       y += 16; var half = (w - 60) / 2, lim = bottom - partsH - 10;
+      var repEnd = y;
       [['+ strengths', rep.p, C.teal, x], ['− concerns', rep.m, C.down, x + half + 60]].forEach(function (L) {
         var ly = y; g.font = '52px ' + FONT; g.fillStyle = L[2]; g.fillText(L[0], L[3], ly); ly += 72; g.font = '40px ' + FONT;
         (L[1].length ? L[1] : ['none']).forEach(function (it) {
-      var repEnd = y;
           var ls = wrap(g, it, half - 56); if (ly + ls.length * 54 > lim) return;
           g.fillStyle = L[2]; g.fillText(L[0][0], L[3] + 4, ly); g.fillStyle = C.lilac; ls.forEach(function (l) { g.fillText(l, L[3] + 56, ly); ly += 54; }); ly += 12;
         });
+        repEnd = Math.max(repEnd, ly);
       });
+      y = repEnd;
     }
     // FV inputs: each driver's push on the grade, two columns of pixel bars pinned to the bottom
-        repEnd = Math.max(repEnd, ly);
     if (parts.length) inputBars(g, x, bottom - partsH + 40, w, 'FV INPUTS', '', parts, Math.max(1, Math.max.apply(null, parts.map(function (p) { return Math.abs(p[1]); }))), 2, 470);
-      y = repEnd;
     if (det.opened && det.close) det.close();
     // a row with few numbers: the empty stretch under the last band (above the FV inputs when it has them) comes out
     return pcTrim(F.canvas, y + 16, parts.length ? bottom - partsH : bottom - 24);
@@ -2131,7 +2134,7 @@
         if (sel.value === '') return;
         var t = win.querySelector('table'), r = pcRows(t)[+sel.value], k = pcNameAt(pcHeads(t).map(txt)); sel.value = ''; if (!r) return;
         sel.disabled = true;
-        try { var cv = await buildPCard(win, r); if (cv) preview(cv, 'arkboard-' + pcName(r, k).toLowerCase().replace(/[^a-z0-9]+/g, '-')); } finally { sel.disabled = false; }
+        try { var cv = await buildPCard(win, r); if (cv) preview(cv, 'arkboard-' + pcName(r, k).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')); } finally { sel.disabled = false; }
       });
     });
   }
@@ -2444,12 +2447,12 @@
       var h = secs.length * (2 * pad + sz * 1.5) + nLines * sz * 1.45 + (secs.length - 1) * gap;
       if (h <= F.h && g.measureText(longest).width <= F.w - 2 * pad - sz) break;
     }
-    var lh = sz * 1.45, y = F.y, spare = (F.h - (secs.length * (2 * pad + sz * 1.5) + nLines * lh + (secs.length - 1) * gap)) / secs.length;
-    secs.forEach(function (s) {
-      var bh = 2 * pad + sz * 1.5 + s.l.length * lh + spare;
     // more lines than the card holds at the smallest size: the card grows, nothing runs over its box
     g.font = sz + 'px ' + FONT; h = secs.length * (2 * pad + sz * 1.5) + nLines * sz * 1.45 + (secs.length - 1) * gap;
     if (h > F.h) { F = await frame(2160, Math.ceil(2700 + h - F.h), d.title || 'method', win.getAttribute('data-gfx-date')); g = F.g; g.font = sz + 'px ' + FONT; }
+    var lh = sz * 1.45, y = F.y, spare = (F.h - (secs.length * (2 * pad + sz * 1.5) + nLines * lh + (secs.length - 1) * gap)) / secs.length;
+    secs.forEach(function (s) {
+      var bh = 2 * pad + sz * 1.5 + s.l.length * lh + spare;
       well(g, F.x, y, F.w, bh);
       g.font = Math.round(sz * 0.85) + 'px ' + FONT; g.fillStyle = C.lilac;
       g.fillText(s.h, F.x + pad, y + pad + sz * 0.5);
@@ -4231,10 +4234,10 @@
         : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);
       if (canvas) {
         var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : SITE === 'arkndjl.net/laursen_111' ? 'laursen-111-' : 'arkboard-';
-        if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
-        if (mode === 'term') { preview(canvas, 'arkboard-process-' + ((JSON.parse(btn.getAttribute('data-gfx-term') || '{}').t) || 'term').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
-        if (mode === 'rq') { preview(canvas, 'arkboard-research-' + ((JSON.parse(btn.getAttribute('data-gfx-rq') || '{}').id) || 'card').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 60)); return; }
-        var name = mode === 'depth' ? 'arkboard-depth-' + (((win.__dcTeam || {}).n) || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'perf' ? 'arkboard-arklist-' + ((win.__arkPerf || {}).sport || 'all').replace(/^college-/, '') + '-' + ((win.__arkPerf || {}).day || 'latest') : mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' || mode === 'bracket' || mode === 'pickem' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
+        if (mode === 'term') { preview(canvas, 'arkboard-process-' + ((JSON.parse(btn.getAttribute('data-gfx-term') || '{}').t) || 'term').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
+        if (mode === 'rq') { preview(canvas, 'arkboard-research-' + ((JSON.parse(btn.getAttribute('data-gfx-rq') || '{}').id) || 'card').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 60)); return; }
+        var name = mode === 'depth' ? 'arkboard-depth-' + (((win.__dcTeam || {}).n) || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'perf' ? 'arkboard-arklist-' + ((win.__arkPerf || {}).sport || 'all').replace(/^college-/, '') + '-' + ((win.__arkPerf || {}).day || 'latest') : mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' || mode === 'bracket' || mode === 'pickem' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
     } catch (err) {
