@@ -772,7 +772,7 @@ def cbb(fit, rng):
         teams[p['t']] = (w, w + l, p['xW'], team_sd(tot - w - l, p['xW'] / max(tot, 1), p.get('rsd', 3), .03), tot)
         tinfo[p['t']] = (p['off'] - p['def'], p.get('rsd', 3) * 1.45, p.get('conf'))
     P5 = {'ACC', 'B10', 'B12', 'BE', 'SEC'}
-    K, TAU = 300, 3.5
+    K, KPX, TAU = 300, 600, 3.5
     cands = []
     try:
         import awards_cbb as AC
@@ -794,15 +794,25 @@ def cbb(fit, rng):
         if not now.get('gp') or r['team'] not in teams: continue
         last = r.get('last') or {}
         xo, xd = xshift.get(r['team'], (0.0, 0.0))
-        # priors: last season's line (any team) for returners; the board's projected BPM for newcomers
+        # priors: his preseason pXPM (the board's frozen column: the predictive pick, on the voter value's BPM scale) with
+        # KPX minutes; without one, last season's line (any team) or the board's projected BPM for newcomers with K.
+        # scripts/research/ctx_nov27/cbb/r1_awards_rate.py, game logs 2017-26, rest-of-season game BPM of 20+ minute
+        # players at the 5th to 20th team game: last season's BPM at K 300 MSE 7.35 -> pXPM at K 300 6.54 (t 17.2, 10/10
+        # seasons), at K 600 (the walk's pick every season) 6.35; the top 100 by BPM to date 7.35 -> 6.11 (t 8.6, 10/10)
         prior = last['bpm'] if last.get('bpm') is not None and (last.get('gp') or 0) >= 8 else \
             next((x[2] for x in (r.get('parts') or []) if x[0] == 'BPM'), now['bpm'])
+        pk = K
+        if r.get('pxpm') is not None: prior, pk = r['pxpm'], KPX
+        elif not (last.get('bpm') is not None and (last.get('gp') or 0) >= 8) and r.get('xb0') is not None:
+            # a newcomer: his preseason xXPM. The board part this line looked for ('BPM') is gone, so his prior had been
+            # his own BPM to date, no shrink at all (r1b_newcomers.py: no shrink MSE 12.52, a flat prior at K 300 8.92, 9/9)
+            prior = r['xb0']
         pp0 = last['ppg'] if last.get('ppg') is not None and (last.get('gp') or 0) >= 8 else None
         espn = re.search(r'/id/(\d+)', (r.get('links') or {}).get('espn', '') or '')
         w, g, _, _, tot = teams[r['team']]
         cands.append({'id': r['name'] + '|' + r['team'], 'n': r['name'], 'tm': r['team'], 'logo': r.get('logo'),
                       'ph': espn.group(1) if espn else None, 'cls': r.get('cls'), 'gp': now['gp'], 'tg': g, 'tot': tot,
-                      'mpg': now.get('mpg') or 0, 'ppg': now.get('ppg') or 0, 'bpm': now.get('bpm') or 0, 'prior': prior,
+                      'mpg': now.get('mpg') or 0, 'ppg': now.get('ppg') or 0, 'bpm': now.get('bpm') or 0, 'prior': prior, 'pk': pk,
                       'pp0': pp0, 'dbpm': now.get('dbpm') or 0, 'blk': now.get('blk') or 0, 'stl': now.get('stl') or 0,
                       'drb': now.get('drb'), 'yr': now.get('yr') or r.get('cls'),
                       'dprior': last['dbpm'] if last.get('dbpm') is not None and (last.get('gp') or 0) >= 8 else .5 * (now.get('dbpm') or 0),
@@ -821,8 +831,9 @@ def cbb(fit, rng):
         gr = games_left(rng, left, av, 'cbb')
         gp = c['gp'] + gr
         m0, mr = c['gp'] * c['mpg'], gr * c['mpg']
-        mean = c['bpm'] if SEASON_ONLY else (c['bpm'] * m0 + c['prior'] * K) / (m0 + K)
-        b_rest = gauss(rng, mean, TAU * math.sqrt(K / (m0 + K)) + (TAU * math.sqrt(K / mr) if mr > 0 else 0))
+        pk = K if SEASON_ONLY else c['pk']       # conviction: this season's own rate, the noise as before
+        mean = c['bpm'] if SEASON_ONLY else (c['bpm'] * m0 + c['prior'] * pk) / (m0 + pk)
+        b_rest = gauss(rng, mean, TAU * math.sqrt(pk / (m0 + pk)) + (TAU * math.sqrt(K / mr) if mr > 0 else 0))
         bpm = (c['bpm'] * m0 + b_rest * mr) / max(m0 + mr, 1)
         pp0 = c['pp0'] if c['pp0'] is not None else .6 * c['ppg'] + 4
         p_rest = gauss(rng, c['ppg'] if SEASON_ONLY else (c['ppg'] * c['gp'] + pp0 * 10) / (c['gp'] + 10), 3.0 * math.sqrt(10 / (c['gp'] + 10)))
