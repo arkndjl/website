@@ -115,6 +115,56 @@ def nhl_marcel(by, pid, y, w=(1.0, 0.7, 0.5), K=1600.0):
     return num / (den + K) * 60
 
 
+def soccer_fit(S, sage):
+    """soccer's own xGap terms (Nov 27 2026, scripts/research/ctx_nov27/soccer P1c: t -5.9, 7/7 seasons over gap + age):
+    the backup watch's pairs and grade (GAR a 90 over the fringe line the live grade is shrunk to, this season and
+    last at half weight, K 900), plus the pair's gap in p/90 (pg90 on the season file) as a second term d"""
+    W = json.load(open(os.path.join(ROOT, 'data', 'soccer_war_fit.json')))
+    dl = {k: W['repl'][k] - W['replFringe'][k] for k in W['repl']} if W.get('replFringe') else {}
+    val = lambda p: None if p.get('gar90') is None else p['gar90'] + dl.get(p['pos'], 0.0)
+    use = lambda p: p['min']
+    by = {y: {p['p']: p for p in d['players']} for y, d in S.items()}
+    shape, last, rows = {'GK': 1, 'D': 4, 'M': 4, 'F': 2}, max(S), []
+    for y in sorted(S):
+        if y - 1 not in S or y + H >= last:                  # the season in progress is never a target
+            continue
+        g = lambda pid: rate(by, pid, [y, y - 1], (1, .5), val, use, 900, 0.0)
+        f = lambda pid: rate(by, pid, [y + 1, y + 2], [1] * H, val, use, 900, 0.0)
+        rooms = {}
+        for p in S[y]['players']:
+            if val(p) is None or not use(p) or sage(p, y) is None:
+                continue
+            rooms.setdefault(p['team'], {}).setdefault(p['pos'], []).append(p)
+        for R in rooms.values():
+            for gp, L in R.items():
+                L.sort(key=lambda p: -use(p))
+                n = shape[gp]
+                if len(L) < n:
+                    continue
+                gs, s = min(((g(x['p']), x) for x in L[:n]), key=lambda t: t[0])
+                for b in L[n:3 * n]:
+                    gb = g(b['p'])
+                    if use(b) < 270 or gb <= gs or b.get('pg90') is None or s.get('pg90') is None:
+                        continue
+                    rows.append((y, gb - gs, sage(s, y) - sage(b, y), f(b['p']) - f(s['p']), b['pg90'] - s['pg90']))
+    P = np.array(rows, float)
+    ys = sorted(set(P[:, 0].astype(int)))
+    e0, e1 = [], []
+    for y in ys:
+        tr, te = P[P[:, 0] + H <= y], P[P[:, 0] == y]
+        if len(tr) < 100 or not len(te):
+            continue
+        for cols, e in (([1, 2], e0), ([1, 2, 4], e1)):
+            b = np.linalg.lstsq(np.c_[np.ones(len(tr)), tr[:, cols]], tr[:, 3], rcond=None)[0]
+            e += list((np.c_[np.ones(len(te)), te[:, cols]] @ b - te[:, 3]) ** 2)
+    d = np.array(e1) - np.array(e0)
+    b = np.linalg.lstsq(np.c_[np.ones(len(P)), P[:, [1, 2, 4]]], P[:, 3], rcond=None)[0]
+    return {'a': round(float(b[0]), 5), 'b': round(float(b[1]), 4), 'c': round(float(b[2]), 5), 'd': round(float(b[3]), 4),
+            'unit': 'year', 'src': 'fit', 'n': len(P), 'held': len(d), 'seasons': [int(ys[0]), int(ys[-1])],
+            'mse_gap_age': round(float(np.mean(e0)), 6), 'mse_p90': round(float(np.mean(e1)), 6),
+            't': round(float(d.mean() / (d.std(ddof=1) / math.sqrt(len(d)))), 2)}
+
+
 def cbb_pairs(path, px=False):
     """the live CBB grade (scripts/backup_watch.py cbb_grade): BPM this season and last at half weight, by minutes,
     shrunk to -6 with 240 minutes; backup and starter need 60 minutes, a gap of 1 BPM. px: last season's slot carries
@@ -330,6 +380,17 @@ def main_nhl(old):
     print('wrote', OUT)
 
 
+def soccer_only():
+    """--soccer: refit the soccer terms alone (the other sports' entries stay as they are)"""
+    old = json.load(open(OUT))
+    link = json.load(gzip.open(os.path.join(HERE, 'data', 'soccer_mv_link.json.gz'), 'rt'))
+    dob = {u: link['dob'].get(str(t)) for u, t in link['p'].items()}
+    sage = lambda p, y: (y - 1 + 8 / 12 - (int(dob[p['p']][:4]) + (int(dob[p['p']][5:7]) - 1) / 12)) if dob.get(p['p']) else None
+    old['sports']['soccer'] = soccer_fit(seasons('soccer-war'), sage)
+    print('soccer', old['sports']['soccer'])
+    json.dump(old, open(OUT, 'w'), indent=1)
+
+
 def main():
     old = json.load(open(OUT)) if os.path.exists(OUT) else {'sports': {}}
     if '--nhl' in sys.argv:            # the NHL block alone (the others keep their last fit)
@@ -363,6 +424,7 @@ def main():
         out[s] = {'a': round(f['a'], 5), 'b': round(f['b'], 4), 'c': round(f['c'], 5), 'unit': 'class' if s == 'cbb' else 'year', 'src': 'fit',
                   **{k: f[k] for k in ('n', 'held', 'seasons', 't')},
                   **({'d': round(f['d'], 5), 't_d': f['t_d']} if 'd' in f else {})}
+    out['soccer'] = soccer_fit(seasons('soccer-war'), sage)   # own terms with the p/90 gap; the borrowed z keeps the gap-only fit
     for s, z, src, unit in (('nfl', zp, 'pros', 'year'), ('cfb', F['cbb']['z'], 'cbb', 'class')):
         if (old['sports'].get(s) or {}).get('src') == 'fit':   # the NFL's own fit (--nfl) stays
             out[s] = old['sports'][s]
@@ -379,4 +441,4 @@ def main():
 
 
 if __name__ == '__main__':
-    nfl_main() if '--nfl' in sys.argv else main()
+    nfl_main() if '--nfl' in sys.argv else soccer_only() if '--soccer' in sys.argv else main()

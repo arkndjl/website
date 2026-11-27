@@ -1092,6 +1092,10 @@ def backup(rows, F, S):
         print('backup watch ages:', e); dob = {}
     today = dt.date.today()
     age = lambda u: round((today - dt.date.fromisoformat(dob[u][:10])).days / 365.25, 1) if dob.get(u) else None
+    try:                                                  # p/90 for the xGap fit's second gap (backup_age_fit.soccer_fit)
+        pg = {o['p']: o.get('pg90') for o in json.load(open(os.path.join(SDIR, f'{S}.json')))['players']}
+    except (OSError, ValueError, KeyError):
+        pg = {}
     out = []
     for (team, pos), rs in squads.items():
         rs.sort(key=lambda r: -r['min'])
@@ -1106,7 +1110,8 @@ def backup(rows, F, S):
                 out.append({'name': r['n'], 'team': team, 'lg': r['lg'], 'pos': pos, 'str': 2 if i < n else 3,
                             'g': round(g, 2), 'use': r['min'], 'age': age(r['p']),
                             'starter': {'name': low['n'], 'g': round(grade[low['p']], 2), 'use': low['min'], 'age': age(low['p'])},
-                            'gap': round(g - grade[low['p']], 2)})
+                            'gap': round(g - grade[low['p']], 2),
+                            'pgap': round(pg[r['p']] - pg[low['p']], 3) if pg.get(r['p']) is not None and pg.get(low['p']) is not None else None})
     out.sort(key=lambda o: -o['gap'])
     import backup_age
     backup_age.apply('soccer', out)                       # ranked by xGap: the gap two seasons on, with the age gap
