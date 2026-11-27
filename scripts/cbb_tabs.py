@@ -549,7 +549,8 @@ def main():
         n = nilby.get((m['name'], m['school'])) or {}
         if not dfit or 'gap' not in dfit or (m.get('cls') or '') not in ('Fr', 'So', 'Jr') or (m.get('declare') or 0) >= 1 or a is None: return {}
         v = DECT.nba_dect(m.get('cons'), a, n.get('y'), n.get('x'), dfit, payk.get(m['school']))      # a = age on draft night
-        return dict(zip(('dect', 'dectD', 'dectM', 'dectL', 'dectP', 'dectT'), v)) if v else {}
+        mpg = ((fvby.get((m['name'], m['school'])) or {}).get('now') or {}).get('mpg')      # share of a 40-minute game, for the hover
+        return {**dict(zip(('dect', 'dectD', 'dectM', 'dectL', 'dectP', 'dectT'), v)), 'dectS': round(mpg / 40 * 100) if mpg is not None else None} if v else {}
     for m in M['mocks']['pred']:
         r = fvby.get((m['name'], m['school'])) or {}
         sim = m.get('sim') or {}
