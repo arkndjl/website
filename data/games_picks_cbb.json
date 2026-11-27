@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-27T19:18:43Z",
+ "asof": "2026-11-27T19:22:23Z",
  "recenter": {
-  "2026-11-27": 1.98
+  "2026-11-27": 1.99
  },
  "monitor": {
   "clocks": {
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-27T19:15:47Z",
-  "ageH": 0.0,
+  "ageH": 0.1,
   "stale": false
  },
  "picks": [],
@@ -2046,7 +2046,7 @@
    "mk": "spread",
    "side": "home",
    "line": 9.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 4.3,
    "x": 4.5,
    "why": "edge under 4.5 (line: 9-15)",
@@ -2246,22 +2246,6 @@
    "tm": 145.7
   },
   {
-   "id": "401902282",
-   "sport": "cbb",
-   "kick": "2026-11-27T20:00:00Z",
-   "home": "Butler",
-   "away": "Bellarmine",
-   "mk": "total",
-   "side": "under",
-   "line": 150.5,
-   "price": -116.0,
-   "edge": 4.8,
-   "x": 6.5,
-   "why": "edge under 6.5 (side: under)",
-   "m": 20.3,
-   "tm": 145.7
-  },
-  {
    "id": "401920543",
    "sport": "cbb",
    "kick": "2026-11-28T01:30:00Z",
@@ -2342,20 +2326,36 @@
    "tm": 155.5
   },
   {
-   "id": "401926756",
+   "id": "401902282",
    "sport": "cbb",
-   "kick": "2026-11-28T00:00:00Z",
-   "home": "UC Santa Barbara",
-   "away": "Lehigh",
+   "kick": "2026-11-27T20:00:00Z",
+   "home": "Butler",
+   "away": "Bellarmine",
    "mk": "total",
    "side": "under",
-   "line": 144.5,
-   "price": -121.0,
+   "line": 149.5,
+   "price": -112.0,
    "edge": 3.8,
    "x": 6.5,
    "why": "edge under 6.5 (side: under)",
-   "m": 13.4,
-   "tm": 140.7
+   "m": 20.3,
+   "tm": 145.7
+  },
+  {
+   "id": "401912711",
+   "sport": "cbb",
+   "kick": "2026-11-28T00:00:00Z",
+   "home": "North Carolina",
+   "away": "West Virginia",
+   "mk": "spread",
+   "side": "home",
+   "line": -3.5,
+   "price": -121.0,
+   "edge": 2.3,
+   "x": 4.0,
+   "why": "edge under 4 (tier: power)",
+   "m": -1.2,
+   "tm": 148.1
   }
  ],
  "games": {
@@ -2674,9 +2674,9 @@
   "401902282": {
    "mk": "total",
    "side": "under",
-   "line": 150.5,
-   "price": -116.0,
-   "edge": 4.8,
+   "line": 149.5,
+   "price": -112.0,
+   "edge": 3.8,
    "ev": null,
    "units": 0.0,
    "home": "Butler",
@@ -2686,9 +2686,9 @@
   "401926756": {
    "mk": "total",
    "side": "under",
-   "line": 144.5,
-   "price": -121.0,
-   "edge": 3.8,
+   "line": 143.5,
+   "price": -107.0,
+   "edge": 2.8,
    "ev": null,
    "units": 0.0,
    "home": "UC Santa Barbara",
@@ -2698,9 +2698,9 @@
   "401922264": {
    "mk": "spread",
    "side": "home",
-   "line": 11.5,
-   "price": -121.0,
-   "edge": 1.5,
+   "line": 12.5,
+   "price": -103.0,
+   "edge": 0.5,
    "ev": null,
    "units": 0.0,
    "home": "Washington State",
@@ -2771,7 +2771,7 @@
    "mk": "spread",
    "side": "home",
    "line": 9.5,
-   "price": -106.0,
+   "price": -108.0,
    "edge": 4.3,
    "ev": null,
    "units": 0.0,
@@ -2880,7 +2880,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 27634,
+  "snapshots": 27659,
   "buckets": [
    {
     "when": "24h+",
@@ -2893,27 +2893,27 @@
    },
    {
     "when": "6-24h",
-    "clvN": 5541,
+    "clvN": 5544,
     "clvRet": -0.0062,
-    "clvT": -3.11,
+    "clvT": -3.13,
     "clv": 0.61,
-    "beat": 0.409,
+    "beat": 0.408,
     "still": 0.395
    },
    {
     "when": "1-6h",
-    "clvN": 2334,
+    "clvN": 2336,
     "clvRet": -0.0407,
-    "clvT": -32.85,
+    "clvT": -32.88,
     "clv": 0.07,
     "beat": 0.169,
     "still": 0.702
    },
    {
     "when": "<1h",
-    "clvN": 392,
+    "clvN": 393,
     "clvRet": -0.0474,
-    "clvT": -27.41,
+    "clvT": -27.48,
     "clv": -0.03,
     "beat": 0.071,
     "still": 0.837
@@ -21628,7 +21628,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-27T19:18:43Z",
+ "checked": "2026-11-27T19:22:23Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
