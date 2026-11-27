@@ -1,7 +1,7 @@
 {
  "sport": "nfl",
  "name": "NFL",
- "asof": "2026-11-27T02:16:14Z",
+ "asof": "2026-11-27T03:43:25Z",
  "recenter": {},
  "monitor": {
   "clocks": {
@@ -52,7 +52,7 @@
  },
  "model": {
   "asof": "2026-11-26T23:48:56Z",
-  "ageH": 2.5,
+  "ageH": 3.9,
   "stale": false
  },
  "picks": [],
@@ -116,7 +116,7 @@
    "mk": "total",
    "side": "under",
    "line": 47.5,
-   "price": -119.0,
+   "price": -116.0,
    "edge": 4.0,
    "x": null,
    "why": "total market off",
@@ -188,6 +188,22 @@
    "tm": 46.9
   },
   {
+   "id": "2026_12_LV_CLE",
+   "sport": "nfl",
+   "kick": "2026-11-30T01:20:00Z",
+   "home": "CLE",
+   "away": "LV",
+   "mk": "total",
+   "side": "over",
+   "line": 39.5,
+   "price": -123.0,
+   "edge": 2.0,
+   "x": null,
+   "why": "total market off",
+   "m": 5.5,
+   "tm": 41.5
+  },
+  {
    "id": "2026_12_SEA_SF",
    "sport": "nfl",
    "kick": "2026-11-29T21:25:00Z",
@@ -234,22 +250,6 @@
    "why": "spread market off",
    "m": 3.8,
    "tm": 44.0
-  },
-  {
-   "id": "2026_12_LV_CLE",
-   "sport": "nfl",
-   "kick": "2026-11-30T01:20:00Z",
-   "home": "CLE",
-   "away": "LV",
-   "mk": "spread",
-   "side": "home",
-   "line": 4.5,
-   "price": -119.0,
-   "edge": 1.0,
-   "x": null,
-   "why": "spread market off",
-   "m": 5.5,
-   "tm": 41.5
   }
  ],
  "games": {
@@ -281,7 +281,7 @@
    "mk": "total",
    "side": "under",
    "line": 47.5,
-   "price": -119.0,
+   "price": -116.0,
    "edge": 4.0,
    "ev": null,
    "units": 0.0,
@@ -374,11 +374,11 @@
    "state": "off"
   },
   "2026_12_LV_CLE": {
-   "mk": "spread",
-   "side": "home",
-   "line": 4.5,
-   "price": -119.0,
-   "edge": 1.0,
+   "mk": "total",
+   "side": "over",
+   "line": 39.5,
+   "price": -123.0,
+   "edge": 2.0,
    "ev": null,
    "units": 0.0,
    "home": "CLE",
@@ -450,16 +450,16 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 6737,
+  "snapshots": 6745,
   "buckets": [
    {
     "when": "24h+",
-    "clvN": 2650,
+    "clvN": 2652,
     "clvRet": -0.0342,
     "clvT": -22.15,
     "clv": 0.28,
     "beat": 0.315,
-    "still": 0.555
+    "still": 0.556
    },
    {
     "when": "6-24h",
@@ -2866,7 +2866,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-27T02:16:14Z",
+ "checked": "2026-11-27T03:43:25Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
