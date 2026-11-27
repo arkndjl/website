@@ -536,7 +536,8 @@ def main():
         rows.append({'id': pid, 'n': a['n'] or w.get('n'), 'tm': tm, 'pos': a['pos'], 'lo': logo(tm),
                      'age': round((c or a)['age'] + (0 if c else cur - y0), 1), 'ph': FACE % ph if ph else None,
                      'p': round(p, 3), 'best': round(pk, 2) if pk is not None else None, 'u': round(u, 1), 't': t, 'sig': sig,
-                     'x': round(shr(c) if c and c.get('war') is not None else shr(a), 2),
+                     # the tab's value beside the odds is the player-level predictive rate (Marcel WAR), this season in
+                     'x': round(marcel(hist + ([c] if c and c['y'] > y0 and c.get('war') is not None else []), cur), 2),
                      'xc': round(CE.value(cf, ceil_inputs(a, hist),
                                           max(0.0, min(cf['scen'], cf['cap']['D' if a['d'] else 'F'] - a['toi']))), 2)})
     rows.sort(key=lambda r: -r['p'])
@@ -559,7 +560,7 @@ def main():
            'base': lab(y0), 'u': {'lab': 'TOI', 'dec': 1},
            'tiers': [{'k': k, 'lab': f'TOI {k}'} for k in TIERS],
            'stat': {'lab': 'P/82', 'eff': 'P/60', 'dec': 0, 'edec': 2},
-           'cur': {'lab': 'WAR/1k', 't': 'WAR a 1,000 minutes this season, shrunk to replacement by ice time (k 600)', 'dec': 2},
+           'cur': {'lab': 'mWAR/1k', 't': 'Marcel WAR a 1,000 minutes: this season and the two before at 5 / 4 / 3 by minutes, shrunk to replacement with 1,000 minutes', 'dec': 2},
            'ceil': {'lab': 'CEIL', 't': 'ceiling WAR a 1,000 minutes (shrunk, like Best): 80th percentile season if TOI rises %g minutes a game' % cf['scen'],
                     'dec': 2},
            'about': about, 'rows': rows}
