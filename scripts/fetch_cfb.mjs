@@ -665,6 +665,7 @@ const TEAM_ALIAS = {
   floridainternational: 'Florida International', hawaii: "Hawai'i", sanjosestate: 'San José State',
   fiugoldenpanthers: 'Florida International', connecticuthuskies: 'UConn', usfbulls: 'South Florida',
   appalachianstatemountaineers: 'App State', samhoustonstatebearkats: 'Sam Houston', delawarefightinbluehens: 'Delaware',
+  samhoustonstate: 'Sam Houston',   // PFN's name from Nov 18 2026: unresolved, the roster split in two and the team left the team table
   // FCS (PFN's names)
   uni: 'Northern Iowa', stthomasmn: 'St. Thomas', gramblingstate: 'Grambling', southeasternlouisiana: 'SE Louisiana',
   etsu: 'East Tennessee State', sfa: 'Stephen F. Austin', uiw: 'Incarnate Word', liu: 'Long Island University',
