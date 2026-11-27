@@ -41,3 +41,43 @@ $525K): unchanged.
 
 Run from this folder with the On3 pull as `on3_cfb.json` (slug, nil) and the budgets research file beside it; paths in
 `base.py` and `calib.py` point at the scratch layout used on the day.
+
+## Whole-roster split and provisional players (same day, after the first rebuild)
+
+The first rebuild on school budgets split each budget among PFN-listed players only: carried rows kept stale values on
+top (team totals over budget) and the listed players alone absorbed the reported figure. On the rebuilt board yNIL
+against On3 read bias +.27, rmse .554, top yNIL $14.9M. The offline test above had renormalised over carried rows too,
+so it did not show this.
+
+Fix and test (`full.py`, `full2.py`; listed players reweighted exactly, carried rows on their own old yNIL moved by the
+listed players' median change, ESPN backups at d x the median listed player at his position on the team). CSC = log
+rmse on the A4 pay percentiles with every rostered player counted:
+
+| k | d | CSC A4 | CSC non-A4 | On3 bias | On3 rmse | On3 r | deals rmse | ESPN starters rmse | top yNIL |
+|---|---|---|---|---|---|---|---|---|---|
+| 1.375 | listed only (first rebuild) | 1.43 | .43 | +.27 | .554 | .69 | .71 | .21 | $14.9M |
+| 1.375 | 0 | 1.22 | .48 | +.11 | .503 | .69 | .70 | .23 | $12.7M |
+| 1.1 | 0 | 1.23 | .49 | +.04 | .491 | .64 | .69 | .23 | $8.4M |
+| 1.25 | 0 | 1.23 | .48 | +.08 | .493 | .67 | .69 | .23 | $10.6M |
+| 1.25 | .03 | .70 | .48 | +.04 | .487 | .67 | .70 | .28 | $10.2M |
+| 1.25 | .05 (shipped) | .64 | .47 | +.01 | .484 | .67 | .71 | .30 | $9.8M |
+| 1.25 | .10 | .71 | .48 | -.05 | .486 | .67 | .73 | .35 | $9.4M |
+| 1.25 | .15 | .82 | .48 | -.10 | .494 | .67 | .75 | .41 | $8.8M |
+
+A projected yNIL for provisional players halves the CSC error against a blank (1.23 to .64) and leaves On3 flat. P4
+median provisional yNIL $24K (CSC bottom-quartile to median: $0 to $75K). k 1.375 dropped to 1.25: the r gain no longer
+pays for the top-end error once the whole roster shares the budget.
+
+xNIL and zNIL for provisional players, tested on backups provisional on Nov 5 and graded by Nov 27 (111 FBS, 157 FCS),
+log error against the xNIL they got once graded:
+
+| | FBS rmse | FCS rmse |
+|---|---|---|
+| worth formula at the provisional FV, no snaps | .44 | .57 |
+| formula at half playing time | .47 | .31 |
+| median graded teammate at the position (naive) | .41 | .29 |
+
+The formula does not beat the naive value, and the naive value is only right for the ones who go on to play: left
+blank. The FV slope of pay within provisional players was tested too (.018 log per FV point in P4): no change in any
+score, dropped. CBB has no analogue: its budget loop already covers the whole roster (newcomers on the freshman
+projection).
