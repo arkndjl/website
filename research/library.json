@@ -1184,6 +1184,21 @@
      ]
     },
     {
+     "term": "team builder",
+     "short": "Each program's next season: who comes back, who leaves, the class, the signings the budget buys, and what the team projects to be.",
+     "body": [
+      "Returners count at their chance to be back (Ret%, Transfer%, the draft), the class at its chance to be on the field, signings at Transfer% x landing odds. Money is the school's NIL budget (its roster yNIL, which shares the reported budget) as a soft limit.",
+      "Football strength is Elo from the plan's college WAR, fit on this season's Elo across FBS (R2 = 0.63, n = 138). Basketball strength is the ARK rating of the plan's rotation.",
+      "xW is wins over a conference schedule at every team's projected strength: 12 games in football, 31 in basketball. Wins over replacement are xW less a 10th-percentile team on the same schedule, and NIL $ a win is next season's spend over those wins.",
+      "DECT as an input failed everywhere it was tested. In Ret% the staying edge made held-out log loss worse in both sports (CFB t = 2.96, CBB t = 0.72 against it). CBB Transfer%: DECT t = 1.47 on 2025-26 (needs 2), school pay per market dollar t = 1.61, market over school pay t = 0.17. CBB landing, money per market dollar at the destination t = 1.15. CFB Transfer% has one fall board to test on and is retested after the 2026-27 cycle. DECT shows on the builder for reading only."
+     ],
+     "where": "CFB team builder, CBB team builder",
+     "sports": [
+      "CFB",
+      "CBB"
+     ]
+    },
+    {
      "term": "FBS%",
      "short": "The chance an FCS player is on an FBS roster next season.",
      "body": [
