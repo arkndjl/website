@@ -25,7 +25,7 @@ model     square), defense and goalie flags. Candidates (draft-year line: NHLe a
           fit 2008-15 / grade 2016-19 MSE -0.33, same sign in all three leagues): the NHL draft still pays for junior
           pedigree that the draft-year line already prices.
 Stages    Drafted players after k seasons (k = 1-4): OLS on the draft model's out-of-class grade, the latest season's
-          NHLe (NHL and AHL lines translated too), age, NHL games and WAR so far, a World Juniors spot that season,
+          NHLe (NHL and AHL lines translated too), age, NHL games and pWAR so far, a World Juniors spot that season,
           pro games that season, NHLe growth since the draft year, AHL shots per game over the league's (HockeyTech's
           public AHL feed, 2008-09 on); inputs kept on the same rule (the last four also had to pass top-of-board and
           forward checks, scripts/hockey_fv_drivers.py). Stages 3-4 fit on picks not yet graduated and add any NHL
@@ -425,7 +425,7 @@ def outcome(r, W, cur):
 
 
 def outcome_scale(rows):
-    """FV cuts on peak WAR by rarity among 2008-19 picks; goalies mapped by rarity among goalies"""
+    """FV cuts on peak pWAR by rarity among 2008-19 picks; goalies mapped by rarity among goalies"""
     fit = [r for r in rows if FIRST <= r['year'] <= LAST_FIT]
     ncls = LAST_FIT - FIRST + 1
     sk = sorted((r['peak'] for r in fit if not r['G']), reverse=True)
@@ -821,7 +821,7 @@ def fit(frozen=False, scorecard=False):
     if scorecard:
         from fv_scorecard import card
         sc_ = card(p0, y, cls=cls, note=f'{len(tr):,} draft picks {FIRST}-{LAST_FIT}, each graded by a fit that left his draft class out; '
-                   'outcome: the FV his first NHL seasons earned on WAR; tier odds from a logistic on that grade, also class-out')
+                   'outcome: the FV his first NHL seasons earned on pWAR; tier odds from a logistic on that grade, also class-out')
         print('scorecard', sc_['summary'])
         cur_fit = json.load(open(FIT)); cur_fit['scorecard'] = sc_
         json.dump(cur_fit, open(FIT, 'w'), indent=1)

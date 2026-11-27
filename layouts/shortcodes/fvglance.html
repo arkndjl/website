@@ -20,7 +20,7 @@
 {{- $md := "| FV | Tier | Football | Basketball | Hockey | Soccer | Baseball |\n| :---: | ----- | ----- | ----- | ----- | ----- | ----- |\n" -}}
 {{- range $rows }}{{ $fv := index . 0 -}}
 {{- $h := cond (eq $fv "30") "some NHL games" (cond (eq $fv "20") "no NHL games" "—") -}}
-{{- with index $hk $fv }}{{ $h = printf "%s, %.2f+ peak WAR" (index $hkPer $fv) (float .) }}{{ end -}}
+{{- with index $hk $fv }}{{ $h = printf "%s, %.2f+ peak pWAR" (index $hkPer $fv) (float .) }}{{ end -}}
 {{- $s := cond (eq $fv "30") "some senior value" (cond (eq $fv "20") "no senior value" "—") -}}
 {{- with index $sp $fv }}{{ $s = index $spPer $fv }}{{ end -}}
 {{- $b := index . 3 }}{{ with index $bx $fv }}{{ $b = printf "%s, %.1f+ peak XPM" $b (float .) }}{{ end -}}
