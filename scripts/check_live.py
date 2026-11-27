@@ -4,9 +4,10 @@
 
 The Hugo build writes the commit it built to https://arkndjl.net/build.json (layouts/index.buildinfo.json).
 Run this after a merge:  python3 scripts/check_live.py [--sha SHA] [--timeout 1200] [--interval 30] [--site URL]
-Exit 0 once live serves SHA or a descendant of it, 1 on timeout. Needs the repo's git history (git fetch origin main).
+Exit 0 once live serves SHA or a descendant of it, 1 on timeout. Ancestry comes from the local git history when the clone
+is complete, else from GitHub's compare API (GITHUB_TOKEN if set), so a one-commit checkout is enough.
 """
-import argparse, json, subprocess, sys, time, urllib.request
+import argparse, json, os, subprocess, sys, time, urllib.request
 
 def git(*a):
     return subprocess.run(["git", *a], capture_output=True, text=True)
@@ -19,14 +20,37 @@ def live(site):
     except Exception as e:  # 404 before the first stamped build, network blips
         return None, str(e)
 
+def shallow():
+    return git("rev-parse", "--is-shallow-repository").stdout.strip() == "true"
+
+def api_ahead(target, got):
+    """Is `got` at or ahead of `target` on GitHub (compare API)? None when the API cannot say. Lets the deploy check run on
+    a one-commit sparse checkout: the full history is 3 GB and took the workflow 4 minutes to clone on every push."""
+    repo = os.environ.get("GITHUB_REPOSITORY") or "arkndjl/website"
+    req = urllib.request.Request(f"https://api.github.com/repos/{repo}/compare/{target}...{got}",
+                                 headers={"Accept": "application/vnd.github+json", "User-Agent": "check-live"})
+    tok = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    if tok: req.add_header("Authorization", f"Bearer {tok}")
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            return json.loads(r.read().decode()).get("status") in ("ahead", "identical")
+    except Exception as e:
+        print(f"compare API failed for {target[:9]}...{got[:9]}: {e}", flush=True)
+        return None
+
 def landed(target, got):
-    if got == target:
+    if got == target or got.startswith(target) or target.startswith(got) and len(got) >= 7:
         return True
     if not got or got == "unknown":
         return False
     if git("cat-file", "-e", got + "^{commit}").returncode != 0:
         git("fetch", "-q", "origin", "main")  # the live build is newer than our clone
-    return git("merge-base", "--is-ancestor", target, got).returncode == 0
+    rc = git("merge-base", "--is-ancestor", target, got).returncode
+    if rc == 0:
+        return True
+    if rc == 1 and not shallow():
+        return False
+    return bool(api_ahead(target, got))  # a shallow clone cannot tell (history cut, or the commit is missing): ask GitHub
 
 def main():
     ap = argparse.ArgumentParser()

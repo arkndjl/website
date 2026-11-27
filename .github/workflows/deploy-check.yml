@@ -22,12 +22,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
+      # One commit, one file: the full history is 3 GB and its clone took 4 of this job's minutes on every push (Nov 27).
+      # check_live.py asks GitHub's compare API whether the live commit is this one or a later one.
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          sparse-checkout: scripts/check_live.py
+          sparse-checkout-cone-mode: false
       - name: Wait for the deploy, kick the build hook if it stalls
         env:
           HOOK: ${{ secrets.CF_DEPLOY_HOOK_URL }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           python3 scripts/check_live.py --sha "$GITHUB_SHA" --timeout 600 && exit 0
           if [ -z "$HOOK" ]; then echo "no CF_DEPLOY_HOOK_URL secret: cannot start a build"; exit 1; fi
