@@ -118,6 +118,7 @@ COVERS = {
     "p-automatic": ("deezer", "Automatic"),
     "p-chokecherry": ("deezer", "271260652"),  # pinned: another chokecherry has more fans
     "p-geese": ("deezer", "Geese"),
+    "p-underscores": ("deezer", "11926479"),  # pinned: name search is fine but several Underscores exist
     "p-ninajirachi": ("deezer", "Ninajirachi"),
     "p-hardrock": ("deezer", "Hardrock"),
     "p-pinkpantheress": ("deezer", "PinkPantheress"),
