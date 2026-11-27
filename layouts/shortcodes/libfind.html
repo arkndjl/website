@@ -9,7 +9,7 @@
   </div>
   <label class="gallery__filter libfind__box"><span class="gallery__filter-label">find</span><input type="search" data-libfind-q placeholder="title, artist, author, year" autocomplete="off" enterkeyhint="search"></label>
   <ol class="libfind__rows" data-libfind-rows hidden></ol>
-  <div class="win__status"><span data-libfind-count>{{ .Get "hint" | default "every list on the page" }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span data-libfind-count>{{ .Get "hint" }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 <script>
 (function () {
@@ -35,7 +35,8 @@
       if (t && n && !t.querySelector('.libtab__n')) { var s = document.createElement('span'); s.className = 'libtab__n'; s.textContent = n; t.appendChild(s); }
     });
     all.forEach(function (it) { it.hay = (it.name + ' ' + it.by + ' ' + it.year + ' ' + it.tab).toLowerCase(); });
-    var q = f.querySelector('[data-libfind-q]'), list = f.querySelector('[data-libfind-rows]'), count = f.querySelector('[data-libfind-count]'), hint = count.textContent;
+    var q = f.querySelector('[data-libfind-q]'), list = f.querySelector('[data-libfind-rows]'), count = f.querySelector('[data-libfind-count]'), hint = count.textContent || all.length + ' items';
+    count.textContent = hint;
     function open(it) {
       if (g.__show) g.__show(it.tab);
       try { history.replaceState(null, '', '#' + it.tab.toLowerCase().replace(/[^a-z0-9]+/g, '-')); } catch (e) {}
