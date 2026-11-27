@@ -42,3 +42,17 @@ carried). Holm over the three tests, alpha .05.
 
 ## Rule fixes, no test
 - Next up tab shows WAR/17 as its rate stat: a predictive tab, so pXP/60 (display only; the odds do not read it).
+
+## T1b backup watch xGap input (added after T1 was scored, before any T1b number; Holm now over four)
+T1 as registered: primary (weeks 10+) FAIL, secondary (next season) the other way. The tab ranks by xGap, the gap
+projected over the next two seasons (scripts/backup_age_fit.py), so its own target is the two-season one. The NFL has
+no fit of its own there (it borrows the other pros' terms). This test uses that script's design on the NFL replay.
+- Pairs: season S 2016-23, team x sub-position; starter = most snaps, a backup = any other with 50+ snaps.
+- Target: backup's minus starter's board WAR per 1,000 snaps over S+1 and S+2 (snap-weighted, shrunk to 0 with 300
+  snaps, gone = 0): backup_age_fit's target in the live grade's own units.
+- Models: target = a + b gap + c (starter age - backup age); gap = the live grade's gap (now) or the pXP/60 gap.
+- Walk-forward as the fit: season S is predicted from pairs whose target was complete before it (S' <= S-3), test
+  S = 2019-23. Scored as paired squared error over pairs.
+- Guard: the same on the pairs the tab lists (backup's live grade above the starter's).
+- Pass: paired t <= -2, most test seasons better, guard not worse (t < 2). Shipping it = xGap on the pXP/60 gap with the
+  NFL's own a, b, c; the grade shown and the listing rule stay on this season's WAR a snap (T1 primary).
