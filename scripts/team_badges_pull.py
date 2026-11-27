@@ -57,6 +57,7 @@ def nfl(current):
             continue
         b = get(f'https://github.com/nflverse/nflverse-data/releases/download/stats_team/stats_team_week_{y}.csv')
         if b:
+            os.makedirs(C, exist_ok=True)
             open(p, 'wb').write(b)
         print('nfl', y, len(b or b''), flush=True)
 
