@@ -19,7 +19,7 @@ Era adjustment (every sport, teams and players): a season's value is set against
   Players  peak = best season, career = sum of seasons, each season's value measured against replacement in its league:
            NBA VORP (Basketball Reference; before 1974 from WS / 48 and minutes at the 1974-85 fit), per 82 games;
            NHL point shares (Hockey Reference), per 82 games; CBB VORX (XPM x minutes over replacement, Barttorvik 2008-);
-           tennis Elo (own fit on the Sackmann archive 1968-), peak and career weeks above the top-20 line;
+           tennis season SV (wins over replacement on an own Elo fit, Sackmann archive 1968-) over the year's #20;
            soccer GAR seasons where the site has them; CS2 HLTV-style rating where the site has it.
   Era check (about in each table): decade share of the top 100 against the decade's share of rows; KL divergence
   of the adjusted list vs the raw one (lower = no era favoured) and the era-blind 95% line (null95); every list passes
@@ -267,8 +267,12 @@ def player_lists(seasons, key_v, minv=None, per=None, every=False):
 
 def tennis_players(tour):
     """Elo on every tour-level singles match (FiveThirtyEight K = 250 / (matches + 5)^.4, Slams x1.1), 1968 on.
-    season value = year-end Elo over that year's 20th best year-end Elo (players with 20+ matches), in SDs of the
-    year's top 100; peak = best year-end-or-in-season Elo as the same z; career = sum of positive season values"""
+    Season value (Nov 27 2026 context audit: a descriptive list reads the season alone, and a year-end Elo carries
+    every earlier season) = SV, the year's wins over what a replacement player would have won against the same
+    opponents (opponent Elo before the match; replacement = that year's median year-end Elo of the players ranked
+    101-150, the lowest third of a thinner year), over that year's 20th best SV in SDs of the year's top 100 (v);
+    career = sum of positive season values (cv). The old Elo forms stay on the row as ev / ecv (research A/B) and
+    raw = peak Elo that year"""
     import csv as _csv
     ORD = {'Q1': 0, 'Q2': 1, 'Q3': 2, 'R128': 3, 'R64': 4, 'R32': 5, 'R16': 6, 'RR': 6, 'QF': 7, 'SF': 8, 'BR': 8, 'F': 9}
     M = []
@@ -279,9 +283,11 @@ def tennis_players(tour):
     M.sort(key=lambda m: (m[0], m[1]))
     E, N, name = defaultdict(lambda: 1500.0), Counter(), {}
     yr_peak, yr_end, yr_n = {}, {}, Counter()
+    faced = defaultdict(list)       # (player, year) -> [(won, the opponent's Elo before the match)]
     for d, _, w, l, g, wn, ln in M:
         y = int(d[:4]); name[w] = wn; name[l] = ln
         ew, el = E[w], E[l]; pw = 1 / (1 + 10 ** ((el - ew) / 400))
+        faced[(w, y)].append((1, el)); faced[(l, y)].append((0, ew))
         kw = 250 / (N[w] + 5) ** .4 * (1.1 if g else 1); kl = 250 / (N[l] + 5) ** .4 * (1.1 if g else 1)
         E[w] = ew + kw * (1 - pw); E[l] = el - kl * (1 - pw); N[w] += 1; N[l] += 1
         for p in (w, l):
@@ -290,13 +296,26 @@ def tennis_players(tour):
     by = defaultdict(list)
     for (p, y), n in yr_n.items():
         if n >= 20: by[y].append(yr_end[(p, y)])
+    repl, sv, svy = {}, {}, defaultdict(list)
+    lo = defaultdict(list)
+    for (p, y), n in yr_n.items():
+        if n >= 10: lo[y].append(yr_end[(p, y)])
+    for y, L in lo.items():
+        L = sorted(L, reverse=True)
+        repl[y] = float(np.median(L[100:150] if len(L) >= 150 else L[2 * len(L) // 3:]))
+    for (p, y), n in yr_n.items():
+        if n >= 20:
+            sv[(p, y)] = sum(won - 1 / (1 + 10 ** ((eo - repl[y]) / 400)) for won, eo in faced[(p, y)])
+            svy[y].append(sv[(p, y)])
     out = []
     for (p, y), e in yr_end.items():
         L = sorted(by.get(y, []), reverse=True)
         if len(L) < 50 or yr_n[(p, y)] < 20: continue
         top = L[:100]; sd = float(np.std(top)); line = L[19]
         pk = yr_peak.get((p, y))
-        out.append(dict(id=p, n=name[p], y=y, v=(pk - line) / sd if pk else None, cv=max(0.0, (e - line) / sd), raw=round(pk) if pk else None))
+        V = sorted(svy[y], reverse=True); z = (sv[(p, y)] - V[19]) / float(np.std(V[:100]))
+        out.append(dict(id=p, n=name[p], y=y, v=z, cv=max(0.0, z), sv=round(sv[(p, y)], 1), raw=round(pk) if pk else None,
+                        ev=(pk - line) / sd if pk else None, ecv=max(0.0, (e - line) / sd)))
     return out
 
 
@@ -1164,6 +1183,10 @@ def main():
         if '--cbb' in sys.argv:  # CBB player seasons again from the Barttorvik cache (alltime_pull.py cbbp): VORX on rXPM
             src['cbbS'] = cbb_players()
             json.dump(src, gzip.open(SNAP, 'wt'), separators=(',', ':'))
+        if '--tennis' in sys.argv:   # tennis seasons again from the Sackmann cache (alltime_pull.py tennis): season SV
+            r3 = lambda L: [{k: round(v, 3) if isinstance(v, float) else v for k, v in r.items()} for r in L]
+            src['atp'], src['wta'] = r3(tennis_players('atp')), r3(tennis_players('wta'))
+            json.dump(src, gzip.open(SNAP, 'wt'), separators=(',', ':'))
         src['soccerS'] = soccer_players()      # local season files: SV / SVAR (scripts/soccer_sv.py) without a re-pull
         nba_pub(src)                   # the published XPM files (rXPM, VORX on rXPM) over the snapshot's 2010-26 rows
     else:
@@ -1308,15 +1331,17 @@ def main():
     for sp_, t_ in ET.items(): res[sp_]['players']['eraT'] = t_
     for t in ('atp', 'wta'):
         S = src[t]
-        pk = players_out([dict(s, v=100 + 25 * s['v']) for s in S if s['v'] is not None],
-                         dict(l='Elo+', t="peak Elo that year against the year's #20 (100) in SDs of the year's top 100 (x25)", f='%.0f', rl='Elo', rt='peak Elo that year', rf='%.0f'),
+        # season SV (Nov 27 2026): the year's own wins over replacement, not a year-end Elo that carries earlier seasons
+        pk = players_out([dict(s, v=100 + 25 * s['v'], raw=s['sv']) for s in S if s['v'] is not None],
+                         dict(l='SV+', t="season SV against the year's #20 (100) in SDs of the year's top 100 (x25)", f='%.0f', rl='SV',
+                              rt='SV: wins that year over what a replacement player (ranked 101-150) would win against the same opponents', rf='%.1f'),
                          {}, 'Sackmann archive', pos=False, tm=False, every=True)
-        drift = era_drift([dict(s, v=s['v'], v0=s['raw']) for s in S if s['v'] is not None])
-        cr = players_out([dict(s, v=s['cv']) for s in S], {}, dict(l='Career', t="sum of year-end Elo over the year's #20, in SDs of the year's top 100", f='%.1f', s=1, pl='', pt=''),
+        drift = era_drift([dict(s, v=s['v'], v0=s['sv']) for s in S if s['v'] is not None])
+        cr = players_out([dict(s, v=s['cv']) for s in S], {}, dict(l='Career', t="sum of season SV over the year's #20, in SDs of the year's top 100", f='%.1f', s=1, pl='', pt=''),
                          'Sackmann archive', pos=False, tm=False)
         pk['career'] = cr['career']; pk['car'] = cr['car']
-        pk['peak_about'] = 'Tour-level singles; peak counts after 40 matches.'; pk['career_about'] = 'Years with 20+ tour-level matches.'
-        pk['drift'] = drift; pk['eraT'] = "Era: Elo against that year's #20, in SDs of that year's top 100."
+        pk['peak_about'] = 'Tour-level singles; years with 20+ matches.'; pk['career_about'] = 'Years with 20+ tour-level matches.'
+        pk['drift'] = drift; pk['eraT'] = "Era: season SV against that year's #20, in SDs of that year's top 100."
         res[t] = {'players': pk}
     snm = {}
     import names as NM
