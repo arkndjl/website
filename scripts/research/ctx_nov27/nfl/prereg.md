@@ -56,3 +56,23 @@ no fit of its own there (it borrows the other pros' terms). This test uses that 
 - Guard: the same on the pairs the tab lists (backup's live grade above the starter's).
 - Pass: paired t <= -2, most test seasons better, guard not worse (t < 2). Shipping it = xGap on the pXP/60 gap with the
   NFL's own a, b, c; the grade shown and the listing rule stay on this season's WAR a snap (T1 primary).
+
+# Round 2 (port round), registered before scoring. Holm over R1-R4, alpha .05.
+
+## R1 = T3 above, on this audit's replay (season's end and week 9, S 2018-24 for y1, 2018-22 for y3)
+Baseline = form E (live). F = E + pXP/60 by group (+ a flag for a rate row). Pass as T3.
+## R2 season-only XV of S, S-1, S-2 beside the prior (P3)
+G = E + XV a 17 games of S (pace), S-1, S-2 (pooled slopes; 0 and the has flags when absent; XV exists 2018 on, so
+S-1 / S-2 are absent for S 2018 / 2018-19). Same rows, same pass rule as T3.
+## R3 pXP/60 in the percentile projections' rate prior (scripts/player_pctl.py Rate.prior), downstream
+Now: Marcel WAR a snap 1/.7/.5 shrunk to the group rate. Candidate: the same prior plus slope_g x pXP/60's market
+shift (the part pXP/60 has and this prior lacks), slope fit leaving the season out. Downstream target: next-season WAR
+= rate x next-season snaps actually played (so the exposure model is held fixed), S 2018-24, squared error, leave one
+season out. Pass: paired t <= -2, most seasons. If the frames replay finishes in time the fit is rerun through
+player_pctl.py --fit instead and its own calibration table is the guard.
+## R4 predictive awards, games-left rate (scripts/awards.py football_draw, NFL)
+Now: this season's box rate a team game. Candidate: (now x g + last season's rate a team game x g0) / (g + g0), no
+last season = .85 x now (the NBA draw's rule), g0 from (2, 4, 6, 8, 12) picked on the training seasons.
+Rows: after week 9 of S = 2016-25, the top 40 to date in each of passing yards, scrimmage yards, offensive TDs, sacks.
+Target: his rate a team game in weeks 10 on, squared error in units of the stat's own target SD, leave one season out.
+Pass: pooled paired t <= -2, most seasons, no single stat worse at t >= 2.
