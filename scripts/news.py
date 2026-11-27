@@ -17,6 +17,7 @@ Weight `w` ranks an item; MAJOR (w >= 60) is what the ticker and the daily GFX d
   trade             a player at or above the sport's 90th value percentile 88; 75th 72; other players 52; picks only 45
   move              sign / release / claim / call-up only for a 75th+ percentile player: 56 (90th: 68)
   soccer transfer   market value EUR 40M+ 80; 15M+ 62; smaller ones stay on the transactions tab
+  NIL deal          confirmed college deal (data/nil_deals.json): $5M+ a season 80; $2M+ 62; smaller 45
   portal            college player entering: FV 50+ 78; 45+ 62; else 42
   injury            RotoWire item that takes a player out (OUT pattern; rest days skipped): 90th percentile 72; 75th 54;
                     college FV 50+ 70; 45+ 54; +16 for a long absence (SEVERE: season, ACL, Achilles, tear,
@@ -203,9 +204,14 @@ def transactions(V, since):
         for r in d.get('rows', []):
             if r['d'] < since or r['k'] in ('trade', 'practice', 'down') or (r['d'], r['n']) in traded: continue
             college = sp in ('cfb', 'cbb')
-            v = V.get(sp, r['n'], r.get('fr') if college else (r.get('to') or r.get('fr')))
+            v = V.get(sp, r['n'], (r.get('fr') or r.get('to')) if college else (r.get('to') or r.get('fr')))
             tr = tier(sp, v)
-            if college and r['k'] == 'exit':
+            if college and r['k'] == 'nil':
+                w = 80 if r.get('amt', 0) >= 5e6 else 62 if r.get('amt', 0) >= 2e6 else 45
+                t = '%s NIL deal · $%.1fM%s' % (r['n'], r.get('amt', 0) / 1e6, ' (%s)' % r['to'] if r.get('to') else '')
+                s = 'NIL · %s' % r['pos'] if r.get('pos') else 'NIL'
+                if v is not None: s += ' · FV %s' % num(v)
+            elif college and r['k'] == 'exit':
                 w = 78 if tr == 2 else 62 if tr == 1 else 42
                 t = '%s%s enters the portal' % (r['n'], ' (%s)' % r['fr'] if r.get('fr') and r['fr'] != 'No Current School' else '')
                 s = 'portal · %s' % r['pos'] if r.get('pos') else 'portal'
