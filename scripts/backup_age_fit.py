@@ -19,7 +19,13 @@ errors, t). Coefficients shipped are the full-sample fit.
   soccer  static/data/soccer-war/ (GAR a 90; age from the Transfermarkt birth dates, scripts/data/soccer_mv_link)
   cbb     the CBB research seasons (BPM, which the history has; the age gap is the class gap, Fr 1 .. Sr 4, the
           only age the college boards carry for everyone). Departures dominate: a senior starter is gone next season.
-  nfl     no past seasons on file: borrows the pro sports' fit in standard-deviation units of the gap
+  nfl     python3 scripts/backup_age_fit.py --nfl   (rewrites the NFL terms only; replays the WAR board 2016 on, ~10 min
+          cold). Pairs: team x sub-position, the starter has the most snaps, a backup 50+ snaps and the live grade
+          (WAR per 1,000 snaps, shrunk 300) above his. The gap that predicts is the pXP/60 gap (scripts/nfl_rate.py's
+          form, rebuilt for each past season from the replay), not the grade's: on the two-season target in the
+          grade's own units, walk-forward 2019-23, squared error .0429 -> .0375 on listed pairs (t -5.13, 5/5
+          seasons), all pairs t -3.68 (scripts/research/ctx_nov27/nfl/, Nov 27 2026). The terms carry key = pgap
+          (the row's pXP/60 gap) and alt = the borrowed pro terms for a row without one.
   cfb     no past seasons on file: borrows the CBB fit in standard-deviation units of the gap
 The CBB backup watch grades by BPM, the history's own units, so CBB ships its own fit.
 """
@@ -166,6 +172,101 @@ def fit(P, start_after=4):
             'z': {'a': float(b[0]) / sd, 'b': float(b[1]), 'c': float(b[2]) / sd}}
 
 
+def nfl_pairs(first=2016):
+    """[(season, pXP/60 gap, age gap, two-season future gap in WAR per 1,000 snaps)] and the same with the live grade's
+    gap, for the pairs the tab would list. The board is replayed once a season (scripts/.cache/nfl/backup_age_rows_<y>.json)."""
+    import nfl_war as W
+    import nfl_rate as R
+    import nfl_market as MK
+    cache = os.path.join(HERE, '.cache', 'nfl')
+    os.makedirs(cache, exist_ok=True)
+    games = [g for g in W.rows(W.get('games.csv', W.GAMES)) if g['game_type'] == 'REG']
+    open_ = {int(g['season']) for g in games if g['home_score'] in ('', 'NA')}
+    last = max(int(g['season']) for g in games if int(g['season']) not in open_)      # the last finished season
+    keep = ('id', 't', 'sn', 'war', 'age', 'ax', 'sh', 'stw', '_sub', '_g', '_war', '_avg', '_tg', 'waa')
+    B = {}
+    for y in range(first, last + 1):
+        fn = os.path.join(cache, f'backup_age_rows_{y}.json')
+        if not os.path.exists(fn):
+            out, _, _ = W.board(y)
+            json.dump([{k: p[k] for k in keep if k in p} for p in out], open(fn, 'w'))
+        B[y] = {p['id']: p for p in json.load(open(fn))}
+    RT = {y: {i: r for i, r in ((i, R.row_of(p)) for i, p in d.items()) if r} for y, d in B.items()}
+    M = json.load(open(R.FIT))['model']
+    mq = M.get('mq') or {}
+    MK.load()
+    K = 300.0
+
+    def pxp(y, pid):
+        r = RT[y][pid]
+        g, prior, s = r['grp'], M['m'].get(r['sub'], 0.0), MK.signal(pid, y)
+        k = f'{g}:{s[0]}' if s else None
+        if k in mq.get('b', {}):
+            prior += mq['b'][k] * (s[1] - mq['xb'][k])
+        P, S = r['pts'] * R.PER, r['sn']
+        for i, w in enumerate(M['marcel'][1:], 1):
+            h = RT.get(y - i, {}).get(pid)
+            if h and h['grp'] == g:
+                P += w * h['pts'] * R.PER; S += w * h['sn']
+        return (P + M['K'][g] * prior) / (S + M['K'][g])
+
+    grade = lambda y, pid: 1000 * (B[y][pid].get('war') or 0.0) / (B[y][pid]['sn'] + K)
+
+    def fut(y, pid):
+        w = s = 0.0
+        for j in range(1, H + 1):
+            p = B[y + j].get(pid)
+            if p and p['sn'] > 0:
+                w += p.get('war') or 0.0; s += p['sn']
+        return 1000 * w / (s + K)
+    age = lambda y, pid: B[y][pid].get('ax') or B[y][pid].get('age')
+    Pp, Pg = [], []
+    for y in range(first, last - H + 1):
+        rooms = {}
+        for pid, r in RT[y].items():
+            if age(y, pid) is not None:
+                rooms.setdefault((B[y][pid]['t'], r['sub']), []).append(pid)
+        for L in rooms.values():
+            L.sort(key=lambda i: -RT[y][i]['sn'])
+            s = L[0]
+            for b in L[1:]:
+                if RT[y][b]['sn'] < 50 or grade(y, b) <= grade(y, s):
+                    continue
+                t = fut(y, b) - fut(y, s)
+                Pp.append((y, pxp(y, b) - pxp(y, s), age(y, s) - age(y, b), t))
+                Pg.append((y, grade(y, b) - grade(y, s), age(y, s) - age(y, b), t))
+    return Pp, Pg
+
+
+def nfl_main():
+    """the NFL's own terms on the pXP/60 gap; every other sport's block is left as it is"""
+    old = json.load(open(OUT))
+    Pp, Pg = nfl_pairs()
+    f, g = fit(Pp, start_after=3), fit(Pg, start_after=3)
+    A, B_ = np.array(Pp, float), np.array(Pg, float)
+    ys = sorted(set(A[:, 0].astype(int)))
+    d = []
+    for y in ys[3:]:                                          # the swap itself: pXP/60 gap against the grade's gap, both with age
+        tr, te = A[:, 0] + H <= y, A[:, 0] == y
+        e = []
+        for Q in (B_, A):
+            X = np.c_[np.ones(tr.sum()), Q[tr][:, 1:3]]
+            b = np.linalg.lstsq(X, Q[tr][:, 3], rcond=None)[0]
+            e.append((np.c_[np.ones(te.sum()), Q[te][:, 1:3]] @ b - Q[te][:, 3]) ** 2)
+        d += list(e[1] - e[0])
+    d = np.array(d)
+    prev = old['sports'].get('nfl') or {}
+    alt = prev.get('alt') or {k: prev[k] for k in ('a', 'b', 'c') if k in prev}
+    old['sports']['nfl'] = {'a': round(f['a'], 5), 'b': round(f['b'], 4), 'c': round(f['c'], 5), 'unit': 'year', 'src': 'fit',
+                            'key': 'pgap', 'n': f['n'], 'held': f['held'], 'seasons': f['seasons'], 't': f['t'],
+                            'tSwap': round(float(d.mean() / (d.std(ddof=1) / math.sqrt(len(d)))), 2),
+                            'mseGrade': g['mse_age'], 'msePxp': f['mse_age'], 'alt': alt}
+    print('nfl', old['sports']['nfl'])
+    old['asof'] = time.strftime('%Y-%m-%d')
+    txt = json.dumps(old, indent=1, allow_nan=False)
+    open(OUT + '.tmp', 'w').write(txt); os.replace(OUT + '.tmp', OUT)
+
+
 def live_sd(sport):
     rows = json.load(open(os.path.join(ROOT, 'data', f'backup_{sport}.json')))['rows']
     return float(np.std([r['gap'] for r in rows])) if len(rows) > 2 else None
@@ -207,6 +308,9 @@ def main():
         out[s] = {'a': round(f['a'], 5), 'b': round(f['b'], 4), 'c': round(f['c'], 5), 'unit': 'class' if s == 'cbb' else 'year', 'src': 'fit',
                   **{k: f[k] for k in ('n', 'held', 'seasons', 't')}}
     for s, z, src, unit in (('nfl', zp, 'pros', 'year'), ('cfb', F['cbb']['z'], 'cbb', 'class')):
+        if (old['sports'].get(s) or {}).get('src') == 'fit':   # the NFL's own fit (--nfl) stays
+            out[s] = old['sports'][s]
+            continue
         sd = live_sd(s) or (old['sports'].get(s) or {}).get('sd') or 1.0
         out[s] = {'a': round(z['a'] * sd, 5), 'b': round(z['b'], 4), 'c': round(z['c'] * sd, 5), 'unit': unit, 'src': src,
                   'sd': round(sd, 4)}
@@ -219,4 +323,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    nfl_main() if '--nfl' in sys.argv else main()

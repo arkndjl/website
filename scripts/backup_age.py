@@ -32,7 +32,9 @@ def apply(sport, rows):
     except (OSError, KeyError, ValueError):
         return rows
     nd = 1 if sport in ('cfb', 'cbb') else 2 if sport in ('nba',) else 3
+    key = T.get('key', 'gap')      # NFL: the pXP/60 gap (pgap) carries the projection, not the grade's (backup_age_fit.py --nfl)
     for r in rows:
-        r['xgap'] = round(T['a'] + T['b'] * r['gap'] + T['c'] * gap_of(sport, r), nd)
+        t, g = (T, r[key]) if r.get(key) is not None else (T.get('alt') or T, r['gap'])
+        r['xgap'] = round(t['a'] + t['b'] * g + t['c'] * gap_of(sport, r), nd)
     rows.sort(key=lambda r: (-r['xgap'], -r['gap']))
     return rows

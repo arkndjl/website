@@ -29,7 +29,10 @@ CBB     No college depth charts, so the order is minutes: this season's minutes 
         his group (G, F, C; a group with no starter falls back to the next one); both need CBB_MIN minutes, and is listed
         and he is listed when he beats that starter by CBB_GAP BPM or more.
 Every sport's rows are ranked by xGap (scripts/backup_age.py): the gap projected over the next two seasons from
-today's gap and the age gap to the starter, fit on past seasons by scripts/backup_age_fit.py.
+today's gap and the age gap to the starter, fit on past seasons by scripts/backup_age_fit.py. NFL rows also carry px
+(pXP/60, the board's predictive rate) and pgap, its gap to the starter: xGap projects from that gap (held out it
+predicts the two-season gap better than this season's WAR a snap, which stays the grade shown: it is the better read
+of the rest of this season, scripts/research/ctx_nov27/nfl/).
 """
 import bisect
 import json
@@ -233,6 +236,8 @@ def depth_rows(charts, grade, team_of, skip=lambda chart, slot: False, slot_name
             row = {'name': nm, 'team': t, 'pos': slot_name(slot), 'str': i, 'g': b['g'], 'use': b['n'], 'pos2': b.get('pos'),
                    'age': b.get('age'), 'starter': {'name': ath[0][0], 'g': s['g'], 'use': s['n'], 'age': s.get('age')},
                    'gap': round(b['g'] - s['g'], 2)}
+            if b.get('px') is not None and s.get('px') is not None:      # the predictive rate's gap, where the sport grades carry one
+                row['px'], row['starter']['px'], row['pgap'] = b['px'], s['px'], round(b['px'] - s['px'], 2)
             k = (t, NM.key(nm)); old = out.get(k)
             if old is None or (i, -row['gap']) < (old['str'], -old['gap']):
                 out[k] = row
@@ -328,7 +333,8 @@ def nfl():
         if p is None:
             return None
         sn = p.get('sn') or 0
-        return {'g': round(1000 * (p.get('war') or 0) / (sn + NFL_K), 2), 'n': sn, 'pos': p.get('pos'), 'age': p.get('age')}
+        return {'g': round(1000 * (p.get('war') or 0) / (sn + NFL_K), 2), 'n': sn, 'pos': p.get('pos'), 'age': p.get('age'),
+                'px': p.get('pxp')}       # pXP/60: the gap xGap projects from (scripts/backup_age_fit.py --nfl)
     # the base defense and the 3-WR offense (ESPN lists both units for every team; a team can carry a nickel chart too)
     charts = espn_depth('football/nfl')
     rows, n = depth_rows(charts, grade, lambda a: NFL_TEAM.get(a, a), need=NFL_MIN,
