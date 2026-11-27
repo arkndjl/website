@@ -10,15 +10,18 @@
   // the sport's short link (static/_redirects): /cfb -> /arkboard/college-football/, the hash carried through
   var SITE = 'arkndjl.net/' + ([[/^\/1nt/i, '1nt'], [/^\/laursen_111/i, 'laursen_111'], [/college-football/, 'cfb'], [/college-basketball/, 'cbb'], [/arkboard\/nfl/, 'nfl'], [/arkboard\/nba/, 'nba'],
     [/arkboard\/nhl/, 'nhl'], [/hockey-prospects/, 'hockey'], [/soccer-prospects/, 'u22'], [/arkboard\/soccer/, 'soccer'], [/arkboard\/baseball/, 'baseball'], [/arkboard\/counter-strike/, 'cs2'],
-    [/arkboard\/predictions/, 'picks'], [/arkboard\/arklist/, 'arklist'], [/arkboard\/process/, 'process'], [/./, 'arkboard']].filter(function (x) { return x[0].test(location.pathname); })[0][1]);
+    [/arkboard\/predictions/, 'picks'], [/arkboard\/arklist/, 'arklist'], [/arkboard\/process/, 'process'],
+    // a board with no short link (tennis, ARKRANKING, games) prints its own path, so the #tab on the card opens
+    [/^\/arkboard\/[a-z0-9-]+\/?$/, location.pathname.replace(/^\/|\/$/g, '')], [/./, 'arkboard']].filter(function (x) { return x[0].test(location.pathname); })[0][1]);
   // the short link a graphic prints: the sport's short path plus the tab it came from (#<tab>), or a player (#<board>:p=<key>)
   function tabLink(win) { var t = win && win.closest('[data-tab]'); t = t && t.getAttribute('data-tab'); return SITE + (t && !/(1nt|laursen_111)$/.test(SITE) ? '#' + String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : ''); }
   function txt(el) { return (el && el.textContent || '').replace(/\s+/g, ' ').trim(); }
   // a photo from another site (ESPN, Wikimedia) loads with CORS so the canvas can still be saved
   // On3 recruit photos come through the site's own /api/photo (worker/site.js): On3's CDN sends CORS headers unreliably
+  var IMG_WAIT = 8000;   // a photo or logo host that never answers: the card is drawn without it, not left waiting
   function loadPhoto(src) {
     if (src) src = src.replace(/^https:\/\/on3static\.com\/(?=cdn-cgi\/image\/)/, '/api/photo/');
-    return new Promise(function (res) { if (!src) return res(null); var i = new Image(); i.crossOrigin = 'anonymous'; i.onload = function () { res(i); }; i.onerror = function () { res(null); }; i.src = src; });
+    return new Promise(function (res) { if (!src) return res(null); var i = new Image(); i.crossOrigin = 'anonymous'; i.onload = function () { res(i); }; i.onerror = function () { res(null); }; setTimeout(function () { res(null); }, IMG_WAIT); i.src = src; });
   }
   // an on-theme picture frame: raised bevel, a dark inner line, the photo cover-cropped from the top
   function photoFrame(g, img, x, y, w, h) {
@@ -46,7 +49,7 @@
   }
   // an image from another site loads with CORS, so a hotlinked logo can't taint the canvas and block the save (no CORS: no logo)
   function loadImg(src) {
-    return new Promise(function (res) { if (!src) return res(null); var i = new Image(); if (new URL(src, location.href).origin !== location.origin) i.crossOrigin = 'anonymous'; i.onload = function () { res(i); }; i.onerror = function () { res(null); }; i.src = src; });
+    return new Promise(function (res) { if (!src) return res(null); var i = new Image(); if (new URL(src, location.href).origin !== location.origin) i.crossOrigin = 'anonymous'; i.onload = function () { res(i); }; i.onerror = function () { res(null); }; setTimeout(function () { res(null); }, IMG_WAIT); i.src = src; });
   }
   function capHead(h) { return /^x[A-Z]/.test(h) || /^NHLe$/.test(h) ? h : h.toUpperCase(); }   // xNIL keeps its x, NHLe its e
   function bevel(g, x, y, w, h, raised, t) {
@@ -686,7 +689,7 @@
       g.font = '48px ' + FONT;
       c.risers.slice(0, 6).forEach(function (r) { if (y > F.y + F.h - 60) return; g.fillStyle = C.white; g.fillText(r.name, x, y); g.fillStyle = C.lilac; g.fillText(r.pos + '  ' + r.hs + ' → ' + r.now, x + 760, y); y += 72; });
     }
-    return F.canvas;
+    return pcTrim(F.canvas, y, F.y + F.h - 24);   // a coach with one scheme line and no risers: no empty lower half
   }
   // ---- team builder plan, college basketball (cbbbuilder.html sets window.__arkCbbBuilder): the program's offseason on a
   // 4:5 card: header, team rating now / returning / after the plan, the NIL budget bar, next season's rotation by BPM
@@ -1159,6 +1162,8 @@
   // place in the view; every other column is a tile with where the value sits among the rows in view (pNN, 0 = lowest).
   // context columns a card shows as a fact strip under the name (no percentile tile)
   var PC_INFO = /^(age|g|gp|gs|mp|min|toi|snaps|ht|wt|ht \/ wt|yrs|salary|contract|nhl gp|wt\. gp|starts|w-l)$/i;
+  // a signed Contract is the contract surplus (NBA contract value), a graded number: it stays a tile, never a fact under the name
+  function pcFact(h, t) { return PC_INFO.test(h) && !(/^contract$/i.test(h) && /^[+−-]\d/.test(t)); }
   // a percentile bar in pixel blocks: 20 cells of 5 points, lit to the value
   function pxBar(g, x, y, w, h, pct, col) {
     var n = 20, gap = Math.max(3, Math.round(h / 4)), cw = (w - (n - 1) * gap) / n, lit = Math.round(pct / 5);
@@ -1172,7 +1177,7 @@
   // never on a player card: GAP / xGAP (value minus market or starter, read as noise on a card) and the weekly move
   var PC_DROP = /^(gap|xgap|±|\+\/-|δ|Δ)$/i;
   var PC_SKIP = /^(rk|#|pick|spot|tm)$/i, PC_SUB = /^(pos|position|team|school|club|org|league|lg|conf|class|yr|year|season|plays|tag|stage)$/i;
-  var PC_NOPCT = /^(rank|cons|xslot|vrs|ht|wt|ht \/ wt|range|w-l|rec|season line|plays|tag|contract|yrs|last|form|roster|stage)$/i;
+  var PC_NOPCT = /^(rank|cons|xslot|vrs|ht|wt|ht \/ wt|hand-ht\/wt|eta|acq\/\$|stat|range|w-l|rec|season line|plays|tag|contract|yrs|last|form|roster|stage)$/i;   // baseball's mixed cells (S-6'1/180, an ETA year, DRFT/$8.2m, 128 wRC+ beside a 3.20 ERA) are not numbers to rank
   var PC_MARKS = '.gfx-off, .cfb__star, .cfb__carried, .cfb__warin, .cfb__riser, .cfb__injchip, .injtag, .cfb__rbrole, .cfb__medals, .cfb__upchip, .cfb__movechip, .cfb__multichip, .cfb__valuechip, .cfb__reachchip, .cfb__divtag, .pxframe, .cfbst__more, .nflwar__col, .nflwar__tm, .nflwar__rook, .esea-flag, .nbaxpm__tm, svg, img';
   function pcRows(table) { return [].slice.call(table.tBodies[0].rows).filter(function (r) { return !r.hidden && getComputedStyle(r).display !== 'none' && !r.classList.contains('cfb__detail') && r.cells.length > 2; }); }
   // boards that render one page of a longer list hand over every filtered row (table.__gfxAll, built off the page by the
@@ -1185,7 +1190,11 @@
     var hc = [].slice.call(table.tHead.rows[0].cells), vis = hc.filter(function (h) { return !h.hidden; }), r0 = pcRows(table)[0];
     return r0 && vis.length < hc.length && r0.cells.length === vis.length ? vis : hc;
   }
-  function pcNameAt(heads) { return heads.findIndex(function (h) { return /^(player|goalie|qb|recruit|prospect|name)$/i.test(h); }); }
+  // a position cell down to the position: the small print and the rank at position (G3) go; a span that only wraps
+  // the position (a recruit QB's "QB ·pro") stays
+  function pcPosTrim(c) { c.querySelectorAll('.cfb__dim').forEach(function (e) { e.remove(); }); c.querySelectorAll('span').forEach(function (e) { if (!/[a-z]/i.test(e.textContent)) e.remove(); }); }
+  // a team table's QB or Goalie column is a team number or the team's starter, never a player row: no player card from it
+  function pcNameAt(heads) { return isTeamTable(heads.filter(function (h) { return h !== "±"; })) ? -1 : heads.findIndex(function (h) { return /^(player|goalie|qb|recruit|prospect|name)$/i.test(h); }); }
   // a cell's main text and its small print (the dim splits: raw XPM, 80% range, position rank)
   function pcCell(c) {
     if (!c) return { t: '', sub: '' };
@@ -1197,6 +1206,8 @@
     return { t: t || '—', sub: sub, color: col ? (col.classList.contains('cfb__up') ? C.teal : C.down) : null };
   }
   function pcNum(c, t) {
+    // a cell that reads as a label (T1, <=Jul 24, S-6'1/180, DRFT/$8.2m) is no number to rank, whatever it sorts by
+    if (t && !/^\s*[<>~≤≥#]?\s*[+−–-]?\s*[$€£]?\.?\d/.test(t)) return null;
     var v = c && c.getAttribute('data-v');
     if (v != null && v !== '' && isFinite(+v)) return +v;
     if (!t || /\d\s*-\s*\d/.test(t)) return null;
@@ -1287,7 +1298,7 @@
       var title = txt(w2 && w2.querySelector('.win__title-text')).replace(/_$/, '').split('::')[0].trim();
       if (PC_XSKIP.test(tab) || PC_XSKIP.test(title) || !title || seen[title]) return;
       var hc = pcHeads(t), hs = hc.map(txt), k = pcNameAt(hs); if (k < 0) return;
-      var rs = pcRows(t), r = rs.find(function (x) { return nk(pcName(x, k)) === key; }); if (!r) return;
+      var rs = t.__gfxN > 5000 ? pcRows(t) : pcAll(t), r = rs.find(function (x) { return nk(pcName(x, k)) === key; }); if (!r) return;   // every row, not the page on screen (a board past 5,000 rows is too slow to build for a side band)
       var ti = hs.findIndex(function (h) { return TEAM_COL.test(h); });
       if (ti >= 0 && mine.length) { var th = tk(pcCell(r.cells[ti]).t); if (th.length && !th.some(function (x) { return mine.indexOf(x) >= 0; })) return; }
       var items = [];
@@ -1295,7 +1306,7 @@
         var lc = h.toLowerCase();
         if (i === k || i === ti || !h || shown[lc] || PC_SKIP.test(h) || PC_DROP.test(h) || PC_SUB.test(h) || FV_COL.test(h) || (hc[i] && hc[i].hidden) || !r.cells[i] || r.cells[i].hidden) return;
         var c = pcCell(r.cells[i]); if (c.t === '—' || c.t.length > 12) return;
-        var n = PC_NOPCT.test(h) || PC_INFO.test(h) ? null : pcNum(r.cells[i], c.t), pct = null;
+        var n = PC_NOPCT.test(h) || pcFact(h, c.t) ? null : pcNum(r.cells[i], c.t), pct = null;
         if (n != null) {
           var vals = pcAll(t).map(function (x) { var cc = x.cells[i]; return cc ? pcNum(cc, pcCell(cc).t) : null; }).filter(function (v) { return v != null; });
           if (vals.length >= 5) pct = pcPct(vals, n);
@@ -1444,7 +1455,7 @@
       var lc = h.toLowerCase(), isTeam = /^team$/i.test(h) && two;
       if (i === k || !h || (shown[lc] && !isTeam) || /^(rk|#|tm)$/i.test(h) || PC_DROP.test(h) || (PC_SUB.test(h) && !isTeam) || FV_COL.test(h) || (hc[i] && hc[i].hidden) || !row.cells[i] || row.cells[i].hidden) return;
       var c = pcCell(row.cells[i]); if (c.t === '—' || pcDash(c.t) || c.t.length > 16) return;
-      var n = PC_NOPCT.test(h) || PC_INFO.test(h) || PC_SKIP.test(h) || PC_ORD.test(h) || isTeam ? null : pcNum(row.cells[i], c.t), pct = null;
+      var n = PC_NOPCT.test(h) || pcFact(h, c.t) || PC_SKIP.test(h) || PC_ORD.test(h) || isTeam ? null : pcNum(row.cells[i], c.t), pct = null;
       if (n != null) {
         var vals = pcAll(t).map(function (x) { var cc = x.cells[i]; return cc ? pcNum(cc, pcCell(cc).t) : null; }).filter(function (v) { return v != null; });
         if (vals.length >= 5) pct = pcPct(vals, n);
@@ -1518,7 +1529,7 @@
     if (rc.a) items.push({ h: 'ARK', stars: rc.a, col: PLAT });
     items.push({ h: 'INDUSTRY', stars: rc.s || 0, plus: !!rc.p, col: C.lilac });
     if (rc.e) items.push({ h: 'EXPERTS', t: rc.e[0], sub: rc.e[1] + ' of ' + rc.e[2], prob: rc.e[1] / rc.e[2] * 100, img: await logo(rc.e[3]) });
-    if (rc.r) items.push({ h: 'ON3 RPM', t: rc.r[0], sub: Math.round(rc.r[1]) + '%', prob: rc.r[1], img: await logo(rc.r[2]) });
+    if (rc.r) items.push({ h: 'ON3 RPM', t: rc.r[0], sub: Math.round(rc.r[1]) + '%', prob: rc.r[1], img: await logo(rc.r[2] || (rc.l && rc.l[0] === rc.r[0] && rc.l[2]) || (rc.e && rc.e[0] === rc.r[0] && rc.e[3])) });   // CBB's RPM leader carries no logo id: the lean's or the experts' when they name the same school
     if (rc.l) items.push({ h: 'ARK LEAN', t: rc.l[0], sub: rc.l[1] + '%', prob: rc.l[1], img: await logo(rc.l[2]) });
     return items;
   }
@@ -1640,7 +1651,7 @@
     var cn = function (re) { var c = cv(re), v = c ? parseFloat(c.getAttribute('data-v')) : NaN; return isFinite(v) ? v : null; };
     var D = null, why = null; try { D = JSON.parse(row.getAttribute('data-d') || 'null'); why = D ? D.why : JSON.parse(row.getAttribute('data-why') || 'null'); } catch (e) {}
     var cbb = !!D, open = !!rc.o, nameC = cells[nameI >= 0 ? nameI : 1], name = nameC && nameC.querySelector('button.cfb__who, b') ? pcName(row, nameI >= 0 ? nameI : 1) : nameC ? pcCell(nameC).t : '';
-    var posI = gi(POS_COL), pOf = function (r) { var c = r.cells[posI]; if (!c) return ''; c = c.cloneNode(true); c.querySelectorAll('.cfb__dim, span').forEach(function (e) { e.remove(); }); return txt(c); };
+    var posI = gi(POS_COL), pOf = function (r) { var c = r.cells[posI]; if (!c) return ''; c = c.cloneNode(true); pcPosTrim(c); return txt(c); };
     var posT = posI >= 0 ? pOf(row) : '', team = open ? '' : ct(TEAM_COL), conf = open ? '' : ct(/^conf$/i);
     var fv = cbb ? D.fv : cn(/^xfv/i), alt = cbb ? (D.y1fv != null ? ['Y1 FV', D.y1fv] : D.fvIf != null ? ['IF NBA', D.fvIf] : null) : (cn(/^y1 fv$/i) != null ? ['Y1 FV', cn(/^y1 fv$/i)] : null);
     if (fv == null) return null;
@@ -1758,7 +1769,7 @@
     var rc = null; try { rc = JSON.parse(row.getAttribute('data-rc') || 'null'); } catch (e) {}
     if (rc && rc.o) team = 'uncommitted';   // the team cell holds a lean, which the STARS · PICKS band draws
     var rcI = await rcItems(rc);
-    var posC = posI >= 0 && cells[posI] && cells[posI].cloneNode(true); if (posC) posC.querySelectorAll('.cfb__dim, span').forEach(function (e) { e.remove(); });
+    var posC = posI >= 0 && cells[posI] && cells[posI].cloneNode(true); if (posC) pcPosTrim(posC);
     var ageI = isYouth(win) ? gi(AGE_COL) : -1, ageT = ageI >= 0 && cells[ageI] ? pcCell(cells[ageI]).t : '';
     if (!/\d/.test(ageT)) { ageI = -1; ageT = ''; }
     var playsI = gi(/^plays$/i);
@@ -1788,7 +1799,7 @@
         if (vals.length >= 5) pct = pcPct(vals, n);
       }
       // context columns (age, games, minutes, size, contract) are facts, not grades: a strip under the name, no percentile
-      if (PC_INFO.test(h)) { info.push([capHead(h), c.t]); return; }
+      if (pcFact(h, c.t)) { info.push([capHead(h), c.t]); return; }
       var good = pct == null || PD_NEUTRAL.test(h) ? null : PD_LOWER.test(h) ? 100 - pct : pct;
       tiles.push(pcProb({ i: i, h: h, t: c.t, sub: c.sub, color: c.color, pct: pct, good: good, tip: hcells[i] ? hcells[i].getAttribute('title') : '' }));
     });
@@ -1805,7 +1816,7 @@
       }
     }
     // the headline: the board's FV, else the sorted column (or the first graded number), in a plaque at the top right
-    var hasFv = !!(fvT && fvT !== '—');
+    var hasFv = !!(fvT && !pcDash(fvT));   // any dash (soccer's seniors carry "–"): the sorted stat takes the plaque
     var feat = tiles.find(function (t) { return t.i === sortI; }) || (!hasFv ? tiles.find(function (t) { return t.pct != null && t.prob == null; }) : null);
     if (feat && !hasFv) tiles.splice(tiles.indexOf(feat), 1); else if (feat) feat.key = true;
     var wt = txt(win.querySelector('.win__title-text')).replace(/_$/, '').trim();
@@ -1821,8 +1832,8 @@
     photoFrame(g, photo, x, y - 60, 370, 400);   // no headshot: the frame keeps its place with the pixel silhouette
     // his place in the view, and among the rows at his position
     var posT = posC ? txt(posC) : '', place = '#' + (at + 1) + ' of ' + rows.length, posPlace = '';
-    if (posT && posI >= 0 && rows.length <= 3000 && at >= 0) {
-      var pk0 = 0, pn = 0, pOf = function (r) { var c = r.cells[posI]; if (!c) return ''; c = c.cloneNode(true); c.querySelectorAll('.cfb__dim, span').forEach(function (e) { e.remove(); }); return txt(c); };
+    if (posT && posI >= 0 && rows.length <= 30000 && at >= 0) {
+      var pk0 = 0, pn = 0, pOf = function (r) { var c = r.cells[posI]; if (!c) return ''; c = c.cloneNode(true); pcPosTrim(c); return txt(c); };
       rows.forEach(function (r, k) { if (pOf(r) === posT) { pn++; if (k < at) pk0++; } });
       if (pn >= 3 && pn < rows.length) posPlace = posT + ' #' + (pk0 + 1) + ' of ' + pn;
     }
@@ -1885,7 +1896,7 @@
         if (pcDash(it.t)) return false;
         var ks = words(it.h).map(function (q) { return q + '|' + it.t; }); ks.push(String(it.h).toLowerCase() + '|' + it.t);
         if (ks.some(function (q) { return had[q]; })) return false;
-        if (b.compact && !b.src && (PC_INFO.test(it.h) || /^pct$/i.test(it.h))) { if (PC_INFO.test(it.h) && !info.some(function (f) { return f[0] === capHead(it.h); })) info.push([capHead(it.h), it.t]); return false; }
+        if (b.compact && !b.src && (pcFact(it.h, it.t) || /^pct$/i.test(it.h))) { if (pcFact(it.h, it.t) && !info.some(function (f) { return f[0] === capHead(it.h); })) info.push([capHead(it.h), it.t]); return false; }
         ks.forEach(function (q) { had[q] = 1; }); return true;
       });
       // shares of one whole (NBA position: PF 46%, SF 37% ...): each cell's bar is its share
@@ -1962,18 +1973,31 @@
     if (badges.length) { y += 6; cardRule(g, x, y, w, 'BADGES'); y += 50; y += badgeRows(g, badges, x, y, w); }
     if (repH) {
       y += 16; var half = (w - 60) / 2, lim = bottom - partsH - 10;
+      var repEnd = y;
       [['+ strengths', rep.p, C.teal, x], ['− concerns', rep.m, C.down, x + half + 60]].forEach(function (L) {
         var ly = y; g.font = '52px ' + FONT; g.fillStyle = L[2]; g.fillText(L[0], L[3], ly); ly += 72; g.font = '40px ' + FONT;
         (L[1].length ? L[1] : ['none']).forEach(function (it) {
           var ls = wrap(g, it, half - 56); if (ly + ls.length * 54 > lim) return;
           g.fillStyle = L[2]; g.fillText(L[0][0], L[3] + 4, ly); g.fillStyle = C.lilac; ls.forEach(function (l) { g.fillText(l, L[3] + 56, ly); ly += 54; }); ly += 12;
         });
+        repEnd = Math.max(repEnd, ly);
       });
+      y = repEnd;
     }
     // FV inputs: each driver's push on the grade, two columns of pixel bars pinned to the bottom
     if (parts.length) inputBars(g, x, bottom - partsH + 40, w, 'FV INPUTS', '', parts, Math.max(1, Math.max.apply(null, parts.map(function (p) { return Math.abs(p[1]); }))), 2, 470);
     if (det.opened && det.close) det.close();
-    return F.canvas;
+    // a row with few numbers: the empty stretch under the last band (above the FV inputs when it has them) comes out
+    return pcTrim(F.canvas, y + 16, parts.length ? bottom - partsH : bottom - 24);
+  }
+  // rows y0..y1 of a finished card cut out, in steps of the background's 16 px dot grid; a short gap stays
+  function pcTrim(cv, y0, y1) {
+    y0 = Math.ceil(y0); var cut = Math.floor((y1 - y0) / 16) * 16; if (cut < 480) return cv;
+    var c = document.createElement('canvas'); c.width = cv.width; c.height = cv.height - cut;
+    var g = c.getContext('2d'); g.imageSmoothingEnabled = false;
+    g.drawImage(cv, 0, 0, cv.width, y0, 0, 0, cv.width, y0);
+    g.drawImage(cv, 0, y0 + cut, cv.width, cv.height - y0 - cut, 0, y0, cv.width, cv.height - y0 - cut);
+    return c;
   }
   // ---- a dropdown for every player table that has none (pro boards, mocks, backup watch, ARKLIST ...): the CFB layout
   // built from the row itself. Strengths and concerns are the columns where he sits in the top or bottom fifth of the
@@ -1981,7 +2005,7 @@
   // his place in the view, the ranges a cell carries (80% range, raw value) and the FV chip's note, then the badges and a
   // percentile breakdown of every number. Template text only.
   var PD_NEUTRAL = /^(str|age|g|gp|mp|min|toi|snaps|plays|share|wt\. gp|ht|wt|ht \/ wt|class|yr|yrs|salary|contract|season|gap|xgap|starter|st .*|w-l|rec|range|tag|stage|last|form|roster|pick|rd|vs cons|nhl gp|peak|out|value|tm|xmv|sh|kp|g-xg)$/i;
-  var PD_LOWER = /^(rank|cons|xslot|vrs|ga|gaa|riv|nat)$/i;   // riv, nat: recruit national ranks
+  var PD_LOWER = /^(rank|cons|xslot|vrs|ga|gaa|riv|nat|sack%|int%|fum)$/i;   // riv, nat: recruit national ranks; sack%, int%: QB tables only; fum: returners
   function pdOwn(table) {   // a table that builds its own dropdown
     return table.matches('.cfbm:not(.cbbm), .cfbrc, [data-pd-kind], [data-td-kind]') || !!table.closest('[data-cfb], [data-cbb], [data-esea]') ||
       !!table.querySelector('tbody .cfb__who, tbody .cfbst__more');
@@ -2110,7 +2134,7 @@
         if (sel.value === '') return;
         var t = win.querySelector('table'), r = pcRows(t)[+sel.value], k = pcNameAt(pcHeads(t).map(txt)); sel.value = ''; if (!r) return;
         sel.disabled = true;
-        try { var cv = await buildPCard(win, r); if (cv) preview(cv, 'arkboard-' + pcName(r, k).toLowerCase().replace(/[^a-z0-9]+/g, '-')); } finally { sel.disabled = false; }
+        try { var cv = await buildPCard(win, r); if (cv) preview(cv, 'arkboard-' + pcName(r, k).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')); } finally { sel.disabled = false; }
       });
     });
   }
@@ -2423,6 +2447,9 @@
       var h = secs.length * (2 * pad + sz * 1.5) + nLines * sz * 1.45 + (secs.length - 1) * gap;
       if (h <= F.h && g.measureText(longest).width <= F.w - 2 * pad - sz) break;
     }
+    // more lines than the card holds at the smallest size: the card grows, nothing runs over its box
+    g.font = sz + 'px ' + FONT; h = secs.length * (2 * pad + sz * 1.5) + nLines * sz * 1.45 + (secs.length - 1) * gap;
+    if (h > F.h) { F = await frame(2160, Math.ceil(2700 + h - F.h), d.title || 'method', win.getAttribute('data-gfx-date')); g = F.g; g.font = sz + 'px ' + FONT; }
     var lh = sz * 1.45, y = F.y, spare = (F.h - (secs.length * (2 * pad + sz * 1.5) + nLines * lh + (secs.length - 1) * gap)) / secs.length;
     secs.forEach(function (s) {
       var bh = 2 * pad + sz * 1.5 + s.l.length * lh + spare;
@@ -3563,9 +3590,9 @@
     g.font = fs + 'px ' + FONT; g.fillStyle = C.white;
     fl.forEach(function (t, i) { g.fillText(t, x + pad, cy + pad + 40 + fs * 0.75 + i * fs * 1.3); });
     if (parts.length) {
-      var px = x + pad, pw = w - 2 * pad, tot = parts.reduce(function (a, p) { return a + (+p[1]); }, 0) || 1, py = cy + fh - pad - 104, PC = [C.teal, C.lilac, '#9a8cc4', C.white];
+      var px = x + pad, pw = w - 2 * pad, tot = parts.reduce(function (a, p) { return a + Math.abs(+p[1]); }, 0) || 1, py = cy + fh - pad - 104, PC = [C.teal, C.lilac, '#9a8cc4', C.white];
       parts.forEach(function (p, i) {
-        var ww = i === parts.length - 1 ? x + pad + pw - px : Math.round(pw * (+p[1]) / tot / 8) * 8, inner = ww - (i < parts.length - 1 ? 8 : 0);
+        var ww = i === parts.length - 1 ? x + pad + pw - px : Math.round(pw * Math.abs(+p[1]) / tot / 8) * 8, inner = ww - (i < parts.length - 1 ? 8 : 0);
         g.fillStyle = PC[i % PC.length]; g.fillRect(px, py, inner, 56);
         g.fillStyle = C.dark; g.fillRect(px, py + 52, inner, 4);
         g.font = '36px ' + FONT; g.fillStyle = C.dark; g.fillText(num(p[1], 2).replace(/0$/, ''), px + 12, py + 30);
@@ -3756,9 +3783,9 @@
     blocks.forEach(function (b) {
       var kind = b[0], bhh = b[1];
       if (kind === 'parts') {
-        var tot = d.parts.reduce(function (a, p) { return a + (+p[1]); }, 0) || 1, px = cx0;
+        var tot = d.parts.reduce(function (a, p) { return a + Math.abs(+p[1]); }, 0) || 1, px = cx0;   // by size: a negative weight (soccer GAR's npxG) is a share of the bar too, its sign stays on the number
         d.parts.forEach(function (p, i) {
-          var pw = i === d.parts.length - 1 ? cx0 + cw - px : Math.round(cw * (+p[1]) / tot / 8) * 8;
+          var pw = i === d.parts.length - 1 ? cx0 + cw - px : Math.round(cw * Math.abs(+p[1]) / tot / 8) * 8;
           g.fillStyle = COLS[i % COLS.length]; g.fillRect(px, by + 20, pw - (i < d.parts.length - 1 ? 8 : 0), 96);
           g.fillStyle = C.dark; g.fillRect(px, by + 108, pw - (i < d.parts.length - 1 ? 8 : 0), 8);
           g.font = '64px ' + FONT; g.fillStyle = C.dark; g.fillText(num(p[1]), px + 20, by + 66);
@@ -3946,7 +3973,7 @@
   // on top with their tag; the player standing in carries FILL-IN. Slots pack into the column count that gives the
   // biggest type, in chart order.
   var DC_LG = { cfb: 'CFB', cbb: 'CBB', nfl: 'NFL', nba: 'NBA', nhl: 'NHL', soccer: 'SOCCER' };
-  var DC_INJ = { out: 'O', doubtful: 'D', questionable: 'Q', probable: 'P', 'injured reserve': 'IR', suspension: 'SUSP', 'day-to-day': 'DTD' };
+  var DC_INJ = { dd: 'DTD', 'out (season)': 'OFS', out: 'O', doubtful: 'D', questionable: 'Q', probable: 'P', 'injured reserve': 'IR', suspension: 'SUSP', 'day-to-day': 'DTD' };
   function dcNum(v, f) {
     if (v == null) return '—';
     if (f === 'i') return String(Math.round(v));
@@ -4019,11 +4046,17 @@
             var tags = [], inj = p[3] ? DC_INJ[String(p[3]).toLowerCase()] || String(p[3]).toUpperCase() : '';
             if (inj) tags.push([inj, C.down]);
             if (p[4] === 'fill-in') tags.push(['FILL-IN', C.teal]);
-            g.font = ss + 'px ' + FONT; var tagW = tags.reduce(function (a, t) { return a + g.measureText(t[0]).width + ss * 0.6 + 10; }, 0);
-            g.font = fs + 'px ' + FONT; g.fillStyle = starter ? C.white : C.light;
-            var nroom = Math.max(fs * 3, room - tagW), nm = p[0];
-            if (g.measureText(nm).width > nroom) { var pw = String(nm).split(' '); if (pw.length > 1) nm = pw[0][0] + '. ' + surname(nm); }   // C. Beck before a cut name
-            nm = fit(g, nm, nroom); g.fillText(nm, nx, my);
+            // the name beside its tags: whole, then C. Beck, then Beck; a tag goes before the name is cut
+            var pw = String(p[0]).split(' '), forms = pw.length > 1 ? [p[0], pw[0][0] + '. ' + surname(p[0]), surname(p[0])] : [p[0]], nm = null, nroom = room;
+            for (;;) {
+              g.font = ss + 'px ' + FONT; var tagW = tags.reduce(function (a, t) { return a + g.measureText(t[0]).width + ss * 0.6 + 10; }, 0);
+              g.font = fs + 'px ' + FONT; nroom = Math.max(fs * 3, room - tagW);
+              nm = forms.filter(function (f) { return g.measureText(f).width <= nroom; })[0];
+              if (nm || !tags.length) break;
+              tags.pop();
+            }
+            g.fillStyle = starter ? C.white : C.light;
+            nm = nm || fit(g, forms[forms.length > 1 ? 1 : 0], nroom); g.fillText(nm, nx, my);
             var tgx = nx + g.measureText(nm).width + 12;
             g.font = ss + 'px ' + FONT;
             tags.forEach(function (t) {
@@ -4201,10 +4234,10 @@
         : mode === 'esea-fan' ? await buildFan(win, btn) : mode === 'esea-team' ? await buildTeam(win, btn) : await build(win, btn);
       if (canvas) {
         var pre = SITE === 'arkndjl.net/1nt' ? '1nt-' : SITE === 'arkndjl.net/laursen_111' ? 'laursen-111-' : 'arkboard-';
-        if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
-        if (mode === 'term') { preview(canvas, 'arkboard-process-' + ((JSON.parse(btn.getAttribute('data-gfx-term') || '{}').t) || 'term').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
-        if (mode === 'rq') { preview(canvas, 'arkboard-research-' + ((JSON.parse(btn.getAttribute('data-gfx-rq') || '{}').id) || 'card').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 60)); return; }
-        var name = mode === 'depth' ? 'arkboard-depth-' + (((win.__dcTeam || {}).n) || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'perf' ? 'arkboard-arklist-' + ((win.__arkPerf || {}).sport || 'all').replace(/^college-/, '') + '-' + ((win.__arkPerf || {}).day || 'latest') : mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' || mode === 'bracket' || mode === 'pickem' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
+        if (mode === 'term') { preview(canvas, 'arkboard-process-' + ((JSON.parse(btn.getAttribute('data-gfx-term') || '{}').t) || 'term').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
+        if (mode === 'rq') { preview(canvas, 'arkboard-research-' + ((JSON.parse(btn.getAttribute('data-gfx-rq') || '{}').id) || 'card').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 60)); return; }
+        var name = mode === 'depth' ? 'arkboard-depth-' + (((win.__dcTeam || {}).n) || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'perf' ? 'arkboard-arklist-' + ((win.__arkPerf || {}).sport || 'all').replace(/^college-/, '') + '-' + ((win.__arkPerf || {}).day || 'latest') : mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' || mode === 'bracket' || mode === 'pickem' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
     } catch (err) {

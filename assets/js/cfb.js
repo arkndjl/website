@@ -343,6 +343,9 @@
       var pages = Math.max(1, Math.ceil(match.length / PER));
       page = Math.min(Math.max(page, 0), pages - 1);
       body.innerHTML = match.slice(page * PER, page * PER + PER).map(function (r) { return rowHtml(r, RK[r.i], opt, PRK[r.i]); }).join('');
+      // every matching row for the GFX card's percentiles and "#k of N" (assets/js/gfx.js pcAll), built off the page on demand, photos left out
+      var gfxAll = null, list = match; body.parentNode.__gfxOff = page * PER; body.parentNode.__gfxN = list.length;
+      body.parentNode.__gfxAll = function () { if (!gfxAll) { var b = document.createElement('tbody'); b.innerHTML = list.map(function (r) { return rowHtml(r, RK[r.i], opt, PRK[r.i]); }).join('').replace(/<img[^>]*>/g, ''); gfxAll = [].slice.call(b.rows); } return gfxAll; };
       atEl.textContent = page + 1; ofEl.textContent = pages; pager.hidden = pages < 2;
     }
     // underclassmen: Fr or So (redshirts included); many rows carry only the class label, no eligibility year
