@@ -18,6 +18,7 @@ NIL, per player (CFB definitions, Noah):
   k and a are chosen by fit to On3's valuations (log RMSE; On3 values only the top ~60 players, so a diagnostic).
 """
 import gzip
+import datetime
 import json
 import math
 import os
@@ -384,6 +385,20 @@ def main():
     if not frozen:
         with open(YNIL, 'w') as h:
             json.dump({'season': season, 'asof': G.get('asof'), 'ynil': {f"{p['name']}|{p['team']}": p['ynil'] for p in P if p['ynil'] is not None}}, h, separators=(',', ':'))
+    # reported deals (data/nil_deals.json): half way (geometric) from the model's number to the report: yNIL when the deal
+    # is for this season, xNIL when it was reported in the last year. After the freeze, so a report is applied once
+    try:
+        deals = {(N.key(d['player']), d['team']): d for d in sorted(json.load(open(os.path.join(ROOT, 'data', 'nil_deals.json')))['deals'], key=lambda d: d['date'])
+                 if d.get('sport') == 'cbb' and d.get('amount')}
+    except (OSError, ValueError, KeyError):
+        deals = {}
+    today = datetime.date.today()
+    for p in P:
+        d = deals.get((N.key(p['name']), p['team']))
+        if not d: continue
+        if d['season'] == season and p['ynil']: p['ynil'] = money(math.sqrt(p['ynil'] * d['amount']))
+        if d['season'] >= season and (today - datetime.date.fromisoformat(d['date'])).days <= 365 and p['xnil']: p['xnil'] = money(math.sqrt(p['xnil'] * d['amount']))
+        p['znil'] = None if p['ynil'] is None else p['xnil'] - p['ynil']
     xr, xb = rmse({id(p): p['xnil'] for p in P}); yr, yb = rmse({id(p): p['ynil'] or 1e3 for p in P})
     nilfit = {'a': a, 'k': kappa, 'n': len(fitset), 'valueTest': {str(k): r0(v, 3) for k, v in grid.items()}, 'kTest': {str(k): r0(v, 3) for k, v in kg.items()},
               'rmseX': r0(xr, 3), 'biasX': r0(xb, 3), 'rmseY': r0(yr, 3), 'biasY': r0(yb, 3), 'price': {k: money(v) for k, v in price.items()},

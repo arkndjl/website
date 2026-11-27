@@ -1565,7 +1565,7 @@
   // transactions, fetched on the first card. A recruit keeps the rows of his class; anyone else the chain of teams ending at his.
   var MV_DATA = {}, MV_SPORT = { cfb: 'cfb', cbb: 'cbb', nfl: 'nfl', nba: 'nba', nhl: 'nhl', hockey: 'nhl', soccer: 'soccer', u22: 'soccer' };
   var MV_H = 190, MV_MON = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-  var MV_LAB = { commit: ['COMMIT', 'teal'], decommit: ['DECOMMIT', 'down'], flip: ['FLIP', 'white'], sign: ['SIGNED', 'teal'], resign: ['RE-SIGNED', 'teal'], extend: ['EXTENSION', 'teal'], reclass: ['RECLASS', 'lilac'],
+  var MV_LAB = { nil: ['NIL DEAL', 'teal'], commit: ['COMMIT', 'teal'], decommit: ['DECOMMIT', 'down'], flip: ['FLIP', 'white'], sign: ['SIGNED', 'teal'], resign: ['RE-SIGNED', 'teal'], extend: ['EXTENSION', 'teal'], reclass: ['RECLASS', 'lilac'],
                  visit: ['OFFICIAL VISIT', 'lilac'], unofficial: ['VISIT', 'lilac'], portal: ['PORTAL', 'down'], transfer: ['TRANSFER', 'white'], trade: ['TRADE', 'white'], release: ['RELEASED', 'down'], claim: ['CLAIMED', 'teal'] };
   function mvDate(d) { var m = String(d || '').match(/^(\d{4})(?:-(\d\d)-(\d\d))?/); return !m ? '' : m[2] ? MV_MON[+m[2] - 1] + ' ' + (+m[3]) + ' \'' + m[1].slice(2) : m[1]; }
   async function pcMoves(win, name, o) {

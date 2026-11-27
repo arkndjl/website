@@ -111,3 +111,10 @@
   (rookie deal, later earnings by pick/position/age from OverTheCap contracts, pick spreads of declarers and returners from the
   PFF boards) and writes `data/dor_fit.json`; `dorOf` in `scripts/cfb_teams.mjs` reads its grid on every board write (`dor`,
   `dorD` columns). Refit after each draft and when the rookie scale in `scripts/cfb_declare_econ.py` is updated.
+
+## NIL deals ledger
+
+- A confirmed NIL deal is one row in `data/nil_deals.json` (player, team, season, amount for that season, date, source; `cls` for a
+  recruit). Nothing else is typed: the next board runs move the player's yNIL / xNIL half way to the report (`NIL_DEALS` in
+  `scripts/fetch_cfb.mjs`, `scripts/cbb_market.py`), `scripts/transactions.py` and `scripts/recruit_news.py` list it in the
+  transactions and recruit transactions tabs (`k: "nil"`), and `scripts/news.py` posts it. School budgets are `data/nil_budgets.json`.

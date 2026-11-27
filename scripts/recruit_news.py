@@ -507,6 +507,12 @@ def main():
             hit = [x for x in pool.rows if x.get('cls') and x['cls'] == r.get('cls') and names.same(x['n'], r['n'])
                    and (not r.get('pos') or not x.get('pos') or names.pos_fits(x['pos'], r['pos'], 'football' if sport == 'cfb' else 'basketball'))]
             if len({x['n'] for x in hit}) == 1: r['n'], r['b'] = hit[0]['n'], 1
+        # confirmed NIL deals of recruits (data/nil_deals.json, the ledger the NIL models read), last 120 days
+        from transactions import nil_deals
+        have = {(r['d'], names.key(r['n']), r['k']) for r in rows}
+        since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=120)).strftime('%Y-%m-%d')
+        rows += [{'n': x['n'], 'pos': x['pos'], 'cls': x['cls'], 'k': 'nil', 'to': x['to'], 't': x['h'], 'd': x['d'], 'amt': x['amt'], 'b': 1, 'src': {}}
+                 for x in nil_deals(sport, recruits=True) if x['d'] >= since and (x['d'], names.key(x['n']), 'nil') not in have]
         rows.sort(key=lambda r: (r['d'], r['n']), reverse=True)
         out[sport] = [{k: v for k, v in r.items() if v is not None} for r in rows]
         print(f'{sport}: {len(new)} moves pulled, {len(rows)} kept', file=sys.stderr)

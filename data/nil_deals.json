@@ -1,5 +1,5 @@
 {
- "_readme": "Reported NIL / revenue-share deals, one row a report (amount in USD for the season named; a range is entered at its midpoint). Read by scripts/fetch_cfb.mjs (NIL_DEALS): a deal for this season moves the player's yNIL, one reported in the last year moves his xNIL and the price fit's target for him, each half way (geometric). Add a row when a deal is reported; the board picks it up on its next run.",
+ "_readme": "Reported NIL / revenue-share deals, one row a report (amount in USD for the season named: the fall's year in football, the spring's in basketball; a range is entered at its midpoint; cls = the recruiting class for a recruit's deal). Add a row when a deal is confirmed. Read by scripts/fetch_cfb.mjs (NIL_DEALS) and scripts/cbb_market.py: a deal for this season moves the player's yNIL, one reported in the last year moves his xNIL (and in football the price fit's target for him), each half way (geometric). scripts/transactions.py and scripts/recruit_news.py list the rows in the transactions and recruit transactions tabs.",
  "deals": [
   {
    "sport": "cfb",
@@ -66,6 +66,86 @@
    "date": "2026-11-25",
    "kind": "re-sign",
    "source": "On3; confirmed by the school's statement"
+  },
+  {
+   "sport": "cfb",
+   "player": "Jackson Cantwell",
+   "team": "Miami",
+   "pos": "OL",
+   "season": 2026,
+   "amount": 2000000,
+   "date": "2026-08-11",
+   "kind": "recruit",
+   "cls": 2026,
+   "source": "ESPN"
+  },
+  {
+   "sport": "cfb",
+   "player": "Felix Ojo",
+   "team": "Texas Tech",
+   "pos": "OL",
+   "season": 2026,
+   "amount": 775000,
+   "date": "2025-12-09",
+   "kind": "recruit",
+   "cls": 2026,
+   "source": "The Athletic ($775K a year for three years)"
+  },
+  {
+   "sport": "cfb",
+   "player": "David Gabriel Georges",
+   "team": "Tennessee",
+   "pos": "RB",
+   "season": 2027,
+   "amount": 2000000,
+   "date": "2026-08-11",
+   "kind": "recruit",
+   "cls": 2027,
+   "source": "ESPN"
+  },
+  {
+   "sport": "cbb",
+   "player": "Thomas Haugh",
+   "team": "Florida",
+   "pos": "F",
+   "season": 2027,
+   "amount": 5000000,
+   "date": "2026-05-06",
+   "kind": "re-sign",
+   "source": "On3"
+  },
+  {
+   "sport": "cbb",
+   "player": "Flory Bidunga",
+   "team": "Louisville",
+   "pos": "C",
+   "season": 2027,
+   "amount": 5000000,
+   "date": "2026-05-06",
+   "kind": "portal",
+   "source": "On3"
+  },
+  {
+   "sport": "cbb",
+   "player": "Jackson Shelstad",
+   "team": "Louisville",
+   "pos": "G",
+   "season": 2027,
+   "amount": 2000000,
+   "date": "2026-05-06",
+   "kind": "portal",
+   "source": "On3"
+  },
+  {
+   "sport": "cbb",
+   "player": "Milan Momcilovic",
+   "team": "Kentucky",
+   "pos": "F",
+   "season": 2027,
+   "amount": 6000000,
+   "date": "2026-10-21",
+   "kind": "portal",
+   "source": "CBS Sports"
   }
  ]
 }

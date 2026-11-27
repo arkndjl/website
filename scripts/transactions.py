@@ -29,7 +29,7 @@ import os
 import re
 import sys
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -242,6 +242,19 @@ def soccer():
     return rows, []
 
 
+def nil_deals(sport, recruits=False):
+    """Confirmed NIL deals (data/nil_deals.json, the ledger the NIL models read) from the last year, as rows: k 'nil',
+    amt the season's amount. recruits: the rows with a recruiting class (the recruit transactions tab) or the rest."""
+    try:
+        L = json.load(open(os.path.join(ROOT, 'data', 'nil_deals.json')))['deals']
+    except (OSError, ValueError, KeyError):
+        return []
+    since = (datetime.now(timezone.utc) - timedelta(days=365)).strftime('%Y-%m-%d')
+    return [{'d': d['date'], 'n': d['player'], 'pos': d.get('pos') or '', 'k': 'nil', 'fr': None, 'to': d['team'], 'amt': d['amount'],
+             'h': f"${d['amount'] / 1e6:.1f}M for {d['season']} ({d.get('source') or 'reported'})", **({'cls': d['cls']} if d.get('cls') else {})}
+            for d in L if d.get('sport') == sport and d.get('amount') and d['date'] >= since and bool(d.get('cls')) == recruits]
+
+
 def build(sport):
     p = os.path.join(OUT, f'{sport}.json')
     if sport == 'soccer' and '--force' not in sys.argv:
@@ -252,6 +265,8 @@ def build(sport):
         except (OSError, ValueError, KeyError):
             pass
     rows, deals = soccer() if sport == 'soccer' else pro(sport)
+    if sport in ('cfb', 'cbb'):
+        rows = sorted(rows + nil_deals(sport), key=lambda r: r['d'], reverse=True)
     os.makedirs(OUT, exist_ok=True)
     with open(p + '.tmp', 'w') as f:
         json.dump({'asof': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'rows': rows, 'deals': deals}, f,

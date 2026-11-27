@@ -18,7 +18,7 @@
 {{- $vn := slice }}{{ range $cols }}{{ $vn = $vn | append (index . 0) }}{{ end -}}
 {{- $icon := cond (in (slice "cbb" "nba") $sport) "basketball" (cond (eq $sport "nhl") "hockey" (cond $soccer "soccer" "football")) -}}
 {{- $filter := cond $soccer "Move,Lg,From,To" (cond $college "Move,Pos,Team" "Move,Pos,From,To") -}}
-{{- $kt := dict "trade" "traded" "claim" "claimed off waivers" "release" "waived, released or cut" "sign" "signed (contract, extension, active roster)" "practice" "practice squad" "up" "called up / promoted" "down" "sent down / assigned" "exit" (cond $college "left the program (portal, dismissed, retired)" "retired, overseas or parted ways") "transfer" "transfer or loan" -}}
+{{- $kt := dict "trade" "traded" "claim" "claimed off waivers" "release" "waived, released or cut" "sign" "signed (contract, extension, active roster)" "practice" "practice squad" "up" "called up / promoted" "down" "sent down / assigned" "exit" (cond $college "left the program (portal, dismissed, retired)" "retired, overseas or parted ways") "transfer" "transfer or loan" "nil" "confirmed NIL deal, the season's amount" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "transactions") "icon" $icon "filter" $filter "tab" ($.Get "tab") "gfxCols" (cond $soccer (printf "Date,Player,%s,From,To,Fee" (delimit $vn ",")) (printf "Date,Player,Pos,%s,Move,From,To%s" (delimit $vn ",") (cond $pro ",Picks" ""))) "gfxDate" (lower ((time .asof).Format "Jan 2")) "gfxMax" "30") -}}
 <table class="cfb__table tx">
   <thead><tr>
@@ -36,7 +36,7 @@
     {{- if not $soccer }}<td>{{ .pos }}</td>{{ end }}
     {{- $v := index $V (printf "%s|%s|%s" .d .n .k) | default slice }}
     {{- range $i, $c := $cols }}{{ $x := cond (lt $i (len $v)) (index $v $i) nil }}<td class="cfb__num" data-v="{{ if ne $x nil }}{{ $x }}{{ end }}">{{ if ne $x nil }}{{ if eq (index $c 2) "%d" }}{{ printf "%d" (int $x) }}{{ else }}{{ partial "num.html" (slice (index $c 2) (float $x)) }}{{ end }}{{ end }}</td>{{ end }}
-    <td title="{{ index $kt .k }}"><span class="tx__k tx__k--{{ .k }}">{{ .k }}</span></td>
+    <td title="{{ index $kt .k }}"><span class="tx__k tx__k--{{ .k }}">{{ .k }}{{ with .amt }} ${{ lang.FormatNumber 1 (div . 1e6) }}M{{ end }}</span></td>
     {{- if $soccer }}<td>{{ .lg }}</td>{{ end }}
     {{- if $college }}
     <td>{{ .fr | default .to }}</td>
