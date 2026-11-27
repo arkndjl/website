@@ -1,0 +1,64 @@
+{{- /* ARKLOG > scoreboard: the log counted. Tests by week, by sport and by area (shipped / part shipped / failed),
+       every change by week, and the game-model term ledger. Charts are pixel SVGs written by scripts/arklog.py into
+       data/arklog.json. The GFX button draws the scoreboard 16:9 (gfx.js buildBoard).
+       {{< arklogboard tab="scoreboard" >}} */ -}}
+{{- $l := site.Data.arklog -}}
+{{- $o := site.Data.library.overview -}}
+{{- $btns := `<span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>` | safeHTML -}}
+{{- $key := `<p class="libstudy__legend"><span class="lc-key lc-k0">shipped</span><span class="lc-key lc-k2">part shipped</span><span class="lc-key lc-k4">failed</span></p>` | safeHTML -}}
+<div class="desk libgrid proc" data-tab="{{ .Get "tab" }}">
+<div class="win proc__wide">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>scoreboard.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="proc__tiles proc__tiles--row">
+    <div class="proc__tile"><i>changes</i><b>{{ lang.FormatNumber 0 $l.changes }}</b></div>
+    <div class="proc__tile"><i>tests</i><b>{{ $l.tests }}</b></div>
+    <div class="proc__tile is-s"><i>shipped</i><b>{{ $l.shipped }}</b></div>
+    <div class="proc__tile is-m"><i>part shipped</i><b>{{ $l.mixed }}</b></div>
+    <div class="proc__tile is-f"><i>failed</i><b>{{ $l.failed }}</b></div>
+    <div class="proc__tile"><i>studies</i><b>{{ $l.studies }}</b></div>
+  </div>
+  {{- $card := dict "tests" $l.tests "shipped" $l.shipped "mixed" $l.mixed "failed" $l.failed "changes" $l.changes "studies" $l.studies "first" $l.first "asof" $l.asof "sport" $l.by_sport "area" $l.by_area }}
+  <p class="rq__bar libstudy__bar">
+    <button type="button" class="cfb__btn" data-gfx data-gfx-mode="logboard" data-gfx-board="{{ jsonify $card }}" title="scoreboard PNG, 16:9 for X">GFX card</button>
+    <a class="cfb__btn rq__link" href="#log">log</a>
+  </p>
+  <div class="win__status"><span>since {{ dateFormat "Jan 2 2006" $l.first }}</span><span>updated {{ dateFormat "Jan 2 2006" $l.asof }}</span></div>
+</div>
+<div class="win">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>tests by week<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="libstudy__body"><div class="libstudy__chart">{{ $l.svg.weeks | safeHTML }}{{ $key }}</div></div>
+</div>
+<div class="win">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>changes by week<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="libstudy__body"><div class="libstudy__chart">{{ $l.svg.all | safeHTML }}
+    <p class="libstudy__legend"><span class="lc-key lc-k0">tests</span><span class="lc-key lc-k3">features and fixes</span></p></div></div>
+</div>
+<div class="win">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>tests by sport<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="libstudy__body"><div class="libstudy__chart">{{ $l.svg.sport | safeHTML }}{{ $key }}</div></div>
+</div>
+<div class="win">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>tests by area<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="libstudy__body"><div class="libstudy__chart">{{ $l.svg.area | safeHTML }}{{ $key }}</div></div>
+</div>
+<div class="win">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>changes by section<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="libstudy__body"><div class="libstudy__chart">{{ $l.svg.sec | safeHTML }}
+    <p class="libstudy__legend"><span class="lc-key lc-k0">tests</span><span class="lc-key lc-k3">features and fixes</span></p></div></div>
+</div>
+{{- with $o.ledger }}
+<div class="win proc__wide">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>model ledger<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="proc__tiles proc__tiles--row">
+    <div class="proc__tile is-s"><i>kept</i><b>{{ .keep }}</b></div>
+    <div class="proc__tile"><i>core</i><b>{{ .core }}</b></div>
+    <div class="proc__tile is-m"><i>watch</i><b>{{ .watch }}</b></div>
+    <div class="proc__tile is-f"><i>dropped</i><b>{{ .drop }}</b></div>
+    <div class="proc__tile"><i>candidates</i><b>{{ .candidate }}</b></div>
+  </div>
+  <p class="rq__bar libstudy__bar"><a class="cfb__btn rq__link" href="{{ "arkboard/process/" | relURL }}#g-model-ledger">rule</a></p>
+  <div class="win__status"><span>game model terms</span><span>held-out t, one family</span></div>
+</div>
+{{- end }}
+</div>
+{{- partial "js.html" "gfx" -}}

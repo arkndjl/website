@@ -5202,3 +5202,129 @@ a.tick__g--nw:hover .tick__me { color: #fff; }
 /* a term in running text (ticker cells, news rows) */
 .term { text-decoration: underline dotted; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, currentColor 55%, transparent); cursor: help; }
 [data-term] { cursor: help; }
+
+/* ---- Process (Nov 27 2026): overview, sport sheets, log, scoreboard; charts inside glossary windows ----
+   layouts/shortcodes/procover.html, procsports.html, proclog.html, procboard.html, libglossary.html */
+.libchart .lc-s3 { fill: color-mix(in srgb, var(--accent) 38%, transparent); }
+.libchart .lc-s4 { fill: #ff9ec7; }
+.libchart .lc-bar.lc-s3 { fill: color-mix(in srgb, var(--accent) 38%, transparent); }
+.libchart .lc-own { fill: var(--foreground); }
+.lc-k3::before { background: color-mix(in srgb, var(--accent) 38%, transparent); }
+.lc-k4::before { background: #ff9ec7; }
+.proc > .proc__wide { grid-column: 1 / -1; }
+.proc__chain { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 18px; margin: 12px 12px 0; }
+.proc__node { position: relative; display: grid; gap: 2px; padding: 8px 6px; text-align: center; text-decoration: none; color: var(--foreground);
+  background: var(--win-well); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); }
+.proc__node:hover, .proc__node:focus-visible { background: var(--win-title); color: #fff; outline: none; }
+.proc__node b { font-size: 1.6em; font-weight: 400; line-height: 1.1; color: #fff; }
+.proc__node span { overflow-wrap: anywhere; }
+.proc__node i { font-style: normal; font-size: .8em; color: var(--accent); }
+.proc__node:not(:last-child)::after { content: ""; position: absolute; right: -15px; top: 50%; width: 10px; height: 10px; margin-top: -5px; background: var(--accent);
+  clip-path: polygon(0 40%, 60% 40%, 60% 0, 100% 50%, 60% 100%, 60% 60%, 0 60%); }
+.proc__gate { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 10px 12px; padding: 6px 10px; text-decoration: none; color: var(--accent);
+  background: var(--win-dark); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); }
+.proc__gate:hover, .proc__gate:focus-visible { background: var(--win-title); outline: none; }
+.proc__gate span { margin-right: auto; letter-spacing: .08em; text-transform: uppercase; color: #fff; }
+.proc__gate b { font-weight: 400; font-size: 1.2em; color: #fff; }
+.proc__gate i { font-style: normal; margin-right: 8px; }
+.proc__gate b.is-s, .proc__tile.is-s b { color: var(--foreground); }
+.proc__gate b.is-m, .proc__tile.is-m b { color: #cf9bff; }
+.proc__gate b.is-f, .proc__tile.is-f b { color: #ff9ec7; }
+.proc__cell { display: grid; grid-template-columns: minmax(0, 1fr) 56px 4ch; gap: 0 6px; align-items: center; }
+.proc__lead .proc__m { color: #fff; overflow-wrap: anywhere; }
+.proc__r { display: block; height: 10px; background: var(--win-dark); }
+.proc__r i { display: block; height: 100%; background: var(--foreground); }
+.proc__n { color: var(--foreground); }
+.proc__gates { margin: 10px 12px; }
+.proc__gates dt { margin: 8px 0 0; }
+.proc__gates dt:first-child { margin-top: 0; }
+.proc__gates dt a { color: var(--foreground); }
+.proc__gates dd { margin: 0; color: color-mix(in srgb, #fff 88%, transparent); }
+.proc__tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0 0 10px; }
+.proc__tiles--row { grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); margin: 12px 12px 0; }
+.proc__tile { display: grid; gap: 1px; padding: 6px 8px; background: var(--win-well); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); min-width: 0; }
+.proc__tile i { font-style: normal; font-size: .8em; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.proc__tile b { font-weight: 400; font-size: 1.25em; color: #fff; overflow-wrap: anywhere; }
+.proc__tile span { font-size: .85em; color: var(--foreground); }
+.procsheet__grp { display: flex; flex-wrap: wrap; gap: 4px 6px; margin: 0 0 8px; }
+.procsheet__tab { flex: 0 0 100%; font-size: .8em; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); text-decoration: none; }
+.procsheet__term { padding: 0 6px; text-decoration: none; color: var(--foreground); background: var(--win-well); border: 1px solid var(--win-dark); }
+.procsheet__tab:hover, .procsheet__term:hover, .procsheet__term:focus-visible { color: #fff; background: var(--win-title); outline: none; }
+.libterm__figs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 8px; margin: 0 0 10px; }
+.libterm__fig { margin: 0; }
+.libterm__fig figcaption, .post .libterm__fig figcaption { margin: 4px 0 0; padding: 0; background: none; text-align: left; font-size: .8em; color: var(--accent); }
+.libterm__fig .libchart .lc-tick, .libterm__fig .libchart .lc-label, .libterm__fig .libchart .lc-marktext { font-size: 11.5px; }
+.libterm__fig .proc__tiles { margin: 0; }
+/* the log */
+.proclog > .libfind__box { margin: 0; }
+.proclog__chips { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 12px 0; }
+.post ol.proclog__rows, ol.proclog__rows { list-style: none; margin: 10px 12px 0; padding: 0; }
+.post ol.proclog__rows li { margin: 0; }
+.post ol.proclog__rows li::before, .post ul.plrow__lines li::before { content: none; }
+.plrow { border-bottom: 1px solid var(--win-well); border-left: 4px solid var(--win-well); }
+.plrow--s { border-left-color: var(--foreground); }
+.plrow--m { border-left-color: #b46cff; }
+.plrow--f { border-left-color: #ff9ec7; }
+.plrow--study { border-left-color: var(--accent); }
+.plrow__head { display: grid; grid-template-columns: 6ch minmax(0, auto) minmax(0, 1fr) auto auto; gap: 2px 10px; align-items: baseline; width: 100%; margin: 0; padding: 4px 8px;
+  font: inherit; text-align: left; text-decoration: none; color: #fff; background: transparent; border: 0; border-radius: 0; cursor: pointer; }
+.plrow__head:hover, .plrow__head:focus-visible, .plrow.is-open > .plrow__head { background: var(--win-well); outline: none; }
+.plrow__date { color: var(--accent); white-space: nowrap; }
+.plrow__tags { display: flex; gap: 3px; }
+.plrow__tags i { font-style: normal; font-size: .8em; padding: 0 4px; color: #fff; background: var(--win-title); }
+.plrow__tags:empty { display: none; }
+.plrow__tags:empty + .plrow__title { grid-column: 2 / 4; }
+.plrow__eff { color: var(--foreground); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 34ch; }
+.plrow__eff.is-down { color: #ff9ec7; }
+.plrow__v { min-width: 11ch; text-align: right; font-size: .8em; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); white-space: nowrap; }
+.plrow--s .plrow__v { color: var(--foreground); }
+.plrow--m .plrow__v { color: #cf9bff; }
+.plrow--f .plrow__v { color: #ff9ec7; }
+.plrow--study .plrow__eff { white-space: normal; max-width: 60ch; text-align: left; grid-column: 3 / 5; }
+.plrow--study .plrow__title { grid-column: 3 / 5; }
+.plrow--study .plrow__v { grid-row: 1; grid-column: 5; }
+.plrow__more { padding: 4px 8px 10px calc(6ch + 18px); background: color-mix(in srgb, var(--win-well) 55%, transparent); }
+.plrow__meta { margin: 0 0 6px; font-size: .85em; color: var(--accent); }
+.post ul.plrow__lines, ul.plrow__lines { list-style: none; margin: 0 0 8px; padding: 0; }
+.plrow__lines li { position: relative; margin: 0 0 5px; padding-left: 12px; border-left: 3px solid var(--win-dark); color: color-mix(in srgb, #fff 90%, transparent); }
+.plrow__lines li.is-s { border-left-color: var(--foreground); }
+.plrow__lines li.is-f { border-left-color: #ff9ec7; }
+.plrow__lines li[data-v]::before { content: attr(data-v); display: block; position: static; width: auto; height: auto; background: none; font-size: .75em; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.plrow__lines li.is-s[data-v]::before { color: var(--foreground); }
+.plrow__lines li.is-f[data-v]::before { color: #ff9ec7; }
+.plrow__more .rq__bar { margin: 0; }
+.proclog__rows--mini .plrow__head { grid-template-columns: 6ch minmax(0, 1fr) auto; }
+.proclog__rows--mini .plrow__eff { grid-column: 2; text-align: left; max-width: none; }
+.proclog__rows--mini .plrow__v { grid-column: 3; grid-row: 1; }
+@media (max-width: 900px) {
+  .proc__chain { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px 18px; }
+}
+@media (max-width: 684px) {
+  .proc__chain { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 8px 8px 0; }
+  .proc__node:not(:last-child)::after { display: none; }
+  .proc__gate { margin: 8px; }
+  .proc__gate span { flex: 0 0 100%; }
+  .proc__cell { grid-template-columns: minmax(0, 1fr) 4ch; }
+  .proc__cell .proc__r { display: none; }
+  .proc__tiles--row { margin: 8px 8px 0; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .proclog__chips { margin: 6px 8px 0; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .proclog__chips .cfb__chip { flex: 0 0 auto; min-height: 32px; }
+  .post ol.proclog__rows, ol.proclog__rows { margin: 8px 0 0; }
+  .plrow__head { grid-template-columns: auto minmax(0, 1fr) auto; min-height: 44px; }
+  .plrow__date { grid-column: 1; }
+  .plrow__tags { grid-column: 2; }
+  .plrow__v { grid-column: 3; grid-row: 1; min-width: 0; }
+  .plrow__title, .plrow__tags:empty + .plrow__title { grid-column: 1 / -1; }
+  .plrow__eff { grid-column: 1 / -1; text-align: left; max-width: none; white-space: normal; }
+  .plrow--study .plrow__eff, .plrow--study .plrow__title { grid-column: 1 / -1; }
+  .plrow--study .plrow__v { grid-column: 3; }
+  .plrow__more { padding-left: 8px; }
+  .proclog__rows--mini .plrow__head { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .proclog__rows--mini .plrow__title { grid-column: 1 / -1; grid-row: 2; }
+  .proclog__rows--mini .plrow__eff { grid-column: 1 / -1; grid-row: 3; }
+}
+.proclog__mo { margin: 0 0 0 auto; padding: 1px 6px; font: inherit; color: var(--foreground); background: var(--win-well); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); border-radius: 0; }
+.arklog__months td.is-s { color: var(--foreground); }
+.arklog__months td.is-m { color: #cf9bff; }
+.arklog__months td.is-f { color: #ff9ec7; }
+@media (max-width: 684px) { .proclog__mo { flex: 0 0 auto; margin-left: 0; min-height: 32px; } }

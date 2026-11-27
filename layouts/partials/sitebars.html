@@ -1,4 +1,4 @@
-{{- /* Pixel bar chart for /site/ (layouts/shortcodes/sitestats.html): dict "v" (values) "v2" (optional, stacked on v)
+{{- /* Pixel bar chart for /arklog/ (layouts/shortcodes/sitestats.html): dict "v" (values) "v2" (optional, stacked on v)
        "line" (optional, a step line over the bars; 0 or less = none) "t" (hover title per bar) "dim" (index of a bar drawn
        dim, -1 none) "label" (aria label). Width scales to the window; bars stay crisp. */ -}}
 {{- $v := .v }}{{ $n := len $v }}{{ $v2 := .v2 | default slice }}{{ $ln := .line | default slice }}{{ $dim := .dim | default -1 -}}

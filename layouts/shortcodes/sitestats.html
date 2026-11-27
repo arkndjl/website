@@ -1,4 +1,4 @@
-{{- /* /site/ (content/site.md): the site's own numbers from data/site_stats.json (scripts/site_stats.py, workflow
+{{- /* /arklog/ site data tabs (content/arklog.md): the site's own numbers from data/site_stats.json (scripts/site_stats.py, workflow
        site-stats.yml: Cloudflare zone analytics + GitHub) and data/freshness.json. {{< sitestats part="views|trend|traffic|build|fresh" >}}
        Days are UTC (Cloudflare's day). The newest day is drawn dim while it is still open. */ -}}
 {{- $d := site.Data.site_stats }}{{ $s := $d.summary }}{{ $part := .Get "part" }}{{ $cls := .Get "class" -}}

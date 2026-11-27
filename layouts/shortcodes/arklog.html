@@ -1,0 +1,29 @@
+{{- /* ARKLOG (/arklog/) > log: every merged change to the site with its merge time, and for a test the held-out number before
+       and after, the t, and shipped / part shipped / failed. Rows are read in the browser from /data/arklog.json
+       (scripts/arklog.py, rebuilt by the process refresh workflow) by assets/js/arklog.js: find box, chips for the verdict,
+       the site section, the sport and the area; a row opens to the numbered lines of its record. "#log-<n>" opens one
+       row, "#log:<sport>" a sport's rows. Each row has a 16:9 GFX card (gfx.js buildLog).
+       {{< arklog tab="log" >}} */ -}}
+{{- $l := site.Data.arklog -}}
+<div class="desk libgrid libgrid--one" data-tab="{{ .Get "tab" }}">
+<div class="win proclog" data-proclog="{{ "data/arklog.json" | relURL }}" data-repo="https://github.com/arkndjl/website">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-site"/></svg>arklog.exe<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <label class="gallery__filter libfind__box"><span class="gallery__filter-label">find</span><input type="search" data-pl-q placeholder="metric, model or sport" autocomplete="off" enterkeyhint="search"></label>
+  <div class="proclog__chips" data-pl-v role="group" aria-label="verdict">
+    <button type="button" class="cfb__chip" data-v="">all</button><button type="button" class="cfb__chip is-on" data-v="t">tests</button><button type="button" class="cfb__chip" data-v="s">shipped</button><button type="button" class="cfb__chip" data-v="m">part shipped</button><button type="button" class="cfb__chip" data-v="f">failed</button><button type="button" class="cfb__chip" data-v="study">studies</button><button type="button" class="cfb__chip" data-v="o">features and fixes</button><select class="proclog__mo" data-pl-mo aria-label="month"><option value="">every month</option>{{ range $l.months }}<option value="{{ .mo }}">{{ dateFormat "Jan 2006" (printf "%s-01" .mo) }}</option>{{ end }}</select>
+  </div>
+  <div class="proclog__chips" data-pl-sec role="group" aria-label="section">
+    <button type="button" class="cfb__chip is-on" data-sec="">every section</button>{{ range slice "ARKBOARD" "1NT" "LAURSEN_111" "ST. CLAIRE" "ARKLIBRARY" "site" }}{{ if index $l.sections . }}<button type="button" class="cfb__chip" data-sec="{{ . }}">{{ . }}</button>{{ end }}{{ end }}
+  </div>
+  <div class="proclog__chips" data-pl-sp role="group" aria-label="sport">
+    <button type="button" class="cfb__chip is-on" data-sp="">every sport</button>{{ range slice "CFB" "NFL" "CBB" "NBA" "NHL" "Soccer" "Tennis" "CS2" "MLB" }}{{ if (index $l.sports .).all }}<button type="button" class="cfb__chip" data-sp="{{ . }}">{{ . }}</button>{{ end }}{{ end }}
+  </div>
+  <div class="proclog__chips" data-pl-ar role="group" aria-label="area">
+    <button type="button" class="cfb__chip is-on" data-ar="">every area</button>{{ range slice (slice "fv" "FV") (slice "value" "player value") (slice "players" "player odds") (slice "teams" "team ratings") (slice "games" "game models") (slice "drafts" "drafts and mocks") }}<button type="button" class="cfb__chip" data-ar="{{ index . 0 }}">{{ index . 1 }}</button>{{ end }}
+  </div>
+  <ol class="proclog__rows" data-pl-rows><li class="cfb__dim">loading…</li></ol>
+  <p class="rq__bar libstudy__bar"><button type="button" class="cfb__btn" data-pl-more hidden>more</button></p>
+  <div class="win__status"><span data-pl-count>{{ lang.FormatNumber 0 $l.changes }} changes · {{ $l.tests }} tests · {{ $l.studies }} studies</span><span>updated {{ dateFormat "Jan 2 2006" $l.asof }}</span></div>
+</div>
+</div>
+{{- partial "js.html" "gfx" -}}{{- partial "js.html" "arklog" -}}

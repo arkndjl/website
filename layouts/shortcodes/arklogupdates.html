@@ -1,0 +1,22 @@
+{{- /* ARKLOG > updates: the monthly Process updates (posts with series = "process" and month = "YYYY-MM" in their front
+       matter) beside each month's tallies from data/arklog.json "months" (scripts/arklog.py). A month with no post yet
+       shows its tallies alone; the month links to its rows in the log (#log:YYYY-MM).
+       {{< arklogupdates tab="updates" >}} */ -}}
+{{- $l := site.Data.arklog -}}
+{{- $posts := where (where site.RegularPages "Params.series" "process") "Params.month" "!=" nil -}}
+<div class="desk libgrid libgrid--one" data-tab="{{ .Get "tab" }}">
+<div class="win">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-site"/></svg>process updates<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="libfv__wrap"><table class="libfv arklog__months">
+    <thead><tr><th>month</th><th>update</th><th title="merged changes">changes</th><th title="model and metric tests">tests</th><th>shipped</th><th title="part shipped">part</th><th>failed</th></tr></thead>
+    <tbody>
+    {{- range $l.months }}{{ $m := .mo }}{{ $p := index (where $posts "Params.month" $m) 0 }}
+    <tr><th><a href="#log:{{ $m }}">{{ dateFormat "Jan 2006" (printf "%s-01" $m) }}</a></th>
+      <td>{{ with $p }}<a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ end }}</td>
+      <td>{{ lang.FormatNumber 0 .changes }}</td><td>{{ add (add .s .m) .f }}</td><td class="is-s">{{ .s }}</td><td class="is-m">{{ .m }}</td><td class="is-f">{{ .f }}</td></tr>
+    {{- end }}
+    </tbody>
+  </table></div>
+  <div class="win__status"><span>{{ len $posts }} updates</span><span>updated {{ dateFormat "Jan 2 2006" $l.asof }}</span></div>
+</div>
+</div>

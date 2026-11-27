@@ -10,17 +10,11 @@ draft = false
 
 {{< winpane title="process.exe" icon="process" sprite="px/hero-library" status="" class="winpane--art" />}}
 
-{{< glossfind tabs="fv=FV|value=player value|players=player odds|teams=team ratings|games=game models|drafts=drafts and mocks|data=data and names|abbr=abbreviations" >}}
+{{< glossfind tabs="fv=FV|value=player value|players=player odds|teams=team ratings|games=game models|drafts=drafts and mocks|method=testing|data=data and names|abbr=abbreviations" >}}
 
-{{< wintabs groups="Research:all studies,football,basketball,hockey,baseball,soccer,tennis,esports|Glossary/Methodology:FV,FV scales,player value,player odds,team ratings,game models,drafts and mocks,data and names,abbreviations|Data Sources:data sources" side="true" class="libtabs" label="Process views" >}}
-{{< libresearch tab="all studies" group="all" >}}
-{{< lazytab tab="football" >}}{{< libresearch tab="football" group="football" >}}{{< /lazytab >}}
-{{< lazytab tab="basketball" >}}{{< libresearch tab="basketball" group="basketball" >}}{{< /lazytab >}}
-{{< lazytab tab="hockey" >}}{{< libresearch tab="hockey" group="hockey" >}}{{< /lazytab >}}
-{{< lazytab tab="baseball" >}}{{< libresearch tab="baseball" group="baseball" >}}{{< /lazytab >}}
-{{< lazytab tab="soccer" >}}{{< libresearch tab="soccer" group="soccer" >}}{{< /lazytab >}}
-{{< lazytab tab="tennis" >}}{{< libresearch tab="tennis" group="tennis" >}}{{< /lazytab >}}
-{{< lazytab tab="esports" >}}{{< libresearch tab="esports" group="esports" >}}{{< /lazytab >}}
+{{< wintabs groups="Overview:overview,sports|Metrics:FV,FV scales,player value,player odds|Models:team ratings,game models,drafts and mocks,testing|Research:all studies,football,basketball,hockey,baseball,soccer,tennis,esports|Data:data sources,data and names,abbreviations" side="true" class="libtabs" label="Process views" >}}
+{{< procover tab="overview" >}}
+{{< lazytab tab="sports" >}}{{< procsports tab="sports" >}}{{< /lazytab >}}
 {{< lazytab tab="FV" >}}{{< libglossary tab="FV" section="fv" >}}{{< /lazytab >}}
 {{< lazytab tab="FV scales" >}}{{< libglossary tab="FV scales" fv="true" >}}{{< /lazytab >}}
 {{< lazytab tab="player value" >}}{{< libglossary tab="player value" section="value" >}}{{< /lazytab >}}
@@ -28,8 +22,17 @@ draft = false
 {{< lazytab tab="team ratings" >}}{{< libglossary tab="team ratings" section="teams" >}}{{< /lazytab >}}
 {{< lazytab tab="game models" >}}{{< libglossary tab="game models" section="games" >}}{{< /lazytab >}}
 {{< lazytab tab="drafts and mocks" >}}{{< libglossary tab="drafts and mocks" section="drafts" >}}{{< /lazytab >}}
+{{< lazytab tab="testing" >}}{{< libglossary tab="testing" section="method" >}}{{< /lazytab >}}
+{{< lazytab tab="all studies" >}}{{< libresearch tab="all studies" group="all" >}}{{< /lazytab >}}
+{{< lazytab tab="football" >}}{{< libresearch tab="football" group="football" >}}{{< /lazytab >}}
+{{< lazytab tab="basketball" >}}{{< libresearch tab="basketball" group="basketball" >}}{{< /lazytab >}}
+{{< lazytab tab="hockey" >}}{{< libresearch tab="hockey" group="hockey" >}}{{< /lazytab >}}
+{{< lazytab tab="baseball" >}}{{< libresearch tab="baseball" group="baseball" >}}{{< /lazytab >}}
+{{< lazytab tab="soccer" >}}{{< libresearch tab="soccer" group="soccer" >}}{{< /lazytab >}}
+{{< lazytab tab="tennis" >}}{{< libresearch tab="tennis" group="tennis" >}}{{< /lazytab >}}
+{{< lazytab tab="esports" >}}{{< libresearch tab="esports" group="esports" >}}{{< /lazytab >}}
+{{< lazytab tab="data sources" >}}{{< datasources tab="data sources" >}}{{< /lazytab >}}
 {{< lazytab tab="data and names" >}}{{< libglossary tab="data and names" section="data" >}}{{< /lazytab >}}
 {{< lazytab tab="abbreviations" >}}{{< libglossary tab="abbreviations" section="abbr" >}}{{< /lazytab >}}
-{{< lazytab tab="data sources" >}}{{< datasources tab="data sources" >}}{{< /lazytab >}}
 {{< /wintabs >}}
-{{< libgidx tabs="fv=FV|value=player value|players=player odds|teams=team ratings|games=game models|drafts=drafts and mocks|data=data and names|abbr=abbreviations" >}}
+{{< libgidx tabs="fv=FV|value=player value|players=player odds|teams=team ratings|games=game models|drafts=drafts and mocks|method=testing|data=data and names|abbr=abbreviations" >}}

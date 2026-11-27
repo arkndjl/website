@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""Writes the Reference (Glossary/Methodology) entry for the all-time team and player rankings into research/library.json
+"""Writes the Process glossary entry for the all-time team and player rankings into research/library.json
 from data/alltime.json, then rerun scripts/library_build.py.
 
     python3 scripts/alltime.py && python3 scripts/alltime_ref.py && python3 scripts/library_build.py
