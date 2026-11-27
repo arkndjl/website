@@ -184,16 +184,28 @@ def main():
     _, zA = walk(kept, BY)
     ysub = np.array([r['left'] for r in sub], float); ysy = np.array([r['year'] for r in sub])
     LA = ll(1 / (1 + np.exp(-zA)), ysub)
-    XB = np.column_stack([np.ones(len(sub)), zA, [r['board'] for r in sub], [r['nb'] is not None for r in sub]])
-    pB = np.zeros(len(sub))
-    for y in BY:
-        m = ysy == y
-        bB = logit(XB[~m], ysub[~m], l2=0.1); pB[m] = 1 / (1 + np.exp(-XB[m] @ bB))
+    XB0 = np.column_stack([np.ones(len(sub)), zA, [r['board'] for r in sub], [r['nb'] is not None for r in sub]])
+    # the 2024+ step again in the board stage (Noah, Nov 27 2026: ship it under the gate): stage A's step is fit on every
+    # prospect, and board-ranked players moved more (ranks 31-60 left at 62% in 2022-23, 22% in 2025-26). Leaving one
+    # draft out it wins 3 of 5 drafts; walking forward it is t -4.0 (scripts/research/ret_pay_nov27)
+    XB = np.column_stack([XB0, ysy >= 2024])
+    def held(X, wf=False):
+        p = np.full(len(sub), np.nan)
+        for y in BY:
+            m = ysy == y; tr = (ysy < y) if wf else ~m
+            if tr.any(): p[m] = 1 / (1 + np.exp(-X[m] @ logit(X[tr], ysub[tr], l2=0.1)))
+        return p
+    pB0, pB = held(XB0), held(XB)
     LB = ll(pB, ysub)
-    stageB = {'drafts': BY, 'n': len(sub), 'ranked': int(sum(r['nb'] is not None for r in sub)), 'A': round(float(LA.mean()), 4), **cmp(LB, LA, ysy, BY)}
     rk = np.array([r['nb'] is not None for r in sub])
+    stageB = {'drafts': BY, 'n': len(sub), 'ranked': int(sum(r['nb'] is not None for r in sub)), 'A': round(float(LA.mean()), 4), **cmp(LB, LA, ysy, BY)}
     stageB['rankedOnly'] = {'n': int(rk.sum()), 'stay': round(1 - float(ysub[rk].mean()), 3), 'A': round(float(LA[rk].mean()), 4), 'B': round(float(LB[rk].mean()), 4),
                             'calibB': calib(pB[rk], ysub[rk]), 'calibA': calib(1 / (1 + np.exp(-zA[rk])), ysub[rk])}
+    w0, w1 = held(XB0, True), held(XB, True); ok = rk & ~np.isnan(w1)
+    stageB['step'] = {'lodo': cmp(LB[rk], ll(pB0, ysub)[rk], ysy[rk], BY), 'walkForward': cmp(ll(w1, ysub)[ok], ll(w0, ysub)[ok], ysy[ok], sorted(set(ysy[ok]))),
+                      'bands': [{'ranks': f'{a}-{c}', 'era': lab, 'n': int(m.sum()), 'left': round(float(ysub[m].mean()), 3), 'before': round(float(pB0[m].mean()), 3), 'model': round(float(pB[m].mean()), 3)}
+                                for a, c in ((1, 14), (15, 30), (31, 60)) for lab, e in (('2022-23', ysy <= 2023), ('2025-26', ysy >= 2025))
+                                for m in [rk & e & np.array([(r['nb'] or 0) >= a and (r['nb'] or 0) <= c for r in sub])]]}
     print('stage B', json.dumps(stageB))
     bB_all = logit(XB, ysub, l2=0.1)
 
@@ -207,7 +219,7 @@ def main():
            'stageB': stageB,
            'fit': {'cols': ['const', 'So', 'Jr', 'nil', 'covid', 'e24'] + kept, 'b': [round(float(x), 4) for x in b_all],
                    'mu': {k: round(v, 4) for k, v in mu.items()}, 'sd': {k: round(v, 4) for k, v in sd.items()}},
-           'board': {'cols': ['const', 'zA', 'board', 'ranked'], 'b': [round(float(x), 4) for x in bB_all], 'depth': BOARD_DEPTH,
+           'board': {'cols': ['const', 'zA', 'board', 'ranked', 'e24'], 'b': [round(float(x), 4) for x in bB_all], 'depth': BOARD_DEPTH,
                      'ship': bool(stageB['vsRef'] < 0 and stageB['seasonsWon'] >= 3 and stageB['t'] <= -2)}}
     print(json.dumps({k: out[k] for k in ('n', 'nHeld', 'base', 'singles', 'kept', 'held', 'calib', 'drafted', 'returned', 'fit', 'board', 'leftRate')}))
     json.dump(out, open(OUT, 'w'), indent=1)
