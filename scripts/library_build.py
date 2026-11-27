@@ -152,7 +152,7 @@ def chart_svg(c):
 
 
 GLOSS_TAB = {'fv': 'FV', 'value': 'player value', 'players': 'player odds', 'teams': 'team ratings',
-             'games': 'game models', 'drafts': 'drafts and mocks', 'data': 'data and names'}
+             'games': 'game models', 'drafts': 'drafts and mocks', 'data': 'data and names', 'abbr': 'abbreviations'}
 GROUP_ORDER = ['football', 'basketball', 'hockey', 'baseball', 'soccer', 'tennis', 'esports']
 
 

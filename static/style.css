@@ -5163,3 +5163,38 @@ a.tick__g--nw:hover .tick__me { color: #fff; }
 .esea-br__t.is-tbd .esea-br__n { color: #8a7fb0; font-style: normal; } .esea-br__m.is-bye { opacity: .8; } .esea-br__m.is-tbd { box-shadow: inset 1px 1px 0 #241a3a, inset -1px -1px 0 #5b4a80; }
 .n1-md__next { margin: 0; font-size: .9em; } .n1-md__next b { color: #fff; font-weight: normal; }
 .esea-br__path { margin: 4px 12px 8px; font-size: .8em; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; } .esea-br__pp b { color: #7fffd4; font-weight: normal; }
+
+/* Term hovers (assets/js/terms.js, data/terms.json): one popover for every acronym and metric label. A small window:
+   the label and what it stands for on the title bar, one line on what it is, the table's own note, the Process link. */
+.termtip {
+  position: fixed;
+  z-index: 1200;
+  left: 0;
+  top: 0;
+  width: max-content;
+  max-width: min(300px, calc(100vw - 12px));
+  border: 2px solid;
+  border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+  background: var(--win-face);
+  box-shadow: 3px 3px 0 var(--win-dark);
+  color: var(--foreground);
+  font-size: 0.9rem;
+  line-height: 1.35;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: 0;
+  white-space: normal;
+}
+.termtip[hidden] { display: none; }
+.termtip p { margin: 0; padding: 5px 8px 0; }
+.termtip > :last-child { padding-bottom: 6px; }
+.termtip .termtip__h { margin: 2px; padding: 2px 6px; background: var(--win-title); color: #fff; display: flex; flex-wrap: wrap; gap: 0 8px; align-items: baseline; }
+.termtip__h b { font-weight: normal; letter-spacing: 0.05em; }
+.termtip__h span { color: color-mix(in srgb, #fff 78%, transparent); }
+.termtip .termtip__n { color: color-mix(in srgb, var(--foreground) 72%, transparent); overflow-wrap: anywhere; }
+.termtip__a { display: block; margin: 6px 2px 2px; padding: 1px 8px; border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); color: var(--accent); text-decoration: none; }
+.termtip__a::after { content: " →"; }
+.termtip__a:hover, .termtip__a:focus-visible { background: var(--win-well); }
+/* a term in running text (ticker cells, news rows) */
+.term { text-decoration: underline dotted; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, currentColor 55%, transparent); cursor: help; }
+[data-term] { cursor: help; }

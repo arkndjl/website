@@ -1071,6 +1071,23 @@ for _n in _adds.get('add', []):
     _at = next((i + 1 for i, e in enumerate(_ents) if e['term'] == _n.get('after')), len(_ents))
     _ents.insert(_at, dict(_n['entry']))
 
+# ---------------------------------------------------------------- abbreviations (data/terms.json)
+# The site's term hovers (assets/js/terms.js) read data/terms.json. A label with no glossary term of its own links to its
+# group's entry here, one line per label, so every hover has a Process entry behind it.
+_terms = ld('data/terms.json')
+_abbr = {}
+for _k, _e in _terms['terms'].items():
+    for _v in [_e] + list((_e.get('by') or {}).values()) + list(_e.get('when') or []):
+        if _v.get('g') or (_v is _e and not _e.get('a')) or (_v is not _e and not (_v.get('n') or _v.get('a'))):
+            continue
+        _line = f"{_k}: {_v.get('n') or _e['n']}. {_v.get('d') or _e['d']}"
+        _rows = _abbr.setdefault(_v.get('a') or _e.get('a'), [])
+        if _line not in _rows:
+            _rows.append(_line)
+sections.append({'id': 'abbr', 'title': 'Abbreviations', 'entries': [
+    E(_g['term'], _g['short'], sorted(_abbr.get(_id, []), key=str.lower), 'every table', _g['sports'])
+    for _id, _g in _terms['groups'].items() if _abbr.get(_id)]})
+
 lib = {'asof': '2026-11-02',
        'about': 'ARKBOARD Process: the definition and method for every metric and model, and the FV conversion chart for each board.',
        'sections': sections, 'fv_tables': fv_tables}

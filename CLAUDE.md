@@ -49,6 +49,22 @@
   formulas and numbers, no explanatory paragraphs or "how it works" windows (Noah, Nov 2). Kept: Process text,
   article bodies, source attributions in status bars, résumé content on about/contact.
 
+## Term hovers (acronyms and metric labels)
+
+- One popover, one dictionary: `assets/js/terms.js` (loaded in the footer on every page) reads `data/terms.json` and shows what
+  a label stands for, one plain line on what it is, the header's own `title` note, and a link to its Process glossary entry.
+  Hover or focus on desktop, tap on phones. Never write a per-page tooltip or a second glossary of labels.
+- It finds terms by itself: any `<th>` whose text is a key (case-insensitive; "XPM NOW" falls back to the one known word),
+  any element with `data-term="KEY"`, metric chips (`.cfb__chip` with a title), and known site metrics in running text inside `.tick__g`, `.nws__main` or `[data-terms]`
+  (keys with `"inline": true`).
+- A new column label or metric: add it to `data/terms.json` `terms` (`n` stands for, `d` one short sentence in Noah's voice, then
+  `g` = the glossary term exactly as in `data/library.json`, or `a` = an abbreviation group from `groups`). `by.<page slug>`
+  holds a page's own reading (WAR on `/arkboard/nfl/` is NFL WAR) and `when` one picked by the header's own note (`m`, a
+  regex: G is goals when the note says goals); `only` limits a key to the pages listed. `alias` maps other spellings to a key; `"part": false`
+  keeps a short word (ON, G, ST) from matching inside longer labels.
+- Labels with no glossary term of their own are listed under Process > Glossary/Methodology > abbreviations, written from
+  `data/terms.json` by `scripts/library_glossary.py` (rerun it and `scripts/library_build.py` after a change; `python3 scripts/check_terms.py` checks every link).
+
 ## ARKBOARD tabs
 
 - Side strip = sections, kept short. Tabs that are views of one thing share a side tab and sit under it as subtabs:

@@ -86,6 +86,16 @@ def check_teams():
     return [] if built == names.TEAM_ALIAS else ['data/team_alias.json is behind scripts/names.py TEAM_ALIAS: run python3 scripts/names.py --teams']
 
 
+def check_terms():
+    """data/terms.json (term hovers): a link to a glossary term that no longer exists is a warning, the hover just loses its link"""
+    sys.path.insert(0, os.path.join(ROOT, 'scripts'))
+    import check_terms as ct
+    try:
+        return ['terms: ' + b for b in ct.problems()[0]]
+    except (OSError, ValueError, KeyError) as e:
+        return [f'terms: data/terms.json unreadable ({e})']
+
+
 def check_fv_scale(tol=0.25, warn_only=('hockey', 'soccer')):   # soccer: stretch held at the earlier fit (8-season tail)
     """stored K/T against a fresh fit from the tables on disk; returns (errors, warnings)"""
     sys.path.insert(0, os.path.join(ROOT, 'scripts'))
@@ -166,6 +176,7 @@ if __name__ == '__main__':
     e2, warns = check_sizes(); errs += e2 + check_pairs() + check_cbb_mean() + check_awards()
     e3, w3 = check_fv_scale(); errs += e3; warns += w3
     e4, w4 = check_1nt_sync(); errs += e4; warns += w4
+    warns += check_terms()
     if '--hugo' in sys.argv[1:]: errs += check_teams() + check_moves()
     if '--hugo' in sys.argv[1:] and not errs: errs += check_hugo()
     for w in warns: print('warning:', w)
