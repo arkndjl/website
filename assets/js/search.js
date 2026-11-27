@@ -5,7 +5,7 @@
 // every word anywhere > one-typo words; ties go to the row's standing on its own board (w, 0-99).
 (function () {
   if (window.__arkSearch) return;
-  var SITE = '{{ "search/index.json" | relURL }}?v={{ now.Unix }}';
+  var SITE = '{{ "search/index.json" | relURL }}';   // no build stamp: the file is served max-age=0 + ETag, and a stamp here renamed this script on every build
   var PLAY = '{{ "data/search-players.json" | relURL }}?v={{ with os.ReadFile "static/data/search-players.json" }}{{ . | md5 | truncate 8 "" }}{{ end }}';
   var PAGE = '{{ "search/" | relURL }}';
   var GROUPS = { p: 'players', t: 'teams', b: 'ARKBOARD', x: 'Process', l: 'ARKLIBRARY', s: 'ST. CLAIRE', n: '1NT', z: 'LAURSEN_111', a: 'articles', o: 'pages' };
