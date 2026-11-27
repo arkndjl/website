@@ -10,7 +10,10 @@
 Nothing here is typed in. Every row is one merged pull request: its merge time, its title, and what its description
 says was tested (the held-out number before and after, the t, shipped or failed). The descriptions are cached in
 scripts/data/arklog_prs.json.gz (number, title, merged_at, body), so a parser change reruns on all of them.
-A wrong reading of one row is fixed in research/arklog_fix.json ({"<pr>": {"hide": true} or any row field}).
+The reading is by pattern, so it is not trusted on its own. A description's own line
+  ARKLOG: shipped · R² .643 to .732 · t = 2.1        (shipped, part shipped or failed; the number and t are optional)
+is taken as written. research/arklog_fix.json holds the reviewed reading of a row ({"<pr>": {"v", "e", "tt"}, null drops
+a field, {"hide": true} drops the row): every test through #1283 was read against its write-up on Nov 27 2026.
 
 Writes
   static/data/arklog.json   every row, read by layouts/shortcodes/arklog.html in the browser (assets/js/arklog.js)
@@ -191,7 +194,7 @@ def metric_name(m):
             'correlation': 'r', 'r': 'r'}.get(low, low)
 
 
-def effect(line):
+def effect(line, with_end=False):
     """[metric, before, after, better (1 better, 0 worse, None unknown)] from one line, or None."""
     for m in EFF.finditer(line):
         a, b = fnum(m.group('a')), fnum(m.group('b'))
@@ -208,8 +211,19 @@ def effect(line):
         if low and abs(b - a) / max(abs(a), abs(b)) > .5:   # a halved loss is two different things on one line, not a gain
             continue
         better = (b < a) if low else (b > a)
-        return [name, m.group('a'), m.group('b'), 1 if better else 0]
-    return None
+        e = [name, m.group('a'), m.group('b'), 1 if better else 0]
+        return (e, m.end()) if with_end else e
+    return (None, 0) if with_end else None
+
+
+def tnear(line, end):
+    """The t that belongs to the number ending at `end`: the first one in the same clause, right after it."""
+    m = TVAL.search(re.split(r';|\.\s|\s·\s', line[end:end + 60])[0])
+    t = fnum(m.group('t')) if m else None
+    return t if t is not None and abs(t) < 60 else None
+
+
+LOGLINE = re.compile(r'^ARKLOG:\s*(?P<v>shipped|part shipped|failed)\b(?P<rest>.*)$', re.I)
 
 
 def tval(line):
@@ -252,6 +266,10 @@ def parse(pr):
             hf, hs = bool(FAIL_H.match(head)), bool(SHIP_H.match(head))
             lf, ls = bool(FAIL_L.search(c)), bool(SHIP_L.search(c))
             tag = 'f' if (hf or (lf and not hs)) else 's' if (hs or ls) else ''
+            if re.match(r'(shipped|ships|pass(es|ed)?|kept)\b', c, re.I) or re.search(r'\bso (it|this) passes\b', c, re.I):   # the line says so itself
+                tag = 's'
+            elif re.match(r'(failed|fails?|not shipped|not kept)\b', c, re.I):
+                tag = 'f'
             if tag == 'f' and not hf and ls and re.search(r'\bpass(es|ed)?\b', c, re.I) and not re.search(r'\bfails?\b|\bfailed\b|not shipped', c, re.I):
                 tag = 's'
             if not (TEST.search(c) or effect(c) or tag or re.search(r'\bn\s*=?\s*\d', c)):
@@ -259,30 +277,26 @@ def parse(pr):
             c = re.sub(r'\bt\s*=?\s*(-?\+?\.?\d)', r't = \1', re.sub(r'\s+vs\.?\s+', ' against ', c))
             # a line with code names in it still counts as evidence, but is not shown
             show = not re.search(r'\b[a-z]+[A-Z][A-Za-z]+\b|\b[a-z]+_[a-z_]+\b|--[a-z]|\b[a-z]{2,}\d\b', c)
-            tagged.append([tag, c[:300].rstrip(), show])
+            tagged.append([tag, c[:300].rstrip(), show, head])
             ship_n += tag == 's'
             fail_n += tag == 'f'
-    # the headline number: from a shipped line when one is tagged, else the first line that carries one
-    order = [c for tg, c, _ in tagged if tg == 's'] + [c for tg, c, _ in tagged if tg == ''] + [c for tg, c, _ in tagged if tg == 'f']
+    # the headline number: one held-out number, with the t stated right after it in the same clause. From a shipped
+    # line when one is tagged, else the first line that carries one. A t with no number beside it is never a headline.
+    order = [c for tg, c, _, _h in tagged if tg == 's'] + [c for tg, c, _, _h in tagged if tg == ''] + [c for tg, c, _, _h in tagged if tg == 'f']
     tf = bool(FAIL_T.search(title))
-    for c in (order if not tf else [c for _, c, _ in tagged]):
-        e = effect(c)
-        if e and (tf or e[3] == 1 or not ship_n):
+    for c in (order if not tf else [c for _, c, _, _h in tagged]):
+        e, end = effect(c, True)
+        if e and (tf or e[3] == 1):
             row['e'] = e
-            t = tval(c)
+            t = tnear(c, end)
             if t is not None:
                 row['tt'] = t
             break
-    if 'tt' not in row:
-        for c in (order if not tf else [c for _, c, _ in tagged]):
-            t = tval(c)
-            if t is not None:
-                row['tt'] = t
-                break
+    has_t = any(tval(c) is not None for _, c, _, _h in tagged)
     # a test is a row with a held-out number, or a title that says it was one
     named = bool(re.search(r'\btests?\b|\btested\b|backtest|research|held[- ]out|\baudit\b|\bsweep\b|\brefit\b|retest|'
                            r'walk-forward|pre-?reg|\bdrivers?\b|calibrat', title, re.I))
-    if not (tf or 'e' in row or 'tt' in row or (named and (ship_n or fail_n))):
+    if not (tf or 'e' in row or has_t or (named and (ship_n or fail_n))):
         row['ar'] = area_of(title, text) if not UI.search(title) else 'site'
         return row
     bare = re.sub(r"not shipped|nothing ship\w*|not kept|none pass\w*|nothing passes|no(ne)? [^;,]{0,20}pass\w*|does not \w+", '', title, flags=re.I)
@@ -301,7 +315,27 @@ def parse(pr):
     row['v'] = v
     if v == 'f' and row.get('e') and row['e'][3] == 1:   # a gain that still failed its gate reads as a failed line, not a win
         row['e'][3] = None
-    row['l'] = [[tg, c] for tg, c, show in tagged if show][:14]
+    row['l'] = [['', c] for tg, c, show, head in tagged if show][:14]   # shown unmarked: the row's verdict is the reviewed one
+    return row
+
+
+def logline(pr, row):
+    """A description's own "ARKLOG: shipped · R² .643 to .732 · t = 2.1" line is taken as written, over the reading above."""
+    for raw in (pr.get('b') or '').split('\n'):
+        m = LOGLINE.match(raw.strip().strip('*_ '))
+        if not m:
+            continue
+        row['v'] = {'shipped': 's', 'part shipped': 'm', 'failed': 'f'}[m.group('v').lower()]
+        row.pop('e', None), row.pop('tt', None)
+        e, end = effect(clean(m.group('rest')), True)
+        if e:
+            if row['v'] == 'f':
+                e[3] = None
+            row['e'] = e
+        t = tval(clean(m.group('rest')))
+        if t is not None and e:
+            row['tt'] = t
+        row.setdefault('l', [])
     return row
 
 
@@ -440,12 +474,15 @@ def build():
     rows = []
     for p in prs:
         r = parse(p)
+        r = logline(p, r) if r else r
         if not r:
             continue
         f = fix.get(str(r['n'])) or {}
         if f.get('hide'):
             continue
         r.update({k: v for k, v in f.items() if k != 'hide'})
+        for k in [k for k, v in r.items() if v is None]:   # a fix of null drops the field
+            del r[k]
         x = headline(r)
         if x:
             r['x'] = x
@@ -532,8 +569,8 @@ def selftest():
          "(`hc_ten`). 2025-26 held out t 2.89; log loss .8862 to .8831, AUC .725 to .727.\n\n**Failed (not shipped)**\n"
          "- Came with his coach: t -.91 / .98.\n\n---\n_Generated by [Claude Code](https://claude.ai/code)_")
     r = parse({'n': 1, 't': 'Coach loyalty: CBB Transfer% coach tenure', 'at': '2026-11-27T21:46:03Z', 'b': b})
-    assert r['v'] == 'm' and r['e'] == ['log loss', '.8862', '.8831', 1] and r['tt'] == 2.89 and r['sp'] == ['CBB'], r
-    assert r['ar'] == 'players' and [x[0] for x in r['l']] == ['s', 'f'], r
+    assert r['v'] == 'm' and r['e'] == ['log loss', '.8862', '.8831', 1] and 'tt' not in r and r['sp'] == ['CBB'], r
+    assert r['ar'] == 'players' and len(r['l']) == 2, r
     r = parse({'n': 2, 't': 'NBA: RAPM / LEBRON / RAPTOR test (research only, all failed)', 'at': '2026-10-29T00:00:00Z',
                'b': 'Held out 2015-23, none beats XPM: RMSE 2.93 to 2.97 (t 1.4).'})
     assert r['v'] == 'f' and r['e'][0] == 'RMSE' and r['e'][3] == 0 and r['sp'] == ['NBA'], r

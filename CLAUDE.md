@@ -48,10 +48,13 @@
 - The dated record of every change on the whole site (ARKBOARD, 1NT, LAURSEN_111, ST. CLAIRE, ARKLIBRARY, site) plus the site
   data tabs (traffic, build, data). `scripts/arklog.py` reads the merged pull requests (cache `scripts/data/arklog_prs.json.gz`)
   into `static/data/arklog.json` (rows, `assets/js/arklog.js`) and `data/arklog.json` (tallies and charts for the scoreboard and
-  the Process overview); process-refresh.yml reruns it. Never hand-write a row. A row read wrong is fixed in
-  `research/arklog_fix.json` (`{"<pr>": {"hide": true}}` or any row field). `python3 scripts/arklog.py --test` after a parser change.
-- A pull request description is the log entry. A model or metric test says what was tested, the held-out number before and
-  after ("R² .643 to .732"), the t ("t = 2.1") and "Shipped" or "Failed" on its own line, in Noah's voice (below).
+  the Process overview); process-refresh.yml reruns it. Never hand-write a row. `python3 scripts/arklog.py --test` after a parser change.
+- A pull request description is the log entry, in Noah's voice (below). A model or metric test ends with its own line,
+  `ARKLOG: shipped · R² .643 to .732 · t = 2.1` (`shipped`, `part shipped` or `failed`; then the one held-out number that
+  decided it, before to after, and its t; leave the number out when there is no single one). That line is taken as
+  written. Without it the row is read by pattern, which misreads often: check the new row on /arklog/ after the merge
+  and correct it in `research/arklog_fix.json`. Every test through #1283 was read against its write-up on Nov 27 and is
+  held there (`v`, `e`, `tt`); do not regenerate those entries.
 - Hidden pages (Franchise Fantasy, the ST. CLAIRE style guide) never appear in the log (`OUT` in arklog.py).
 - Process updates: one post a month ("Process #N: ... / <month> updates"), front matter `series = "process"` and
   `month = "YYYY-MM"`, listed by ARKLOG > updates. It covers every section of the site that month: models and metrics,
