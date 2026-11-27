@@ -3,7 +3,7 @@
        and the preseason prior; view="tests": every candidate input and what it did. */ -}}
 {{- with site.Data.cbb_games_fit -}}
 {{- $f := . }}{{ $view := $.Get "view" | default "model" -}}
-{{- $names := dict "eff" "adjusted efficiency x possessions" "elo" "Elo difference / 25" "mkt" "market rating (earlier closes)" "home" "home court" "inj" "availability (sat out last game)" "pinj" "injury report (listed, not played yet; last season's line)" "rest" "rest days" "confh" "conference game at home" "alt" "altitude home court" "early" "preseason prior, first 10 games" "tourn" "tournament x efficiency" "form" "form (last 5 vs expected)" "mkteff" "market rating, first 10 games" -}}
+{{- $names := dict "eff" "adjusted efficiency x possessions" "elo" "Elo difference / 25" "mkt" "market rating (earlier closes)" "home" "home court" "inj" "availability (sat out last game)" "pinj" "injury report (listed, not played yet; last season's line)" "rest" "rest days" "confh" "conference game at home" "alt" "altitude home court" "early" "preseason prior, first 10 games" "tourn" "tournament x efficiency" "form" "form (last 5 vs expected)" "mkteff" "market rating, first 10 games" "gc" "game control rating" "gm" "long-memory margin rating" "hatt" "home court x home crowd" "bpi" "ESPN BPI forecast margin" "mdis" "market disagreement (earlier closes vs the inputs)" -}}
 {{- $pnames := dict "one" "constant" "last" "last season's net rating" "lastret" "last season x returning minutes" "ret" "returning BPM x minutes" "retmin" "returning minutes share" "tr" "transfers' BPM x minutes" "trmin" "transfer minutes share" "fr" "freshmen, ln(300 / rank)" "fvtop" "top 5 players' FV, minus 20" "agew" "minutes-weighted age, minus 21" "tenure" "coach tenure, years / 10" "rret" "returners' projected BPM x minutes" "newmin" "newcomer minutes share" "fvfrm" "freshmen E[FV] above 20" "nohist" "first season of the history (no last season)" "ptrdn" "transfers' step down in level x minutes (2021 on)" "cres" "head coach's past finals minus preseason priors, shrunk" -}}
 {{- $fvn := dict "fvw" "minutes-weighted FV" "fvfr" "freshmen's FV" "fvtop" "top 5 players' FV" "bpm3w" "3-season BPM, minutes-weighted" "agew" "minutes-weighted age" -}}
 <div class="win cfbm"{{ with $.Get "tab" }} data-tab="{{ . }}"{{ end }}>
@@ -39,6 +39,8 @@
     </table></div>
     <p class="cfb__dim">recency half-life: {{ with $f.params.hl }}{{ . }} days{{ else }}none{{ end }} · prior worth {{ $f.params.lam }} games · market step {{ $f.params.mk }}</p>
   {{- else }}
+    {{- /* the candidate log is empty when the fit ran on a fixed input set (CBB_FEATS): no header-only table */ -}}
+    {{- if $f.select }}
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Candidate</th><th title="paired t on absolute error, 2016-20">t 16-20</th><th title="2021-26, held out">t 21-26</th><th title="kept in the model after the held-out test">Kept</th></tr></thead>
       <tbody>
@@ -47,7 +49,8 @@
       {{- end }}{{ end }}
       </tbody>
     </table></div>
-    <p class="cfb__dim">core inputs taken out, t 16-20 (21-26):{{ $seen2 := dict }}{{ $first := true }}{{ range $f.drop }}{{ if not (index $seen2 .drop) }}{{ $seen2 = merge $seen2 (dict .drop true) }}{{ if not $first }};{{ end }}{{ $first = false }} {{ index $names .drop }} {{ partial "num.html" (slice "%+.1f" .t) }} ({{ partial "num.html" (slice "%+.1f" .heldT) }}){{ if not (in $f.feats .drop) }}, dropped{{ end }}{{ end }}{{ end }}.</p>
+    {{- end }}
+    <p class="cfb__dim">core inputs taken out, t 16-20 (21-26):{{ $seen2 := dict }}{{ $first := true }}{{ range $f.drop }}{{ if not (index $seen2 .drop) }}{{ $seen2 = merge $seen2 (dict .drop true) }}{{ if not $first }};{{ end }}{{ $first = false }} {{ index $names .drop | default .drop }} {{ partial "num.html" (slice "%+.1f" .t) }} ({{ partial "num.html" (slice "%+.1f" .heldT) }}){{ if not (in $f.feats .drop) }}, dropped{{ end }}{{ end }}{{ end }}.</p>
     <div class="wintable__scroll wts--in"><table class="cfb__table cfbm__t tstick">
       <thead><tr><th>Season</th><th>MAE</th><th>Line</th><th>ATS 2+</th><th title="prior vs final rating: correlation, prior / last season alone">Prior r</th></tr></thead>
       <tbody>{{ range $s, $b := $f.bySeason }}{{ $pr := dict }}{{ range $f.priorTest }}{{ if eq (string .season) $s }}{{ $pr = . }}{{ end }}{{ end }}<tr><td>{{ $s }}</td><td class="cfb__num">{{ $b.maeModel }}</td><td class="cfb__num">{{ $b.maeLine }}</td><td class="cfb__num">{{ with $b.ats2.pct }}{{ partial "num.html" (slice "%.1f%%" (mul . 100)) }}{{ end }}</td><td class="cfb__num">{{ with $pr.rPrior }}{{ . }} <span class="cfb__dim">/ {{ $pr.rLast }}</span>{{ end }}</td></tr>{{ end }}</tbody>

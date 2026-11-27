@@ -71,7 +71,7 @@
   {{- range $i, $r := $tf.past }}
   <tr>
     <td class="cfb__rk">{{ add $i 1 }}</td>
-    <td class="cfb__name" style="white-space: nowrap">{{ with .nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index $ctry . | default . }}" width="16" height="11" loading="lazy" onerror="this.remove()">{{ end }}<b>{{ .name }}</b></td>
+    <td class="cfb__name">{{ with .nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index $ctry . | default . }}" width="16" height="11" loading="lazy" onerror="this.remove()">{{ end }}<b>{{ .name }}</b></td>
     <td class="fv" data-v="{{ .fv }}"><span class="fv-chip" data-fv="{{ mul (div (int .fv) 5) 5 }}">{{ .fv }}</span></td>
     <td>{{ .season }}</td>
     <td class="cfb__num">{{ if .ageEst }}~{{ partial "num.html" (slice "%.1f" (float .age)) }}{{ else }}{{ partial "num.html" (slice "%.1f" (float .age)) }}{{ end }}</td>

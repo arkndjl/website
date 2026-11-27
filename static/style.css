@@ -2962,6 +2962,7 @@ table.trophycase__hist td.trophycase__post {
 .cfb__logo {
   width: 20px;
   height: 20px;
+  max-width: none;   /* the theme's img max-width: 100% counts a logo as 0 wide in a squeezed table cell: the name ran over the next column on phones */
   margin: 0;
   padding: 0;
   border: 0;
@@ -3256,7 +3257,7 @@ table.trophycase__hist td.trophycase__post {
   /* the pinned player cell wraps inside 40vw (photo floated beside the name) so the stats keep most of the screen;
      hockey prospects and breakouts set their own widths further down */
   .cfb__table td.cfb__name { white-space: normal; min-width: 40vw; width: 40vw; max-width: 40vw; }
-  .cs__table td.cfb__name { white-space: normal !important; }   /* Counter-Strike team cells (flag + logo + name) wrap inside the 40vw too */
+  .cs__table td.cfb__name, .tennis__table td.cfb__name { white-space: normal !important; }   /* Counter-Strike team cells (flag + logo + name) and tennis player cells wrap inside the 40vw too */
   .cfb__table td.cfb__name .pxframe--row { float: left; margin: 1px 6px 0 0; }
   .cfb__table td.cfb__name .cfb__who { white-space: normal; max-width: calc(100% - 32px); }
   .cfb__table td.cfb__name .cfb__dim { white-space: nowrap; }
@@ -3988,6 +3989,7 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 @media (max-width: 684px) {
   .nbaxpm__table .nbaxpm__team, .nbaxpm__table .nbaxpm__src, .nbaxpm__table .nbaxpm__ph { display: none; }
   .nbaxpm__tm { display: block; font-size: 0.85em; }
+  .cfb__table td.cfb__name .nbaxpm__tm { white-space: normal; }   /* a long club + league line wraps inside the pinned cell (it ran under the next column) */
   /* badge medals ride on the team line, so a long name doesn't widen the table */
   .nbaxpm__table b + .cfb__medals { display: none; }
   .nbaxpm__table th, .nbaxpm__table td { padding-left: 4px; padding-right: 4px; }
@@ -4206,7 +4208,7 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 }
 
 /* soccer: nationality flags (static/img/flags/<iso2>.png, scripts/soccer_faces.py) */
-img.flag { display: inline-block; width: 16px; height: 11px; margin: 0 4px 0 0; padding: 0; border: 0; vertical-align: -1px; object-fit: cover; box-shadow: 0 0 0 1px var(--win-dark); }
+img.flag { display: inline-block; width: 16px; height: 11px; max-width: none; margin: 0 4px 0 0; padding: 0; border: 0; vertical-align: -1px; object-fit: cover; box-shadow: 0 0 0 1px var(--win-dark); }
 
 /* depth chart tab, every sport ({{< depthchart >}}): team picker, then a card a slot, best-first; tiles on the team
    builder's FV ramp (--t fill, --k ink); two columns on a phone */

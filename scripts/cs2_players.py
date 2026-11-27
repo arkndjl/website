@@ -777,6 +777,12 @@ def fee_fit(M, c, p, pdir, ag, scale_a, bo3):
     return v
 
 
+def nat_code(c):
+    """bo3.gg country code as the flag file's name (iso2, lower case); "UNKNOWN" or blank = None (no flag to draw)"""
+    c = (c or "").strip().lower()
+    return c if len(c) == 2 and c.isalpha() else None
+
+
 def team_flag(nats):
     """Team flag from the latest five's nationalities: the code 3+ of them share, else "eu" (a mixed roster, any
     region); None when fewer than 3 nationalities are known."""
@@ -870,7 +876,7 @@ def build():
         tid = int(M.team[lastrow[i]])
         tk = bo3.k(tid)
         ti = tinfo.get(tk, {})
-        return {"id": pid, "n": M.nick.get(pid) or d[1], "slug": d[0], "nat": (d[3] or "").lower() or None,
+        return {"id": pid, "n": M.nick.get(pid) or d[1], "slug": d[0], "nat": nat_code(d[3]),
                 "ph": d[5], "age": None if age[i] != age[i] else round(float(age[i]), 2),
                 "tm": ti.get("n") or tname.get(tid) or "", "tk": tk if ti else None, "trk": ti.get("rk"),
                 "tier": ti.get("tier", 4), "logo": bool(ti.get("logo")),

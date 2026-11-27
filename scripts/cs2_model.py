@@ -610,6 +610,8 @@ def build():
         form[k].sort()
     for k, v in vt.items():
         names[k] = v[2]
+    # series stored before the ticker parse dropped it still carry Liquipedia's no-page suffix on the name
+    names = {k: (v or "").replace(" (page does not exist)", "") for k, v in names.items()}
     cands = [k for k in lastd if lastd[k] >= cut and n[k] >= 15 and st["lastros"].get(k)]
     # one row per five: a rebrand rated as a listed team (rated()) is that team, not a second entry
     cset = set(cands)
