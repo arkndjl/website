@@ -7,7 +7,7 @@
 Each race simulates the rest of the season SIMS times and scores every simulated finish with the sport's voter model
 (data/awards_fit.json from scripts/awards_research.py; only awards that passed their held-out test are run):
 - team finish: the board's season odds (projected wins / points and their spread), drawn once a simulation per team
-- player rates over the games left: the board's predictive value (NBA shrunk XPM, NHL pWAR a minute) and box rates
+- player rates over the games left: the board's predictive value (NBA shrunk XPM, NHL Marcel WAR a minute) and box rates
   blended with last season, each with its talent and sampling noise; games left from his share of games so far
 - eligibility: the NBA's 65 games for MVP and DPOY
 A candidate's P(win) is the voter model's softmax averaged over the simulations. Where Polymarket has an open, liquid
@@ -528,6 +528,9 @@ def nba_races(fit, rng, cands, teams, conf, G=82, min_g=65, sims=SIMS, coy=()):
 
 # ---------------------------------------------------------------- NHL
 
+NHL_MW, NHL_MW_K = (1.0, 0.7, 0.5), 1600.0     # Marcel WAR: season weights, shrink minutes (scripts/player_pctl.py MARCEL, data/pctl_fit_nhl.json)
+
+
 def nhl(fit, rng):
     import awards_nhl as A
     W = {}
@@ -540,9 +543,25 @@ def nhl(fit, rng):
         left = 82 - gp
         # points: 2 a win plus the OT loss point; spread from game luck (about 1.0 points a game sd) and the rating
         teams[p['t']] = (p.get('pts', 0), gp * 2, p.get('xpts', 82.0), math.sqrt(left * 1.0 + (left * .25 * p.get('rsd', .2)) ** 2), 164)
-    hist = {}
+    hist, mu = {}, {}
     for s in range(A.FIRST - 1, S):
-        for r in A.war(s): hist.setdefault(NM.key(r['n']), []).append(r.get('gp') or 0)
+        for r in A.war(s):
+            hist.setdefault(NM.key(r['n']), []).append(r.get('gp') or 0)
+            if r.get('war') is not None and r.get('toi'):
+                m = mu.setdefault(r['grp'], [0.0, 0.0]); m[0] += r['war']; m[1] += r['toi']
+    last2 = {r['id']: r for r in A.war(S - 2)}
+
+    def marcel_war(r):
+        """Marcel WAR a minute: this season to date and the two before at 1 / .7 / .5 by ice time, shrunk with
+        NHL_MW_K minutes to his group's WAR a minute over the seasons before (the projections tab's form). The
+        games left run at this rate: pWAR sits on its own replacement scale (goalies near 0) and misses next-season
+        WAR by more (scripts/research/ctx_nov27/nhl: MSE 1.81 -> 1.47, t 10.7, 15 of 15 seasons)"""
+        m = mu.get(r['grp'])
+        num, den = NHL_MW_K * (m[0] / m[1] if m and m[1] else 0.0), NHL_MW_K
+        for w, q in zip(NHL_MW, (r, last.get(r['id']), last2.get(r['id']))):
+            if q and q.get('war') is not None and q.get('toi'):
+                num += w * q['war']; den += w * q['toi']
+        return num / den
     TG = {t: v[1] / 2 for t, v in teams.items()}
     cands = []
     for r in cur:
@@ -554,7 +573,7 @@ def nhl(fit, rng):
         q = last.get(r['id'], {})
         gp = r.get('gp') or 0
         cands.append({'id': r['id'], 'n': r['n'], 'tm': tm, 'ph': r.get('ph'), 'grp': r['grp'], 'gp': gp, 'tg': TG[tm],
-                      'toi': r.get('toi') or 0, 'war': r.get('war') or 0, 'pwar': r.get('pwar') or 0, 'gd': r.get('gd') or 0,
+                      'toi': r.get('toi') or 0, 'war': r.get('war') or 0, 'mwr': marcel_war(r), 'gd': r.get('gd') or 0,
                       'pts': r.get('pts') or 0, 'g': r.get('g') or 0, 'gsax': r.get('gsax') or 0,
                       'ppg0': (q.get('pts') or 0) / q['gp'] if q.get('gp') else None,
                       'gpg0': (q.get('g') or 0) / q['gp'] if q.get('gp') else None,
@@ -615,7 +634,7 @@ def nhl_draw(fit, teams, G=82):
         gp = c['gp'] + gr
         tpg = c['toi'] / max(c['gp'], 1)
         tr = gr * tpg
-        rate = (c['war'] if SEASON_ONLY else c['pwar']) / max(c['toi'], 1)   # predictive WAR a minute (conviction: this season's)
+        rate = c['war'] / max(c['toi'], 1) if SEASON_ONLY else c['mwr']   # Marcel WAR a minute (conviction: this season's own)
         war_r = gauss(rng, rate * tr, abs(rate) * tr * .35 + .25 * math.sqrt(tr / 60) * (.6 if c['grp'] != 'G' else 1.5))
         war = c['war'] + war_r
         # rates toward last season (no season: 80% of the pace so far), points by 40 games, goals 50, GSAx 40 starts
