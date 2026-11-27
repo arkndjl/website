@@ -6,7 +6,7 @@
   cfb cbb      FV: the board's headline FV (static/data/cfb-all.json, cbb-all.json)
   nfl          WAR (static/data/nfl-war.json) + SVAR (data/nfl_qb.json, data/nfl_season_value.json; QBs, skill, defense)
   nba          XPM + VORX (static/data/nba-xpm/<latest season>.json)
-  nhl          WAR (static/data/nhl-war/<latest>.json)
+  nhl          WAR + pWAR (static/data/nhl-war/<latest>.json)
   soccer       GAR, SVAR (static/data/soccer-war/<latest>.json)
   recruits     ARK stars + FV (year-1 xFV, rounded) from static/data/cfb-recruits.json (full class, future classes) and
                data/cbb_recruits.json (classes, international); a row that is no recruit (a portal move) takes the board FV
@@ -60,7 +60,7 @@ def lookup(m, r, sport='football'):
 
 
 def rnd(x, n=2):
-    return None if x is None else round(float(x), n)
+    return None if x is None else round(float(x), n) + 0.0
 
 
 def college(sport):
@@ -106,7 +106,7 @@ def pro_values():
     o = {}
     for r in tx['nhl']:
         h = m and m.find(r['n'], team=tuple(x for x in (r.get('fr'), r.get('to')) if x) or None)[0]
-        if h: o[f"{r['d']}|{r['n']}|{r['k']}"] = [rnd(h.get('war')), None]
+        if h: o[f"{r['d']}|{r['n']}|{r['k']}"] = [rnd(h.get('war')), rnd(h.get('pwar'))]   # a move is read forward: pWAR beside the season to date (Nov 27)
     out['nhl'] = o
 
     p = latest('static/data/soccer-war/*.json')

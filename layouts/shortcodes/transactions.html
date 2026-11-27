@@ -13,7 +13,7 @@
 {{- $vc := dict "cfb" (slice (slice "FV" "FV, the board's headline grade (mean outcome)" "%d")) "cbb" (slice (slice "FV" "FV, the board's headline grade (mean outcome)" "%d"))
     "nfl" (slice (slice "WAR" "WAR this season" "%+.2f") (slice "SVAR" "SVAR = SV over replacement this season, in wins (QBs, skill players, defense)" "%+.2f"))
     "nba" (slice (slice "XPM" "XPM this season: points per 100 possessions over an average player" "%+.1f") (slice "VORX" "VORX this season: wins over a replacement player" "%+.2f"))
-    "nhl" (slice (slice "WAR" "WAR this season" "%+.2f")) "soccer" (slice (slice "GAR" "GAR this season: goals above replacement" "%+.2f") (slice "SVAR" "SVAR = SV over replacement this season, in goals: this season's inputs alone, finishing and keeper saves shrunk by split-half reliability" "%+.2f")) -}}
+    "nhl" (slice (slice "WAR" "WAR this season" "%+.2f") (slice "pWAR" "projected WAR: (HPM - replacement) x TOI / 60 / goals a win, the components weighted by how well they carry to next season" "%+.2f")) "soccer" (slice (slice "GAR" "GAR this season: goals above replacement" "%+.2f") (slice "SVAR" "SVAR = SV over replacement this season, in goals: this season's inputs alone, finishing and keeper saves shrunk by split-half reliability" "%+.2f")) -}}
 {{- $cols := index $vc $sport | default slice -}}
 {{- $vn := slice }}{{ range $cols }}{{ $vn = $vn | append (index . 0) }}{{ end -}}
 {{- $icon := cond (in (slice "cbb" "nba") $sport) "basketball" (cond (eq $sport "nhl") "hockey" (cond $soccer "soccer" "football")) -}}
