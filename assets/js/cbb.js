@@ -75,7 +75,7 @@
       (r.intl ? '<span class="cfb__divtag cfb__divtag--intl" title="international: graded on the draft boards and his pro league line, adjusted for league strength and minutes">INTL</span>' : '') +
       (r.low ? '<span class="cfb__divtag" title="' + esc(LOWTAG[r.div] || r.div) + ': D-1% ' + pct(r.d1P) + '">' + esc(r.div) + '</span>' + prov('below D-I: graded on his projected first D-I season, its class and D-1%') : '') + '</td>' +
       '<td class="fv cfb__g"><span class="fv-chip" data-fv="' + tier + '" title="mean outcome ' + (+r.fvx).toFixed(2) + '">' + fv + '</span></td>' +
-      (past || !WKFROM ? '' : r.wkm ? window.__wk.fv(r.fv, r.w0, WKFROM) : window.__wk.none) +
+      (past || !WKFROM ? '' : r.wkm ? window.__wk.pos(r.wk, r.wr, r.w0, WKFROM) : window.__wk.none) +
       '<td class="cfb__pos-cell cfb__g"' + (r.role ? ' title="' + esc(r.role) + ' (Barttorvik role, last season)"' : '') + '>' + esc(r.pos) + (prk ? '<span title="rank at position, players in view, by FV">' + prk + '</span>' : '') +
         moveChip(r) + (r.role ? '<span class="cfb__dim gfx-off">·' + esc(r.role) + '</span>' : '') + '</td>' +
       '<td class="cfb__team">' + (r.logo ? '<img class="cfb__logo" src="' + esc(r.logo) + '" alt="" width="20" height="20" loading="lazy">' : '') + '<span>' + esc(r.team) + '</span></td>' +
@@ -228,7 +228,7 @@
 
   var KEY = {
     rk: function (r) { return r.ovr; }, name: function (r) { return r.name; }, team: function (r) { return r.team; },
-    fv: function (r) { return r.fvx; }, wk: function (r) { return r.wkm && r.w0 != null ? r.fv - r.w0 : null; }, pos: function (r) { return r.pos + String(r.ovr).padStart(6, '0'); },
+    fv: function (r) { return r.fvx; }, wk: function (r) { return r.wkm && r.wk != null ? r.wk : null; }, pos: function (r) { return r.pos + String(r.ovr).padStart(6, '0'); },
     cls: function (r) { return r.elig; }, age: function (r) { return r.age != null ? r.age : r.ageEst; }, ht: function (r) { return r.mht != null ? r.mht + 1.17 : inches(r.ht) || null; },
     nbaP: function (r) { return r.nbaP; }, xbpm: function (r) { return r.xbpm; }, bpm: function (r) { return bpmNow(r); }, d1P: function (r) { return r.d1P; }, out: function (r) { return r.outcome == null ? (r.draft ? 25 : -1) : r.outcome + (r.pick ? (61 - r.pick) / 100 : 0); }
   };

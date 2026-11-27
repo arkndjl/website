@@ -76,6 +76,18 @@ EXTRA = {
 }
 
 
+# FV boards: the field that holds a row's place on the board. Default: its place in the list (the files are written in
+# board order), put in `_pos` before the snapshot; CBB's columnar file carries it as `ovr`
+POS = {'cbb': 'ovr'}
+
+
+def _positions(board, d):
+    for _, rows, get, put, idf, val, name, _ in lists(d, BOARDS[board][1]):
+        if val == 'fv' and name:                      # dict rows (the columnar file has its own rank column)
+            for i, r in enumerate(rows):
+                r['_pos'] = i + 1
+
+
 def _nfl_xvp(d):
     """XV per 17 team games as the page works it out (nflwar.html): XV x the team's WAR/17 over WAR ratio"""
     t17 = {}
@@ -103,17 +115,27 @@ PREP = {'nfl': _nfl_xvp, 'soccer': _nx90, 'soccerm': _nx90, 'soccerb': _nx90}
 def prep(board, d):
     if board in PREP:
         PREP[board](d)
+    _positions(board, d)
 
 
-def unprep(d):
-    for r in (d.get('players') or []) if isinstance(d, dict) else []:
-        for k in [k for k in r if k.startswith('_')]:
-            del r[k]
+def unprep(d, board=None):
+    rows = list((d.get('players') or []) if isinstance(d, dict) else [])
+    if board:
+        for _, rs, _, _, _, _, name, _ in lists(d, BOARDS[board][1]):
+            if name:
+                rows += rs
+    for r in rows:
+        if isinstance(r, dict):
+            for k in [k for k in r if k.startswith('_')]:
+                del r[k]
 
 
 def full_spec(board):
     """the board's lists plus one pseudo-list per extra view field (name '<path>@<field>')"""
     spec = list(BOARDS[board][1])
+    # every FV list also keeps each row's place on the board (name '<path>@<pos field>'), so the page shows the move in
+    # rank, not in the grade (Noah, Nov 26 2026: the #1 player read "down 1" when his FV slipped a point)
+    spec += [(path, idf, POS.get(board, '_pos'), False, POS.get(board, '_pos')) for path, idf, val, *_ in BOARDS[board][1] if val == 'fv']
     if board in EXTRA:
         path, fields = EXTRA[board]
         idf = next(i for p_, i, *_ in spec if p_ == path)
@@ -181,7 +203,7 @@ def lists(d, spec):
     for path, idf, val, *rk in spec:
         if not path:                        # columnar file
             c = Columnar(d)
-            yield d, d['rows'], c.get, c.put, idf, val, '', False
+            yield d, d['rows'], c.get, c.put, idf, val, ('@' + rk[1] if len(rk) > 1 and rk[1] else ''), False
             continue
         x = d
         for k in path[:-1]:
@@ -260,6 +282,14 @@ def mark(d, spec, base, since):
                 r.pop('wx', None)
     for holder, rows, get, put, idf, val, name, rk in lists(d, spec):
         b = (base or {}).get(name) or {}
+        if name.endswith(('@_pos', '@ovr')):   # an FV list's places: wr = the rank then, wk = places moved (+ = up)
+            for r in rows:
+                v, now = (b.get(rid(get, r, idf)) if since else None), get(r, val)
+                if v is not None and now is not None:
+                    put(r, 'wr', int(v)); put(r, 'wk', int(v) - int(now))
+                elif get(r, 'wr') is not None or get(r, 'wk') is not None:
+                    put(r, 'wr', None); put(r, 'wk', None)
+            continue
         if '@' in name:                     # an extra view: wx[field]
             for r in rows:
                 v = b.get(rid(get, r, idf)) if since else None
@@ -454,7 +484,7 @@ def update(board, day=None, d=None, h=None, write=True):
     h, since = step(h, snap(d, spec), day, fv=graded(spec), sport=board, model=fingerprint(board))
     # wkFrom names the post day the moves count from (the values are the last snapshot on or before it)
     mark(d, spec, h['hist'].get(since) if since else None, cutoff(day, board).isoformat() if since else None)
-    unprep(d)
+    unprep(d, board)
     if write:
         with open(full, 'w', encoding='utf-8') as f:       # the builders' format: compact, UTF-8 as is
             f.write(json.dumps(d, separators=(',', ':'), ensure_ascii=False, allow_nan=False) + ('\n' if raw.endswith('\n') else ''))
