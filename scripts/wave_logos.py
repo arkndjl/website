@@ -346,6 +346,9 @@ def all_logos():
         sid = wave.slug(s['name'])
         if sid not in X:
             X[sid] = word(s['name'], (L, A)[i % 2], P)
+    for b in wave.BRANDS:
+        if b['id'] not in X:
+            X[b['id']] = word(b['name'].title(), A, P)
     missing = [i for i in ids + [wave.slug(b) for b in bands] if i not in X]
     assert not missing, missing
     return X
