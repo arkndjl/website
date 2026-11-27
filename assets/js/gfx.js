@@ -686,7 +686,7 @@
       g.font = '48px ' + FONT;
       c.risers.slice(0, 6).forEach(function (r) { if (y > F.y + F.h - 60) return; g.fillStyle = C.white; g.fillText(r.name, x, y); g.fillStyle = C.lilac; g.fillText(r.pos + '  ' + r.hs + ' → ' + r.now, x + 760, y); y += 72; });
     }
-    return F.canvas;
+    return pcTrim(F.canvas, y, F.y + F.h - 24);   // a coach with one scheme line and no risers: no empty lower half
   }
   // ---- team builder plan, college basketball (cbbbuilder.html sets window.__arkCbbBuilder): the program's offseason on a
   // 4:5 card: header, team rating now / returning / after the plan, the NIL budget bar, next season's rotation by BPM
@@ -1973,15 +1973,28 @@
       [['+ strengths', rep.p, C.teal, x], ['− concerns', rep.m, C.down, x + half + 60]].forEach(function (L) {
         var ly = y; g.font = '52px ' + FONT; g.fillStyle = L[2]; g.fillText(L[0], L[3], ly); ly += 72; g.font = '40px ' + FONT;
         (L[1].length ? L[1] : ['none']).forEach(function (it) {
+      var repEnd = y;
           var ls = wrap(g, it, half - 56); if (ly + ls.length * 54 > lim) return;
           g.fillStyle = L[2]; g.fillText(L[0][0], L[3] + 4, ly); g.fillStyle = C.lilac; ls.forEach(function (l) { g.fillText(l, L[3] + 56, ly); ly += 54; }); ly += 12;
         });
       });
     }
     // FV inputs: each driver's push on the grade, two columns of pixel bars pinned to the bottom
+        repEnd = Math.max(repEnd, ly);
     if (parts.length) inputBars(g, x, bottom - partsH + 40, w, 'FV INPUTS', '', parts, Math.max(1, Math.max.apply(null, parts.map(function (p) { return Math.abs(p[1]); }))), 2, 470);
+      y = repEnd;
     if (det.opened && det.close) det.close();
-    return F.canvas;
+    // a row with few numbers: the empty stretch under the last band (above the FV inputs when it has them) comes out
+    return pcTrim(F.canvas, y + 16, parts.length ? bottom - partsH : bottom - 24);
+  }
+  // rows y0..y1 of a finished card cut out, in steps of the background's 16 px dot grid; a short gap stays
+  function pcTrim(cv, y0, y1) {
+    y0 = Math.ceil(y0); var cut = Math.floor((y1 - y0) / 16) * 16; if (cut < 480) return cv;
+    var c = document.createElement('canvas'); c.width = cv.width; c.height = cv.height - cut;
+    var g = c.getContext('2d'); g.imageSmoothingEnabled = false;
+    g.drawImage(cv, 0, 0, cv.width, y0, 0, 0, cv.width, y0);
+    g.drawImage(cv, 0, y0 + cut, cv.width, cv.height - y0 - cut, 0, y0, cv.width, cv.height - y0 - cut);
+    return c;
   }
   // ---- a dropdown for every player table that has none (pro boards, mocks, backup watch, ARKLIST ...): the CFB layout
   // built from the row itself. Strengths and concerns are the columns where he sits in the top or bottom fifth of the
@@ -2434,6 +2447,9 @@
     var lh = sz * 1.45, y = F.y, spare = (F.h - (secs.length * (2 * pad + sz * 1.5) + nLines * lh + (secs.length - 1) * gap)) / secs.length;
     secs.forEach(function (s) {
       var bh = 2 * pad + sz * 1.5 + s.l.length * lh + spare;
+    // more lines than the card holds at the smallest size: the card grows, nothing runs over its box
+    g.font = sz + 'px ' + FONT; h = secs.length * (2 * pad + sz * 1.5) + nLines * sz * 1.45 + (secs.length - 1) * gap;
+    if (h > F.h) { F = await frame(2160, Math.ceil(2700 + h - F.h), d.title || 'method', win.getAttribute('data-gfx-date')); g = F.g; g.font = sz + 'px ' + FONT; }
       well(g, F.x, y, F.w, bh);
       g.font = Math.round(sz * 0.85) + 'px ' + FONT; g.fillStyle = C.lilac;
       g.fillText(s.h, F.x + pad, y + pad + sz * 0.5);
@@ -3571,9 +3587,9 @@
     g.font = fs + 'px ' + FONT; g.fillStyle = C.white;
     fl.forEach(function (t, i) { g.fillText(t, x + pad, cy + pad + 40 + fs * 0.75 + i * fs * 1.3); });
     if (parts.length) {
-      var px = x + pad, pw = w - 2 * pad, tot = parts.reduce(function (a, p) { return a + (+p[1]); }, 0) || 1, py = cy + fh - pad - 104, PC = [C.teal, C.lilac, '#9a8cc4', C.white];
+      var px = x + pad, pw = w - 2 * pad, tot = parts.reduce(function (a, p) { return a + Math.abs(+p[1]); }, 0) || 1, py = cy + fh - pad - 104, PC = [C.teal, C.lilac, '#9a8cc4', C.white];
       parts.forEach(function (p, i) {
-        var ww = i === parts.length - 1 ? x + pad + pw - px : Math.round(pw * (+p[1]) / tot / 8) * 8, inner = ww - (i < parts.length - 1 ? 8 : 0);
+        var ww = i === parts.length - 1 ? x + pad + pw - px : Math.round(pw * Math.abs(+p[1]) / tot / 8) * 8, inner = ww - (i < parts.length - 1 ? 8 : 0);
         g.fillStyle = PC[i % PC.length]; g.fillRect(px, py, inner, 56);
         g.fillStyle = C.dark; g.fillRect(px, py + 52, inner, 4);
         g.font = '36px ' + FONT; g.fillStyle = C.dark; g.fillText(num(p[1], 2).replace(/0$/, ''), px + 12, py + 30);
@@ -3764,9 +3780,9 @@
     blocks.forEach(function (b) {
       var kind = b[0], bhh = b[1];
       if (kind === 'parts') {
-        var tot = d.parts.reduce(function (a, p) { return a + (+p[1]); }, 0) || 1, px = cx0;
+        var tot = d.parts.reduce(function (a, p) { return a + Math.abs(+p[1]); }, 0) || 1, px = cx0;   // by size: a negative weight (soccer GAR's npxG) is a share of the bar too, its sign stays on the number
         d.parts.forEach(function (p, i) {
-          var pw = i === d.parts.length - 1 ? cx0 + cw - px : Math.round(cw * (+p[1]) / tot / 8) * 8;
+          var pw = i === d.parts.length - 1 ? cx0 + cw - px : Math.round(cw * Math.abs(+p[1]) / tot / 8) * 8;
           g.fillStyle = COLS[i % COLS.length]; g.fillRect(px, by + 20, pw - (i < d.parts.length - 1 ? 8 : 0), 96);
           g.fillStyle = C.dark; g.fillRect(px, by + 108, pw - (i < d.parts.length - 1 ? 8 : 0), 8);
           g.font = '64px ' + FONT; g.fillStyle = C.dark; g.fillText(num(p[1]), px + 20, by + 66);
