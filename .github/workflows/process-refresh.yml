@@ -1,7 +1,7 @@
 # Regenerates ARKBOARD Process (Research, Glossary/Methodology, Data Sources) from the live fit files after the board and
 # refit workflows: scripts/library_glossary.py reads the fits (fv_scale, cbb_live_fit, hockey fit, board counts) into
 # research/library.json, scripts/library_build.py writes data/library.json and content/arkboard-process.md. Never hand-edit
-# those numbers (Noah, Nov 19 2026). Commits only when something changed.
+# those numbers (Noah, Nov 19 2026). Then the glossary GFX cards (scripts/glossary_gfx.py). Commits only when something changed.
 name: process refresh
 
 on:
@@ -31,9 +31,13 @@ jobs:
         run: |
           python3 scripts/library_glossary.py
           python3 scripts/library_build.py
+      # the glossary GFX cards (scripts/glossary_gfx.py -> data/glossary_gfx.json): top 10s and distributions from the
+      # season files, test numbers from the backtest files; stdlib, reads the repo only
+      - name: Glossary GFX cards
+        run: python3 scripts/glossary_gfx.py
       - name: Commit if anything changed
         run: |
-          git add research/library.json data/library.json content/arkboard-process.md
+          git add research/library.json data/library.json content/arkboard-process.md data/glossary_gfx.json
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes

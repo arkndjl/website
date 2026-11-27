@@ -102,12 +102,24 @@ def young(sport, r, Y):
     return r.get('age') is not None and int(r['age']) <= y['max_age']
 
 
+def status_x(sport, v):
+    """v: recruit rank (cbb), stars (cfb), pick (nba, nfl), market value EUR M (soccer); None = unranked / undrafted / missing"""
+    if sport == 'cbb':
+        lr = -math.log(min(500.0, v)) if v else -math.log(500)
+        return [lr, 0.0 if v else 1.0, max(0.0, lr + math.log(100))]
+    if sport == 'cfb':
+        return [float(v) if v else 2.0, 0.0 if v else 1.0]
+    if sport in ('nba', 'nfl'):
+        return [-math.log(v if v else (61 if sport == 'nba' else 270)), 0.0 if v else 1.0]
+    if sport == 'soccer':
+        return [math.log(v + 0.1) if v else math.log(5.1), 0.0 if v else 1.0]
+
+
 def convert(sport):
     src = json.load(open(os.path.join(DIR, sport + '.json')))
     Y = json.load(open(YOUNG)) if os.path.exists(YOUNG) else {}
     SF = (json.load(open(STATUS)) if os.path.exists(STATUS) else {}).get(sport)
     if SF:
-        import next_up_status_research as NS
         DR = json.load(open(os.path.join(ROOT, 'scripts', 'nba_draft_picks.json'))) if sport == 'nba' else {}
 
     def edge(r):
@@ -119,7 +131,7 @@ def convert(sport):
         st = r.get('st')
         if sport == 'nba':
             st = (DR.get(str(r.get('id'))) or [None, None])[1]
-        x = NS.status_x(sport, st)
+        x = status_x(sport, st)
         z = SF['fit']['b0'] + sum(b * v for b, v in zip(SF['fit']['b'], x))
         return round(100 * r['p'] - 100 / (1 + math.exp(-max(-30, min(30, z)))), 1)
     try:
