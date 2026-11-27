@@ -45,7 +45,7 @@
     {{- $rows := slice }}{{ $nets := dict "twitch" "Twitch" "youtube" "YouTube" "tiktok" "TikTok" "x" "X" "ig" "Instagram" }}
     {{- range $k, $h := $s.hist | default dict }}
       {{- range $h.ms }}{{ if .hit }}{{ $rows = $rows | append (dict "net" (index $nets $k) "goal" .goal "kind" "milestone" "t" .hit "est" .est "target" .eta0 "ahead" .ahead "hit" true) }}{{ end }}{{ end }}
-      {{- range $h.dated }}{{ if .done }}{{ $rows = $rows | append (dict "net" (index $nets $k) "goal" .goal "kind" (printf "%dd" .T) "t" (.hit | default .due) "due" .due "ahead" .ahead "hit" (ne .hit nil) "final" .final) }}{{ end }}{{ end }}
+      {{- range $h.dated }}{{ if .done }}{{ $rows = $rows | append (dict "net" (index $nets $k) "goal" .goal "kind" (printf "%dd" (int .T)) "t" (.hit | default .due) "due" .due "ahead" .ahead "hit" (ne .hit nil) "final" .final) }}{{ end }}{{ end }}
     {{- end }}
     {{- $gx := slice }}
     {{- range $w := $want }}{{ if not (in (slice "tth" "igl" "igv") $w) }}{{ $sp := index $spec $w }}{{ $k := index $sp 0 }}
