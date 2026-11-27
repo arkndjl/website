@@ -5,6 +5,8 @@
 {{- $date := lower ((time .asof).Format "Jan 2") -}}
 {{- $kt := dict "join" "joined: first map of a new stint (5+ maps; shorter runs are stand-ins)" "out" "last map for the team 45+ days ago while the team kept playing (benched, released or inactive)" "core" "3+ players from one team joined one team within 30 days" "drop" "the org let the roster go (now listed as ex-org)" "rebrand" "same team, new name" "exit" "a team with 50+ maps in its last year and none in 60 days" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "transactions") "icon" "cs" "filter" "Move,Tier,From,To" "tab" ($.Get "tab") "gfxCols" "Date,Player,Move,From,To,xTV" "gfxDate" $date "gfxMax" "30") -}}
+{{- /* the Fee column shows only while a move in the window has a reported fee */ -}}
+{{- $fee := false }}{{ range .tx }}{{ if .fee }}{{ $fee = true }}{{ end }}{{ end -}}
 <table class="cfb__table tx cs__table">
   <thead><tr>
     <th>Date</th><th>Player</th><th>Move</th><th>From</th><th>To</th>
@@ -13,7 +15,7 @@
     <th title="transfer value at the move">At move</th>
     <th title="RWA now (0 = average tier-1 starter; group mean)">RWA</th>
     <th class="hk__x" title="RWA at the move">RWA0</th>
-    <th class="hk__x" title="publicly reported buyout (unconfirmed)">Fee</th>
+    {{ if $fee }}<th class="hk__x" title="publicly reported buyout (unconfirmed)">Fee</th>{{ end }}
   </tr></thead>
   <tbody>
   {{- range .tx }}
@@ -28,7 +30,7 @@
     <td class="cfb__num" data-v="{{ .v0 | default 0 }}">{{ with .v0 }}{{ partial "cs2money.html" . }}{{ else }}-{{ end }}</td>
     <td class="cfb__num" data-v="{{ .rwa | default 0 }}">{{ if isset . "rwa" }}{{ partial "num.html" (slice "%+.2f" (float .rwa)) }}{{ else }}-{{ end }}</td>
     <td class="cfb__num hk__x" data-v="{{ .rwa0 | default 0 }}">{{ if isset . "rwa0" }}{{ partial "num.html" (slice "%+.2f" (float .rwa0)) }}{{ else }}-{{ end }}</td>
-    <td class="cfb__num hk__x" data-v="{{ .fee | default 0 }}">{{ with .fee }}{{ partial "cs2money.html" . }}{{ else }}-{{ end }}</td>
+    {{ if $fee }}<td class="cfb__num hk__x" data-v="{{ .fee | default 0 }}">{{ with .fee }}{{ partial "cs2money.html" . }}{{ else }}-{{ end }}</td>{{ end }}
   </tr>
   {{- end }}
   </tbody>

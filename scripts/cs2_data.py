@@ -172,7 +172,9 @@ def lp_parse(t):
         fmt = re.search(r'scoreholder-lower">\((Bo\d)\)', blk)
         ev = re.search(r'match-info-tournament-name"><a [^>]*title="([^"]*)"[^>]*>(?:<span>)?([^<]*)', blk)
         # the link title is the team's page ("BetBoom Team"); the text is a ticker abbreviation ("BB")
-        a, b = (html.unescape(n[0].strip() or n[1].strip()) for n in names[:2])
+        # a team with no Liquipedia page: its link title ends " (page does not exist)", which is not part of the name
+        a, b = (re.sub(r"\s*\(page does not exist\)", "", html.unescape(n[0].strip() or n[1].strip()), flags=re.I).strip()
+                for n in names[:2])
         if not a or not b or a.upper() == "TBD" or b.upper() == "TBD":
             continue
         sa = sb = None

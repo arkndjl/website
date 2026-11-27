@@ -3,7 +3,7 @@
 {{- $r := .r -}}{{- $v := .view -}}
 <tr data-pk="{{ $r.id }}">
   <td class="cfb__rk">{{ .rk | default $r.rk }}</td>
-  <td class="cfb__name" style="white-space: nowrap">{{ partial "face.html" (dict "u" ($r.ph | default "")) }}{{ with $r.nat }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index $.ctry . | default (upper .) }}" width="16" height="11" loading="lazy" onerror="this.remove()">{{ end }}<b>{{ $r.n }}</b></td>
+  <td class="cfb__name" style="white-space: nowrap">{{ partial "face.html" (dict "u" ($r.ph | default "")) }}{{ with $r.nat }}{{ if eq (len .) 2 }}<img class="flag" src="/img/flags/{{ . }}.png" alt="{{ . }}" title="{{ index $.ctry . | default (upper .) }}" width="16" height="11" loading="lazy" onerror="this.remove()">{{ end }}{{ end }}<b>{{ $r.n }}</b></td>
   {{- if eq $v "board" }}{{ partial "wkrk.html" (dict "r" $r "from" .from "v" "rwa" "label" "RWA" "fmt" "%+.2f") }}
   <td class="cfb__num" data-v="{{ $r.rwa }}"><b>{{ partial "num.html" (slice "%+.2f" (float $r.rwa)) }}</b></td>
   <td style="white-space: nowrap">{{ if and $r.tk $r.logo }}<img class="cs__logo" src="/img/cs2/{{ $r.tk }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()"> {{ end }}{{ $r.tm }}{{ with $r.trk }} <span class="cfb__dim">#{{ . }}</span>{{ end }}</td>
