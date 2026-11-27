@@ -90,6 +90,7 @@ STORES = {
     'Playboi Carti': [{'base': 'https://shop.playboicarti.com'}],
     'FKA twigs': [{'base': 'https://store.fkatwigsofficial.com'}],
     'Geese': [{'base': 'https://store.geeseband.com'}],
+    'underscores': [{'base': 'https://u4ya.shop'}],
     'Sextile': [{'base': 'https://www.sacredbonesrecords.com', 'coll': 'sextile'}],
     'The Voidz': [{'base': 'https://cultrecords.com', 'keep': r'Voidz'}],
     'Julian Casablancas': [{'base': 'https://cultrecords.com', 'keep': r'Casablancas'}],
@@ -100,7 +101,7 @@ STORES = {
     'Ethel Cain': [{'base': 'https://shop.roughtrade.com', 'coll': 'ethel-cain'}],
 }
 # Names that are ordinary words: a news match needs a music word, a show must lead with the name.
-GENERIC = {'Automatic', 'Geese', 'Hardrock', 'The Fashion', 'Nas', 'chokecherry'}
+GENERIC = {'Automatic', 'Geese', 'underscores', 'Hardrock', 'The Fashion', 'Nas', 'chokecherry'}
 MUSIC_WORDS = r'\b(band|album|single|song|tour|tours|LP|EP|record|video|merch|show|shows|concert|announce[sd]?|shares|releases?|drops?|live|dates)\b'
 COLLAB_WORDS = r'\b(collab\w*|collection|capsule|x|×|drop\w*|release[sd]?|jersey|cap|hat|merch|sneakers?|apparel|tee|hoodie|partner\w*|giveaway|edition)\b'
 
