@@ -539,27 +539,27 @@ def main():
     M = json.load(open(os.path.join(ROOT, 'data', 'cbb_mock.json')))
     fvby = {(r['name'], r['team']): r for r in B}
     drows = []
-    # DoR (scripts/dor.py): college players with a year left, a consensus rank and a yNIL
-    import dor as DOR
-    try: dfit = json.load(open(DOR.OUT)); ynil = {(p['name'], p['team']): p.get('y') for p in json.load(open(os.path.join(ROOT, 'data', 'cbb_market.json')))['nil']}
+    # DEC (scripts/dec.py): college players with a year left, a consensus rank and a yNIL
+    import dec as DEC
+    try: dfit = json.load(open(DEC.OUT)); ynil = {(p['name'], p['team']): p.get('y') for p in json.load(open(os.path.join(ROOT, 'data', 'cbb_market.json')))['nil']}
     except (OSError, ValueError, KeyError): dfit, ynil = None, {}
-    def dor_of(m, a):
-        if not dfit or 'nba' not in dfit or (m.get('cls') or '') not in ('Fr', 'So', 'Jr') or (m.get('declare') or 0) >= 1 or a is None: return None, None
-        v = DOR.nba_dor(m.get('cons'), a, ynil.get((m['name'], m['school'])), dfit)      # a = age on draft night
-        return v or (None, None)
+    def dec_of(m, a):
+        if not dfit or 'bins' not in (dfit.get('nba') or {}).get('grid', {}) or (m.get('cls') or '') not in ('Fr', 'So', 'Jr') or (m.get('declare') or 0) >= 1 or a is None: return None, None, None, None
+        v = DEC.nba_dec(m.get('cons'), a, ynil.get((m['name'], m['school'])), dfit)      # a = age on draft night
+        return v[:4] if v else (None, None, None, None)
     for m in M['mocks']['pred']:
         r = fvby.get((m['name'], m['school'])) or {}
         sim = m.get('sim') or {}
-        dv, dd = dor_of(m, m.get('age'))
+        dv, dd, dm, de = dec_of(m, m.get('age'))
         drows.append({'n': m['name'], 'tm': m['school'], 'pos': m.get('pos') or '', 'age': m.get('age'), 'ph': m.get('photo') or r.get('photo'), 'lo': m.get('logo'),
-                      'sub': m.get('cls') or '', 'slot': m['pick'], 'cons': m.get('cons'), 'ret': r1((1 - (m.get('declare') or 0)) * 100, 0), 'fv': m.get('fv'), 'dor': dv, 'dorD': dd,
+                      'sub': m.get('cls') or '', 'slot': m['pick'], 'cons': m.get('cons'), 'ret': r1((1 - (m.get('declare') or 0)) * 100, 0), 'fv': m.get('fv'), 'dec': dv, 'decD': dd, 'decM': dm, 'decE': de,
                       'nbaP': r1(r['nbaP'] * 100, 0) if r.get('nbaP') is not None else None, 'xbpm': r.get('xbpm'),
                       'rng': f"{sim['lo']}-{sim['hi']}" if sim.get('lo') else '', 'conv': (m.get('slots') or {}).get('conv')})
     for s in M.get('staying') or []:
         r = fvby.get((s['name'], s['school'])) or {}
-        dv, dd = dor_of(s, age(r) + 0.7 if r and age(r) is not None else None)      # board age is at the season's start
+        dv, dd, dm, de = dec_of(s, age(r) + 0.7 if r and age(r) is not None else None)      # board age is at the season's start
         drows.append({'n': s['name'], 'tm': s['school'], 'pos': r.get('pos') or '', 'age': age(r) if r else None, 'ph': r.get('photo'), 'lo': r.get('logo'),
-                      'sub': (s.get('cls') or '') + ' · stays', 'slot': None, 'cons': s.get('cons'), 'ret': r1((1 - (s.get('declare') or 0)) * 100, 0), 'fv': r.get('fv'), 'dor': dv, 'dorD': dd,
+                      'sub': (s.get('cls') or '') + ' · stays', 'slot': None, 'cons': s.get('cons'), 'ret': r1((1 - (s.get('declare') or 0)) * 100, 0), 'fv': r.get('fv'), 'dec': dv, 'decD': dd, 'decM': dm, 'decE': de,
                       'nbaP': r1(r['nbaP'] * 100, 0) if r.get('nbaP') is not None else None, 'xbpm': r.get('xbpm'), 'rng': '', 'conv': None})
     write('draft', {
         'title': 'draft board', 'key': 'slot',
@@ -571,7 +571,7 @@ def main():
         'cols': [col('slot', 'Mock', 'predictive mock pick (consensus + model, Tankathon order)', 'i', 1, 1),
                  col('cons', 'Cons', f"consensus rank: median on {M['boards']} 2027 boards; past drafts, ESPN and NBADraft.net final boards", 'i', 1, 1),
                  col('rng', '80%', '80% range of his pick across 2,000 simulated drafts', 's', 0), col('conv', 'Conv', 'conviction mock pick', 'i', 1, 1),
-                 col('ret', 'Ret%', 'chance he returns to school instead of entering the 2027 draft (1 - declare model; seniors and internationals 0)', 'p'), col('dor', 'DoR', "DoR = declare or return: money by returning (yNIL + the same draft value a year older) - money by declaring (rookie deal + later earnings over the pick spread), $ at this season's cap. RET = return pays more. college players with a year left. hover: both sides", 'dor'),
+                 col('ret', 'Ret%', 'chance he returns to school instead of entering the 2027 draft (1 - declare model; seniors and internationals 0)', 'p'), col('dec', 'DEC', "DEC = declare, even or college: what another year in college is worth (yNIL + the same draft value a year older) less what declaring is worth (rookie deal + later earnings over the pick spread), each as the sure amount he would trade the gamble for, $ at this season's cap. Even = inside the model's error. college players with a year left. hover: the edge, and the edge on average", 'dec'),
                  col('fv', 'FV', 'FV now', 'i'),
                  col('nbaP', 'NBA%', 'chance of an NBA career', 'p'), col('xbpm', 'xXPM', 'projected XPM this season', 's1'),
                  col('out', 'Out', 'what he became: NBA career on the FV scale (drafts through 2020, six NBA seasons or more)', 'i'),

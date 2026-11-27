@@ -28,7 +28,7 @@ _NPOS = ', '.join(f'{g} {round((math.exp(v) - 1) * 100):+d}%' for g, v in ld('da
 _nbm = lambda k: sum((lo + hi) / 2 for lo, hi in _NB[k]['teams'].values()) / len(_NB[k]['teams'])
 _VX = ld('data/nba_vorx_research.json')                         # VORX on rXPM (scripts/nba_vorx_research.py)             # rXPM team adjustment (scripts/nba_rxpm_research.py)
 _NT = ld('data/nba_trade_fit.json')                         # NBA draft-night trades (scripts/nba_draft_trades.py)
-_DR = ld('data/dor_fit.json')                              # DoR, declare or return in dollars (scripts/dor.py)
+_DR = ld('data/dec_fit.json')                              # DEC, declare / even / college in dollars (scripts/dec.py)
 _RP = ld('data/return_pay.json')                           # draft pay vs college pay in Return% (scripts/research/ret_pay_nov27/pay.py)
 _RD = ld('data/return_drivers.json')                       # Return% sweep + reported-return lock (scripts/return_drivers.py, return_news.py)
 _CL = {k: ld(f'scripts/research/coach_loyalty_nov27/results_{k}.json') for k in ('cbb', 'cfb', 'recruits_cfb', 'recruits_cbb')}   # coach loyalty tests
@@ -500,12 +500,22 @@ sections.append({'id': 'players', 'title': 'Player odds and projections', 'entri
       ['Declare is a logit on ln xPick and age on draft day. Ranked underclassmen declare about 94% of the time, seniors about 69% and RS seniors 100%.',
        'Picked is a log-normal around the mock xPick, with an SD that narrows toward the draft (PFF dated boards, 2020-26).'],
       'CFB board, draft board', ['CFB']),
-    (lambda f, t, k, r, n: E('DoR', 'Declare or Return: the money by going back to college less the money by declaring, for a draft prospect with eligibility left.',
-      [f"Declare = the rookie deal + later earnings, averaged over where he goes from his xPick (CBB: his consensus rank). Return = yNIL for the season + the same draft value one year older. "
-       f"Dollars are at this season's cap, later years count {f['d']:.2f} a year. RET on the board means return pays more. It is what pays on average, not what he will do (that is Ret%).",
-       "The return side holds his draft stock where it is, so going back costs a year and pays yNIL. A board ranks him for this draft, so a young player who develops can beat that, "
-       "and one who gets hurt falls under it. Who went back is not a fair sample of either (the ones told they would go late stay), so their record is shown below and not used. "
-       "These are means, and a few long careers carry them.",
+    (lambda f, t, k, r, n, q, qn: E('DEC', 'Declare, Even, College: what another year in college is worth to a draft prospect less what declaring is worth, with Even when the model cannot tell the two apart.',
+      [f"Declare = the rookie deal + later earnings over where he goes from his xPick (CBB: his consensus rank). College = yNIL for the season + the same draft value one year older. "
+       f"Dollars are at this season's cap, later years count {f['d']:.2f} a year. It is what is worth more to him, not what he will do (that is Ret%).",
+       f"Each side is a certainty equivalent: the sure amount he would trade the gamble for, with log utility over ${f['w0']:.0f}M (what a college graduate earns outside the sport) plus the outcome. "
+       "A player gets one career and cannot spread the risk, so a sure yNIL counts for more than the same dollars spread over a few long careers. "
+       f"The outcome spread is the pick spread times how far later earnings land from the fit at that pick, from the same drafts as the fit "
+       f"(NBA: the {qn['drafts'][0]}-{str(qn['drafts'][1])[2:]} drafts, {qn['n']} picks and {qn['undrafted']} undrafted prospects). The hover keeps the edge on plain averages.",
+       f"Even: the edge is inside one standard error, from yNIL's error (log error {f['sig']['cfb']:.2f} CFB, {f['sig']['cbb']:.2f} CBB against On3) and the age term's. "
+       f"On the {k['drafts'][0]}-{str(k['drafts'][-1])[2:]} CFB boards {100 * q['even']['share']:.0f}% were Even, on the CBB boards {100 * n['check']['readings']['even']['share']:.0f}%.",
+       f"Three readings against who went back, CFB ({q['n']} prospects, {100 * q['returned']:.0f}% returned) / CBB ({n['check']['readings']['n']}, {100 * n['check']['readings']['returned']:.0f}%). "
+       + ' '.join(f"{lab}: says college for {100 * q[key]['saysCollege']:.0f}% / {100 * n['check']['readings'][key]['saysCollege']:.0f}%, AUC inside rank thirds {q[key]['aucInThirds']:.2f} / {n['check']['readings'][key]['aucInThirds']:.2f}."
+                  for lab, key in (('Average', 'mean'), ('Median', 'median'), ('Certainty equivalent', 'ce'))) +
+       f" The average sends almost nobody back, so the board uses the certainty equivalent. Returned by verdict, CFB: Declare {100 * q['even']['returnedDeclare']:.0f}%, Even {100 * q['even']['returned']:.0f}%, "
+       f"College {100 * q['even']['returnedCollege']:.0f}%. CBB: {100 * n['check']['readings']['even']['returnedDeclare']:.0f}%, {100 * n['check']['readings']['even']['returned']:.0f}%, {100 * n['check']['readings']['even']['returnedCollege']:.0f}%.",
+       "The college side holds his draft stock where it is, so going back costs a year and pays yNIL. A young player who develops can beat that, and one who gets hurt falls under it. "
+       "Who went back is not a fair sample of either (the ones told they would go late stay), so their record is shown below and not used.",
        f"NFL rookie deal: the 2026 slotted four-year totals, with the guaranteed share by pick from OverTheCap rookie deals and the rest counted at the odds he is still on a roster. "
        f"Later earnings: every veteran contract of the {f['later']['drafts'][0]}-{str(f['later']['drafts'][1])[2:]} drafts ({f['later']['n']:,} picks) as a share of the cap, fit on pick, position and age. "
        f"A year older at the same pick is {f['later']['agePct']:.0f}% in later earnings (t = {f['later']['ageT']:.1f}). "
@@ -517,14 +527,14 @@ sections.append({'id': 'players', 'title': 'Player odds and projections', 'entri
        f"{n['spread']['declare']['n']} seniors on the No Ceilings midseason board ({n['spread']['drafts'][0]}-{str(n['spread']['drafts'][-1])[2:]}; "
        f"{100 * n['spread']['declare']['undrafted']:.0f}% undrafted, sd {n['spread']['declare']['sd']:.2f}). Early entrants who left went undrafted "
        f"{100 * f['spread']['allDeclared']['undrafted']:.0f}% (all declared, CFB) and {100 * n['spread']['earlyEntrants']['undrafted']:.0f}% (CBB) of the time: they left knowing more than the board.",
-       "Break-even yNIL, CFB by xPick (WR / QB, $M): " + ', '.join(f"{x['xPick']} {x['breakEvenNil']:.1f} / {x['breakEvenNilQB']:.1f}" for x in t if x['xPick'] in (10, 32, 50, 100, 150, 200, 300)) +
-       ". CBB by consensus rank (age 20): " + ', '.join(f"{x['rank']} {x['breakEvenNil']:.1f}" for x in n['table'] if x['rank'] in (5, 14, 30, 50, 60, 80, 100)) + ".",
+       "Break-even yNIL, CFB by xPick (WR certainty equivalent / QB / WR on averages, $M): " + ', '.join(f"{x['xPick']} {x['ce']:.1f} / {x['ceQB']:.1f} / {x['breakEvenNil']:.1f}" for x in t if x['xPick'] in (10, 32, 50, 100, 150, 200, 300)) +
+       ". CBB by consensus rank (age 20, certainty equivalent / averages): " + ', '.join(f"{x['rank']} {x['ce']:.1f} / {x['breakEvenNil']:.1f}" for x in n['table'] if x['rank'] in (5, 14, 30, 50, 60, 80, 100)) +
+       f". With ${1:.0f}M or $4M outside the sport in place of ${f['w0']:.0f}M the CFB break-even at xPick 32 is " + ' or '.join(f"{x[k]:.1f}" for x in t if x['xPick'] == 32 for k in ('ceW1', 'ceW4')) + ".",
        f"The returners' record, CFB {k['drafts'][0]}-{str(k['drafts'][-1])[2:]} boards: {r['n']} went back, {100 * r['drafted']:.0f}% were drafted the next year and {100 * r['beatDeclare']:.0f}% came out ahead of "
-       f"what declaring was worth (mean ${r['meanGot']:.1f}M with NIL scaled to that season's market, against ${r['meanDeclareEV']:.1f}M). CBB {n['check']['drafts'][0]}-{str(n['check']['drafts'][-1])[2:]}: "
+       f"what declaring was worth on average (mean ${r['meanGot']:.1f}M with NIL scaled to that season's market, against ${r['meanDeclareEV']:.1f}M). CBB {n['check']['drafts'][0]}-{str(n['check']['drafts'][-1])[2:]}: "
        f"{n['check']['returners']['n']} returners with a draft or an exit the next year ({n['check']['returners']['again']} went back again), {100 * n['check']['returners']['drafted']:.0f}% drafted, "
-       f"{100 * n['check']['returners']['beatDeclare']:.0f}% ahead (${n['check']['returners']['meanGot']:.1f}M against ${n['check']['returners']['meanDeclareEV']:.1f}M). "
-       "Break-even yNIL on that record, CFB (WR / QB): " + ', '.join(f"{x['xPick']} {x['slide']:.1f} / {x['slideQB']:.1f}" for x in t if x['xPick'] in (10, 32, 100, 200)) + "."],
-      'CFB draft board, CBB draft board', ['CFB', 'CBB']))(_DR, _DR['table'], _DR['check'], _DR['check']['returners'], _DR['nba']),
+       f"{100 * n['check']['returners']['beatDeclare']:.0f}% ahead (${n['check']['returners']['meanGot']:.1f}M against ${n['check']['returners']['meanDeclareEV']:.1f}M)."],
+      'CFB draft board, CBB draft board', ['CFB', 'CBB']))(_DR, _DR['table'], _DR['check'], _DR['check']['returners'], _DR['nba'], _DR['check']['readings'], _DR['nba']['spreadN']),
     (lambda c, b, n, fails: E('Ret%', 'The chance a player is back in college next season instead of in the 2027 draft, 1 - P(declares).',
       [f"CFB uses the Draft% declare logit (ln xPick, age on draft day, by class group). Leaving one draft out on the 2021-25 fall PFF boards "
        f"({c['n']} prospects, without RS seniors and grads), log loss is {c['baselines']['live']:.3f}, compared to {c['baselines']['class']:.3f} for class only, "
