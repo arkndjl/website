@@ -1,0 +1,361 @@
+{
+ "_readme": "python3 scripts/research/ret_pay_nov27/pay.py     # -> data/return_pay.json (read by scripts/library_glossary.py)",
+ "nilMarket": {
+  "2022": 1.14,
+  "2023": 1.17,
+  "2024": 2.26,
+  "2025": 2.6,
+  "2026": 2.8
+ },
+ "cap": {
+  "nfl": {
+   "2022": 208.2,
+   "2023": 224.8,
+   "2024": 255.4,
+   "2025": 279.2,
+   "2026": 301.2
+  },
+  "nba": {
+   "2022": 123.7,
+   "2023": 136.0,
+   "2024": 140.6,
+   "2025": 154.6,
+   "2026": 165.0
+  }
+ },
+ "cbb": {
+  "stageA": {
+   "nHeld": 1555,
+   "shipped": 0.2843,
+   "idxOnTop": {
+    "logLoss": 0.2861,
+    "vsLive": 0.0018,
+    "t": 4.62,
+    "won": 1,
+    "of": 4,
+    "pass": false
+   },
+   "idxSwap": {
+    "logLoss": 0.288,
+    "vsLive": 0.0037,
+    "t": 4.69,
+    "won": 1,
+    "of": 4,
+    "pass": false
+   }
+  },
+  "stageB": {
+   "ranked": 212,
+   "returned": 72,
+   "drafts": [
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+   ],
+   "ynilShape": {
+    "a": 13.114,
+    "b": -0.277,
+    "hm": 2.298,
+    "n": 400
+   },
+   "shippedRanked": 0.4948,
+   "onTop": {
+    "econ4": {
+     "logLoss": 0.4903,
+     "vsLive": -0.0045,
+     "t": -1.13,
+     "won": 3,
+     "of": 5,
+     "pass": false
+    },
+    "econ1": {
+     "logLoss": 0.4902,
+     "vsLive": -0.0045,
+     "t": -1.14,
+     "won": 3,
+     "of": 5,
+     "pass": false
+    },
+    "econ1p": {
+     "logLoss": 0.4784,
+     "vsLive": -0.0164,
+     "t": -2.46,
+     "won": 5,
+     "of": 5,
+     "pass": true
+    },
+    "gap": {
+     "logLoss": 0.4772,
+     "vsLive": -0.0175,
+     "t": -3.25,
+     "won": 5,
+     "of": 5,
+     "pass": true
+    },
+    "pstay": {
+     "logLoss": 0.4848,
+     "vsLive": -0.0099,
+     "t": -2.57,
+     "won": 5,
+     "of": 5,
+     "pass": true
+    },
+    "idx": {
+     "logLoss": 0.4607,
+     "vsLive": -0.034,
+     "t": -2.18,
+     "won": 3,
+     "of": 5,
+     "pass": false
+    },
+    "step": {
+     "logLoss": 0.4588,
+     "vsLive": -0.0359,
+     "t": -2.41,
+     "won": 3,
+     "of": 5,
+     "pass": false
+    }
+   },
+   "besideStep": {
+    "econ1p": {
+     "logLoss": 0.4575,
+     "vsLive": -0.0013,
+     "t": -0.39,
+     "won": 2,
+     "of": 5,
+     "pass": false
+    },
+    "gap": {
+     "logLoss": 0.4575,
+     "vsLive": -0.0013,
+     "t": -0.52,
+     "won": 2,
+     "of": 5,
+     "pass": false
+    },
+    "pstay": {
+     "logLoss": 0.4573,
+     "vsLive": -0.0015,
+     "t": -0.63,
+     "won": 3,
+     "of": 5,
+     "pass": false
+    }
+   },
+   "walkForward": {
+    "econ1p": {
+     "logLoss": 0.5489,
+     "vsLive": -0.0109,
+     "t": -1.74,
+     "won": 3,
+     "of": 4,
+     "pass": false
+    },
+    "gap": {
+     "logLoss": 0.5473,
+     "vsLive": -0.0125,
+     "t": -1.94,
+     "won": 3,
+     "of": 4,
+     "pass": false
+    },
+    "pstay": {
+     "logLoss": 0.5557,
+     "vsLive": -0.0041,
+     "t": -0.93,
+     "won": 3,
+     "of": 4,
+     "pass": false
+    },
+    "step": {
+     "logLoss": 0.5216,
+     "vsLive": -0.0381,
+     "t": -3.96,
+     "won": 2,
+     "of": 4,
+     "pass": false
+    }
+   },
+   "moneyOnly": {
+    "logLoss": 0.5768,
+    "vsLive": 0.082,
+    "t": 2.83,
+    "won": 0,
+    "of": 5,
+    "pass": false
+   },
+   "r2OnRank": {
+    "econ4": 0.201,
+    "econ1": 0.163,
+    "econ1p": 0.113,
+    "gap": 0.644,
+    "pstay": 0.456
+   },
+   "bands": [
+    {
+     "picks": "1-14",
+     "era": "2022-23",
+     "n": 22,
+     "left": 1.0,
+     "model": 0.968
+    },
+    {
+     "picks": "1-14",
+     "era": "2025-26",
+     "n": 26,
+     "left": 0.962,
+     "model": 0.979
+    },
+    {
+     "picks": "15-30",
+     "era": "2022-23",
+     "n": 25,
+     "left": 0.8,
+     "model": 0.756
+    },
+    {
+     "picks": "15-30",
+     "era": "2025-26",
+     "n": 23,
+     "left": 0.609,
+     "model": 0.821
+    },
+    {
+     "picks": "31-60",
+     "era": "2022-23",
+     "n": 47,
+     "left": 0.617,
+     "model": 0.363
+    },
+    {
+     "picks": "31-60",
+     "era": "2025-26",
+     "n": 37,
+     "left": 0.216,
+     "model": 0.454
+    }
+   ]
+  }
+ },
+ "cfb": {
+  "n": 479,
+  "returned": 78,
+  "drafts": [
+   2022,
+   2023,
+   2024,
+   2025
+  ],
+  "ynilShape": {
+   "a": 14.999,
+   "b": -0.259,
+   "qb": 1.306,
+   "g5": -1.677,
+   "fcs": -2.959,
+   "n": 370
+  },
+  "live": 0.3218,
+  "onTop": {
+   "econ4": {
+    "logLoss": 0.334,
+    "vsLive": 0.0122,
+    "t": 1.34,
+    "won": 5,
+    "of": 8,
+    "pass": false
+   },
+   "econ1": {
+    "logLoss": 0.3328,
+    "vsLive": 0.011,
+    "t": 1.33,
+    "won": 5,
+    "of": 8,
+    "pass": false
+   },
+   "econ1p": {
+    "logLoss": 0.337,
+    "vsLive": 0.0153,
+    "t": 1.91,
+    "won": 5,
+    "of": 8,
+    "pass": false
+   },
+   "gap": {
+    "logLoss": 0.3436,
+    "vsLive": 0.0218,
+    "t": 2.07,
+    "won": 4,
+    "of": 8,
+    "pass": false
+   },
+   "pstay": {
+    "logLoss": 0.3358,
+    "vsLive": 0.014,
+    "t": 1.91,
+    "won": 5,
+    "of": 8,
+    "pass": false
+   },
+   "idx": {
+    "logLoss": 0.3299,
+    "vsLive": 0.0081,
+    "t": 5.49,
+    "won": 2,
+    "of": 8,
+    "pass": false
+   }
+  },
+  "swap": {
+   "econ1p": {
+    "logLoss": 0.3401,
+    "vsLive": 0.0183,
+    "t": 1.82,
+    "won": 3,
+    "of": 8,
+    "pass": false
+   },
+   "gap": {
+    "logLoss": 0.3463,
+    "vsLive": 0.0245,
+    "t": 1.63,
+    "won": 2,
+    "of": 8,
+    "pass": false
+   },
+   "pstay": {
+    "logLoss": 0.3385,
+    "vsLive": 0.0167,
+    "t": 1.74,
+    "won": 3,
+    "of": 8,
+    "pass": false
+   },
+   "idx": {
+    "logLoss": 0.3313,
+    "vsLive": 0.0095,
+    "t": 5.62,
+    "won": 1,
+    "of": 8,
+    "pass": false
+   }
+  },
+  "moneyOnly": {
+   "logLoss": 0.3444,
+   "vsLive": 0.0226,
+   "t": 1.87,
+   "won": 1,
+   "of": 8,
+   "pass": false
+  },
+  "r2OnRank": {
+   "econ4": 0.073,
+   "econ1": 0.188,
+   "econ1p": 0.213,
+   "gap": 0.632,
+   "pstay": 0.479
+  }
+ }
+}
