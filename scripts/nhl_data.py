@@ -171,9 +171,37 @@ def schedule(day):
     return out
 
 
+PAGE = 100          # the stats API returns at most 100 rows a call (limit=-1 included, since Nov 2026)
+
+
+def _pages(url):
+    """every row of one stats-API query, paged by start in a fixed order (game, then player); raises when the rows
+    that came back are not the query's total, so a short answer never passes for a full log"""
+    srt = '%5B%7B%22property%22:%22gameId%22,%22direction%22:%22ASC%22%7D,%7B%22property%22:%22playerId%22,%22direction%22:%22ASC%22%7D%5D'
+
+    def page(start):
+        j = get(f'{url}&sort={srt}&start={start}&limit={PAGE}')
+        if j is None or 'data' not in j:
+            raise RuntimeError(f'stats API: no answer for {url} start={start}')
+        return j
+
+    for attempt in range(3):            # rows added while the pages were read (a game going final) shift them: read again
+        first = page(0)
+        rows, total = list(first['data']), first.get('total') or 0
+        step = len(rows)                # the page size the API really gave
+        if total > step > 0:
+            with ThreadPoolExecutor(6) as ex:
+                for j in ex.map(page, range(step, total, step)):
+                    rows += j['data']
+        if len(rows) == total and len({(r['gameId'], r['playerId']) for r in rows}) == total:
+            return rows
+        time.sleep(3)
+    raise RuntimeError(f'stats API: {len(rows)} of {total} rows for {url}')
+
+
 def _logs(kind, S, gtype, fresh):
-    """stats-API game logs (goalie or skater summary, one row a player-game); the API caps a query at 10,000 rows, so
-    skaters come a month at a time"""
+    """stats-API game logs (goalie or skater summary, one row a player-game), every page of each query (_pages);
+    skaters come two weeks at a time"""
     fn = os.path.join(CACHE, kind, f'{S}-{gtype}.json.gz')
     if not fresh and os.path.exists(fn):
         return load(fn)
@@ -191,11 +219,7 @@ def _logs(kind, S, gtype, fresh):
         q = f'seasonId={sid(S)}%20and%20gameTypeId={gtype}'
         if lo:
             q += f'%20and%20gameDate%3E=%22{lo}%22%20and%20gameDate%3C=%22{hi}%22'
-        j = get(f'{STATS}/{kind}/summary?isAggregate=false&isGame=true&limit=-1&cayenneExp={q}')
-        data = (j or {}).get('data', [])
-        if len(data) >= 10000:
-            raise RuntimeError(f'{kind} {S} {lo}: query hit the 10,000-row cap')
-        rows += data
+        rows += _pages(f'{STATS}/{kind}/summary?isAggregate=false&isGame=true&cayenneExp={q}')
     if kind == 'goalie':
         keep = [(r['gameId'], r['playerId'], r['goalieFullName'], team(r['teamAbbrev']), r['gamesStarted'],
                  r['timeOnIce'], r['shotsAgainst'], r['goalsAgainst']) for r in rows]
