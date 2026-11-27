@@ -71,3 +71,32 @@ kept blocks gain vacated minutes and minutes room, held log loss .17786 -> .1624
 - Season-so-far input of 1Y / 3Y from SV: snapshots need a partial-season SV (soccer_proj_research.snapshot + soccer_sv).
 - `python3 scripts/soccer_ceiling_research.py` (ceiling fit, same age as the old breakout fit) and
   `python3 scripts/backup_age_fit.py` (soccer part; shrink line).
+
+## Round 2 (port round)
+
+prereg.md "Round 2" written before scoring; `run2.py` -> results2.json. Holm at .05 over P1b, P1c, P2.
+
+| item | target | before -> after | t | k/n | result |
+|---|---|---|---|---|---|
+| P1b xGap: grade gap replaced by the p/90 gap | pair gap next two seasons, walk-forward MSE | .002191 -> .002143 | -2.16 | 5/7 | pass (Holm p .015 <= .025) |
+| P1c xGap: grade gap + p/90 gap + age | same | .002191 -> .002116 | -5.88 | 7/7 | PASS, shipped (lower MSE than P1b) |
+| P2 awards games-left GAR rate: own pace -> 3-season GAR a minute (1/.5/.25, K 900) | rest-of-season GAR, top 150 at f .25 / .5 / .75 | RMSE 2.114 -> 1.930 / 1.391 -> 1.347 / .825 -> .833 | -8.52 / -5.36 / -1.86 | 10/10, 6/10, 4/10 | FAIL (rule: every share; worse late in the season) |
+
+- P1 shipped: scripts/backup_age_fit.py soccer_fit (+ `--soccer` to refit soccer alone), scripts/backup_age.py term d on
+  r['pgap'], scripts/soccer_players.py backup() writes pgap. The shipped fit grades on the fringe line the live grade is
+  shrunk to (fit form = serve form): n 6,642, MSE .002095 -> .002040, t -5.27; a -.00262 b .2499 c -.00005 d .2635
+  (age is inside p/90, so its own term falls to zero). The grade and the pair rule stay GAR a 90.
+- P2 lead: the predictive rate wins through half a season and loses after; a share-weighted blend (weight on pace rising
+  with f) is the next candidate, not tested here. scripts/awards.py soccer draw unchanged.
+- P5: data/soccer_ceiling_fit.json was stale (coefficients b .211 / .528 then, .529 / .323 on today's files; kept blocks
+  lose usage change x context): refit with `python3 scripts/soccer_ceiling_research.py`, next up rebuilt.
+  data/backup_age.json soccer was from Nov 11 (6,393 pairs then, 6,642 now): refit with P1.
+- P6: the leaders tab already ranks by SVAR (soccerplayers.html:188, rk). scripts/search_index.py:170 now orders soccer
+  players by SVAR (GAR only where a row has none).
+- "GAR leaders" tab name: content/arkboard-soccer.md:33 (wintabs tabs list) and :34 (soccerplayers title= and tab=);
+  scripts/search_index.py:169 names the same tab for player rows; scripts/library_glossary.py:454 and :472 mention it in
+  text. A rename needs an ALIAS entry in layouts/shortcodes/wintabs.html ('gar-leaders' -> the new hash).
+
+Workflow reruns after merge: soccer.yml (data/backup_soccer.json gets pgap and the new xGap, static/data/depth/soccer.json);
+the search index workflow (static/data/search-players.json). Neither was regenerated here: the offline rows are the Nov 1
+Understat cache without the FotMob stand-in.

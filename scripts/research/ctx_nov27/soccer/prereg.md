@@ -47,3 +47,21 @@ A race that fails keeps GAR and is reported as a standing descriptive mismatch.
 
 ## Blocked before scoring (leads, not tests)
 xMV inputs (GAR now / 1 / 2 seasons -> SV): needs the Transfermarkt dump (scripts/.cache/soccer_prospects/dump).
+
+# Round 2 (port round), written before any of these was scored. Holm at .05 over P1b, P1c, P2.
+
+## P1 backup xGap on the p/90 gap, own fit (the grade and the pair rule stay GAR a 90)
+Harness: scripts/backup_age_fit.py soccer block exactly (pairs = a backup whose grade beats the lowest-graded starter).
+Target: the pair's gap over the next two seasons (the harness's own). Control A: target = a + b gap + c age gap.
+P1b: the gap replaced by the p/90 gap (pg90 backup - pg90 starter, season y's file). P1c: A + the p/90 gap.
+Walk-forward as fit(). Pass: paired squared error t <= -2 over held pairs and more than half the seasons.
+If both pass the lower held MSE ships.
+
+## P2 awards games-left rate for the voter model's value (GAR) = a predictive rate on GAR's scale
+Now: GAR so far / club games x games left (this season's own pace). Candidate: GAR a minute over three seasons
+(this season so far + .5 x S-1 + .25 x S-2, minutes the same weights, + 900 minutes at 0: p/90's weights on GAR's
+scale) x minutes left at his pace. Conviction draws (SVAR, goals) keep the season's own rate.
+Test: projection snapshots at f .25 .5 .75 (scripts/.cache/soccer/proj_snaps.json.gz, seasons 2017-2026), the 150
+players with the most GAR at the snapshot (the award pool), target = full-season GAR - GAR at the snapshot,
+minutes left = minutes / f x (1 - f) for both. No fitted constant. Pass: squared error t <= -2 (players as units) at
+every f and most seasons at every f.
