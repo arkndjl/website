@@ -33,8 +33,9 @@ A player's value a match = his rates at those weights plus his league's strength
 league-season, so a Ligue 1 regular and a Premier League regular are put on one scale: LG_SCALE is measured on players
 who changed league, this season's value on last season's and the gap); replacement, by position = the
 minutes-weighted value of the regulars (900+ minutes for the club) on the bottom three sides by goal difference of
-every finished league-season (repl_line: what a relegation-level side fields; the season in progress is not in it, so
-the line holds still through a season); GAR = (value - replacement) x matches of minutes; PAR = GAR x league points
+every finished league-season, less the sides that collapsed (second-half points a match under .6 and below their first
+half's: Nov 27 2026, scripts/soccer_repl_research_nov27.py; repl_line: what a relegation-level side fields; the season
+in progress is not in it, so the line holds still through a season); GAR = (value - replacement) x matches of minutes; PAR = GAR x league points
 per goal of difference (a team-season regression). The line before it (replFringe: players with 90-899 minutes, every
 season) sat at about the league median; the fits trained on it still read GAR on it through gar_fringe() until they
 are refit (xMV, the projections, backup watch, the game model's injury term).
@@ -78,6 +79,11 @@ NAMES = {'orp': 'xG plus-minus, offence (regression over on-pitch spells, 3 seas
          'bup': 'xGBuildup', 'gk': 'goalkeeper: goals saved vs xG faced'}
 POS = {'GK': 'GK', 'DR': 'D', 'DL': 'D', 'DC': 'D', 'DMR': 'M', 'DML': 'M', 'DMC': 'M', 'MR': 'M', 'ML': 'M', 'MC': 'M',
        'AMR': 'F', 'AML': 'F', 'AMC': 'M', 'FW': 'F', 'FWR': 'F', 'FWL': 'F'}
+# functional role (Nov 27 2026, scripts/soccer_repl_research_nov27.py): the modal Understat starting position
+ROLE_US = {'GK': 'GK', 'DC': 'CB', 'DL': 'FB', 'DR': 'FB', 'DML': 'FB', 'DMR': 'FB', 'DMC': 'DM', 'MC': 'CM', 'ML': 'W',
+           'MR': 'W', 'AMC': 'AM', 'AML': 'W', 'AMR': 'W', 'FW': 'ST', 'FWL': 'W', 'FWR': 'W'}
+ROLES = ('GK', 'FB', 'CB', 'DM', 'CM', 'AM', 'W', 'ST')
+COLL = os.path.join(HERE, 'data', 'soccer_collapsed.json')
 
 
 def f(x):
@@ -230,6 +236,7 @@ def build_rows(S0, S1, before=None):
     for (lg, S, tid, p), a in agg.items():
         pc = [x for x, _ in a['pos'].most_common() if x != 'Sub']
         a['pos'] = POS.get(pc[0], 'M') if pc else 'M'
+        a['role'] = ROLE_US.get(pc[0]) if pc else None
         rows.append(dict(a, lg=lg, S=S, tid=tid, team=teams.get(tid, tid), p=p))
     return rows
 
@@ -681,16 +688,66 @@ def lg_adj(r, F, LS):
 def gar_of(r, F, LS):
     """(value a 90 on the one big-five scale, GAR)"""
     v = value(r, F) + lg_adj(r, F, LS)
-    return v, (v - F['repl'][r['pos']]) * r['min'] / 90
+    return v, (v - repl_of(r, F)) * r['min'] / 90
 
 
 REPL_MIN, REPL_BOTTOM = 900, 3
 
 
-def repl_line(rows, F, LS, cur):
-    """replacement value a match by position: the minutes-weighted value of the regulars (REPL_MIN+ minutes for the
-    club that season) on the REPL_BOTTOM sides with the worst goal difference a match in each finished big-five
-    league-season (S < cur), every such season pooled. A side's goal difference comes from the rows themselves
+def repl_of(r, F):
+    """a row's replacement line, by position. Lines by functional role (repl_line key 'role') were tested Nov 27 2026
+    and failed the free-signings target held out (scripts/soccer_repl_research_nov27.py G4): not used"""
+    return F['repl'][r['pos']]
+
+
+def collapse_of(lg, S):
+    """the Understat team ids of league-season (lg, S) that gave up: second-half points a match under .6 and below
+    their first half's (Understat's results, matches in kick-off order). None when the league file is not at hand"""
+    d = D.us_league(lg, S)
+    if not d:
+        return None
+    pts = defaultdict(list)
+    for m in sorted((m for m in d['matches'] if m.get('res')), key=lambda m: m.get('t') or ''):
+        hg, ag = int(m['hg']), int(m['ag'])
+        pts[str(m['hid'])].append(3 if hg > ag else 1 if hg == ag else 0)
+        pts[str(m['aid'])].append(3 if ag > hg else 1 if hg == ag else 0)
+    out = []
+    for tid, v in pts.items():
+        n = len(v) // 2
+        a, b = sum(v[:n]) / max(n, 1), sum(v[n:]) / max(len(v) - n, 1)
+        if b < 0.6 and b < a:
+            out.append(tid)
+    return sorted(out)
+
+
+def collapsed(cur):
+    """{(league, season, team id)} of every finished league-season's collapsed sides: frozen in COLL
+    (scripts/data/soccer_collapsed.json), a finished season not in it read from Understat and added"""
+    try:
+        C = json.load(open(COLL))
+    except (OSError, ValueError):
+        C = {'note': 'sides that gave up (second-half points a match < .6 and below the first half), finished seasons; '
+                     'dropped from the GAR replacement line (scripts/soccer_players.py collapse_of)', 'seasons': {}}
+    new = False
+    for S in range(FIRST, cur):
+        for lg in D.BIG5:
+            k = f'{lg}|{S}'
+            if k not in C['seasons']:
+                v = collapse_of(lg, S)
+                if v is not None:
+                    C['seasons'][k] = v; new = True
+    if new:
+        C['seasons'] = dict(sorted(C['seasons'].items()))
+        json.dump(C, open(COLL, 'w'), indent=0, allow_nan=False)
+    return {(k.split('|')[0], int(k.split('|')[1]), t) for k, v in C['seasons'].items() for t in v}
+
+
+def repl_line(rows, F, LS, cur, key='pos'):
+    """replacement value a match by position (key 'role': by functional role): the minutes-weighted value of the
+    regulars (REPL_MIN+ minutes for the club that season) on the REPL_BOTTOM sides with the worst goal difference a
+    match in each finished big-five league-season (S < cur), every such season pooled, less the sides that collapsed
+    (collapsed(): gave up in the second half; their regulars sit .02 a 90 under the other bottom sides' and the line
+    with them in sat under free signings and promoted sides' regulars, scripts/soccer_repl_research_nov27.py). A side's goal difference comes from the rows themselves
     (on-pitch goals for less against summed over its players / 11, over its minutes / 990). None before any season
     is finished. rows: after prep()"""
     team = defaultdict(lambda: [0.0, 0.0])
@@ -704,9 +761,12 @@ def repl_line(rows, F, LS, cur):
     bottom = {(lg, S, tid) for (lg, S), v in by.items() for _, tid in sorted(v)[:REPL_BOTTOM]}
     if not bottom:
         return None
+    bottom -= collapsed(cur)
     out = {}
-    for pos in ('GK', 'D', 'M', 'F'):
-        g = [r for r in rows if r['pos'] == pos and r['min'] >= REPL_MIN and (r['lg'], r['S'], r['tid']) in bottom]
+    for pos in (ROLES if key == 'role' else ('GK', 'D', 'M', 'F')):
+        g = [r for r in rows if r.get(key) == pos and r['min'] >= REPL_MIN and (r['lg'], r['S'], r['tid']) in bottom]
+        if not g:
+            continue
         out[pos] = round(sum((value(r, F) + lg_adj(r, F, LS)) * r['min'] for r in g) / max(1, sum(r['min'] for r in g)), 4)
     return out
 
@@ -714,7 +774,7 @@ def repl_line(rows, F, LS, cur):
 def gar_fringe(o, F=None):
     """a season-file row's (GAR, GAR a 90) on the fringe line (F['replFringe']), for the fits trained on it"""
     F = F or _fit()
-    d = F['repl'][o['pos']] - F['replFringe'][o['pos']] if F.get('replFringe') else 0.0
+    d = repl_of(o, F) - F['replFringe'][o['pos']] if F.get('replFringe') else 0.0
     return o['gar'] + d * o['min'] / 90, (o.get('gar90') or 0.0) + d
 
 
@@ -773,7 +833,8 @@ def write(rows, F, ts, all_seasons=False):
     for pos in ('GK', 'D', 'M', 'F'):
         fr = [r for r in rows if r['pos'] == pos and 90 <= r['min'] < 900]
         F['replFringe'][pos] = round(sum((value(r, F) + lg_adj(r, F, LS)) * r['min'] for r in fr) / max(1, sum(r['min'] for r in fr)), 4)
-    # replacement, by position: the regulars of each finished league-season's bottom three sides
+    # replacement, by position: the regulars of each finished league-season's bottom three sides, less the ones that
+    # collapsed
     F['repl'] = repl_line(rows, F, LS, cur) or dict(F['replFringe'])
     _FIT[:] = [F]
     os.makedirs(SDIR, exist_ok=True)
@@ -785,8 +846,8 @@ def write(rows, F, ts, all_seasons=False):
             if r['min'] < 90:
                 continue
             v, gar = gar_of(r, F, LS)
-            repl = F['repl'][r['pos']]
-            o = {'p': r['p'], 'n': r['n'], 'team': r['team'], 'lg': r['lg'], 'pos': r['pos'], 'mp': r['mp'], 'min': r['min'],
+            repl = repl_of(r, F)
+            o = {'p': r['p'], 'n': r['n'], 'team': r['team'], 'lg': r['lg'], 'pos': r['pos'], 'role': r.get('role'), 'mp': r['mp'], 'min': r['min'],
                  'g': r['g'], 'a': r['as'], 'npxg': round(r['x'] - r['pen'], 2), 'xa': round(r['xA'], 2),
                  'xg': round(r['x'], 2), 'sh': r.get('sh', 0), 'kp': r['kp'], 'ch': round(r['ch'], 2), 'bu': round(r['bu'], 2),
                  'st': r['start'], 'onxgd': round((r['xf'] - r['xa']) / max(r['min'], 1) * 90, 2),
@@ -1111,6 +1172,34 @@ def current():
     write(rows, F, None)
 
 
+def roles_backfill():
+    """--roles: each frozen row's functional role (ROLE_US of its modal Understat starting position) from the cached
+    match line-ups, and the collapsed sides of every finished season (COLL)"""
+    rows = D.load(ROWS)
+    cnt = defaultdict(Counter)
+    for S in sorted({r['S'] for r in rows}):
+        for lg in D.BIG5:
+            d = D.us_league(lg, S)
+            for mt in (d or {}).get('matches', []):
+                if not mt['res']:
+                    continue
+                m = D.us_match(mt['id'])
+                if not m:
+                    continue
+                for s_ in 'ha':
+                    tid = str(mt['hid'] if s_ == 'h' else mt['aid'])
+                    for r in m['ro'][s_]:
+                        if int(f(r.get('positionOrder'))) < 17 and r.get('position') not in (None, 'Sub'):
+                            cnt[(lg, S, tid, str(r['player_id']))][r['position']] += 1
+    n = 0
+    for r in rows:
+        c = cnt.get((r['lg'], r['S'], str(r['tid']), str(r['p'])))
+        r['role'] = ROLE_US.get(c.most_common(1)[0][0]) if c else None
+        n += r['role'] is not None
+    D.save(ROWS, rows)
+    print('roles on', n, 'of', len(rows), 'rows; collapsed sides', len(collapsed(D.current_season())), flush=True)
+
+
 def sv_rapm(rows, segs, seasons):
     """the season-only xG plus-minus (sorp / sdrp) that SV reads (scripts/soccer_sv.py)"""
     import soccer_sv as SV
@@ -1219,6 +1308,8 @@ if __name__ == '__main__':
         inject_rate()
     elif '--proj' in sys.argv:
         inject_proj()
+    elif '--roles' in sys.argv:
+        roles_backfill()
     elif '--fit' in sys.argv:
         fit()
     elif '--backup' in sys.argv:                      # from the cached rows, no pull

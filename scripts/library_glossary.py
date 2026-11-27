@@ -387,7 +387,7 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
       'Hockey prospects board, first-year tab', ['Hockey']),
     E('GAR (soccer, senior)', 'Goals above replacement, on one scale across leagues.',
       ['Shrunk per-90 rates (on-ice, npxG, xA, xGBuildup, keeper saves), weighted to next-season team goal difference.',
-       'Replacement for each position is the regulars (900+ minutes) on the bottom three sides by goal difference of each finished league-season, pooled: GK -.14, D -.09, M -.05, F .00 a match. League strength counts. Held out R² is .61.',
+       'Replacement for each position is the regulars (900+ minutes) on the bottom three sides by goal difference of each finished league-season, pooled, less sides that collapsed: GK -.14, D -.09, M -.05, F .00 a match. League strength counts. Held out R² is .61.',
        'An average side totals about 26 GAR a season. xMV, 1Y / 3Y and backup watch still read GAR over the earlier line (players under 900 minutes) until they are refit.',
        'PAR = GAR × points per goal of difference (.626).'],
       'Soccer player value, rookies, backup watch', ['Soccer']),
@@ -446,7 +446,7 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
                   'from split-half reliability within a season (odd against even matches: r %.3f for saves and %.3f for finishing, with no player prior). '
                   'A side\'s players then add up to its goal difference with R² %.3f over %d team-seasons %d-%d (GAR on the same seasons %.3f).'
                   % (f"{F['kGk']:,}", f"{F['kFin']:,}", R['gk0']['splitHalfR'], R['fin']['splitHalfR'], F['r2Gd'], F['teamSeasons'], F['seasons'][0] - 1, F['seasons'][1], F['r2GarGd']),
-                  'Replacement is the xG part of the bottom-three sides\' regulars (GK %+.3f, D %+.3f, M %+.3f, F %+.3f a 90), with finishing and saves at league average. League strength is ×%.3f a goal of club rating.'
+                  'Replacement is the xG part of the bottom-three sides\' regulars, less sides that collapsed (GK %+.3f, D %+.3f, M %+.3f, F %+.3f a 90), with finishing and saves at league average. League strength is ×%.3f a goal of club rating.'
                   % (F['repl']['GK'], F['repl']['D'], F['repl']['M'], F['repl']['F'], F['lgScale']['k']),
                   'Weights fit on the same season (team goal difference, or first half to second half) could not split a side\'s xG between its players. '
                   'The team totals are the same either way, so GAR\'s split is kept.'])(json.load(open(os.path.join(ROOT, 'data', 'soccer_sv_fit.json'))),

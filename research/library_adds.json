@@ -570,7 +570,12 @@
     "a spell's npxG a 90 on the attacking side's players (offence) and the defending side's (defence), with league-season and home terms.",
     "Offence is shrunk toward his xG + xA a 90 over the window, and defence toward 0.",
     "Replacement for each position is the regulars (900+ minutes) on the bottom three sides by goal difference of each finished league-season,",
-    "pooled. League strength counts. Held out R² is .686 (.673 before the plus-minus; nested test t = -2.97, 9/11 seasons).",
+    "pooled, less the sides that collapsed (second-half points a match under .6 and below their first half; 42 of 180, Nov 27 2026).",
+    "Their regulars sat .02 a 90 under the rest of the bottom three. Without them the line sits closer to what free signings and academy",
+    "call-ups (t -7.3, 11/11 seasons) and promoted sides' regulars (t -3.3, 9/11) produce the next season up, held out. Season to season the line",
+    "moves .010 to .018 a 90 by position, 0.3 to 0.5 GAR for a 30-match regular. Lines by role (FB, CB, DM, CM, AM, W, ST) matched promoted",
+    "sides better (t -7.4) but not free signings (6/11), so the line stays GK, D, M, F; the board shows the role.",
+    "League strength counts. Held out R² is .686 (.673 before the plus-minus; nested test t = -2.97, 9/11 seasons).",
     "PAR = GAR × points per goal of difference (.626)."
    ]
   },

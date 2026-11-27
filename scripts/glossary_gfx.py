@@ -154,7 +154,7 @@ def soccer():
         'viz': {'kind': 'dist', 't': f"900+ minutes · {S[-1]['label']}", 'unit': '',
                 'bins': hist([p['gar'] for p in last], -4, 12, 1), 'mark': 0, 'marks': [[0, 'repl']]},
         'top': {'t': f'best season per player · {yrs}', 'rows': [[p['n'], p['lab'], p['team'], p['gar']] for p in best(rows, 'gar')], 'dec': 1},
-        'foot': 'replacement: regulars on each league\'s bottom three sides',
+        'foot': 'replacement: regulars on each league\'s bottom three sides, less collapsed sides',
     }
 
 
