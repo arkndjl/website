@@ -181,12 +181,20 @@ def main():
         pl[inv[i]] = [round(float(th[i] - center), 2), int(rounds[i])]
     rk = sorted(pl.items(), key=lambda kv: -kv[1][0])
     seasons = season_lines(M, c, th, p, es, center, cn)
+    # the division's season board (data/esea.json rankings.players, the S59 player rankings table): the same season
+    # line for every listed player, by FACEIT id -> [season RWA, rounds]. A season board reads the season's maps only
+    # (career RWA stays the model input: preview, team RWA, opponent credit)
+    import re
+    cur = str(int((re.search(r'S(\d{2})', cn) or [0, 0])[1] or 0))
+    rkp = [{'id': x['id'], 'nick': x['id']} for x in (es.get('rankings') or {}).get('players') or [] if x.get('id')]
+    sall = {q: v[cur] for q, v in season_lines(M, c, th, p, es, center, cn, who=rkp).items() if cur in v}
     teams = team_rwa(ms + live, th, M, center, cn, new_v)
     t = fit['tests']
     out = {'asof': time.strftime('%Y-%m-%dT%H:%MZ', time.gmtime(now)), 'head': fit.get('head', 'ark'),
            'test': {k: t[k] for k in ('rwa_vs_ark', 'pelo+lv+rwa_vs_pelo+lv') if k in t},
            'params': p, 'center': round(center, 3), 'new': round(new_v, 2), 'n': len(pl), 'live_maps': sum(len(m['maps']) for m in live),
-           'names': {q: nick[q] for q, _ in rk if nick.get(q)}, 'p': {q: v for q, v in rk}, 'seasons': seasons, 'teams': teams}
+           'names': {q: nick[q] for q, _ in rk if nick.get(q)}, 'p': {q: v for q, v in rk}, 'seasons': seasons, 'teams': teams,
+           'seasonAll': {'season': int(cur), 'p': {q: [v[0], v[2]] for q, v in sall.items()}}}
     s = json.dumps(out, separators=(',', ':'))
     open(OUT, 'w').write(s)
     print(f'wrote {OUT}: {len(pl)} players, {out["live_maps"]} live maps, {len(s) // 1024} KB', file=sys.stderr)
