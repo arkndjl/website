@@ -96,7 +96,7 @@ jobs:
       - name: Next up tab
         continue-on-error: true
         run: python3 scripts/soccer_breakout.py && python3 scripts/next_up.py soccer
-      # rookie / first-year leaderboard tab (scripts/rookies.py -> static/data/rookies/soccer.json static/data/next-up/soccer.json static/data/next-up/soccer-tab.json), display only
+      # rookie / first-year leaderboard tab (scripts/rookies.py -> static/data/rookies/soccer.json), display only
       - name: Rookies tab
         continue-on-error: true
         run: python3 scripts/rookies.py soccer
@@ -113,6 +113,6 @@ jobs:
         run: python3 scripts/board_moves.py soccer soccerm soccerb r-soccer
       - name: Commit if anything changed
         run: |
-          files="data/brackets scripts/data/moves data/units_soccer.json static/data/rookies/soccer.json data/soccer_games.json static/img/soccer static/data/soccer-more static/img/flags scripts/data/soccer_faces.json.gz data/soccer_war.json data/backup_soccer.json static/data/depth/soccer.json static/data/lineups/soccer.json static/data/soccer-war scripts/data/soccer_mv_cur.json.gz data/model_monitor/soccer.json scripts/data/model_monitor/soccer.json static/data/teams/soccer.json data/team_badges scripts/data/soccer_groups_usa.1.json"
+          files="data/brackets scripts/data/moves data/units_soccer.json static/data/rookies/soccer.json static/data/next-up/soccer.json static/data/next-up/soccer-tab.json data/soccer_games.json static/img/soccer static/data/soccer-more static/img/flags scripts/data/soccer_faces.json.gz data/soccer_war.json data/backup_soccer.json static/data/depth/soccer.json static/data/lineups/soccer.json static/data/soccer-war scripts/data/soccer_mv_cur.json.gz data/model_monitor/soccer.json scripts/data/model_monitor/soccer.json static/data/teams/soccer.json data/team_badges scripts/data/soccer_groups_usa.1.json"
           # the build gate, then the push; on a rejection this run's files are taken whole onto the new main (scripts/data_push.py)
           python3 scripts/data_push.py -m "Update the soccer matches ($(date -u +%Y-%m-%d))" -- $files
