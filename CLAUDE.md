@@ -238,7 +238,7 @@
   stars and class. A score shows only for a sport where it passed the split-half test (`scripts/research/agencies_nov28/tendency.py`
   -> `research/agency_tendency.json`, p < .05 weighted and unweighted; rerun by hand when the ledger grows). Situation+ (FV growth),
   Reach+ (power-conference spot) and Stability+ (stayed) failed Nov 28; CBB had nothing pass. Recruits count for talent only.
-  Agency+ (lead column, Nov 28) = mean of z-scored parts: shipped tendencies as the shrunk edge sum(v - mu) / ((n + k) sd), times n
+  Agency+ (lead column, Nov 28) = mean of z-scored parts: Deal (COMPOSITE; Breakout+ left out, it measures the clients, Noah) as the shrunk edge sum(v - mu) / ((n + k) sd), times n
   only when above zero (Noah: big rosters not charged per player for a low score) + sent (pre-draft-process first-round picks); `components` in agencies.py; forward test 2022-24 -> 2025-26 sends in
   `scripts/research/agencies_nov28/compose.py` (research/agency_composite.json).
   Drafted counts only agencies signed before the draft process (declaring; Dec 1 football, Mar 15 basketball), never the pro agent.

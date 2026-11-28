@@ -240,6 +240,7 @@ def record_drafts(ledger, today=None):
 # ---- tendency scores (Noah, Nov 28: "+" scores in place of the x/y/zNIL columns, 100 = the average agency) -----------
 
 TEND_TEST = 'research/agency_tendency.json'     # scripts/research/agencies_nov28/tendency.py, rerun by hand
+COMPOSITE = ('Deal',)                            # tendency scores that go into Agency+
 
 
 def tendencies(pool):
@@ -314,7 +315,9 @@ def components(clients, pros, sp, pool):
             out[a][name.lower()] = e * len(l) if e > 0 else e
     for p in pros: out[canon(p['agency'])]['sent'] = out[canon(p['agency'])].get('sent', 0) + 1
     for a, l in by.items(): out[a]['vol'] = math.log1p(len(l))
-    use = [k.lower() for k in shipped(sp)] + ['sent']
+    # Agency+ rewards the agency's own work: deals (Deal+) and players sent to the pros. Breakout+ is about how good the clients
+    # turned out, not what the agency did for them, so it stays a column but is not in the composite (Noah, Nov 28)
+    use = [k.lower() for k in shipped(sp) if k in COMPOSITE] + ['sent']
     ag = [a for a in out if a not in SPECIAL]
     z = {}
     for k in use:
@@ -373,7 +376,7 @@ def board(clients, pros=(), sp='cfb', pool=()):
     for r in rows:
         c = cp.get(r['agency'])
         r['agencyP'] = round(100 + 25 * (c['score'] - m) / (sd or 1.0)) if c else None
-    pf['agencyP'] = dict(parts=[k.lower() for k in shipped(sp)] + ['sent'])
+    pf['agencyP'] = dict(parts=[k.lower() for k in shipped(sp) if k in COMPOSITE] + ['sent'])
     lead = 'agencyP'
     rows.sort(key=lambda r: (r['agency'] in SPECIAL, -(r[lead] if lead and r.get(lead) is not None else -1e12), -(r['fv'] or 0), -r['n']))
     return rows, dict(k=round(k, 1), mu=round(mu), nZ=len(allz), plus=pf, lead=lead)

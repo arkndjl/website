@@ -6,7 +6,8 @@ counts for more the more players it covers. (A first run used a t, sum(v - mu) /
 client with an extreme value scored as high as a 64-client agency, which is not what volume should do, so the total replaced
 it; both results are reported. Nov 28, Noah: a big roster should not be charged per player for a low Breakout, so an edge
 below the mean now counts once, as the shrunk mean, and only an edge above it is multiplied by the clients. Totals for both
-signs had rho .367, p .0025.) Sent = first-round picks the agency had before the draft process (data/agency_pros.json,
+signs had rho .367, p .0025; the change gave .258, p .023. Then, Noah: Breakout+ measures the clients, not the agency's work,
+so Agency+ is Deal + sent only.) Sent = first-round picks the agency had before the draft process (data/agency_pros.json,
 low confidence not counted). Each component is z-scored across agencies and the composite is their mean.
 
 Test, forward in time: the composite built from the clients on file now and the 2022-24 sends, against the first-round picks
