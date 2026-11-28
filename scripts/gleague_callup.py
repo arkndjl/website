@@ -42,6 +42,7 @@ DRAFT = os.path.join(HERE, 'nba_draft.json')
 FIT = os.path.join(ROOT, 'data', 'gleague_callup_fit.json')
 OUT = os.path.join(ROOT, 'static', 'data', 'gleague.json')
 PAST = os.path.join(ROOT, 'static', 'data', 'gleague-past.json')
+CAL = os.path.join(ROOT, 'data', 'gleague_cal.json')      # held-out recalibration of xVORX / xXPM (scripts/research/gleague_cal_nov28)
 STATUS = os.path.join(HERE, 'data', 'gleague_status.json')   # {season: {'dob': {pid: date}, 'tw': [pid], 'nba': [pid]}}
 UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36'
 API = ('https://stats.gleague.nba.com/stats/leaguedashplayerstats?LeagueID=20&Season={s}&SeasonType={t}&PerMode=Totals'
@@ -423,6 +424,19 @@ def research():
     print('wrote', FIT)
 
 
+def calibrate():
+    """xVORX (a season) and xXPM as the board shows them, on the scale of what happened: data/gleague_cal.json, fit on the
+    past boards' walk-forward values (static/data/gleague-past.json) against VORX and XPM over the next three seasons.
+    Nov 28 2026, scripts/research/gleague_cal_nov28/test.py, held out 2020-23 (fit on seasons through s-3): both ran high,
+    xVORX .056 a season against .028, xXPM -0.8 against -1.4 for those who played. xVORX = a + b x (MSE .0816 -> .0784,
+    t -2.84, 4/4 seasons), xXPM = x + c (minute-weighted MSE 3.15 -> 2.70, t -4.02, 4/4). No file = the raw values."""
+    try:
+        C = json.load(open(CAL))
+    except (OSError, ValueError):
+        C = {}
+    return lambda k, x: C[k]['a'] + C[k]['b'] * x if k in C else x
+
+
 def build():
     fit = json.load(open(FIT)); y = current_season()
     fetch(y, fresh=True)
@@ -438,6 +452,7 @@ def build():
         W.link(p, o['n'], [y - o['age']] if o['age'] else [])
         f, t, info = W.row(y, o, part); F.append(f); keep.append((o, f, info))
     p1, p5, xv, xx = predict(fit, F, fit['feats'])
+    cal = calibrate()
     players = []
     for i, (o, f, info) in enumerate(keep):
         b = info['b']; nb = W.NB.get(y, {}).get(b, {}) if b else {}
@@ -448,8 +463,8 @@ def build():
                         'gp': o['GP'], 'min': round(o['MIN']), 'pts': round(f['pts36'], 1), 'gs': round(f['gs36'], 1),
                         'ts': round(100 * o['TS_PCT'], 1) if o['MIN'] else None,
                         'cmp': round(info['cmp'] + now), 'ph': ph, 'pk': info['pk'], 'dy': info['dy'], 'bb': b,
-                        'p1': round(float(p1[i]), 3), 'p5': round(float(p5[i]), 3), 'xv': round(float(xv[i]) / 3, 2),
-                        'xx': round(float(xx[i]), 1)})
+                        'p1': round(float(p1[i]), 3), 'p5': round(float(p5[i]), 3), 'xv': round(cal('xv', float(xv[i]) / 3), 2),
+                        'xx': round(cal('xx', float(xx[i])), 1)})
     try:
         stt = status(y, players)
     except Exception as e:
