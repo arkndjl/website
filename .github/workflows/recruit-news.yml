@@ -47,6 +47,12 @@ jobs:
       - name: Moves for the GFX cards (commitments, flips, visits, portal, pro transactions)
         continue-on-error: true
         run: python3 scripts/player_moves.py
+      # the class rankings dropdown and classGFX read their own file: rewritten when a commitment moved a class above
+      - name: Class cards
+        continue-on-error: true
+        run: |
+          if git diff --quiet -- static/data/cfb-recruits.json; then echo "no class change"; exit 0; fi
+          python3 scripts/class_cards.py
       # the header strip and /news/ read the recruit moves; the odds-snap rerun (every half hour on paper) can lag hours
       # when GitHub drops scheduled runs, so a new move goes out with this run
       - name: Site news
@@ -60,4 +66,4 @@ jobs:
       - name: Commit if anything changed
         run: |
           python3 scripts/data_push.py -m "Update the recruit news ($(date -u +%Y-%m-%d))" \
-            -- data/recruit_news.json data/cfb_recruits.json static/data/cfb-recruits.json static/data/cfb-builder.json static/data/moves scripts/data/player_moves_hist.json.gz data/news.json scripts/data/news_state.json data/recruit_extra.json data/transactions/values.json data/nil_deals.json scripts/data/nil_deal_candidates.json
+            -- data/recruit_news.json data/cfb_recruits.json static/data/cfb-recruits.json static/data/cfb-builder.json static/data/classes static/data/moves scripts/data/player_moves_hist.json.gz data/news.json scripts/data/news_state.json data/recruit_extra.json data/transactions/values.json data/nil_deals.json scripts/data/nil_deal_candidates.json
