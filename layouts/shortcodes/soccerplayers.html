@@ -198,7 +198,7 @@
       var h = __hp(win), s = h.get('season');
       bar.elements.season.value = s && bar.querySelector('option[value="' + s.replace(/\D/g, '') + '"]') ? s : win.dataset.cur;
       pos = h.get('pos') || ''; bar.elements.lg.value = h.get('lg') || ''; bar.elements.team.value = h.get('team') || ''; bar.elements.nat.value = h.get('nat') || '';
-      bar.elements.q.value = h.get('q') || ''; bar.elements.mp.value = h.get('mp') || ''; chips();
+      bar.elements.q.value = h.get('q') || ''; bar.elements.mp.value = h.get('mp') || (h.get('q') ? '0' : ''); chips();   // a link to a named player (the search) shows him at any minutes
     }
     function writeHash() {
       var h = __hp(win), e = bar.elements;
