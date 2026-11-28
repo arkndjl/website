@@ -1,9 +1,9 @@
 {
 "asof":"2026-11-28",
-"n":90,
+"n":92,
 "count":{
 "watching":1,
-"waiting":89
+"waiting":91
 },
 "next":[
 "understat_return",
@@ -11,7 +11,7 @@
 "thunderpick_recheck",
 "dect_transfer_cost",
 "tennis_year_end",
-"soccer_props_novig"
+"soccer_lg_unrated"
 ],
 "rows":[
 {
@@ -91,6 +91,22 @@
 "gate":"birth-year-out t >= 2, 12/19, forward top-50 not worse; Holm at .05 inside the family; ATP tree blend on forward MSE t >= 2",
 "ledger":"tennis_year_end",
 "due":"2026-12-07",
+"est":0,
+"state":"waiting"
+},
+{
+"key":"soccer_lg_unrated",
+"t":"Squad-value league strength for unrated senior leagues in soccer prospect FV",
+"sp":[
+"Soccer"
+],
+"ar":"fv",
+"kind":"deferred",
+"how":"hand",
+"was":"not run: the Transfermarkt dump refit is a full soccer prospects run",
+"trigger":"the next soccer prospects refit (Challenger Pro League, 3. Liga, Regionalliga, Austrian 2. Liga, Serie C, Primera Federacion and Czech second tier minutes now count at the replacement floor)",
+"gate":"lg_share from the mean squad-value club rating of the league; class-out t >= 2, forward top-50 not worse",
+"due":"2026-12-14",
 "est":0,
 "state":"waiting"
 },
@@ -1049,6 +1065,22 @@
 "trigger":"the 2027 drafts add a sixth board year",
 "gate":"point in time, held out t >= 2",
 "due":"2027-07-08",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"hockey_nhle_ratio",
+"t":"NHLe refit as a ratio of summed points (and pooled league names)",
+"sp":[
+"NHL"
+],
+"ar":"fv",
+"kind":"retest",
+"how":"hand",
+"was":"draft class-out t -1.98 (ratio), -1.24 (ratio with age), -2.41 (pooled names) vs the live pairs factors",
+"trigger":"the 2026-27 season adds a year of league movers to the landing pages",
+"gate":"strict class-out (factors refit without the class's careers) t >= 2, 8 of 12, top-64 and point in time (factors through 2015-16, grade 2016-19) not worse",
+"due":"2027-07-10",
 "est":1,
 "state":"waiting"
 },
