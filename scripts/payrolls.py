@@ -387,7 +387,10 @@ def nhl():
         teams.append({'tm': tri, 'name': meta.get('name'), 'pay': r2(money(ch.get('total')), 2), 'space': r2(money(S.get('capSpace')), 2),
                       'dead': r2(money(ch.get('deadCap')) if ch.get('deadCap') is not None else dead, 2),
                       'ltir': r2(money(S.get('ltir')), 2), 'cap': r2(money(S.get('upperLimit')), 2),
-                      'proj': r2(money(S.get('projectedCapSpace')), 2), 'n': S.get('totalContracts'), 'roster': S.get('roster')})
+                      'proj': r2(money(S.get('projectedCapSpace')), 2), 'n': S.get('totalContracts'), 'roster': S.get('roster'),
+                      # future picks it holds (its own not traded away, plus the ones it acquired): [year, round, original team, conditions]
+                      'picks': [[int(k['year']), k['round'], k.get('team'), 1 if k.get('conditions') else 0] for k in d.get('draftPicks') or []
+                                if not k.get('isTradedAway') and str(k.get('year', '')).isdigit()]})
     finish('nhl', L, teams, players, 'CapWages team pages; WAR and xAAV from the NHL board')
 
 

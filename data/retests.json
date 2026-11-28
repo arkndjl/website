@@ -1422,6 +1422,56 @@
    "trigger": "the 2026 season is out of the lockbox (one more origin, and a second OL and DB origin)",
    "gate": "prereg.md spot test: driver x spot against the pooled driver, t >= 2, every season but one",
    "run_hint": "python3 scripts/research/start_odds_nov28/test.py cfb && python3 scripts/research/start_odds_nov28/test.py cbb"
+  },
+  {
+   "key": "builder_verdict_nba_projection",
+   "t": "Pro team builder: the priced projection (value on the age curve read with the deal's price) as the NBA verdict read in place of the one-season Surplus",
+   "sp": [
+    "NBA"
+   ],
+   "ar": "teams",
+   "kind": "retest",
+   "how": "hand",
+   "was": "Nov 28: right calls .693 against .697 for the one-season Surplus, t -.41 (beat carrying the season forward, t 3.77)",
+   "after": "nba:champ:2027",
+   "lag": 30,
+   "trigger": "the 2026-27 season in the NBA payroll panel (one more decision year with three seasons seen)",
+   "gate": "scripts/research/pro_builder_nov28/verdicts.py: agedp beats carry and last on right calls, paired t >= 2 and most seasons",
+   "run_hint": "python3 scripts/research/pro_builder_nov28/verdicts.py nba"
+  },
+  {
+   "key": "builder_verdict_market_line",
+   "t": "Pro team builder: verdicts against the market line (surplus less what a deal at that price returned) in place of the plain sign, NFL and NBA",
+   "sp": [
+    "NFL",
+    "NBA"
+   ],
+   "ar": "teams",
+   "kind": "retest",
+   "how": "hand",
+   "was": "Nov 28: NFL t 1.95 against carry (passed against last, t 4.55), NBA t 1.41; passed NHL (t 2.5, 2.89)",
+   "after": "nfl:champ:2027",
+   "lag": 30,
+   "trigger": "one more full season in each panel (NFL 2026, NBA 2026-27)",
+   "gate": "verdicts.py 'market': agedp beats carry and last, paired t >= 2 and most seasons",
+   "run_hint": "python3 scripts/research/pro_builder_nov28/verdicts.py nfl nba"
+  },
+  {
+   "key": "builder_dev_projection",
+   "t": "Pro team builder: the board's projection (NHL pWAR, NBA pXPM, NFL projected WAR) as a development input to the verdict read, beside last season and the price",
+   "sp": [
+    "NHL",
+    "NBA",
+    "NFL"
+   ],
+   "ar": "teams",
+   "kind": "retest",
+   "how": "hand",
+   "was": "Nov 28: NHL pWAR added nothing (right calls .682 with and without it, t .00); the season files' pWAR come from today's fit, so not strictly point in time. NBA and NFL have no past projections on file",
+   "trigger": "two seasons of weekly board vintages in the forward logs (scripts/data/snaps), so the projection as it stood at each call is on file",
+   "gate": "verdicts.py: agedpw beats agedp on right calls, paired t >= 2 and most seasons",
+   "run_hint": "python3 scripts/research/pro_builder_nov28/verdicts.py nhl",
+   "due": "2028-07-01"
   }
  ]
 }
