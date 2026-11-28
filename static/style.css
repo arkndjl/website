@@ -5592,6 +5592,7 @@ html.ytp-max { overflow: hidden; }
   .ytp__yt { font-size: 0; gap: 0; padding: 6px 8px; }
   .ytp__yt svg { width: 14px; height: 14px; }
   .hvid .hvid__vol { display: flex; }
+}
 /* Article list strip (layouts/partials/postbar.html, assets/js/postbar.js): a bevelled bar over the posts */
 .pbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 8px; padding: 8px 10px;
   background: var(--win-face); border: 2px solid; border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light); box-shadow: 2px 2px 0 var(--win-dark); }
@@ -5764,3 +5765,17 @@ html.ytp-max { overflow: hidden; }
   background: var(--accent); vertical-align: 1px; cursor: help; }
 .pay__opt { font-size: 11px; margin-left: 2px; color: var(--accent); }
 .pay__table tr.pay__dead td { color: color-mix(in srgb, var(--foreground) 55%, transparent); font-style: italic; }
+
+/* pro team builder (layouts/shortcodes/probuilder.html): verdict chips, the depth chart columns */
+.pb__head { display: flex; align-items: center; gap: 8px; margin: 10px 0 0; font-size: 1.25em; }
+.pb__head .cfb__logo { width: 28px; height: 28px; }
+.pb__vd { display: inline-block; padding: 0 4px; font-size: 0.72em; line-height: 1.35; color: #241a3a; background: var(--d, #c0b0ff); vertical-align: 1px; white-space: nowrap; cursor: help; }
+.pb__vd--E { --d: #7fffd4; } .pb__vd--K { --d: #c0b0ff; } .pb__vd--T { --d: #ffd34d; } .pb__vd--W { --d: #ff9ec7; }
+.pb__table td:first-child { white-space: nowrap; }
+.pb__unit { margin: 10px 0 4px; font-size: 0.78em; letter-spacing: 0.12em; text-transform: uppercase; color: #7fffd4; }
+.pb__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px; }
+.pb__pos { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 4px 6px; background: var(--win-well); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); }
+.pb__pos > b { font-weight: normal; color: #c0b0ff; font-size: 0.8em; letter-spacing: 0.08em; }
+.pb__man { font-size: 0.85em; overflow-wrap: anywhere; }
+@media (max-width: 640px) { .pb__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.pb__table .pb__dev { background: color-mix(in srgb, #7fffd4 7%, transparent); }

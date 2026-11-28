@@ -11,7 +11,7 @@ cover = "/og/nfl.png"
 
 {{< winpane title="nfl.exe :: 2026" icon="football" sprite="px/hero-football" status="nflverse · PFR AV" class="winpane--art" />}}
 
-{{< wintabs groups="players:leaders,projections,standouts,awards,all-time players,ARKLIST|rosters:depth chart,personnel,transactions|games:games,game table|teams:ARK Ranking,units,all-time|market:payrolls,free agents,contract value" side="true" label="NFL views" >}}
+{{< wintabs groups="players:leaders,projections,standouts,awards,all-time players,ARKLIST|rosters:depth chart,personnel,transactions|games:games,game table|teams:ARK Ranking,units,team builder,all-time|market:payrolls,free agents,contract value" side="true" label="NFL views" >}}
 {{< pctl sport="nfl" icon="football" title="projections" tab="projections" >}}
 {{< wintabs tab="payrolls" tabs="payrolls,cap space,contracts" sub="true" label="payrolls views" >}}
 {{< lazytab tab="payrolls" >}}{{< payrolls lg="nfl" view="teams" tab="payrolls" >}}{{< /lazytab >}}
@@ -69,6 +69,7 @@ cover = "/og/nfl.png"
 {{< /lazytab >}}
 {{< nflteamwar title="team WAR" tab="team WAR" >}}
 {{< /wintabs >}}
+{{< probuilder lg="nfl" title="team builder" tab="team builder" >}}
 {{< wintabs tab="all-time" tabs="all-time teams,all-time offenses,all-time defenses,all-time coaches" sub="true" label="all-time views" >}}
 {{< lazytab tab="all-time teams" >}}
 {{< alltime sport="nfl" list="teams" title="all-time teams" tab="all-time teams" >}}

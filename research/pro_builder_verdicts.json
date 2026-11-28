@@ -1,0 +1,857 @@
+{
+ "nba": {
+  "n": 1807,
+  "years": "2018-2023",
+  "acc": {
+   "aged": 0.6464,
+   "flat": 0.606,
+   "aged3": 0.6547,
+   "flat3": 0.6076,
+   "agedp": 0.6929,
+   "carry": 0.6469,
+   "last": 0.6973
+  },
+  "aged_vs": {
+   "carry": {
+    "t": -0.05,
+    "won": "3/6",
+    "gain": -0.0006
+   },
+   "last": {
+    "t": -4.29,
+    "won": "0/6",
+    "gain": -0.0509
+   },
+   "flat": {
+    "t": 3.89,
+    "won": "6/6",
+    "gain": 0.0404
+   }
+  },
+  "aged3_vs": {
+   "carry": {
+    "t": 0.67,
+    "won": "4/6",
+    "gain": 0.0077
+   },
+   "last": {
+    "t": -3.63,
+    "won": "0/6",
+    "gain": -0.0426
+   },
+   "flat3": {
+    "t": 4.25,
+    "won": "6/6",
+    "gain": 0.047
+   },
+   "aged": {
+    "t": 2.1,
+    "won": "5/6",
+    "gain": 0.0083
+   }
+  },
+  "agedp_vs": {
+   "carry": {
+    "t": 3.77,
+    "won": "6/6",
+    "gain": 0.0459
+   },
+   "last": {
+    "t": -0.41,
+    "won": "2/6",
+    "gain": -0.0044
+   },
+   "aged3": {
+    "t": 4.45,
+    "won": "6/6",
+    "gain": 0.0382
+   }
+  },
+  "last_vs": {
+   "carry": {
+    "t": 5.62,
+    "won": "5/6",
+    "gain": 0.0504
+   },
+   "agedp": {
+    "t": 0.41,
+    "won": "3/6",
+    "gain": 0.0044
+   }
+  },
+  "newDeal": {
+   "n": 780,
+   "acc": {
+    "aged": 0.6333,
+    "flat": 0.5769,
+    "aged3": 0.6385,
+    "flat3": 0.5744,
+    "agedp": 0.6846,
+    "carry": 0.6397,
+    "last": 0.691
+   },
+   "aged_vs": {
+    "carry": {
+     "t": -0.38,
+     "won": "3/6",
+     "gain": -0.0064
+    },
+    "last": {
+     "t": -3.0,
+     "won": "0/6",
+     "gain": -0.0577
+    }
+   },
+   "aged3_vs": {
+    "carry": {
+     "t": -0.07,
+     "won": "4/6",
+     "gain": -0.0013
+    },
+    "last": {
+     "t": -2.77,
+     "won": "0/6",
+     "gain": -0.0526
+    }
+   },
+   "agedp_vs": {
+    "carry": {
+     "t": 2.35,
+     "won": "6/6",
+     "gain": 0.0449
+    },
+    "last": {
+     "t": -0.39,
+     "won": "2/6",
+     "gain": -0.0064
+    }
+   }
+  },
+  "sameDeal": {
+   "n": 1027,
+   "acc": {
+    "aged": 0.6563,
+    "flat": 0.628,
+    "aged3": 0.667,
+    "flat3": 0.6329,
+    "agedp": 0.6991,
+    "carry": 0.6524,
+    "last": 0.702
+   },
+   "aged_vs": {
+    "carry": {
+     "t": 0.26,
+     "won": "3/6",
+     "gain": 0.0039
+    },
+    "last": {
+     "t": -3.07,
+     "won": "0/6",
+     "gain": -0.0458
+    }
+   },
+   "aged3_vs": {
+    "carry": {
+     "t": 0.96,
+     "won": "4/6",
+     "gain": 0.0146
+    },
+    "last": {
+     "t": -2.37,
+     "won": "0/6",
+     "gain": -0.0351
+    }
+   },
+   "agedp_vs": {
+    "carry": {
+     "t": 2.97,
+     "won": "6/6",
+     "gain": 0.0467
+    },
+    "last": {
+     "t": -0.2,
+     "won": "2/6",
+     "gain": -0.0029
+    }
+   }
+  },
+  "realized": {
+   "keep": 0.1172,
+   "nKeep": 888,
+   "go": -0.0822,
+   "nGo": 919
+  },
+  "market": {
+   "acc": {
+    "agedp": 0.6796,
+    "aged3": 0.6918,
+    "carry": 0.663,
+    "last": 0.6469
+   },
+   "agedp_vs": {
+    "carry": {
+     "t": 1.41,
+     "won": "5/6",
+     "gain": 0.0166
+    },
+    "last": {
+     "t": 2.83,
+     "won": "6/6",
+     "gain": 0.0327
+    },
+    "aged3": {
+     "t": -1.61,
+     "won": "1/6",
+     "gain": -0.0122
+    }
+   },
+   "last_vs": {
+    "carry": {
+     "t": -1.68,
+     "won": "1/6",
+     "gain": -0.016
+    },
+    "agedp": {
+     "t": -2.83,
+     "won": "0/6",
+     "gain": -0.0327
+    }
+   },
+   "note": "reads and truth less the market line (the realized surplus of a deal at that price)",
+   "pass": {
+    "agedp": false,
+    "last": false
+   }
+  },
+  "pass": {
+   "aged": false,
+   "aged3": false,
+   "agedp": false
+  },
+  "read": "last",
+  "marketRead": null,
+  "marketLine": [
+   -0.06779,
+   0.33323
+  ],
+  "live": {
+   "bins": [
+    "0-24",
+    "25-27",
+    "28-30",
+    "31-33",
+    "34-99"
+   ],
+   "all": [
+    -0.3221,
+    1.5587,
+    9.0345
+   ],
+   "b": [
+    [
+     1.1824,
+     2.0044,
+     8.6502
+    ],
+    [
+     -1.2106,
+     1.7185,
+     10.1522
+    ],
+    [
+     -0.9618,
+     1.4261,
+     6.8959
+    ],
+    [
+     -1.9334,
+     1.0824,
+     11.9707
+    ],
+    [
+     -1.4138,
+     1.0208,
+     11.1699
+    ]
+   ],
+   "form": "sum_k v(s+k) = c0 + c1 v(s) + c2 sum_k max(pay(s+k) - min, 0) / cap(s+k), by age group; value in league units, pay as cap share"
+  }
+ },
+ "nhl": {
+  "n": 3249,
+  "years": "2016-2023",
+  "acc": {
+   "aged": 0.6396,
+   "flat": 0.6187,
+   "aged3": 0.6371,
+   "flat3": 0.6137,
+   "agedp": 0.6817,
+   "agedpw": 0.6817,
+   "carry": 0.6282,
+   "last": 0.6445
+  },
+  "aged_vs": {
+   "carry": {
+    "t": 1.37,
+    "won": "5/8",
+    "gain": 0.0114
+   },
+   "last": {
+    "t": -0.55,
+    "won": "4/8",
+    "gain": -0.0049
+   },
+   "flat": {
+    "t": 3.26,
+    "won": "6/8",
+    "gain": 0.0209
+   }
+  },
+  "aged3_vs": {
+   "carry": {
+    "t": 1.06,
+    "won": "5/8",
+    "gain": 0.0089
+   },
+   "last": {
+    "t": -0.81,
+    "won": "3/8",
+    "gain": -0.0074
+   },
+   "flat3": {
+    "t": 3.82,
+    "won": "8/8",
+    "gain": 0.0234
+   },
+   "aged": {
+    "t": -1.0,
+    "won": "2/8",
+    "gain": -0.0025
+   }
+  },
+  "agedp_vs": {
+   "carry": {
+    "t": 6.06,
+    "won": "7/8",
+    "gain": 0.0536
+   },
+   "last": {
+    "t": 4.52,
+    "won": "7/8",
+    "gain": 0.0372
+   },
+   "aged3": {
+    "t": 5.95,
+    "won": "8/8",
+    "gain": 0.0446
+   }
+  },
+  "last_vs": {
+   "carry": {
+    "t": 2.75,
+    "won": "6/8",
+    "gain": 0.0163
+   },
+   "agedp": {
+    "t": -4.52,
+    "won": "1/8",
+    "gain": -0.0372
+   }
+  },
+  "agedpw_vs": {
+   "agedp": {
+    "t": 0.0,
+    "won": "5/8",
+    "gain": 0.0
+   },
+   "carry": {
+    "t": 5.96,
+    "won": "7/8",
+    "gain": 0.0536
+   },
+   "last": {
+    "t": 4.41,
+    "won": "7/8",
+    "gain": 0.0372
+   }
+  },
+  "newDeal": {
+   "n": 792,
+   "acc": {
+    "aged": 0.5947,
+    "flat": 0.5972,
+    "aged3": 0.5846,
+    "flat3": 0.596,
+    "agedp": 0.6326,
+    "agedpw": 0.6414,
+    "carry": 0.5972,
+    "last": 0.5619
+   },
+   "aged_vs": {
+    "carry": {
+     "t": -0.14,
+     "won": "5/8",
+     "gain": -0.0025
+    },
+    "last": {
+     "t": 1.46,
+     "won": "4/8",
+     "gain": 0.0328
+    }
+   },
+   "aged3_vs": {
+    "carry": {
+     "t": -0.69,
+     "won": "5/8",
+     "gain": -0.0126
+    },
+    "last": {
+     "t": 1.0,
+     "won": "3/8",
+     "gain": 0.0227
+    }
+   },
+   "agedp_vs": {
+    "carry": {
+     "t": 1.9,
+     "won": "7/8",
+     "gain": 0.0354
+    },
+    "last": {
+     "t": 4.04,
+     "won": "7/8",
+     "gain": 0.0707
+    }
+   }
+  },
+  "sameDeal": {
+   "n": 2457,
+   "acc": {
+    "aged": 0.654,
+    "flat": 0.6256,
+    "aged3": 0.654,
+    "flat3": 0.6195,
+    "agedp": 0.6976,
+    "agedpw": 0.6947,
+    "carry": 0.6382,
+    "last": 0.6711
+   },
+   "aged_vs": {
+    "carry": {
+     "t": 1.69,
+     "won": "5/8",
+     "gain": 0.0159
+    },
+    "last": {
+     "t": -1.82,
+     "won": "4/8",
+     "gain": -0.0171
+    }
+   },
+   "aged3_vs": {
+    "carry": {
+     "t": 1.68,
+     "won": "5/8",
+     "gain": 0.0159
+    },
+    "last": {
+     "t": -1.79,
+     "won": "3/8",
+     "gain": -0.0171
+    }
+   },
+   "agedp_vs": {
+    "carry": {
+     "t": 5.92,
+     "won": "7/8",
+     "gain": 0.0594
+    },
+    "last": {
+     "t": 2.84,
+     "won": "7/8",
+     "gain": 0.0265
+    }
+   }
+  },
+  "realized": {
+   "keep": 0.0216,
+   "nKeep": 1196,
+   "go": -0.0508,
+   "nGo": 2053
+  },
+  "market": {
+   "acc": {
+    "agedp": 0.6476,
+    "aged3": 0.619,
+    "carry": 0.6273,
+    "last": 0.6257
+   },
+   "agedp_vs": {
+    "carry": {
+     "t": 2.5,
+     "won": "6/8",
+     "gain": 0.0203
+    },
+    "last": {
+     "t": 2.89,
+     "won": "6/8",
+     "gain": 0.0219
+    },
+    "aged3": {
+     "t": 3.8,
+     "won": "7/8",
+     "gain": 0.0286
+    }
+   },
+   "last_vs": {
+    "carry": {
+     "t": -0.25,
+     "won": "3/8",
+     "gain": -0.0015
+    },
+    "agedp": {
+     "t": -2.89,
+     "won": "2/8",
+     "gain": -0.0219
+    }
+   },
+   "note": "reads and truth less the market line (the realized surplus of a deal at that price)",
+   "pass": {
+    "agedp": true,
+    "last": false
+   }
+  },
+  "pass": {
+   "aged": false,
+   "aged3": false,
+   "agedp": true
+  },
+  "read": "agedp",
+  "marketRead": "agedp",
+  "marketLine": [
+   -0.01785,
+   -0.06667
+  ],
+  "live": {
+   "bins": [
+    "0-24",
+    "25-27",
+    "28-30",
+    "31-33",
+    "34-99"
+   ],
+   "all": [
+    -0.5197,
+    0.8939,
+    18.1991
+   ],
+   "b": [
+    [
+     -0.2295,
+     1.1132,
+     21.3794
+    ],
+    [
+     -0.1871,
+     0.8422,
+     17.8254
+    ],
+    [
+     -0.5061,
+     0.9215,
+     14.7184
+    ],
+    [
+     -0.8185,
+     0.6857,
+     16.9251
+    ],
+    [
+     -0.6116,
+     0.5021,
+     18.0175
+    ]
+   ],
+   "form": "sum_k v(s+k) = c0 + c1 v(s) + c2 sum_k max(pay(s+k) - min, 0) / cap(s+k), by age group; value in league units, pay as cap share"
+  }
+ },
+ "nfl": {
+  "n": 2456,
+  "years": "2018-2022",
+  "acc": {
+   "aged": 0.6596,
+   "flat": 0.6531,
+   "aged3": 0.6502,
+   "flat3": 0.6331,
+   "agedp": 0.6877,
+   "carry": 0.6132,
+   "last": 0.5932
+  },
+  "aged_vs": {
+   "carry": {
+    "t": 4.82,
+    "won": "5/5",
+    "gain": 0.0464
+   },
+   "last": {
+    "t": 5.43,
+    "won": "5/5",
+    "gain": 0.0664
+   },
+   "flat": {
+    "t": 1.07,
+    "won": "3/5",
+    "gain": 0.0065
+   }
+  },
+  "aged3_vs": {
+   "carry": {
+    "t": 3.87,
+    "won": "5/5",
+    "gain": 0.0371
+   },
+   "last": {
+    "t": 4.49,
+    "won": "5/5",
+    "gain": 0.057
+   },
+   "flat3": {
+    "t": 3.17,
+    "won": "5/5",
+    "gain": 0.0171
+   },
+   "aged": {
+    "t": -2.31,
+    "won": "0/5",
+    "gain": -0.0094
+   }
+  },
+  "agedp_vs": {
+   "carry": {
+    "t": 6.23,
+    "won": "5/5",
+    "gain": 0.0745
+   },
+   "last": {
+    "t": 9.24,
+    "won": "5/5",
+    "gain": 0.0945
+   },
+   "aged3": {
+    "t": 3.31,
+    "won": "4/5",
+    "gain": 0.0375
+   }
+  },
+  "last_vs": {
+   "carry": {
+    "t": -1.87,
+    "won": "2/5",
+    "gain": -0.02
+   },
+   "agedp": {
+    "t": -9.24,
+    "won": "0/5",
+    "gain": -0.0945
+   }
+  },
+  "newDeal": {
+   "n": 2195,
+   "acc": {
+    "aged": 0.6547,
+    "flat": 0.6524,
+    "aged3": 0.6478,
+    "flat3": 0.6319,
+    "agedp": 0.6788,
+    "carry": 0.61,
+    "last": 0.5759
+   },
+   "aged_vs": {
+    "carry": {
+     "t": 4.39,
+     "won": "5/5",
+     "gain": 0.0446
+    },
+    "last": {
+     "t": 5.94,
+     "won": "5/5",
+     "gain": 0.0788
+    }
+   },
+   "aged3_vs": {
+    "carry": {
+     "t": 3.75,
+     "won": "5/5",
+     "gain": 0.0378
+    },
+    "last": {
+     "t": 5.26,
+     "won": "5/5",
+     "gain": 0.072
+    }
+   },
+   "agedp_vs": {
+    "carry": {
+     "t": 5.4,
+     "won": "5/5",
+     "gain": 0.0688
+    },
+    "last": {
+     "t": 9.39,
+     "won": "5/5",
+     "gain": 0.103
+    }
+   }
+  },
+  "sameDeal": {
+   "n": 261,
+   "acc": {
+    "aged": 0.7011,
+    "flat": 0.659,
+    "aged3": 0.6705,
+    "flat3": 0.6437,
+    "agedp": 0.7625,
+    "carry": 0.6398,
+    "last": 0.7395
+   },
+   "aged_vs": {
+    "carry": {
+     "t": 2.04,
+     "won": "5/5",
+     "gain": 0.0613
+    },
+    "last": {
+     "t": -1.42,
+     "won": "5/5",
+     "gain": -0.0383
+    }
+   },
+   "aged3_vs": {
+    "carry": {
+     "t": 1.02,
+     "won": "5/5",
+     "gain": 0.0307
+    },
+    "last": {
+     "t": -2.23,
+     "won": "5/5",
+     "gain": -0.069
+    }
+   },
+   "agedp_vs": {
+    "carry": {
+     "t": 3.53,
+     "won": "5/5",
+     "gain": 0.1226
+    },
+    "last": {
+     "t": 0.85,
+     "won": "5/5",
+     "gain": 0.023
+    }
+   }
+  },
+  "realized": {
+   "keep": 0.0003,
+   "nKeep": 1179,
+   "go": -0.0348,
+   "nGo": 1277
+  },
+  "market": {
+   "acc": {
+    "agedp": 0.6107,
+    "aged3": 0.5981,
+    "carry": 0.5879,
+    "last": 0.5623
+   },
+   "agedp_vs": {
+    "carry": {
+     "t": 1.95,
+     "won": "4/5",
+     "gain": 0.0228
+    },
+    "last": {
+     "t": 4.55,
+     "won": "5/5",
+     "gain": 0.0485
+    },
+    "aged3": {
+     "t": 1.13,
+     "won": "4/5",
+     "gain": 0.0126
+    }
+   },
+   "last_vs": {
+    "carry": {
+     "t": -2.3,
+     "won": "1/5",
+     "gain": -0.0257
+    },
+    "agedp": {
+     "t": -4.55,
+     "won": "0/5",
+     "gain": -0.0485
+    }
+   },
+   "note": "reads and truth less the market line (the realized surplus of a deal at that price)",
+   "pass": {
+    "agedp": false,
+    "last": false
+   }
+  },
+  "pass": {
+   "aged": true,
+   "aged3": true,
+   "agedp": true
+  },
+  "read": "agedp",
+  "marketRead": null,
+  "marketLine": [
+   0.00055,
+   -0.34074
+  ],
+  "live": {
+   "bins": [
+    "0-24",
+    "25-27",
+    "28-30",
+    "31-33",
+    "34-99"
+   ],
+   "all": [
+    -0.0127,
+    0.5899,
+    3.564
+   ],
+   "b": [
+    [
+     0.0777,
+     0.7134,
+     3.2721
+    ],
+    [
+     -0.0169,
+     0.5605,
+     3.2481
+    ],
+    [
+     -0.0232,
+     0.4564,
+     3.6202
+    ],
+    [
+     -0.0417,
+     0.2408,
+     4.2718
+    ],
+    [
+     -0.117,
+     0.5327,
+     6.0332
+    ]
+   ],
+   "form": "sum_k v(s+k) = c0 + c1 v(s) + c2 sum_k max(pay(s+k) - min, 0) / cap(s+k), by age group; value in league units, pay as cap share"
+  }
+ },
+ "note": "Pro team builder verdicts, tested point in time: does the sign of a player's projected surplus over the next three\nseasons (value on the age curve at the league's $ a win, less his pay above the minimum) call the sign of the surplus he\nactually returned better than the readings a team has without a projection?\n\n    python3 scripts/research/pro_builder_nov28/verdicts.py [nba nhl nfl]   -> research/pro_builder_verdicts.json\n\nRows: the payroll panels (scripts/research/payrolls_nov28/panel_<lg>.json.gz). A row is a player at the end of season s with\npay above twice the minimum and pay again in s + 1 (a contract a team carries or a new one it signs), s + 3 <= the last\nfull season. Pay in s + 1 .. s + 3 is what he was paid (the deal on the table at the decision; 0 after he leaves the\nleague, when the cost and the value both stop). Value and pay are read as cap shares (value x that season's $ a win /\ncap), so seasons on different caps add.\n\n  realized   sum_k  v(s+k) rate(s) / cap(s) - max(pay(s+k) - min, 0) / cap(s+k)\n  aged       v(s+k) read as a_k,age + b_k,age v(s), the curve fit on seasons before s only (walk-forward)\n  flat       a_k + b_k v(s), one curve for every age (walk-forward)\n  carry      v(s) carried forward unchanged (no projection)\n  last       one season: v(s) rate - (pay(s) - min), the Surplus a payroll table shows, its sign carried to the deal\n\nVerdict = the sign of the read (keep or extend when >= 0; trade or let walk below). Score = share of rows whose verdict\nmatches the realized sign. Ships when aged beats carry and last on that share with paired t >= 2 (on the right-call\nindicator) and wins most seasons. Flat is reported beside it. Subsets: new deal (pay in s + 1 moved more than 10% from s:\nthe extend / let walk calls) and same deal (the keep / trade calls)."
+}
