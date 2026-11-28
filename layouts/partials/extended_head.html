@@ -4,7 +4,7 @@
 {{- with $.Site.Params.owner }}
 <meta name="author" content="{{ . }}">
 {{- end }}
-<link rel="preload" href="{{ "fonts/mspgothic-pixel.woff2" | absURL }}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ "fonts/mspgothic-pixel.woff2" | absURL }}?v=2" as="font" type="font/woff2" crossorigin>
 {{- /* one fetch per data file per page: every board, ARKLIST and GFX reads site JSON through window.__arkJson(url),
        so a file two scripts need (cbb-all.json, cfb-all.json) downloads and parses once. Callers must not change the result. */}}
 {{- /* a team logo or crest that fails to load is dropped rather than shown as a broken image (tables, cards, depth charts) */}}
