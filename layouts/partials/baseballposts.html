@@ -1,0 +1,12 @@
+{{- /* Rows for {{< winlist rows="baseballposts" >}}: every baseball article, newest first. A post counts when it has a baseball tag and no other
+       sport's tag (so the cross-sport research posts stay out). New baseball posts show up here by their tags. */ -}}
+{{- $yes := slice "mlb" "baseball" "mets" "sabermetrics" "prospx" "eephus.io" -}}
+{{- $no := slice "nfl" "nba" "cbb" "cfb" "nhl" "soccer" "tennis" "cs2" -}}
+{{- $out := "" -}}
+{{- range (where site.RegularPages "Section" "posts").ByDate.Reverse }}
+{{- $t := apply (.Params.tags | default slice) "lower" "." -}}
+{{- if and (gt (len (intersect $t $yes)) 0) (eq (len (intersect $t $no)) 0) }}
+{{- $out = printf "%s- [%s](%s) | %s\n" $out .Title .RelPermalink (.Date.Format "Jan 2 2006") -}}
+{{- end }}
+{{- end }}
+{{- return $out -}}

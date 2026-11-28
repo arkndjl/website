@@ -230,11 +230,15 @@
 
 ## Article views and favorites
 
-- Every post shows its views and a pixel heart with its favorite count in the post meta line (article page, home and
+- Every post shows its views and a "favorite" button with the platinum pixel ARK star and its favorite count in the post meta line (article page, home and
   /posts/): `layouts/partials/poststats.html` + `assets/js/poststats.js`, counted by the site Worker (`/api/posts`, Durable
   Object `PostStats` in `worker/site.js`). A view is one a visitor (hashed IP + user agent, salted per day) per article per day,
   bots and other origins skipped. A favorite is one per browser (random id in local storage) and can be taken back; per IP a day,
   5 favorites of one article and 40 clicks in all. No setup: a new post gets both by itself. Only articles from PROCESS #0 on show them (`postStatsFrom` in hugo.toml; Noah, Nov 28: older ones were not counted).
+  Favoriting plays a pixel spark burst (none under reduced motion) and a quiet 8-bit blip made with WebAudio (Noah, Nov 28: star, not heart).
 - `scripts/post_stats.py` (site-stats.yml, every 6 hours) samples the counts into `data/post_stats.json`; `scripts/milestones.py`
   reads it for the article milestones in ARKLOG. Process > ARKLOG > traffic has articles.exe (`layouts/shortcodes/articlestats.html`,
   in TABS traffic of `scripts/library_build.py`): one row an article, live counts, sorts on every header.
+- Article lists (home and /posts/) have a strip on top (`layouts/partials/postbar.html`, `assets/js/postbar.js`): search, type, tag,
+  sort (newest, views, favorites) and a favorited toggle (this browser's stars). Type is the post's front matter `form` (board, method,
+  research, analysis, essay, process, list, video, tool; `kind` is reserved by Hugo). Every post is on one page (`pagerSize = 100`).

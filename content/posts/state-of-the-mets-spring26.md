@@ -4,6 +4,7 @@ date = "2026-05-01T13:00:42-06:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["mets", "analysis", "baseball"]
+form = "analysis"
 keywords = ["mets", "new york"]
 description = "Analyzing the process of the Mets across the past few seasons."
 showFullContent = false

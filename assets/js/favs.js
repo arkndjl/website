@@ -1,8 +1,8 @@
 // Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-// "your favorites" (/favorites/, layouts/shortcodes/favorites.html) and the heart buttons that feed it: ST. CLAIRE songs
+// "your favorites" (/favorites/, layouts/shortcodes/favorites.html) and the star buttons that feed it: ST. CLAIRE songs
 // (layouts/shortcodes/arkndjlmusic.html, [data-fav-song]) and the home video.exe (layouts/partials/home-video.html,
 // [data-fav-video]). No login: everything lives in this browser's local storage.
-//   ark-favs  {slug: 1}            articles, written by the post heart (assets/js/poststats.js; counted by the Worker)
+//   ark-favs  {slug: 1}            articles, written by the post star (assets/js/poststats.js; counted by the Worker)
 //   ark-favx  {s: {slug: t}, y: {id: {t, n, k, d, at}}, f: {id: {b, k, n, s, i, u, p, at}}}   songs, videos, teams and players
 // A share code carries all of it to another browser. Followed teams and players read static/data/favs/<sport>.json
 // (scripts/favorites_track.py): ARK Ranking, record, the last result, the next game, and the player's board numbers.
@@ -20,7 +20,7 @@
   function now() { return Date.now(); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function slug(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
-  function vid() {   // the browser's own random id, the same one the post heart sends (assets/js/poststats.js)
+  function vid() {   // the browser's own random id, the same one the post star sends (assets/js/poststats.js)
     var id = get('ark-vid');
     if (!/^[a-f0-9]{16,32}$/.test(id || '')) {
       var b = new Uint8Array(12); (window.crypto && crypto.getRandomValues) ? crypto.getRandomValues(b) : b.forEach(function (_, i) { b[i] = Math.random() * 256; });
@@ -37,7 +37,7 @@
     toggleSong: function (s) { if (st.s[s]) delete st.s[s]; else st.s[s] = now(); save(); return !!st.s[s]; },
     toggleVideo: function (id, m) { if (st.y[id]) delete st.y[id]; else st.y[id] = { t: m.t, n: m.n, k: m.k, d: m.d, at: now() }; save(); return !!st.y[id]; },
     toggleItem: function (id, m) { if (st.f[id]) delete st.f[id]; else { m.at = now(); st.f[id] = m; } save(); return !!st.f[id]; },
-    // an article: the same call the post heart makes, so the article's count stays right
+    // an article: the same call the post star makes, so the article's count stays right
     toggleArticle: function (s, on) {
       var a = api.articles(); if (on) a[s] = 1; else delete a[s]; put(AKEY, JSON.stringify(a)); fire();
       return fetch('/api/posts/' + encodeURIComponent(s) + '/fav', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: vid(), on: on }) })
@@ -75,7 +75,7 @@
     return n;
   };
 
-  // ---- the heart button (songs, videos, cards): .favb, pressed when saved ----
+  // ---- the star button (songs, videos, cards): .favb, pressed when saved ----
   function paintBtn(b, on, name) {
     b.setAttribute('aria-pressed', on ? 'true' : 'false');
     b.classList.toggle('is-on', on);
@@ -91,7 +91,7 @@
     bs.forEach(function (b) { b.addEventListener('click', function (e) { e.stopPropagation(); api.toggleSong(b.getAttribute('data-fav-song')); }); });
     api.on(paint); paint();
   }
-  // the home video.exe: the heart saves the video on screen; saved rows in the list carry a small heart
+  // the home video.exe: the star saves the video on screen; saved rows in the list carry a small star
   function videos() {
     var w = document.getElementById('video'), b = w && w.querySelector('[data-fav-video]'); if (!b) return;
     function cur() { return w.querySelector('.hvid__list a.is-on') || w.querySelector('.hvid__list a[data-vid]'); }
@@ -259,7 +259,7 @@
       var on = only === 'all' ? 'favorites' : only;
       if (lp) lp.setAttribute('data-lp-model', on);
     }
-    // a heart taken back stays on the page, unpressed, until the next visit: one more click puts it back
+    // a star taken back stays on the page, unpressed, until the next visit: one more click puts it back
     out.addEventListener('click', function (e) {
       var b = e.target.closest('.favb'); if (!b) return;
       var id;

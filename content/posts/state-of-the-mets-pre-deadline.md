@@ -4,6 +4,7 @@ date = "2026-07-28T10:00:42-06:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["mets", "analysis", "baseball"]
+form = "analysis"
 keywords = ["mets", "new york"]
 description = "Breaking down the entire Mets roster, payroll, and where we stand before the 2026 trade deadline."
 showFullContent = false

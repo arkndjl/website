@@ -5,7 +5,7 @@
 {{- $start := "2026-11-28" -}}
 {{- partial "wintable-open.html" (dict "title" "articles.exe" "icon" "site" "filter" " " "wait" true "class" "desk__wide") }}
 <table class="cfb__table astat" data-astat data-start="{{ $start }}">
-  <thead><tr><th>article</th><th title="published">date</th><th>tags</th><th title="one a visitor a day, counted since Nov 28 2026">views</th><th title="heart clicks, net of the ones taken back">favorites</th><th title="favorites per view">fav%</th><th title="views a day since it was published, or since counting began on Nov 28 2026 for older articles">views/day</th></tr></thead>
+  <thead><tr><th>article</th><th title="published">date</th><th>tags</th><th title="one a visitor a day, counted since Nov 28 2026">views</th><th title="star clicks, net of the ones taken back">favorites</th><th title="favorites per view">fav%</th><th title="views a day since it was published, or since counting began on Nov 28 2026 for older articles">views/day</th></tr></thead>
   <tbody>
   {{- range $posts.ByDate.Reverse }}
   {{- $slug := path.Base (strings.TrimSuffix "/" .RelPermalink) }}

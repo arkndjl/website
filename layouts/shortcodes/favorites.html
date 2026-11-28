@@ -1,7 +1,7 @@
 {{- /* "your favorites" (/favorites/, content/favorites.md): favorites.exe with the hero sprite (scripts/favorites_art.py), a
        low-poly viewport (assets/js/lowpoly.js, data-lp-model follows the open group), the counts, the search that adds a
        team or player, the share code, then one window a group. Everything is kept in this browser (assets/js/favs.js):
-       articles from the post heart (ark-favs, assets/js/poststats.js), songs, videos, teams and players (ark-favx).
+       articles from the post star (ark-favs, assets/js/poststats.js), songs, videos, teams and players (ark-favx).
        Tracking for followed teams and players: static/data/favs/<sport>.json (scripts/favorites_track.py). */ -}}
 {{- $posts := dict -}}
 {{- range where site.RegularPages "Type" "posts" -}}

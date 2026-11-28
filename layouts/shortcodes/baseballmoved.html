@@ -1,0 +1,10 @@
+{{- /* The page used to hold the boards as tabs (#draft-hitters, #u19-milb, #white-sox-org, #fv-model): an old link opens
+       the article the board came from; the fv scale and anything else go to eephus.io. */ -}}
+<script>
+(function () {
+  var h = location.hash.slice(1).split(':')[0].toLowerCase(); if (!h) return;
+  var to = { 'draft-hitters': '/posts/arkboard-mlb-draft-hitters-v1/', 'u19-milb': '/posts/u19-milb-evaluations-may26/',
+    'white-sox-org': '/posts/prospect-grades-chicago-white-sox/', 'fv-model': 'https://eephus.io' }[h];
+  if (to) location.replace(to);
+})();
+</script>

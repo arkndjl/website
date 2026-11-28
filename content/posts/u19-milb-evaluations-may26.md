@@ -4,6 +4,7 @@ date = "2026-05-10T14:00:42-06:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["mlb", "prospect", "evaluation", "arkboard"]
+form = "board"
 keywords = ["mlb", "baseball", "statistics", "prospects"]
 description = "Evaluating all 13 prospects U19 who are currently at Single-A or higher."
 showFullContent = false

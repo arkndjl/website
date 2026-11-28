@@ -28,6 +28,10 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
 [outputs]
   home = ['HTML', 'RSS', 'BuildInfo']
 
+# Article lists show every post on one page, so the search and filter strip (layouts/partials/postbar.html) sees them all.
+[pagination]
+  pagerSize = 100
+
 # Required for Chroma and the custom syntax highlighting.
 [markup.highlight]
   noClasses = false
@@ -160,7 +164,7 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
             icon = "img/icons/arkboard.svg"
         # ARKBOARD children, grouped by params.group (menu.html, mobile-menu.html, arknav.html draw one labelled row
         # per group, in weight order; gname = the name inside its group): all sports (30-32), then each sport's
-        # prospects page before its pro league (football 33-34, basketball 35-36, hockey 37-38, soccer 39-40), baseball 41 (college, then eephus.io), tennis 42-43 (prospects 42), esports 44
+        # prospects page before its pro league (football 33-34, basketball 35-36, hockey 37-38, soccer 39-40), baseball 41 (articles, then eephus.io), tennis 42-43 (prospects 42), esports 44
         [[languages.en.menu.main]]
           identifier = "arkboard-predictions"
           parent = "ARKBOARD"
@@ -284,13 +288,13 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
         [[languages.en.menu.main]]
           identifier = "arkboard-baseball"
           parent = "ARKBOARD"
-          name = "College Baseball / MLB Draft"
+          name = "Baseball Articles"
           url = "/arkboard/baseball/"
           weight = 41
           [languages.en.menu.main.params]
             icon = "img/icons/baseball.svg"
             group = "baseball"
-            gname = "College · MLB Draft"
+            gname = "Baseball Articles"
         [[languages.en.menu.main]]
           identifier = "eephus"
           parent = "ARKBOARD"

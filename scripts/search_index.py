@@ -217,35 +217,9 @@ def cs2(ix):
                                   [(t['n'], sub(t.get('rg')), f'/img/cs2/{t["k"]}.png' if t.get('logo') else None, t.get('ark'), None) for t in g.get('teams') or []], 't'))
 
 
-def baseball(ix):
-    # the baseball boards are markdown tables in posts (shortcodes/board.html): the player column by its header
-    for post, tab in (('ARKBOARD-MLB-DRAFT-HITTERS-v1', 'draft hitters'), ('u19-milb-evaluations-may26', 'U19 MiLB'),
-                      ('prospect-grades-chicago-white-sox', 'White Sox org')):
-        try:
-            with open(os.path.join(ROOT, f'content/posts/{post}.md'), encoding='utf-8') as f: text = f.read()
-        except OSError: continue
-        lines = [l for l in text.splitlines() if l.startswith('|')]
-        if len(lines) < 3: continue
-        cells = lambda l: [re.sub(r'[*\\]', '', x).strip() for x in l.strip().strip('|').split('|')]
-        head = [h.lower() for h in cells(lines[0])]
-        ni = next((i for i, h in enumerate(head) if h in ('player', 'prospect', 'name')), None)
-        if ni is None: continue
-        pi = next((i for i, h in enumerate(head) if h in ('pos', 'h-pos')), None)
-        ti = next((i for i, h in enumerate(head) if h in ('school', 'team', 'org/lvl')), None)
-        fi = next((i for i, h in enumerate(head) if h == 'fv'), None)
-        items = []
-        for l in lines[2:]:
-            c = cells(l)
-            if len(c) <= ni or not c[ni] or not re.search('[A-Za-z]', c[ni]): continue
-            try: fv = float(c[fi]) if fi is not None else None
-            except ValueError: fv = None
-            items.append((c[ni], sub(c[pi] if pi is not None and pi < len(c) else '', c[ti] if ti is not None and ti < len(c) else ''), None, fv, None))
-        print('baseball', tab, ix.add('arkboard-baseball', tab, items))
-
-
 def main():
     ix = Index()
-    for f in (cfb, cbb, pro, soccer, hockey, tennis, cs2, baseball):
+    for f in (cfb, cbb, pro, soccer, hockey, tennis, cs2):
         try: f(ix)
         except Exception as e: print(f'  {f.__name__} failed: {e!r}', file=sys.stderr)
     asof = max((str((load(p) or {}).get('asof') or '') for p in ('static/data/cfb-all.json', 'data/nfl_games.json')), default='')

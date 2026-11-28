@@ -4,6 +4,7 @@ date = "2026-11-02T16:00:00-05:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["arkboard", "cfb", "nfl", "cbb", "nba", "nhl", "hockey", "soccer", "tennis", "cs2", "draft", "predictions"]
+form = "method"
 keywords = ["arkboard", "future value", "20-80 scale", "college football", "college basketball", "nfl", "nba", "nhl", "hockey prospects", "soccer", "soccer prospects", "tennis", "counter-strike", "war", "xpm", "gar", "mock draft", "nil", "game model", "predictions", "kelly"]
 description = "How each ARKBOARD tab is calculated and how it tested held out: FV, WAR, XPM, GAR, mock drafts, NIL, recruits, team ratings, season odds, game models and Predictions."
 showFullContent = false

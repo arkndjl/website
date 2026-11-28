@@ -1,7 +1,7 @@
 // Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Article views and favorites (layouts/partials/poststats.html; counts in worker/site.js PostStats, /api/posts).
 // The article page posts its view (the Worker keeps one a visitor a day) and lists read every count in one GET.
-// The pixel heart toggles a favorite: one per browser, kept in local storage with the browser's own random id, so the
+// The platinum star toggles a favorite: one per browser, kept in local storage with the browser's own random id, so the
 // Worker can take it back later. Nothing shows until the counts load.
 (function () {
   var els = [].slice.call(document.querySelectorAll('.pst[data-post]'));
@@ -36,7 +36,46 @@
     return fetch(API + '/' + path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body || {}) })
       .then(function (r) { if (!r.ok) throw r.status; return r.json(); });
   }
+  // favoriting: a pixel burst around the star (skipped under reduced motion) and a short 8-bit blip, square-wave notes
+  // made on the spot with WebAudio, quiet. Taking a favorite back plays nothing.
+  var RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches, AC = null;
+  function blip() {
+    try {
+      AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+      if (AC.state === 'suspended') AC.resume();
+      var t = AC.currentTime + 0.01, g = AC.createGain();
+      g.connect(AC.destination);
+      g.gain.setValueAtTime(0.0001, t);
+      [988, 1319, 1976].forEach(function (f, i) {   // B5, E6, B6: a coin-style step up
+        var o = AC.createOscillator(), at = t + i * 0.06;
+        o.type = 'square'; o.frequency.setValueAtTime(f, at);
+        o.connect(g); o.start(at); o.stop(at + 0.06);
+        g.gain.setValueAtTime(0.045, at);
+        g.gain.exponentialRampToValueAtTime(0.004, at + 0.055);
+      });
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.24);
+    } catch (e) {}
+  }
+  var COL = ['#b9f2ff', '#fff', '#7fffd4', '#c8c7ff', '#b9f2ff', '#fff', '#7fffd4', '#c8c7ff'];
+  function burst(btn) {
+    btn.classList.remove('is-pop'); void btn.offsetWidth; btn.classList.add('is-pop');
+    if (RM) return;
+    var s = btn.querySelector('.pst__s'), b = document.createElement('span');
+    b.className = 'pst__burst'; b.setAttribute('aria-hidden', 'true');
+    for (var i = 0; i < 8; i++) {
+      var a = i * Math.PI / 4, r = i % 2 ? 20 : 30, p = document.createElement('u');
+      p.style.setProperty('--dx', Math.round(Math.cos(a) * r / 2) * 2 + 'px');
+      p.style.setProperty('--dy', Math.round(Math.sin(a) * r / 2) * 2 + 'px');
+      p.style.background = COL[i];
+      if (i % 2 === 0) p.className = 'is-x';
+      b.appendChild(p);
+    }
+    s.appendChild(b);
+    setTimeout(function () { if (b.parentNode) b.parentNode.removeChild(b); }, 700);
+  }
   var cache = {};
+  // the list strip (assets/js/postbar.js) sorts and filters on these counts
+  function shared() { window.__arkPostStats = cache; try { window.dispatchEvent(new Event('arkposts')); } catch (e) {} }
   function bySlug(s) { return els.filter(function (e) { return e.getAttribute('data-post') === s; }); }
   els.forEach(function (el) {
     var s = el.getAttribute('data-post'), btn = el.querySelector('.pst__fav');
@@ -45,7 +84,7 @@
       var on = !favs[s], d = cache[s] || { v: 0, f: 0 };
       btn.disabled = true;
       // drawn at once, then set to what the Worker says
-      if (on) favs[s] = 1; else delete favs[s];
+      if (on) { favs[s] = 1; burst(btn); blip(); } else delete favs[s];
       cache[s] = { v: d.v, f: Math.max(0, d.f + (on ? 1 : -1)) };
       bySlug(s).forEach(function (e) { paint(e, cache[s]); });
       post(encodeURIComponent(s) + '/fav', { id: id, on: on }).then(function (r) {
@@ -57,6 +96,7 @@
       }).then(function () {
         set('ark-favs', JSON.stringify(favs));
         bySlug(s).forEach(function (e) { paint(e, cache[s]); });
+        shared();
         btn.disabled = false;
       });
     });
@@ -66,7 +106,7 @@
     var load = mine
       ? post(encodeURIComponent(mine.getAttribute('data-post')) + '/view').then(function (r) { cache[mine.getAttribute('data-post')] = r; })
       : fetch(API).then(function (r) { if (!r.ok) throw r.status; return r.json(); }).then(function (all) { cache = all || {}; });
-    load.then(function () { els.forEach(function (e) { paint(e, cache[e.getAttribute('data-post')]); }); }).catch(function () {});
+    load.then(function () { els.forEach(function (e) { paint(e, cache[e.getAttribute('data-post')]); }); shared(); }).catch(function () {});
   }
   // a page the browser renders ahead of a click is not a view until it is shown
   if (document.prerendering) document.addEventListener('prerenderingchange', go, { once: true });

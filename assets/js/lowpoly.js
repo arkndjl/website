@@ -3,7 +3,7 @@
 // icosahedron, philosophy a cut gem, ARKLOG a 3D bar chart of every test by sport and verdict (data-bars, from
 // data/arklog.json), metrics a sphere, models a torus, research a cone, data a stack of disks. No library.
 // A box with data-lp-model shows that model instead and follows the attribute when it changes ("your favorites",
-// layouts/shortcodes/favorites.html: a heart, and per group a trophy, a star, a book, a record or a screen).
+// layouts/shortcodes/favorites.html: the ARK star, and per group a trophy, a ball, a book, a record or a screen).
 (function () {
   'use strict';
   var box = document.querySelector('[data-lowpoly]');
@@ -94,14 +94,6 @@
     }
     return { v: v, f: f };
   }
-  function heart() {
-    var p = [];
-    for (var i = 0; i < 28; i++) {
-      var t = i / 28 * Math.PI * 2, x = 16 * Math.pow(Math.sin(t), 3), y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
-      p.push([x / 15, (y + 2) / 15]);
-    }
-    return pillow(p, function (i) { return i % 2 ? 'w' : 'p'; });
-  }
   function star() {
     var p = [];
     for (var i = 0; i < 10; i++) { var a = Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 0.46 : 1.12; p.push([r * Math.cos(a), r * Math.sin(a) - 0.05]); }
@@ -134,7 +126,7 @@
     box3(-1.0, -0.92, -1.2, 1.2, -0.38, 0.38, 'm', out);
     return out;
   }
-  var MODELS = { favorites: heart, teams: trophy, players: star, articles: book, songs: record, videos: screen, overview: ico, philosophy: gem, arklog: bars, metrics: sphere, models: torus, research: cone, data: disks };
+  var MODELS = { favorites: star, teams: trophy, players: sphere, articles: book, songs: record, videos: screen, overview: ico, philosophy: gem, arklog: bars, metrics: sphere, models: torus, research: cone, data: disks };
   var cache = {};
   function model(k) { k = MODELS[k] ? k : 'overview'; return cache[k] || (cache[k] = MODELS[k]()); }
 

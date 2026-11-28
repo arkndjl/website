@@ -4,6 +4,7 @@ date = "2026-04-17T13:00:42-06:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["economics", "statistics", "counter strike"]
+form = "research"
 keywords = ["economics", "counter strike", "esports", "steam market", "statistics"]
 description = "A case study focusing on the economic conditions of the video game Counter Strike."
 showFullContent = false

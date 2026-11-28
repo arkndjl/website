@@ -2,11 +2,11 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 """Pixel art for "your favorites" (/favorites/), drawn with scripts/pixelart.py's helpers in the px__f frame format:
 
-  layouts/partials/px/hero-favorites.html     the favorites.exe hero: a beating heart in a display case and a list
+  layouts/partials/px/hero-favorites.html     the favorites.exe hero: the ARK star beating in a display case and a list
                                               beside it whose rows light up one by one (8 frames)
   layouts/partials/px/fav-<group>.html        one 24 x 24 sprite a group: teams, players, articles, songs, videos (4 frames)
-  static/img/icons/favorites.svg              the menu icon (16 x 16, the heart)
-  (the one-colour heart, #icon-favorites in layouts/partials/icons.html, is printed by --symbol)
+  static/img/icons/favorites.svg              the menu icon (16 x 16, the ARK star)
+  (the one-colour star, #icon-favorites in layouts/partials/icons.html, is printed by --symbol)
 
     python3 scripts/favorites_art.py
 """
@@ -31,45 +31,46 @@ PL = '#b9f2ff'     # platinum
 PD = '#7fcbe6'     # platinum shade
 
 ICON = [
-    '................',
-    '..LLLL....LLLL..',
-    '.LPPPPL..LPPPPL.',
-    'LPWWPPPLLPPPPPPL',
-    'LPWPPPPPPPPPPPPL',
-    'LPPPPPPPPPPPPPPL',
-    'LPPPPPPPPPPPPPUL',
-    '.LPPPPPPPPPPPUL.',
-    '..LPPPPPPPPPUL..',
-    '...LPPPPPPPUL...',
-    '....LPPPPPUL....',
-    '.....LPPPUL.....',
-    '......LPUL......',
     '.......LL.......',
-    '................',
+    '.......LL.......',
+    '......LWPL......',
+    '......LPPL......',
+    '.....LPPPPL.....',
+    'LLLLLLPPPPLLLLLL',
+    'LPWPPPPPPPPPPPUL',
+    '.LPPPPPPPPPPPUL.',
+    '..LLPPPPPPPPLL..',
+    '...LPPPPPPPPL...',
+    '...LPPPPPPPUL...',
+    '..LPPPPLLPPPUL..',
+    '..LPPPL..LPPUL..',
+    '.LPPLL....LLUL..',
+    '.LLL........LLL.',
     '................',
 ]
 
 
-def heart(g, cx, cy, r, fill, edge, glint=True, shade=U):
-    """A pixel heart r wide each side of cx: two lobes and a point, outlined in edge, shaded at the lower right."""
-    pts = set()
-    lr = r * 0.54
-    for y in range(int(cy - r), int(cy + r * 1.2) + 2):
+def star(g, cx, cy, r, fill, edge, glint=True, shade=U):
+    """The ARK star (the site's favorite mark) r from centre to point: a 5-point star, outlined in edge, shaded lower right."""
+    import math
+    pts = []
+    for i in range(10):
+        a = -math.pi / 2 + i * math.pi / 5
+        rr = r if i % 2 == 0 else r * 0.45
+        pts.append((cx + rr * math.cos(a), cy + rr * math.sin(a)))
+    from pixelart import inside
+    on = set()
+    for y in range(int(cy - r) - 1, int(cy + r) + 2):
         for x in range(int(cx - r) - 1, int(cx + r) + 2):
-            px, py = x + 0.5, y + 0.5
-            lobe = any((px - (cx + s * lr * 0.92)) ** 2 + (py - (cy - r * 0.28)) ** 2 <= lr * lr for s in (-1, 1))
-            tip = py >= cy - r * 0.28 and abs(px - cx) <= (cy + r * 1.05 - py) * 0.98 and py <= cy + r * 1.05
-            if lobe or tip: pts.add((x, y))
-    for (x, y) in pts:
-        edgy = any((x + a, y + b) not in pts for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+            if inside(x + 0.5, y + 0.5, pts): on.add((x, y))
+    for (x, y) in on:
+        edgy = any((x + a, y + b) not in on for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1)))
         g.set(x, y, edge if edgy else fill)
-    for (x, y) in pts:
-        if g.get(x, y) == fill and ((x + 1, y + 1) not in pts or (x + 2, y + 1) not in pts): g.set(x, y, shade)
-    if glint:
-        top = min(y for _, y in pts)
-        gx = int(cx - lr * 0.92)
-        g.rect(gx - 1, top + 2, 2, 1, W); g.set(gx - 2, top + 3, W)
-    return pts
+    for (x, y) in on:
+        if g.get(x, y) == fill and ((x + 1, y + 1) not in on or (x + 2, y + 1) not in on): g.set(x, y, shade)
+    if glint and r >= 6:
+        g.set(int(cx), int(cy - r * 0.55), W); g.set(int(cx) - 1, int(cy - r * 0.2), W); g.set(int(cx) - 2, int(cy - r * 0.15), W)
+    return on
 
 
 def sparkle(g, x, y, k, c=PL):
@@ -80,7 +81,7 @@ def sparkle(g, x, y, k, c=PL):
 
 def hero():
     frames = []
-    beat = [7, 8, 9, 8, 7, 7, 8, 7]
+    beat = [11, 12, 13, 12, 11, 11, 12, 11]
     for k in range(8):
         g = Grid(64, 40)
         # display case
@@ -88,21 +89,21 @@ def hero():
         g.rect(5, 5, 34, 1, D); g.rect(5, 5, 1, 26, D)
         g.rect(3, 33, 38, 1, D); g.rect(8, 37, 28, 2, M); g.rect(8, 37, 28, 1, L)
         for i in range(4): g.set(7 + i * 9, 32, T if (i + k) % 4 == 0 else D)       # base lights
-        # the heart and its shadow
+        # the star and its shadow
         r = beat[k]
-        heart(g, 22, 17, r, PL, L, shade=PD)
-        g.rect(22 - r + 2, 29, 2 * r - 4, 1, D)
+        star(g, 22, 18, r, PL, L, shade=PD)
+        g.rect(22 - r // 2, 30, r, 1, D)
         sparkle(g, 9, 9, (k + 0) % 4 if k % 4 < 3 else 0)
         sparkle(g, 34, 8, (k + 2) % 4 if (k + 2) % 4 < 3 else 0, T)
         sparkle(g, 35, 25, (k + 1) % 3)
-        # the list: rows light up one by one, a heart bullet each
+        # the list: rows light up one by one, a star bullet each
         g.rect(45, 4, 17, 30, L); g.rect(46, 5, 15, 28, D); g.rect(46, 5, 15, 3, U); g.rect(57, 6, 2, 1, L)
         lens = [9, 7, 10, 6, 8, 9]
         for j in range(6):
             y = 10 + j * 4
             on = j <= k
             c = PL if on and j == min(k, 5) else (P if on else M)
-            g.set(47, y, c); g.set(49, y, c); g.rect(47, y + 1, 3, 1, c); g.set(48, y + 2, c)
+            g.set(48, y, c); g.rect(47, y + 1, 3, 1, c); g.set(47, y + 2, c); g.set(49, y + 2, c)
             g.rect(51, y + 1, lens[j], 1, L if on else M)
         frames.append(g)
     return frames
@@ -152,7 +153,7 @@ def articles():   # a page whose lines write themselves
         lens = [8, 9, 6, 9, 7]
         for j in range(5):
             if j <= k + 1: g.rect(7, 5 + j * 3, lens[j] if j <= k else lens[j] // 2, 1, U if j else P)
-        heart(g, 16, 18, 3, P, U, glint=False)
+        star(g, 16, 18, 4, P, U, glint=False)
         out.append(g)
     return out
 

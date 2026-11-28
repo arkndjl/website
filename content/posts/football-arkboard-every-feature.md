@@ -4,6 +4,7 @@ date = "2026-10-14T10:30:00-05:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["cfb", "nfl", "football", "draft", "arkboard"]
+form = "method"
 keywords = ["arkboard", "college football", "nfl", "future value", "football war", "mock draft", "nil", "transfer portal", "team builder", "recruiting", "game projections", "fantasy projections", "upset picks"]
 description = "College Football and NFL ARKBOARD method: FV, Stat+, WAR, badges, Draft%, mock draft, xNIL, Transfer%, team builder, recruit stars, game model, upset and favorite picks, NFL WAR, NFL games, fantasy projections. Formulas, inputs, out-of-sample tests."
 showFullContent = false
