@@ -433,7 +433,7 @@ def build():
     import nhl_pbox as B
     F = json.load(open(FIT))
     today = datetime.date.today()
-    S = today.year + 1 if today.month >= 8 else today.year
+    S = B.season(today)                            # nhl_data.current_season: the Aug 1 rollover
     B.pull(since=datetime.date(S - 2, 10, 1))
     # the walk starts where the backtest's does (2021-22), not two seasons back: season carries and the goalie save
     # rates keep weight from older seasons, so a shorter walk served different projections than were tested

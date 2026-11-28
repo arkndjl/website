@@ -741,12 +741,30 @@ def build(seasons=None):
     json.dump(idx, open(IDX, 'w'), indent=1)
 
 
+def final_rebuild(cur=None, idx=None):
+    """[the season just finished] when its file was last written while it was still the current season (asof before
+    Aug 1 of its end year, nhl_data.current_season's rollover), else []: --current rebuilds it once after the rollover,
+    so its last weeks are in it; the rebuild's own asof stops it from running again"""
+    cur = cur or D.current_season()
+    if idx is None:
+        try:
+            idx = json.load(open(IDX))
+        except (OSError, ValueError):
+            return []
+    S = cur - 1
+    row = next((s for s in idx.get('seasons', []) if s.get('season') == S), None)
+    if row is None or (row.get('asof') or '')[:10] >= f'{S}-08-01':
+        return []
+    print(f'nhl war: final rebuild of {S} (last written {row.get("asof")})', flush=True)
+    return [S]
+
+
 if __name__ == '__main__':
     if '--fit' in sys.argv:
         fit()
     elif '--nested' in sys.argv:
         nested()
     elif '--current' in sys.argv:
-        build([D.current_season()])
+        build([D.current_season()] + final_rebuild())
     else:
         build()
