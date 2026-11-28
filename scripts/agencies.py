@@ -380,7 +380,7 @@ def board(clients, pros=(), sp='cfb', pool=()):
     for r in rows:
         d = dr.get(r['agency'], [])
         r['pro'] = len(d); r['pro1'] = sum(1 for p in d if p['round'] == 1)
-        r['proPct'] = round(len(d) / (len(d) + r['nCol']), 3) if d and r['nCol'] else None   # no college clients on file: no share
+        r['proPct'] = round(len(d) / (len(d) + r['nCol']), 3) if r['nCol'] else None   # no college clients on file: no share (none drafted yet = 0)
     pf = plus_scores(rows, by, sp, pool)
     # Agency+: the composite (components), 100 + 25 x score / SD over the agencies
     cp = components(clients, [p for p in pros if p.get('conf') != 'low'], sp, pool)

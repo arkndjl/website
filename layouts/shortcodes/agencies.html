@@ -69,10 +69,7 @@
     <td class="cfb__num" data-v="{{ .ark5 }}">{{ .ark5 }}</td>
     <td class="cfb__num" data-v="{{ .pro | default 0 }}">{{ .pro | default 0 }}</td>
     <td class="cfb__num" data-v="{{ .pro1 | default 0 }}">{{ .pro1 | default 0 }}</td>
-    <td class="cfb__num" data-v="{{ .proPct }}">{{ with .proPct }}{{ partial "num.html" (slice "%.0f" (mul . 100)) }}%{{ else }}—{{ end }}</td>
-    <td class="cfb__num" data-v="{{ .pro | default 0 }}">{{ .pro | default 0 }}</td>
-    <td class="cfb__num" data-v="{{ .pro1 | default 0 }}">{{ .pro1 | default 0 }}</td>
-    <td class="cfb__num" data-v="{{ .proPct }}">{{ with .proPct }}{{ partial "num.html" (slice "%.0f" (mul . 100)) }}%{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .proPct }}">{{ if ne .proPct nil }}{{ partial "num.html" (slice "%.0f" (mul .proPct 100)) }}%{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-v="{{ .high }}">{{ partial "num.html" (slice "%.0f" (mul .high 100)) }}%</td>
     <td class="agency__top">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ index $p 0 }} <span class="cfb__dim">{{ index $p 1 }}</span>{{ end }}</td>
     <td><button type="button" class="cfb__btn cfb__cardbtn" data-gfx data-gfx-mode="agency" data-gfx-sport="{{ $sp }}" data-gfx-i="{{ $i }}" title="agency card PNG, 16:9">agencyGFX</button></td>
