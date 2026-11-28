@@ -21,6 +21,17 @@
   ([docs/rules/workflow.md](docs/rules/workflow.md)): merge when done, then `python3 scripts/check_live.py`; retrigger
   the build if not live in about 20 minutes.
 
+## OVR (pro players, 0-99; Nov 28)
+
+- The pro counterpart of FV: `scripts/ovr.py` reads each sport's most predictive rate (NBA pXPM, NHL pWAR a 60 on a full season by
+  F / D / G starter TOI, NFL pXP/60, soccer p/90 on a full season, tennis ARK log-odds by tour, CS2 RWA) and maps it piecewise
+  linearly: replacement 60, median starter 75, mean of each season's best 97, cap 99, floor 20. Anchors and weights in
+  `data/ovr_fit.json` (`--fit`, from past seasons and `research/ovr_research.json`); rows in `data/ovr/<sport>.json`, board
+  `layouts/shortcodes/ovr.html` (projections > OVR on NBA / NFL / NHL, soccer leaders > OVR, tennis ATP / WTA OVR, CS2 RWA
+  leaders > OVR); process-refresh.yml reruns it. An input ships only through the OVR gate (`scripts/research/ovr_nov28/`):
+  better on next-season rate, next-season value r or team R2 at t >= 2, worse on none past 1. Rookie draft-FV prior failed
+  (retest `ovr_rookie_fv_prior`); NFL, tennis and CS2 ideas untested (`ovr_nfl_ideas`, `ovr_tennis_cs2_ideas`).
+
 ## ARKLIBRARY (content/arklibrary.md)
 
 - Keep music artists and albums in sync: when an album is added to `albums.exe`, add its artist

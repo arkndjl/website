@@ -1,0 +1,72 @@
+{{- /* OVR board: {{< ovr sport="nba|nhl|nfl|soccer|atp|wta|cs2" tab="..." title="..." >}}. Rows from data/ovr/<sport>.json
+       (scripts/ovr.py): a 0-99 grade on each sport's most predictive rate, replacement 60, the median starter 75, the
+       mean of each season's best 97. One table, every stat a sortable column; filters only pick rows. */ -}}
+{{- $sp := .Get "sport" -}}
+{{- with index (site.Data.ovr | default dict) $sp -}}
+{{- $D := . -}}
+{{- $icon := index (dict "nba" "basketball" "nhl" "hockey" "nfl" "football" "soccer" "soccer" "atp" "tennis" "wta" "tennis" "cs2" "cs") $sp -}}
+{{- $logo := index (dict "nba" "/img/nba/{}.png" "nhl" "/img/nhl/{}.png" "nfl" "/img/nfl/{}.png") $sp -}}
+{{- $ten := in (slice "atp" "wta") $sp }}{{ $cs := eq $sp "cs2" }}{{ $nba := eq $sp "nba" }}{{ $soc := eq $sp "soccer" -}}
+{{- $date := lower ((time $D.asof).Format "Jan 2") -}}
+{{- $K := $D.anchors -}}
+{{- $mf := index (dict "nba" "%.1f" "nhl" "%.2f" "nfl" "%.2f" "soccer" "%.3f" "atp" "%.1f" "wta" "%.1f" "cs2" "%.2f") $sp -}}
+{{- $xf := index (dict "nba" "%.1f" "nhl" "%.2f" "nfl" "%.2f" "soccer" "%.3f" "atp" "%.0f" "wta" "%.0f" "cs2" "%+.2f") $sp -}}
+{{- $mt := index (dict
+     "nba" "pXPM: next season's XPM, three seasons by minutes, shrunk to a role mean and aged"
+     "nhl" "pWAR a full season: projected WAR a 60 x a starter's TOI at his position"
+     "nfl" "pXP/60: points of margin over an average regular at his sub-position per 60 snaps, three seasons, shrunk"
+     "soccer" "p/90: projected GAR a 90 (goals over replacement)"
+     "atp" "ARK: win chance against the average top-50 player, best of three, %"
+     "wta" "ARK: win chance against the average top-50 player, best of three, %"
+     "cs2" "RWA rating: round win % added a round, 0 = average tier-1 starter") $sp -}}
+{{- $xt := index (dict
+     "nba" "XPM this season (team-adjusted rXPM)" "nhl" "WAR this season" "nfl" "rXP/60 this season" "soccer" "SV: this season's GAR a 90, shrunk"
+     "atp" "official ATP rank" "wta" "official WTA rank" "cs2" "RWA change over the last 90 days") $sp -}}
+{{- $smp := index (dict "nba" "minutes this season" "nhl" "time on ice this season, minutes" "nfl" "snaps this season" "soccer" "minutes this season" "atp" "tour-level matches on file" "wta" "tour-level matches on file" "cs2" "maps on file") $sp -}}
+{{- $fl := "Pos,Team" }}{{ if $ten }}{{ $fl = "Nat" }}{{ else if $cs }}{{ $fl = "Team,Tier" }}{{ else if $soc }}{{ $fl = "Pos,Lg" }}{{ end -}}
+{{- $gc := printf "RK,Player,OVR,Pos,Team,Age,%s" $D.metric }}{{ if $ten }}{{ $gc = printf "RK,Player,OVR,Nat,Age,%s,Rank" $D.metric }}{{ else if $cs }}{{ $gc = "RK,Player,OVR,Team,Age,RWA" }}{{ else if $nba }}{{ $gc = "RK,Player,OVR,Pos,Team,Age,O,D,pXPM" }}{{ end -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "OVR") "icon" $icon "filter" $fl "rerank" true "tab" ($.Get "tab") "gfxCols" $gc "gfxDate" $date "gfxMax" "30" "class" "ovr") -}}
+<table class="cfb__table tstick2 ovr__table"{{ with $logo }} data-gfx-logo="{{ . }}"{{ end }}>
+  <thead><tr>
+    <th title="rank by OVR">RK</th><th>Player</th>
+    <th class="cfb__g ovr__k" data-term="OVR" title="0-99 on {{ $D.metric }}: replacement 60, median starter 75, the best in a typical season 97">OVR</th>
+    {{- if $ten }}<th title="nationality">Nat</th>{{ end }}
+    {{- if not $ten }}{{ if not $cs }}<th>Pos</th>{{ end }}<th>Team</th>{{ end }}
+    {{- if $soc }}<th title="league">Lg</th>{{ end }}
+    {{- if $cs }}<th title="event-access tier">Tier</th>{{ end }}
+    <th>Age</th>
+    <th title="{{ $smp }}">{{ $D.sample }}</th>
+    {{- if not (or $ten $cs (eq $sp "nfl")) }}<th class="cfb__g" title="80% band on true talent, in OVR">Band</th>{{ end }}
+    {{- if $nba }}<th data-term="O-OVR" title="OVR with his defense at the median starter's: offense alone">O</th><th data-term="D-OVR" title="OVR with his offense at the median starter's: defense alone">D</th>{{ end }}
+    {{- if not $ten }}<th title="rank at his position{{ if eq $sp "nhl" }} group (F / D / G){{ end }}">Pos Rk</th>{{ end }}
+    <th class="cfb__g" data-term="{{ $D.metric }}" title="{{ $mt }}">{{ $D.metric }}</th>
+    <th title="{{ $xt }}">{{ $D.desc }}</th>
+    {{- if $ten }}<th data-term="Elo" title="overall Elo">Elo</th>{{ end }}
+  </tr></thead>
+  <tbody>
+  {{- range $D.rows }}
+  <tr>
+    <td class="cfb__rk">{{ .rk }}</td>
+    <td class="cfb__name"><b>{{ .n }}</b></td>
+    <td class="cfb__num is-key ovr__k cfb__g" data-v="{{ .z }}"><b>{{ .ovr }}</b></td>
+    {{- if $ten }}<td>{{ upper (.nat | default "") }}</td>{{ end }}
+    {{- if not $ten }}
+    {{- if not $cs }}<td>{{ .pos }}</td>{{ end }}
+    <td class="cfb__team">{{ if $logo }}{{ with .tm }}<img class="cfb__logo" src="{{ replace $logo "{}" (lower (index (split . "/") 0)) }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}{{ else if and $cs .logo }}<img class="cfb__logo" src="/img/cs2/{{ .tk }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span>{{ .tm }}</span></td>
+    {{- end }}
+    {{- if $soc }}<td>{{ .lg }}</td>{{ end }}
+    {{- if $cs }}<td class="cs__tier" data-v="{{ .tier }}" data-filter="Tier {{ .tier }}"><span class="cs__t cs__t--{{ .tier }}">T{{ .tier }}</span></td>{{ end }}
+    <td class="cfb__num">{{ with .age }}{{ if or $soc $ten }}{{ printf "%.0f" (math.Floor .) }}{{ else if $cs }}{{ printf "%.0f" (math.Floor .) }}{{ else }}{{ . }}{{ end }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .smp }}">{{ .smp }}</td>
+    {{- if not (or $ten $cs (eq $sp "nfl")) }}<td class="cfb__num cfb__g" data-v="{{ .hi }}">{{ if and .lo .hi }}{{ .lo }}-{{ .hi }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
+    {{- if $nba }}<td class="cfb__num">{{ .o }}</td><td class="cfb__num">{{ .d }}</td>{{ end }}
+    {{- if not $ten }}<td class="cfb__num">{{ .prk }}</td>{{ end }}
+    <td class="cfb__num cfb__g" data-v="{{ .m }}">{{ with .m }}{{ printf $mf (float .) }}{{ else }}{{ if eq .m 0.0 }}{{ printf $mf 0.0 }}{{ end }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .x }}">{{ if ne .x nil }}{{ printf $xf (float .x) }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    {{- if $ten }}<td class="cfb__num">{{ .elo }}</td>{{ end }}
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $D.rows) "note" (printf "%s · updated %s" $D.label $date) "about" (printf "OVR 0-99 on %s. Replacement %.2f = 60, median starter %.2f = 75, the mean of each season's best %.2f = 97 (%s). Inputs and weights from held-out tests (research/ovr_research.json)." $D.metric (float $K.r) (float $K.s) (float $K.t) $K.unit)) -}}
+{{- end -}}

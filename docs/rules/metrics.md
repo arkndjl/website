@@ -52,3 +52,9 @@ Names are Noah's. Don't rename a metric without his call; renamed ones keep an a
 ## All-time lists
 
 - Era-adjusted, and every list passes the era gate. Tennis all-time lists on season SV.
+
+## OVR
+
+- Noah, Nov 28: a 0-99 overall grade for pro players, the pro counterpart of FV, predictive first. It reads each sport's most
+  predictive rate and takes descriptive inputs only at the weight they earn held out. Scale: replacement 60, median starter 75,
+  the best in a typical season 97, cap 99. Inputs pass the OVR gate (next-season rate, next-season value, team results). See CLAUDE.md.

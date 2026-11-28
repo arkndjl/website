@@ -14,7 +14,10 @@ cover = "/og/nhl.png"
 {{< wintabs groups="players:leaders,projections,rookies,awards,all-time players,ARKLIST|rosters:depth chart,lines,transactions|games:games,game table|teams:ARK Ranking,units,team builder,all-time|market:payrolls,free agents,contract value" side="true" label="NHL views" >}}
 {{< nhlgames title="games" tab="games" >}}
 {{< nhlgametable title="game table" tab="game table" >}}
+{{< wintabs tab="projections" tabs="projections,OVR" sub="true" label="projections views" >}}
 {{< pctl sport="nhl" icon="hockey" title="projections" tab="projections" >}}
+{{< lazytab tab="OVR" >}}{{< ovr sport="nhl" title="NHL :: OVR" tab="OVR" >}}{{< /lazytab >}}
+{{< /wintabs >}}
 {{< wintabs tab="payrolls" tabs="payrolls,cap space,contracts" sub="true" label="payrolls views" >}}
 {{< lazytab tab="payrolls" >}}{{< payrolls lg="nhl" view="teams" tab="payrolls" >}}{{< /lazytab >}}
 {{< lazytab tab="cap space" >}}{{< payrolls lg="nhl" view="space" tab="cap space" >}}{{< /lazytab >}}

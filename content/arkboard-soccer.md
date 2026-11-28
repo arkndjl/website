@@ -30,7 +30,8 @@ cover = "/og/soccer.png"
 {{< lazytab tab="transactions" >}}
 {{< transactions sport="soccer" title="transactions" tab="transactions" >}}
 {{< /lazytab >}}
-{{< wintabs tab="leaders" tabs="SVAR leaders,player stats,top speed" sub="true" label="leaders views" >}}
+{{< wintabs tab="leaders" tabs="SVAR leaders,OVR,player stats,top speed" sub="true" label="leaders views" >}}
+{{< lazytab tab="OVR" >}}{{< ovr sport="soccer" title="big five :: OVR" tab="OVR" >}}{{< /lazytab >}}
 {{< soccerplayers view="value" title="SVAR leaders" tab="SVAR leaders" >}}
 {{< soccerplayers view="stats" title="player stats" tab="player stats" >}}
 {{< lazytab tab="top speed" >}}{{< soccerextra k="speed" tab="top speed" >}}{{< /lazytab >}}

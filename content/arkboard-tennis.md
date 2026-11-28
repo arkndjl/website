@@ -15,11 +15,13 @@ draft = false
 {{< tennismatches view="results" title="game table" tab="game table" >}}
 {{< lazytab tab="event odds" >}}{{< tennisevents tab="event odds" >}}{{< /lazytab >}}
 {{< tennismodel title="model" tab="model" >}}
-{{< wintabs tab="ATP" tabs="ATP ARK Ranking,ATP serve + return" sub="true" label="ATP views" >}}
+{{< wintabs tab="ATP" tabs="ATP ARK Ranking,ATP OVR,ATP serve + return" sub="true" label="ATP views" >}}
+{{< lazytab tab="ATP OVR" >}}{{< ovr sport="atp" title="ATP :: OVR" tab="ATP OVR" >}}{{< /lazytab >}}
 {{< tennisrank tour="atp" title="ATP :: ARK Ranking" tab="ATP ARK Ranking" >}}
 {{< lazytab tab="ATP serve + return" >}}{{< tennisstats tour="atp" title="ATP :: serve + return" tab="ATP serve + return" >}}{{< /lazytab >}}
 {{< /wintabs >}}
-{{< wintabs tab="WTA" tabs="WTA ARK Ranking,WTA serve + return" sub="true" label="WTA views" >}}
+{{< wintabs tab="WTA" tabs="WTA ARK Ranking,WTA OVR,WTA serve + return" sub="true" label="WTA views" >}}
+{{< lazytab tab="WTA OVR" >}}{{< ovr sport="wta" title="WTA :: OVR" tab="WTA OVR" >}}{{< /lazytab >}}
 {{< lazytab tab="WTA ARK Ranking" >}}{{< tennisrank tour="wta" title="WTA :: ARK Ranking" tab="WTA ARK Ranking" >}}{{< /lazytab >}}
 {{< lazytab tab="WTA serve + return" >}}{{< tennisstats tour="wta" title="WTA :: serve + return" tab="WTA serve + return" >}}{{< /lazytab >}}
 {{< /wintabs >}}
