@@ -5424,3 +5424,7 @@ td.tbx__p { color: #7fffd4; font-weight: bold; }
 .proc__node:nth-child(4)::after { animation-delay: .9s; } .proc__node:nth-child(5)::after { animation-delay: 1.2s; }
 .proc__node:nth-child(6)::after { animation-delay: 1.5s; }
 @keyframes proc-flow { 0% { background: var(--foreground); } 15% { background: var(--accent); } }
+/* Process > ARKLOG > milestones (layouts/shortcodes/arklogmiles.html) */
+.miles td { white-space: nowrap; }
+.miles td:nth-child(3), .miles td:nth-child(2) { white-space: normal; }
+.miles__cell { grid-template-columns: 80px 7ch; }

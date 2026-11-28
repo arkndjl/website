@@ -37,6 +37,7 @@ jobs:
           python3 scripts/library_glossary.py
           # ARKLOG first: the Process overview prints its tallies. A failed fetch rebuilds from the cache.
           python3 scripts/arklog.py --fetch || python3 scripts/arklog.py
+          python3 scripts/milestones.py         # ARKLOG > milestones from the social, site and log data
           python3 scripts/philosophy_build.py   # Process > Philosophy figures and numbers
           python3 scripts/library_build.py
       # the glossary GFX cards (scripts/glossary_gfx.py -> data/glossary_gfx.json): top 10s and distributions from the
@@ -47,7 +48,7 @@ jobs:
           python3 scripts/library_build.py   # the term windows draw the cards' pictures
       - name: Commit if anything changed
         run: |
-          git add data/agencies_board.json static/data/agencies.json research/library.json data/library.json content/arkboard-process.md data/philosophy.json data/glossary_gfx.json static/data/arklog.json data/arklog.json scripts/data/arklog_prs.json.gz
+          git add data/agencies_board.json static/data/agencies.json research/library.json data/library.json content/arkboard-process.md data/philosophy.json data/milestones.json data/glossary_gfx.json static/data/arklog.json data/arklog.json scripts/data/arklog_prs.json.gz
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes

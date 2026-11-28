@@ -23,8 +23,8 @@
 ## Process (was ARKBOARD Process, "Reference", before that "Library"; ARKLOG folded in Nov 28)
 
 - **Process** is its own section (Noah, Nov 28 2026): page `content/arkboard-process.md`, URL `/process/`, top menu item
-  `process` right under donate (icon `static/img/icons/process.svg`), also listed in the ARKBOARD menu (`arkboard-process`).
-  ARKLOG is a group inside it (log, updates, scoreboard, traffic, build, data). Never call it "Library" (that is ARKLIBRARY),
+  `process` right under donate (icon `static/img/icons/process.svg`); not in the ARKBOARD menu or hub (Noah, Nov 28).
+  ARKLOG is a group inside it (log, updates, calendar, milestones, scoreboard, traffic, build, data). Milestones = `scripts/milestones.py` -> `data/milestones.json` (social, site and log thresholds, detected from the data, never typed in). Never call it "Library" (that is ARKLIBRARY),
   "Lab", "Reference" or "ARKPROCESS". `/arkboard/process/`, `/arklog/`, `/reference`, `/library`, `/lab` and the old
   ARKBOARD paths redirect to it in `static/_redirects` (no hash in the target, so `/arklog/#scoreboard` keeps its tab).
 - Philosophy (Noah, Nov 28): Overview | Philosophy | Metrics ... Text in Noah's words is `research/philosophy.json` (numbers as
