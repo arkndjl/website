@@ -42,6 +42,7 @@
         <button type="button" class="hvid__btn hvid__btn--main" data-hv="play" aria-label="play"><svg><use href="#icon-play"/></svg></button>
         <button type="button" class="hvid__btn" data-hv="stop" aria-label="stop"><svg><use href="#icon-stop"/></svg></button>
         <button type="button" class="hvid__btn" data-hv="next" aria-label="next"><svg><use href="#icon-next"/></svg></button>
+        <button type="button" class="hvid__btn favb" data-fav-video aria-pressed="false" title="add to your favs" aria-label="favorite this video"><i></i></button>
         <span class="hvid__grille" aria-hidden="true"></span>
         <button type="button" class="hvid__btn hvid__btn--sm" data-hv="mute" aria-label="mute"><svg><use href="#icon-vol"/></svg></button>
         <span class="ytp__vol hvid__vol" role="slider" tabindex="0" aria-label="volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="75">{{ range seq 8 }}<i></i>{{ end }}</span>
@@ -230,4 +231,5 @@
 })();
 </script>
 {{- partial "js.html" "ytpix" -}}
+{{- partial "js.html" "favs" -}}
 {{- end }}

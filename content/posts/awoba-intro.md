@@ -5,6 +5,7 @@ date = "2025-12-04T15:44:42-06:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["mlb", "statistics"]
+form = "method"
 keywords = ["awoba", "mlb", "baseball", "statistics"]
 description = "An introduction to aWOBA and its evaluation of the best hitters of the 2025 MLB season."
 showFullContent = false

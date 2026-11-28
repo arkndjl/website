@@ -4,6 +4,7 @@ date = "2026-01-31T22:59:42-06:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["nba", "statistics", "arkboard"]
+form = "method"
 keywords = ["arkboard", "nba", "basketball", "statistics"]
 description = "Introducing the translated creation of an NBA Future Value Grading System and releasing my first official NBA Big Board (\"ARKBOARD\") for 2026 draft prospects."
 showFullContent = false

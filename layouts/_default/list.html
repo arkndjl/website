@@ -5,9 +5,10 @@
       {{ . }}
     </div>
   {{ end }}
+  {{ if (eq .Section "posts") }}{{ partial "postbar.html" . }}{{ end }}
   <div class="posts">
     {{ range .Paginator.Pages }}
-      <article class="post on-list">
+      <article class="post on-list" data-post="{{ path.Base (strings.TrimSuffix "/" .RelPermalink) }}" data-kind="{{ .Params.form }}" data-tags="{{ delimit (.Params.tags | default slice) "|" }}" data-date="{{ .Date.Unix }}" data-q="{{ lower (printf "%s %s %s %s" .Title (.Description | default (.Summary | plainify)) (delimit (.Params.tags | default slice) " ") (.Params.form | default "")) }}">
         <h2 class="post-title">
           <a href="{{ .Permalink }}">{{ .Title | markdownify }}</a>
         </h2>

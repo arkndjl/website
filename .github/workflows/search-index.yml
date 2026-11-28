@@ -1,6 +1,6 @@
 # Rebuilds the site search's player and team index (scripts/search_index.py: static/data/search-players.json) after the
 # board workflows and commits it when a name, team or rank moved (the write is skipped when nothing but asof would
-# change). Pages, tabs, glossary terms and the rest of the index are written by Hugo on every build, so they need no run.
+# change), and the favorites tracking files (scripts/favorites_track.py: static/data/favs/). Pages, tabs, glossary terms and the rest of the index are written by Hugo on every build, so they need no run.
 name: search index
 
 on:
@@ -28,9 +28,11 @@ jobs:
           ref: main
       - name: Build the player and team index
         run: python3 scripts/search_index.py
+      - name: Tracking for followed teams and players (your favorites)
+        run: python3 scripts/favorites_track.py
       - name: Commit if anything changed
         run: |
-          git add static/data/search-players.json
+          git add static/data/search-players.json static/data/favs
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes

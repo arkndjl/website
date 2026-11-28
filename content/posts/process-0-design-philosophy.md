@@ -4,6 +4,7 @@ date = "2026-11-27T19:45:00-05:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["design", "process", "arklog"]
+form = "process"
 keywords = ["design philosophy", "predictive", "descriptive", "future value", "sports betting", "anti-minimalism", "friction", "y2k", "windows 98", "organized maximalism", "cybergothic", "flat design", "liquid glass", "ai slop", "data density", "arkndjl"]
 description = "PROCESS #0: the design of arkndjl.net, the 2000s software, game menus and broadcasts it comes from, frictionless design, friction, organized maximalism, prediction and description, Future Value, skin in the game, and trust."
 series = "process"
@@ -12,6 +13,16 @@ readingTime = false
 hideComments = true
 draft = false
 Toc = true
+
+[gfx]
+quote = [
+  "Friction is a big part of life, and my designs are made to have friction because friction is a form of expression and personality.",
+  "I believe strongly in cybergothicism and organized maximalism, which means making everything available at once while building a structure underneath it that makes all of it readable once you learn how it works.",
+  "Every test on the site is published, including the ones that failed, because people should know what has been tested, tried, and proven not to work.",
+]
+post = """PROCESS #0: My Design Philosophy, Anti-Minimalism, and the Beauty of Friction
+
+Friction is a big part of life, and my designs are made to have friction because friction is a form of expression and personality."""
 +++
 
 Everything on this site is designed the way it is on purpose, including the windows with .exe titles, the pixel font, the purple and teal palette, the square corners, and the tables that are wider than your screen. All of it comes from everything I loved about design growing up in the 2000s, and from my belief that the homogenization of modern design has made most of the internet worse than it used to be.

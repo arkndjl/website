@@ -4,6 +4,7 @@ date = "2026-11-02T18:00:00-05:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["arkboard", "research", "nfl", "nba", "cbb", "nhl", "mlb", "soccer", "tennis", "cs2"]
+form = "research"
 keywords = ["arkboard", "research", "4th down", "two-point conversion", "qb sneak", "onside kick", "foul up 3", "2-for-1", "free throw icing", "goalie pull", "stolen bases", "intentional walk", "sacrifice bunt", "times through the order", "xg", "game state", "second serve", "serve direction", "pistol round", "cs2 economy", "win probability"]
 description = "27 strategy questions in the NFL, NBA, college basketball, NHL, MLB, soccer, tennis and CS2, each with its answer, key number, 95% CI and sample."
 showFullContent = false

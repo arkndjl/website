@@ -1,0 +1,18 @@
+{{- /* The strip over article lists (home, /posts/): search, type (front matter form), tag, sort, and a toggle for the
+       articles this browser favorited. Every article is on the page (pagerSize in hugo.toml), so it all runs in the browser:
+       assets/js/postbar.js. Hidden without JavaScript. */ -}}
+{{- $ps := where site.RegularPages "Type" "posts" -}}
+{{- $kinds := slice }}{{ $tags := dict }}
+{{- range $ps }}{{ with .Params.form }}{{ $kinds = $kinds | append . }}{{ end }}{{ range .Params.tags }}{{ $tags = merge $tags (dict . (add (index $tags . | default 0) 1)) }}{{ end }}{{ end -}}
+{{- $tl := slice }}{{ range $k, $v := $tags }}{{ $tl = $tl | append (dict "t" $k "n" $v) }}{{ end -}}
+<form class="pbar" data-pbar hidden onsubmit="return false" role="search" aria-label="search and filter articles">
+  <label class="cfb__field pbar__q"><span>find</span><input type="search" name="q" placeholder="search" autocomplete="off"></label>
+  <label class="cfb__field"><span>type</span><select name="kind"><option value="">all</option>{{ range sort (uniq $kinds) }}<option value="{{ . }}">{{ . }}</option>{{ end }}</select></label>
+  <label class="cfb__field"><span>tag</span><select name="tag"><option value="">all</option>{{ range sort $tl "n" "desc" }}<option value="{{ .t }}">{{ .t }} ({{ .n }})</option>{{ end }}</select></label>
+  <label class="cfb__field"><span>sort</span><select name="sort"><option value="new">newest</option><option value="v">views</option><option value="f">favorites</option></select></label>
+  <button type="button" class="cfb__btn pbar__fav" name="fav" aria-pressed="false" title="only the articles you favorited"><i aria-hidden="true"></i>favorited</button>
+  <button type="reset" class="cfb__btn">reset</button>
+  <span class="pbar__n" data-pbar-n aria-live="polite"></span>
+</form>
+<p class="pbar__none" data-pbar-none hidden>no articles</p>
+{{- partial "js.html" "postbar" -}}
