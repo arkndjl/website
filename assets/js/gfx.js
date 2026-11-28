@@ -334,6 +334,9 @@
     var fs = rdWant ? { filters: [], sort: '' } : filterSummary(win);
     var cnt = win.querySelector('[data-cfb-count], [data-cbb-count], [data-tf-count], [data-gfx-count]'), total = cnt ? (/([\d,]+)\s*(?:of\s*([\d,]+))?/.exec(txt(cnt)) || []) : [];
     var tot = total[2] || total[1], noun = win.hasAttribute('data-gfx-noun') ? ' ' + win.getAttribute('data-gfx-noun') : cnt && /players/.test(txt(cnt)) ? ' players' : '';
+    // no count line to read the noun from: the table's own name column says what a row is (a bare "30" said nothing)
+    if (!noun) { var hl = heads.map(function (h) { return h.toLowerCase(); }); noun = hl.indexOf('player') >= 0 || hl.indexOf('name') >= 0 ? ' players' : hl.indexOf('team') >= 0 ? ' teams' : hl.indexOf('agency') >= 0 ? ' agencies' : ' rows'; }
+    if (noun === ' players' && rows.length === 1) noun = ' player'; else if (noun === ' teams' && rows.length === 1) noun = ' team'; else if (noun === ' rows' && rows.length === 1) noun = ' row';
     var sub = [rows.length + (tot && +String(tot).replace(/,/g, '') > rows.length ? ' of ' + tot + noun : noun)].concat(fs.filters).concat(fs.sort ? [fs.sort] : []).join(' · ');
 
     // layout
