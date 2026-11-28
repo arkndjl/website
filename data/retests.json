@@ -1213,6 +1213,22 @@
    },
    "trigger": "six months of news items stamped as first seen (scripts/data/snaps/news)",
    "gate": "news weight w against the size of the line, FV or board move that followed within 48 hours; reweight only where the rank correlation improves held out"
+  },
+  {
+   "key": "cbb_live_xpm",
+   "t": "rXPM in place of BPM in the CBB in-season line (FV now grade)",
+   "sp": [
+    "CBB"
+   ],
+   "ar": "players",
+   "kind": "retest",
+   "how": "hand",
+   "was": "t -.33",
+   "after": "nba:champ:2027",
+   "lag": 30,
+   "trigger": "one more college season has three NBA seasons to show (realized FV through 2019-20)",
+   "gate": "scripts/research/cbb_live_nov28/prereg.md test 2: held-out realized rung deviance, t <= -2 and better in 6+ of the seasons",
+   "run_hint": "python3 scripts/research/cbb_live_nov28/xpm_live.py (SEASONS one longer)"
   }
  ]
 }
