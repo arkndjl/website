@@ -10,7 +10,7 @@
   column groups, every page works on a phone.
 - Copy ([docs/rules/copy-voice.md](docs/rules/copy-voice.md)): minimal text, no blurbs; everything published in Noah's
   voice (academic, his own words, Oxford commas, no LLM phrasing or marketing); ARKLOG never logs copy cleanups or
-  mentions AI; one PROCESS #N article a month; every article gets an articleGFX card of verbatim excerpts.
+  mentions AI; one PROCESS #N article a month; every article gets an articleGFX card (each section's key words, a comma list).
 - Models ([docs/rules/models-tests.md](docs/rules/models-tests.md)): ship only what passes out-of-sample tests, point
   in time; 2026-27 is a lockbox; cross-sport rule; predictive metric in predictive contexts, descriptive in
   descriptive; FV is absolute 20-80 true talent, mean headline, never class-relative or a shared cross-sport scale.
