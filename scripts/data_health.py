@@ -468,7 +468,7 @@ WATCH = ['cbb board', 'cbb boards', 'cbb recruits', 'cfb board', 'cs2', 'esea se
          'model refits', 'build gate', 'wave', 'awards', 'cfb recruits', 'cs2 ark loop', 'esea research',
          'process refresh', 'recruit leans', 'recruit news', 'rotowire history', 'search index', 'site stats',
          'soccer extra', 'soccer intl', 'cbb bracket matrix', 'cs2 market log', 'darko log', 'dratings log',
-         'nhl lineups log']
+         'nhl lineups log', 'season roll']
 RED = ('failure', 'timed_out', 'startup_failure')
 RED_WORD = {'failure': 'failed', 'timed_out': 'timed out', 'startup_failure': 'failed to start',
             'cancelled': 'was cancelled by a job time limit'}
