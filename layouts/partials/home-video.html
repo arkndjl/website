@@ -55,7 +55,7 @@
       {{- with site.Data.arkmixes_upcoming }}
       <ol class="hvid__list hvid__up" hidden>
         {{- range $i, $x := . }}
-        <li><span class="hvid__no">{{ printf "%02d" (add $i 1) }}</span><span class="hvid__t">{{ .n }} ARKMIX</span>{{ if .tb }}<b class="hvid__ch hvid__ch--arkndjl">THROWBACK</b>{{ end }}</li>
+        <li><span class="hvid__no">{{ printf "%02d" (add $i 1) }}</span><span class="hvid__t">{{ with .t }}{{ . }}{{ else }}{{ .n }} ARKMIX{{ end }}{{ with .d }} <i class="hvid__date">{{ . }}</i>{{ end }}</span>{{ if .tb }}<b class="hvid__ch hvid__ch--arkndjl">THROWBACK</b>{{ else if .k }}<b class="hvid__ch hvid__ch--{{ .k }}">{{ .s }}</b>{{ end }}</li>
         {{- end }}
       </ol>
       {{- end }}
