@@ -171,7 +171,8 @@ TEAM_ALIAS = {'uconn': 'connecticut', 'olemiss': 'mississippi', 'lsu': 'louisian
               'stjohns': 'saintjohns', 'stmarys': 'saintmarys', 'ncstate': 'northcarolinastate', 'gatech': 'georgiatech',
               'washst': 'washingtonstate', 'mizzou': 'missouri', 'cal': 'california', 'ucberkeley': 'california',
               'texasam': 'texasam', 'tamu': 'texasam', 'unm': 'newmexico', 'uh': 'houston', 'etsu': 'easttennesseestate',
-              'fgcu': 'floridagulfcoast', 'liu': 'longisland', 'uab': 'alabamabirmingham', 'ucsb': 'ucsantabarbara'}
+              'fgcu': 'floridagulfcoast', 'liu': 'longisland', 'uab': 'alabamabirmingham', 'ucsb': 'ucsantabarbara',
+              'samhoustonstate': 'samhouston'}
 
 
 def team_key(s):
