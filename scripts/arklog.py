@@ -51,6 +51,11 @@ SPORTS = [  # (tag, pattern on the title; the description is used only when the 
 ]
 # what stays out: pages that are not public (CLAUDE.md: never surface hidden pages)
 OUT = re.compile(r'Franchise Fantasy|\bTLS\b|style guide', re.I)
+# never logged (Noah, Nov 28): copy cleanups (taglines, blurbs, intros, rewrites into his own words) and anything that
+# mentions AI; a description line that mentions it is dropped too. Earlier rows are hidden or retitled in the fix file.
+NOAI = re.compile(r'tagline|\bblurbs?\b|bold lead-ins|\bLLMs?\b|\bA\.?I\b(?! bot)|\bClaude\b|Anthropic|ChatGPT|\bGPT\b|'
+                  r'(?:Noah\'s|my) (?:own )?(?:voice|words)|descriptive copy|intro (?:text|box)|"::" subtitles|method-spec style', re.I)
+AI_LINE = re.compile(r'\bA\.?I\b|\bLLMs?\b|\bClaude\b|Anthropic|ChatGPT|\bGPT\b|language model', re.I)
 # the site section a row belongs to, by its title; first match wins, ARKBOARD when the title names a sport or a board
 SECTIONS = [
     ('LAURSEN_111', r'LAURSEN|\b111\b|laurlog|chat-box|mfplug|Valorant|Twitch'),
@@ -144,7 +149,7 @@ def body_lines(b):
     out, head = [], ''
     for raw in b.split('\n'):
         ln = raw.strip()
-        if not ln:
+        if not ln or AI_LINE.search(ln):
             continue
         m = re.match(r'^(?:#{1,6}\s*(.+?)\s*#*|\*\*([^*]+?)\*\*:?)$', ln)
         if m:
@@ -240,7 +245,7 @@ def show_title(title):
 
 def parse(pr):
     title = re.sub(r'\s*\(#\d+\)$', '', pr['t']).strip()
-    if OUT.search(title):
+    if OUT.search(title) or NOAI.search(title):
         return None
     lines = body_lines(pr.get('b') or '')
     text = ' '.join(l for _, l in lines)
