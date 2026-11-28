@@ -229,7 +229,59 @@ def record_drafts(ledger, today=None):
     return pros['rows']
 
 
-def board(clients, pros=()):
+# ---- tendency scores (Noah, Nov 28: "+" scores in place of the x/y/zNIL columns, 100 = the average agency) -----------
+
+TEND_TEST = 'research/agency_tendency.json'     # scripts/research/agencies_nov28/tendency.py, rerun by hand
+
+
+def tendencies(pool):
+    """per-client values for the tendency scores, each against every board player like him.
+    Deal: -zNIL over the sport's zNIL SD (1st-99th percentile clamp), so above zero = paid more than he is worth.
+    Breakout: FV - the mean FV of board players with his ARK stars (half stars) and class."""
+    zs = sorted(r['z'] for r in pool if r.get('z') is not None)
+    if not zs: return {}
+    m = sum(zs) / len(zs); sd = (sum((v - m) ** 2 for v in zs) / len(zs)) ** .5 or 1.0
+    lo, hi = zs[int(.01 * len(zs))], zs[int(.99 * len(zs)) - 1]
+    cell = defaultdict(list)
+    for r in pool:
+        if r.get('ark') and r.get('fv') is not None: cell[(round(r['ark'] * 2), r.get('cls'))].append(r['fv'])
+    allv = [v for l in cell.values() for v in l]; mu = sum(allv) / len(allv) if allv else 0.0
+    base = lambda r: (sum(cell[(round(r['ark'] * 2), r.get('cls'))]) / len(cell[(round(r['ark'] * 2), r.get('cls'))])
+                      if len(cell.get((round(r['ark'] * 2), r.get('cls')), [])) >= 15 else mu)
+    return {
+        'Deal': lambda c: None if c['kind'] != 'college' or c.get('z') is None or c.get('conf') == 'low' else -max(lo, min(hi, c['z'])) / sd,
+        'Breakout': lambda c: None if c['kind'] != 'college' or not c.get('ark') or c.get('fv') is None else c['fv'] - base(c),
+    }
+
+
+def shipped(sp):
+    """the scores that passed the split-half test for this sport (p < .05 weighted and unweighted)"""
+    t = (load(TEND_TEST, {}) or {}).get(sp, {})
+    return [k for k in ('Deal', 'Breakout') if (t.get(k) or {}).get('ship')]
+
+
+def plus_scores(rows, by, sp, pool):
+    """Deal+ / Breakout+: the agency's mean client value shrunk toward the mean of every represented client by n / (n + k),
+    then 100 + 25 x (score - mean agency score) / SD of agency scores, over the agencies (not Family or None)."""
+    fs = tendencies(pool); fit = {}
+    for name in shipped(sp):
+        f = fs.get(name)
+        if f is None: continue
+        vals = {a: [v for v in (f(c) for c in l) if v is not None] for a, l in by.items()}
+        allv = [v for a, l in vals.items() if a not in SPECIAL for v in l]
+        if not allv: continue
+        mu = sum(allv) / len(allv); k = shrink_k([l for a, l in vals.items() if a not in SPECIAL])
+        shr = {a: (sum(l) + k * mu) / (len(l) + k) for a, l in vals.items() if l}
+        ag = [v for a, v in shr.items() if a not in SPECIAL]
+        m = sum(ag) / len(ag); sd = (sum((v - m) ** 2 for v in ag) / len(ag)) ** .5 or 1.0
+        key = name[0].lower() + name[1:] + 'P'
+        for r in rows:
+            v = shr.get(r['agency']); r[key] = round(100 + 25 * (v - m) / sd) if v is not None else None
+        fit[key] = dict(k=round(k, 1), n=len(allv))
+    return fit
+
+
+def board(clients, pros=(), sp='cfb', pool=()):
     by = defaultdict(list)
     for c in clients: by[c['agency']].append(c)
     zs = {a: [c['z'] for c in l if c['kind'] == 'college' and c['z'] is not None and c['conf'] != 'low'] for a, l in by.items() if a not in SPECIAL}
@@ -268,8 +320,10 @@ def board(clients, pros=()):
         d = dr.get(r['agency'], [])
         r['pro'] = len(d); r['pro1'] = sum(1 for p in d if p['round'] == 1)
         r['proPct'] = round(len(d) / (len(d) + r['nCol']), 3) if d else None
-    rows.sort(key=lambda r: (r['agency'] in SPECIAL, -(r['zShr'] if r['zShr'] is not None else -1e12), -r['n']))
-    return rows, dict(k=round(k, 1), mu=round(mu), nZ=len(allz))
+    pf = plus_scores(rows, by, sp, pool)
+    lead = 'dealP' if 'dealP' in pf else 'breakoutP' if 'breakoutP' in pf else None
+    rows.sort(key=lambda r: (r['agency'] in SPECIAL, -(r[lead] if lead and r.get(lead) is not None else -1e12), -(r['fv'] or 0), -r['n']))
+    return rows, dict(k=round(k, 1), mu=round(mu), nZ=len(allz), plus=pf, lead=lead)
 
 
 def main():
@@ -279,7 +333,7 @@ def main():
     look = {}
     for sp, col, rec in (('cfb', cfb_rows(), cfb_recruits()), ('cbb', cbb_rows(), cbb_recruits())):
         clients, miss = join(led, sp, col, rec)
-        rows, fit = board(clients, [p for p in pros if p['sport'] == sp])
+        rows, fit = board(clients, [p for p in pros if p['sport'] == sp], sp, col)
         clients.sort(key=lambda c: (c['agency'] in SPECIAL, c['agency'], -(c['fv'] or 0)))
         out['sports'][sp] = dict(fit=fit, agencies=rows,
                                  clients=[{k: c[k] for k in ('name', 'team', 'logo', 'pos', 'cls', 'kind', 'fv', 'x', 'y', 'z', 'ark', 'agency', 'agent', 'conf', 'src', 'date')} for c in clients],
