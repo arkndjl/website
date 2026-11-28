@@ -69,6 +69,15 @@ def _payage():
             '. Deal is the expected value over the seasons left in view at the price of a win, minus the cap hits above the minimum. Risk is the cap dollars after this season the curve expects to buy no value. The curve passed in all three, but Deal and Risk show only where Surplus passed too.')
 _PAYAGE = re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _payage())
 _PAYTEST = re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _paytest())
+_NPCAL = ld('research/nhl_pwar_cal.json')                     # NHL pWAR on WAR's scale (scripts/research/nhl_pwar_nov28/test.py)
+
+
+def _NPC(g):
+    G = (_NPCAL or {}).get('groups', {}).get(g, {})
+    f = G.get('forms', {}).get(G.get('ship'), {})
+    return '%.1f' % f['t_vs_live'] if f.get('t_vs_live') is not None else 'not run'
+
+
 _PBV = ld('research/pro_builder_verdicts.json')              # pro team builder verdicts held out (scripts/research/pro_builder_nov28/verdicts.py)
 _PBP = ld('research/pro_pick_value.json')                   # pick value by slot (scripts/research/pro_builder_nov28/pick_value.py)
 def _pbtest():
@@ -582,7 +591,8 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
     E('pWAR / HPM', 'Projected WAR, and projected goals per 60 over an average player.',
       ['HPM is Marcel-weighted (1 / .5 / .25) shrunk rates, with each component weighted by how well it carries to the next season.',
        'pWAR = (HPM - replacement) × TOI / 60 / goals per win. Leave one season out, R² is .37 compared to .26 before (t = 4.24, 15/17 seasons).',
-       'Goalie GSAx barely repeats (weight .21), so goalie pWAR is about 0.4 while goalie WAR runs about 7.'],
+       'Since Nov 28 pWAR is put on the scale of next season\'s WAR. Its rate a 60 is fit, leaving each season out, on that rate (HPM over replacement, the last three seasons\' WAR a 60 and age for skaters, HPM alone for goalies) and multiplied by his TOI this season, so it covers the same minutes as WAR.',
+       'Error on next season\'s WAR fell for forwards (t = ' + _NPC('F') + '), defencemen (t = ' + _NPC('D') + ') and goalies (t = ' + _NPC('G') + '), 16 of 16 seasons. Goalie pWAR had sat at about a quarter of the next season\'s goalie WAR.'],
       'NHL WAR leaders, backup watch, rookies; hockey prospect outcome (skaters)', ['NHL', 'Hockey']),
     E('GSAx', 'Goals saved above expected (MoneyPuck xG).',
       ['The goalie tab shows GSAx a game, shrunk toward a new goalie\'s level. It feeds the NHL totals model.'],

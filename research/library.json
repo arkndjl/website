@@ -908,7 +908,8 @@
      "body": [
       "HPM is Marcel-weighted (1 / .5 / .25) shrunk rates, with each component weighted by how well it carries to the next season.",
       "pWAR = (HPM - replacement) × TOI / 60 / goals per win. Leave one season out, R² is .37 compared to .26 before (t = 4.24, 15/17 seasons).",
-      "Goalie GSAx barely repeats (weight .21), so goalie pWAR is about 0.4 while goalie WAR runs about 7.",
+      "Since Nov 28 pWAR is put on the scale of next season's WAR. Its rate a 60 is fit, leaving each season out, on that rate (HPM over replacement, the last three seasons' WAR a 60 and age for skaters, HPM alone for goalies) and multiplied by his TOI this season, so it covers the same minutes as WAR.",
+      "Error on next season's WAR fell for forwards (t = -13.9), defencemen (t = -10.0) and goalies (t = -9.9), 16 of 16 seasons. Goalie pWAR had sat at about a quarter of the next season's goalie WAR.",
       "5 on 5 on-ice and individual xG read MoneyPuck's flurry, score and venue adjusted columns. WAR keeps raw xG.",
       "Next-season team GD R² goes from .384 to .387 (t = 2.88, 13 of 17 pairs). With the weights refit, held out it goes from .373 to .376, walk-forward t = 3.59.",
       "PP on-ice xG at a weight of .2 fails (t = 1.19 worse), and score and venue alone is flat (t = .32)."
