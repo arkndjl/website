@@ -120,7 +120,7 @@
   var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   function day(d) { var m = /^(\d{4})-(\d\d)-(\d\d)/.exec(d || ''); return m ? MON[+m[2] - 1] + ' ' + (+m[3]) : (d || ''); }
   function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
-  function heartBtn(attrs, on, name) {
+  function starBtn(attrs, on, name) {
     return '<button type="button" class="favb' + (on ? ' is-on' : '') + '" ' + attrs + ' aria-pressed="' + on + '" title="' + (on ? 'remove from your favorites' : 'add to your favorites') + '" aria-label="' + (on ? 'remove ' : 'favorite ') + esc(name) + '"><i></i></button>';
   }
 
@@ -182,7 +182,7 @@
       var sp = SPORT[m.b] || ['', ''];
       return '<article class="fv__card fv__card--' + (m.k === 't' ? 'team' : 'player') + (gone ? ' is-gone' : '') + '" data-id="' + esc(id) + '">' +
         '<div class="fv__ch">' + img(m.i, 'fv__logo') + '<div class="fv__nm"><a href="' + esc(m.u || '#') + '">' + esc(m.n) + '</a><span class="fv__sub">' + esc(m.s) + '</span></div>' +
-        heartBtn('data-fv-item="' + esc(id) + '"', !gone, m.n) + '</div>' +
+        starBtn('data-fv-item="' + esc(id) + '"', !gone, m.n) + '</div>' +
         '<div class="fv__tr" data-tr><span class="fv__wait">' + (sp[0] ? '…' : '') + '</span></div></article>';
     }
     function fillTrack(card, m) {
@@ -205,19 +205,19 @@
     function articleCard(s, gone) {
       var p = POSTS[s]; if (!p) return '';
       return '<article class="fv__card fv__card--art' + (gone ? ' is-gone' : '') + '"><div class="fv__ch"><span class="fv__ax" aria-hidden="true"></span><div class="fv__nm"><a href="' + esc(p[2]) + '">' + esc(p[0]) + '</a><span class="fv__sub">' + esc(p[1]) + '</span></div>' +
-        heartBtn('data-fv-art="' + esc(s) + '"', !gone, p[0]) + '</div></article>';
+        starBtn('data-fv-art="' + esc(s) + '"', !gone, p[0]) + '</div></article>';
     }
     function songCard(s, gone) {
       var t = SONGS[s]; if (!t) return '';
       return '<article class="fv__card fv__card--song' + (gone ? ' is-gone' : '') + '"><div class="fv__ch"><button type="button" class="fv__play" data-fv-play="' + esc(s) + '" aria-label="play ' + esc(t.t) + '"><svg aria-hidden="true"><use href="#icon-play"/></svg></button>' +
         '<div class="fv__nm"><a href="' + esc(root.getAttribute('data-music')) + '">' + esc(t.t) + '</a><span class="fv__sub">ARKNDJL<span class="fv__dur" data-fv-dur="' + esc(s) + '"></span></span></div>' +
         (t.sc ? '<a class="fv__ext" href="' + esc(t.sc) + '" target="_blank" rel="noopener" aria-label="' + esc(t.t) + ' on SoundCloud"><svg aria-hidden="true"><use href="#icon-soundcloud"/></svg></a>' : '') +
-        heartBtn('data-fv-song="' + esc(s) + '"', !gone, t.t) + '</div><i class="fv__bar" data-fv-bar="' + esc(s) + '"></i></article>';
+        starBtn('data-fv-song="' + esc(s) + '"', !gone, t.t) + '</div><i class="fv__bar" data-fv-bar="' + esc(s) + '"></i></article>';
     }
     function videoCard(id, v, gone) {
       return '<article class="fv__card fv__card--vid' + (gone ? ' is-gone' : '') + '"><a class="fv__thumb" href="https://www.youtube.com/watch?v=' + esc(id) + '" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/' + esc(id) + '/mqdefault.jpg" alt="" width="320" height="180" loading="lazy"><svg aria-hidden="true"><use href="#icon-play"/></svg></a>' +
         '<div class="fv__ch"><div class="fv__nm"><a href="https://www.youtube.com/watch?v=' + esc(id) + '" target="_blank" rel="noopener">' + esc(v.t) + '</a><span class="fv__sub">' + (v.k ? '<b class="hvid__ch hvid__ch--' + esc(v.k) + '">' + esc(v.n) + '</b> ' : '') + esc(v.d || '') + '</span></div>' +
-        heartBtn('data-fv-vid="' + esc(id) + '"', !gone, v.t) + '</div></article>';
+        starBtn('data-fv-vid="' + esc(id) + '"', !gone, v.t) + '</div></article>';
     }
 
     function byAt(o) { return Object.keys(o).sort(function (a, b) { return ((o[b] && o[b].at) || o[b] || 0) - ((o[a] && o[a].at) || o[a] || 0); }); }
@@ -336,7 +336,7 @@
           return '<div class="fv__hit' + (i === sel ? ' is-sel' : '') + (on ? ' is-on' : '') + '" role="option" aria-selected="' + on + '" data-i="' + i + '">' +
             (it.i ? '<img class="srch__img" src="' + esc(it.i) + '" alt="" width="24" height="24" loading="lazy">' : '<svg class="srch__ico" aria-hidden="true"><use href="#icon-' + (it.g === 't' ? 'standings' : 'pointer') + '"/></svg>') +
             '<span class="srch__txt"><span class="srch__t">' + esc(it.t) + '</span><span class="srch__s">' + esc(it.s) + '</span></span><span class="srch__g">' + (it.g === 't' ? 'team' : 'player') + '</span>' +
-            heartBtn('tabindex="-1"', on, it.t) + '</div>';
+            starBtn('tabindex="-1"', on, it.t) + '</div>';
         }).join('') : '<span class="srch__none">0 results</span>';
         drop.hidden = false; q.setAttribute('aria-expanded', 'true'); shown = v;
       }).catch(function () { drop.innerHTML = '<span class="srch__none">load failed</span>'; drop.hidden = false; });
