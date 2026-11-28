@@ -1262,6 +1262,22 @@
    "run_hint": "python3 scripts/research/payrolls_nov28/mls_panel.py && python3 scripts/research/payrolls_nov28/test.py mls"
   },
   {
+   "key": "payroll_surplus_cap_carry",
+   "t": "Surplus with last season's $ a win carried to this season's cap, NBA and NHL",
+   "sp": [
+    "NBA",
+    "NHL"
+   ],
+   "ar": "teams",
+   "kind": "retest",
+   "how": "hand",
+   "was": "NBA t -1.97 (6/9), NHL t -1.42 (8/11) against the shipped Surplus; MAE .0827 to .0815, .0662 to .0660",
+   "due": "2028-07-01",
+   "trigger": "the 2027-28 season is complete (one more held-out season past the 2026-27 lockbox)",
+   "gate": "scripts/research/payrolls_nov28/cap_carry.py: the carried rate beats the shipped Surplus on held-out next-season win%, paired t <= -2 and better in most seasons; then payrolls.py team_value and deal_risk carry the rate as pro_builder.rate_now does",
+   "run_hint": "python3 scripts/research/payrolls_nov28/nba_panel.py && python3 scripts/research/payrolls_nov28/nhl_panel.py && python3 scripts/research/payrolls_nov28/cap_carry.py nba nhl"
+  },
+  {
    "key": "payroll_wins_over_pay",
    "t": "Wins over payroll (the plain efficiency form) against next-season wins",
    "sp": [
@@ -1677,6 +1693,65 @@
    "trigger": "a season-by-season player file for each (tennis_ratings history by year, cs2 player ratings by month)",
    "gate": "the OVR gate on next-season (tennis) or next-six-months (CS2) results",
    "run_hint": "add loaders to scripts/research/ovr_nov28/run.py"
+  },
+  {
+   "key": "cbb_builder_xw_scale",
+   "t": "CBB team builder xW: the win chance scale on per-game ratings",
+   "sp": [
+    "CBB"
+   ],
+   "ar": "team",
+   "kind": "fix",
+   "how": "hand",
+   "was": "units sweep Nov 28: the builder's ratings are points a game (ARK rating) but its win chance multiplies their gap by .68 possessions before the 11.4 sd; against the game model's conference xW the builder runs too flat (sd ratio 1.14) and at x1 too steep (.85), so x1 alone is not the fix",
+   "due": "2026-12-15",
+   "trigger": "a point-in-time test of next-season conference win% from preseason ratings (2016-26 priors)",
+   "gate": "the new scale (x1 with a rating-error sd, or a fit factor) beats x.68 on held-out next-season conference win% RMSE, t >= 2, leave one season out",
+   "run_hint": "scripts/team_builder_next.py CBB_POSS, pw in cbb() and put_years; scripts/cbb_games.py priors",
+   "result": {
+    "d": "2026-11-28",
+    "v": "shipped",
+    "e": "log loss .62846 to .62760 at k .64 (k 1, the per-game units alone, .65298, t +22.6)",
+    "tt": -6.74,
+    "pr": null
+   }
+  },
+  {
+   "key": "cbb_next_vorx_line",
+   "t": "CBB Next VORX on the position replacement lines",
+   "sp": [
+    "CBB"
+   ],
+   "ar": "player",
+   "kind": "fix",
+   "how": "hand",
+   "was": "units sweep Nov 28: Next (next season's VORX, scripts/cbb_next.py) is fit to VORX on the flat -1.4 line while the board's VORX moved to position lines in #1386 (G -1.95, F -1.22, C -.74); a guard at 70% of minutes reads about .15 wins low, a center .18 high",
+   "due": "2026-12-15",
+   "trigger": "refit scripts/cbb_next_research.py on the position-line target",
+   "gate": "walk-forward 2016-26 RMSE on the position-line target no worse than the flat-line fit moved by the line (t <= -2 fails)",
+   "run_hint": "scripts/cbb_next_research.py, scripts/cbb_next.py war(), scripts/repl_levels.py cbb_line",
+   "result": {
+    "d": "2026-11-28",
+    "v": "shipped",
+    "e": "RMSE .5190 to .5139 (moved onto the line; refit .5169)",
+    "tt": -10.9,
+    "pr": null
+   }
+  },
+  {
+   "key": "hockey_callup_cal",
+   "t": "Hockey prospect call-up projections (AHL, CHL) recalibrated on what happened, as the G League xVORX and xXPM were",
+   "sp": [
+    "NHL"
+   ],
+   "ar": "prospects",
+   "kind": "deferred",
+   "how": "hand",
+   "was": "cross-sport rule: G League recalibration shipped Nov 28 (xVORX MSE .0816 to .0784, t -2.84; xXPM 3.15 to 2.70, t -4.02); the hockey analogue was not tested",
+   "due": "2026-12-15",
+   "trigger": "untested analogue of a shipped fix (cross-sport rule)",
+   "gate": "walk-forward like scripts/research/gleague_cal_nov28/test.py: fit on seasons through s-3, test offset and linear forms on next-season NHL value; ship only at paired t <= -2 and better in most seasons",
+   "run_hint": "adapt scripts/research/gleague_cal_nov28/test.py to the hockey prospect board's past values"
   }
  ]
 }

@@ -835,9 +835,9 @@
      "term": "CBB VORX / WAA",
      "short": "Wins over a replacement or an average D-I player.",
      "body": [
-      "VORX = (sXPM + 1.4) × minutes / 40 × 68 possessions a 40 / 100 × .0187 wins a point. WAA uses sXPM alone.",
+      "VORX = (sXPM - R) × minutes / 40 × 68 possessions a 40 / 100 × .0187 wins a point, R the replacement line at his position. WAA uses sXPM alone.",
       "XPM is rXPM (CBB), and sXPM = (XPM × min + 100 × season mean) / (min + 100).",
-      "Replacement is 1.4 below average, the 9th man's sXPM in 2025-26. Wins a point is fit on 3,485 team seasons 2017-26:",
+      "R is -1.4 plus each position's offset among the 9th to 12th men over the last three finished seasons (2024-26): G -1.95, F -1.22, C -.74. Wins a point is fit on 3,485 team seasons 2017-26:",
       "wins = .39 × games + team VORX (r .87). It is season only, so no earlier season enters a season's VORX.",
       "GBPM over season BPM moved held-out team win% R² from .633 to .658, 15 of 15 seasons. The shrink cut half-B GBPM MSE from 16.2 to 11.4",
       "(10 of 10) and held-out team wins RMSE from 3.348 to 3.331 (14 of 14). rXPM then replaced GBPM, with the same team totals and BPM's split inside the team.",

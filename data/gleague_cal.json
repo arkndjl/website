@@ -1,0 +1,40 @@
+{
+ "xv": {
+  "form": "linear",
+  "b": 0.7191,
+  "a": -0.0119,
+  "through": 2023,
+  "test": {
+   "n": 1650,
+   "seasons": [
+    2020,
+    2023
+   ],
+   "mse_raw": 0.08161,
+   "mse_linear": 0.07836,
+   "linear_vs_raw": {
+    "t": -2.84,
+    "won": "4/4"
+   }
+  }
+ },
+ "xx": {
+  "form": "offset",
+  "b": 1.0,
+  "a": -0.59,
+  "through": 2023,
+  "test": {
+   "n": 438,
+   "seasons": [
+    2020,
+    2023
+   ],
+   "mse_raw": 3.15473,
+   "mse_offset": 2.70491,
+   "offset_vs_raw": {
+    "t": -4.02,
+    "won": "4/4"
+   }
+  }
+ }
+}

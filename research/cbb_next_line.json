@@ -1,0 +1,52 @@
+{
+ "built": "scripts/research/units_nov28/cbb_next_line.py",
+ "walk_forward": [
+  2016,
+  2026
+ ],
+ "models": {
+  "A": {
+   "n": 31633,
+   "rmse": 0.519,
+   "t_players": 0.0,
+   "t_seasons": 0.0,
+   "won": 0,
+   "of": 11,
+   "bias_by_pos": {
+    "G": -0.0799,
+    "F": 0.0279,
+    "C": 0.0351
+   },
+   "slope": 0.98
+  },
+  "A2": {
+   "n": 31633,
+   "rmse": 0.5139,
+   "t_players": -10.88,
+   "t_seasons": -4.62,
+   "won": 10,
+   "of": 11,
+   "bias_by_pos": {
+    "G": -0.0121,
+    "F": 0.0038,
+    "C": -0.012
+   },
+   "slope": 0.978
+  },
+  "B": {
+   "n": 31633,
+   "rmse": 0.5169,
+   "t_players": -8.82,
+   "t_seasons": -3.32,
+   "won": 10,
+   "of": 11,
+   "bias_by_pos": {
+    "G": -0.0458,
+    "F": 0.0171,
+    "C": 0.0122
+   },
+   "slope": 0.982
+  },
+  "verdict": "pass"
+ }
+}

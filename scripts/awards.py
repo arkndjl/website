@@ -644,6 +644,8 @@ def nhl_draw(fit, teams, G=82):
         gpg = max(gauss(rng, bl(c['g'] / max(c['gp'], 1), c['gpg0'], 50), .06), 0)
         pts = c['pts'] + max(gauss(rng, ppg * gr, math.sqrt(max(ppg * gr, 0) * 1.3)), 0)
         g = c['g'] + max(gauss(rng, gpg * gr, math.sqrt(max(gpg * gr, 0) * 1.1)), 0)
+        if c['grp'] == 'G':     # the voter models were fit with goalies at 0 points and goals (the WAR files carry none);
+            pts, g = c['pts'], c['g']   # a draw floored at 0 gave them points from noise alone (Fowler 1.5 points, 0.8 goals)
         gs_rate = c['gsax'] / max(c['toi'], 1) * 60
         if not SEASON_ONLY: gs_rate = bl(gs_rate, c['gsx0'], 40) if c['gsx0'] is not None else gs_rate * c['gp'] / (c['gp'] + 40)
         gsax = c['gsax'] + gauss(rng, gs_rate * tr / 60, 1.4 * math.sqrt(max(tr / 60, 0)))   # 1.4 goals a game

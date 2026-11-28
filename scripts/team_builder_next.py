@@ -37,7 +37,11 @@ from collections import defaultdict
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 SD = os.path.join(ROOT, 'static', 'data')
 CFB_GAMES, CBB_GAMES = 12, 31
-CBB_POSS, CBB_SD = 0.68, 11.4
+# CBB win chance on next-season ratings (points a game, the ARK rating's scale): ncdf(CBB_K x gap / 11.4). CBB_K is not
+# possessions (the ratings are already per game): it is the scale that prices next season's conference games from a
+# rating a season out, walk-forward 2017-26 (scripts/research/units_nov28/cbb_builder_xw.py, research/cbb_builder_xw.json):
+# log loss .62846 at the old .68 to .62760 at .64 (t -6.7, 9 of 10 seasons); the per-game units alone (1.0) .65298 (t +22.6)
+CBB_K, CBB_SD = 0.64, 11.4
 REPL_Q = 0.10
 
 
@@ -498,7 +502,8 @@ def cfb():
     for t in T:
         t['_e'] = {'now': elo.get(t['tid'], E(t['av26'], t)), 'ret': E(t['av27'], t), 'exp': E(t['avExp'], t), 'plan': E(t['avPlan'], t)}
     conf = lambda t: t.get('conf') if t.get('conf') and not str(t.get('conf')).startswith('IND') else '_' + t['level']
-    WK = json.load(open(os.path.join(ROOT, 'data', 'cfb_war_backtest.json')))['constants']['cwarPerAv']
+    WC = json.load(open(os.path.join(ROOT, 'data', 'cfb_war_backtest.json')))['constants']
+    WK, WB = WC['cwarPerAv'], WC['teamReplWar']['all']   # AV x WK + the replacement lineup's line = team WAR (gains: AV x WK)
     out = {}
     for k in ('now', 'ret', 'exp', 'plan'):
         xw = sched(T, lambda o: o['_e']['plan' if k != 'now' else 'now'], conf, pw, CFB_GAMES)
@@ -511,7 +516,7 @@ def cfb():
         spend = t['budget'] - t['left']
         t['nx'] = out[id(t)]; t['war'] = r1(max(0.0, war)); t['spendNext'] = int(spend)
         t['eff'] = int(round(spend / max(war, 0.5), -3))
-        t['warSea'] = r1(t['avPlan'] * WK)
+        t['warSea'] = r1(t['avPlan'] * WK + WB)
         t['bud'] = budget_next('cfb', t['team'], D['next'])
     er = rank(T, lambda o: -o['eff'])
     for t in T: t['effRk'] = er[id(t)]
@@ -591,7 +596,7 @@ def cbb():
     p = os.path.join(SD, 'cbb-builder.json')
     if not os.path.exists(p): return None
     D = json.load(open(p)); T = D['teams']
-    pw = lambda a, c: ncdf((a - c) * CBB_POSS / CBB_SD)
+    pw = lambda a, c: ncdf((a - c) * CBB_K / CBB_SD)
     conf = lambda t: t.get('conf') or '_'
     out = {}
     for k, key in (('now', 'now'), ('ret', 'ret'), ('plan', 'after')):
@@ -670,7 +675,7 @@ def cbb():
                 if v: x['dect'] = v
     try: yrs = cbb_years(D, T, conf, pw)
     except (OSError, ValueError, KeyError) as e: print('cbb years', repr(e)); yrs = None
-    D['nxFit'] = {'years': yrs, 'games': CBB_GAMES, 'poss': CBB_POSS, 'sd': CBB_SD, 'replQ': REPL_Q, 'pot': potfit}
+    D['nxFit'] = {'years': yrs, 'games': CBB_GAMES, 'k': CBB_K, 'sd': CBB_SD, 'replQ': REPL_Q, 'pot': potfit}
     json.dump(D, open(p, 'w'), separators=(',', ':'), allow_nan=False)
     return D['nxFit']
 

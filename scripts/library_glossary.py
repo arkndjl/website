@@ -201,6 +201,7 @@ _XX = ld('scripts/research/xpm_swap_nov26/xxpm.json')   # xBPM to xXPM test
 _CXB = dict(zip(ld('data/cbb_xpm_fit.json')['cols2'], zip(ld('data/cbb_xpm_fit.json')['beta2']['o'], ld('data/cbb_xpm_fit.json')['beta2']['d'])))
 import gzip as _gz
 _CW = json.load(_gz.open(ROOT + '/scripts/data/cbb_tabs_2026.json.gz'))   # 2025-26 tabs: WAR fit, Stat+ norms (scripts/cbb_tabs.py --freeze)
+_RL = json.load(open(os.path.join(ROOT, 'data', 'repl_levels.json')))['cbb']   # CBB VORX lines by position (scripts/repl_levels.py)
 _PX = ld('data/nba_pxpm_research.json')                     # pXPM fit + held-out tests (scripts/nba_pxpm_research.py)
 _NBAEX = (f"Held out 2012-23 ({_NX['n']:,} player seasons, {100 * _NX['exitShare']:.0f}% out of the league), RMSE goes from {_NX['exit_vs_cp']['rmse'][1]:.2f} to "
           f"{_NX['exit_vs_cp']['rmse'][0]:.2f} (t = {_NX['exit_vs_cp']['t']:.1f}, {_NX['exit_vs_cp']['won']}/{_NX['exit_vs_cp']['of']} seasons).")
@@ -616,9 +617,9 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
        'The descriptive counterpart is rXPM (CBB).']],
       'CBB pXPM leaders, portal, board hover; box form: FV (returners), roster prior / game model', ['CBB']),
     E('CBB VORX / WAA', 'Wins over a replacement or an average D-I player.',
-      [re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _t) for _t in [f'VORX = (sXPM + 1.4) × minutes / 40 × 68 possessions a 40 / 100 × {_CW["wfit"]["wpp"]:.4f} wins a point. WAA uses sXPM alone.',
+      [re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _t) for _t in [f'VORX = (sXPM - R) × minutes / 40 × 68 possessions a 40 / 100 × {_CW["wfit"]["wpp"]:.4f} wins a point, R the replacement line at his position. WAA uses sXPM alone.',
        'XPM is rXPM (CBB), and sXPM = (XPM × min + 100 × season mean) / (min + 100).',
-       f'Replacement is 1.4 below average, the 9th man\'s sXPM in 2025-26. Wins a point is fit on {_CW["wfit"]["teams"]:,} team seasons 2017-26:',
+       f'R is {_RL["level"]} plus each position\'s offset among the 9th to 12th men over the last three finished seasons ({_RL["from"][0]}-{str(_RL["from"][1])[2:]}): G {_RL["lines"]["G"]}, F {_RL["lines"]["F"]}, C {_RL["lines"]["C"]}. Wins a point is fit on {_CW["wfit"]["teams"]:,} team seasons 2017-26:',
        f'wins = {_CW["wfit"]["a"]:.2f} × games + team VORX (r {_CW["wfit"]["r"]:.2f}). It is season only, so no earlier season enters a season\'s VORX.',
        'GBPM over season BPM moved held-out team win% R² from .633 to .658, 15 of 15 seasons. The shrink cut half-B GBPM MSE from 16.2 to 11.4',
        '(10 of 10) and held-out team wins RMSE from 3.348 to 3.331 (14 of 14). rXPM then replaced GBPM, with the same team totals and BPM\'s split inside the team.',

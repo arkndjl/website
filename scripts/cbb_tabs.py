@@ -425,7 +425,7 @@ def main():
     for l in F['lines']:
         r = by_pid.get(l['pid'])
         tm, lo, cf = esp(l['bt'])
-        last_rows.append(srow(l['n'], tm, r['pos'] if r else l['pos'], None, l['conf'], r.get('photo') if r else None, lo, {**l['s'], 'nx': nx_last.get(l['pid'])}, r['fv'] if r else None))
+        last_rows.append(srow(l['n'], tm, r['pos'] if r else l['pos'], None, l['conf'], r.get('photo') if r else None, lo, {**l['s'], 'nx': r1(NXT.to_line(nx_last.get(l['pid']), l['pos'], l.get('min_per'), SEASON), 2)}, r['fv'] if r else None))
     XT = 'XPM (rXPM): box plus-minus on team totals that track wins; points a 100 possessions over an average D-I player'
     stat_cols = [col('xpm', 'XPM', XT, 's1'), col('oxpm', 'O-XPM', 'offensive XPM', 's1'), col('dxpm', 'D-XPM', 'defensive XPM', 's1'),
                  col('splus', 'Stat+', 'Stat+ = 100 + 25 z; z = XPM against his position\'s (G, F, C) minutes-weighted mean and sd that season (2025-26 until this season has 40 a position), players with 10%+ of team minutes', '0'),
