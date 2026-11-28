@@ -5439,8 +5439,17 @@ td.tbx__p { color: #7fffd4; font-weight: bold; }
 .miles td:nth-child(3), .miles td:nth-child(2) { white-space: normal; }
 .miles__cell { grid-template-columns: 80px 7ch; }
 
+/* The favorite star, one sprite for every star button (articles, the list strip, your favs, ST. CLAIRE songs, video.exe): the ARK
+   star on a 9 x 9 pixel grid, drawn at whole multiples (9 or 18 px) so every pixel lands on the screen grid. --ark-star is the
+   shape (a mask, coloured by the background: dim when off, lit on hover); --ark-star-on is the saved star in colour (platinum,
+   a white glint, an ice shade). */
+:root { --ark-star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 9' shape-rendering='crispEdges'%3E%3Cpath d='M4 0h1v1h-1zM4 1h1v1h-1zM3 2h3v1h-3zM0 3h9v1h-9zM1 4h7v1h-7zM2 5h5v1h-5zM2 6h2v1h-2zM5 6h2v1h-2zM1 7h2v1h-2zM6 7h2v1h-2zM1 8h1v1h-1zM7 8h1v1h-1z'/%3E%3C/svg%3E");
+  --ark-star-on: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 9' shape-rendering='crispEdges'%3E%3Cpath fill='%23b9f2ff' d='M4 0h1v1h-1zM4 1h1v1h-1zM3 2h3v1h-3zM0 3h9v1h-9zM1 4h7v1h-7zM2 5h5v1h-5zM2 6h2v1h-2zM5 6h2v1h-2zM1 7h2v1h-2zM6 7h2v1h-2zM1 8h1v1h-1zM7 8h1v1h-1z'/%3E%3Crect x='4' y='0' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='4' y='1' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='3' y='2' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='1' y='3' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='7' y='3' width='1' height='1' fill='%237fcbe6'/%3E%3Crect x='6' y='4' width='1' height='1' fill='%237fcbe6'/%3E%3Crect x='7' y='4' width='1' height='1' fill='%237fcbe6'/%3E%3Crect x='6' y='5' width='1' height='1' fill='%237fcbe6'/%3E%3Crect x='6' y='6' width='1' height='1' fill='%237fcbe6'/%3E%3Crect x='7' y='7' width='1' height='1' fill='%237fcbe6'/%3E%3Crect x='7' y='8' width='1' height='1' fill='%237fcbe6'/%3E%3C/svg%3E"); }
+.ark-star-on, .pst__fav.is-on i, .pbar__fav[aria-pressed="true"] i, .favb.is-on i, .hvid__ctl .favb.is-on i {
+  -webkit-mask: none !important; mask: none !important; animation: none !important; background: var(--ark-star-on) 0 0 / 100% 100% no-repeat !important; }
+
 /* Article views and favorites (layouts/partials/poststats.html, assets/js/poststats.js): in the post meta line, after the
-   date. The favorite is the ARK star in pixels: dim platinum when off, platinum with the 5-star+ shimmer and glow when on. */
+   date. The favorite is the shared ARK star sprite (--ark-star above): dim when off, the coloured sprite when on. */
 .pst[hidden] { display: none; }
 .pst { white-space: nowrap; }
 .pst__v b, .pst__fav b { font-weight: normal; color: var(--foreground); }
@@ -5454,26 +5463,24 @@ td.tbx__p { color: #7fffd4; font-weight: bold; }
 .pst__fav:disabled { cursor: progress; }
 .pst__fav.is-on { color: #b9f2ff; background: var(--win-well); border-color: var(--win-dark) #b9f2ff #b9f2ff var(--win-dark); box-shadow: none; transform: translate(2px, 2px); }
 .pst__fav b { padding-left: 5px; border-left: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); }
-.pst__fav i { display: block; width: 15px; height: 13.5px;
-  --star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 9' shape-rendering='crispEdges'%3E%3Cpath d='M4 0h1v1h-1zM4 1h1v1h-1zM3 2h3v1h-3zM0 3h9v1h-9zM1 4h7v1h-7zM2 5h5v1h-5zM2 6h2v1h-2zM5 6h2v1h-2zM1 7h2v1h-2zM6 7h2v1h-2zM1 8h1v1h-1zM7 8h1v1h-1z'/%3E%3C/svg%3E");
-  background: color-mix(in srgb, #b9f2ff 30%, transparent); -webkit-mask: var(--star) 0 0 / 20px 18px no-repeat; mask: var(--star) 0 0 / 20px 18px no-repeat; }
-.pst__fav.is-on .pst__s { display: inline-flex; filter: drop-shadow(1px 0 0 #241a3a) drop-shadow(-1px 0 0 #241a3a) drop-shadow(0 1px 0 #241a3a) drop-shadow(0 -1px 0 #241a3a) drop-shadow(0 0 3px #b9f2ff); }
-.pst__fav.is-on i { background: linear-gradient(90deg, #7fcbe6 0 22%, #fff 36%, #b9f2ff 46% 62%, #8fd9ef 76%, #7fcbe6 100%) 0 0 / 40px 100% repeat-x; animation: pstfav 3s steps(20) infinite; }
+.pst__fav i { display: block; flex: none; width: 18px; height: 18px;
+  --star: var(--ark-star);
+  background: color-mix(in srgb, #b9f2ff 30%, transparent); -webkit-mask: var(--star) 0 0 / 18px 18px no-repeat; mask: var(--star) 0 0 / 18px 18px no-repeat; }
+.pst__s { display: inline-flex; }
 .pst__fav.is-on b { color: #b9f2ff; border-left-color: color-mix(in srgb, #b9f2ff 45%, transparent); }
-@keyframes pstfav { to { background-position: -40px 0; } }
 /* the meta line (date :: views [favorite]) is one row and wraps only where it cannot fit; no author (Noah writes every article) */
 .post-meta { display: flex; flex-wrap: wrap; align-items: center; row-gap: 4px; }
 .post-meta .post-author { display: none; }
 /* favoriting: the star pops in pixel steps and eight sparks fly out (assets/js/poststats.js burst); crosses on the long arms */
 .pst__s { position: relative; }
 .pst__fav.is-pop .pst__s { animation: pstpop .36s steps(4) 1; }
-@keyframes pstpop { 0% { transform: scale(1); } 40% { transform: scale(1.5); } 70% { transform: scale(.9); } 100% { transform: scale(1); } }
+@keyframes pstpop { 0%, 100% { transform: translateY(0); } 33% { transform: translateY(-4px); } 66% { transform: translateY(-2px); } }
 .pst__burst { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; }
 .pst__burst u { display: block; text-decoration: none; position: absolute; left: -2px; top: -2px; width: 4px; height: 4px; background: #b9f2ff;
   animation: pstspark .6s steps(6) 1 forwards; }
 .pst__burst u.is-x { box-shadow: 4px 0 0 currentColor, -4px 0 0 currentColor, 0 4px 0 currentColor, 0 -4px 0 currentColor; color: rgba(185, 242, 255, .55); }
 @keyframes pstspark { 0% { transform: translate(0, 0); opacity: 1; } 70% { opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .pst__fav.is-on i { animation: none; } .pst__fav.is-pop .pst__s { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .pst__fav.is-pop .pst__s { animation: none; } }
 /* Process > ARKLOG > traffic > articles.exe (layouts/shortcodes/articlestats.html) */
 .astat td.astat__t { white-space: normal; min-width: 18ch; max-width: 36ch; }
 .astat td.astat__tags { white-space: normal; max-width: 22ch; color: color-mix(in srgb, var(--foreground) 70%, transparent); }
@@ -5483,9 +5490,9 @@ td.tbx__p { color: #7fffd4; font-weight: bold; }
 .pbar[hidden] { display: none; }
 .pbar__q { flex: 1 1 200px; }
 .pbar .cfb__btn { display: inline-flex; align-items: center; gap: 5px; font-size: 0.9em; }
-.pbar__fav i { display: block; width: 15px; height: 13.5px; background: color-mix(in srgb, #b9f2ff 35%, transparent);
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 9' shape-rendering='crispEdges'%3E%3Cpath d='M4 0h1v1h-1zM4 1h1v1h-1zM3 2h3v1h-3zM0 3h9v1h-9zM1 4h7v1h-7zM2 5h5v1h-5zM2 6h2v1h-2zM5 6h2v1h-2zM1 7h2v1h-2zM6 7h2v1h-2zM1 8h1v1h-1zM7 8h1v1h-1z'/%3E%3C/svg%3E") 0 0 / 15px 13.5px no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 9' shape-rendering='crispEdges'%3E%3Cpath d='M4 0h1v1h-1zM4 1h1v1h-1zM3 2h3v1h-3zM0 3h9v1h-9zM1 4h7v1h-7zM2 5h5v1h-5zM2 6h2v1h-2zM5 6h2v1h-2zM1 7h2v1h-2zM6 7h2v1h-2zM1 8h1v1h-1zM7 8h1v1h-1z'/%3E%3C/svg%3E") 0 0 / 15px 13.5px no-repeat; }
+.pbar__fav i { display: block; flex: none; width: 18px; height: 18px; background: color-mix(in srgb, #b9f2ff 35%, transparent);
+  -webkit-mask: var(--ark-star) 0 0 / 18px 18px no-repeat;
+  mask: var(--ark-star) 0 0 / 18px 18px no-repeat; }
 .pbar__fav[aria-pressed="true"] { color: #b9f2ff; background: var(--win-well); border-color: var(--win-dark) #b9f2ff #b9f2ff var(--win-dark); }
 .pbar__fav[aria-pressed="true"] i { background: #b9f2ff; }
 .pbar__n { margin-left: auto; font-size: 0.85em; color: color-mix(in srgb, var(--foreground) 70%, transparent); white-space: nowrap; }
@@ -5502,34 +5509,31 @@ td.tbx__p { color: #7fffd4; font-weight: bold; }
 /* "your favorites" (/favorites/, layouts/shortcodes/favorites.html, assets/js/favs.js) and its star buttons (.favb) on
    ST. CLAIRE songs and the home video.exe. The star is the post favorite's pixels (the ARK star): dim platinum when off, platinum with
    the 5-star+ shimmer when saved; the button is framed and lifts on hover, so it reads as a button without a label. */
-.favb { --star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 9' shape-rendering='crispEdges'%3E%3Cpath d='M4 0h1v1h-1zM4 1h1v1h-1zM3 2h3v1h-3zM0 3h9v1h-9zM1 4h7v1h-7zM2 5h5v1h-5zM2 6h2v1h-2zM5 6h2v1h-2zM1 7h2v1h-2zM6 7h2v1h-2zM1 8h1v1h-1zM7 8h1v1h-1z'/%3E%3C/svg%3E");
+.favb { --star: var(--ark-star);
   display: inline-grid; place-items: center; flex: none; width: 32px; height: 32px; margin: 0; padding: 0; cursor: pointer; font: inherit; line-height: 1;
   background: var(--win-face); border: 2px solid; border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light); border-radius: 0; box-shadow: 2px 2px 0 var(--win-dark); transition: none; }
-.favb i { display: block; width: 20px; height: 18px; background: color-mix(in srgb, #b9f2ff 45%, transparent);
-  -webkit-mask: var(--star) 0 0 / 20px 18px no-repeat; mask: var(--star) 0 0 / 20px 18px no-repeat; }
+.favb i { display: block; width: 18px; height: 18px; background: color-mix(in srgb, #b9f2ff 45%, transparent);
+  -webkit-mask: var(--star) 0 0 / 18px 18px no-repeat; mask: var(--star) 0 0 / 18px 18px no-repeat; }
 .favb:hover { background: var(--win-well); border-color: #b9f2ff var(--win-dark) var(--win-dark) #b9f2ff; }
 .favb:hover i { background: #b9f2ff; }
 .favb:active { border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); box-shadow: none; transform: translate(2px, 2px); }
 .favb:focus-visible { outline: 1px dotted #b9f2ff; outline-offset: 2px; }
 .favb.is-on { background: var(--win-well); border-color: var(--win-dark) #b9f2ff #b9f2ff var(--win-dark); box-shadow: none; transform: translate(2px, 2px);
   filter: drop-shadow(0 0 3px color-mix(in srgb, #b9f2ff 55%, transparent)); }
-.favb.is-on i { background: linear-gradient(90deg, #7fcbe6 0 22%, #fff 36%, #b9f2ff 46% 62%, #8fd9ef 76%, #7fcbe6 100%) 0 0 / 40px 100% repeat-x; animation: pstfav 3s steps(20) infinite; }
 .favb.is-on:hover { border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); }
-@media (prefers-reduced-motion: reduce) { .favb.is-on i { animation: none; } }
 /* ST. CLAIRE music rows: the star before the SoundCloud and YouTube tiles */
 .am-row .x .favb { display: inline-grid; place-items: center; box-sizing: border-box; width: 32px; height: 32px; padding: 0; cursor: pointer; background: transparent; border: 2px solid; border-color: var(--am-lil) var(--am-coal) var(--am-coal) var(--am-lil); box-shadow: 2px 2px 0 #000; }
 .am-row .x .favb:hover { background: var(--am-ink); border-color: #b9f2ff var(--am-coal) var(--am-coal) #b9f2ff; }
 .am-row .x .favb.is-on { background: var(--am-ink); border-color: var(--am-coal) #b9f2ff #b9f2ff var(--am-coal); box-shadow: none; }
 /* home video.exe: the star in the transport row, small stars on saved rows of the list */
 .hvid__ctl .favb { width: 34px; height: 26px; border: 0; box-shadow: inset 2px 2px 0 #fff, inset -2px -2px 0 #4a3a86, 0 0 0 2px #120c22; }
-.hvid__ctl .favb i { width: 15px; height: 13.5px; -webkit-mask-size: 15px 13.5px; mask-size: 15px 13.5px; background: #120c22; }
+.hvid__ctl .favb i { width: 18px; height: 18px; -webkit-mask-size: 18px 18px; mask-size: 18px 18px; background: #120c22; }
 .hvid__ctl .favb:hover i { background: #57068c; }
 .hvid__ctl .favb.is-on { transform: none; background: #120c22; box-shadow: inset 2px 2px 0 #4a3a86, inset -2px -2px 0 #fff, 0 0 0 2px #120c22; }
-.hvid { --favh: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 9' shape-rendering='crispEdges'%3E%3Cpath d='M4 0h1v1h-1zM4 1h1v1h-1zM3 2h3v1h-3zM0 3h9v1h-9zM1 4h7v1h-7zM2 5h5v1h-5zM2 6h2v1h-2zM5 6h2v1h-2zM1 7h2v1h-2zM6 7h2v1h-2zM1 8h1v1h-1zM7 8h1v1h-1z'/%3E%3C/svg%3E"); }
-.hvid__list a.is-fav::after { content: ""; flex: none; order: 1; width: 10px; height: 9px; background: #b9f2ff; -webkit-mask: var(--favh) 0 0 / 10px 9px no-repeat; mask: var(--favh) 0 0 / 10px 9px no-repeat; }
+.hvid { --favh: var(--ark-star); }
+.hvid__list a.is-fav::after { content: ""; flex: none; order: 1; width: 9px; height: 9px; background: #b9f2ff; -webkit-mask: var(--favh) 0 0 / 9px 9px no-repeat; mask: var(--favh) 0 0 / 9px 9px no-repeat; }
 .hvid__list a .hvid__ch { order: 2; }
 .hvid__list a.is-on.is-fav::after { background: #120c22; }
-.hvid__ctl .favb.is-on i { background: linear-gradient(90deg, #7fcbe6 0 22%, #fff 36%, #b9f2ff 46% 62%, #8fd9ef 76%, #7fcbe6 100%) 0 0 / 40px 100% repeat-x; }
 @media (max-width: 684px) { .hvid__ctl .favb { width: 40px; height: 30px; } }
 
 .post:has(.fv) .post-title { display: none; }
@@ -5555,7 +5559,7 @@ td.tbx__p { color: #7fffd4; font-weight: bold; }
 .fv__hit + .fv__hit { border-top-color: var(--win-face); }
 .fv__hit:hover, .fv__hit.is-sel { color: #fff; background: var(--win-title); border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); }
 .fv__hit .favb { width: 28px; height: 28px; }
-.fv__hit .favb i { width: 15px; height: 13.5px; -webkit-mask-size: 15px 13.5px; mask-size: 15px 13.5px; }
+.fv__hit .favb i { width: 18px; height: 18px; -webkit-mask-size: 18px 18px; mask-size: 18px 18px; }
 .fv__hit .srch__img { display: block; width: 24px; height: 24px; margin: 0; padding: 0; border: 0; box-shadow: none; background: none; }
 .fv__chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 12px 0; }
 .fv__chip .px { display: block; width: 24px; height: 24px; }
