@@ -213,6 +213,7 @@ def build(sp, hist, slugs):
 
 EXTRA = os.path.join(ROOT, 'data', 'recruit_extra.json')
 VISIT_DAYS = 30
+FLIP_DAYS = 120
 
 
 def recruit_extra(slugs, lg):
@@ -220,14 +221,20 @@ def recruit_extra(slugs, lg):
       visits  the last VISIT_DAYS days' On3 visits of the class tabs' recruits: {d, n, k: visit (official) | unofficial,
               to, tl, cls, pos, a (ARK stars), f (xFV)}
       cb      a 247 Crystal Ball headline names no school: On3's RPM expert pick for the recruit on or before the headline
-              day + 1 (On3 live pull, uncommitted recruits) -> {"<d>|<n>": [school, logo, confidence, pick date]}"""
+              day + 1 (On3 live pull, uncommitted recruits) -> {"<d>|<n>": [school, logo, confidence, pick date]}
+      flips   flip picks: a committed recruit's On3/Rivals RPM expert picks (On3 committed pull) for another school, made on
+              or after his commitment (each expert at his latest pick) -> {d (latest such pick), n, k: fp, to, tl, fr, fl,
+              cls, pos, a, f, x (experts on that school), of (experts who picked since he committed), c (mean confidence)},
+              last FLIP_DAYS days. A row stays until it rolls off, also after he flips or the experts change their picks."""
     since, today = (dt.date.today() - dt.timedelta(days=VISIT_DAYS)).isoformat(), dt.date.today().isoformat()
-    out = {'visits': {}, 'cb': {}}
+    fsince = (dt.date.today() - dt.timedelta(days=FLIP_DAYS)).isoformat()
+    out = {'visits': {}, 'cb': {}, 'flips': {}}
+    prev = j(os.path.relpath(EXTRA, ROOT))
     news = j('data/recruit_news.json')
     for sp in ('cfb', 'cbb'):
         rec = site_recruits(sp)
         vis, seen = [], set()
-        picks = []
+        picks, flips = [], []
         for src in ('scripts/data/recruit_on3_live.json.gz', 'scripts/data/recruit_on3_committed.json.gz'):
             for y, rows in (j(src).get(sp) or {}).items():
                 m = names.Matcher(rec.get(int(y)) or [], team=None)
@@ -235,6 +242,11 @@ def recruit_extra(slugs, lg):
                     r, _ = m.find(o.get('name'))
                     if not r or (o.get('state') and r.get('home') and not r['home'].endswith(o['state'])): continue
                     if o.get('picks'): picks.append((r['name'], int(y), o['picks']))
+                    if o.get('picks') and o.get('cdate') and r.get('team') and src.endswith('committed.json.gz'):
+                        fl = flip_picks(r, int(y), o, slugs, lg, fsince)
+                        for x in fl:
+                            key = (x['n'], 'fp', names.team_key(x['to']))
+                            if key not in seen: seen.add(key); flips.append(x)
                     for v in o.get('visits') or []:
                         if not (v[2] and since <= v[2] <= today and v[0] in slugs): continue
                         k = 'visit' if v[1] == 'Official' else 'unofficial'
@@ -258,11 +270,40 @@ def recruit_extra(slugs, lg):
                     cb[f"{n['d']}|{n['n']}"] = [to, lg.get(names.team_key(to)) or None, best[3], best[0]]
                 break
         out['cb'][sp] = cb
+        have = {(x['n'], names.team_key(x['to'])) for x in flips}   # earlier runs' rows stay until they roll off
+        flips += [x for x in ((prev.get('flips') or {}).get(sp) or []) if x.get('d', '') >= fsince and (x['n'], names.team_key(x['to'])) not in have]
+        flips.sort(key=lambda x: (x['d'], x['n']), reverse=True)
+        out['flips'][sp] = flips
     out['asof'] = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%d')
-    prev = j(os.path.relpath(EXTRA, ROOT))
-    if {k: prev.get(k) for k in ('visits', 'cb')} != {k: out[k] for k in ('visits', 'cb')}:
+    if {k: prev.get(k) for k in ('visits', 'cb', 'flips')} != {k: out[k] for k in ('visits', 'cb', 'flips')}:
         json.dump(out, open(EXTRA, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
-    print('recruit extra:', {sp: len(v) for sp, v in out['visits'].items()}, 'visits;', {sp: len(v) for sp, v in out['cb'].items()}, 'crystal ball schools')
+    print('recruit extra:', {sp: len(v) for sp, v in out['visits'].items()}, 'visits;', {sp: len(v) for sp, v in out['cb'].items()},
+          'crystal ball schools;', {sp: len(v) for sp, v in out['flips'].items()}, 'flip picks')
+
+
+def flip_picks(r, y, o, slugs, lg, since):
+    """a committed recruit's flip picks: each expert's latest pick, kept when it is dated on or after his commitment and
+    names a school other than his (the board's school), grouped by school"""
+    last = {}
+    for p in o['picks']:
+        if p[0] and (p[2] not in last or p[0] >= last[p[2]][0]): last[p[2]] = p
+    after = [p for p in last.values() if p[0] >= o['cdate']]
+    by = {}
+    for p in after:
+        to = slugs.get(p[1]) if p[1] in slugs else None
+        if not to or names.same_team(to, r['team']): continue
+        by.setdefault(to, []).append(p)
+    out = []
+    for to, ps in by.items():
+        d = max(p[0] for p in ps)
+        if d < since: continue
+        cs = [p[3] for p in ps if p[3] is not None]
+        f = r.get('xfv', r.get('fv'))
+        out.append({k: v for k, v in {'d': d, 'n': r['name'], 'k': 'fp', 'to': to, 'tl': lg.get(names.team_key(to)) or None, 'fr': r['team'],
+                    'fl': r.get('logo') or lg.get(names.team_key(r['team'])) or None, 'cls': y, 'pos': r.get('pos'), 'a': r.get('ark'),
+                    'f': None if f is None else int(round(f)), 'x': len(ps), 'of': len(after),
+                    'c': round(sum(cs) / len(cs)) if cs else None}.items() if v is not None})
+    return out
 
 
 def main():

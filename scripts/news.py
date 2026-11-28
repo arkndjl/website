@@ -22,7 +22,7 @@ Weight `w` ranks an item; MAJOR (w >= 60) is what the ticker and the daily GFX d
   injury            RotoWire item that takes a player out (OUT pattern; rest days skipped): 90th percentile 72; 75th 54;
                     college FV 50+ 70; 45+ 54; +16 for a long absence (SEVERE: season, ACL, Achilles, tear,
                     fracture, surgery, IR); everyone else stays on the injury tabs
-  recruit           commit / sign / flip / decommit / reclass: a recruit on the site's board 70 (flip 76, decommit 66); cb (247 Crystal Ball alert) 45, never MAJOR;
+  recruit           commit / sign / flip / decommit / reclass: a recruit on the site's board 70 (flip 76, decommit 66); cb (247 Crystal Ball alert) and fp (On3/Rivals flip pick, data/recruit_extra.json) 45, never MAJOR;
                     off the board 40
   FV                |change| >= 2 since the day's first build on an FV board: 44 + 6 per point (cap 92), so >= 3 is major;
                     a player under FV 40 before and after needs >= 3 and tops out at 55 (college boards track FV 40+ only)
@@ -252,10 +252,11 @@ def recruits(since):
     d = load('data/recruit_news.json') or {}
     for sp in ('cfb', 'cbb'):
         seen, rows = set(), d.get(sp, [])
-        for r in rows:
-            if r['d'] < since or (r['n'], r['k']) in seen: continue
+        fps = [dict(r, b=1) for r in ((load('data/recruit_extra.json') or {}).get('flips') or {}).get(sp) or []]   # On3/Rivals flip picks
+        for r in rows + fps:
+            if r['d'] < since or (r['n'], r['k'], r.get('to') if r['k'] == 'fp' else None) in seen: continue
             if r['k'] == 'decommit' and folded(r, rows): continue
-            seen.add((r['n'], r['k']))
+            seen.add((r['n'], r['k'], r.get('to') if r['k'] == 'fp' else None))
             k, on = r['k'], bool(r.get('b'))
             who = r['n'] + (' %s' % r['pos'] if r.get('pos') else '') + (" '%s" % str(r['cls'])[2:] if r.get('cls') else '')
             if k == 'flip': t = '%s flips %s → %s' % (who, r.get('fr') or '', r.get('to') or '')
@@ -263,12 +264,13 @@ def recruits(since):
             elif k == 'reclass': t = '%s reclassifies%s' % (who, ' to %s' % r['cls'] if r.get('cls') else '')
             elif k == 'sign': t = '%s signs%s' % (who, ' with %s' % r['to'] if r.get('to') else '')
             elif k in ('portal',): t = '%s enters the portal' % who
-            elif k == 'cb': t = '%s: 247 Crystal Ball%s' % (who, ' → %s' % r['to'] if r.get('to') else '')
+            elif k == 'cb': t = '%s: 247 Crystal Ball%s' % (who, (' to flip %s → %s' % (r['fr'], r['to']) if r.get('fr') else ' → %s' % r['to']) if r.get('to') else '')
+            elif k == 'fp': t = '%s: On3 flip pick%s %s → %s' % (who, 's' if r.get('x', 1) > 1 else '', r.get('fr') or '', r.get('to') or '')
             else: t = '%s commits%s' % (who, ' to %s' % r['to'] if r.get('to') else '')
             if k == 'commit' and not r.get('fr'):   # a commitment right after a decommitment is a flip
                 dec = next((x for x in rows if x['k'] == 'decommit' and x.get('fr') and folded(x, [r])), None)
                 if dec: k, r = 'flip', dict(r, fr=dec['fr'], fl=dec.get('fl')); t = '%s flips %s → %s' % (who, r['fr'], r['to'])
-            w = 45 if k == 'cb' else ({'flip': 76, 'decommit': 66}.get(k, 70)) if on else 40   # a Crystal Ball is a lean, not a move: never MAJOR
+            w = 45 if k in ('cb', 'fp') else ({'flip': 76, 'decommit': 66}.get(k, 70)) if on else 40   # a Crystal Ball is a lean, not a move: never MAJOR
             out.append(item('rc|%s|%s|%s|%s' % (sp, r['d'], slug(r['n']), k), r['d'], 'arkboard', 'recruit', TAG[sp], ' '.join(t.split()), w,
                             'recruit · %s' % k + (' · on board' if on else ''), PAGE[sp] + '#recruit-transactions',
                             logo=r.get('fl') if k == 'flip' else (r.get('tl') or r.get('fl')), logo2=r.get('tl') if k == 'flip' else None, sp=sp))

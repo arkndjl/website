@@ -12,12 +12,13 @@ key, move and school within 4 days). Players join the recruit classes and portal
 
 data/recruit_news.json {asof, cfb: [rows], cbb: [rows]}, newest first, last 120 days, merged with the previous file:
   d date, n player, pos, cls class year, k move (commit / decommit / flip / portal / transfer / rank / cb), to school,
-  fr school left, src {"247": url, "on3": url}, t headline, b 1 when the player is on a board
+  fr school left (cb: his commitment when the Crystal Ball names another school, a flip pick), src {"247": url, "on3": url}, t headline, b 1 when the player is on a board
 
 247Sports Crystal Ball alerts (k "cb", Nov 19 2026): headlines that a Crystal Ball went in on a board player
 (`intitle:"crystal ball"` / `intitle:"where will"` on 247sports.com), with the school when the headline names it.
 Alerts only: they move nothing on the boards and are not a model input (about 4% of Crystal Ball headlines name
-player and school; scripts/research/recruit_experts_nov19/README.md).
+player and school; scripts/research/recruit_experts_nov19/README.md). A Crystal Ball seen only on a post (X) goes in
+data/crystal_balls.json with the post's link. On3/Rivals flip picks are scripts/player_moves.py's (data/recruit_extra.json).
 
     python3 scripts/recruit_news.py           # pull and merge
     python3 scripts/recruit_news.py --test    # headline parser cases
@@ -343,7 +344,8 @@ def parse_cb(title, pool):
                 sc = pool.school(m.group(1))
                 if sc and not names.same(sc, row['n']): to = sc; break
             if to: break
-    return [{'n': row['n'], 'pos': row.get('pos') or hp, 'cls': row.get('cls'), 'k': 'cb', 'to': to, 't': t, 'b': 1}]
+    fr = row.get('team') if to and row.get('team') and not names.same_team(to, row['team']) else None   # a flip pick
+    return [{'n': row['n'], 'pos': row.get('pos') or hp, 'cls': row.get('cls'), 'k': 'cb', 'to': to, 'fr': fr, 't': t, 'b': 1}]
 
 
 def pull_cb(pools, today, days=7):
@@ -449,6 +451,51 @@ def pull(today, days=7):
     return out
 
 
+CB_LEDGER = os.path.join(ROOT, 'data', 'crystal_balls.json')
+
+
+def full_class(sport, x):
+    """the ledger's player in the full class lists (static/data/<sport>-recruits.json: every graded recruit, where the
+    headline pool holds the top of each class)"""
+    try:
+        d = json.load(open(os.path.join(ROOT, 'static', 'data', f'{sport}-recruits.json'), encoding='utf-8'))
+    except (OSError, ValueError):
+        return None
+    cs = [{'year': d.get('next'), 'list': d.get('class') or []}] + (d.get('future') or []) if sport == 'cfb' else d.get('classes') or []
+    for c in cs:
+        if str(c.get('year')) != str(x.get('cls')): continue
+        hit = [r for r in c.get('list') or [] if names.same(r.get('name') or '', x['n'])]
+        if len(hit) == 1:
+            r = hit[0]
+            return {'n': r['name'], 'pos': r.get('pos'), 'cls': int(c['year']), 'team': r.get('team') if r.get('status') != 'uncommitted' else None, 'logo': r.get('logo'),
+                    'a': r.get('ark'), 'f': None if r.get('xfv', r.get('fv')) is None else int(round(r.get('xfv', r.get('fv'))))}
+    return None
+
+
+def crystal_balls(sport, pool):
+    """data/crystal_balls.json rows {sport, n, cls, to, d, src (the post), expert, conf} -> k "cb" rows; fr = his
+    commitment on the board when it is another school (a flip pick). A name the board doesn't have is left out."""
+    try:
+        led = json.load(open(CB_LEDGER, encoding='utf-8')).get('rows') or []
+    except (OSError, ValueError):
+        return []
+    out = []
+    for x in led:
+        if x.get('sport', 'cfb') != sport: continue
+        row = next((r for r in pool.by.get(names.key(x['n']), []) if r.get('cls') == x.get('cls')), None) or \
+            next((r for r in pool.rows if r.get('cls') == x.get('cls') and names.same(r['n'], x['n'])), None)
+        fc = full_class(sport, x) or {}
+        row = row or fc or None
+        if not row: continue
+        to = pool.school(x['to']) or x['to']
+        fr = row.get('team') if row.get('team') and not names.same_team(to, row['team']) else None
+        out.append({k: v for k, v in {'n': row['n'], 'pos': row.get('pos'), 'cls': row['cls'], 'k': 'cb', 'to': to, 'fr': fr,
+                    't': '247Sports Crystal Ball' + (' (%s)' % x['expert'] if x.get('expert') else ''), 'd': x['d'], 'c': x.get('conf'),
+                    'b': 1, 'src': {'x': x['src']}, 'a': fc.get('a'), 'f': fc.get('f'), 'tl': pool.logos.get(names.team_key(to)),
+                    'fl': (pool.logos.get(names.team_key(fr)) or row.get('logo')) if fr else None}.items() if v is not None})
+    return out
+
+
 def main():
     if '--test' in sys.argv: return _test()
     today = dt.datetime.now(dt.timezone.utc).date()
@@ -470,6 +517,8 @@ def main():
             if x is None and r['k'] == 'flip':   # a decommitment + commitment folded into a flip: its headline is the commitment's
                 x = next((x for x in parse(r.get('t', ''), pool) if x['k'] == 'commit'), None)
             if x is None: continue
+            if r['k'] == 'cb' and r.get('src', {}).get('x'): continue   # the ledger's rows are added again below
+            if r['k'] == 'cb': r['fr'] = x.get('fr')
             if r['k'] != 'cb' and x.get('to') and not (r['k'] == 'flip' and x['k'] == 'commit'):   # today's patterns fix a misread school
                 r['to'] = x['to']
                 if x.get('fr'): r['fr'] = x['fr']
@@ -513,6 +562,10 @@ def main():
         since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=120)).strftime('%Y-%m-%d')
         rows += [{'n': x['n'], 'pos': x['pos'], 'cls': x['cls'], 'k': 'nil', 'to': x['to'], 't': x['h'], 'd': x['d'], 'amt': x['amt'], 'b': 1, 'src': {}}
                  for x in nil_deals(sport, recruits=True) if x['d'] >= since and (x['d'], names.key(x['n']), 'nil') not in have]
+        # Crystal Balls read off a post (data/crystal_balls.json): 247 serves no feed a bot may read, so a Crystal Ball
+        # that no headline carries is a ledger row with its source
+        for x in crystal_balls(sport, pool):
+            if x['d'] >= since and not any(r['k'] == 'cb' and r['d'] == x['d'] and names.same(r['n'], x['n']) for r in rows): rows.append(x)
         rows.sort(key=lambda r: (r['d'], r['n']), reverse=True)
         out[sport] = [{k: v for k, v in r.items() if v is not None} for r in rows]
         print(f'{sport}: {len(new)} moves pulled, {len(rows)} kept', file=sys.stderr)

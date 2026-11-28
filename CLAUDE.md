@@ -156,6 +156,14 @@
   `dectOf` in `scripts/cfb_teams.mjs` and `nba_dect` (read by `scripts/cbb_tabs.py`) write `dect` / `dectL` / `dectD` / `dectM` /
   `dectP` / `dectT` on the draft boards. Refit after each draft and when the rookie scale in `scripts/cfb_declare_econ.py` moves.
 
+## Flip predictions (recruit transactions, news)
+
+- Two kinds, both alerts only (they move nothing on the boards). A 247 Crystal Ball for a school other than his commitment
+  is a `cb` row with `fr` (shown "crystal ball flip"): from 247 headlines (`scripts/recruit_news.py`), or, when only a post
+  carries it (247 serves no feed a bot may read), a row in `data/crystal_balls.json` with the post's link. On3/Rivals flip
+  picks (`fp`) are experts whose latest pick, made since he committed, names another school: `scripts/player_moves.py`
+  from the daily committed On3 pull (recruit-leans.yml) into `data/recruit_extra.json` "flips". `scripts/news.py` posts both (w 45).
+
 ## NIL deals ledger
 
 - A confirmed NIL deal is one row in `data/nil_deals.json` (player, team, season, amount for that season, date, source; `cls` for a

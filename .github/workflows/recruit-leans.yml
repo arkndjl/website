@@ -51,14 +51,14 @@ jobs:
           node scripts/recruit_on3_visits.mjs cfb $(seq $CO $((CY + 2))) --open --top 400
           node scripts/recruit_on3_visits.mjs cbb $(seq $BY $((BY + 2))) --open --top 120
           python3 scripts/recruit_on3_join.py --live $(seq $LO $HI)
-      # the committed recruits' visits for the GFX cards (scripts/player_moves.py): Mondays and hand runs; a recruit who
-      # commits between pulls keeps the visits the daily pull saw (scripts/data/player_moves_hist.json.gz)
-      - name: On3 visits of the committed recruits (weekly)
+      # the committed recruits' visits for the GFX cards and their expert picks for the flip picks (scripts/player_moves.py):
+      # daily, since a flip pick is news the day it goes in; a recruit who commits between pulls keeps the visits the
+      # daily pull saw (scripts/data/player_moves_hist.json.gz)
+      - name: On3 visits and expert picks of the committed recruits
         if: github.event_name != 'workflow_run'
         continue-on-error: true
         timeout-minutes: 40
         run: |
-          if [ "${{ github.event_name }}" != "workflow_dispatch" ] && [ "$(date -u +%u)" != "1" ]; then echo "not Monday"; exit 0; fi
           CY=$(python3 scripts/season.py --get cfb class); BY=$(python3 scripts/season.py --get cbb class)
           LO=$(( CY < BY ? CY : BY )); HI=$(( CY > BY ? CY + 2 : BY + 2 ))
           node scripts/recruit_on3_visits.mjs cfb $(seq $CY $((CY + 2))) --committed --top 400
