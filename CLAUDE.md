@@ -262,3 +262,11 @@
 - Article lists (home and /posts/) have a strip on top (`layouts/partials/postbar.html`, `assets/js/postbar.js`): search, type, tag,
   sort (newest, views, favorites) and a favorited toggle (this browser's stars). Type is the post's front matter `form` (board, method,
   research, analysis, essay, process, list, video, tool; `kind` is reserved by Hugo). Every post is on one page (`pagerSize = 100`).
+
+## articleGFX (every article)
+
+- Every post has an articleGFX button (layouts/_default/single.html, `buildArticle` in assets/js/gfx.js): a 16:9 card with the
+  title, each section's heading over a comma list of its key words, and the article's own figures, plus post text for X.
+- Each new article gets a `[gfx]` block in its front matter: `keys` = one comma list a section, in order (Noah, Nov 28: key words
+  and taglines from the section, not lines from it), `post` = the title and one of his sentences. `python3 scripts/article_gfx.py`
+  (in the build gate) checks every key word is in its section and the post lines are his own words and fit 280.

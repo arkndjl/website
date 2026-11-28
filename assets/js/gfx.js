@@ -4944,7 +4944,10 @@
       hs.forEach(function (hh) { if (hh.compareDocumentPosition(p) & Node.DOCUMENT_POSITION_FOLLOWING) s0 = txt(hh).replace(/\s*#$/, ''); });
       return s0;
     }
-    var quotes = (d.q || []).map(function (q) { var p = P.filter(function (pp) { return txt(pp).indexOf(q) >= 0; })[0]; return p ? [secOf(p), q] : null; }).filter(Boolean);
+    var H2 = [].slice.call(art.querySelectorAll('.post-content h2')).map(function (hh) { return txt(hh).replace(/\s*#$/, ''); });
+    // front matter keys: one comma list of key words for each section, in order (Noah, Nov 28: key words, not lines)
+    var quotes = (d.k || []).length ? H2.map(function (hh, i) { return [hh, (d.k[i] || '').trim()]; }).filter(function (q) { return q[1]; }) : (d.q || []).map(function (q) { var p = P.filter(function (pp) { return txt(pp).indexOf(q) >= 0; })[0]; return p ? [secOf(p), q] : null; }).filter(Boolean);
+    if (!quotes.length && H2.length) quotes = H2.slice(0, 8).map(function (hh) { return [hh, '']; });
     if (!quotes.length) {
       var seen = {};
       P.forEach(function (p) {
