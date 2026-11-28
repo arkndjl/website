@@ -122,10 +122,20 @@
           r.__f = ok; ok = ok && (!q || fold(txt(r)).indexOf(q) >= 0);
           r.hidden = !ok; if (ok) n++;
         });
-        renum();
+        renum(); narrow();
         shown = WIN; paint();
         var tot = yr ? rows.filter(function (r) { return r.dataset.yr === yr; }).length : total;
         if (count) count.textContent = (n === tot ? tot : n + ' of ' + tot) + ' ' + (count.dataset.noun || 'rows');
+      }
+      // each dropdown offers only values some row has under the other dropdowns (league Premier League: its 20 clubs)
+      function sv(r, s) { return s.attr ? r.getAttribute(s.attr) || '' : fval(r.cells[s.c]); }
+      function narrow() {
+        var ex = sels.filter(function (s) { return !s.fv; }); if (ex.length < 2) return;
+        ex.forEach(function (s) {
+          var live = {};
+          rows.forEach(function (r) { if (ex.every(function (o) { return o === s || !o.el.value || sv(r, o) === o.el.value; })) live[sv(r, s)] = 1; });
+          [].forEach.call(s.el.options, function (o) { if (!o.value) return; var off = !live[o.value] && o.value !== s.el.value; o.hidden = off; o.disabled = off; });
+        });
       }
       function renum() {
         if (rc < 0) return;
