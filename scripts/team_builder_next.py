@@ -37,7 +37,11 @@ from collections import defaultdict
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 SD = os.path.join(ROOT, 'static', 'data')
 CFB_GAMES, CBB_GAMES = 12, 31
-CBB_POSS, CBB_SD = 0.68, 11.4
+# CBB win chance on next-season ratings (points a game, the ARK rating's scale): ncdf(CBB_K x gap / 11.4). CBB_K is not
+# possessions (the ratings are already per game): it is the scale that prices next season's conference games from a
+# rating a season out, walk-forward 2017-26 (scripts/research/units_nov28/cbb_builder_xw.py, research/cbb_builder_xw.json):
+# log loss .62846 at the old .68 to .62760 at .64 (t -6.7, 9 of 10 seasons); the per-game units alone (1.0) .65298 (t +22.6)
+CBB_K, CBB_SD = 0.64, 11.4
 REPL_Q = 0.10
 
 
@@ -592,7 +596,7 @@ def cbb():
     p = os.path.join(SD, 'cbb-builder.json')
     if not os.path.exists(p): return None
     D = json.load(open(p)); T = D['teams']
-    pw = lambda a, c: ncdf((a - c) * CBB_POSS / CBB_SD)
+    pw = lambda a, c: ncdf((a - c) * CBB_K / CBB_SD)
     conf = lambda t: t.get('conf') or '_'
     out = {}
     for k, key in (('now', 'now'), ('ret', 'ret'), ('plan', 'after')):
@@ -671,7 +675,7 @@ def cbb():
                 if v: x['dect'] = v
     try: yrs = cbb_years(D, T, conf, pw)
     except (OSError, ValueError, KeyError) as e: print('cbb years', repr(e)); yrs = None
-    D['nxFit'] = {'years': yrs, 'games': CBB_GAMES, 'poss': CBB_POSS, 'sd': CBB_SD, 'replQ': REPL_Q, 'pot': potfit}
+    D['nxFit'] = {'years': yrs, 'games': CBB_GAMES, 'k': CBB_K, 'sd': CBB_SD, 'replQ': REPL_Q, 'pot': potfit}
     json.dump(D, open(p, 'w'), separators=(',', ':'), allow_nan=False)
     return D['nxFit']
 

@@ -1535,7 +1535,14 @@
    "due": "2026-12-15",
    "trigger": "a point-in-time test of next-season conference win% from preseason ratings (2016-26 priors)",
    "gate": "the new scale (x1 with a rating-error sd, or a fit factor) beats x.68 on held-out next-season conference win% RMSE, t >= 2, leave one season out",
-   "run_hint": "scripts/team_builder_next.py CBB_POSS, pw in cbb() and put_years; scripts/cbb_games.py priors"
+   "run_hint": "scripts/team_builder_next.py CBB_POSS, pw in cbb() and put_years; scripts/cbb_games.py priors",
+   "result": {
+    "d": "2026-11-28",
+    "v": "shipped",
+    "e": "log loss .62846 to .62760 at k .64 (k 1, the per-game units alone, .65298, t +22.6)",
+    "tt": -6.74,
+    "pr": null
+   }
   },
   {
    "key": "cbb_next_vorx_line",
