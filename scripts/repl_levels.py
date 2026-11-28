@@ -14,7 +14,8 @@ What each sport reads, and how it was tested (scripts/research/repl_nov28/, Nov 
         (best: the CBB form, same-season W% t .59, next season -.2; freely available pools by position t -.26 to -3.4),
         and a refit level ties under fixed effects and loses pooled (t -2.3 to -4.9). Tracked here, not read.
   nhl / nfl / soccer / tennis / cs2: already fit by position (or tour) inside their own runs; copied here with dates so
-        every line has one history (nhl F/D/G beyond each team's top 13/7/2, pooled over seasons; nfl by sub-position,
+        every line has one history (nhl F/D/G beyond each team's top 13/7/2, pooled over seasons, which beat the last
+        three seasons on next season's line, scripts/research/repl_nov28/nhl.py: F RMSE .051 vs .060, D .085 vs .082, G .173 vs .178; nfl by sub-position,
         part-timers, data/nfl_war_pos.json; soccer GK/D/M/F, bottom-three sides' regulars; tennis ranked 101-150 Elo by
         tour; cs2 VRS 51-100 starters at the day).
 

@@ -37,7 +37,7 @@ Names are Noah's. Don't rename a metric without his call; renamed ones keep an a
   new workflow.
 - A position split or a refit level ships only after it passes held out (models-tests.md); a failed one is registered in
   `data/retests.json`. Nov 28: CBB VORX by position passed; NBA VORX by position and a refit level failed (NBA keeps
-  -1.4, tracked); NHL, NFL and soccer WAR were already by position and refit in their own runs.
+  -1.4, tracked); NHL, NFL and soccer WAR were already by position and refit in their own runs; NHL's lines pooled over every season beat the last three seasons on next season's line (F RMSE .051 vs .060, D .085 vs .082, G .173 vs .178), so they stay pooled.
 
 ## Football
 
