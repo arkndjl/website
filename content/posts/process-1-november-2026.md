@@ -5,7 +5,7 @@ author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["process", "arklog"]
 keywords = ["arklog", "process", "november 2026", "xpm", "dect", "nil", "ark stars", "1nt", "laursen_111", "st. claire", "site data"]
-description = "ARKLOG, the dated record of every change and test on the site, and everything that happened on arkndjl.net in November 2026: models and metrics that shipped and failed, new features, bug fixes, 1NT, LAURSEN_111, ST. CLAIRE, videos and articles, social data and site data."
+description = "November 2026 on arkndjl.net: ARKLOG, models and metrics that shipped and failed, new features, bug fixes, 1NT, LAURSEN_111, ST. CLAIRE, videos and articles, social data and site data."
 series = "process"
 month = "2026-11"
 showFullContent = false
@@ -39,7 +39,7 @@ In November through the 28th there were 648 merged changes and 210 tests. 72 shi
 
 ## Process
 
-Process is where the method lives. This month it moved out of ARKBOARD to its own page at /process/, right under donate in the menu, and it was rebuilt into seven sections. Overview has the chain from data sources to mocks, each sport's most descriptive and most predictive metric with its held-out R², the tests by week, the gates and the latest tests. Philosophy is how I think about metrics and design, in eight tabs. ARKLOG is the log. Metrics has FV, the FV scales, player value and player odds. Models has team ratings, game models, drafts and mocks, and testing. Then Research and Data.
+This month Process moved out of ARKBOARD to its own page at /process/, right under donate in the menu, and it was rebuilt into seven sections. Overview has the chain from data sources to mocks, each sport's most descriptive and most predictive metric with its held-out R², the tests by week, the gates and the latest tests. Philosophy is how I think about metrics and design, in eight tabs. ARKLOG is the log. Metrics has FV, the FV scales, player value and player odds. Models has team ratings, game models, drafts and mocks, and testing. Then Research and Data.
 
 {{< image src="/img/process-1/process-overview.png" alt="The Process overview tab: the chain of sections with counts, the describe and predict metric for each sport with held-out R², tests by week, the gates and the latest tests" position="center" >}}
 
