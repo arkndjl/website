@@ -1,0 +1,58 @@
+{{- /* agencies board: click an agency, its clients open under the row (best FV first) with the agencyGFX button
+       (assets/js/gfx.js buildAgency). Rows carry data-ag (index into the page's agency-data-<sport> JSON). Printed once per page. */ -}}
+<script>
+(function () {
+  if (window.__arkAgencyDrop) return; window.__arkAgencyDrop = true;
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function money(n) { var a = Math.abs(n), t = a >= 1e6 ? '$' + (a / 1e6).toFixed(a >= 1e7 ? 0 : 1) + 'M' : '$' + Math.round(a / 1e3) + 'K'; return (n < 0 ? '-' : '') + t; }
+  function stars(a) {
+    if (a == null) return '<span class="cfb__dim">—</span>';
+    var lbl = a > 5 ? '5-star+' : a + ' ARK stars', s = '<span class="cfbrc__ark' + (a > 5 ? ' is-plus' : '') + '" style="--n:' + Math.min(a, 5) + '" role="img" aria-label="' + lbl + '" title="' + lbl + '"><i></i></span>';
+    return a > 5 ? '<span class="cfbrc__glow">' + s + '<span class="cfbrc__plus" aria-hidden="true">+</span></span>' : s;
+  }
+  var data = {};
+  function D(sp) { if (!data[sp]) { var el = document.getElementById('agency-data-' + sp); try { data[sp] = el ? JSON.parse(el.textContent) : null; } catch (e) { data[sp] = null; } } return data[sp]; }
+  function shut(table) { table.querySelectorAll('tr.cfb__detail').forEach(function (d) { d.remove(); }); }
+  function render(d, i) {
+    var a = d.agencies[i], pl = (d.fit && d.fit.plus) || {}, lead = d.fit && d.fit.lead;
+    var ldN = lead === 'agencyP' ? 'Agency+' : lead === 'dealP' ? 'Deal+' : lead === 'breakoutP' ? 'Breakout+' : '';
+    var ranked = lead ? d.agencies.filter(function (r) { return r[lead] != null && r.agency !== 'Family' && r.agency !== 'None'; }) : [];
+    var rk = ranked.indexOf(a);
+    var L = (d.clients || []).filter(function (c) { return c.agency === a.agency; }).sort(function (p, q) { return (q.fv || 0) - (p.fv || 0); });
+    var z = L.some(function (c) { return c.z != null; }), ag = L.some(function (c) { return c.agent; });
+    var head = '<tr><th>Player</th><th>Pos</th><th>Team</th><th title="class (college) or recruiting class">Cl</th><th>FV</th><th title="high school ARK stars">ARK</th>' +
+      (z ? '<th title="xNIL - yNIL: above zero worth more than he is paid">zNIL</th>' : '') + (ag ? '<th>Agent</th>' : '') + '<th title="how sure the source is">Conf</th><th>Src</th></tr>';
+    var body = L.map(function (c) {
+      var fv = c.fv == null ? '—' : '<span class="fv-chip" data-fv="' + Math.floor(c.fv / 5) * 5 + '">' + Math.round(c.fv) + '</span>';
+      return '<tr><td>' + esc(c.name) + '</td><td>' + esc(c.pos || '') + '</td><td>' + (c.logo ? '<img class="cfb__logo cfb__logo--in" src="' + esc(c.logo) + '" alt="" loading="lazy"> ' : '') + esc(c.team || (c.kind === 'recruit' ? 'uncommitted' : '')) + '</td>' +
+        '<td>' + esc(c.cls == null ? '' : c.cls) + '</td><td class="cfb__num">' + fv + '</td><td>' + stars(c.ark) + '</td>' +
+        (z ? '<td class="cfb__num' + (c.z > 0 ? ' cfb__up' : c.z < 0 ? ' cfb__down' : '') + '">' + (c.z == null ? '—' : money(c.z)) + '</td>' : '') +
+        (ag ? '<td>' + esc(c.agent || '') + '</td>' : '') + '<td class="agency__conf is-' + esc(c.conf) + '">' + esc(c.conf) + '</td>' +
+        '<td>' + (c.src ? '<a href="' + esc(c.src) + '" target="_blank" rel="noopener">' + esc(c.date || 'link') + '</a>' : '') + '</td></tr>';
+    }).join('');
+    var bits = [rk >= 0 ? '#' + (rk + 1) + ' ' + ldN : '', a.n + ' clients', a.pro ? a.pro + ' drafted' : ''].filter(Boolean).join(' · ');
+    return '<p class="cfb__dhead"><b>' + esc(a.agency) + '</b> · ' + esc(bits) +
+      ' <button type="button" class="cfb__btn cfb__cardbtn" data-gfx data-gfx-mode="agency" data-gfx-sport="' + esc(d.sport) + '" data-gfx-i="' + i + '" title="agency card graphic (16:9)">agencyGFX</button></p>' +
+      '<div class="clsd"><table class="clsd__t"><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>';
+  }
+  document.addEventListener('click', function (e) {
+    var t = e.target; if (!t.closest) return;
+    var table = t.closest('table[data-ag-sport]'); if (!table) return;
+    if (t.closest('thead') && !t.closest('tr.cfb__detail')) { shut(table); return; }
+    if (t.closest('a, button, tr.cfb__detail')) return;
+    var tr = t.closest('tbody tr[data-ag]'); if (!tr) return;
+    var next = tr.nextElementSibling, open = next && next.classList.contains('cfb__detail');
+    shut(table); if (open) return;
+    var d = D(table.getAttribute('data-ag-sport')), i = +tr.getAttribute('data-ag'); if (!d || !d.agencies[i]) return;
+    var sc = table.closest('.wintable__scroll') || table.parentElement, cols = table.tHead.rows[0].cells.length;
+    tr.insertAdjacentHTML('afterend', '<tr class="cfb__detail"><td colspan="' + cols + '"><div class="cfb__dwrap" style="width:' + Math.max(260, sc.clientWidth - 30) + 'px">' + render(d, i) + '</div></td></tr>');
+  });
+  // a filter or a search reorders the rows: the open agency closes
+  ['change', 'input'].forEach(function (ev) {
+    document.addEventListener(ev, function (e) {
+      var w = e.target.closest && e.target.closest('.win'); if (!w || e.target.closest('tr.cfb__detail')) return;
+      w.querySelectorAll('table[data-ag-sport]').forEach(shut);
+    });
+  });
+})();
+</script>

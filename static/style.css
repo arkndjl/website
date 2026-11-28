@@ -5389,6 +5389,7 @@ a.tick__g--nw:hover .tick__me { color: #fff; }
 .agency__bar { margin: 6px 8px; display: flex; justify-content: flex-end; }
 .agency__name { white-space: nowrap; }
 .agency__top { min-width: 14em; }
+.agency__row { cursor: pointer; } .agency__row:hover td { background: rgba(200,199,255,0.06); }
 .agency__conf.is-high { color: #7fffd4; } .agency__conf.is-medium { color: #c8c7ff; } .agency__conf.is-low { color: #ff9ec7; }
 @media (max-width: 700px) { .agency__top { min-width: 10em; } .agency__name { white-space: normal; min-width: 8em; } }
 /* team builder, next season (cfbbuilder.html, cbbbuilder.html; data from scripts/team_builder_next.py): a scoreboard of
