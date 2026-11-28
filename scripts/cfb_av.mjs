@@ -280,3 +280,5 @@ export const starterReplWar = pos => (SAV_W[pos] == null ? 0 : (CWAR_V[pos] + SA
 // AV-at-FV starter totals x CWAR_PER_AV (team talent, next season's starters) by the templates
 const lineupRepl = keep => r2(Object.entries(STARTERS).filter(([g]) => keep(g)).reduce((a, [g, n]) => a + n * starterReplWar(g), 0));
 export const TEAM_REPL_WAR = { all: lineupRepl(() => true), off: lineupRepl(g => OFF.includes(g)), def: lineupRepl(g => !OFF.includes(g)) };
+// the same by room (a position's starters), added to a room's AV-at-FV x CWAR_PER_AV (the team builder's unit meters)
+export const ROOM_REPL_WAR = Object.fromEntries(Object.keys(STARTERS).map(g => [g, r2(STARTERS[g] * starterReplWar(g))]));

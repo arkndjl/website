@@ -36,6 +36,9 @@
   var WB = {{ site.Data.cfb_war_backtest.constants.teamReplWar.all }};
   function war(v) { return (v * WK).toFixed(2); }
   function warT(v) { return (v * WK + WB).toFixed(2); }
+  // a room's total: its starters' share of that line (roomReplWar)
+  var WR = {{ site.Data.cfb_war_backtest.constants.roomReplWar | jsonify }};
+  function warR(v, g) { return (v * WK + (WR[g] || 0)).toFixed(2); }
   var POS = ['QB', 'RB', 'WR', 'TE', 'OL', 'EDGE', 'DL', 'LB', 'CB', 'S'], OLS = ['LT', 'LG', 'C', 'RG', 'RT'];
   // a room's label (the interior line reads DT once the board splits it from the edge)
   var LBL = {}; function lab(g) { return LBL[g] || g; }
@@ -168,7 +171,7 @@
     var units = T.positions.map(function (p) {
       var tg = (T.plan || []).filter(function (s) { return s.slot === p.g; }).reduce(function (a, s) { return a + s.gain; }, 0), after = p.nextAv;
       var st = after >= p.bar ? 'ok' : after >= p.bar * 0.7 ? 'mid' : 'low', w = Math.min(100, after / Math.max(p.bar, 0.1) * 50);
-      return '<div class="tb__pos tb__pos--' + st + '"><span class="tb__g">' + lab(p.g) + '</span><span class="tb__meter" title="' + esc('WAR a season: ' + war(p.nowAv) + ' now, ' + war(p.nextAv) + ' guaranteed roster, ' + war(after + tg) + ' with the transfer targets; bar ' + war(p.bar)) + '"><i style="width:' + w.toFixed(0) + '%"></i><b style="left:50%" title="contender bar"></b></span></div>';
+      return '<div class="tb__pos tb__pos--' + st + '"><span class="tb__g">' + lab(p.g) + '</span><span class="tb__meter" title="' + esc('WAR a season: ' + warR(p.nowAv, p.g) + ' now, ' + warR(p.nextAv, p.g) + ' guaranteed roster, ' + warR(after + tg, p.g) + ' with the transfer targets; bar ' + warR(p.bar, p.g)) + '"><i style="width:' + w.toFixed(0) + '%"></i><b style="left:50%" title="contender bar"></b></span></div>';
     }).join('');
     var avMax = Math.max(T.av26, T.av27, T.avExp || 0, T.avPlan, 1);
     var avs = [['now', T.av26, 'now'], ['no adds', T.av27, 'none']].concat(T.avExp != null ? [['expected', T.avExp, 'exp']] : []).concat([['w/ targets', T.avPlan, 'plan']]).map(function (b) { return '<div class="tb__av tb__av--' + b[2] + '"><span>' + b[0] + '</span><span class="tb__avbar"><i style="width:' + (b[1] / avMax * 100).toFixed(0) + '%"></i></span><b>' + warT(b[1]) + '</b></div>'; }).join('');
@@ -181,7 +184,7 @@
     // with the snap share it plays (what a backup is worth), a line under the starters
     var KIND = { recruit: ['FR', D.next + ' class'], redshirt: ['RS', 'rostered, no snaps'], 'new': ['NEW', 'plan signing'] };
     var depth = '<section class="tb__panel tb__depth"><h4>depth chart · ' + D.next + '</h4><div class="tb__dgrid">' + T.positions.filter(function (p) { return (p.chart || []).length; }).map(function (p) {
-      return '<div class="tb__dpos"><h5>' + lab(p.g) + ' <span class="cfb__dim">' + (p.nextAv != null ? war(p.nextAv) + ' WAR' : '') + '</span></h5><ol>' + p.chart.filter(function (o) { return o.kind !== 'new'; }).map(function (o, k) {
+      return '<div class="tb__dpos"><h5>' + lab(p.g) + ' <span class="cfb__dim">' + (p.nextAv != null ? warR(p.nextAv, p.g) + ' WAR' : '') + '</span></h5><ol>' + p.chart.filter(function (o) { return o.kind !== 'new'; }).map(function (o, k) {
         var sn = (p.snaps || [])[k], tag = KIND[o.kind];
         if (tag && o.ark) tag = [tag[0] + ' ' + (o.ark > 5 ? '5★+' : o.ark + '★'), tag[1] + ', ' + (o.ark > 5 ? '5-star+' : o.ark + ' ARK stars')];
         return '<li class="' + (k === p.n - 1 ? 'tb__dlast' : '') + (o.kind === 'open' ? ' tb__dopen' : '') + '"><span class="tb__dsn" title="snap share at this spot">' + (sn ? Math.round(sn * 100) + '%' : '·') + '</span>' +
