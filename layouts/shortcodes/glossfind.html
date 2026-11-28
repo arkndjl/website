@@ -3,8 +3,8 @@
        Same look as ARKLIBRARY's libfind. Usage: {{< glossfind tabs="fv=FV|value=player value|…" >}} before the wintabs. */ -}}
 {{- $tabs := dict -}}
 {{- range split (.Get "tabs") "|" }}{{ $kv := split . "=" }}{{ if eq (len $kv) 2 }}{{ $tabs = merge $tabs (dict (index $kv 0) (index $kv 1)) }}{{ end }}{{ end -}}
-{{- $ix := slice -}}
-{{- range site.Data.library.sections }}{{ $t := index $tabs .id }}{{ if $t }}{{ range .entries }}
+{{- $ix := slice }}{{ $nt := 0 -}}
+{{- range site.Data.library.sections }}{{ $t := index $tabs .id }}{{ if $t }}{{ $ab := eq .id "abbr" }}{{ range .entries }}{{ if not $ab }}{{ $nt = add $nt 1 }}{{ end }}
 {{- $ix = $ix | append (dict "t" .term "s" .short "sp" (delimit (.sports | default slice) " ") "tab" $t "id" (partial "glossid.html" .term)) }}
 {{- end }}{{ end }}{{ end -}}
 <div class="win libfind" data-glossfind>
@@ -14,7 +14,7 @@
   </div>
   <label class="gallery__filter libfind__box"><span class="gallery__filter-label">find</span><input type="search" data-glossfind-q placeholder="term or definition" autocomplete="off" enterkeyhint="search"></label>
   <ol class="libfind__rows" data-glossfind-rows hidden></ol>
-  <div class="win__status"><span data-glossfind-count>{{ len $ix }} terms</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span data-glossfind-count>{{ $nt }} terms</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
   <script type="application/json" data-glossfind-ix>{{ jsonify $ix | safeJS }}</script>
 </div>
 <script>

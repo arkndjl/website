@@ -6,7 +6,7 @@
   same thread. A weekly sync and each monthly PROCESS batch check the two against each other. The repo is public:
   secrets, private client or business work, personal contact details and betting stakes stay in memory only.
 - Design ([docs/rules/design.md](docs/rules/design.md)): pixel art, purple / teal / lilac, one font (MS PGothic), no
-  emoji, team logos full colour, ARK stars platinum with the 5-star+ shimmer, GFX 16:9 with no overlap and boxed
+  emoji, team logos full colour, ARK stars platinum with the 5-star+ shimmer, table/player/team GFX 4:5 (other cards 16:9), no overlap, boxed
   column groups, every page works on a phone.
 - Copy ([docs/rules/copy-voice.md](docs/rules/copy-voice.md)): minimal text, no blurbs; everything published in Noah's
   voice (academic, his own words, Oxford commas, no LLM phrasing or marketing); ARKLOG never logs copy cleanups or
@@ -60,7 +60,7 @@
   `process` right under donate (icon `static/img/icons/process.svg`); not in the ARKBOARD menu or hub (Noah, Nov 28).
   ARKLOG is a group inside it (log, updates, calendar, milestones, scoreboard, traffic, build, data). Milestones = `scripts/milestones.py` -> `data/milestones.json` (social, site and log thresholds, detected from the data, never typed in). Never call it "Library" (that is ARKLIBRARY),
   "Lab", "Reference" or "ARKPROCESS". `/arkboard/process/`, `/arklog/`, `/reference`, `/library`, `/lab` and the old
-  ARKBOARD paths redirect to it in `static/_redirects` (no hash in the target, so `/arklog/#scoreboard` keeps its tab).
+  ARKBOARD paths redirect to it in `static/_redirects`; bare `/arklog/` opens `/process/#log` (Noah, Nov 28).
 - Philosophy (Noah, Nov 28): Overview | Philosophy | Metrics ... Text in Noah's words is `research/philosophy.json` (numbers as
   `{key}` placeholders), filled with figures from the fit files by `scripts/philosophy_build.py` into `data/philosophy.json`,
   drawn by `layouts/shortcodes/procphil.html`; process-refresh.yml reruns it. The 16:9 ARKPHILOSOPHY card
