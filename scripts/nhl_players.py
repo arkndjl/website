@@ -5,6 +5,7 @@ every skater and goalie since 2008-09, from MoneyPuck's season summaries.
 
     python3 scripts/nhl_players.py --fit     # fit pWAR's weights to team results out of sample, WAR's levels (numpy)
     python3 scripts/nhl_players.py --nested  # past seasons' HPM on weights known at the time (--fit runs it too)
+    python3 scripts/nhl_players.py --calibrate   # pWAR on WAR's scale again from each file's raw pw0 (data/nhl_pwar_cal.json)
     python3 scripts/nhl_players.py           # write static/data/nhl-war/<season>.json and data/nhl_war.json
 
 Skater components, each in goals per 60 of the player's ice time, centred on the league:
@@ -45,6 +46,12 @@ pWAR (projected, what it is worth going forward): HPM = the weighted components 
     weights (t 2.88, Holm p .006, 13/17 pairs); refit LOSO .373 -> .376 (t -2.82, 15/17), walk forward t -3.59, 14/15.
     pWAR = (HPM - replacement) x TOI / 60 / goals a win, replacement as above on HPM; goals a win from team points
     against goal differential.
+    Nov 28 2026 (scripts/research/nhl_pwar_nov28/test.py): that raw pWAR (pw0) was fit to team goal differential, not to
+    WAR, and sat off WAR's scale: goalies at about a quarter of their next-season WAR a 60 (.012 vs .048), defencemen
+    high (.035 vs .023). calibrate() puts it on next season's WAR a 60, leaving each season out: F and D on pw0 + the
+    last three seasons' WAR a 60 (1/.7/.5, 1,600 min at the group mean) + age, age^2 (t -13.9 and -10.0 against the raw
+    pWAR, 16/16 seasons, time split t -10.1 and -8.2), G on pw0 alone (t -9.9; adding WAR a 60 t -1.9, a retest). It
+    stays a count over his TOI this season, the same minutes as WAR.
 3Y (p3, display only): projected WAR over the next three seasons, proj3() with data/nhl_proj_fit.json
     (scripts/nhl_proj_research.py: pWAR + the percentile tab's Marcel WAR + age by F / D / G + TOI82, coefficients per
     share of the season; held out by season RMSE 2.455 vs 2.617 for pWAR + Marcel, t -14.2, 14/14 seasons, skaters).
@@ -614,6 +621,41 @@ def season_table(S, fitd, bio):
 
 
 PROJ = os.path.join(ROOT, 'data', 'nhl_proj_fit.json')
+PCAL = os.path.join(ROOT, 'data', 'nhl_pwar_cal.json')
+
+
+def calibrate(S, rows):
+    """pWAR on WAR's scale (Nov 28 2026, scripts/research/nhl_pwar_nov28/test.py -> data/nhl_pwar_cal.json): the raw
+    (HPM - replacement) rate was fit to team goal differential, so it sat off WAR's scale (goalies at a quarter of their
+    next-season WAR, defencemen high). pWAR a 60 = c . [1, pw, pm, A, A^2] (F, D) or c . [1, pw] (G), pw = the raw rate,
+    pm = WAR a 60 over S, S-1, S-2 (1/.7/.5) with 1,600 minutes at the group mean, A = age - 27; x TOI / 60, so it sits on
+    the same minutes as WAR. The raw value stays as pw0 for the models fit on it (3Y, xAAV, badges, prospects, awards)."""
+    try:
+        cf = json.load(open(PCAL))
+    except (OSError, ValueError):
+        return
+    past = []
+    for j in (1, 2):
+        try:
+            past.append({p['id']: p for p in json.load(open(os.path.join(OUTD, f'{S - j}.json')))['players']})
+        except (OSError, ValueError):
+            past.append({})
+    mw = cf['mw']
+    for r in rows:
+        r['pw0'] = r['pwar']
+        g = cf['groups'].get(r['grp'])
+        if not g or not r['toi']:
+            continue
+        pw = r['pwar'] / r['toi'] * 60
+        num, den = mw[0] * r['war'], mw[0] * r['toi']
+        for w, ix in zip(mw[1:], past):
+            q = ix.get(r['id'])
+            if q:
+                num += w * q['war']; den += w * q['toi']
+        pm = (num + cf['K'] * cf['mu'][r['grp']]) / (den + cf['K']) * 60
+        A = (r['age'] if r['age'] is not None else cf['A0']) - cf['A0']
+        x = [1.0, pw] if g['form'] == 'cal' else [1.0, pw, pm] if g['form'] == 'both' else [1.0, pw, pm, A, A * A]
+        r['pwar'] = round(sum(a * b for a, b in zip(g['c'], x)) * r['toi'] / 60, 2)
 PM_K, PM_W = 1600.0, (1.0, 0.7, 0.5)             # the percentile tab's Marcel WAR a minute (scripts/player_pctl.py)
 
 
@@ -680,7 +722,7 @@ def proj3(S, rows, repl, f, gS):
             if q:
                 num += w * q['war']; den += w * q['toi']
         pm = (num + PM_K * pf['mu'][r['grp']]) / (den + PM_K) * toi82
-        pw = r['pwar'] * 82 / gS
+        pw = r.get('pw0', r['pwar']) * 82 / gS          # fit on the raw pWAR (before the Nov 28 calibration)
         A = r['age'] - pf['A0']
         x = [1.0, pw, pm]
         for grp in part['grps']:
@@ -717,6 +759,7 @@ def build(seasons=None):
         gmax = min(82, max(r['gp'] for r in rows))              # traded players can pass 82 (83-85 in full seasons)
         f = min(1.0, gmax / 82) if S == cur else 1.0             # only the season in progress is partial
         proj3(S, rows, repl, f, gmax if S == cur else {2013: 48, 2020: 70, 2021: 56}.get(S, 82))
+        calibrate(S, rows)
         # predictive badges (scripts/nhl_badges.py; tested against next season's WAR in scripts/nhl_badge_backtest.py)
         nhl_badges.assign(S, rows, gmax)
         if S == cur:
@@ -739,6 +782,22 @@ def build(seasons=None):
            'goalsPerWin': fitd['goalsPerWin'], 'r2': fitd['r2'], 'r2Points': fitd['r2Points'], 'r2OnIceXg': fitd['r2OnIceXg'],
            'teamSeasons': fitd['teamSeasons'], 'r2Same': fitd['desc']['r2Same'], 'repl': fitd['desc']['repl']}
     json.dump(idx, open(IDX, 'w'), indent=1)
+
+
+def recalibrate():
+    """rewrite every season file's pWAR from its raw pw0 and data/nhl_pwar_cal.json, no download (after a refit of the
+    calibration)"""
+    for fn in sorted(os.listdir(OUTD)):
+        if not fn.endswith('.json'):
+            continue
+        S, path = int(fn[:-5]), os.path.join(OUTD, fn)
+        d = json.load(open(path))
+        for r in d['players']:
+            if 'pw0' in r:
+                r['pwar'] = r['pw0']
+        calibrate(S, d['players'])
+        json.dump(d, open(path, 'w'), separators=(',', ':'))
+        print(S, 'pWAR calibrated', flush=True)
 
 
 def final_rebuild(cur=None, idx=None):
@@ -764,6 +823,8 @@ if __name__ == '__main__':
         fit()
     elif '--nested' in sys.argv:
         nested()
+    elif '--calibrate' in sys.argv:
+        recalibrate()
     elif '--current' in sys.argv:
         build([D.current_season()] + final_rebuild())
     else:

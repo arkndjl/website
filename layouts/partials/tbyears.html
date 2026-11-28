@@ -21,7 +21,9 @@ data/team_years_fit.json). Included once by cfbbuilder.html and cbbbuilder.html.
       ['y1', 'y2', 'y3'].map(function (k, i) { var r = N[k]; return '<div class="tbx__yr"><span>' + years[i] + '</span><b>' + fmt(r[unit]) + '</b><i>#' + r.rk + ' · ' + r.xw.toFixed(1) + ' xW</i></div>'; }).join('') + '</div>';
   }
   function pcell(p) { var a = Math.max(0, Math.min(1, p || 0)); return '<td class="cfb__num tbx__pc" style="--a:' + a.toFixed(2) + '">' + (p ? pc(p) : '—') + '</td>'; }
-  function rows(R, key) { var L = (R.teams || {})[key] || [], c = R.cols; return L.map(function (a) { var o = {}; c.forEach(function (k, i) { o[k] = a[i]; }); return o; }); }
+  // guaranteed players only (Noah, Nov 28): returners and committed classes; transfer and recruit targets have their own tabs
+  var SURE = { back: 1, cls: 1 };
+  function rows(R, key) { var L = (R.teams || {})[key] || [], c = R.cols; return L.map(function (a) { var o = {}; c.forEach(function (k, i) { o[k] = a[i]; }); return o; }).filter(function (o) { return SURE[o.kind]; }); }
   function seasonLabel(sp, y) { return sp === 'cbb' ? y + '-' + String(y + 1).slice(2) : String(y); }
   function depthHtml(sp, P, j, y) {
     var by = {}; P.forEach(function (o) { var p = o['p' + j]; if (p >= 0.15) (by[o.pos] = by[o.pos] || []).push(o); });
@@ -48,7 +50,7 @@ data/team_years_fit.json). Included once by cfbbuilder.html and cbbbuilder.html.
       if (L.length <= n) return;
       var hi = L[n - 1].s, lo = L[n].s;
       if (hi - lo >= 0.15 || lo < 0.15) return;
-      var C = L.filter(function (x) { return x.s <= lo + 0.15 && x.s >= hi - 0.15; });
+      var C = L.filter(function (x) { return x.s <= lo + 0.15 && x.s >= Math.max(0.15, hi - 0.15); }).slice(0, 6);
       out.push({ g: G[0], n: n, open: L.filter(function (x) { return x.s > lo + 0.15; }).length, C: C, gap: hi - lo });
     });
     if (!out.length) return '';
