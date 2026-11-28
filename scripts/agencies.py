@@ -240,6 +240,7 @@ def record_drafts(ledger, today=None):
 # ---- tendency scores (Noah, Nov 28: "+" scores in place of the x/y/zNIL columns, 100 = the average agency) -----------
 
 TEND_TEST = 'research/agency_tendency.json'     # scripts/research/agencies_nov28/tendency.py, rerun by hand
+COMPOSITE = ('Deal',)                            # tendency scores that go into Agency+
 
 
 def tendencies(pool):
@@ -314,7 +315,9 @@ def components(clients, pros, sp, pool):
             out[a][name.lower()] = e * len(l) if e > 0 else e
     for p in pros: out[canon(p['agency'])]['sent'] = out[canon(p['agency'])].get('sent', 0) + 1
     for a, l in by.items(): out[a]['vol'] = math.log1p(len(l))
-    use = [k.lower() for k in shipped(sp)] + ['sent']
+    # Agency+ rewards the agency's own work: deals (Deal+) and players sent to the pros. Breakout+ is about how good the clients
+    # turned out, not what the agency did for them, so it stays a column but is not in the composite (Noah, Nov 28)
+    use = [k.lower() for k in shipped(sp) if k in COMPOSITE] + ['sent']
     ag = [a for a in out if a not in SPECIAL]
     z = {}
     for k in use:
@@ -372,16 +375,18 @@ def board(clients, pros=(), sp='cfb', pool=()):
     m = sum(ag) / len(ag) if ag else 0.0; sd = (sum((v - m) ** 2 for v in ag) / len(ag)) ** .5 if ag else 1.0
     for r in rows:
         c = cp.get(r['agency'])
-        r['agencyP'] = round(100 + 25 * (c['score'] - m) / (sd or 1.0)) if c else None
-    pf['agencyP'] = dict(parts=[k.lower() for k in shipped(sp)] + ['sent'])
-    lead = 'agencyP'
+        r['agencyP'] = round(100 + 25 * (c['score'] - m) / sd) if c and sd > 1e-9 else None   # no part varies yet: blank
+    if sd > 1e-9: pf['agencyP'] = dict(parts=[k.lower() for k in shipped(sp) if k in COMPOSITE] + ['sent'])
+    lead = 'agencyP' if 'agencyP' in pf else 'dealP' if 'dealP' in pf else 'breakoutP' if 'breakoutP' in pf else None
     rows.sort(key=lambda r: (r['agency'] in SPECIAL, -(r[lead] if lead and r.get(lead) is not None else -1e12), -(r['fv'] or 0), -r['n']))
     return rows, dict(k=round(k, 1), mu=round(mu), nZ=len(allz), plus=pf, lead=lead)
 
 
 def main():
     led = load('data/agencies.json', {'rows': []})['rows']
-    pros = record_drafts(led)
+    # the 2022-26 backfill stays in data/agency_pros.json for research but counts nowhere: sources on who had a player before
+    # the draft process are too thin to judge agencies on (Noah, Nov 28). Drafted and Agency+ start with the 2027 drafts.
+    pros = [p for p in record_drafts(led) if not p.get('backfill')]
     out = {'asof': None, 'sports': {}}
     look = {}
     for sp, col, rec in (('cfb', cfb_rows(), cfb_recruits()), ('cbb', cbb_rows(), cbb_recruits())):
