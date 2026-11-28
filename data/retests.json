@@ -1472,6 +1472,39 @@
    "gate": "verdicts.py: agedpw beats agedp on right calls, paired t >= 2 and most seasons",
    "run_hint": "python3 scripts/research/pro_builder_nov28/verdicts.py nhl",
    "due": "2028-07-01"
+  },
+  {
+   "key": "hockey_nhle_ratio",
+   "t": "NHLe refit as a ratio of summed points (and pooled league names)",
+   "sp": [
+    "NHL"
+   ],
+   "ar": "fv",
+   "kind": "retest",
+   "how": "hand",
+   "was": "draft class-out t -1.98 (ratio), -1.24 (ratio with age), -2.41 (pooled names) vs the live pairs factors",
+   "after": "nhl:draft:2027",
+   "lag": 14,
+   "due": "2027-07-08",
+   "est": 1,
+   "trigger": "the 2026-27 season adds a year of league movers to the landing pages",
+   "gate": "strict class-out (factors refit without the class's careers) t >= 2, 8 of 12, top-64 and point in time (factors through 2015-16, grade 2016-19) not worse",
+   "run_hint": "python3 scripts/hockey_nhle.py --test2"
+  },
+  {
+   "key": "soccer_lg_unrated",
+   "t": "Squad-value league strength for unrated senior leagues in soccer prospect FV",
+   "sp": [
+    "Soccer"
+   ],
+   "ar": "fv",
+   "kind": "deferred",
+   "how": "hand",
+   "was": "not run: the Transfermarkt dump refit is a full soccer prospects run",
+   "due": "2026-12-14",
+   "trigger": "the next soccer prospects refit (Challenger Pro League, 3. Liga, Regionalliga, Austrian 2. Liga, Serie C, Primera Federacion and Czech second tier minutes now count at the replacement floor)",
+   "gate": "lg_share from the mean squad-value club rating of the league; class-out t >= 2, forward top-50 not worse",
+   "run_hint": "python3 scripts/soccer_prospects.py --fit (rlg_td in features())"
   }
  ]
 }

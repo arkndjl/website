@@ -1,0 +1,12 @@
+{{- /* NHLe cell for the hockey prospect boards (Nov 28 2026): every skater has one; ~ marks an estimate (a short season
+  pulled toward the prior, or an earlier line), goalies get a dash. data-v sorts it. */ -}}
+{{- $r := .r -}}
+{{- $tip := .line | default "" -}}
+{{- $est := "" -}}
+{{- with $r.nhleOf }}{{ $est = printf "estimated from %s" . }}{{ else }}{{ if $r.nhleEst }}{{ with $r.nhleRaw }}{{ $est = printf "%.1f at his own rate so far, pulled toward the typical NHLe for his slot until he has 20 games" (float .) }}{{ else }}{{ $est = "no games yet: the typical NHLe for his slot" }}{{ end }}{{ end }}{{ end -}}
+{{- with $est }}{{ if $tip }}{{ $tip = printf "%s; %s" $tip . }}{{ else }}{{ $tip = . }}{{ end }}{{ end -}}
+{{- if and (ne $r.pos "G") (isset $r "nhle") (ne $r.nhle nil) -}}
+<td class="cfb__num" data-v="{{ $r.nhle }}"{{ with $tip }} title="{{ . }}"{{ end }}>{{ if $r.nhleEst }}~{{ end }}{{ partial "num.html" (slice "%.0f" (float $r.nhle)) }}</td>
+{{- else -}}
+<td class="cfb__num" data-v="-1">-</td>
+{{- end -}}
