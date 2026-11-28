@@ -2,6 +2,8 @@
 // dithered to the site palette and scaled up with square pixels. The model follows the open Process group: overview an
 // icosahedron, philosophy a cut gem, ARKLOG a 3D bar chart of every test by sport and verdict (data-bars, from
 // data/arklog.json), metrics a sphere, models a torus, research a cone, data a stack of disks. No library.
+// A box with data-lp-model shows that model instead and follows the attribute when it changes ("your favorites",
+// layouts/shortcodes/favorites.html: a heart, and per group a trophy, a star, a book, a record or a screen).
 (function () {
   'use strict';
   var box = document.querySelector('[data-lowpoly]');
@@ -83,7 +85,56 @@
     });
     return out;
   }
-  var MODELS = { overview: ico, philosophy: gem, arklog: bars, metrics: sphere, models: torus, research: cone, data: disks };
+  function pillow(pts, ramp, rim) {   // a flat outline (star-shaped about 0,0) made solid: a raised centre each side, a rim
+    var v = [[0, 0, 0.42], [0, 0, -0.42]], f = [], n = pts.length, d = rim || 0.16;
+    pts.forEach(function (p) { v.push([p[0], p[1], d]); v.push([p[0], p[1], -d]); });
+    for (var i = 0; i < n; i++) {
+      var a = 2 + i * 2, b = 2 + ((i + 1) % n) * 2, r = typeof ramp === 'function' ? ramp(i) : ramp;
+      f.push([0, a, b, r]); f.push([1, b + 1, a + 1, r]); f.push([a, a + 1, b + 1, 'w']); f.push([a, b + 1, b, 'w']);
+    }
+    return { v: v, f: f };
+  }
+  function heart() {
+    var p = [];
+    for (var i = 0; i < 28; i++) {
+      var t = i / 28 * Math.PI * 2, x = 16 * Math.pow(Math.sin(t), 3), y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+      p.push([x / 15, (y + 2) / 15]);
+    }
+    return pillow(p, function (i) { return i % 2 ? 'w' : 'p'; });
+  }
+  function star() {
+    var p = [];
+    for (var i = 0; i < 10; i++) { var a = Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 0.46 : 1.12; p.push([r * Math.cos(a), r * Math.sin(a) - 0.05]); }
+    return pillow(p, function (i) { return i % 2 ? 't' : 'w'; }, 0.12);
+  }
+  function trophy() {
+    var m = lathe([[0.95, 1.0], [0.85, 0.55], [0.5, 0.1], [0.14, -0.15], [0.14, -0.55], [0.6, -0.7], [0.6, -0.95]], 8,
+      function (j, i) { return j < 3 ? (i % 2 ? 't' : 'w') : 'p'; });
+    return m;
+  }
+  function record() {
+    var out = lathe([[1.15, 0.07], [1.15, -0.07]], 14, function (j, i) { return i % 3 ? 'p' : 'm'; });
+    var lab = lathe([[0.42, 0.09], [0.42, 0.075]], 10, 't'), o = out.v.length;
+    lab.v.forEach(function (p) { out.v.push(p); }); lab.f.forEach(function (x) { out.f.push([x[0] + o, x[1] + o, x[2] + o, 't']); });
+    out.v = out.v.map(function (p) { return [p[0], p[2], p[1]]; });   // stand it up, face to the viewer
+    return out;
+  }
+  function screen() {
+    var out = { v: [], f: [] };
+    box3(-1.2, 1.2, -0.65, 0.85, -0.45, 0.45, 'p', out);
+    box3(-1.02, 1.02, -0.5, 0.7, 0.45, 0.5, 't', out);
+    box3(-0.5, 0.5, -1.0, -0.65, -0.3, 0.3, 'm', out);
+    return out;
+  }
+  function book() {
+    var out = { v: [], f: [] };
+    box3(-0.95, 0.95, -1.15, 1.15, -0.3, 0.3, 'w', out);
+    box3(-1.0, 1.0, -1.2, 1.2, 0.3, 0.38, 'p', out);
+    box3(-1.0, 1.0, -1.2, 1.2, -0.38, -0.3, 'p', out);
+    box3(-1.0, -0.92, -1.2, 1.2, -0.38, 0.38, 'm', out);
+    return out;
+  }
+  var MODELS = { favorites: heart, teams: trophy, players: star, articles: book, songs: record, videos: screen, overview: ico, philosophy: gem, arklog: bars, metrics: sphere, models: torus, research: cone, data: disks };
   var cache = {};
   function model(k) { k = MODELS[k] ? k : 'overview'; return cache[k] || (cache[k] = MODELS[k]()); }
 
@@ -134,8 +185,10 @@
   }
 
   // ---- which group is open: the selected tab's group in the side strip
-  var cur = 'overview';
+  var cur = box.getAttribute('data-lp-model') || 'overview';
   function group() {
+    var fixed = box.getAttribute('data-lp-model');
+    if (fixed) { if (fixed !== cur) { cur = fixed; if (label) label.textContent = fixed; } return; }
     var sel = document.querySelector('.libtabs [role="tab"][aria-selected="true"]');
     var g = sel && sel.closest('[data-wingroup]'), name = g ? g.getAttribute('data-wingroup') : '';
     name = (name || 'overview').trim().toLowerCase();

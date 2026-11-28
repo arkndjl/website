@@ -71,6 +71,7 @@
         <button type="button" data-am-go="{{ $i }}" aria-label="play {{ $t.title }}"><span class="n">{{ printf "%02d" (add $i 1) }}</span><span class="t">{{ $t.title }}</span></button>
         <span class="d" data-am-dur="{{ $i }}" data-src="{{ $t.src | relURL }}">-:--</span>
         <span class="x">
+          <button type="button" class="favb" data-fav-song="{{ path.BaseName $t.src }}" data-name="{{ $t.title }}" aria-pressed="false" title="add to your favorites" aria-label="favorite {{ $t.title }}"><i></i></button>
           {{- with $t.soundcloud }}<a href="{{ . }}" target="_blank" rel="noopener" aria-label="{{ $t.title }} on SoundCloud"><svg aria-hidden="true"><use href="#icon-soundcloud"/></svg></a>{{ end }}
           {{- with $t.youtube }}<a href="{{ . }}" target="_blank" rel="noopener" aria-label="{{ $t.title }} on YouTube"><svg aria-hidden="true"><use href="#icon-youtube"/></svg></a>{{ end }}
         </span>
@@ -150,3 +151,4 @@
   draw(); if (!still) requestAnimationFrame(loop);
 })();
 </script>
+{{- partial "js.html" "favs" -}}

@@ -368,6 +368,14 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
           weight = 12
           [languages.en.menu.main.params]
             icon = "img/icons/process.svg"
+        # your favorites (Nov 28 2026): each visitor's saved articles, songs, videos, teams and players (this browser only)
+        [[languages.en.menu.main]]
+          identifier = "favorites"
+          name = "your favorites"
+          url = "/favorites/"
+          weight = 23
+          [languages.en.menu.main.params]
+            icon = "img/icons/favorites.svg"
         # hidden (Noah Nov 17): Franchise Fantasy; to restore, uncomment this entry and set draft = false in content/franchise-fantasy.md
         # [[languages.en.menu.main]]
         #   identifier = "franchise-fantasy"

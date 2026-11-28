@@ -41,6 +41,7 @@
         <button type="button" class="hvid__btn hvid__btn--main" data-hv="play" aria-label="play"><svg><use href="#icon-play"/></svg></button>
         <button type="button" class="hvid__btn" data-hv="stop" aria-label="stop"><svg><use href="#icon-stop"/></svg></button>
         <button type="button" class="hvid__btn" data-hv="next" aria-label="next"><svg><use href="#icon-next"/></svg></button>
+        <button type="button" class="hvid__btn favb" data-fav-video aria-pressed="false" title="add to your favorites" aria-label="favorite this video"><i></i></button>
         <span class="hvid__grille" aria-hidden="true"></span>
         <span class="hvid__led" aria-hidden="true"></span>
       </div>
@@ -220,4 +221,5 @@
   pick(w.querySelector('.hvid__modes button'));
 })();
 </script>
+{{- partial "js.html" "favs" -}}
 {{- end }}
