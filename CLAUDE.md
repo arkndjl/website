@@ -294,6 +294,19 @@
   (`research/payroll_efficiency.json`: NBA, NHL; NFL, MLS and wins over payroll failed, in data/retests.json). Deal and Risk use the
   age curve in `research/payroll_aging.json` and show only where Surplus passed. Research in `scripts/research/payrolls_nov28/`.
 
+## Pro team builder (NBA, NFL, NHL teams > team builder; Nov 28)
+
+- `scripts/pro_builder.py` -> `static/data/builder/<lg>.json` and `data/pro_fa/<lg>.json` (free agent status and xYrs for the
+  payrolls free agents view); runs after payrolls in nba-xpm.yml, nfl.yml, nhl.yml; `--test`. Page `probuilder.html`, GFX
+  `buildProBuilder` (plan), `buildProWindow`, `buildProDepth` (4:5; badges a fixed right column, centred on the row).
+- Verdict = his next three seasons against the replacement his money buys at his position (`research/pro_builder_replace.json`,
+  `scripts/research/pro_builder_nov28/replace.py`): NBA (pooled line) and NFL (by position) passed; NHL failed (t 1.88) and keeps
+  the priced projection against pay. Core = team top two, league top 15% in projected value, 31 or under, above replacement;
+  never an override (core players read below the line beat it 32-40%).
+- Future score failed against last season's record in all three leagues (`future.py`); the page shows value under contract by
+  season, the top-ten window and Now / Window / Rebuild instead. xYrs: `term.py` (NFL OTC, NBA B-Ref signings; NHL xTerm).
+  Retests: builder_verdict_nhl_replacement, builder_future_score, builder_dev_projection.
+
 ## Season rollovers (calendar, phases, post days)
 
 - One calendar per sport: `data/seasons/<sport>.json` (league dates `events`, step `keys`: phase, season, draft, class,

@@ -1,0 +1,63 @@
+{
+ "nfl": {
+  "n": 16070,
+  "years": "2014-2025",
+  "maeFit": 0.293,
+  "maeBase": 0.486,
+  "t": -57.8,
+  "won": "12/12",
+  "pass": true,
+  "groups": [
+   "DB",
+   "DL",
+   "ED",
+   "LB",
+   "OL",
+   "QB",
+   "RB",
+   "ST",
+   "TE",
+   "WR"
+  ],
+  "b": [
+   1.18713,
+   -0.00742,
+   105.964911,
+   -2.468084,
+   0.01014,
+   -0.0547,
+   0.00367,
+   0.055226,
+   -0.098048,
+   0.008275,
+   0.302252,
+   0.058898,
+   -0.034171
+  ],
+  "form": "years = b0 + b1 age + b2 (AAV / cap) + b3 age (AAV / cap) + position group terms (first group = base), clipped 1-6 (Nov 28: the age x price term beat age squared held out, NBA t -2.95 to -2.50, NFL MAE .293 to .304)"
+ },
+ "nba": {
+  "n": 420,
+  "years": "2024-2027",
+  "maeFit": 1.037,
+  "maeBase": 1.124,
+  "t": -2.95,
+  "won": "3/4",
+  "pass": true,
+  "groups": [
+   "C",
+   "F",
+   "G"
+  ],
+  "b": [
+   4.948309,
+   -0.086859,
+   36.777719,
+   -0.919069,
+   -0.01764,
+   0.03213
+  ],
+  "form": "years = b0 + b1 age + b2 (AAV / cap) + b3 age (AAV / cap) + position group terms (first group = base), clipped 1-6 (Nov 28: the age x price term beat age squared held out, NBA t -2.95 to -2.50, NFL MAE .293 to .304)"
+ },
+ "note": "xTerm for the NFL and NBA free agent tables: the years a free agent signs for, from his age, position and price.\n(The NHL has its own, scripts/xaav.py --fit-term.)\n\n    python3 scripts/research/pro_builder_nov28/term.py [nfl nba]   -> research/pro_term.json\n\n  NFL  OverTheCap veteran contracts (nflverse historical_contracts; 3+ years after the draft or undrafted), 2014 on:\n       years on position group, age at signing, APY as a cap share and age x APY share. Held out one signing year at a time.\n  NBA  free agent signings in the four offseasons before 2026-27 (Basketball-Reference transactions, the xAAV rule),\n       years = seasons left on his deal now (data/payrolls/nba.json, options counted) plus the seasons already played on\n       it; deals that ended early are not on file (a short deal waived is missed). Held out one offseason at a time.\nBaseline = the mean years by position group x age band. Ships when the fit beats it on MAE with paired t <= -2 and wins\nmost held-out years."
+}

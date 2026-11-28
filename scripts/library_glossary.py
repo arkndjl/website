@@ -106,6 +106,43 @@ def _pbpick():
         if not r: continue
         out.append('%s %s drafts (%d picks, %s): mean miss %.3f against %.3f for the round mean (t = %.2f, %s)' % (nm[k], r['drafts'], r['n'], r['unit'], r['maeCurve'], r['maeRound'], r['t'], r['won']))
     return '; '.join(out) + '.'
+_PBR = ld('research/pro_builder_replace.json')               # verdicts against the replacement (scripts/research/pro_builder_nov28/replace.py)
+_PBF = ld('research/pro_builder_future.json')                # future score against future wins (scripts/research/pro_builder_nov28/future.py)
+_PBT = ld('research/pro_term.json')                          # xYrs, free agents' expected deal length (scripts/research/pro_builder_nov28/term.py)
+def _pbrep():
+    nm = {'nba': 'NBA', 'nhl': 'NHL', 'nfl': 'NFL'}
+    out = []
+    for k in ('nfl', 'nba', 'nhl'):
+        r = _PBR.get(k)
+        if not r: continue
+        out.append('%s %s (%d calls): right on %.1f%% against %.1f%% for the season carried forward (t = %.2f, %s)%s' % (nm[k], r['years'], r['n'], 100 * r['acc']['agedp'], 100 * r['acc']['carry'],
+                   r['agedp_vs']['carry']['t'], r['agedp_vs']['carry']['won'], ', and the line by position beat one line for every position (t = %.2f)' % r['agedp_vs']['pooled']['t'] if r.get('posPass') else ', one line for every position (by position t = %.2f)' % r['agedp_vs']['pooled']['t']))
+    return '; '.join(out) + '.'
+def _pbcore():
+    out = []
+    for k, n in (('nfl', 'NFL'), ('nba', 'NBA'), ('nhl', 'NHL')):
+        c = (_PBR.get(k) or {}).get('core')
+        if c and c.get('nNeg'):
+            out.append('%s %d of %d (%.0f%%)' % (n, round(c['negBeat'] * c['nNeg']), c['nNeg'], 100 * c['negBeat']))
+    return ', '.join(out)
+def _pbfut():
+    out = []
+    for k, n in (('nba', 'NBA'), ('nhl', 'NHL'), ('nfl', 'NFL')):
+        r = _PBF.get(k)
+        if not r: continue
+        out.append('%s %s (%d team-seasons): mean miss %.3f for the roster read, %.3f for last season\'s record (t = %.2f, %s), %.3f with both' % (n, r['years'], r['n'], r['mae']['roster'], r['mae']['carry'],
+                   r['roster_vs']['carry']['t'], r['roster_vs']['carry']['won'], r['mae']['rosterp']))
+    return '; '.join(out) + '.'
+def _pbterm():
+    out = []
+    for k, n in (('nfl', 'NFL'), ('nba', 'NBA')):
+        r = _PBT.get(k)
+        if not r: continue
+        out.append('%s %s (%d deals): mean miss %.2f years against %.2f (t = %.2f, %s)' % (n, r['years'], r['n'], r['maeFit'], r['maeBase'], r['t'], r['won']))
+    return '; '.join(out) + '.'
+_PBREP = re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _pbrep()) if _PBR else ''
+_PBFUT = re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _pbfut()) if _PBF else ''
+_PBTERM = re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _pbterm()) if _PBT else ''
 _PBTEST = re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _pbtest()) if _PBV else ''
 _PBMKT = re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _pbmarket()) if _PBV else ''
 _PBPICK = re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _pbpick()) if _PBP else ''
@@ -500,12 +537,14 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
        _PAYAGE,
        'It shows only for the NBA and NHL, the two leagues where it passed. In both, the roster\'s value alone predicts next season a little better than Surplus does, so what carries the number forward is the talent, and the pay side is the judgement of how cheaply it was bought.'],
       'NBA, NHL payrolls and contracts', ['NBA', 'NHL']),
-    E('Pro team builder', 'A pro team\'s contracts by season, a verdict on every player (extend, let walk, keep or trade), its future picks and what they are worth.',
-      ['The verdict is the sign of his surplus over the next three seasons: what his play should be worth at the league\'s price of a win, minus what he is paid above the minimum. A player in the last season of his deal is priced at his xAAV for the seasons after it, and the verdict is Extend when the surplus is positive and Let walk when it is not. A player signed beyond this season is Keep or Trade on the same sign.',
-       'The value side is the priced projection: his value over the next three seasons = c0 + c1 × his last full season + c2 × the three seasons\' pay above the minimum as a share of the cap, fit by age group (24 and under, 25-27, 28-30, 31-33, 34 and over). The price is in it because what a team agreed to pay him says something about him that last season does not.',
-       'Tested walk-forward on the payroll panels, a call a player-season with pay above twice the minimum and pay again the next season, fitting on outcomes seen before the call only, and scored on whether the verdict had the sign of the surplus he went on to return. ' + _PBTEST + ' It had to beat both to ship, so the NHL and NFL use it and the NBA keeps the one-season Surplus, which beat carrying the season forward on its own. The value read on the age curve alone, with no price in it, did worse than the one-season Surplus in the NBA and tied it in the NHL.',
-       'Development is shown year by year from the age curve under Deal and Risk (his value k seasons on = a + b × his last full season, by age group), the curve that beat the same line with no age groups walk-forward in all three leagues. I also tried the board\'s own projection as an input to the verdict read. NHL pWAR added nothing: ' + ('right on %.1f%% of calls with it and %.1f%% without (t = %.2f)' % (100 * _PBV['nhl']['acc']['agedpw'], 100 * _PBV['nhl']['acc']['agedp'], _PBV['nhl']['agedpw_vs']['agedp']['t']) if _PBV.get('nhl', {}).get('agedpw_vs') else 'not run') + ', and the pWAR in the old season files come from today\'s fit, so that is not strictly point in time either. The NBA and NFL have no past projections on file. It is in the retests ledger for when the forward logs hold two seasons of board vintages.',
-       'Most veteran deals come out below zero at the league\'s price of a win, because rookie deals make the average win cheap. Read against the market line instead (the surplus a deal at that price went on to return), the priced projection passed in the NHL and not elsewhere: ' + _PBMKT + '. Both failed reads are in the retests ledger.',
+    E('Pro team builder', 'A pro team\'s contracts by season, a verdict on every player (extend, let walk, keep or trade), his development, its picks, a five-season timeline, scenarios and a sandbox.',
+      ['The verdict asks whether a player returns more over the next three seasons than the replacement his money buys. The replacement is a line fit on the new deals signed at his position: the value those deals returned over three seasons on what they cost (pay above the minimum as a share of the cap). His own three seasons are the priced projection: c0 + c1 × his last full season + c2 × the three seasons\' pay above the minimum, fit by age group (24 and under, 25-27, 28-30, 31-33, 34 and over). A player in the last season of his deal is priced at his xAAV after it and gets Extend or Let walk; a player signed beyond this season gets Keep or Trade. The number beside it is the gap in dollars at the league\'s price of a win.',
+       'Tested walk-forward on the payroll panels, a call a player-season paid above twice the minimum and paid again the next season, the lines fit on outcomes seen before the call only, scored on whether the verdict had the sign he went on to return against that line: ' + _PBREP + ' It passed in the NFL and NBA. In the NHL it did not, so the NHL keeps the earlier read, the priced projection against what he is paid: ' + _PBTEST,
+       'Core marks a player in his team\'s top two and the league\'s top 15% in projected value over three seasons, 31 or under, and above his replacement. I tested whether core players should be kept even when the read says otherwise. Of the core players whose read was below the line, the share that beat it anyway was ' + _pbcore() + ', so the read stands and a core player is one the read already keeps.',
+       'Development is shown year by year from the age curve under Deal and Risk (his value k seasons on = a + b × his last full season, by age group), the curve that beat the same line with no age groups walk-forward in all three leagues. NHL pWAR as an input to the verdict added nothing (' + ('%.1f%% with it and %.1f%% without, t = %.2f' % (100 * _PBV['nhl']['acc']['agedpw'], 100 * _PBV['nhl']['acc']['agedp'], _PBV['nhl']['agedpw_vs']['agedp']['t']) if _PBV.get('nhl', {}).get('agedpw_vs') else 'not run') + ').',
+       'I tried a future score for the team: the age curve on every player times the share of players like him still on the team k seasons on, summed and mapped to win share over the next three seasons. It did not beat last season\'s record in any league: ' + _PBFUT + ' The timeline shows value under contract by season instead, the same age curve on the players signed for that season, and the window is the seasons that value ranks in the league\'s top ten. A team is now when this season is in the window, window when a later one is, rebuild when none is.',
+       'Scenarios price next season four ways at this season\'s cap: the verdicts as called, every expiring deal re-signed at xAAV, every expiring deal let go, and only the keeps. Trade fits are the three teams with the biggest need at his position (value under contract next season against the league) that can take his cap hit; contenders rank first for players 29 and up and rebuilding teams for players 25 and under. The need heatmap is the same z by position for every team.',
+       'Free agents show xYrs, the years the next deal should run, from age, xAAV as a share of the cap, the two multiplied (older players get shorter deals at the same price) and position, held out one signing year at a time against the mean by position and age band: ' + _PBTERM + ' The NHL uses its own xTerm. NBA restricted free agents are first-round picks finishing the fourth year of the rookie scale.',
        'Picks: NHL from the CapWages team pages (every pick a team owns through 2030), NFL from the Wikipedia draft pages (each team\'s seven picks moved by every listed trade, 2027 and 2028, compensatory picks not yet known), NBA the 2027 own picks before trades from the season sims, because no free source I can reach lists NBA pick trades. A pick\'s value is what the slot has returned over the cheap years, a curve in the log of the slot, at the price of a win, minus the slot\'s rookie pay above the minimum. Held out one draft at a time against the mean of the pick\'s round: ' + _PBPICK,
        'MLS is not in it. Its free source has no contract years or ages, so there is no multi-year decision to make.'],
       'NBA, NFL, NHL team builder', ['NBA', 'NFL', 'NHL']),
