@@ -53,7 +53,7 @@
   `ARKLOG: shipped · R² .643 to .732 · t = 2.1` (`shipped`, `part shipped` or `failed`; then the one held-out number that
   decided it, before to after, and its t; leave the number out when there is no single one). That line is taken as
   written. Without it the row is read by pattern, which misreads often: check the new row on /arklog/ after the merge
-  and correct it in `research/arklog_fix.json`. Every test through #1283 was read against its write-up on Nov 27 and is
+  and correct it in `research/arklog_fix.json`. Every test through #1301 was read against its write-up on Nov 27 and is
   held there (`v`, `e`, `tt`); do not regenerate those entries.
 - Hidden pages (Franchise Fantasy, the ST. CLAIRE style guide) never appear in the log (`OUT` in arklog.py).
 - Process updates: one post a month ("Process #N: ... / <month> updates"), front matter `series = "process"` and
