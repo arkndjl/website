@@ -35,24 +35,50 @@ function looksLikeBot(ua) {
 
 // Cloudflare's own clock (wrangler.toml [triggers]) starts the feed workflows that GitHub's cron skips. Each one is
 // a workflow_dispatch of an existing workflow, so its concurrency group still queues or merges overlapping runs.
-// Needs the GITHUB_TOKEN secret: a fine-grained token on arkndjl/website with Actions: read and write.
+// Needs a GitHub token as a secret on this Worker (Workers & Pages > website > Settings > Variables and Secrets, not the
+// build variables and not a repo Actions secret): a fine-grained token on arkndjl/website with Actions: read and write.
+// Any of these names works. /api/feeds says which name it found (never the value) and how the last dispatch went.
 const DISPATCH = ["odds-snap.yml", "esea.yml", "picks-refresh.yml"];
+const TOKEN_NAMES = ["GITHUB_TOKEN", "GH_TOKEN", "GITHUB_PAT", "GH_PAT", "GITHUB_API_TOKEN", "GITHUB_ACCESS_TOKEN", "GH_DISPATCH_TOKEN"];
+const FEEDS_KEY = "https://arkndjl.net/__feeds_last";
+
+function ghToken(env) {
+  for (const k of TOKEN_NAMES) if (env[k]) return [k, env[k]];
+  return [null, null];
+}
 
 async function dispatchFeeds(env) {
-  if (!env.GITHUB_TOKEN) return console.log("feed dispatch: GITHUB_TOKEN not set");
-  for (const wf of DISPATCH) {
-    const r = await fetch(`https://api.github.com/repos/arkndjl/website/actions/workflows/${wf}/dispatches`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${env.GITHUB_TOKEN}`,
-        Accept: "application/vnd.github+json",
-        "User-Agent": "arkndjl-site-cron",
-        "X-GitHub-Api-Version": "2022-11-28",
-      },
-      body: JSON.stringify({ ref: "main" }),
-    });
-    console.log(`feed dispatch ${wf}: ${r.status}`);
+  const [name, token] = ghToken(env);
+  const last = { at: new Date().toISOString(), token: name, runs: {} };
+  if (!token) {
+    console.log("feed dispatch: no GitHub token secret on this Worker");
+  } else {
+    for (const wf of DISPATCH) {
+      const r = await fetch(`https://api.github.com/repos/arkndjl/website/actions/workflows/${wf}/dispatches`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/vnd.github+json",
+          "User-Agent": "arkndjl-site-cron",
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+        body: JSON.stringify({ ref: "main" }),
+      });
+      last.runs[wf] = r.status;
+      console.log(`feed dispatch ${wf}: ${r.status}`);
+    }
   }
+  try {
+    await caches.default.put(FEEDS_KEY, new Response(JSON.stringify(last), {
+      headers: { "content-type": "application/json", "cache-control": "max-age=86400" },
+    }));
+  } catch (e) { console.log("feed dispatch: could not keep the last result", e); }
+}
+
+async function feeds(env) {
+  let last = null;
+  try { const r = await caches.default.match(FEEDS_KEY); if (r) last = await r.json(); } catch { last = null; }
+  return json({ token: ghToken(env)[0], names: TOKEN_NAMES, last }, 200, { "cache-control": "no-store" });
 }
 
 // /api/photo/<path>: an On3 recruit photo (on3static.com/<path>) served from this site, so the GFX cards can draw it on a
@@ -84,6 +110,7 @@ export default {
       return json(await supporters(request, env), 200, { "cache-control": "public, max-age=60" });
     }
     if (url.pathname.startsWith("/api/photo/")) return photo(url, request);
+    if (url.pathname.replace(/\/+$/, "") === "/api/feeds" && request.method === "GET") return feeds(env);
     if (url.pathname.replace(/\/+$/, "") === "/api/posts" || url.pathname.startsWith("/api/posts/")) return posts(url, request, env);
     if (!url.pathname.startsWith("/api/plays")) return env.ASSETS.fetch(request);
     const stub = env.PLAYS.get(env.PLAYS.idFromName("stclaire"));
