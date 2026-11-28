@@ -30,6 +30,7 @@ draft = false
 {{< sitestats part="views" class="desk__wide" >}}
 {{< sitestats part="trend" >}}
 {{< sitestats part="traffic" >}}
+{{< articlestats >}}
 {{< /desk >}}
 {{< desk tab="build" >}}
 {{< sitestats part="build" class="desk__wide" >}}

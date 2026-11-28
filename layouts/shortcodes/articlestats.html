@@ -1,0 +1,39 @@
+{{- /* Process > ARKLOG > traffic: one row an article with its live views and favorites (worker/site.js /api/posts, the same
+       counts as the post meta line, layouts/partials/poststats.html). Rows come from the posts; the counts are filled in on
+       load and the table sorts by any header. {{< articlestats >}} */ -}}
+{{- $posts := where site.RegularPages "Type" "posts" -}}
+{{- $start := "2026-11-28" -}}
+{{- partial "wintable-open.html" (dict "title" "articles.exe" "icon" "site" "filter" " " "wait" true "class" "desk__wide") }}
+<table class="cfb__table astat" data-astat data-start="{{ $start }}">
+  <thead><tr><th>article</th><th title="published">date</th><th>tags</th><th title="one a visitor a day, counted since Nov 28 2026">views</th><th title="platinum star clicks, net of the ones taken back">favorites</th><th title="favorites per view">fav%</th><th title="views a day since it was published, or since counting began on Nov 28 2026 for older articles">views/day</th></tr></thead>
+  <tbody>
+  {{- range $posts.ByDate.Reverse }}
+  {{- $slug := path.Base (strings.TrimSuffix "/" .RelPermalink) }}
+  <tr data-post="{{ $slug }}" data-pub="{{ .Date.Format "2006-01-02" }}"><td class="astat__t"><a href="{{ .RelPermalink }}">{{ .Title }}</a></td><td data-v="{{ .Date.Unix }}">{{ .Date.Format "Jan 2 2006" }}</td><td class="astat__tags">{{ delimit (.Params.tags | default (slice "—")) ", " }}</td><td class="cfb__num" data-k="v">—</td><td class="cfb__num" data-k="f">—</td><td class="cfb__num" data-k="r">—</td><td class="cfb__num" data-k="d">—</td></tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $posts) "about" "Views and favorites are counted by the site, one view a visitor a day, bots skipped. fav% = favorites / views. views/day runs from the later of the publish date and Nov 28 2026, when counting began.") }}
+<script>
+(function () {
+  var t = document.querySelector('[data-astat]'); if (!t || !window.fetch) return;
+  var w = t.closest('.wintable'), start = Date.parse(t.getAttribute('data-start') + 'T00:00:00Z');
+  function fmt(n, d) { return Number(n).toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+  function cell(r, k, v, s) { var c = r.querySelector('[data-k="' + k + '"]'); c.setAttribute('data-v', v == null ? '' : v); c.textContent = s; }
+  fetch('/api/posts').then(function (r) { if (!r.ok) throw r.status; return r.json(); }).then(function (all) {
+    var rows = [].slice.call(t.tBodies[0].rows), now = Date.now();
+    rows.forEach(function (r) {
+      var c = all[r.getAttribute('data-post')] || { v: 0, f: 0 }, v = c.v || 0, f = c.f || 0;
+      var from = Math.max(start, Date.parse(r.getAttribute('data-pub') + 'T00:00:00Z')), days = Math.max(1, (now - from) / 864e5);
+      cell(r, 'v', v, fmt(v)); cell(r, 'f', f, fmt(f));
+      cell(r, 'r', v ? f / v * 100 : null, v ? fmt(f / v * 100, 1) + '%' : '—');
+      cell(r, 'd', v / days, fmt(v / days, 1));
+      r._v = v;
+    });
+    rows.sort(function (a, b) { return b._v - a._v; }).forEach(function (r) { t.tBodies[0].appendChild(r); });
+  }).catch(function () {}).then(function () {
+    w.removeAttribute('data-tf-wait');
+    if (window.__arkTfInit) window.__arkTfInit();
+  });
+})();
+</script>

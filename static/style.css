@@ -5438,17 +5438,25 @@ td.tbx__p { color: #7fffd4; font-weight: bold; }
 .pst[hidden] { display: none; }
 .pst { white-space: nowrap; }
 .pst__v b, .pst__fav b { font-weight: normal; color: var(--foreground); }
-.pst__fav { display: inline-flex; align-items: center; gap: 5px; margin: 0 0 0 10px; padding: 0 2px; vertical-align: -2px;
-  background: none; border: 0; box-shadow: none; color: inherit; font: inherit; font-weight: normal; cursor: pointer; }
-.pst__fav:hover, .pst__fav:focus-visible { transform: none; box-shadow: none; outline: 1px dotted var(--accent); outline-offset: 2px; }
+.pst__fav { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 0 10px; padding: 3px 8px 3px 6px; vertical-align: middle;
+  color: var(--accent); background: var(--win-face); border: 2px solid; border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+  border-radius: 0; box-shadow: 2px 2px 0 var(--win-dark); font: inherit; font-weight: normal; line-height: 1; cursor: pointer; transition: none; }
+.pst__fav:hover { color: #b9f2ff; background: var(--win-well); }
+.pst__fav:hover i { background: color-mix(in srgb, #b9f2ff 70%, transparent); }
+.pst__fav:active { border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); box-shadow: none; transform: translate(2px, 2px); }
+.pst__fav:focus-visible { outline: 1px dotted var(--accent); outline-offset: 3px; }
 .pst__fav:disabled { cursor: progress; }
-.pst__fav i { display: inline-block; width: 20px; height: 18px;
+.pst__fav.is-on { color: #b9f2ff; background: var(--win-well); border-color: var(--win-dark) #b9f2ff #b9f2ff var(--win-dark); box-shadow: none; transform: translate(2px, 2px); }
+.pst__fav b { padding-left: 6px; border-left: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); }
+.pst__fav i { display: block; width: 20px; height: 18px;
   --star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 9' shape-rendering='crispEdges'%3E%3Cpath d='M4 0h1v1h-1zM4 1h1v1h-1zM3 2h3v1h-3zM0 3h9v1h-9zM1 4h7v1h-7zM2 5h5v1h-5zM2 6h2v1h-2zM5 6h2v1h-2zM1 7h2v1h-2zM6 7h2v1h-2zM1 8h1v1h-1zM7 8h1v1h-1z'/%3E%3C/svg%3E");
   background: color-mix(in srgb, #b9f2ff 30%, transparent); -webkit-mask: var(--star) 0 0 / 20px 18px no-repeat; mask: var(--star) 0 0 / 20px 18px no-repeat; }
-.pst__fav:hover i { background: color-mix(in srgb, #b9f2ff 60%, transparent); }
 .pst__fav.is-on .pst__s { display: inline-flex; filter: drop-shadow(1px 0 0 #241a3a) drop-shadow(-1px 0 0 #241a3a) drop-shadow(0 1px 0 #241a3a) drop-shadow(0 -1px 0 #241a3a) drop-shadow(0 0 3px #b9f2ff); }
 .pst__fav.is-on i { background: linear-gradient(90deg, #7fcbe6 0 22%, #fff 36%, #b9f2ff 46% 62%, #8fd9ef 76%, #7fcbe6 100%) 0 0 / 40px 100% repeat-x; animation: pstfav 3s steps(20) infinite; }
-.pst__fav.is-on b { color: #b9f2ff; }
+.pst__fav.is-on b { color: #b9f2ff; border-left-color: color-mix(in srgb, #b9f2ff 45%, transparent); }
 @keyframes pstfav { to { background-position: -40px 0; } }
 @media (max-width: 684px) { .pst__fav i { width: 15px; height: 13.5px; -webkit-mask-size: 15px 13.5px; mask-size: 15px 13.5px; } }
 @media (prefers-reduced-motion: reduce) { .pst__fav.is-on i { animation: none; } }
+/* Process > ARKLOG > traffic > articles.exe (layouts/shortcodes/articlestats.html) */
+.astat td.astat__t { white-space: normal; min-width: 18ch; max-width: 36ch; }
+.astat td.astat__tags { white-space: normal; max-width: 22ch; color: color-mix(in srgb, var(--foreground) 70%, transparent); }
