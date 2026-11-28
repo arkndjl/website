@@ -36,6 +36,8 @@
   weights held out (`scripts/research/ovr_nov28/team.py`, NBA R2 .699, NHL .522).
 - Cards: `static/data/ovr/<sport>.json` (written by ovr.py) puts an OVR tile on every pro player card (`pcOvr` in gfx.js) and team
   OVR in the team card's line, with OVR beside each key player (`teamOvr`; ESPN short keys in its AL map).
+- OVR as a team-model input failed (NBA identical to pXPM, NHL t .92; `team.py --input`) and as an FV anchor (draft FV ranks
+  third-season OVR below the pre-draft rank, t -3.94; `fv_anchor.py`): retests `ovr_team_input`, `ovr_fv_anchor`, `ovr_nhl_shrink_pwar`.
 
 ## ARKLIBRARY (content/arklibrary.md)
 
