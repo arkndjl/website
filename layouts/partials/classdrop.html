@@ -12,20 +12,16 @@
     var lbl = a > 5 ? '5-star+' : a + ' ARK stars', s = '<span class="cfbrc__ark' + (a > 5 ? ' is-plus' : '') + '" style="--n:' + Math.min(a, 5) + '" role="img" aria-label="' + lbl + '" title="' + lbl + '"><i></i></span>';
     return a > 5 ? '<span class="cfbrc__glow">' + s + '<span class="cfbrc__plus" aria-hidden="true">+</span></span>' : s;
   }
-  function gap(r) {
-    if (r.s == null) return '<span class="cfb__dim">—</span>';
-    var v = Math.min(r.a, 5) - r.s;
-    return v > 0 ? '<span class="cfb__up">+' + v + '</span>' : v < 0 ? '<span class="cfb__down">−' + (-v) + '</span>' : '0';
-  }
   function shut(table) { table.querySelectorAll('tr.cfb__detail').forEach(function (d) { d.remove(); }); }
   function render(team, yr, Y, t, today) {
-    var hs = t.r.some(function (r) { return r.hs; }), wt = t.r.every(function (r) { return r.w; });
+    var hs = t.r.some(function (r) { return r.hs; }), fl = t.r.some(function (r) { return r.fl; }), wt = t.r.every(function (r) { return r.w; });
     var head = '<tr><th>Recruit</th><th>ARK</th><th>Pos</th><th>Ht</th>' + (wt ? '<th>Wt</th>' : '') + (hs ? '<th>High school</th>' : '') + '<th>Hometown</th>' +
-      '<th>xFV</th><th>Y1 FV</th><th title="industry stars">Stars</th><th title="ARK stars minus industry stars (5-star+ counts as 5)">Δ★</th><th>xNIL</th></tr>';
+      '<th>xFV</th><th>Y1 FV</th><th title="industry stars">Stars</th><th>xNIL</th>' + (fl ? '<th title="the school he was committed to before this one">Flipped from</th>' : '') + '</tr>';
     var body = t.r.map(function (r) {
       return '<tr><td>' + esc(r.n) + '</td><td>' + stars(r.a) + '</td><td>' + esc(r.p) + '</td><td class="cfb__num">' + esc(r.h || '—') + '</td>' + (wt ? '<td class="cfb__num">' + r.w + '</td>' : '') +
         (hs ? '<td>' + esc(r.hs || '—') + '</td>' : '') + '<td>' + esc(r.o || '—') + '</td><td class="cfb__num"><b>' + r.f + '</b></td><td class="cfb__num">' + r.y + '</td>' +
-        '<td class="cfb__num">' + (r.s == null ? '<span class="cfb__dim">—</span>' : r.s + (r.sp ? '+' : '')) + '</td><td class="cfb__num">' + gap(r) + '</td><td class="cfb__num">' + (r.x ? money(r.x) : '—') + '</td></tr>';
+        '<td class="cfb__num">' + (r.s == null ? '<span class="cfb__dim">—</span>' : r.s + (r.sp ? '+' : '')) + '</td><td class="cfb__num">' + (r.x ? money(r.x) : '—') + '</td>' +
+        (fl ? '<td>' + (r.fl ? (r.fl[1] ? '<img class="cfb__logo cfb__logo--in" src="' + esc(r.fl[1]) + '" alt="" loading="lazy"> ' : '') + esc(r.fl[0]) + ' <span class="cfb__dim">' + esc(r.fl[2].slice(5)) + '</span>' : '') + '</td>' : '') + '</tr>';
     }).join('');
     var who = function (r) { return '<td>' + esc(r.n) + '</td><td>' + stars(r.a || 0) + '</td><td>' + esc(r.p) + '</td><td class="cfb__num"><b>' + r.f + '</b></td>'; };
     var ld = (t.ld || []).map(function (r) {

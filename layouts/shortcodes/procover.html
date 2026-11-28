@@ -38,7 +38,7 @@
     <div class="libstudy__chart">{{ $l.svg.weeks | safeHTML }}
       <p class="libstudy__legend"><span class="lc-key lc-k0">shipped</span><span class="lc-key lc-k2">part shipped</span><span class="lc-key lc-k4">failed</span></p></div>
   </div>
-  <p class="rq__bar libstudy__bar"><a class="cfb__btn rq__link" href="{{ "arklog/" | relURL }}">ARKLOG</a><a class="cfb__btn rq__link" href="{{ "arklog/" | relURL }}#scoreboard">scoreboard</a></p>
+  <p class="rq__bar libstudy__bar"><a class="cfb__btn rq__link" href="#log">ARKLOG</a><a class="cfb__btn rq__link" href="#scoreboard">scoreboard</a></p>
   <div class="win__status"><span>{{ $l.tests }} tests</span><span>{{ with $o.ledger }}ledger: {{ .keep }} kept · {{ .watch }} watch · {{ .drop }} dropped{{ end }}</span></div>
 </div>
 <div class="win">
@@ -54,7 +54,7 @@
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>latest tests<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
   <ol class="proclog__rows proclog__rows--mini">
     {{- range first 8 (where $l.latest "sec" "ARKBOARD") }}
-    <li class="plrow plrow--{{ .v }}"><a class="plrow__head" href="{{ "arklog/" | relURL }}#log-{{ .n }}">
+    <li class="plrow plrow--{{ .v }}"><a class="plrow__head" href="#log-{{ .n }}">
       <span class="plrow__date">{{ dateFormat "Jan 2" .d }}</span>
       <span class="plrow__title">{{ .t }}</span>
       <span class="plrow__eff">{{ .x }}</span>
@@ -62,7 +62,7 @@
     </a></li>
     {{- end }}
   </ol>
-  <p class="rq__bar libstudy__bar"><a class="cfb__btn rq__link" href="{{ "arklog/" | relURL }}">ARKLOG</a></p>
+  <p class="rq__bar libstudy__bar"><a class="cfb__btn rq__link" href="#log">ARKLOG</a></p>
   <div class="win__status"><span>updated {{ dateFormat "Jan 2 2006" $l.asof }}</span><span></span></div>
 </div>
 </div>

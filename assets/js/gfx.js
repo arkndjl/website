@@ -2579,7 +2579,6 @@
     g.fillStyle = C.light; g.fillRect(x, y, w, t); g.fillRect(x, y, t, h); g.fillStyle = '#16102a'; g.fillRect(x, y + h - t, w, t); g.fillRect(x + w - t, y, t, h);
   }
   function on3Photo(path, px) { return path ? loadPhoto('https://on3static.com/cdn-cgi/image/height=' + px + ',width=' + px + ',quality=85,fit=cover,gravity=top,format=auto/' + path) : Promise.resolve(null); }
-  function starGap(r) { if (r.s == null) return null; var v = Math.min(r.a, 5) - r.s; return [(v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v), v > 0 ? C.teal : v < 0 ? C.down : C.lilac]; }
   // ARK stars in a cell of its own colour (cell = [x, y, w, h, fill]): a 5-star+ repaints its cell each step of the preview
   function arkStars(g, a, x, cy, ss, sg, cell) {
     var sy = Math.round(cy - ss / 2);
@@ -2600,6 +2599,17 @@
     F.canvas._name = (yr + '-' + team).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     var lim = tr.querySelector('img.cfb__logo'), logo = await loadImg(lim && lim.getAttribute('src'));
     var photos = await Promise.all(R.map(function (r) { return on3Photo(r.i, tiles ? 640 : n <= 8 ? 320 : 160); }));
+    var flogo = await Promise.all(R.map(function (r) { return r.fl && r.fl[1] ? loadImg(r.fl[1]) : null; }));   // the school he flipped from
+    // FLIP tag, old school's logo, then its name when there is room; returns the width drawn
+    function flipTag(i, x, yc, sz, room, named) {
+      var fl = R[i].fl; if (!fl) return 0;
+      g.font = sz + 'px ' + FONT; var tw0 = g.measureText('FLIP').width, tp = Math.round(sz * 0.3), th0 = Math.round(sz * 1.25), w0 = tw0 + 2 * tp;
+      g.fillStyle = C.down; g.fillRect(x, Math.round(yc - th0 / 2), w0, th0); g.fillStyle = C.dark; g.fillText('FLIP', x + tp, yc + 1);
+      var lx2 = x + w0 + Math.round(sz * 0.35), lz = Math.round(sz * 1.5);
+      if (flogo[i]) { drawLogo(g, flogo[i], lx2, Math.round(yc - lz / 2), lz, lz); lx2 += lz + Math.round(sz * 0.3); }
+      if (named || !flogo[i]) { var nm = fit(g, fl[0], Math.max(0, x + room - lx2)); g.fillStyle = C.down; g.fillText(nm, lx2, yc + 1); lx2 += g.measureText(nm).width; }
+      return lx2 - x;
+    }
     var scH = (txt(win.querySelector('thead th:nth-child(4)')) || 'CLASS').toUpperCase();
     var LW = 600, pad = 20, X = F.x, Y0 = F.y, HH = F.h, bot = Y0 + HH - pad, PW = 640, PX = F.x + F.w - PW;
 
@@ -2718,19 +2728,19 @@
         g.fillStyle = C.teal; g.fillText(r.p, cx + ip, cy + lf / 2); var pw2 = g.measureText(r.p).width + 18;
         g.fillStyle = C.lilac; g.fillText(fit(g, [r.h, r.w ? r.w + ' lb' : null].filter(Boolean).join(' · '), iw - pw2), cx + ip + pw2, cy + lf / 2); cy += lf + 12;
         [r.hs, r.o].filter(Boolean).forEach(function (t) { g.fillText(fit(g, t, iw), cx + ip, cy + lf / 2); cy += lf + 12; });
-        // FV and Y1 FV, then industry stars, the gap and xNIL, pinned to the bottom
-        var h1 = 132, h2 = 104, by = Y0 + HH - ip - h1 - h2 - 10, gapd = starGap(r);
+        if (r.fl) { flipTag(i, cx + ip, cy + lf / 2, lf, iw, 1); cy += lf + 12; }
+        // FV and Y1 FV, then industry stars and xNIL, pinned to the bottom
+        var h1 = 132, h2 = 104, by = Y0 + HH - ip - h1 - h2 - 10;
         function cell(x, yy, w, h, lab, val, col, tint, lead, big) {
           g.fillStyle = lead ? C.dark : tint; g.fillRect(x, yy, w, h); if (lead) { g.fillStyle = C.teal; g.fillRect(x, yy + h - 6, w, 6); }
           g.font = '26px ' + FONT; g.fillStyle = C.lilac; g.fillText(lab, x + 14, yy + 24);
           g.font = big + 'px ' + FONT; while (big > 24 && g.measureText(val).width > w - 24) { big -= 2; g.font = big + 'px ' + FONT; }
           g.fillStyle = col; g.fillText(val, x + 14, yy + 24 + (h - 24) / 2 + 2);
         }
-        var w2 = (iw - 10) / 2, w3 = (iw - 20) / 3, vs = cw >= 500 ? 64 : 52;
+        var w2 = (iw - 10) / 2, vs = cw >= 500 ? 64 : 52;
         cell(cx + ip, by, w2, h1, 'FV', String(r.f), C.teal, TINT.ark, 1, 88); cell(cx + ip + w2 + 10, by, w2, h1, 'Y1 FV', String(r.y), C.white, TINT.ark, 0, 88);
-        cell(cx + ip, by + h1 + 10, w3, h2, 'IND', r.s == null ? '–' : r.s + (r.sp ? '+' : ''), C.white, TINT.ind, 0, vs);
-        cell(cx + ip + w3 + 10, by + h1 + 10, w3, h2, 'Δ★', gapd ? gapd[0] : '–', gapd ? gapd[1] : C.lilac, TINT.ind, 0, vs);
-        cell(cx + ip + 2 * (w3 + 10), by + h1 + 10, w3, h2, 'xNIL', r.x ? money(r.x) : '–', C.white, TINT.nil, 0, vs);
+        cell(cx + ip, by + h1 + 10, w2, h2, 'IND', r.s == null ? '–' : r.s + (r.sp ? '+' : ''), C.white, TINT.ind, 0, vs);
+        cell(cx + ip + w2 + 10, by + h1 + 10, w2, h2, 'xNIL', r.x ? money(r.x) : '–', C.white, TINT.nil, 0, vs);
       });
       return F.canvas;
     }
@@ -2739,7 +2749,7 @@
     var P = function (v) { return Math.round(v * s); }, sc = Math.min(s, 1.6), Q = function (v) { return Math.round(v * sc); };   // one wide column: the number cells stop growing, the name takes the room
     var ss2 = Math.max(14, Math.floor(21 * sc / 7) * 7), sg2 = Math.max(2, Q(3)), stW = 5 * (ss2 + sg2) + Q(26);
     // columns right to left: [header, width, group]
-    var CW = [['xNIL', Q(90), 'nil'], ['Δ★', Q(58), 'ind'], ['IND', Q(54), 'ind'], ['Y1 FV', Q(72), 'ark'], ['FV', Q(58), 'ark'], ['ARK', stW, 'ark']];
+    var CW = [['xNIL', Q(90), 'nil'], ['IND', Q(54), 'ind'], ['Y1 FV', Q(72), 'ark'], ['FV', Q(58), 'ark'], ['ARK', stW, 'ark']];
     var hf = Math.min(30, Math.max(20, P(20)));
     for (var c = 0; c < cols; c++) {
       var cx0 = RX + c * (cw2 + cg), right = cx0 + cw2 - P(6), hx = right;
@@ -2753,17 +2763,17 @@
       var fs = Math.min(rh - 2 * Math.max(4, P(4)), 150), fx = x + P(8);
       faceBox(g, photos[i], fx, Math.round(mid - fs / 2), fs, fs, r.n);
       // the number cells, right-aligned under their headers
-      var right = x + cw2 - P(6), cx = right, ct = y2 + Math.max(4, P(5)), ch = rh - 2 * Math.max(4, P(5)), gapd = starGap(r);
-      var vals = [[r.x ? money(r.x) : '–', C.white], gapd || ['–', 'rgba(200,199,255,0.4)'], [r.s == null ? '–' : r.s + (r.sp ? '+' : ''), r.s == null ? 'rgba(200,199,255,0.4)' : C.white], [String(r.y), C.white], [String(r.f), C.teal]];
+      var right = x + cw2 - P(6), cx = right, ct = y2 + Math.max(4, P(5)), ch = rh - 2 * Math.max(4, P(5));
+      var vals = [[r.x ? money(r.x) : '–', C.white], [r.s == null ? '–' : r.s + (r.sp ? '+' : ''), r.s == null ? 'rgba(200,199,255,0.4)' : C.white], [String(r.y), C.white], [String(r.f), C.teal]];
       CW.forEach(function (k, j) {
         var bx = cx - k[1] + 2, bw = k[1] - 4, lead = k[0] === 'FV';
-        if (j === 5) {
+        if (j === 4) {
           var fills = [C.well, TINT.ark]; fills.forEach(function (f) { g.fillStyle = f; g.fillRect(bx, ct, bw, ch); });
           arkStars(g, r.a, bx + Q(8), mid, ss2, sg2, { x: bx, y: ct, w: bw, h: ch, fills: fills });
         } else {
           g.fillStyle = lead ? C.dark : TINT[k[2]]; g.fillRect(bx, ct, bw, ch);
           if (lead) { g.fillStyle = C.teal; g.fillRect(bx, ct + ch - Math.max(3, P(3)), bw, Math.max(3, P(3))); }
-          g.font = Math.round((lead ? 32 : j === 0 || j === 1 ? 25 : 28) * Math.min(s, 1.7)) + 'px ' + FONT; g.fillStyle = vals[j][1];
+          g.font = Math.round((lead ? 32 : j === 0 ? 25 : 28) * Math.min(s, 1.7)) + 'px ' + FONT; g.fillStyle = vals[j][1];
           g.fillText(vals[j][0], Math.round(cx - k[1] / 2 - g.measureText(vals[j][0]).width / 2), mid + 1);
         }
         cx -= k[1];
@@ -2771,8 +2781,12 @@
       // name over position, size and where he is from
       var tx = fx + fs + P(12), room = cx - P(8) - tx, l1 = y2 + Math.round(rh * 0.32), l2 = y2 + Math.round(rh * 0.74);
       g.font = P(28) + 'px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, r.n, room), tx, l1);
+      // line 2: position, the school he flipped from (FLIP, its logo and name), then size and where he is from as room allows
       g.font = P(21) + 'px ' + FONT; g.fillStyle = C.teal; g.fillText(r.p, tx, l2);
       var pw3 = g.measureText(r.p).width + P(10), parts = sub(r, cols === 1);
+      if (r.fl) pw3 += flipTag(i, tx + pw3, l2, P(19), room - pw3, 1) + P(12);
+      g.font = P(21) + 'px ' + FONT;
+      while (parts.length > 1 && g.measureText(parts.join(' · ')).width > room - pw3) parts.pop();
       g.fillStyle = C.lilac; g.fillText(fit(g, parts.join(' · '), room - pw3), tx + pw3, l2);
     });
     return F.canvas;
@@ -3770,7 +3784,7 @@
   // head (term + what it stands for + sports), WHAT / USE lines, formula, held-out test vs similar metrics,
   // a picture (distribution, calibration, bars or scale), top 10, footnote
   async function buildExplain(d) {
-    var F = await frame(1800, 2400, 'ARKBOARD PROCESS :: GLOSSARY', '', 'arkndjl.net/process' + (d.id ? '#' + d.id : ''));
+    var F = await frame(1800, 2400, 'PROCESS :: GLOSSARY', '', 'arkndjl.net/process' + (d.id ? '#' + d.id : ''));
     var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 32, gap = 20, cy = y;
     var num = function (v, dec, sign, unit) {
       if (typeof v === 'string') return v;
@@ -3960,7 +3974,7 @@
     var d; try { d = JSON.parse(btn.getAttribute('data-gfx-term') || '{}'); } catch (e) { return null; }
     if (!d.t) return null;
     if (d.x) return btn.hasAttribute('data-gfx-wide') ? buildWide(d) : buildExplain(d);
-    var F = await frame(2400, 1350, 'ARKBOARD PROCESS :: GLOSSARY', '', 'arkndjl.net/process' + (d.id ? '#' + d.id : ''));
+    var F = await frame(2400, 1350, 'PROCESS :: GLOSSARY', '', 'arkndjl.net/process' + (d.id ? '#' + d.id : ''));
     var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 40;
     var ab = d.ab || String(d.t).replace(/\s*\(.*$/, ''), name = d.name || ((/\(([^)]*)\)/.exec(d.t) || [])[1]) || '';
     var num = function (v, unit) {
@@ -4090,7 +4104,7 @@
     var d; try { d = JSON.parse(btn.getAttribute('data-gfx-log') || '{}'); } catch (e) { return null; }
     if (!d.t) return null;
     var study = d.k === 'study', key = study ? d.id : d.n;
-    var F = await frame(2400, 1350, 'ARKLOG' + (d.sec ? ' :: ' + String(d.sec).toUpperCase() : ''), String(d.d || '').replace(/,? \d+:\d+.*$/, ''), 'arkndjl.net/arklog' + (key ? '#log-' + key : ''));
+    var F = await frame(2400, 1350, 'ARKLOG' + (d.sec ? ' :: ' + String(d.sec).toUpperCase() : ''), String(d.d || '').replace(/,? \d+:\d+.*$/, ''), 'arkndjl.net/process#' + (key ? 'log-' + key : 'log'));
     var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 40;
     // head: tags, then the title in the largest of 88/72/56 px that fits three lines
     var tags = (d.sp || []).slice(0, 4).map(function (s) { return String(s).toUpperCase(); }), vt = study ? (d.v === 'w' ? 'STUDY · WEAK' : 'STUDY') : VLAB[d.v] || String(d.ar || '').toUpperCase();
@@ -4172,7 +4186,7 @@
     var d; try { d = JSON.parse(btn.getAttribute('data-gfx-board') || '{}'); } catch (e) { return null; }
     if (!d.tests) return null;
     var day = ''; try { day = new Date(d.asof).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'America/New_York' }); } catch (e) {}
-    var F = await frame(2400, 1350, 'ARKLOG :: SCOREBOARD', day, 'arkndjl.net/arklog#scoreboard');
+    var F = await frame(2400, 1350, 'ARKLOG :: SCOREBOARD', day, 'arkndjl.net/process#scoreboard');
     var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, gap = 24;
     var tiles = [['CHANGES', d.changes, C.white], ['TESTS', d.tests, C.white], ['SHIPPED', d.shipped, VCOL.s], ['PART SHIPPED', d.mixed, VCOL.m], ['FAILED', d.failed, VCOL.f], ['STUDIES', d.studies, C.white]];
     var tw = (w - gap * (tiles.length - 1)) / tiles.length, th = 280;
@@ -4190,7 +4204,7 @@
   async function buildSheet(win, btn) {
     var d; try { d = JSON.parse(btn.getAttribute('data-gfx-sheet') || '{}'); } catch (e) { return null; }
     if (!d.sport) return null;
-    var F = await frame(2400, 1350, 'ARKBOARD PROCESS :: ' + String(d.sport).toUpperCase(), '', 'arkndjl.net/process#sheet-' + String(d.sport).toLowerCase());
+    var F = await frame(2400, 1350, 'PROCESS :: ' + String(d.sport).toUpperCase(), '', 'arkndjl.net/process#sheet-' + String(d.sport).toLowerCase());
     var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 40, gap = 24, L = d.lead, lg = d.log || {};
     var hw = Math.round(w * 0.3), HH = L ? 420 : 300;
     well(g, x, y, hw, HH);
@@ -4237,7 +4251,7 @@
   // an explainer term as a 16:9 card (the 3:4 card is buildExplain): term, what, use and formula on the left,
   // the held-out test against similar metrics over the top five on the right
   async function buildWide(d) {
-    var F = await frame(2400, 1350, 'ARKBOARD PROCESS :: GLOSSARY', '', 'arkndjl.net/process' + (d.id ? '#' + d.id : ''));
+    var F = await frame(2400, 1350, 'PROCESS :: GLOSSARY', '', 'arkndjl.net/process' + (d.id ? '#' + d.id : ''));
     var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 36, gap = 24, lw = Math.round(w * 0.5), rx = x + lw + gap, rw = w - lw - gap;
     var cap = function (t, X, Y, col) { g.font = '32px ' + FONT; g.fillStyle = col || C.lilac; g.fillText(String(t).toUpperCase(), X, Y); };
     var num = function (v, dec, sign) { if (typeof v === 'string') return v; v = +v; var s = dec == null ? (Math.abs(v) >= 10 ? (Math.round(v * 10) / 10).toString() : (Math.round(v * 1000) / 1000).toString()) : v.toFixed(dec); s = s.replace(/^(-?)0\./, '$1.').replace('-', '−'); return sign && v > 0 ? '+' + s : s; };

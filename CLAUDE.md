@@ -20,13 +20,18 @@
 - A spelling the rules miss (Neo / Neoklis Avdalas, a source's typo) goes in `data/name_aliases.json` "players"; a
   common nickname goes in its "nicknames". Matches still check team and position, so same-name players stay apart.
 
-## ARKBOARD Process (was "Reference", before that "Library")
+## Process (was ARKBOARD Process, "Reference", before that "Library"; ARKLOG folded in Nov 28)
 
-- The ARKBOARD section that holds the method is **Process** (Noah, Nov 17 2026): page `content/arkboard-process.md`, URL
-  `/arkboard/process/`, short link `arkndjl.net/process`, menu identifier `arkboard-process`. Never call it "Library" (that is
-  ARKLIBRARY), "Lab", "Reference" or "ARKPROCESS". `/reference`, `/library`, `/lab`, `/arkboard/reference/`,
-  `/arkboard/library/` and `/arkboard/lab/` redirect to it in `static/_redirects`.
-- Side strip (Nov 27): Overview (overview, sports) | Metrics (FV, FV scales, player value, player odds) | Models (team ratings,
+- **Process** is its own section (Noah, Nov 28 2026): page `content/arkboard-process.md`, URL `/process/`, top menu item
+  `process` right under donate (icon `static/img/icons/process.svg`), also listed in the ARKBOARD menu (`arkboard-process`).
+  ARKLOG is a group inside it (log, updates, scoreboard, traffic, build, data). Never call it "Library" (that is ARKLIBRARY),
+  "Lab", "Reference" or "ARKPROCESS". `/arkboard/process/`, `/arklog/`, `/reference`, `/library`, `/lab` and the old
+  ARKBOARD paths redirect to it in `static/_redirects` (no hash in the target, so `/arklog/#scoreboard` keeps its tab).
+- Philosophy (Noah, Nov 28): Overview | Philosophy | Metrics ... Text in Noah's words is `research/philosophy.json` (numbers as
+  `{key}` placeholders), filled with figures from the fit files by `scripts/philosophy_build.py` into `data/philosophy.json`,
+  drawn by `layouts/shortcodes/procphil.html`; process-refresh.yml reruns it. The 16:9 ARKPHILOSOPHY card
+  (`static/img/process/arkphilosophy.png`) is `python3 scripts/philosophy_gfx.py` (Playwright; rerun by hand).
+- Side strip (Nov 28): Overview | Philosophy | ARKLOG (`ARKLOG` in library_build.py) | Metrics (FV, FV scales, player value, player odds) | Models (team ratings,
   game models, drafts and mocks, testing) | Research | Data (data sources, data and names, abbreviations). The page is written by
   `scripts/library_build.py` from `data/library.json`; rerun it rather than hand-editing. A new glossary section goes in SIDE
   and GLOSS_TAB there; the gate terms (held out, walk-forward, ship gate, ledger) are moved into "testing" by METHOD.
@@ -43,7 +48,7 @@
 - Data Sources tab: `{{< datasources >}}` reads `data/data_sources.json`. A new fetcher that pulls from a new outside
   source adds the source there (name, link, what the site takes from it).
 
-## ARKLOG (/arklog/, menu "ARKLOG", was "site data")
+## ARKLOG (Process > ARKLOG, /process/#log; was /arklog/, before that "site data")
 
 - The dated record of every change on the whole site (ARKBOARD, 1NT, LAURSEN_111, ST. CLAIRE, ARKLIBRARY, site) plus the site
   data tabs (traffic, build, data). `scripts/arklog.py` reads the merged pull requests (cache `scripts/data/arklog_prs.json.gz`)
@@ -52,7 +57,7 @@
 - A pull request description is the log entry, in Noah's voice (below). A model or metric test ends with its own line,
   `ARKLOG: shipped · R² .643 to .732 · t = 2.1` (`shipped`, `part shipped` or `failed`; then the one held-out number that
   decided it, before to after, and its t; leave the number out when there is no single one). That line is taken as
-  written. Without it the row is read by pattern, which misreads often: check the new row on /arklog/ after the merge
+  written. Without it the row is read by pattern, which misreads often: check the new row on /process/#log after the merge
   and correct it in `research/arklog_fix.json`. Every test through #1304 was read against its write-up on Nov 27 and is
   held there (`v`, `e`, `tt`); do not regenerate those entries.
 - Hidden pages (Franchise Fantasy, the ST. CLAIRE style guide) never appear in the log (`OUT` in arklog.py).

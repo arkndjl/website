@@ -8,7 +8,8 @@ Reads static/data/cfb-recruits.json (every graded recruit, scripts/cfb_recruit.m
   {asof, y: {<class year>: {of: schools ranked, t: {<school>: {rk, s, n, a6, ah, am, al, avg, te, dp, x, conf,
      g: [[position group, commits, FV points, mean FV], ...],
      r: [{n name, p position, g group, h height, w weight, o hometown, hs high school, f FV, y Y1 FV, x xNIL,
-          a ARK stars, s industry stars, sp industry 5-star+, i On3 photo path}, ...] best first,
+          a ARK stars, s industry stars, sp industry 5-star+, i On3 photo path,
+          fl [school, logo, date] he flipped from (static/data/moves/<sport>.json)}, ...] best first,
      ld: uncommitted recruits the school leads for, best first: {n, p, a, f, i, e: [experts on it, experts with a pick]
          (On3/Rivals, data/recruit_expert_picks.json), r: On3 RPM % (data/recruit_rpm.json), l: ARK lean %
          (data/recruit_commit_leans.json)},
@@ -112,6 +113,25 @@ def groups(rows, order, floor):
     return [[k, len(by[k]), round(sum(v - floor for v in by[k]), 1), round(sum(by[k]) / len(by[k]), 1)] for k in keys]
 
 
+_MV = {}
+
+
+def flipped(sp, name, yr, team):
+    """[school, logo, date]: the school he was committed to before this one (a flip, or a commit to another school
+    before this one), from static/data/moves/<sp>.json (scripts/player_moves.py); None when there was none"""
+    if sp not in _MV: _MV[sp] = load('static', 'data', 'moves', sp + '.json', default={})
+    m = _MV[sp]
+    T, L = m.get('t') or [], m.get('l') or []
+    nm = lambda i: T[i] if 0 <= i < len(T) else None
+    rows = [x for x in (m.get('p') or {}).get(names.key(name)) or [] if x[4] in (0, int(yr))]
+    out = None
+    for d, k, fr, to, _ in rows:   # oldest first: the latest earlier school wins
+        if k == 'flip' and nm(fr) and not names.same_team(nm(fr), team): out = [nm(fr), (L[fr] or None) if fr < len(L) else None, d]
+        elif k == 'commit' and nm(to) and not names.same_team(nm(to), team): out = [nm(to), (L[to] or None) if to < len(L) else None, d]
+        elif k in ('commit', 'flip') and nm(to) and names.same_team(nm(to), team) and out and k == 'commit' and d and out[2] and d < out[2]: out = None
+    return out
+
+
 def pack(rows, order, floor):
     # best first: ARK stars, then FV (the order of the class rankings' top commits)
     rows = sorted(rows, key=lambda r: (-(r['a'] or 0), -r['fx'], r['n']))
@@ -138,7 +158,7 @@ def cfb():
             by.setdefault(r['team'], []).append({
                 'n': r['name'], 'p': r['pos'].split('-')[0], 'g': r.get('g') or r['pos'], 'h': feet(r.get('ht')), 'w': r.get('wt'),
                 'o': r.get('home'), 'f': round(r['xfv']), 'y': round(r['fvOn']), 'x': r.get('xnil'), 'a': r.get('ark'),
-                's': r.get('stars'), 'i': img(r.get('img')), 'fx': r['xfv']})
+                's': r.get('stars'), 'i': img(r.get('img')), 'fl': flipped('cfb', r['name'], yr, r['team']), 'fx': r['xfv']})
         T, LD, VS = {}, leads('cfb', yr, lst), visits('cfb', yr, lst, d['asof'])
         for t in teams:
             g, rows = pack(by.get(t['team'], []), CFB_G, floor)
@@ -165,7 +185,7 @@ def cbb():
             by.setdefault(r['team'], []).append({
                 'n': r['name'], 'p': r['pos'], 'g': r['pos'], 'h': r.get('ht'), 'w': r.get('wt'), 'o': r.get('home'), 'hs': r.get('hs'),
                 'f': round(r['fv']), 'y': round(r['y1fv']), 'x': r.get('xnil'), 'a': r.get('ark'), 's': r.get('stars'),
-                'sp': 1 if r.get('fsp') else None, 'i': img(r.get('img')), 'fx': r['fv']})
+                'sp': 1 if r.get('fsp') else None, 'i': img(r.get('img')), 'fl': flipped('cbb', r['name'], c['year'], r['team']), 'fx': r['fv']})
         T, LD, VS = {}, leads('cbb', c['year'], c['list']), visits('cbb', c['year'], c['list'], d['asof'])
         for t in teams:
             g, rows = pack(by.get(t['team'], []), CBB_G, floor)

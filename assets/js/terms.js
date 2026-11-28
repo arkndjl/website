@@ -11,7 +11,7 @@
   var D = {{ site.Data.terms | jsonify | safeJS }};
   var T = D.terms || {}, AL = D.alias || {}, GR = D.groups || {}, LOW = {}, k;
   for (k in T) if (!(k.toLowerCase() in LOW)) LOW[k.toLowerCase()] = k;
-  var PROC = {{ "arkboard/process/" | relURL | jsonify | safeJS }};
+  var PROC = {{ "process/" | relURL | jsonify | safeJS }};
   var page = (location.pathname.replace(/\/+$/, '').split('/').pop() || 'home').toLowerCase();
   var SEL = '[data-term], th, .term, .cfb__chip';   // labels read as terms by their text
   var INLINE = '.tick__g, .nws__main, [data-terms]';
