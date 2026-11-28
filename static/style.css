@@ -3119,6 +3119,11 @@ table.trophycase__hist td.trophycase__post {
 .fvo i.fvo__s3 { background: #b3d8ee; }
 .fvo i.fvo__s4 { background: #7fffd4; }
 /* FV scorecard (layouts/shortcodes/fvcard.html): realized share vs predicted odds by FV band */
+/* draft classes (fvclasses.html): draft-day columns tinted lilac, the careers teal, each group boxed */
+.fvcl td.fvcl__d { background: rgba(200, 162, 255, 0.07); }
+.fvcl td.fvcl__o { background: rgba(127, 255, 212, 0.06); }
+.fvcl th.fvcl__d:nth-child(4), .fvcl td.fvcl__d:nth-child(4), .fvcl th.fvcl__o:nth-child(9), .fvcl td.fvcl__o:nth-child(9) { border-left: 2px solid var(--win-dark); }
+.wintable .fvcl td.cfb__name, .wintable .fvcl th { white-space: nowrap; }
 .fvsc { font-size: 0.9em; }
 .fvsc td { vertical-align: top; }
 .wintable .fvsc th, .wintable .fvsc td { padding-left: 4px; padding-right: 4px; }

@@ -28,9 +28,12 @@ cover = "/og/hockey-prospects.png"
 {{< fvcard sport="hockey" title="fv scorecard" >}}
 {{< /deskcol >}}
 {{< /desk >}}
+{{< wintabs tab="all-time FV" tabs="all-time FV,draft classes" sub="true" label="all-time FV views" >}}
 {{< lazytab tab="all-time FV" >}}
 {{< fvalltime sport="hockey" tab="all-time FV" >}}
 {{< /lazytab >}}
+{{< fvclasses sport="hockey" tab="draft classes" >}}
+{{< /wintabs >}}
 {{< wintabs tab="mock draft" tabs="predictive mock,blended mock,conviction mock,lottery" sub="true" label="mock draft views" >}}
 {{< hockeymock mode="pred" tab="predictive mock" >}}
 {{< hockeymock mode="blend" tab="blended mock" >}}
