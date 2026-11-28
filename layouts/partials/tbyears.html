@@ -25,7 +25,7 @@ data/team_years_fit.json). Included once by cfbbuilder.html and cbbbuilder.html.
   function seasonLabel(sp, y) { return sp === 'cbb' ? y + '-' + String(y + 1).slice(2) : String(y); }
   function depthHtml(sp, P, j, y) {
     var by = {}; P.forEach(function (o) { var p = o['p' + j]; if (p >= 0.15) (by[o.pos] = by[o.pos] || []).push(o); });
-    return '<div class="tbx__room">' + ORDER[sp].filter(function (g) { return by[g]; }).map(function (g) {
+    return battles(sp, by, j) + '<div class="tbx__room">' + ORDER[sp].filter(function (g) { return by[g]; }).map(function (g) {
       // order: P(starts here) = P(on the roster) x P(wins the job | here) (scripts/start_odds.py); K, P and anyone without it after, by FV
       var st = function (o) { return o['ps' + j] == null ? -1 : o['p' + j] * o['ps' + j]; },
         L = by[g].sort(function (a, b) { return st(b) - st(a) || (b.fv || 0) - (a.fv || 0) || (b['p' + j] || 0) - (a['p' + j] || 0); }), deep = DEEP[sp][g] || 6;
@@ -33,6 +33,31 @@ data/team_years_fit.json). Included once by cfbbuilder.html and cbbbuilder.html.
         var p = o['p' + j], rs = /^RS/.test(o.cls || '') ? 'RS' : '', tag = TAG[o.kind] || rs, s = st(o);
         return '<span class="tbx__rc tbx__rc--' + o.kind + (p < 0.5 ? ' is-maybe' : '') + (i >= deep ? ' is-deep' : '') + '" title="' + esc(o.name + ' · ' + (o.cls || '') + (s >= 0 ? ' · P(starts ' + seasonLabel(sp, y) + ') ' + pc(s).replace('&lt;', '<') + ' · P(wins the job if here) ' + pc(o['ps' + j]).replace('&lt;', '<') : '') + ' · P(here) ' + Math.round(p * 100) + '%') + '"><i>' + (i + 1) + '</i>' + fvchip(o.fv) + '<span>' + esc(o.name) + '</span>' + (tag ? '<em>' + tag + '</em>' : '') + '<small>' + pc(s >= 0 ? s : p) + '</small></span>';
       }).join('') + '</div></div>';
+    }).join('') + '</div>';
+  }
+  // position battles: the starting spots still up for grabs. Players ranked by P(starts) (here x wins the job); a battle is
+  // the last spot's holder and the next man inside 15 points of each other, and everyone else within 15 points of that line
+  var SEATS = { cfb: { QB: 1, RB: 1, WR: 3, TE: 1, OL: 5, EDGE: 2, DL: 2, LB: 2, CB: 2, S: 2 } };
+  function battles(sp, by, j) {
+    var groups = sp === 'cbb' ? [['starting five', [].concat.apply([], ORDER.cbb.map(function (g) { return by[g] || []; })), 5]]
+      : ORDER.cfb.filter(function (g) { return by[g] && SEATS.cfb[g]; }).map(function (g) { return [g, by[g], SEATS.cfb[g]]; });
+    var out = [];
+    groups.forEach(function (G) {
+      var L = G[1].filter(function (o) { return o['ps' + j] != null; }).map(function (o) { return { o: o, s: o['p' + j] * o['ps' + j] }; })
+        .sort(function (a, b) { return b.s - a.s; }), n = G[2];
+      if (L.length <= n) return;
+      var hi = L[n - 1].s, lo = L[n].s;
+      if (hi - lo >= 0.15 || lo < 0.15) return;
+      var C = L.filter(function (x) { return x.s <= lo + 0.15 && x.s >= hi - 0.15; });
+      out.push({ g: G[0], n: n, open: L.filter(function (x) { return x.s > lo + 0.15; }).length, C: C, gap: hi - lo });
+    });
+    if (!out.length) return '';
+    out.sort(function (a, b) { return a.gap - b.gap; });
+    return '<div class="tbx__bat"><b class="tbx__bath">battles</b>' + out.map(function (B) {
+      var spots = B.n - B.open;
+      return '<div class="tbx__brow" title="' + esc(B.g + ': ' + spots + ' of ' + B.n + ' starting spot' + (B.n > 1 ? 's' : '') + ' between these players; P(starts) = P(here) x P(wins the job if here)') + '"><span class="tbx__bg">' + esc(B.g) + '<small>' + spots + ' of ' + B.n + '</small></span><span class="tbx__bl">' +
+        B.C.map(function (x) { var o = x.o, tag = TAG[o.kind] || (/^RS/.test(o.cls || '') ? 'RS' : '');
+          return '<span class="tbx__rc tbx__rc--' + o.kind + '">' + fvchip(o.fv) + '<span>' + esc(o.name) + '</span>' + (tag ? '<em>' + tag + '</em>' : '') + (sp === 'cbb' ? '<em>' + esc(o.pos || '') + '</em>' : '') + '<small>' + pc(x.s) + '</small></span>'; }).join('<i class="tbx__vs">vs</i>') + '</span></div>';
     }).join('') + '</div>';
   }
   function vcell(v) { return '<td class="cfb__num">' + (v == null ? '—' : (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1)) + '</td>'; }
