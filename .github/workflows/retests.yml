@@ -9,6 +9,10 @@ name: retests
 on:
   schedule:
     - cron: "40 14 * * 2,5"
+  # a merged pull request that adds or answers a retest shows on ARKLOG > retests the same day, not at the next Tue/Fri run
+  push:
+    branches: [main]
+    paths: [data/retests.json]
   workflow_dispatch:
     inputs:
       dry:
