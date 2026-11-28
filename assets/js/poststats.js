@@ -1,7 +1,7 @@
 // Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 // Article views and favorites (layouts/partials/poststats.html; counts in worker/site.js PostStats, /api/posts).
 // The article page posts its view (the Worker keeps one a visitor a day) and lists read every count in one GET.
-// The platinum star toggles a favorite: one per browser, kept in local storage with the browser's own random id, so the
+// The pixel heart toggles a favorite: one per browser, kept in local storage with the browser's own random id, so the
 // Worker can take it back later. Nothing shows until the counts load.
 (function () {
   var els = [].slice.call(document.querySelectorAll('.pst[data-post]'));

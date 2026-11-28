@@ -5448,14 +5448,15 @@ td.tbx__p { color: #7fffd4; font-weight: bold; }
 .pst__fav:disabled { cursor: progress; }
 .pst__fav.is-on { color: #b9f2ff; background: var(--win-well); border-color: var(--win-dark) #b9f2ff #b9f2ff var(--win-dark); box-shadow: none; transform: translate(2px, 2px); }
 .pst__fav b { padding-left: 6px; border-left: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); }
-.pst__fav i { display: block; width: 20px; height: 18px;
-  --star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 9' shape-rendering='crispEdges'%3E%3Cpath d='M4 0h1v1h-1zM4 1h1v1h-1zM3 2h3v1h-3zM0 3h9v1h-9zM1 4h7v1h-7zM2 5h5v1h-5zM2 6h2v1h-2zM5 6h2v1h-2zM1 7h2v1h-2zM6 7h2v1h-2zM1 8h1v1h-1zM7 8h1v1h-1z'/%3E%3C/svg%3E");
-  background: color-mix(in srgb, #b9f2ff 30%, transparent); -webkit-mask: var(--star) 0 0 / 20px 18px no-repeat; mask: var(--star) 0 0 / 20px 18px no-repeat; }
+.pst__fav i { display: block; width: 18px; height: 16px;
+  --star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 8' shape-rendering='crispEdges'%3E%3Cpath d='M1 0h2v1h-2zM6 0h2v1h-2zM0 1h4v1h-4zM5 1h4v1h-4zM0 2h9v2h-9zM1 4h7v1h-7zM2 5h5v1h-5zM3 6h3v1h-3zM4 7h1v1h-1z'/%3E%3C/svg%3E");
+  background: color-mix(in srgb, #b9f2ff 30%, transparent); -webkit-mask: var(--star) 0 0 / 18px 16px no-repeat; mask: var(--star) 0 0 / 18px 16px no-repeat; }
+.pst__l { display: none; }
 .pst__fav.is-on .pst__s { display: inline-flex; filter: drop-shadow(1px 0 0 #241a3a) drop-shadow(-1px 0 0 #241a3a) drop-shadow(0 1px 0 #241a3a) drop-shadow(0 -1px 0 #241a3a) drop-shadow(0 0 3px #b9f2ff); }
 .pst__fav.is-on i { background: linear-gradient(90deg, #7fcbe6 0 22%, #fff 36%, #b9f2ff 46% 62%, #8fd9ef 76%, #7fcbe6 100%) 0 0 / 40px 100% repeat-x; animation: pstfav 3s steps(20) infinite; }
 .pst__fav.is-on b { color: #b9f2ff; border-left-color: color-mix(in srgb, #b9f2ff 45%, transparent); }
 @keyframes pstfav { to { background-position: -40px 0; } }
-@media (max-width: 684px) { .pst__fav i { width: 15px; height: 13.5px; -webkit-mask-size: 15px 13.5px; mask-size: 15px 13.5px; } }
+@media (max-width: 684px) { .pst__fav i { width: 13.5px; height: 12px; -webkit-mask-size: 13.5px 12px; mask-size: 13.5px 12px; } }
 @media (prefers-reduced-motion: reduce) { .pst__fav.is-on i { animation: none; } }
 /* Process > ARKLOG > traffic > articles.exe (layouts/shortcodes/articlestats.html) */
 .astat td.astat__t { white-space: normal; min-width: 18ch; max-width: 36ch; }
