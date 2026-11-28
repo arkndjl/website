@@ -1,5 +1,8 @@
 name = "website"
 compatibility_date = "2026-02-14"
+# Keep variables added in the Cloudflare dashboard: without this every deploy from this file wipes plain-text vars
+# (secrets survive either way). The feed cron reads its GitHub token from one (worker/site.js TOKEN_NAMES).
+keep_vars = true
 # Worker code runs only for /api/* (play counter, article views and favorites, Ko-fi, photos); every other path is plain static assets.
 main = "worker/site.js"
 
