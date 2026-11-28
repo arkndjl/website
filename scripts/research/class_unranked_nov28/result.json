@@ -1,0 +1,84 @@
+{
+ "n": 2209,
+ "commits": {
+  "listed": 26832,
+  "off rated": 6515,
+  "off unrated": 1539
+ },
+ "classes": [
+  2011,
+  2020
+ ],
+ "drafted": 2267,
+ "baseRmse": 1.044,
+ "forms": {
+  "graded": {
+   "rmse": 1.052,
+   "d": -0.01682,
+   "t": -2.05,
+   "up": 2,
+   "of": 10,
+   "forward": {
+    "n": 716,
+    "d": -0.01453,
+    "t": -1.28,
+    "u": 0.0
+   },
+   "pass": false
+  },
+  "half": {
+   "rmse": 1.0518,
+   "d": -0.01635,
+   "t": -2.01,
+   "up": 2,
+   "of": 10,
+   "forward": {
+    "n": 716,
+    "d": -0.01443,
+    "t": -1.27,
+    "u": 0.25
+   },
+   "u": 0.0,
+   "pass": false
+  }
+ },
+ "byLevel": {
+  "P4": {
+   "listed": 12441,
+   "off": 1601,
+   "offUnrated": 123
+  },
+  "G5": {
+   "listed": 12406,
+   "off": 2402,
+   "offUnrated": 177
+  },
+  "FCS": {
+   "listed": 1985,
+   "off": 4051,
+   "offUnrated": 1239
+  }
+ },
+ "pick": "none",
+ "explore": {
+  "two_terms": {
+   "d": 0.00066,
+   "t": 0.16,
+   "up": 6,
+   "weights": {
+    "P4": {
+     "on": 0.0379,
+     "off": -0.0195
+    },
+    "G5": {
+     "on": 0.0529,
+     "off": -0.0256
+    },
+    "FCS": {
+     "on": 0.0823,
+     "off": 0.0424
+    }
+   }
+  }
+ }
+}

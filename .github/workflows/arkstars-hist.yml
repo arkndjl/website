@@ -50,13 +50,31 @@ jobs:
           ON3_TEAMS=scripts/data/arkstars_on3_teams.json ON3_EXTRA=scripts/data/arkstars_on3_extra.json \
             node scripts/on3_commits.mjs football $Y $((Y + 3)) --fcs
           node scripts/on3_commits.mjs basketball $BY $((BY + 2))
+      # each program's On3 offer list for the class cards (scripts/class_offboard.py --offers packs it)
+      - name: On3 offer lists
+        if: github.event_name != 'workflow_run'
+        continue-on-error: true
+        timeout-minutes: 40
+        env:
+          ON3_WORKERS: "6"
+        run: |
+          Y=$(python3 scripts/season.py --get cfb season); BY=$(( $(python3 scripts/season.py --get cbb season) - 1 ))
+          ON3_TEAMS=scripts/data/arkstars_on3_teams.json ON3_EXTRA=scripts/data/arkstars_on3_extra.json \
+            node scripts/on3_commits.mjs football $((Y + 1)) $((Y + 3)) --fcs --offers
+          node scripts/on3_commits.mjs basketball $((BY + 1)) $((BY + 3)) --offers
       - name: Packs
         if: github.event_name != 'workflow_run'
         run: python3 scripts/arkstars_hist.py --update
       - name: Join only
         if: github.event_name == 'workflow_run'
         run: python3 scripts/arkstars_hist.py
+      # every commit and offer for the class rankings and the class cards (the boards' next runs rank them)
+      - name: Class lists and offers
+        continue-on-error: true
+        run: |
+          python3 scripts/class_offboard.py $([ "${{ github.event_name }}" != workflow_run ] && echo --offers)
+          python3 scripts/class_cards.py
       - name: Commit if anything changed
         run: |
           python3 scripts/data_push.py -m "Update the high school ARK stars ($(date -u +%Y-%m-%d))" \
-            -- scripts/data/arkstars_hist_cfb.json.gz scripts/data/arkstars_hist_cbb.json.gz scripts/data/cfb_hometowns.json.gz static/data/arkstars-cfb.json static/data/arkstars-cbb.json data/arkstars_hs.json
+            -- scripts/data/arkstars_hist_cfb.json.gz scripts/data/arkstars_hist_cbb.json.gz scripts/data/cfb_hometowns.json.gz static/data/arkstars-cfb.json static/data/arkstars-cbb.json data/arkstars_hs.json data/class_offboard.json scripts/data/class_offers.json.gz static/data/classes

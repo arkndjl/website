@@ -30,13 +30,17 @@
     var vs = (t.v || []).map(function (r) {
       return '<tr>' + who(r) + '<td class="cfb__num' + (r.d >= today ? ' cfb__up' : '') + '">' + esc(r.d) + '</td><td>' + (r.k === 'o' ? 'official' : 'unofficial') + '</td><td>' + (r.c ? esc(r.c) : '<span class="cfb__dim">—</span>') + '</td></tr>';
     }).join('');
+    var of = (t.of || []).map(function (r) {
+      return '<tr>' + who(r) + '<td>' + (r.c ? (r.cl ? '<img class="cfb__logo cfb__logo--in" src="' + esc(r.cl) + '" alt="" loading="lazy"> ' : '') + esc(r.c) : '<span class="cfb__dim">—</span>') + '</td></tr>';
+    }).join('');
     var tbl = function (h, b) { return '<div class="clsd"><table class="clsd__t"><thead><tr>' + h + '</tr></thead><tbody>' + b + '</tbody></table></div>'; };
     var pr = '<th>Recruit</th><th>ARK</th><th>Pos</th><th>xFV</th>';
     return '<p class="cfb__dhead"><b>' + esc(team) + '</b> · ' + esc(yr) + ' · #' + t.rk + ' of ' + Y.of +
       ' <button type="button" class="cfb__btn cfb__cardbtn" data-gfx data-gfx-mode="class" title="class card graphic (16:9)">classGFX</button></p>' +
-      '<div class="clsd"><table class="clsd__t"><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>' +
+      (body ? '<div class="clsd"><table class="clsd__t"><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>' : '') +
       (ld ? '<p class="cfb__dhead">leads</p>' + tbl(pr + '<th title="On3 and Rivals experts picking the school, of those with a pick">Experts</th><th title="On3 RPM">RPM</th><th title="ARK lean">Lean</th>', ld) : '') +
-      (vs ? '<p class="cfb__dhead">visits</p>' + tbl(pr + '<th>Date</th><th>Visit</th><th>Committed</th>', vs) : '');
+      (vs ? '<p class="cfb__dhead">visits</p>' + tbl(pr + '<th>Date</th><th>Visit</th><th>Committed</th>', vs) : '') +
+      (of ? '<p class="cfb__dhead">offers <span class="cfb__dim">' + (t.on || 0) + (t.oc ? ' · ' + t.oc + ' committed elsewhere' : '') + '</span></p>' + tbl(pr + '<th>Committed</th>', of) : '');
   }
   document.addEventListener('click', function (e) {
     var t = e.target; if (!t.closest) return;

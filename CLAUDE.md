@@ -187,6 +187,18 @@
   recruit news workflow) from files already in the repo; headline and transaction rows are kept in
   `scripts/data/player_moves_hist.json.gz`. A new kind of move needs a label in `MV_LAB` (gfx.js).
 
+## Class rankings (every school, every commit; Noah, Nov 28)
+
+- Every board program is ranked in every class, schools with no commit yet too (they share the last rank). Commits only
+  On3's team lists name (`data/class_offboard.json`, `scripts/class_offboard.py` from the HS ARK stars packs) count in
+  the commits and star buckets at their HS ARK stars, 1 at the lowest, and xFV 20, so they add no class points: their
+  points failed held out (`scripts/research/class_unranked_nov28`, t -2.05; a 0.5-star tier t -2.01). `everyClass` in
+  `scripts/cfb_recruit.mjs`, `class_ranks` in `scripts/cbb_recruit_fit.py`.
+- classGFX shows leads, visits and offers on every card (`buildClassCard`): a column beside a small class, one-line rows
+  under a big one, across the card with no commit. Offers = On3 program offer lists (`on3_commits.mjs --offers`, packed to
+  `scripts/data/class_offers.json.gz`) plus each pulled recruit's On3 recruitment (`of` in the live/committed packs).
+  School slugs for every program: `data/school_slugs.json` (`class_offboard.py --slugs`).
+
 ## DECT (Declare, Even, College, Transfer; was DEC, before that DoR)
 
 - A decision metric in dollars (what is worth most to him), separate from Ret% and Transfer% (what he will do). Board values are
