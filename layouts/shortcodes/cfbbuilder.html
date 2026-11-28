@@ -67,16 +67,13 @@
   function lineup(T, P) {
     // the model's lineup: the chart's first n, open spots filled from the chart and flexible rooms
     // (older data without it: the chart's first n, the next man up filling any spot the returners leave)
-    var L = P.lineup || (P.chart ? P.chart.filter(function (o) { return o.kind !== 'open'; }).slice(0, P.n) : null);
+    // guaranteed players only (Noah, Nov 28): returners, the class and redshirts; transfer targets live in their own tab
+    var L = P.lineup && !P.lineup.some(function (o) { return o.kind === 'new'; }) ? P.lineup : (P.chart ? P.chart.filter(function (o) { return o.kind !== 'open' && o.kind !== 'new'; }).slice(0, P.n) : null);
     // the line comes set left tackle to right tackle (each starter's spot in .at); every other room best first
     if (L) { while (L.length < P.n) L.push({ fv: P.repl, kind: 'open' }); if (!L.every(function (o) { return o.at; })) L = L.slice().sort(function (a, b) { return b.fv - a.fv; }); }
     if (L) return L.map(function (o) { return o.kind === 'open' ? { name: 'open', fv: o.fv, kind: 'open', at: o.at } : { name: o.name, fv: o.fv, kind: o.kind === 'new' ? 'new' : 'back', stay: o.p, team: o.team, from: o.from, mv: o.mv, at: o.at, shift: o.shift, rk: o.kind }; });
     var out = [], d = (P.depth || []).filter(function (x) { return x.stay >= 0.5; }).slice(0, P.n);
     for (var k = 0; k < P.n; k++) out.push(d[k] ? { name: d[k].name, fv: d[k].fv, kind: 'back', stay: d[k].stay } : { name: 'open', fv: P.repl, kind: 'open' });
-    (T.plan || []).filter(function (s) { return s.slot === P.g; }).forEach(function (s) {
-      var wi = 0; out.forEach(function (o, i) { if (o.fv < out[wi].fv) wi = i; });
-      out[wi] = { name: s.name, fv: s.fv, kind: 'new', team: s.team };
-    });
     return out.sort(function (a, b) { return b.fv - a.fv; });
   }
   // the plan for a general manager, a line per call: where the roster stands, the money, who to keep, who changes
@@ -115,13 +112,13 @@
   // wins over replacement, NIL dollars a win) and NIL (budget, the reported range, where the money goes)
   function scoreboard(T, D) {
     var N = T.nx; if (!N) return '';
-    var n = D.teams.length, rows = [['now', N.now, '#c0b0ff'], ['returning', N.ret, '#8a52ea'], ['usual portal', N.exp, '#a24bff'], ['plan', N.plan, '#7fffd4']].concat(N.pot && N.pot.e !== N.plan.e ? [['+ targets', N.pot, '#40e0d0']] : []);
+    var n = D.teams.length, rows = [['now', N.now, '#c0b0ff'], ['roster', N.ret, '#7fffd4'], ['usual portal', N.exp, '#a24bff'], ['w/ targets', N.plan, '#40e0d0']];
     var lo = 1300, hi = 2000;
     var bridge = rows.map(function (r) { var w = Math.max(2, Math.min(100, (r[1].e - lo) / (hi - lo) * 100));
       return '<span>' + r[0] + '</span><span class="tbx__bar" title="' + esc(r[0] + ': Elo ' + r[1].e + ', #' + r[1].rk + ' of ' + n + ', ' + num1(r[1].xw) + ' conference-schedule wins of ' + (D.nxFit || {}).games) + '"><i style="width:' + w.toFixed(0) + '%;--c:' + r[2] + '"></i></span><span class="tbx__n">' + r[1].e + '</span><span class="tbx__rk">#' + r[1].rk + '</span>'; }).join('');
-    var str = '<section class="tbx__box tbx__box--str"><h4>' + D.next + ' strength</h4><div class="tbx__big"><b>#' + N.plan.rk + '</b><span>of ' + n + ' FBS</span><b>' + num1(N.plan.xw) + '</b><span>xW</span></div><div class="tbx__bridge">' + bridge + '</div>' + (window.__tbYears ? window.__tbYears.strip(N, [D.next, D.next + 1, D.next + 2], 'e', function (v) { return v; }, n) : '') + '</section>';
+    var str = '<section class="tbx__box tbx__box--str"><h4>' + D.next + ' strength</h4><div class="tbx__big"><b>#' + N.ret.rk + '</b><span>of ' + n + ' FBS</span><b>' + num1(N.ret.xw) + '</b><span>xW</span></div><div class="tbx__bridge">' + bridge + '</div>' + (window.__tbYears ? window.__tbYears.strip(N, [D.next, D.next + 1, D.next + 2], 'e', function (v) { return v; }, n) : '') + '</section>';
     var WKc = WK, val = '<section class="tbx__box tbx__box--val"><h4>value</h4><div class="tbx__stats">' +
-      '<div class="tbx__stat tbx__stat--teal"><b>' + num1(T.warSea) + '</b><span>college WAR ' + D.next + '</span></div>' +
+      '<div class="tbx__stat tbx__stat--teal"><b>' + num1(T.av27 * WKc) + '</b><span>college WAR ' + D.next + '</span></div>' +
       '<div class="tbx__stat"><b>' + num1(T.av26 * WKc) + '</b><span>college WAR now</span></div>' +
       '<div class="tbx__stat tbx__stat--teal"><b>' + num1(T.war) + '</b><span>wins over replacement</span></div>' +
       '<div class="tbx__stat"><b>' + money(T.eff) + '</b><span>NIL $ a win · #' + T.effRk + '</span></div></div></section>';
@@ -153,7 +150,7 @@
     var tiles = { D: [], O: [] };
     T.positions.forEach(function (p) { var L = lineup(T, p), on = L.map(function (o) { return o.name; });
       // his backup: next season's chart past the starters, 50%+ to be there, one under each tile
-      var Q = p.bench || (p.chart || []).filter(function (o) { return o.kind !== 'open' && o.kind !== 'new' && (o.p == null || o.p >= 0.5) && on.indexOf(o.name) < 0; });
+      var Q = (p.bench || p.chart || []).filter(function (o) { return o.kind !== 'open' && o.kind !== 'new' && (o.p == null || o.p >= 0.5) && on.indexOf(o.name) < 0; });
       L.forEach(function (o, i) {
       var at = (FIELD[p.g] || [])[o.at ? OLS.indexOf(o.at) : i]; if (!at) return;
       var g = o.at || lab(p.g), w = was(o), how = o.mv ? 'from ' + lab(o.mv) + ' (position-change model); ' : o.shift ? 'slide ' + o.shift + ' to ' + o.at + '; ' : o.from ? 'from ' + lab(o.from) + ' (fills open spot); ' : '';
@@ -165,22 +162,22 @@
     }); });
     var byField = function (a, b) { return a[0] - b[0] || a[1] - b[1]; };
     var units = T.positions.map(function (p) {
-      var after = p.nextAv + (T.plan || []).filter(function (s) { return s.slot === p.g; }).reduce(function (a, s) { return a + s.gain; }, 0);
+      var tg = (T.plan || []).filter(function (s) { return s.slot === p.g; }).reduce(function (a, s) { return a + s.gain; }, 0), after = p.nextAv;
       var st = after >= p.bar ? 'ok' : after >= p.bar * 0.7 ? 'mid' : 'low', w = Math.min(100, after / Math.max(p.bar, 0.1) * 50);
-      return '<div class="tb__pos tb__pos--' + st + '"><span class="tb__g">' + lab(p.g) + '</span><span class="tb__meter" title="' + esc('WAR a season: ' + war(p.nowAv) + ' now, ' + war(p.nextAv) + ' no adds, ' + war(after) + ' plan; bar ' + war(p.bar)) + '"><i style="width:' + w.toFixed(0) + '%"></i><b style="left:50%" title="contender bar"></b></span></div>';
+      return '<div class="tb__pos tb__pos--' + st + '"><span class="tb__g">' + lab(p.g) + '</span><span class="tb__meter" title="' + esc('WAR a season: ' + war(p.nowAv) + ' now, ' + war(p.nextAv) + ' guaranteed roster, ' + war(after + tg) + ' with the transfer targets; bar ' + war(p.bar)) + '"><i style="width:' + w.toFixed(0) + '%"></i><b style="left:50%" title="contender bar"></b></span></div>';
     }).join('');
     var avMax = Math.max(T.av26, T.av27, T.avExp || 0, T.avPlan, 1);
-    var avs = [['now', T.av26, 'now'], ['no adds', T.av27, 'none']].concat(T.avExp != null ? [['expected', T.avExp, 'exp']] : []).concat([['plan', T.avPlan, 'plan']]).map(function (b) { return '<div class="tb__av tb__av--' + b[2] + '"><span>' + b[0] + '</span><span class="tb__avbar"><i style="width:' + (b[1] / avMax * 100).toFixed(0) + '%"></i></span><b>' + war(b[1]) + '</b></div>'; }).join('');
+    var avs = [['now', T.av26, 'now'], ['no adds', T.av27, 'none']].concat(T.avExp != null ? [['expected', T.avExp, 'exp']] : []).concat([['w/ targets', T.avPlan, 'plan']]).map(function (b) { return '<div class="tb__av tb__av--' + b[2] + '"><span>' + b[0] + '</span><span class="tb__avbar"><i style="width:' + (b[1] / avMax * 100).toFixed(0) + '%"></i></span><b>' + war(b[1]) + '</b></div>'; }).join('');
     var ramp = FVT.map(function (t, i) { return '<i style="--t:' + t[1] + ';--k:' + t[2] + '">' + (i ? t[0] : '&lt;' + FVT[1][0]) + (i === FVT.length - 1 ? '+' : '') + '</i>'; }).join('');
     var chart = '<section class="tb__panel tb__chart"><h4>next season · starters and backups</h4><div class="tb__pitch"><div class="tb__field">' +
       '<div class="tb__flab">defense</div>' + tiles.D.sort(byField).map(function (x) { return x[2]; }).join('') + '<div class="tb__los"><span>offense</span></div>' + tiles.O.sort(byField).map(function (x) { return x[2]; }).join('') +
       '</div><div class="tb__side"><h5>units vs the contender bar</h5>' + units + '<h5>WAR a season</h5>' + avs + '</div></div>' +
-      '<p class="tb__legend"><span><i class="tb__key--back"></i>returning</span><span><i class="tb__key--new"></i>signing</span><span><i class="tb__key--open"></i>open</span><span class="cfb__dim">2 = backup</span><span class="tb__ramp" title="tile colour = FV">FV ' + ramp + '</span><span class="cfb__dim">bar tick = level\'s 67th-percentile unit</span></p></section>';
+      '<p class="tb__legend"><span><i class="tb__key--back"></i>returning</span><span><i class="tb__key--open"></i>open</span><span class="cfb__dim">2 = backup</span><span class="tb__ramp" title="tile colour = FV">FV ' + ramp + '</span><span class="cfb__dim">bar tick = level\'s 67th-percentile unit</span></p></section>';
     // next season's full depth chart: returners, the class, redshirts and signings in expected depth order, each spot
     // with the snap share it plays (what a backup is worth), a line under the starters
     var KIND = { recruit: ['FR', D.next + ' class'], redshirt: ['RS', 'rostered, no snaps'], 'new': ['NEW', 'plan signing'] };
     var depth = '<section class="tb__panel tb__depth"><h4>depth chart · ' + D.next + '</h4><div class="tb__dgrid">' + T.positions.filter(function (p) { return (p.chart || []).length; }).map(function (p) {
-      return '<div class="tb__dpos"><h5>' + lab(p.g) + ' <span class="cfb__dim">' + (p.planAv != null ? war(p.planAv) + ' WAR' : '') + '</span></h5><ol>' + p.chart.map(function (o, k) {
+      return '<div class="tb__dpos"><h5>' + lab(p.g) + ' <span class="cfb__dim">' + (p.nextAv != null ? war(p.nextAv) + ' WAR' : '') + '</span></h5><ol>' + p.chart.filter(function (o) { return o.kind !== 'new'; }).map(function (o, k) {
         var sn = (p.snaps || [])[k], tag = KIND[o.kind];
         if (tag && o.ark) tag = [tag[0] + ' ' + (o.ark > 5 ? '5★+' : o.ark + '★'), tag[1] + ', ' + (o.ark > 5 ? '5-star+' : o.ark + ' ARK stars')];
         return '<li class="' + (k === p.n - 1 ? 'tb__dlast' : '') + (o.kind === 'open' ? ' tb__dopen' : '') + '"><span class="tb__dsn" title="snap share at this spot">' + (sn ? Math.round(sn * 100) + '%' : '·') + '</span>' +
@@ -192,9 +189,9 @@
               (o.kind !== 'new' && o.p != null && o.p < 0.9 ? ' <span class="cfb__dim" title="P(here and on the field next season)">' + pct(o.p) + '</span>' : '') + dect(o)) + '</li>';
       }).join('') + '</ol></div>';
     }).join('') + '</div><p class="tb__legend"><span class="cfb__dim">% left = spot\'s snap share this season (rotation, injuries); weights WAR a season · % right = P(there) · ' +
-      '<span class="tb__dtag tb__dtag--recruit">FR</span> ' + D.next + ' class · <span class="tb__dtag tb__dtag--redshirt">RS</span> redshirt · <span class="tb__dtag tb__dtag--new">NEW</span> signing</span></p></section>';
+      '<span class="tb__dtag tb__dtag--recruit">FR</span> ' + D.next + ' class · <span class="tb__dtag tb__dtag--redshirt">RS</span> redshirt</span></p></section>';
     var tbl = function (title, head, rows, empty) { return '<section class="tb__panel"><h4>' + title + '</h4>' + (rows.length ? '<div class="wintable__scroll"><table class="cfb__table tb__t"><thead><tr>' + head.map(function (h) { return '<th' + (h[1] ? ' title="' + esc(h[1]) + '"' : '') + '>' + h[0] + '</th>'; }).join('') + '</tr></thead><tbody>' + rows.join('') + '</tbody></table></div>' : '<p class="cfb__dim">' + empty + '</p>') + '</section>'; };
-    var plan = tbl('the plan · ' + T.plan.length + ' signing' + (T.plan.length === 1 ? '' : 's') + ' · ' + money(T.spend), [['Player'], ['Pos'], ['FV', 'projected FV next season (+1 year)'], ['From'], ['Cost', 'projected price at this level; FCS move-up = 60% of going rate'], ['+WAR', 'room college WAR a season gained; spots weighted by snap share'], ['Xfer%'], ['Land%', 'P(picks this school | moves); conditional logit on 2024-25 transfers (level step, program talent, open playing time, distance from home)'], ['Odds', 'Xfer% x Land% = P(lands here)'], ['Why it\'s realistic'], ['Rivals', 'other plans with this target']],
+    var plan = tbl('transfer targets · ' + T.plan.length + ' · ' + money(T.spend), [['Player'], ['Pos'], ['FV', 'projected FV next season (+1 year)'], ['From'], ['Cost', 'projected price at this level; FCS move-up = 60% of going rate'], ['+WAR', 'room college WAR a season gained; spots weighted by snap share'], ['Xfer%'], ['Land%', 'P(picks this school | moves); conditional logit on 2024-25 transfers (level step, program talent, open playing time, distance from home)'], ['P(signs)', 'Xfer% x Land% = P(signs here)'], ['Why it\'s realistic'], ['Rivals', 'other plans with this target']],
       T.plan.map(function (p) { return '<tr><td>' + who(p) + (p.swap ? ' <span class="cfb__dim" title="funded by releasing ' + esc(p.swap) + '">for ' + esc(p.swap) + '</span>' : p.fill ? '' : ' <span class="cfb__dim" title="value add after holes filled">value</span>') + '</td><td>' + (p.as ? '<span title="' + esc('signs at ' + lab(p.as) + ': ' + (p.why || 'position-change model') + ' (FV ' + p.fvNow + ' now, ' + p.fv + ' first year there)') + '">' + lab(p.pos) + '→' + lab(p.as) + '</span>' : p.pos) + '</td><td>' + fvc(p.fv) + '</td><td>' + from(p) + '</td><td class="cfb__num">' + money(p.cost) + '</td><td class="cfb__num tb__teal">+' + war(p.gain) + '</td><td class="cfb__num"' + (p.up ? ' title="FCS: P(on FBS roster next season), move-up model"' : '') + '>' + pct(p.tp) + '</td><td class="cfb__num">' + land(p.land) + '</td><td class="cfb__num tb__teal">' + land(p.odds) + '</td><td class="tb__real">' + esc((p.real || []).join('; ') || '—') + '</td><td class="cfb__dim">' + esc((p.rivals || []).join(', ') || '—') + '</td></tr>'; }),
       T.space > 2e5 ? 'none: no realistic starter fits the price.' : 'none: no portal space after class and retention.');
     var leaving = tbl('leaving', [['Player'], ['Pos'], ['FV'], ['Gone', 'P(not on roster next season)'], ['Why'], ['DECT', 'worth most to him: Declare, Even, College, Transfer'], ['Draft%'], ['Xfer%'], ['xNIL']],
@@ -227,7 +224,7 @@
       L.map(function (c) { return '<tr><td>' + esc(c.name) + (c.rk ? ' <span class="cfb__dim">No. ' + c.rk + '</span>' : '') + '</td><td>' + esc(c.pos || '') + '</td><td class="tbx__grp">' + fvc(c.fv) + '</td><td class="cfb__num">' + (c.y1 == null ? '—' : Math.round(c.y1)) + '</td><td>' + stars(c.ark) + '</td><td class="cfb__num tbx__grp tbx__grp--nil">' + (c.x ? money(c.x) : '—') + '</td></tr>'; }), ''); }).join('');
     var full = '<section class="tb__panel"><h4>full depth chart</h4><div data-tby-depth></div></section>', ros = '<section class="tb__panel"><h4>roster by season</h4><div data-tby-ros></div></section>';
     body.__tbyKey = String(T.tid);
-    body.innerHTML = head + scoreboard(T, D) + chart + tabs('cfb', [['depth', null, full + depth], ['roster', null, ros], ['portal', nIn, plan + board], ['leaving', nOut, leaving + walk + priced], ['class', (T.cls || []).length + cls2.length || null, cls], ['targets', nPot || null, targets], ['keep', T.keep.length, keep], ['moves', (T.moves || []).length || null, moves]]);
+    body.innerHTML = head + scoreboard(T, D) + chart + tabs('cfb', [['depth', null, full + depth], ['roster', null, ros], ['transfer targets', nIn, plan + board], ['leaving', nOut, leaving + walk + priced], ['class', (T.cls || []).length + cls2.length || null, cls], ['recruit targets', nPot || null, targets], ['keep', T.keep.length, keep], ['moves', (T.moves || []).length || null, moves]]);
     if (window.__tbYears) window.__tbYears.fill(body, 'cfb', body.closest('[data-tb-ros]').getAttribute('data-tb-ros'), String(T.tid), D.next);
   }
 
