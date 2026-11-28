@@ -1,9 +1,9 @@
 {
 "asof":"2026-11-28",
-"n":100,
+"n":102,
 "count":{
 "watching":1,
-"waiting":94,
+"waiting":96,
 "done":2,
 "shipped":3
 },
@@ -157,6 +157,22 @@
 "pr":null
 },
 "state":"done"
+},
+{
+"key":"hockey_callup_cal",
+"t":"Hockey prospect call-up projections (AHL, CHL) recalibrated on what happened, as the G League xVORX and xXPM were",
+"sp":[
+"NHL"
+],
+"ar":"prospects",
+"kind":"deferred",
+"how":"hand",
+"was":"cross-sport rule: G League recalibration shipped Nov 28 (xVORX MSE .0816 to .0784, t -2.84; xXPM 3.15 to 2.70, t -4.02); the hockey analogue was not tested",
+"trigger":"untested analogue of a shipped fix (cross-sport rule)",
+"gate":"walk-forward like scripts/research/gleague_cal_nov28/test.py: fit on seasons through s-3, test offset and linear forms on next-season NHL value; ship only at paired t <= -2 and better in most seasons",
+"due":"2026-12-15",
+"est":0,
+"state":"waiting"
 },
 {
 "key":"soccer_props_novig",
@@ -1655,6 +1671,23 @@
 "was":"Nov 28: NHL pWAR added nothing (right calls .682 with and without it, t .00); the season files' pWAR come from today's fit, so not strictly point in time. NBA and NFL have no past projections on file; rerun Nov 28 on the calibrated pWAR (WAR's scale): .688 with vs .682 without, t 1.01, 4/8 seasons, still short",
 "trigger":"two seasons of weekly board vintages in the forward logs (scripts/data/snaps), so the projection as it stood at each call is on file",
 "gate":"verdicts.py: agedpw beats agedp on right calls, paired t >= 2 and most seasons",
+"due":"2028-07-01",
+"est":0,
+"state":"waiting"
+},
+{
+"key":"payroll_surplus_cap_carry",
+"t":"Surplus with last season's $ a win carried to this season's cap, NBA and NHL",
+"sp":[
+"NBA",
+"NHL"
+],
+"ar":"teams",
+"kind":"retest",
+"how":"hand",
+"was":"NBA t -1.97 (6/9), NHL t -1.42 (8/11) against the shipped Surplus; MAE .0827 to .0815, .0662 to .0660",
+"trigger":"the 2027-28 season is complete (one more held-out season past the 2026-27 lockbox)",
+"gate":"scripts/research/payrolls_nov28/cap_carry.py: the carried rate beats the shipped Surplus on held-out next-season win%, paired t <= -2 and better in most seasons; then payrolls.py team_value and deal_risk carry the rate as pro_builder.rate_now does",
 "due":"2028-07-01",
 "est":0,
 "state":"waiting"

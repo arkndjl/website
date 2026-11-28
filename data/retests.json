@@ -1737,6 +1737,21 @@
     "tt": -10.9,
     "pr": null
    }
+  },
+  {
+   "key": "hockey_callup_cal",
+   "t": "Hockey prospect call-up projections (AHL, CHL) recalibrated on what happened, as the G League xVORX and xXPM were",
+   "sp": [
+    "NHL"
+   ],
+   "ar": "prospects",
+   "kind": "deferred",
+   "how": "hand",
+   "was": "cross-sport rule: G League recalibration shipped Nov 28 (xVORX MSE .0816 to .0784, t -2.84; xXPM 3.15 to 2.70, t -4.02); the hockey analogue was not tested",
+   "due": "2026-12-15",
+   "trigger": "untested analogue of a shipped fix (cross-sport rule)",
+   "gate": "walk-forward like scripts/research/gleague_cal_nov28/test.py: fit on seasons through s-3, test offset and linear forms on next-season NHL value; ship only at paired t <= -2 and better in most seasons",
+   "run_hint": "adapt scripts/research/gleague_cal_nov28/test.py to the hockey prospect board's past values"
   }
  ]
 }
