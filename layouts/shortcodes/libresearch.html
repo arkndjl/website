@@ -3,7 +3,7 @@
        Each card: question (title bar), answer, chart (pixel SVG built by the script), findings, data/method/sample. */ -}}
 {{- $g := .Get "group" | default "all" -}}
 <div class="desk libgrid" data-tab="{{ .Get "tab" }}">
-{{- range site.Data.library.studies }}{{ if or (eq $g "all") (eq .group $g) }}
+{{- range site.Data.library.studies }}{{ $s := . }}{{ if or (eq $g "all") (eq .group $g) }}
 <div class="win libstudy" id="rq-{{ .id }}">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-library"/></svg>{{ .sport | lower }} :: {{ .id }}.txt<span class="win__cursor" aria-hidden="true">_</span></span>
@@ -12,10 +12,24 @@
   <div class="libstudy__body">
     <h3 class="libstudy__q">{{ .question }}</h3>
     <p class="libstudy__answer">{{ .answer }}</p>
+    {{- with .tree }}{{ $t := . }}
+    <table class="libstudy__tree">
+      <thead><tr><th>PAT</th><th>result</th><th title="2-pt or XP rate">rate</th><th title="the next TD, with no other score">next TD</th><th title="win chance given a second TD and no other score">win %</th></tr></thead>
+      <tbody>
+      {{- range $i, $r := .rows }}
+        <tr{{ if eq $i 2 }} class="is-split"{{ end }}><td>{{ index $r 0 }}</td><td>{{ index $r 1 }}</td><td>{{ lang.FormatNumber 1 (mul (index $r 2) 100) }}%</td><td>{{ index $r 3 }}</td><td>{{ lang.FormatNumber 1 (mul (index $r 4) 100) }}%</td></tr>
+        {{- if eq $i 1 }}<tr class="is-sum"><td>go for 2</td><td>all</td><td></td><td></td><td>{{ lang.FormatNumber 1 (mul $t.go 100) }}%</td></tr>{{ end }}
+        {{- if eq $i 3 }}<tr class="is-sum"><td>kick</td><td>all</td><td></td><td></td><td>{{ lang.FormatNumber 1 (mul $t.kick 100) }}%</td></tr>{{ end }}
+      {{- end }}
+      </tbody>
+    </table>
+    {{- end }}
     <div class="libstudy__chart">
+      {{- with .ct }}<p class="libstudy__ct">{{ index . 0 }}</p>{{ end }}
       {{- with .svg }}{{ . | safeHTML }}{{ end }}
       {{- with .legend }}<p class="libstudy__legend">{{ range $i, $n := . }}<span class="lc-key lc-k{{ $i }}">{{ $n }}</span>{{ end }}</p>{{ end }}
     </div>
+    {{- with .svg2 }}<div class="libstudy__chart"><p class="libstudy__ct">{{ index $s.ct 1 }}</p>{{ . | safeHTML }}</div>{{ end }}
     {{- with .findings }}<ul class="libstudy__find">{{ range . }}<li>{{ . }}</li>{{ end }}</ul>{{ end }}
     <dl class="libstudy__meta">
       <dt>data</dt><dd>{{ .data }}</dd>

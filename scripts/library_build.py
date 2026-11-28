@@ -425,6 +425,20 @@ def rq_card(s):
             'note': f"n = {s['n']:,}" + (f" · {c.get('y_label', '')} by {c.get('x_label', '')}" if bars else '') + (f" ({name})" if name and len(c.get('series') or []) > 1 else '')}
 
 
+def rq_tree(s, card):
+    """A study with a decision tree (research/studies/nfl/down14.py): the card draws the tree and the line of the first
+    chart (x, y pairs, the mark and the zero line) in place of bars."""
+    t, c = s.get('tree'), s.get('chart') or {}
+    if not t:
+        return card
+    pts = (c.get('series') or [{}])[0].get('points') or []
+    card.update({'bars': [], 'unit': '', 'tree': t, 'line': [[p['x'], p['y']] for p in pts],
+                 'lx': c.get('x_label', ''), 'ly': c.get('y_label', ''), 'mark': (c.get('mark') or {}).get('x'),
+                 'mlab': (c.get('mark') or {}).get('label', ''),
+                 'note': f"n = {s['n']:,} Q4 PATs at down 8"})
+    return card
+
+
 def main():
     studies = []
     for f in sorted((ROOT / 'research/studies').glob('*/*.json')):
@@ -433,7 +447,11 @@ def main():
             continue
         s['group'] = GROUP.get(s['sport'], 'other')
         s['svg'] = chart_svg(s.get('chart') or {})
-        s['rq'] = rq_card(s)
+        s['rq'] = rq_tree(s, rq_card(s))
+        if s.get('chart2'):   # a second chart under the first, each with its title
+            s['svg2'] = chart_svg(s['chart2'])
+            s['ct'] = [s['chart'].get('title', ''), s['chart2'].get('title', '')]
+            s.pop('chart2')
         s['legend'] = [x['name'] for x in (s.get('chart') or {}).get('series', [])] if len((s.get('chart') or {}).get('series', [])) > 1 else []
         s.pop('chart', None)
         studies.append(s)
