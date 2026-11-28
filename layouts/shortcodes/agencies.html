@@ -37,7 +37,7 @@
 {{- partial "wintable-close.html" (dict "rows" (len .clients) "fresh" "agencies_board" "about" "One row a player a source names an agency for (agency page, announcement or report), with the source and its date. Family = a relative handles his deals; None = a source says he has no agent. Players no source names are left out.") -}}
 {{- else -}}
 {{- $rows := .agencies -}}
-{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "agencies") "icon" $icon "tab" ($.Get "tab") "gfxCols" "RK,Agency,zNIL*,Clients,zNIL,FV sum" "gfxDate" $date "gfxMax" "25") -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "agencies") "icon" $icon "filter" "find" "tab" ($.Get "tab") "gfxCols" "RK,Agency,zNIL*,Clients,zNIL,FV sum" "gfxDate" $date "gfxMax" "25") -}}
 <p class="agency__bar"><button type="button" class="cfb__btn" data-gfx data-gfx-mode="agencyboard" data-gfx-sport="{{ $sp }}" title="agency board PNG, 16:9">GFX 16:9</button></p>
 <script type="application/json" id="agency-data-{{ $sp }}">{{ dict "sport" $sp "fit" $fit "agencies" $rows "clients" .clients "date" $date | jsonify | safeJS }}</script>
 <table class="cfb__table agency">
