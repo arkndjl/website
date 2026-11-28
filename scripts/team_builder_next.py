@@ -301,7 +301,7 @@ def SO_add(sp, ros, pcol, gkey):
             P = []
             for i, x in enumerate(L):
                 m = x[-1]
-                if not isinstance(m, dict) or not m.get('room') or j < m['a']: continue
+                if not isinstance(m, dict) or not m.get('room') or j < m['a'] or x[7] not in ('back', 'cls'): continue   # guaranteed players only
                 p = x[pcol + j - 1] or 0.0
                 if p < 0.15: continue
                 o = {'g': gkey(t, m), 'room': m['room'], 'p': p, 'c': min(4, m['c'] + j - m['a']), 'v': m['v'], 'i': i}
