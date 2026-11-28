@@ -329,7 +329,7 @@
     // layout
     var n = data.length, groups = n > 34 ? 2 : 1, per = Math.ceil(n / groups);
     W = n <= 13 ? 2400 : 2160; var portrait = n > 13;
-    var HEAD = 96, SUB = 72, FOOT = 64, PADI = 24;
+    var HEAD = TBAR + 20, SUB = 72, FOOT = 64, PADI = 24;
     var rowTarget = portrait ? (groups === 2 ? 72 : 76) : 80;
     var tableH = (per + 1) * rowTarget;
     H = portrait ? Math.min(2700, Math.max(1600, 2 * PAD + HEAD + SUB + tableH + 2 * PADI + FOOT)) : 1350;
@@ -344,12 +344,7 @@
     // window with title bar
     var wx = PAD, wy = PAD, ww = W - 2 * PAD, wh = H - 2 * PAD - FOOT;
     g.fillStyle = C.face; g.fillRect(wx, wy, ww, wh); bevel(g, wx, wy, ww, wh, true);
-    g.fillStyle = C.title; g.fillRect(wx + 6, wy + 6, ww - 12, HEAD - 20);
-    g.font = '48px ' + FONT; g.fillStyle = C.white;
-    if (logo) g.drawImage(logo, wx + 22, wy + 18, 52, 52);
-    var wkW = weekTag(g, wx, wy, ww, seas && seas.value && seas.selectedIndex > 0 ? '' : seasonWeek());
-    g.fillText(fit(g, title, ww - 300 - wkW) + '_', wx + 92, wy + 45);
-    for (var b = 0; b < 3; b++) { var bx = wx + ww - 170 + b * 52; g.fillStyle = C.face; g.fillRect(bx, wy + 24, 40, 40); bevel(g, bx, wy + 24, 40, 40, true, 3); }
+    titleBar(g, wx, wy, ww, title, seas && seas.value && seas.selectedIndex > 0 ? '' : seasonWeek(), logo);
     // subtitle strip: what is shown
     var hasReal = data.some(function (r) { return r.some(function (c) { return (c.tags || []).some(function (t) { return t.real; }); }); }),
         hasProj = data.some(function (r) { return r.some(function (c) { return (c.tags || []).some(function (t) { return !t.real && !t.kind; }); }); });
@@ -597,14 +592,52 @@
     }
     return '';
   }
-  // the season week as a teal tab at the right of a title bar, left of the window buttons; returns its width
-  function weekTag(g, wx, wy, ww, lab) {
-    if (!lab) return 0;
-    g.font = '40px ' + FONT; var tw = g.measureText(lab).width + 36, tx = wx + ww - 190 - tw;
-    g.fillStyle = C.well; g.fillRect(tx, wy + 20, tw, 48); bevel(g, tx, wy + 20, tw, 48, false, 3);
-    g.fillStyle = C.teal; g.fillText(lab, tx + 18, wy + 45);
-    g.font = '48px ' + FONT; g.fillStyle = C.white;
-    return tw + 20;
+  // the sport's ball, 16x16 pixel sprites in site colours only (d dark, p purple, l lilac, m mid, t teal,
+  // w white): football (CFB, NFL), basketball (CBB, NBA), puck (NHL, hockey prospects), soccer ball, tennis ball, baseball and
+  // a frag grenade for CS2 (1NT and LAURSEN_111 too). Multi-sport pages draw none.
+  var BALL_INK = { d: C.dark, p: C.title, l: C.lilac, m: '#9a8cc4', t: C.teal, w: C.white };
+  var BALL = {
+    football: ['................', '................', '................', '.....dddddd.....', '...ddppppppdd...', '.ddlppwpwpwplpdd', '.dplpwwwwwwwplpd', 'dpplppwpwpwplppd', 'dpplppppppppplpd', '.dplpppppppplpd.', '.ddlppppppppldd.', '...ddppppppdd...', '.....dddddd.....', '................', '................', '................'],
+    basketball: ['.....dddddd.....', '...ddllpllldd...', '..dplllpllllpd..', '.dlpwllpllllpld.', '.dlwpllplllplld.', 'dlllpllplllpllld', 'dlllpllplllpllld', 'dppppppppppppppd', 'dlllpllplllpllld', 'dlllpllplllpllld', 'dlllpllplllpllld', '.dlplllpllllpld.', '.dpplllpllllppd.', '..dllllpllllld..', '...ddllpllldd...', '.....dddddd.....'],
+    puck: ['................', '.....dddddd.....', '..dddlmmmmlddd..', '.dlmmmmmmmmmmld.', 'dlmmmmmmmmmmmmld', 'dlmmmmmmmmmmmmld', 'dlmmmmmmmmmmmmld', 'dlmmmmmmmmmmmmld', 'dpllmmmmmmmmllpd', 'dppllllllllllppd', 'dppppppppppppppd', 'dppppppppppppppd', '.dppppppppppppd.', '..dddppppppddd..', '.....dddddd.....', '................'],
+    soccer: ['.....dddddd.....', '...ddwppppwdd...', '..dwwwwppwwwwd..', '.dwwwwwwwwwwwwd.', '.dwwwwwmmwwwwwd.', 'dwwwwwwwwwwwwwwd', 'dpwwwwwppwwwwwpd', 'dppwmwppppwmwppd', 'dpwwwwppppwwwwpd', 'dwwwwwppppwwwwwd', 'dwwwwwwwwwwwwwwd', '.dwwwmwwwwmwwwd.', '.dpwwwwwwwwwwpd.', '..dppwwwwwwppd..', '...ddpwwwwpdd...', '.....dddddd.....'],
+    tennis: ['.....dddddd.....', '...ddttwtttdd...', '..dtttwwtttttd..', '.dttttwtttttttd.', '.dtttwwtttttttd.', 'dtttwwtttttttttd', 'dtwwwttttttttttd', 'dwwttttttttttttd', 'dttttttttttttwwd', 'dttttttttttwwwtd', 'dtttttttttwwtttd', '.dtttttttwwtttd.', '.dtttttttwttttd.', '..dtttttwwtttd..', '...ddtttwttdd...', '.....dddddd.....'],
+    baseball: ['.....dddddd.....', '...ddwwwwwwdd...', '..dwwwwwwwwwwd..', '.dwtwwwwwwwwtwd.', '.dttwwwwwwwwttd.', 'dwwwtwwwwwwtwwwd', 'dwwttwwwwwwttwwd', 'dwwwtwwwwwwtwwwd', 'dwwttwwwwwwttwwd', 'dwwwtwwwwwwtwwwd', 'dwtttwwwwwwtttwd', '.dwtwwwwwwwwtwd.', '.dttwwwwwwwwttd.', '..dwwwwwwwwwwd..', '...ddwwwwwwdd...', '.....dddddd.....'],
+    cs2: ['...t............', '..t.t.dddd......', '...tttdlld.ll...', '......dlldd..l..', '.....dddddd...l.', '....dmmmpmmmd.l.', '...dmwmmpmmmmdl.', '..dmwmmmpmmmmmd.', '..dmmmmmpmmmmmd.', '..dpppppppppppd.', '..dmmmmmpmmmmmd.', '..dmmmmmpmmmmmd.', '...dmmmmpmmmmd..', '....dmmmpmmmd...', '.....ddddddd....', '................']
+  };
+  function sportBall() {
+    var p = location.pathname;
+    return /college-football|arkboard\/nfl/.test(p) ? 'football' : /college-basketball|arkboard\/nba/.test(p) ? 'basketball'
+      : /arkboard\/nhl|hockey-prospects/.test(p) ? 'puck' : /arkboard\/soccer/.test(p) ? 'soccer' : /arkboard\/tennis/.test(p) ? 'tennis'
+      : /arkboard\/baseball/.test(p) ? 'baseball' : /arkboard\/(cs2|counter)|^\/1nt|^\/laursen_111/i.test(p) ? 'cs2' : '';
+  }
+  function drawBall(g, k, x, y, u) {
+    var sp = BALL[k]; if (!sp) return;
+    sp.forEach(function (row, j) { for (var i = 0; i < row.length; i++) { var c = BALL_INK[row[i]]; if (c) { g.fillStyle = c; g.fillRect(x + i * u, y + j * u, u, u); } } });
+  }
+  // the title bar of every graphic (tables and cards): 112 px purple bar; ARK logo (64), the title in 64 px (4x the pixel
+  // face), then at the right a sunken 80 px tab holding the sport's ball (64, 4 px a pixel) and the season week (48 px text),
+  // and the three window buttons (48). Everything shares the bar's centre line; the ball's 8 px inset in the tab matches on
+  // every side.
+  var TBAR = 112;
+  function titleBar(g, wx, wy, ww, title, week, logo) {
+    var cy = wy + 6 + TBAR / 2, k = sportBall();
+    g.fillStyle = C.title; g.fillRect(wx + 6, wy + 6, ww - 12, TBAR);
+    if (logo) g.drawImage(logo, wx + 22, cy - 32, 64, 64);
+    var bx0 = wx + ww - 26 - 3 * 48 - 2 * 12;   // the window buttons, right-aligned 26 px in
+    for (var b = 0; b < 3; b++) { var bx = bx0 + b * 60; g.fillStyle = C.face; g.fillRect(bx, cy - 24, 48, 48); bevel(g, bx, cy - 24, 48, 48, true, 3); }
+    var tabR = bx0 - 20, tw = 0;
+    if (k || week) {
+      g.font = '48px ' + FONT;
+      tw = (k ? 8 + 64 : 0) + (week ? (k ? 16 : 20) + g.measureText(week).width + 24 : 8);
+      var tx = tabR - tw;
+      g.fillStyle = C.well; g.fillRect(tx, cy - 40, tw, 80); bevel(g, tx, cy - 40, tw, 80, false, 4);
+      if (k) drawBall(g, k, tx + 8, cy - 32, 4);
+      if (week) { g.fillStyle = C.teal; g.fillText(week, tx + (k ? 8 + 64 + 16 : 20), cy + 1); }
+      tw += 28;
+    }
+    g.font = '64px ' + FONT; g.fillStyle = C.white;
+    g.fillText(fit(g, title, tabR - tw - (wx + 108) - 40) + '_', wx + 108, cy + 1);
   }
   async function frame(w, h, title, stamp, link) {
     W = w; H = h;
@@ -618,17 +651,12 @@
     for (var gx = 0; gx < W; gx += 16) for (var gy = 0; gy < H; gy += 16) g.fillRect(gx, gy, 2, 2);
     var wx = PAD, wy = PAD, ww = W - 2 * PAD, wh = H - 2 * PAD - 56;
     g.fillStyle = C.face; g.fillRect(wx, wy, ww, wh); bevel(g, wx, wy, ww, wh, true);
-    g.fillStyle = C.title; g.fillRect(wx + 6, wy + 6, ww - 12, 76);
-    g.font = '48px ' + FONT; g.fillStyle = C.white;
-    if (logo) g.drawImage(logo, wx + 22, wy + 18, 52, 52);
-    var wkW = weekTag(g, wx, wy, ww, seasonWeek());
-    g.fillText(fit(g, title, ww - 300 - wkW) + '_', wx + 92, wy + 45);
-    for (var b = 0; b < 3; b++) { var bx = wx + ww - 170 + b * 52; g.fillStyle = C.face; g.fillRect(bx, wy + 24, 40, 40); bevel(g, bx, wy + 24, 40, 40, true, 3); }
+    titleBar(g, wx, wy, ww, title, seasonWeek(), logo);
     g.font = '32px ' + FONT; g.fillStyle = C.lilac;
     g.fillText(link || SITE, PAD, H - PAD - 8);
     var right = '@ARKNDJL' + (stamp ? ' · ' + stamp : '');
     g.fillText(right, W - PAD - g.measureText(right).width, H - PAD - 8);
-    return { canvas: canvas, g: g, x: wx + 24, y: wy + 100, w: ww - 48, h: wh - 124 };
+    return { canvas: canvas, g: g, x: wx + 24, y: wy + TBAR + 24, w: ww - 48, h: wh - TBAR - 48 };
   }
   function fit(g, t, max) { t = String(t); if (g.measureText(t).width <= max) return t; while (t.length > 1 && g.measureText(t + '…').width > max) t = t.slice(0, -1); return t + '…'; }
   function wrap(g, t, max) {
@@ -3502,7 +3530,7 @@
     var bodyH = secs.reduce(function (a, s) { return a + SECH + LAB + ng(s) * (BOX + GAP) + 24; }, 0);
     var title = (D.title || txt(win.querySelector('.win__title-text')).replace(/_$/, '')) + (pick !== null ? ' :: ' + secs[0].name : '');
     var stamp = D.asof ? new Date(D.asof + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toLowerCase() : '';
-    var F = await frame(W0, Math.max(1080, bodyH + 2 * PAD + 56 + 124 + 24), title.toUpperCase(), stamp);
+    var F = await frame(W0, Math.max(1080, bodyH + 2 * PAD + 56 + TBAR + 48 + 24), title.toUpperCase(), stamp);
     var g = F.g, x0 = F.x, y = F.y;
     var ids = {}; secs.forEach(function (s) { s.rounds.forEach(function (r) { r.games.forEach(function (gm) { [gm.a, gm.b].forEach(function (t) { if (t) ids[t.t] = 1; }); }); }); if (s.champ) ids[s.champ.t] = 1; });
     var imgs = {}; await Promise.all(Object.keys(ids).map(function (id) { return loadImg((T[id] || {}).logo).then(function (im) { imgs[id] = im; }); }));
