@@ -191,7 +191,7 @@
     var c = w.querySelector('.hvid__lcd-bot .hvid__ch'); c.textContent = a.getAttribute('data-n'); c.className = 'hvid__ch hvid__ch--' + a.getAttribute('data-k');
     w.querySelector('.hvid__date').textContent = a.getAttribute('data-d');
     draw(0, 0); state();
-    var l = w.querySelector('.hvid__list'), li = a.parentNode; if (li.offsetTop < l.scrollTop || li.offsetTop + li.offsetHeight > l.scrollTop + l.clientHeight) l.scrollTop = li.offsetTop - 2;
+    var l = w.querySelector('.hvid__list'), li = a.parentNode, y = li.getBoundingClientRect().top - l.getBoundingClientRect().top + l.scrollTop; if (y < l.scrollTop || y + li.offsetHeight > l.scrollTop + l.clientHeight) l.scrollTop = y - 2;
     w.dispatchEvent(new CustomEvent('hvid:load', { bubbles: true, detail: { vid: a.getAttribute('data-vid') } }));
   }
   function step(d, auto) {
