@@ -1,7 +1,7 @@
 // Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
 (function () {
   if (window.__arkGfx) return; window.__arkGfx = true;
-  var W, H, PAD = 60;
+  var W, H, PAD = 44;   // the backdrop margin around the window: enough to read as a window, no more
   var C = { bg: '#4a3b6b', face: '#4a3b6b', well: '#3a2d56', light: '#c8c7ff', dark: '#241a3a', title: '#57068c', teal: '#7fffd4', lilac: '#c8c7ff', white: '#ffffff', down: '#ff9ec7' };
   var PLAT = '#b9f2ff';   // ARK stars: flat platinum; 5-star+ adds the moving platinum sheen (plusStars)
   var FONT = '"MS PGothic Pixel", "MS PGothic", monospace';
@@ -338,7 +338,7 @@
     // layout
     var n = data.length, groups = n > 34 ? 2 : 1, per = Math.ceil(n / groups);
     W = n <= 13 ? 2400 : 2160; var portrait = n > 13;
-    var HEAD = TBAR + 20, SUB = 72, FOOT = 64, PADI = 24;
+    var HEAD = TBAR + 20, SUB = 60, FOOT = 64, PADI = 24;
     var rowTarget = portrait ? (groups === 2 ? 72 : 76) : 80;
     var tableH = (per + 1) * rowTarget;
     H = portrait ? Math.min(2700, Math.max(1600, 2 * PAD + HEAD + SUB + tableH + 2 * PADI + FOOT)) : 1350;
@@ -2472,7 +2472,7 @@
     // the pick tag (upset or favorite), when the game is one
     var tagH = d.pick ? 120 : 0, bottom = F.y + F.h - (tagH ? tagH + gap : 0);
     // tiles, two to a row, filling what's left
-    var tiles = d.tiles || [], rowsN = Math.ceil(tiles.length / 2) || 1, tw = (w - gap) / 2, tH = Math.min(600, (bottom - y - (rowsN - 1) * gap) / rowsN), tk = Math.max(1, Math.min(1.4, tH / 380));
+    var tiles = d.tiles || [], rowsN = Math.ceil(tiles.length / 2) || 1, tw = (w - gap) / 2, tH = Math.min(600, (bottom - y - (rowsN - 1) * gap) / rowsN), tk = Math.max(1, Math.min(1.8, tH / 330));
     y += (bottom - y - rowsN * tH - (rowsN - 1) * gap) / 2;   // spare height splits above and below the tiles
     tiles.forEach(function (t, i) {
       var tx = x + (i % 2) * (tw + gap), ty = y + Math.floor(i / 2) * (tH + gap);
@@ -3183,7 +3183,7 @@
     g.font = '30px ' + FONT; g.fillStyle = C.lilac;
     cols2.forEach(function (c) { var cx = colX(c); g.fillText(c[0], c[2] === 'r' ? cx - g.measureText(c[0]).width : cx, by); });
     by += 28; g.fillStyle = C.dark; g.fillRect(bx, by, bw, 3); by += 10;
-    var pl = (d.players || []).slice(0, 10), rowP = Math.min(80, Math.floor((y0 + ph2 - 20 - by) / Math.max(pl.length, 1))), fs = Math.min(42, Math.round(rowP * 0.52));
+    var pl = (d.players || []).slice(0, 10), rowP = Math.min(112, Math.floor((y0 + ph2 - 20 - by) / Math.max(pl.length, 1))), fs = Math.min(56, Math.round(rowP * 0.5));
     for (var j = 0; j < pl.length; j++) {
       var P = pl[j], cy2 = by + rowP / 2;
       if (j % 2) { g.fillStyle = 'rgba(36,26,58,0.35)'; g.fillRect(bx - 12, by, bw + 24, rowP); }
