@@ -28,9 +28,6 @@
               {{- partial "post-date" . -}}
             </time>
           {{- end -}}
-          {{- with .Params.Author -}}
-            <span class="post-author">{{ . }}</span>
-          {{- end -}}
             {{- partial "poststats.html" (dict "p" .) -}}
         </div>
 
