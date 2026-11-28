@@ -1388,6 +1388,40 @@
    "est": 1,
    "trigger": "cross-sport port of the CBB position lines (Nov 28 2026); needs role labels for the VRS 51-100 starters",
    "gate": "scripts/cs2_value.py fee test: replacement by role against one line, leave one fee out, t >= 2"
+  },
+  {
+   "key": "start_odds_fv_nil",
+   "t": "FV and x/yNIL as inputs to P(wins the starting job) on the college depth charts",
+   "sp": [
+    "CFB",
+    "CBB"
+   ],
+   "ar": "teams",
+   "kind": "deferred",
+   "how": "hand",
+   "was": "untestable: no point in time FV or NIL before the Nov 28 2026 forward logs; the base uses 247 composite + PFN score (CFB) and pXPM (CBB)",
+   "after": "cfb:champ:2027",
+   "lag": 30,
+   "trigger": "2027 starters on file (PFN 2027 season) with the Nov 2026 to Aug 2027 board vintages and On3 NIL snaps (scripts/data/snaps)",
+   "gate": "scripts/research/start_odds_nov28/prereg.md: held-out log loss against the shipped model, t >= 2 clustered by team (one season: two-fold team split)",
+   "run_hint": "python3 scripts/research/start_odds_nov28/test.py cfb (add the vintages)"
+  },
+  {
+   "key": "start_odds_by_pos",
+   "t": "Starting-job drivers by position (true freshmen at RB, transfer-in and incumbency by spot) and CBB transfer-in",
+   "sp": [
+    "CFB",
+    "CBB"
+   ],
+   "ar": "teams",
+   "kind": "retest",
+   "how": "hand",
+   "was": "no spot split passed: CFB true freshman x spot t .54, RB-only freshman term t 1.09 (3/4 seasons, least behind at RB -1.21 vs -1.59 to -2.09); CBB transfer-in t -1.77, age after class t -.96",
+   "after": "cfb:champ:2027",
+   "lag": 30,
+   "trigger": "the 2026 season is out of the lockbox (one more origin, and a second OL and DB origin)",
+   "gate": "prereg.md spot test: driver x spot against the pooled driver, t >= 2, every season but one",
+   "run_hint": "python3 scripts/research/start_odds_nov28/test.py cfb && python3 scripts/research/start_odds_nov28/test.py cbb"
   }
  ]
 }

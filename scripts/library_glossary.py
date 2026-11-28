@@ -107,6 +107,7 @@ _NBAEX = (f"Held out 2012-23 ({_NX['n']:,} player seasons, {100 * _NX['exitShare
 
 
 _TYF = ld('data/team_years_fit.json'); _TYD = ld('data/team_years_dev.json')   # scripts/research/team_years_nov28
+_SOF = ld('data/start_odds_fit.json')   # scripts/research/start_odds_nov28
 
 
 def _f2(x): return f"{x:.3f}".lstrip('0') if x >= 0 else '-' + f"{-x:.3f}".lstrip('0')
@@ -134,6 +135,29 @@ def _tbx_dev():
             f'his class costs {b[4]:+.2f}, each point of pXPM now {b[5]:+.2f} and a full-time role {b[6]:+.2f}. Walking forward it beat the class means '
             f'one season on (t = {t["1"]["t"]}) and two on (t = {t["2"]["t"]}), so the roster shows pXPM by season on it. Inside the team chain it did not help '
             'next season, so the team projection keeps the class means. Football development waits for two season-end FV boards.')
+
+
+def _tbx_start():
+    """who wins the starting job: data/start_odds_fit.json"""
+    F = _SOF or {}; f, b = F.get('cfb'), F.get('cbb')
+    if not f or not b: return []
+    fs, bs, fc, bc = f['single'], b['single'], f['model']['coef'], b['model']['coef']
+    def ts(S, k): return f"t = {S[k]['t']}"
+    st = {x['add']: x for x in f['step']}; sb = {x['add']: x for x in b['step']}
+    rb = f.get('frRB') or {}
+    fr = f['room']['fr']['coef']; frs = ', '.join(f"{g} {fr['fr:' + g]:+.2f}" for g in ('RB', 'WR', 'QB', 'TE', 'DL', 'LB') if 'fr:' + g in fr)
+    t = ('The depth chart is ordered by the chance that a player starts for the team that season, which is his chance to be on the roster times '
+            'his chance to win the job if he is. Football starters are the top players at each spot on PFN\'s rankings by snaps, attempts or targets '
+            f"(starting seasons 2022 to 2025, {f['n']:,} players), and basketball starters are the top five in minutes ({b['n']:,} players). The base is the value "
+            'we had at the time, 247 composite and last season\'s PFN score in football and pXPM in basketball, and each input was added to it and tested a '
+            f"season at a time. In football, class ({ts(fs, 'class')}), being the starter last season ({ts(fs, 'inc')}) and transferring in ({ts(fs, 'tr')}) "
+            f"passed, and a transfer starts more often than a returner of the same value ({fc['tr']:+.2f} in log odds, against {fc['inc']:+.2f} for the incumbent). "
+            f"Last season's snap share and his rank in the room passed alone but added nothing once incumbency was in (t = {st.get('use', {}).get('t')} and "
+            f"{st.get('role', {}).get('t')}).", f"In basketball, last season's minute share ({ts(bs, 'use')}), incumbency and class passed, while transferring in "
+            f"({ts(bs, 'tr')}) did not, and age added nothing beyond class (t = {sb.get('age', {}).get('t')}). No input was different enough by position to "
+            f"pass. True freshmen are least behind at running back ({frs}), but the running back term on its own did not pass (t = {rb.get('t')}). "
+            'There is no point in time FV or NIL history to test, so the forward logs will test both after next season.')
+    return list(t)
 
 
 def _tbx_pot():
@@ -727,7 +751,7 @@ sections.append({'id': 'players', 'title': 'Player odds and projections', 'entri
        f'Football strength is Elo from the plan\'s college WAR, fit on this season\'s Elo across FBS (R2 = {_TBX["cfb"].get("r2", 0):.2f}, n = {_TBX["cfb"].get("n", 0)}). Basketball strength is the ARK rating of the plan\'s rotation.',
        f'xW is wins over a conference schedule at every team\'s projected strength: {_TBX["cfb"].get("games", 12)} games in football, {_TBX["cbb"].get("games", 31)} in basketball. Wins over replacement are xW less a 10th-percentile team on the same schedule, and NIL $ a win is next season\'s spend over those wins.',
        f'DECT as an input failed everywhere it was tested. In Ret% the staying edge made held-out log loss worse in both sports (CFB t = {_DX["ret"]["cfb"]["terms"]["R1 ce"]["lodo"]["t"]}, CBB t = {_DX["ret"]["cbb"]["terms"]["R1 ce"]["lodo"]["t"]} against it). CBB Transfer%: DECT t = {_DX["cbb_move"]["move"]["terms"]["T4 dect"]["A"]["t"]} on 2025-26 (needs 2), school pay per market dollar t = {_DX["cbb_move"]["move"]["terms"]["T2 k"]["A"]["t"]}, market over school pay t = {_DX["cbb_move"]["move"]["terms"]["T1 zgap"]["A"]["t"]}. CBB landing, money per market dollar at the destination t = {_DX["cbb_move"]["land"]["L1 dest_k"]["A"]["t"]}. CFB Transfer% has one fall board to test on and is retested after the 2026-27 cycle. DECT shows on the builder for reading only.',
-       _tbx_pot(), _tbx_years(), _tbx_dev()],
+       _tbx_pot(), _tbx_years(), _tbx_dev(), *_tbx_start()],
       'CFB team builder, CBB team builder', ['CFB', 'CBB']),
     E('FBS%', 'The chance an FCS player is on an FBS roster next season.',
       ['A logit on 2023-26 FCS-to-FBS moves: production, team strength, year in school and position. It is capped at 1 - Draft%.'],

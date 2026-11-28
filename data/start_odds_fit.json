@@ -1,0 +1,561 @@
+{
+ "_": "scripts/research/start_odds_nov28/test.py (prereg.md): P(start) for the college depth charts, read by scripts/start_odds.py",
+ "cbb": {
+  "model": {
+   "drivers": [
+    "use",
+    "inc",
+    "class"
+   ],
+   "byRoom": [],
+   "coef": {
+    "const": -1.2901,
+    "room:F": -0.3288,
+    "room:C": -1.1571,
+    "zv": 0.6453,
+    "zsc": 0.0,
+    "lst": -0.1375,
+    "sh": 2.2097,
+    "inc": 0.6877,
+    "So": 0.5134,
+    "Jr": 0.6712,
+    "Sr": 0.6964
+   }
+  },
+  "rooms": [
+   "G",
+   "F",
+   "C"
+  ],
+  "N": {
+   "G": 5,
+   "F": 5,
+   "C": 5
+  },
+  "means": {
+   "sc": [
+    0.0,
+    0.0
+   ],
+   "lst": [
+    1.0,
+    1.0
+   ],
+   "sh": [
+    0.2019,
+    0.6708
+   ]
+  },
+  "single": {
+   "tr": {
+    "t": -1.23,
+    "wins": 0,
+    "pass": false,
+    "llA": 0.5256,
+    "llB": 0.5256,
+    "hitA": 0.6374,
+    "hitB": 0.6377
+   },
+   "inc": {
+    "t": 11.99,
+    "wins": 4,
+    "pass": true,
+    "llA": 0.5256,
+    "llB": 0.5108,
+    "hitA": 0.6374,
+    "hitB": 0.6495
+   },
+   "class": {
+    "t": 6.9,
+    "wins": 4,
+    "pass": true,
+    "llA": 0.5256,
+    "llB": 0.5198,
+    "hitA": 0.6374,
+    "hitB": 0.6475
+   },
+   "fr": {
+    "t": 5.1,
+    "wins": 4,
+    "pass": true,
+    "llA": 0.5256,
+    "llB": 0.5226,
+    "hitA": 0.6374,
+    "hitB": 0.6413
+   },
+   "use": {
+    "t": 15.78,
+    "wins": 4,
+    "pass": true,
+    "llA": 0.5256,
+    "llB": 0.5005,
+    "hitA": 0.6374,
+    "hitB": 0.6579
+   },
+   "role": {
+    "t": 7.96,
+    "wins": 4,
+    "pass": true,
+    "llA": 0.5256,
+    "llB": 0.5193,
+    "hitA": 0.6374,
+    "hitB": 0.6421
+   },
+   "age": {
+    "t": 5.81,
+    "wins": 4,
+    "pass": true,
+    "llA": 0.5256,
+    "llB": 0.5217,
+    "hitA": 0.6374,
+    "hitB": 0.6465
+   }
+  },
+  "step": [
+   {
+    "add": "use",
+    "t": 15.78,
+    "wins": 4,
+    "kept": true,
+    "hitA": 0.6374,
+    "hitB": 0.6579
+   },
+   {
+    "add": "inc",
+    "t": 5.2,
+    "wins": 4,
+    "kept": true,
+    "hitA": 0.6579,
+    "hitB": 0.659
+   },
+   {
+    "add": "role",
+    "t": 0.54,
+    "wins": 3,
+    "kept": false,
+    "hitA": 0.659,
+    "hitB": 0.6609
+   },
+   {
+    "add": "class",
+    "t": 5.07,
+    "wins": 4,
+    "kept": true,
+    "hitA": 0.659,
+    "hitB": 0.67
+   },
+   {
+    "add": "age",
+    "t": -0.96,
+    "wins": 0,
+    "kept": false,
+    "hitA": 0.67,
+    "hitB": 0.6691
+   },
+   {
+    "add": "fr",
+    "t": 1.17,
+    "wins": 3,
+    "kept": false,
+    "hitA": 0.67,
+    "hitB": 0.67
+   }
+  ],
+  "room": {
+   "tr": {
+    "t": 0.61,
+    "wins": 2,
+    "pass": false,
+    "coef": {
+     "tr:G": 0.187,
+     "tr:F": -0.124,
+     "tr:C": 0.061
+    }
+   },
+   "inc": {
+    "t": -2.69,
+    "wins": 0,
+    "pass": false,
+    "coef": {
+     "inc:G": 0.693,
+     "inc:F": 0.642,
+     "inc:C": 0.693
+    }
+   },
+   "class": {
+    "t": -0.84,
+    "wins": 2,
+    "pass": false,
+    "coef": {
+     "So:G": 0.522,
+     "So:F": 0.358,
+     "So:C": 0.588,
+     "Jr:G": 0.656,
+     "Jr:F": 0.331,
+     "Jr:C": 0.868,
+     "Sr:G": 0.689,
+     "Sr:F": 0.478,
+     "Sr:C": 0.828
+    }
+   },
+   "fr": {
+    "t": 0.56,
+    "wins": 3,
+    "pass": false,
+    "coef": {
+     "fr:G": -0.999,
+     "fr:F": -0.729,
+     "fr:C": -1.118
+    }
+   },
+   "use": {
+    "t": 1.81,
+    "wins": 4,
+    "pass": false,
+    "coef": {
+     "sh:G": 2.206,
+     "sh:F": 1.655,
+     "sh:C": 2.532
+    }
+   },
+   "role": {
+    "t": -1.33,
+    "wins": 1,
+    "pass": false,
+    "coef": {
+     "rk1:G": 0.049,
+     "rk1:F": -0.208,
+     "rk1:C": 0.419,
+     "rk2:G": -0.146,
+     "rk2:F": -0.431,
+     "rk2:C": -0.155,
+     "rk3:G": 0.098,
+     "rk3:F": -0.133,
+     "rk3:C": 0.231
+    }
+   },
+   "age": {
+    "t": 0.19,
+    "wins": 2,
+    "pass": false,
+    "coef": {
+     "age:G": 0.002,
+     "age:F": -0.065,
+     "age:C": 0.04
+    }
+   }
+  },
+  "frRB": null,
+  "n": 20081,
+  "origins": [
+   2022,
+   2023,
+   2024,
+   2025
+  ]
+ },
+ "cfb": {
+  "model": {
+   "drivers": [
+    "class",
+    "inc",
+    "tr"
+   ],
+   "byRoom": [],
+   "coef": {
+    "const": -3.5018,
+    "room:RB": -0.3931,
+    "room:WR": -0.0344,
+    "room:TE": -0.359,
+    "room:OL": 0.4662,
+    "room:DL": 0.1484,
+    "room:LB": -0.3221,
+    "room:DB": -0.1427,
+    "zv": 0.225,
+    "zsc": 0.1809,
+    "lst": 1.6002,
+    "So": 1.1267,
+    "Jr": 1.6447,
+    "Sr": 1.9317,
+    "inc": 1.0131,
+    "tr": 0.4065
+   }
+  },
+  "rooms": [
+   "QB",
+   "RB",
+   "WR",
+   "TE",
+   "OL",
+   "DL",
+   "LB",
+   "DB"
+  ],
+  "N": {
+   "QB": 1,
+   "RB": 1,
+   "WR": 3,
+   "TE": 1,
+   "OL": 5,
+   "DL": 4,
+   "LB": 2,
+   "DB": 4
+  },
+  "means": {
+   "sc": [
+    -0.0268,
+    0.0478
+   ],
+   "lst": [
+    0.0559,
+    1.0
+   ],
+   "sh": [
+    0.034,
+    1.0171
+   ]
+  },
+  "single": {
+   "tr": {
+    "t": 4.48,
+    "wins": 4,
+    "pass": true,
+    "llA": 0.3523,
+    "llB": 0.3504,
+    "hitA": 0.526,
+    "hitB": 0.5302
+   },
+   "inc": {
+    "t": 5.23,
+    "wins": 4,
+    "pass": true,
+    "llA": 0.3523,
+    "llB": 0.3504,
+    "hitA": 0.526,
+    "hitB": 0.525
+   },
+   "class": {
+    "t": 18.22,
+    "wins": 4,
+    "pass": true,
+    "llA": 0.3523,
+    "llB": 0.3332,
+    "hitA": 0.526,
+    "hitB": 0.5485
+   },
+   "fr": {
+    "t": 17.68,
+    "wins": 4,
+    "pass": true,
+    "llA": 0.3523,
+    "llB": 0.3375,
+    "hitA": 0.526,
+    "hitB": 0.542
+   },
+   "use": {
+    "t": 2.63,
+    "wins": 4,
+    "pass": true,
+    "llA": 0.3523,
+    "llB": 0.3519,
+    "hitA": 0.526,
+    "hitB": 0.5257
+   },
+   "role": {
+    "t": 2.27,
+    "wins": 4,
+    "pass": true,
+    "llA": 0.3523,
+    "llB": 0.3519,
+    "hitA": 0.526,
+    "hitB": 0.5253
+   }
+  },
+  "step": [
+   {
+    "add": "class",
+    "t": 18.22,
+    "wins": 4,
+    "kept": true,
+    "hitA": 0.526,
+    "hitB": 0.5485
+   },
+   {
+    "add": "fr",
+    "t": 1.43,
+    "wins": 3,
+    "kept": false,
+    "hitA": 0.5485,
+    "hitB": 0.5481
+   },
+   {
+    "add": "inc",
+    "t": 5.22,
+    "wins": 4,
+    "kept": true,
+    "hitA": 0.5485,
+    "hitB": 0.5497
+   },
+   {
+    "add": "tr",
+    "t": 3.87,
+    "wins": 4,
+    "kept": true,
+    "hitA": 0.5497,
+    "hitB": 0.5518
+   },
+   {
+    "add": "use",
+    "t": -0.46,
+    "wins": 0,
+    "kept": false,
+    "hitA": 0.5518,
+    "hitB": 0.5518
+   },
+   {
+    "add": "role",
+    "t": -0.22,
+    "wins": 2,
+    "kept": false,
+    "hitA": 0.5518,
+    "hitB": 0.5516
+   }
+  ],
+  "room": {
+   "tr": {
+    "t": -0.2,
+    "wins": 2,
+    "pass": false,
+    "coef": {
+     "tr:QB": 0.212,
+     "tr:RB": 0.443,
+     "tr:WR": 0.513,
+     "tr:TE": 0.416,
+     "tr:OL": 0.0,
+     "tr:DL": 0.233,
+     "tr:LB": 0.468,
+     "tr:DB": 0.0
+    }
+   },
+   "inc": {
+    "t": -1.07,
+    "wins": 1,
+    "pass": false,
+    "coef": {
+     "inc:QB": 1.179,
+     "inc:RB": 0.879,
+     "inc:WR": 0.769,
+     "inc:TE": 1.23,
+     "inc:OL": 0.0,
+     "inc:DL": 0.958,
+     "inc:LB": 1.086,
+     "inc:DB": 0.0
+    }
+   },
+   "class": {
+    "t": -0.58,
+    "wins": 2,
+    "pass": false,
+    "coef": {
+     "So:QB": 1.207,
+     "So:RB": 0.871,
+     "So:WR": 1.053,
+     "So:TE": 1.135,
+     "So:OL": 0.0,
+     "So:DL": 1.318,
+     "So:LB": 1.408,
+     "So:DB": 0.0,
+     "Jr:QB": 1.726,
+     "Jr:RB": 1.3,
+     "Jr:WR": 1.611,
+     "Jr:TE": 1.491,
+     "Jr:OL": 0.0,
+     "Jr:DL": 1.859,
+     "Jr:LB": 2.064,
+     "Jr:DB": 0.0,
+     "Sr:QB": 1.757,
+     "Sr:RB": 1.357,
+     "Sr:WR": 1.836,
+     "Sr:TE": 1.891,
+     "Sr:OL": 0.0,
+     "Sr:DL": 2.193,
+     "Sr:LB": 2.341,
+     "Sr:DB": 0.0
+    }
+   },
+   "fr": {
+    "t": 0.54,
+    "wins": 3,
+    "pass": false,
+    "coef": {
+     "fr:QB": -1.652,
+     "fr:RB": -1.207,
+     "fr:WR": -1.59,
+     "fr:TE": -1.641,
+     "fr:OL": 0.0,
+     "fr:DL": -1.935,
+     "fr:LB": -2.093,
+     "fr:DB": 0.0
+    }
+   },
+   "use": {
+    "t": -0.88,
+    "wins": 3,
+    "pass": false,
+    "coef": {
+     "sh:QB": 0.125,
+     "sh:RB": 0.138,
+     "sh:WR": -0.029,
+     "sh:TE": 0.248,
+     "sh:OL": 0.0,
+     "sh:DL": 0.109,
+     "sh:LB": 0.338,
+     "sh:DB": 0.0
+    }
+   },
+   "role": {
+    "t": -2.63,
+    "wins": 1,
+    "pass": false,
+    "coef": {
+     "rk1:QB": 0.045,
+     "rk1:RB": -0.033,
+     "rk1:WR": -0.207,
+     "rk1:TE": 0.161,
+     "rk1:OL": 0.0,
+     "rk1:DL": 0.161,
+     "rk1:LB": 0.353,
+     "rk1:DB": 0.0,
+     "rk2:QB": -0.223,
+     "rk2:RB": 0.075,
+     "rk2:WR": -0.159,
+     "rk2:TE": -0.287,
+     "rk2:OL": 0.0,
+     "rk2:DL": -0.013,
+     "rk2:LB": 0.132,
+     "rk2:DB": 0.0,
+     "rk3:QB": 1.774,
+     "rk3:RB": 0.207,
+     "rk3:WR": -0.055,
+     "rk3:TE": -0.371,
+     "rk3:OL": 0.0,
+     "rk3:DL": -0.08,
+     "rk3:LB": 0.215,
+     "rk3:DB": 0.0
+    }
+   }
+  },
+  "frRB": {
+   "t": 1.09,
+   "wins": 3,
+   "pass": false
+  },
+  "n": 35164,
+  "origins": [
+   2021,
+   2022,
+   2023,
+   2024
+  ]
+ }
+}
