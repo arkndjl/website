@@ -4345,14 +4345,24 @@
   }
   setTimeout(rqFromHash, 60); window.addEventListener('hashchange', rqFromHash);
 
-  function preview(canvas, name) {
+  function preview(canvas, name, text) {
     var url = canvas.toDataURL('image/png');
     var box = document.createElement('div'); box.className = 'gfx'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', 'graphic preview');
     box.innerHTML = '<div class="win gfx__win"><div class="win__title"><span class="win__title-text">gfx.exe<span class="win__cursor">_</span></span>' +
       '<button type="button" class="gfx__x" aria-label="close">×</button></div><div class="gfx__body"><img alt="graphic preview"></div>' +
       '<div class="gfx__bar"><a class="cfb__btn" download>save PNG</a><button type="button" class="cfb__btn" data-copy hidden>copy</button><button type="button" class="cfb__btn" data-share hidden>share</button>' +
-      '<button type="button" class="cfb__btn" data-close>close</button></div></div>';
+      '<button type="button" class="cfb__btn" data-close>close</button></div>' +
+      (text != null ? '<div class="gfx__post"><textarea readonly rows="6" aria-label="post text"></textarea><div class="gfx__bar"><span class="gfx__n"></span><button type="button" class="cfb__btn" data-copytext>copy text</button></div></div>' : '') + '</div>';
     box.querySelector('img').src = url;
+    if (text != null) {   // the post for X, with its length as X counts it (a link is 23)
+      var ta = box.querySelector('.gfx__post textarea'), ct = box.querySelector('[data-copytext]'); ta.value = text;
+      box.querySelector('.gfx__n').textContent = text.replace(/https?:\/\/\S+/g, new Array(24).join('x')).length + ' / 280';
+      ct.addEventListener('click', function () {
+        var done = function () { ct.textContent = 'copied'; setTimeout(function () { ct.textContent = 'copy text'; }, 1600); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, function () { ta.select(); document.execCommand('copy'); done(); });
+        else { ta.select(); document.execCommand('copy'); done(); }
+      });
+    }
     var a = box.querySelector('a'); a.href = url; a.download = name + '.png';
     // a card with moving parts (5-star+ stars) shows the canvas itself, stepped a few times a second; the saved,
     // copied and shared picture is the still frame
@@ -4782,8 +4792,125 @@
     return F.canvas;
   }
 
+  // ---- articleGFX (layouts/_default/single.html): an article as a 16:9 card, the title, Noah's own sentences from the
+  // article (front matter gfx.quote, checked verbatim by scripts/article_gfx.py; default the first sentence), and the
+  // article's own figures (its images and postcharts, in order, up to four), with post text for X under the preview ----
+  var FONTDATA = null;
+  function fontData() {   // the site face as a data URI, so a chart's SVG drawn as an image keeps the one font
+    return FONTDATA || (FONTDATA = fetch('{{ "fonts/mspgothic-pixel.woff2" | relURL }}?v=2').then(function (r) { return r.blob(); })
+      .then(function (b) { return new Promise(function (res) { var fr = new FileReader(); fr.onload = function () { res(fr.result); }; fr.readAsDataURL(b); }); })
+      .catch(function () { return ''; }));
+  }
+  var SVG_PROPS = ['fill', 'stroke', 'stroke-width', 'opacity', 'font-size', 'text-anchor', 'dominant-baseline', 'display', 'visibility'];
+  async function svgImage(svg, w, h) {   // an on-page SVG chart with its computed styles inlined, rasterised at w x h
+    var cl = svg.cloneNode(true), a = [svg].concat([].slice.call(svg.querySelectorAll('*'))), b = [cl].concat([].slice.call(cl.querySelectorAll('*')));
+    a.forEach(function (el, i) {
+      var cs = getComputedStyle(el), st = SVG_PROPS.map(function (k) { var v = cs.getPropertyValue(k); return v ? k + ':' + v : ''; }).filter(Boolean);
+      st.push('font-family:"MS PGothic Pixel"'); b[i].setAttribute('style', st.join(';'));
+    });
+    cl.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); cl.setAttribute('width', w); cl.setAttribute('height', h);
+    var fd = await fontData();
+    if (fd) { var css = document.createElementNS('http://www.w3.org/2000/svg', 'style'); css.textContent = '@font-face{font-family:"MS PGothic Pixel";src:url(' + fd + ') format("woff2")}'; cl.insertBefore(css, cl.firstChild); }
+    var img = await loadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(cl)));
+    if (img) await new Promise(function (r) { setTimeout(r, 60); });   // the embedded face settles before the draw
+    return img;
+  }
+  function artFigures(art) {   // the article's figures in reading order: [kind, element, aspect]
+    return [].slice.call(art.querySelectorAll('.post-content img, .post-content figure.postchart svg')).map(function (el) {
+      if (el.tagName.toLowerCase() === 'img') return el.naturalWidth ? ['img', el, el.naturalWidth / el.naturalHeight] : null;
+      var vb = (el.getAttribute('viewBox') || '').split(/[\s,]+/).map(Number);
+      return vb.length === 4 && vb[2] ? ['svg', el, vb[2] / vb[3], (el.closest('figure').querySelector('.libstudy__legend') || null)] : null;
+    }).filter(Boolean).slice(0, 4);
+  }
+  // rows of figures (order kept, one to three a row) that fill the box best
+  function figRows(F, w, h, gap) {
+    var best = null, n = F.length;
+    for (var m = 0; m < (1 << Math.max(0, n - 1)); m++) {
+      var rows = [[F[0]]];
+      for (var i = 1; i < n; i++) { if (m & (1 << (i - 1))) rows.push([F[i]]); else rows[rows.length - 1].push(F[i]); }
+      if (rows.some(function (r) { return r.length > 3; })) continue;
+      var hs = rows.map(function (r) { return (w - (r.length - 1) * gap) / r.reduce(function (s, f) { return s + f[2]; }, 0); });
+      var tot = hs.reduce(function (s, v) { return s + v; }, 0) + (rows.length - 1) * gap, k = Math.min(1, (h - (rows.length - 1) * gap) / (tot - (rows.length - 1) * gap));
+      var area = rows.reduce(function (s, r, j) { return s + r.reduce(function (s2, f) { return s2 + Math.pow(hs[j] * k, 2) * f[2]; }, 0); }, 0);
+      var low = Math.min.apply(null, rows.map(function (r, j) { return Math.min.apply(null, r.map(function (f) { return Math.pow(hs[j] * k, 2) * f[2]; })); }));
+      var sc = area + 2 * n * low;   // big, and no figure left tiny
+      if (!best || sc > best.sc) best = { sc: sc, rows: rows, hs: hs.map(function (v) { return v * k; }) };
+    }
+    return best;
+  }
+  function artData(btn) { try { return JSON.parse(btn.getAttribute('data-gfx-art') || '{}'); } catch (e) { return {}; } }
+  function artSentences(art) {   // the article's own text, for the default quote and post and for the verbatim check
+    var ps = [].slice.call(art.querySelectorAll('.post-content p')).filter(function (p) { return !p.closest('figure, .table-of-contents'); });
+    return ps.map(function (p) { return txt(p); }).filter(Boolean);
+  }
+  function firstSentence(t) { var m = /^.+?[.!?](?=\s+[A-Z"(]|$)/.exec(t); return m ? m[0] : t; }
+  function artText(btn) {   // the post for X: the front matter's lines, else the title and the first sentence; then the link
+    var d = artData(btn), art = btn.closest('article'), body = artSentences(art), all = body.join(' ');
+    var lines = (d.post || '').split(/\n\s*\n/).map(function (l) { return l.trim(); }).filter(function (l) { return l && (l === d.t || all.indexOf(l) >= 0); });
+    if (!lines.length) lines = [d.t, firstSentence(body[0] || '')].filter(Boolean);
+    var url = d.u || location.href, X = function (ls) { return ls.join('\n\n').length + 2 + 23; };   // X counts any link as 23
+    while (lines.length > 1 && X(lines) > 280) lines.pop();
+    return lines.join('\n\n') + '\n\n' + url;
+  }
+  async function buildArticle(btn) {
+    var d = artData(btn), art = btn.closest('article'); if (!art || !d.t) return null;
+    var body = artSentences(art), all = body.join(' ');
+    var quotes = (d.q || []).filter(function (q) { return all.indexOf(q) >= 0; });
+    if (!quotes.length && body[0]) quotes = [firstSentence(body[0])];
+    var figs = artFigures(art);
+    var F = await frame(2400, 1350, 'ARTICLE' + (d.s ? ' :: ' + String(d.s).toUpperCase() : ''), d.d, d.l);
+    var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 40, gap = 24;
+    var lw = figs.length ? Math.round(w * 0.5) : w, rx = x + lw + gap, rw = w - lw - gap;
+    // left: the series tag (the part of the title before its colon), the title, then the sentences
+    well(g, x, y, lw, h);
+    var m = /^(.{2,24}?)\s*:\s+(.+)$/.exec(d.t), kick = m ? m[1] : '', title = m ? m[2] : d.t, cw = lw - 2 * pad, cy = y + pad;
+    if (kick) { tag(g, x + pad, cy, kick.toUpperCase(), C.title, C.white, 40); cy += 64 + 32; }
+    var ts = 88, tl;
+    for (; ts >= 56; ts -= 16) { g.font = ts + 'px ' + FONT; tl = wrap(g, title, cw); if (tl.length <= 3) break; }
+    if (ts < 56) { ts = 56; g.font = ts + 'px ' + FONT; tl = wrap(g, title, cw).slice(0, 3); }
+    g.fillStyle = C.white; tl.forEach(function (t, i) { g.fillText(fit(g, t, cw), x + pad, cy + ts * 0.6 + i * ts * 1.2); });
+    cy += tl.length * ts * 1.2 + 28;
+    g.fillStyle = C.dark; g.fillRect(x + pad, cy, cw, 4); cy += 4 + 40;
+    var room = y + h - pad - cy, fs = 56, lay;
+    for (; fs >= 32; fs -= 4) {
+      g.font = fs + 'px ' + FONT; lay = quotes.map(function (q) { return wrap(g, q, cw - 28); });
+      if (lay.reduce(function (s, l) { return s + l.length * fs * 1.3 + 32; }, -32) <= room) break;
+    }
+    lay.forEach(function (l) {
+      var lh = l.length * fs * 1.3;
+      if (cy + lh > y + h - pad + 2) return;
+      g.fillStyle = C.teal; g.fillRect(x + pad, Math.round(cy + 4), 8, Math.round(lh - 12));
+      g.font = fs + 'px ' + FONT; g.fillStyle = C.white;
+      l.forEach(function (t, i) { g.fillText(t, x + pad + 28, cy + fs * 0.62 + i * fs * 1.3); });
+      cy += lh + 32;
+    });
+    if (!figs.length) return F.canvas;
+    // right: the figures, each in a well
+    var inset = 10, lay2 = figRows(figs.map(function (f) { return [f[0], f[1], f[2], f[3]]; }), rw, h, gap), yy = y;
+    var used = lay2.hs.reduce(function (s, v) { return s + v; }, 0) + (lay2.rows.length - 1) * gap; yy += Math.round((h - used) / 2);
+    for (var j = 0; j < lay2.rows.length; j++) {
+      var r = lay2.rows[j], fh = Math.round(lay2.hs[j]), rwid = r.reduce(function (s, f) { return s + fh * f[2]; }, 0) + (r.length - 1) * gap, xx = rx + Math.round((rw - rwid) / 2);
+      for (var k = 0; k < r.length; k++) {
+        var f = r[k], fw = Math.round(fh * f[2]);
+        well(g, xx, yy, fw, fh);
+        var iw = fw - 2 * inset, ih = fh - 2 * inset;
+        if (f[0] === 'img') { g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(f[1], xx + inset, yy + inset, iw, ih); g.imageSmoothingEnabled = false; }
+        else { var si = await svgImage(f[1], iw, ih); if (si) g.drawImage(si, xx + inset, yy + inset, iw, ih); }
+        xx += fw + gap;
+      }
+      yy += fh + gap;
+    }
+    return F.canvas;
+  }
+
   document.addEventListener('click', async function (e) {
     var btn = e.target.closest('[data-gfx]'); if (!btn) return;
+    if (btn.getAttribute('data-gfx-mode') === 'article') {
+      btn.disabled = true; var al = btn.textContent; btn.textContent = '…';
+      try { var arc = await buildArticle(btn); if (arc) preview(arc, 'arkndjl-' + (artData(btn).n || 'article'), artText(btn)); }
+      catch (err) { console.error('gfx article', err); } finally { btn.disabled = false; btn.textContent = al; }
+      return;
+    }
     var win = btn.closest('.win'); if (!win) return;
     btn.disabled = true; var label = btn.textContent; btn.textContent = '…';
     try {

@@ -17,6 +17,14 @@
       <span class="post-reading-time">{{ .ReadingTime }} {{ $.Site.Params.minuteReadingTime | default "min read" }} ({{ .WordCount }} {{ $.Site.Params.words | default "words" }})</span>
     {{- end -}}
       {{- partial "poststats.html" (dict "p" . "count" true) -}}
+      {{- if eq .Type "posts" -}}
+      {{- /* articleGFX: the article as a 16:9 card with post text for X (buildArticle in assets/js/gfx.js); front matter
+             [gfx] quote = [sentences], post = "lines" (Noah's own sentences, checked verbatim by scripts/article_gfx.py) */ -}}
+      {{- $g := .Params.gfx | default dict -}}
+      {{- $art := dict "t" .Title "d" (lower (.Date.Format "Jan 2, 2006")) "n" (path.Base (strings.TrimSuffix "/" .RelPermalink)) "u" .Permalink "l" (strings.TrimSuffix "/" (replaceRE `^https?://` "" .Permalink)) "s" (.Params.series | default "") "q" ($g.quote | default slice) "post" ($g.post | default "") -}}
+      <button type="button" class="cfb__btn pst__gfx" data-gfx data-gfx-mode="article" data-gfx-art="{{ $art | jsonify }}" title="article card graphic (16:9) and post text">articleGFX</button>
+      {{- partial "gfx.html" . -}}
+      {{- end -}}
         </div>
 
   {{ if .Params.tags }}
