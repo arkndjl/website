@@ -1929,7 +1929,7 @@
     // every pro card carries OVR; a table without the column borrows it from the sport's OVR board
     if (!heads.some(function (h) { return /^ovr$/i.test(h); }) && !(rc && rc.c)) {
       var ov = await pcOvr(name, team);
-      if (ov) tiles.unshift({ i: -1, h: 'OVR', t: String(ov.ovr), pct: ov.pct, good: ov.pct, tip: 'overall 0-99: replacement 60, median starter 75, the best in a typical season 97' });
+      if (ov) tiles.unshift({ i: -1, h: 'OVR', t: String(ov.ovr), pct: ov.pct, good: ov.pct, tip: 'overall 0-99 on one straight line: median starter 75, the best in a typical season 97' });
     }
     // the headline: the board's FV, else the sorted column (or the first graded number), in a plaque at the top right
     var hasFv = !!(fvT && !pcDash(fvT));   // any dash (soccer's seniors carry "–"): the sorted stat takes the plaque
