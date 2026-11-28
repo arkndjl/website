@@ -31,7 +31,11 @@
   if (window.__arkTb) return; window.__arkTb = true;
   // college WAR a season per AV (scripts/cfb_av.mjs, data/cfb_war_backtest.json): the builder's values are AV at FV
   var WK = {{ site.Data.cfb_war_backtest.constants.cwarPerAv }};
+  // a team total is WAR over a lineup of replacement starters: AV x WK plus the lineup's replacement line (teamReplWar, the
+  // same offset the teams and recruits tabs add); a gain or a loss is a difference, AV x WK alone
+  var WB = {{ site.Data.cfb_war_backtest.constants.teamReplWar.all }};
   function war(v) { return (v * WK).toFixed(2); }
+  function warT(v) { return (v * WK + WB).toFixed(2); }
   var POS = ['QB', 'RB', 'WR', 'TE', 'OL', 'EDGE', 'DL', 'LB', 'CB', 'S'], OLS = ['LT', 'LG', 'C', 'RG', 'RT'];
   // a room's label (the interior line reads DT once the board splits it from the edge)
   var LBL = {}; function lab(g) { return LBL[g] || g; }
@@ -97,7 +101,7 @@
     else s.push(T.space > 2e5 ? 'Sign. None: no realistic mover who would start fits the space; space goes to retention.' : 'Sign. None: no portal space without a release; next season = development + class.');
     if ((T.walk || []).length) s.push('Let walk. ' + list(T.walk.map(function (w) { return lab(w.pos) + ' ' + w.name + ' (frees ' + money(w.freed) + ' for ' + w.for + ')'; })) + '.');
     var low = T.positions.filter(function (p) { return p.planAv != null && p.planAv < p.bar * 0.85; }).sort(function (a, b) { return a.planAv / Math.max(a.bar, 0.1) - b.planAv / Math.max(b.bar, 0.1); }).map(function (p) { return lab(p.g); });
-    s.push('Next season. ' + war(T.av26) + ' WAR now; ' + (T.avExp != null ? war(T.avExp) + ' expected (returners +1 year, class, redshirts, usual portal); ' : war(T.av27) + ' no adds; ') + war(T.avPlan) + ' with plan (' + back + '% of now)' + (low.length ? '; < 85% of contender bar: ' + list(low.slice(0, 3)) : '; all units >= 85% of contender bar') + (T.open ? '; ' + T.open + ' starting spot' + (T.open === 1 ? '' : 's') + ' open' : '') + '.');
+    s.push('Next season. ' + warT(T.av26) + ' WAR now; ' + (T.avExp != null ? warT(T.avExp) + ' expected (returners +1 year, class, redshirts, usual portal); ' : warT(T.av27) + ' no adds; ') + warT(T.avPlan) + ' with plan (' + back + '% of now)' + (low.length ? '; < 85% of contender bar: ' + list(low.slice(0, 3)) : '; all units >= 85% of contender bar') + (T.open ? '; ' + T.open + ' starting spot' + (T.open === 1 ? '' : 's') + ' open' : '') + '.');
     return s;
   }
 
@@ -118,8 +122,8 @@
       return '<span>' + r[0] + '</span><span class="tbx__bar" title="' + esc(r[0] + ': Elo ' + r[1].e + ', #' + r[1].rk + ' of ' + n + ', ' + num1(r[1].xw) + ' conference-schedule wins of ' + (D.nxFit || {}).games) + '"><i style="width:' + w.toFixed(0) + '%;--c:' + r[2] + '"></i></span><span class="tbx__n">' + r[1].e + '</span><span class="tbx__rk">#' + r[1].rk + '</span>'; }).join('');
     var str = '<section class="tbx__box tbx__box--str"><h4>' + D.next + ' strength</h4><div class="tbx__big"><b>#' + N.ret.rk + '</b><span>of ' + n + ' FBS</span><b>' + num1(N.ret.xw) + '</b><span>xW</span></div><div class="tbx__bridge">' + bridge + '</div>' + (window.__tbYears ? window.__tbYears.strip(N, [D.next, D.next + 1, D.next + 2], 'e', function (v) { return v; }, n) : '') + '</section>';
     var WKc = WK, val = '<section class="tbx__box tbx__box--val"><h4>value</h4><div class="tbx__stats">' +
-      '<div class="tbx__stat tbx__stat--teal"><b>' + num1(T.av27 * WKc) + '</b><span>college WAR ' + D.next + '</span></div>' +
-      '<div class="tbx__stat"><b>' + num1(T.av26 * WKc) + '</b><span>college WAR now</span></div>' +
+      '<div class="tbx__stat tbx__stat--teal"><b>' + num1(T.av27 * WKc + WB) + '</b><span>college WAR ' + D.next + '</span></div>' +
+      '<div class="tbx__stat"><b>' + num1(T.av26 * WKc + WB) + '</b><span>college WAR now</span></div>' +
       '<div class="tbx__stat tbx__stat--teal"><b>' + num1(T.war) + '</b><span>wins over replacement</span></div>' +
       '<div class="tbx__stat"><b>' + money(T.eff) + '</b><span>NIL $ a win · #' + T.effRk + '</span></div></div></section>';
     var tot = Math.max(T.budget, T.reserve + T.keepCost + Math.max(0, T.spend) + Math.max(0, T.left)) || 1;
@@ -167,7 +171,7 @@
       return '<div class="tb__pos tb__pos--' + st + '"><span class="tb__g">' + lab(p.g) + '</span><span class="tb__meter" title="' + esc('WAR a season: ' + war(p.nowAv) + ' now, ' + war(p.nextAv) + ' guaranteed roster, ' + war(after + tg) + ' with the transfer targets; bar ' + war(p.bar)) + '"><i style="width:' + w.toFixed(0) + '%"></i><b style="left:50%" title="contender bar"></b></span></div>';
     }).join('');
     var avMax = Math.max(T.av26, T.av27, T.avExp || 0, T.avPlan, 1);
-    var avs = [['now', T.av26, 'now'], ['no adds', T.av27, 'none']].concat(T.avExp != null ? [['expected', T.avExp, 'exp']] : []).concat([['w/ targets', T.avPlan, 'plan']]).map(function (b) { return '<div class="tb__av tb__av--' + b[2] + '"><span>' + b[0] + '</span><span class="tb__avbar"><i style="width:' + (b[1] / avMax * 100).toFixed(0) + '%"></i></span><b>' + war(b[1]) + '</b></div>'; }).join('');
+    var avs = [['now', T.av26, 'now'], ['no adds', T.av27, 'none']].concat(T.avExp != null ? [['expected', T.avExp, 'exp']] : []).concat([['w/ targets', T.avPlan, 'plan']]).map(function (b) { return '<div class="tb__av tb__av--' + b[2] + '"><span>' + b[0] + '</span><span class="tb__avbar"><i style="width:' + (b[1] / avMax * 100).toFixed(0) + '%"></i></span><b>' + warT(b[1]) + '</b></div>'; }).join('');
     var ramp = FVT.map(function (t, i) { return '<i style="--t:' + t[1] + ';--k:' + t[2] + '">' + (i ? t[0] : '&lt;' + FVT[1][0]) + (i === FVT.length - 1 ? '+' : '') + '</i>'; }).join('');
     var chart = '<section class="tb__panel tb__chart"><h4>next season · starters and backups</h4><div class="tb__pitch"><div class="tb__field">' +
       '<div class="tb__flab">defense</div>' + tiles.D.sort(byField).map(function (x) { return x[2]; }).join('') + '<div class="tb__los"><span>offense</span></div>' + tiles.O.sort(byField).map(function (x) { return x[2]; }).join('') +

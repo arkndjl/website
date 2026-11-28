@@ -7,6 +7,8 @@
   var FONT = '"MS PGothic Pixel", "MS PGothic", monospace';
   // college WAR a season per AV (scripts/cfb_av.mjs): team-builder values are AV at FV, drawn as WAR
   var WARK = {{ with site.Data.cfb_war_backtest }}{{ .constants.cwarPerAv }}{{ else }}0.0953{{ end }};
+  // a team total adds the replacement lineup's line (teamReplWar.all), as the teams and recruits tabs do; gains stay AV x WARK
+  var WARB = {{ with site.Data.cfb_war_backtest }}{{ .constants.teamReplWar.all }}{{ else }}2.93{{ end }};
   // the sport's short link (static/_redirects): /cfb -> /arkboard/college-football/, the hash carried through
   var SITE = 'arkndjl.net/' + ([[/^\/1nt/i, '1nt'], [/^\/laursen_111/i, 'laursen_111'], [/college-football/, 'cfb'], [/college-basketball/, 'cbb'], [/arkboard\/nfl/, 'nfl'], [/arkboard\/nba/, 'nba'],
     [/arkboard\/nhl/, 'nhl'], [/hockey-prospects/, 'hockey'], [/soccer-prospects/, 'u22'], [/arkboard\/soccer/, 'soccer'], [/arkboard\/baseball/, 'baseball'], [/arkboard\/counter-strike/, 'cs2'],
@@ -1010,7 +1012,7 @@
     var wl = [['now', T.av26, C.lilac], T.avExp != null ? ['expected', T.avExp, C.white] : ['no adds', T.av27, C.down], ['plan', T.avPlan, C.teal]], wx = x + w;
     g.font = '32px ' + FONT;
     wl.slice().reverse().forEach(function (b, k) {
-      var s1 = (b[1] * WARK).toFixed(2); g.fillStyle = b[2]; wx -= g.measureText(s1).width; g.fillText(s1, wx, uy);
+      var s1 = (b[1] * WARK + WARB).toFixed(2); g.fillStyle = b[2]; wx -= g.measureText(s1).width; g.fillText(s1, wx, uy);
       g.fillStyle = C.lilac; wx -= g.measureText(b[0] + ' ').width; g.fillText(b[0] + ' ', wx, uy); wx -= 36;
     });
     g.fillStyle = C.teal; wx -= g.measureText('WAR A SEASON ').width; g.fillText('WAR A SEASON ', wx, uy);

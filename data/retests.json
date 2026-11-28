@@ -1437,14 +1437,7 @@
    "lag": 30,
    "trigger": "the 2026-27 season in the NBA payroll panel (one more decision year with three seasons seen)",
    "gate": "scripts/research/pro_builder_nov28/verdicts.py: agedp beats carry and last on right calls, paired t >= 2 and most seasons",
-   "run_hint": "python3 scripts/research/pro_builder_nov28/verdicts.py nba",
-   "result": {
-    "d": "2026-11-28",
-    "v": "s",
-    "e": "superseded: verdicts against the replacement line at his position, right calls .648 to .679 against carry",
-    "tt": 2.82,
-    "pr": 1398
-   }
+   "run_hint": "python3 scripts/research/pro_builder_nov28/verdicts.py nba"
   },
   {
    "key": "builder_verdict_market_line",
@@ -1461,71 +1454,7 @@
    "lag": 30,
    "trigger": "one more full season in each panel (NFL 2026, NBA 2026-27)",
    "gate": "verdicts.py 'market': agedp beats carry and last, paired t >= 2 and most seasons",
-   "run_hint": "python3 scripts/research/pro_builder_nov28/verdicts.py nfl nba",
-   "result": {
-    "d": "2026-11-28",
-    "v": "s",
-    "e": "replacement line by position: NFL right calls .551 to .613 (t 5.38, by position t 2.37), NBA .648 to .679 (t 2.82, pooled line)",
-    "tt": 5.38,
-    "pr": 1398
-   }
-  },
-  {
-   "key": "builder_verdict_nhl_replacement",
-   "t": "Pro team builder: NHL verdicts against the replacement line at his position (F / D / G) in place of the priced projection against his pay",
-   "sp": [
-    "NHL"
-   ],
-   "ar": "teams",
-   "kind": "retest",
-   "how": "hand",
-   "was": "Nov 28: right calls .616 against .599 carrying the season forward, t 1.88, 5 of 8 seasons (passed NFL t 5.38, NBA t 2.82)",
-   "after": "nhl:champ:2027",
-   "lag": 30,
-   "trigger": "the 2026-27 season in the NHL payroll panel",
-   "gate": "replace.py: agedp beats carry, paired t >= 2 and most seasons",
-   "run_hint": "python3 scripts/research/pro_builder_nov28/replace.py nhl",
-   "result": {
-    "d": "2026-11-28",
-    "v": "s",
-    "e": "line on deals with a new team: right calls .599 to .622 against carry, by position t 2.29",
-    "tt": 2.69,
-    "pr": 1398
-   }
-  },
-  {
-   "key": "builder_verdict_nba_market",
-   "t": "Pro team builder: NBA replacement line fit only on deals that came with a new team (the market a team can buy) in place of every new deal",
-   "sp": [
-    "NBA"
-   ],
-   "ar": "teams",
-   "kind": "retest",
-   "how": "hand",
-   "was": "Nov 28: right calls .668 against .652 carrying the season forward, t 1.38, 4 of 6 seasons (passed NFL t 3.18, NHL t 2.69)",
-   "after": "nba:champ:2027",
-   "lag": 30,
-   "trigger": "the 2026-27 season in the NBA payroll panel",
-   "gate": "replace.py LINE=moved: agedp beats carry, paired t >= 2 and most seasons",
-   "run_hint": "LINE=moved python3 scripts/research/pro_builder_nov28/replace.py nba"
-  },
-  {
-   "key": "builder_future_score",
-   "t": "Pro team builder: future score (age curve times stay rate on every player, summed) against win share over the next three seasons",
-   "sp": [
-    "NBA",
-    "NHL",
-    "NFL"
-   ],
-   "ar": "teams",
-   "kind": "retest",
-   "how": "hand",
-   "was": "Nov 28: failed all three against last season's record (NBA t -1.58, NHL t 3.47, NFL t 3.68); stay rate by pay tier failed too",
-   "after": "nba:champ:2027",
-   "lag": 30,
-   "trigger": "one more full season in each payroll panel, and a pick and cap room history if one is built",
-   "gate": "future.py: roster or roster+ beats now and carry on absolute error, paired t <= -2 and most seasons",
-   "run_hint": "python3 scripts/research/pro_builder_nov28/future.py"
+   "run_hint": "python3 scripts/research/pro_builder_nov28/verdicts.py nfl nba"
   },
   {
    "key": "builder_dev_projection",
@@ -1594,89 +1523,34 @@
    "run_hint": "scripts/research/u17wc_nov28 (file saved after the final in project storage, soccer-u17wc-2026/)"
   },
   {
-   "key": "hockey_nhle_ratio",
-   "t": "NHLe refit as a ratio of summed points (and pooled league names)",
+   "key": "cbb_builder_xw_scale",
+   "t": "CBB team builder xW: the win chance scale on per-game ratings",
    "sp": [
-    "NHL"
+    "CBB"
    ],
-   "ar": "fv",
-   "kind": "retest",
+   "ar": "team",
+   "kind": "fix",
    "how": "hand",
-   "was": "draft class-out t -1.98 (ratio), -1.24 (ratio with age), -2.41 (pooled names) vs the live pairs factors",
-   "after": "nhl:draft:2027",
-   "lag": 14,
-   "due": "2027-07-08",
-   "est": 1,
-   "trigger": "the 2026-27 season adds a year of league movers to the landing pages",
-   "gate": "strict class-out (factors refit without the class's careers) t >= 2, 8 of 12, top-64 and point in time (factors through 2015-16, grade 2016-19) not worse",
-   "run_hint": "python3 scripts/hockey_nhle.py --test2"
+   "was": "units sweep Nov 28: the builder's ratings are points a game (ARK rating) but its win chance multiplies their gap by .68 possessions before the 11.4 sd; against the game model's conference xW the builder runs too flat (sd ratio 1.14) and at x1 too steep (.85), so x1 alone is not the fix",
+   "due": "2026-12-15",
+   "trigger": "a point-in-time test of next-season conference win% from preseason ratings (2016-26 priors)",
+   "gate": "the new scale (x1 with a rating-error sd, or a fit factor) beats x.68 on held-out next-season conference win% RMSE, t >= 2, leave one season out",
+   "run_hint": "scripts/team_builder_next.py CBB_POSS, pw in cbb() and put_years; scripts/cbb_games.py priors"
   },
   {
-   "key": "soccer_lg_unrated",
-   "t": "Squad-value league strength for unrated senior leagues in soccer prospect FV",
+   "key": "cbb_next_vorx_line",
+   "t": "CBB Next VORX on the position replacement lines",
    "sp": [
-    "Soccer"
+    "CBB"
    ],
-   "ar": "fv",
-   "kind": "deferred",
+   "ar": "player",
+   "kind": "fix",
    "how": "hand",
-   "was": "not run: the Transfermarkt dump refit is a full soccer prospects run",
-   "due": "2026-12-14",
-   "trigger": "the next soccer prospects refit (Challenger Pro League, 3. Liga, Regionalliga, Austrian 2. Liga, Serie C, Primera Federacion and Czech second tier minutes now count at the replacement floor)",
-   "gate": "lg_share from the mean squad-value club rating of the league; class-out t >= 2, forward top-50 not worse",
-   "run_hint": "python3 scripts/soccer_prospects.py --fit (rlg_td in features())"
-  },
-  {
-   "key": "ovr_rookie_fv_prior",
-   "t": "OVR: rookies start from their final draft FV, its weight fading as pro minutes come in (k / (k + career sample)), against a plain rookie offset with the same fade",
-   "sp": [
-    "NBA",
-    "NHL",
-    "Soccer"
-   ],
-   "ar": "players",
-   "kind": "retest",
-   "how": "hand",
-   "was": "Nov 28: failed in every sport against the offset (NBA t .66 k 1000 best, NHL F t .54, NHL D, G, soccer t 3.33); NBA draft FV r .14 with first-season XPM",
-   "after": "nba:champ:2027",
-   "lag": 14,
-   "est": 1,
-   "trigger": "2026-27 finished: one more season of rookie pairs in every sport",
-   "gate": "scripts/research/ovr_nov28/run.py rookie grid: FV term beats the offset alone (passes the OVR gate: better on next-season rate, value r or team R2 at t >= 2, worse on none past 1)",
-   "run_hint": "python3 scripts/research/ovr_nov28/run.py nba nhlF nhlD nhlG soccer"
-  },
-  {
-   "key": "ovr_nfl_ideas",
-   "t": "NFL OVR: this season's XP/60, career-snap shrink, age and sub-position offsets beside pXP/60, and the talent band",
-   "sp": [
-    "NFL"
-   ],
-   "ar": "players",
-   "kind": "retest",
-   "how": "hand",
-   "was": "Nov 28: not run; the repo holds three seasons of rate history (scripts/data/nfl_rate_hist.json.gz, 2023-25), one usable pair outside the lockbox",
-   "after": "nfl:champ:2027",
-   "lag": 14,
-   "est": 1,
-   "trigger": "2026 season finished and a past-season pxp file per season (2016-25 from scripts/nfl_rate_research.py's pull)",
-   "gate": "the OVR gate in scripts/research/ovr_nov28/suite.py",
-   "run_hint": "add an nfl loader to scripts/research/ovr_nov28/run.py"
-  },
-  {
-   "key": "ovr_tennis_cs2_ideas",
-   "t": "Tennis and CS2 OVR: this season's descriptive rate (PA, season RWA), sample shrink and age beside ARK / RWA, and a talent band",
-   "sp": [
-    "Tennis",
-    "CS2"
-   ],
-   "ar": "players",
-   "kind": "retest",
-   "how": "hand",
-   "was": "Nov 28: not run; OVR reads ARK and the RWA rating as tested, anchors from the current board",
-   "due": "2027-01-15",
-   "trigger": "a season-by-season player file for each (tennis_ratings history by year, cs2 player ratings by month)",
-   "gate": "the OVR gate on next-season (tennis) or next-six-months (CS2) results",
-   "run_hint": "add loaders to scripts/research/ovr_nov28/run.py"
+   "was": "units sweep Nov 28: Next (next season's VORX, scripts/cbb_next.py) is fit to VORX on the flat -1.4 line while the board's VORX moved to position lines in #1386 (G -1.95, F -1.22, C -.74); a guard at 70% of minutes reads about .15 wins low, a center .18 high",
+   "due": "2026-12-15",
+   "trigger": "refit scripts/cbb_next_research.py on the position-line target",
+   "gate": "walk-forward 2016-26 RMSE on the position-line target no worse than the flat-line fit moved by the line (t <= -2 fails)",
+   "run_hint": "scripts/cbb_next_research.py, scripts/cbb_next.py war(), scripts/repl_levels.py cbb_line"
   }
  ]
 }

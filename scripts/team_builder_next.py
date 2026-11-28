@@ -498,7 +498,8 @@ def cfb():
     for t in T:
         t['_e'] = {'now': elo.get(t['tid'], E(t['av26'], t)), 'ret': E(t['av27'], t), 'exp': E(t['avExp'], t), 'plan': E(t['avPlan'], t)}
     conf = lambda t: t.get('conf') if t.get('conf') and not str(t.get('conf')).startswith('IND') else '_' + t['level']
-    WK = json.load(open(os.path.join(ROOT, 'data', 'cfb_war_backtest.json')))['constants']['cwarPerAv']
+    WC = json.load(open(os.path.join(ROOT, 'data', 'cfb_war_backtest.json')))['constants']
+    WK, WB = WC['cwarPerAv'], WC['teamReplWar']['all']   # AV x WK + the replacement lineup's line = team WAR (gains: AV x WK)
     out = {}
     for k in ('now', 'ret', 'exp', 'plan'):
         xw = sched(T, lambda o: o['_e']['plan' if k != 'now' else 'now'], conf, pw, CFB_GAMES)
@@ -511,7 +512,7 @@ def cfb():
         spend = t['budget'] - t['left']
         t['nx'] = out[id(t)]; t['war'] = r1(max(0.0, war)); t['spendNext'] = int(spend)
         t['eff'] = int(round(spend / max(war, 0.5), -3))
-        t['warSea'] = r1(t['avPlan'] * WK)
+        t['warSea'] = r1(t['avPlan'] * WK + WB)
         t['bud'] = budget_next('cfb', t['team'], D['next'])
     er = rank(T, lambda o: -o['eff'])
     for t in T: t['effRk'] = er[id(t)]
