@@ -34,6 +34,7 @@ import gzip
 import json
 import math
 import os
+import re
 import sys
 from collections import Counter, defaultdict
 
@@ -1099,35 +1100,60 @@ def class_parts(xs):
     """The class-rankings card's parts: ARK star counts (5-star+, 4.5-5, 3-4, unranked-2.5), mean FV, the three best commits, and the
     class's FV points split into its top end (the TOP_END best commits) and its depth (the rest)."""
     xs = sorted(xs, key=lambda x: -x['ets'])
+    g = [x for x in xs if not x.get('ob')]   # the board's commits (list-only commits sit at the floor)
     # ARK star buckets (Noah, Nov 28): 5-star+ | 4.5-5 | 3-4 (3, 3.5, 4) | unranked-2.5; every half star lands in one
     return {'a6': sum(1 for x in xs if x['ark'] > 5), 'ah': sum(1 for x in xs if 4.5 <= x['ark'] <= 5), 'am': sum(1 for x in xs if 3 <= x['ark'] < 4.5),
             'al': sum(1 for x in xs if not (x['ark'] or 0) >= 3),
-            'avgFv': round(sum(x['fv'] for x in xs) / len(xs), 1),
+            'avgFv': round(sum(x['fv'] for x in g) / len(g), 1) if g else None,
             'topEnd': round(sum(x['ets'] for x in xs[:TOP_END]), 4), 'depth': round(sum(x['ets'] for x in xs[TOP_END:]), 4),
             'top3': [[x['name'], x['pos'], x['fv'], x['ark']] for x in sorted(xs, key=lambda x: (-x['ark'], -x['ets']))[:3]]}
 
 
 def part_ranks(trows):
     for k, rk in (('topEnd', 'topRk'), ('depth', 'depthRk')):
-        for i, x in enumerate(sorted(trows, key=lambda x: (-x[k], -x['ets']))): x[rk] = i + 1
+        for i, x in enumerate(sorted(trows, key=lambda x: (-x[k], -x['ets']))): x[rk] = i + 1 if x['n'] else None
 
 
-def class_ranks(lst, bt):
-    """One class's rankings: committed schools by summed E[share] (FV points), with the class's year-1 college value."""
+OFFBOARD = os.path.join(ROOT, 'data', 'class_offboard.json')
+
+
+def offboard(year, lst, bt):
+    """the class's commits the board does not list (On3's team commit lists, data/class_offboard.json from
+    scripts/class_offboard.py): 1 star unless a service ranks him, at the floor (FV 20, no E[share]), so they count in the
+    commits and the star buckets and add no class points (their points failed held out in CFB, the sport with the
+    history: scripts/research/class_unranked_nov28). A board row of the same name wins."""
+    if not os.path.exists(OFFBOARD): return []
+    ob = (json.load(open(OFFBOARD)).get('cbb') or {}).get(str(year)) or []
+    names = {N.key(x['name']).replace(' ', '') for x in lst}
+    tid_team = {re.search(r'/(\d+)\.png', v['logo'] or '').group(1): t for t, v in bt.items() if re.search(r'/(\d+)\.png', v['logo'] or '')}
+    out = []
+    for nm, pos, tid, ark, home, ht, wt in ob:
+        t = tid_team.get(str(tid))
+        if not t or N.key(nm).replace(' ', '') in names: continue
+        out.append({'name': nm, 'pos': pos or '', 'team': t, 'ark': ark, 'fv': 20, 'ets': 0.0, 'p': 0.0, 'rk': None, 'xnil': 0, 'home': home,
+                    'path': [{'on': 0.0, 'min': 0.0, 'bpm': None, 'v': 0.0}], 'ob': 1})
+    return out
+
+
+def class_ranks(lst, bt, year=None):
+    """One class's rankings: every D-I school by summed E[share] (FV points), with the class's year-1 college value;
+    schools with no commit share the last rank."""
     by = defaultdict(list)
-    for x in lst:
+    for x in lst + offboard(year, lst, bt):
         if x['team']: by[x['team']].append(x)
     trows = []
-    for t, xs in by.items():
+    for t in bt:
+        xs = by.get(t, [])
         e = sum(x['ets'] for x in xs)
-        trows.append({'team': t, 'logo': bt[t]['logo'], 'conf': bt[t]['conf'], 'n': len(xs), 'ets': round(e, 4),
+        trows.append({'team': t, 'logo': bt[t]['logo'], 'conf': bt[t]['conf'], 'n': len(xs), 'obN': sum(1 for x in xs if x.get('ob')), 'ets': round(e, 4),
                       'fvSum': round(fv_of(e), 1), 'pNba': round(1 - float(np.prod([1 - x['p'] for x in xs])), 3),
-                      'top': [[x['name'], x['pos'], x['fv']] for x in xs[:3]], 'best': min(x['rk'] or 999 for x in xs),
+                      'top': [[x['name'], x['pos'], x['fv']] for x in xs[:3]], 'best': min([x['rk'] for x in xs if x['rk']] or [None]) if xs else None,
                       'xnil': sum(x['xnil'] for x in xs), 'v1': round(sum(x['path'][0]['v'] for x in xs), 2),
                       'min1': round(sum(x['path'][0]['on'] * x['path'][0]['min'] for x in xs), 1),
                       **class_parts(xs)})
-    trows.sort(key=lambda x: -x['ets'])
-    for i, x in enumerate(trows): x['rk'] = i + 1
+    trows.sort(key=lambda x: (-x['ets'], -x['n'], x['team']))
+    zero = 0
+    for i, x in enumerate(trows): x['rk'] = i + 1 if x['n'] else (zero := zero or i + 1)
     part_ranks(trows)
     return trows
 
@@ -1352,7 +1378,7 @@ def write():
                             'reliability': rel[c], 'list': recs})
     # class rankings: expected NBA value the class brings (sum of E[share]) per committed school, each class
     # (teams = the next class; teamsBy = every class, for the class-rankings year filter)
-    teamsBy = {str(c['year']): class_ranks(c['list'], bt) for c in out_classes}
+    teamsBy = {str(c['year']): class_ranks(c['list'], bt, c['year']) for c in out_classes}
     trows = teamsBy[str(LIVE[0])]
     res = {
         'asof': __import__('datetime').date.today().isoformat(),

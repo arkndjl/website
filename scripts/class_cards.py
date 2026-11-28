@@ -13,8 +13,18 @@ Reads static/data/cfb-recruits.json (every graded recruit, scripts/cfb_recruit.m
      ld: uncommitted recruits the school leads for, best first: {n, p, a, f, i, e: [experts on it, experts with a pick]
          (On3/Rivals, data/recruit_expert_picks.json), r: On3 RPM % (data/recruit_rpm.json), l: ARK lean %
          (data/recruit_commit_leans.json)},
-     v: visits to the school, upcoming first (date >= today), then the last VISIT_DAYS days' officials:
-        {d date, k o official | u unofficial, n, p, a, f, i, c school he is committed to, cl its logo when it is another school}}}}}}
+     v: visits to the school in the last year, upcoming first (date >= today), then the last VISIT_DAYS days' officials,
+        then the rest, newest first:
+        {d date, k o official | u unofficial, n, p, a, f, i, c school he is committed to, cl its logo when it is another school},
+     of: offers, the board's recruits first (best first), then the rest of the school's On3 offer list: {n, p, a, f, i, c, cl},
+     on: offers in all, oc: of them committed elsewhere}}}}}
+
+Every board program is listed (scripts/cfb_recruit.mjs everyClass, scripts/cbb_recruit_fit.py class_ranks), the ones
+with no commit yet too, and r holds the commits only On3's team lists name (data/class_offboard.json, scripts/class_offboard.py)
+at their HS ARK stars and FV 20 (ob: 1). Offers: each program's On3 offer list (scripts/data/class_offers.json.gz) and
+the schools in each pulled recruit's On3 recruitment with any status past interest (recruit_on3_live / _committed `of`),
+and for CFB each recruit's offers on ESPN's class lists (scripts/cfb_recruit.mjs cache, else scripts/data/snaps/offers).
+School slugs: data/school_slugs.json (every FBS, FCS and D-I program).
 
 a6 = 5-star+, ah = 4.5-5, am = 3-4, al = unranked to 2.5 ARK stars (copied from the class rankings rows).
 Visits come from On3's live pull of uncommitted recruits and the weekly pull of committed ones
@@ -36,7 +46,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import names  # noqa: E402
 from player_moves import school_slugs  # noqa: E402
 VISIT_DAYS = 30
-LEADS, VISITS = 8, 10
+LEADS, VISITS, OFFERS = 8, 10, 12
+NO_OFFER = re.compile(r'interest|contact|warm|cold', re.I)   # On3 statuses short of an offer
 OUT = os.path.join(ROOT, 'static', 'data', 'classes')
 CFB_G = ['QB', 'RB', 'WR', 'TE', 'OL', 'EDGE', 'DL', 'LB', 'CB', 'S', 'ATH', 'K', 'P', 'LS']
 CBB_G = ['PG', 'CG', 'SG', 'SF', 'PF', 'C']
@@ -77,9 +88,15 @@ def leads(sp, yr, lst):
     return out
 
 
+def slugs_of(sp):
+    """On3 school slug -> board team: every program (data/school_slugs.json), the FBS map underneath"""
+    return {**school_slugs(), **(load('data', 'school_slugs.json', default={}).get(sp) or {})}
+
+
 def visits(sp, yr, lst, today):
-    """{school: [visit rows]}: upcoming visits, then the last VISIT_DAYS days' officials"""
-    slugs, since = school_slugs(), (dt.date.fromisoformat(today) - dt.timedelta(days=VISIT_DAYS)).isoformat()
+    """{school: [visit rows]}: upcoming visits, then the last VISIT_DAYS days' officials, then the year's other visits"""
+    slugs, since = slugs_of(sp), (dt.date.fromisoformat(today) - dt.timedelta(days=VISIT_DAYS)).isoformat()
+    year = (dt.date.fromisoformat(today) - dt.timedelta(days=365)).isoformat()
     m, out, seen = names.Matcher(lst, team=None), {}, set()
     for f in ('recruit_on3_live.json.gz', 'recruit_on3_committed.json.gz'):
         for o in (load('scripts', 'data', f, default={}).get(sp) or {}).get(str(yr)) or []:
@@ -87,13 +104,107 @@ def visits(sp, yr, lst, today):
             if not r or (o.get('state') and r.get('home') and not r['home'].endswith(o['state'])): continue
             for v in o.get('visits') or []:
                 sch, d, k = slugs.get(v[0]), v[2], 'o' if v[1] == 'Official' else 'u'
-                if not sch or not d or (d < today and (k == 'u' or d < since)) or (r['name'], sch, d) in seen: continue
+                if not sch or not d or d < year or (r['name'], sch, d) in seen: continue
                 seen.add((r['name'], sch, d))
                 out.setdefault(sch, []).append(dict(who(r, sp), d=d, k=k, c=r.get('team') or None, cl=(r.get('logo') or None) if r.get('team') and r.get('team') != sch else None))
     for sch in out:
         up = sorted((x for x in out[sch] if x['d'] >= today), key=lambda x: (x['d'], -x['f']))
-        past = sorted((x for x in out[sch] if x['d'] < today), key=lambda x: x['d'], reverse=True)
-        out[sch] = [{k: v for k, v in x.items() if v is not None} for x in (up + past)[:VISITS]]
+        recent = sorted((x for x in out[sch] if since <= x['d'] < today and x['k'] == 'o'), key=lambda x: x['d'], reverse=True)
+        rest = sorted((x for x in out[sch] if x['d'] < today and not (x['d'] >= since and x['k'] == 'o')), key=lambda x: x['d'], reverse=True)
+        out[sch] = [{k: v for k, v in x.items() if v is not None} for x in (up + recent + rest)[:VISITS]]
+    return out
+
+
+def offers(sp, yr, lst):
+    """{school: (rows, offers in all, committed elsewhere)}: the board's recruits with an offer from the school (his own
+    On3 recruitment, or the school's On3 offer list), best first, then the rest of the school's list. A recruit committed
+    to the school is a commit, not an offer."""
+    slugs, logo = slugs_of(sp), {r.get('team'): r.get('logo') for r in lst if r.get('team')}
+    m = names.Matcher(lst, team=None)
+    got = {}   # school -> {name key: row}
+
+    def add(sch, r, name=None, pos=None, org=None):
+        if not sch: return
+        if r is not None:
+            if r.get('team') and names.same_team(r['team'], sch): return
+            row = dict(who(r, sp), c=r.get('team') or None, cl=logo.get(r.get('team')) if r.get('team') else None)
+        else:
+            c = slugs.get(org) if org else None
+            if c and names.same_team(c, sch): return
+            row = {'n': name, 'p': (pos or '').split('-')[0], 'a': 1, 'f': 20, 'c': c, 'cl': logo.get(c) if c else None, 'u': 1}
+        got.setdefault(sch, {}).setdefault(names.key(row['n']), row)
+
+    def board(name, state):
+        r, _ = m.find(name)
+        if r is not None and state and r.get('home') and not r['home'].endswith(state): return None
+        return r
+    for f in ('recruit_on3_live.json.gz', 'recruit_on3_committed.json.gz'):
+        for o in (load('scripts', 'data', f, default={}).get(sp) or {}).get(str(yr)) or []:
+            r = board(o.get('name'), o.get('state'))
+            if r is None: continue
+            for slug, st in o.get('of') or []:
+                if st and NO_OFFER.search(st): continue
+                add(slugs.get(slug), r)
+    for sch, rows in ((load('scripts', 'data', 'class_offers.json.gz', default={}).get(sp) or {}).get(str(yr)) or {}).items():
+        for name, pos, state, st, org in rows:
+            if st and NO_OFFER.search(st): continue
+            add(sch, board(name, state), name, pos, org)
+    if sp == 'cfb':   # ESPN's class lists name each recruit's offers (ESPN team ids)
+        tid = board_tids('cfb')
+        for name, offs in espn_offers(yr):
+            r = board(name, None)
+            for t in offs: add(tid.get(str(t)), r, name)
+    out = {}
+    for sch, by in got.items():
+        rows = sorted(by.values(), key=lambda x: (x.get('u', 0), -(x['a'] or 0), -x['f'], x['n']))
+        out[sch] = ([{k: v for k, v in x.items() if v is not None and k != 'u'} for x in rows[:OFFERS]], len(rows), sum(1 for x in rows if x.get('c')))
+    return out
+
+
+def board_tids(sp):
+    """ESPN team id -> board team (the board's logos carry the id)"""
+    b = load('static', 'data', sp + '-all.json'); c = {k: i for i, k in enumerate(b['cols'])}; out = {}
+    for x in b['rows']:
+        mm = re.search(r'/(\d+)\.png', x[c['logo']] or '')
+        if mm: out.setdefault(mm.group(1), x[c['team']])
+    return out
+
+
+def espn_offers(yr):
+    """[(name, [ESPN team id, ...]), ...]: each recruit's offers on ESPN's class list, from scripts/cfb_recruit.mjs's
+    cache when this run has it, else rebuilt from the dated log (scripts/data/snaps/offers/cfb-<class>.jsonl, scripts/snapshots.py)"""
+    f = os.path.join(ROOT, 'scripts', '.cache', 'cfb', 'espnclass2-%s.json' % yr)
+    if os.path.exists(f):
+        try: return [(a.get('name'), [str(t) for t in a.get('offers') or [] if t]) for a in json.load(open(f)) if a.get('name')]
+        except (OSError, ValueError): pass
+    f = os.path.join(ROOT, 'scripts', 'data', 'snaps', 'offers', 'cfb-%s.jsonl' % yr)
+    if not os.path.exists(f): return []
+    by = {}
+    for line in open(f, encoding='utf-8'):
+        if not line.strip(): continue
+        r = json.loads(line); p = by.setdefault(r['rid'], [r.get('n'), set()])
+        p[0] = r.get('n') or p[0]; p[1] |= set(r.get('add') or []); p[1] -= set(r.get('drop') or [])
+    return [(n, sorted(o)) for n, o in by.values() if n and o]
+
+
+def offboard(sp, yr, lst):
+    """{school: [commit rows]}: the commits only On3's team lists name (data/class_offboard.json), at FV 20; a name the
+    board lists is the board's (as scripts/cfb_recruit.mjs everyClass and scripts/cbb_recruit_fit.py offboard)"""
+    on = {names.key(r['name']).replace(' ', '') for r in lst}   # names.mjs compact(), as everyClass
+    tid = {}
+    for r in lst:
+        t = r.get('tid') or (re.search(r'/(\d+)\.png', r.get('logo') or '') or [None, None])[1]
+        if t and r.get('team'): tid[str(t)] = r['team']
+    b = load('static', 'data', sp + '-all.json'); c = {k: i for i, k in enumerate(b['cols'])}
+    for x in b['rows']:   # every board program (the class lists hold only the schools with a graded commit)
+        mm = re.search(r'/(\d+)\.png', x[c['logo']] or '')
+        if mm: tid.setdefault(mm.group(1), x[c['team']])
+    out = {}
+    for nm, pos, t, ark, home, ht, wt in (load('data', 'class_offboard.json', default={}).get(sp) or {}).get(str(yr)) or []:
+        if names.key(nm).replace(' ', '') in on or str(t) not in tid: continue
+        p = (pos or '').split('-')[0]
+        out.setdefault(tid[str(t)], []).append({'n': nm, 'p': p or '–', 'g': p or '–', 'h': feet(int(ht)) if ht else None, 'w': wt, 'o': home,
+                                                'f': 20, 'y': 20, 'a': ark, 'ob': 1, 'fx': 20.0})
     return out
 
 
@@ -159,12 +270,14 @@ def cfb():
                 'n': r['name'], 'p': r['pos'].split('-')[0], 'g': r.get('g') or r['pos'], 'h': feet(r.get('ht')), 'w': r.get('wt'),
                 'o': r.get('home'), 'f': round(r['xfv']), 'y': round(r['fvOn']), 'x': r.get('xnil'), 'a': r.get('ark'),
                 's': r.get('stars'), 'i': img(r.get('img')), 'fl': flipped('cfb', r['name'], yr, r['team']), 'fx': r['xfv']})
-        T, LD, VS = {}, leads('cfb', yr, lst), visits('cfb', yr, lst, d['asof'])
+        for team, rows in offboard('cfb', yr, lst).items(): by.setdefault(team, []).extend(rows)
+        T, LD, VS, OF = {}, leads('cfb', yr, lst), visits('cfb', yr, lst, d['asof']), offers('cfb', yr, lst)
         for t in teams:
             g, rows = pack(by.get(t['team'], []), CFB_G, floor)
+            of = OF.get(t['team'], ([], 0, 0))
             T[t['team']] = {'rk': t['classRk'], 's': t['classXfv'], 'n': t['classN'], **{k: t.get(k, 0) for k in BUCKETS},
                             'avg': t.get('avgXfv'), 'te': t.get('topRk'), 'dp': t.get('depthRk'), 'x': t.get('classXnil'), 'conf': t.get('conf'), 'g': g, 'r': rows,
-                            'ld': LD.get(t['team'], []), 'v': VS.get(t['team'], [])}
+                            'ld': LD.get(t['team'], []), 'v': VS.get(t['team'], []), 'of': of[0], 'on': of[1], 'oc': of[2]}
         out['y'][str(yr)] = {'of': len(teams), 't': T}
     return out
 
@@ -186,12 +299,14 @@ def cbb():
                 'n': r['name'], 'p': r['pos'], 'g': r['pos'], 'h': r.get('ht'), 'w': r.get('wt'), 'o': r.get('home'), 'hs': r.get('hs'),
                 'f': round(r['fv']), 'y': round(r['y1fv']), 'x': r.get('xnil'), 'a': r.get('ark'), 's': r.get('stars'),
                 'sp': 1 if r.get('fsp') else None, 'i': img(r.get('img')), 'fl': flipped('cbb', r['name'], c['year'], r['team']), 'fx': r['fv']})
-        T, LD, VS = {}, leads('cbb', c['year'], c['list']), visits('cbb', c['year'], c['list'], d['asof'])
+        for team, rows in offboard('cbb', c['year'], c['list']).items(): by.setdefault(team, []).extend(rows)
+        T, LD, VS, OF = {}, leads('cbb', c['year'], c['list']), visits('cbb', c['year'], c['list'], d['asof']), offers('cbb', c['year'], c['list'])
         for t in teams:
             g, rows = pack(by.get(t['team'], []), CBB_G, floor)
+            of = OF.get(t['team'], ([], 0, 0))
             T[t['team']] = {'rk': t['rk'], 's': round(t['ets'], 1), 'n': t['n'], **{k: t.get(k, 0) for k in BUCKETS},
                             'avg': t.get('avgFv'), 'te': t.get('topRk'), 'dp': t.get('depthRk'), 'x': t.get('xnil'), 'conf': t.get('conf'), 'g': g, 'r': rows,
-                            'ld': LD.get(t['team'], []), 'v': VS.get(t['team'], [])}
+                            'ld': LD.get(t['team'], []), 'v': VS.get(t['team'], []), 'of': of[0], 'on': of[1], 'oc': of[2]}
         out['y'][str(c['year'])] = {'of': len(teams), 't': T}
     return out
 

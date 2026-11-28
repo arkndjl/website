@@ -31,3 +31,6 @@
 - Free price sources only. Predictions is the only place for picks; sport pages keep xWins, season odds and
   power rankings. Never betting lines in the news feed.
 - Weekly board deltas use the 10 AM ET posting-day snapshot as the baseline.
+- Class rankings list every board program in every class, schools with no commit too, and every commit On3's team
+  lists name; commits the board does not grade count at their HS ARK stars (1 at the lowest) and xFV 20, adding no
+  class points (their points failed held out, Nov 28). classGFX shows leads, visits and offers on every card.

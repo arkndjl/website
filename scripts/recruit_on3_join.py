@@ -7,7 +7,7 @@ vrec a visit there in the 90 days before the cutoff, esh confidence-weighted sha
 school, eany he has picks and none on the school, lrpm log RPM % at the last leader snapshot (floor .5, 0 = floor),
 rpm_has he has a snapshot and the school is not in it."""
 import json, math, os, sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import date, timedelta
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -67,7 +67,7 @@ def pack(years, dest):
     for sp in TEAMS:
         for y in years:
             rows = read(sp, y, pack_ok=False)
-            if rows: out.setdefault(sp, {})[str(y)] = [{**{k: r.get(k) for k in KEEP}, 'cdate': commit_date(r)} for r in rows]
+            if rows: out.setdefault(sp, {})[str(y)] = [{**{k: r.get(k) for k in KEEP}, 'cdate': commit_date(r), **({'of': offers(r)} if dest == LIVEP else {})} for r in rows]
     with gzip.open(dest, 'wt') as fh: json.dump(out, fh, separators=(',', ':'))
     print('wrote', dest, {sp: {y: len(v) for y, v in d.items()} for sp, d in out.items()})
 
@@ -91,11 +91,22 @@ def pack_committed(years):
                     r = json.loads(l)
                     c = next((t for t in r.get('teams') or [] if t[1] in CHOSE), None)   # the recruitment's committed school (On3's status block is often empty)
                     if c and not r.get('commit'): r['commit'], r['cdate'] = c[0], r.get('cdate') or c[5]
-                    rows[r['slug']] = {k: r.get(k) for k in ('slug', 'name', 'state', 'commit', 'cdate', 'visits', 'picks')}
-            if rows: out.setdefault(sp, {})[str(y)] = [r for r in rows.values() if r.get('visits') or r.get('picks')]
+                    rows[r['slug']] = {**{k: r.get(k) for k in ('slug', 'name', 'state', 'commit', 'cdate', 'visits', 'picks')}, 'of': offers(r)}
+            if rows: out.setdefault(sp, {})[str(y)] = [r for r in rows.values() if r.get('visits') or r.get('picks') or r.get('of')]
     with open(COMP, 'wb') as raw, gzip.GzipFile(filename='', mode='wb', fileobj=raw, mtime=0) as fh:
         fh.write(json.dumps(out, separators=(',', ':'), sort_keys=True).encode())
     print('wrote', COMP, {sp: {y: len(v) for y, v in d.items()} for sp, d in out.items()})
+
+
+STATUS = Counter()
+
+
+def offers(r):
+    """[[school slug, On3 status], ...]: the schools in his recruitment with their status (Offered, Visited, Committed...),
+    for the class cards' offers (scripts/class_cards.py reads every status but the interest-only ones as an offer)"""
+    out = [[t[0], t[1]] for t in r.get('teams') or [] if t and t[0]]
+    STATUS.update(t[1] for t in out)
+    return out or None
 
 
 def read(sp, y, pack_ok=True):
@@ -198,3 +209,4 @@ if __name__ == '__main__':
     if '--pack' in sys.argv: pack(range(2010, ys[0] + 1), HIST)
     if '--live' in sys.argv: pack(ys, LIVEP)
     if '--committed' in sys.argv: pack_committed(ys)
+    if STATUS: print('On3 recruitment statuses', dict(STATUS.most_common()))

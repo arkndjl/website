@@ -718,7 +718,7 @@ function classParts(xs, floor) {
   // ARK star buckets (Noah, Nov 28): 5-star+ | 4.5-5 | 3-4 (3, 3.5, 4) | unranked-2.5 (1 = no grade); every half star lands in one
   return { a6: xs.filter(x => x.ark > 5).length, ah: xs.filter(x => x.ark >= 4.5 && x.ark <= 5).length, am: xs.filter(x => x.ark >= 3 && x.ark < 4.5).length,
     al: xs.filter(x => !(x.ark >= 3)).length,
-    avgXfv: xs.length ? r1(xs.reduce((s, x) => s + x.xfv, 0) / xs.length) : null,
+    avgXfv: (g => g.length ? r1(g.reduce((s, x) => s + x.xfv, 0) / g.length) : null)(xs.filter(x => !x.ob)),   // the board's commits (list-only commits sit at the floor)
     topEnd: pts(xs.slice(0, TOP_END)), depth: pts(xs.slice(TOP_END)),
     top: xs.slice().sort((a, b) => (b.ark || 0) - (a.ark || 0) || b.xfv - a.xfv).slice(0, 3).map(x => ({ name: x.name, pos: x.pos, xfv: x.xfv, ark: x.ark ?? null })) };
 }
@@ -739,6 +739,27 @@ export function classRanks(list, floor) {
   out.sort((a, b) => b.classXfv - a.classXfv || b.classN - a.classN).forEach((t, i) => { t.classRk = i + 1; });
   partRanks(out);
   return out;
+}
+// Every board program in a class's rankings, none left out for having no commit yet, and the commits the board does
+// not list (On3's team commit lists, data/class_offboard.json from scripts/class_offboard.py: HS ARK stars, 1 at the
+// lowest). Those count in the commits and the star buckets at the floor, so they add no class points: their points
+// failed held out (scripts/research/class_unranked_nov28: CFB 2011-20 draft picks, t -2.05). A board row wins over a
+// list row of the same name. Ranks: class points, then commits; schools with no commit share the last rank.
+export function everyClass(ts, list, ob, floor, progs) {
+  const on = new Set(list.map(x => norm(x.name))), extra = {};
+  for (const [name, pos, tid, ark, home, ht, wt] of ob || []) if (!on.has(norm(name))) (extra[tid] ||= []).push({ name, pos: pos || '', xfv: floor, ark, home, ht, wt, ob: 1 });
+  const by = Object.fromEntries(ts.map(t => [t.tid, t]));
+  for (const [tid, p] of Object.entries(progs)) if (!by[tid]) ts.push(by[tid] = { tid, team: p.team, logo: p.logo, conf: p.conf, classXfv: 0, classAv: 0, classXnil: 0 });
+  for (const t of ts) {
+    const mine = list.filter(x => x.tid === t.tid).concat(extra[t.tid] || []);
+    Object.assign(t, { classN: mine.length, obN: (extra[t.tid] || []).length, ...classParts(mine, floor) });
+  }
+  ts.sort((a, b) => b.classXfv - a.classXfv || b.classN - a.classN || (a.team || '').localeCompare(b.team || ''));
+  let zero = 0;
+  ts.forEach((t, i) => { t.classRk = t.classN ? i + 1 : (zero ||= i + 1); });
+  partRanks(ts);
+  for (const t of ts) if (!t.classN) t.topRk = t.depthRk = null;
+  return ts;
 }
 // expected FV at each starting slot (as the team builder's slots()): each player there with his chance
 function slotsAv(players, n, repl, rand) {
@@ -762,6 +783,12 @@ export async function writeRecruits(root = ROOT, { offline = false } = {}) {
   const bp = path.join(root, 'static', 'data', 'cfb-builder.json'), builder = fs.existsSync(bp) ? JSON.parse(fs.readFileSync(bp, 'utf8')) : null;
   const sp = path.join(root, 'scripts', 'cfb_recruit_247.json'), snap247 = fs.existsSync(sp) ? JSON.parse(fs.readFileSync(sp, 'utf8')) : null;
   const out = await recruitBoard({ fit, rows, teams, builder, season: +all.asof.slice(0, 4), asof: all.asof, offline, snap247 });
+  // every board program in each class's rankings, with every commit On3's team lists name (data/class_offboard.json)
+  const op = path.join(root, 'data', 'class_offboard.json'), ob = fs.existsSync(op) ? JSON.parse(fs.readFileSync(op, 'utf8')).cfb || {} : {};
+  const progs = {};
+  for (const r of rows) { const tid = r.tid || /\/logos\/(\d+)\.png/.exec(r.logo || '')?.[1]; if (tid && !progs[tid]) progs[tid] = { team: r.team, logo: r.logo, conf: r.conf }; }
+  everyClass(out.teams, out.class, ob[out.next], fit.floor, progs);
+  for (const f of out.future) f.teams = everyClass(f.teams || [], f.list, ob[f.year], fit.floor, progs);
   fs.writeFileSync(path.join(root, 'static', 'data', 'cfb-recruits.json'), JSON.stringify(out));
   // the team builder's depth charts carry each newcomer's ARK stars from the recruit file it was built on (the board
   // writes the builder before this runs): restamp them from this run so a star change shows there at once

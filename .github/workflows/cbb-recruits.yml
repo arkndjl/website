@@ -56,7 +56,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - run: pip install -q numpy
+      - run: pip install -q numpy requests
       - name: Pull On3's live classes
         run: |
           npm i --no-save --no-package-lock playwright@1.56.1
@@ -68,12 +68,13 @@ jobs:
         run: python3 scripts/recruit_wikidata.py cbb
       - name: Grade the classes
         run: |
+          python3 scripts/class_offboard.py || true   # the commits only On3's team lists name (class rankings)
           python3 scripts/cbb_recruit_fit.py --offline
           python3 scripts/class_cards.py   # each school's class for the class rankings dropdown + classGFX
           python3 scripts/recruit_pos.py   # projected college position on the recruit tables (the fit on file)
       - name: Commit if anything changed
         run: |
-          files="data/cbb_recruits.json data/recruit_pos.json static/data/classes/cbb.json scripts/data/recruit_age_cbb.json scripts/data/recruit_wikidata_dob.json"
+          files="data/cbb_recruits.json data/recruit_pos.json static/data/classes/cbb.json data/class_offboard.json scripts/data/recruit_age_cbb.json scripts/data/recruit_wikidata_dob.json"
           git add $files
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"

@@ -132,9 +132,9 @@
   <thead><tr>
     <th>RK</th><th>Team</th><th title="conference">Conf</th>
     <th class="cfb__g" title="the class's FV points: each commit's FV above the 20 floor, summed">Pts</th>
-    <th title="committed recruits On3 ranks">Commits</th>
+    <th title="every commit; one no service ranks (On3 team lists) counts at 1 ARK star and FV 20">Commits</th>
     <th title="commits at 5-star+ (ARK)">5★+</th><th title="commits at 4.5 or 5 ARK stars">4.5-5★</th><th title="commits at 3, 3.5 or 4 ARK stars">3-4★</th><th title="commits at 2.5 ARK stars or fewer, unranked (1 star) included">0-2.5★</th>
-    <th title="mean FV of the commits">Avg xFV</th>
+    <th title="mean FV of the ranked commits">Avg xFV</th>
     <th title="rank by the two best commits' FV points">Top end</th><th title="rank by the rest of the class's FV points">Depth</th>
     <th title="chance at least one commit reaches the NBA">NBA%</th>
     <th title="year 1: expected share of team minutes the commits play, summed (500 = a full lineup)">Y1 Min</th>
@@ -161,7 +161,7 @@
     <td class="cfb__num" data-v="{{ .v1 }}">{{ partial "num.html" (slice "%.1f" .v1) }}</td>
     <td class="cfb__num" data-v="{{ .xnil }}">{{ with .xnil }}{{ partial "nil.html" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td class="cfb__num">{{ .best }}</td>
-    <td class="cfb__dim">{{ range $j, $x := (.top3 | default .top) }}{{ if $j }} · {{ end }}{{ index $x 0 }} ({{ index $x 1 }}, {{ index $x 2 }}){{ end }}</td>
+    <td class="cfb__dim">{{ range $j, $x := (.top3 | default .top) }}{{ if $j }} · {{ end }}{{ index $x 0 }} ({{ with index $x 1 }}{{ . }}, {{ end }}{{ index $x 2 }}){{ end }}</td>
   </tr>
   {{- end }}{{ end }}
   </tbody>

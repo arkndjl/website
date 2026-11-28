@@ -4,6 +4,8 @@
 // low-rated tail the industry table (scripts/cfb_on3.mjs, about 2,500 a class) and ESPN's class lists leave out,
 // FCS programs included. Read through Chromium (On3 sits behind Cloudflare), one JSON request a team and class.
 //   node scripts/on3_commits.mjs football 2010 2027 [--fcs] [--force]   -> scripts/.cache/on3commits/<sport>/<slug>-<class>.json
+//   node scripts/on3_commits.mjs football 2027 2029 --fcs --offers   -> scripts/.cache/on3offers/<sport>/<slug>-<class>.json (each
+//     program's offer list, the same rows; the class cards' offers, packed by scripts/class_offboard.py --offers)
 // Packed by scripts/arkstars_hist.py.
 import fs from 'fs';
 import path from 'path';
@@ -14,7 +16,8 @@ const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const args = process.argv.slice(2), sport = args[0] || 'football', force = args.includes('--force');
 const [y0, y1] = args.filter(a => /^\d{4}$/.test(a)).map(Number);
-const OUT = path.join(ROOT, 'scripts', '.cache', 'on3commits', sport);
+const KIND = args.includes('--offers') ? 'offers' : 'commits';
+const OUT = path.join(ROOT, 'scripts', '.cache', KIND === 'offers' ? 'on3offers' : 'on3commits', sport);
 fs.mkdirSync(OUT, { recursive: true });
 
 async function loadPlaywright() {
@@ -68,9 +71,17 @@ const pick = it => {
     ht: p.height || null, wt: p.weight || null, home: p.hometown?.abbr || null, state: p.state?.abbr || r.stateAbbr || null,
     hs: p.highSchool?.slug || null, hsName: p.highSchoolName || null, hsType: p.highSchool?.orgType || null, dob: p.dateOfBirth || null,
     status: st.type || null, date: st.date || null, xfer: !!st.transfer, year: st.recruitmentYear ?? null,
+    org: st.committedOrganization?.slug || st.organization?.slug || it.committedOrganization?.slug || null, rk: r.nationalRank ?? r.overallRank ?? null, rating: r.rating ?? r.consensusRating ?? null,
     svc: Object.fromEntries((it.industryComparison || []).filter(x => x.rating != null).map(x => [x.type.toLowerCase(), [x.rating, x.stars ?? null, x.overallRank ?? null, x.positionRank ?? null]])) };
 };
-let done = 0, miss = 0;
+let done = 0, miss = 0, shown = 0;
+// the offers page's player list, wherever the page keeps it: the first {list: [{player, ...}]} in its props
+function listIn(o, d = 0) {
+  if (!o || typeof o !== 'object' || d > 4) return null;
+  if (Array.isArray(o.list) && o.list.length && o.list[0] && (o.list[0].player || o.list[0].person)) return { list: o.list.map(x => x.player ? x : { ...x, player: x.person }), pagination: o.pagination };
+  for (const v of Object.values(o)) { const f = listIn(v, d + 1); if (f) return f; }
+  return null;
+}
 async function worker(w) {
   let { page, bid } = w === 0 ? first : await open();
   const get = async u => page.evaluate(async u => { try { const r = await fetch(u); return [r.status, await r.text()]; } catch (e) { return [0, String(e)]; } }, u);
@@ -79,13 +90,14 @@ async function worker(w) {
     if (t.dead || (!force && fs.existsSync(f))) continue;
     let out = null;
     for (let i = 0; i < 4 && out == null; i++) {
-      const [s, txt] = await get(`/_next/data/${bid}/college/${t.url || t.slug}/${sport}/${y}/commits.json`);
+      const [s, txt] = await get(`/_next/data/${bid}/college/${t.url || t.slug}/${sport}/${y}/${KIND}.json`);
       let j = null; try { j = JSON.parse(txt).pageProps; } catch {}
+      if (j && !j.playerList && KIND === 'offers') { j.playerList = listIn(j); if (!shown++) console.log('  offers page keys:', Object.keys(j).join(', ')); }
       if (j?.__N_REDIRECT) { const m = j.__N_REDIRECT.match(/college\/([^/]+)\//); if (m && m[1] !== (t.url || t.slug)) { t.url = m[1]; i--; continue; } }
       if (j?.playerList) {
         out = j.playerList.list.map(pick);
         const pc = j.playerList.pagination?.pageCount || 1;
-        for (let pg = 2; pg <= pc; pg++) { const [, t2] = await get(`/_next/data/${bid}/college/${t.url || t.slug}/${sport}/${y}/commits.json?page=${pg}`); try { out.push(...JSON.parse(t2).pageProps.playerList.list.map(pick)); } catch {} }
+        for (let pg = 2; pg <= pc; pg++) { const [, t2] = await get(`/_next/data/${bid}/college/${t.url || t.slug}/${sport}/${y}/${KIND}.json?page=${pg}`); try { const p2 = JSON.parse(t2).pageProps; out.push(...(p2.playerList || listIn(p2)).list.map(pick)); } catch {} }
       } else if (s === 404 || j?.notFound || (j && !j.playerList && !j.__N_REDIRECT)) { if (!t.url) { t.dead = true; console.log(`  no On3 page: ${t.slug}`); } out = []; miss++; }
       else {   // a new deploy changes the build id; a block needs a pause
         await sleep(3000 * 2 ** i);

@@ -2645,10 +2645,12 @@
     var det = btn.closest('tr[class*="__detail"]'), tr = det && det.previousElementSibling, table = btn.closest('table[data-cls-src]'); if (!tr || !table) return null;
     var src = table.getAttribute('data-cls-src'), yr = tr.getAttribute('data-yr'), team = txt(tr.querySelector('.cfb__team span') || tr.cells[1]);
     var data = await (window.__arkClassData ? window.__arkClassData(src) : fetch(src).then(function (r) { return r.json(); }));
-    var Y = (data.y || {})[yr], d = Y && Y.t[team]; if (!d || !d.r.length) return null;
+    var Y = (data.y || {})[yr], d = Y && Y.t[team]; if (!d) return null;
     var F = await frame(2400, 1350, yr + ' ' + team + ' class', win.getAttribute('data-gfx-date'), tabLink(win));
     var g = F.g, R = d.r.slice(0, 32), n = R.length;
-    var LD = (d.ld || []).slice(), VS = (d.v || []).slice(), pipe = LD.length || VS.length, pipeLeft = pipe && n > 8, pipeRight = pipe && n <= 8, tiles = n <= 4 && !pipe;
+    // the pipeline: leads, visits and offers (every card shows what it has of the three)
+    var LD = (d.ld || []).slice(), VS = (d.v || []).slice(), OF = (d.of || []).slice(), pipe = LD.length || VS.length || OF.length;
+    var pipeLeft = pipe && n > 8, pipeRight = pipe && n && n <= 8, pipeWide = !n, tiles = n && n <= 4 && !pipe;
     F.canvas._name = (yr + '-' + team).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     var lim = tr.querySelector('img.cfb__logo'), logo = await loadImg(lim && lim.getAttribute('src'));
     var photos = await Promise.all(R.map(function (r) { return on3Photo(r.i, tiles ? 640 : n <= 8 ? 320 : 160); }));
@@ -2706,7 +2708,7 @@
     var G = d.g || [], top = Math.max.apply(null, G.map(function (q) { return q[2]; }).concat([1])), gcols = pipeLeft && G.length > 4 ? 2 : 1;
     var grow = Math.ceil(G.length / gcols), gw = (cw - (gcols - 1) * 20) / gcols;
     var gh = gcols > 1 ? 30 : Math.max(24, Math.min(46, Math.floor((pipeLeft ? 260 : bot - y - 34) / Math.max(1, grow)))), gf = Math.min(30, gh - 6);
-    for (var c0 = 0; c0 < gcols; c0++) {
+    for (var c0 = 0; c0 < (G.length ? gcols : 0); c0++) {
       var gx = lx + c0 * (gw + 20), c1 = gx + Math.round(gw * 0.2), bx0 = gx + Math.round(gw * 0.36), bw0 = Math.round(gw * 0.42);
       g.font = '22px ' + FONT; g.fillStyle = C.lilac; g.fillText('POS', gx, y + 12); g.fillText('N', c1 + 26 - g.measureText('N').width, y + 12);
       g.fillText('FV PTS', bx0, y + 12); g.fillText('AVG', gx + gw - g.measureText('AVG').width, y + 12);
@@ -2722,48 +2724,87 @@
       g.fillStyle = C.lilac; var av = q[3].toFixed(1); g.fillText(av, gx + gw - g.measureText(av).width, gy);
     });
     y += grow * gh + 18;
-    // leads and visits (the pipeline): in the left panel under a big class, in a column of their own beside a small one
-    if (pipeLeft) await drawPipe(lx, y, cw, bot - y);
-    else if (pipeRight) { well(g, PX, Y0, PW, HH); await drawPipe(PX + pad, Y0 + pad, PW - 2 * pad, HH - 2 * pad); }
-    async function drawPipe(px, py, pw, ph) {
-      var lh = 62, hh0 = 32, nB = (LD.length ? 1 : 0) + (VS.length ? 1 : 0), fitRows = Math.max(0, Math.floor((ph - nB * (hh0 + 10)) / lh));
-      var nL = Math.min(LD.length, VS.length ? Math.max(Math.ceil(fitRows / 2), fitRows - VS.length) : fitRows), nV = Math.min(VS.length, fitRows - nL);
-      var rows = LD.slice(0, nL).concat(VS.slice(0, nV));
-      var imgs = await Promise.all(rows.map(function (r) { return on3Photo(r.i, 128); }));
-      var vlg = await Promise.all(rows.map(function (r, i) { return i >= nL && r.c && r.c !== team && r.cl ? loadImg(r.cl) : null; }));
-      var MON = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'], today = data.asof || '';
+    // the pipeline: in the left panel under a big class, in a column of its own beside a small one, across the card when
+    // there is no commit yet (a column a list)
+    var MON = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'], today = data.asof || '';
+    var SEC = [['LEADS', LD, 'EXP · RPM · ARK LEAN'], ['VISITS', VS, 'OV official · UV unofficial'], ['OFFERS', OF, (d.on || OF.length) + (d.oc ? ' · ' + d.oc + ' committed elsewhere' : '')]].filter(function (q) { return q[1].length; });
+    if (pipeLeft) await drawPipe(lx, y, cw, bot - y, SEC);
+    else if (pipeRight) { well(g, PX, Y0, PW, HH); await drawPipe(PX + pad, Y0 + pad, PW - 2 * pad, HH - 2 * pad, SEC); }
+    else if (pipeWide) {
+      var WX = X + LW + 24, WW = F.w - LW - 24;
+      if (!SEC.length) {
+        well(g, WX, Y0, WW, HH); g.font = '64px ' + FONT; g.fillStyle = 'rgba(200,199,255,0.45)';
+        var nt = 'NO COMMITS YET'; g.fillText(nt, Math.round(WX + (WW - g.measureText(nt).width) / 2), Y0 + HH / 2);
+      }
+      // a lone long list takes two columns
+      if (SEC.length === 1 && SEC[0][1].length > 6) { var h2 = Math.ceil(SEC[0][1].length / 2); SEC = [[SEC[0][0], SEC[0][1].slice(0, h2), SEC[0][2]], [SEC[0][0], SEC[0][1].slice(h2), '']]; }
+      var nc = SEC.length, sg = 24, sw0 = Math.floor((WW - (nc - 1) * sg) / Math.max(1, nc));
+      for (var si = 0; si < nc; si++) { var sx0 = WX + si * (sw0 + sg); well(g, sx0, Y0, sw0, HH); await drawPipe(sx0 + pad, Y0 + pad, sw0 - 2 * pad, HH - 2 * pad, [SEC[si]]); }
+    }
+    // the sections share the rows they fit, the shorter lists first
+    async function drawPipe(px, py, pw, ph, secs) {
+      var one = pw < 600 && pipeLeft, lh = one ? 46 : secs.length === 1 ? 84 : 62, hh0 = 32, fitRows = Math.max(0, Math.floor((ph - secs.length * (hh0 + 10)) / lh));
+      var want = secs.map(function (q) { return q[1].length; }), got = want.map(function () { return 0; }), left = fitRows;
+      while (left > 0 && got.some(function (v, i) { return v < want[i]; })) { for (var q = 0; q < want.length && left > 0; q++) if (got[q] < want[q]) { got[q]++; left--; } }
+      var rows = []; secs.forEach(function (q, i) { q[1].slice(0, got[i]).forEach(function (r) { rows.push([q[0], r]); }); });
+      var imgs = await Promise.all(rows.map(function (x) { return on3Photo(x[1].i, lh > 70 ? 192 : 128); }));
+      var lgs = await Promise.all(rows.map(function (x) { var r = x[1]; return x[0] !== 'LEADS' && r.c && r.c !== team && r.cl ? loadImg(r.cl) : null; }));
       function head(t, ry, right) {
         g.fillStyle = C.dark; g.fillRect(px, ry, pw, hh0 - 4);
         g.font = '22px ' + FONT; g.fillStyle = C.lilac; g.fillText(t, px + 10, ry + (hh0 - 4) / 2 + 1);
-        if (right) g.fillText(right, px + pw - 10 - g.measureText(right).width, ry + (hh0 - 4) / 2 + 1);
+        if (right) { var rt = fit(g, right, pw - 30 - g.measureText(t).width); g.fillText(rt, px + pw - 10 - g.measureText(rt).width, ry + (hh0 - 4) / 2 + 1); }
       }
-      // two lines a recruit: name and FV; position, ARK stars and the lead or the visit
-      function row(r, ry, k, i) {
+      // two lines a recruit: name and FV; position, ARK stars and the lead, the visit or where he is committed
+      function row(kind, r, ry, k, i) {
         if (i % 2) { g.fillStyle = 'rgba(36,26,58,0.35)'; g.fillRect(px, ry, pw, lh); }
-        var ps = lh - 10, tx = px + ps + 14, l1 = ry + 20, l2 = ry + lh - 18;
+        if (one) {   // one line a recruit (under a big class): face, name, position, then the lead, the visit or his school, FV
+          var fs1 = lh - 8, my = ry + lh / 2 + 1, x1 = px + fs1 + 12;
+          faceBox(g, imgs[k], px + 4, ry + 4, fs1, fs1, r.n);
+          g.font = '28px ' + FONT; var f1 = String(r.f), w1 = g.measureText(f1).width; g.fillStyle = C.teal; g.fillText(f1, px + pw - 8 - w1, my);
+          var rt = px + pw - 8 - w1 - 14; g.font = '22px ' + FONT;
+          if (kind === 'LEADS') { var t1 = r.r != null ? 'RPM ' + r.r + '%' : r.l != null ? 'ARK ' + r.l + '%' : r.e ? 'EXP ' + r.e[0] + '/' + r.e[1] : ''; g.fillStyle = C.lilac; rt -= g.measureText(t1).width; g.fillText(t1, rt, my); }
+          else {
+            if (lgs[k]) { rt -= 28; drawLogo(g, lgs[k], rt, my - 14, 28, 28); rt -= 8; }
+            if (kind === 'VISITS') { var t2 = MON[+r.d.slice(5, 7) - 1] + ' ' + (+r.d.slice(8, 10)) + ' ' + (r.k === 'o' ? 'OV' : 'UV'); g.fillStyle = r.d >= today ? C.teal : C.lilac; rt -= g.measureText(t2).width; g.fillText(t2, rt, my); }
+          }
+          g.font = '22px ' + FONT; var pp = r.p || '', pwd1 = pp ? g.measureText(pp).width + 10 : 0;
+          g.font = '26px ' + FONT; var nm1 = fit(g, r.n, rt - 14 - pwd1 - x1), nw1 = g.measureText(nm1).width; g.fillStyle = C.white; g.fillText(nm1, x1, my);
+          g.font = '22px ' + FONT; g.fillStyle = C.teal; g.fillText(pp, x1 + nw1 + 10, my);
+          return;
+        }
+        var big = lh > 70, ps = lh - 10, tx = px + ps + 14, l1 = ry + Math.round(lh * 0.33), l2 = ry + lh - Math.round(lh * 0.29);
         faceBox(g, imgs[k], px + 4, ry + 5, ps, ps, r.n);
-        g.font = '30px ' + FONT; var fv = String(r.f), fw = g.measureText(fv).width;
+        g.font = (big ? 36 : 30) + 'px ' + FONT; var fv = String(r.f), fw = g.measureText(fv).width;
         g.fillStyle = C.teal; g.fillText(fv, px + pw - 8 - fw, ry + lh / 2 + 1);
-        g.font = '26px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, r.n, px + pw - 8 - fw - 20 - tx), tx, l1);
-        g.font = '22px ' + FONT; g.fillStyle = C.teal; g.fillText(r.p, tx, l2);
-        var sx = tx + g.measureText(r.p).width + 12, ss = 14, sw = 5 * (ss + 2) + 12;
-        arkStars(g, r.a || 0, sx, l2, ss, 2, { x: sx - 4, y: l2 - 11, w: sw + 2, h: 22, fills: i % 2 ? [C.well, 'rgba(36,26,58,0.35)'] : [C.well] });
-        var rx = sx + sw + 8, rmax = px + pw - 8 - fw - 20;
-        g.font = '22px ' + FONT;
-        if (k < nL) {
+        g.font = (big ? 30 : 26) + 'px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, r.n, px + pw - 8 - fw - 20 - tx), tx, l1);
+        g.font = (big ? 24 : 22) + 'px ' + FONT; g.fillStyle = C.teal; g.fillText(r.p || '', tx, l2);
+        var sx = tx + (r.p ? g.measureText(r.p).width + 12 : 0), ss = big ? 17 : 14, sw = 5 * (ss + 2) + 12;
+        arkStars(g, r.a || 0, sx, l2, ss, 2, { x: sx - 4, y: l2 - Math.round(ss * 0.8), w: sw + 2, h: Math.round(ss * 1.6), fills: i % 2 ? [C.well, 'rgba(36,26,58,0.35)'] : [C.well] });
+        var rx = sx + sw + 8, rmax = px + pw - 8 - fw - 20, lz = big ? 34 : 28;
+        g.font = (big ? 24 : 22) + 'px ' + FONT;
+        if (kind === 'LEADS') {
           var tags = [r.e ? 'EXP ' + r.e[0] + '/' + r.e[1] : null, r.r != null ? 'RPM ' + r.r + '%' : null, r.l != null ? 'ARK ' + r.l + '%' : null].filter(Boolean).join(' · ');
           g.fillStyle = C.lilac; g.fillText(fit(g, tags, rmax - rx), rx, l2);
-        } else {
+          return;
+        }
+        if (kind === 'VISITS') {
           var up = r.d >= today, dd = MON[+r.d.slice(5, 7) - 1] + ' ' + (+r.d.slice(8, 10));
           g.fillStyle = up ? C.teal : C.lilac; g.fillText(dd, rx, l2); rx += g.measureText(dd).width + 12;
           g.fillStyle = r.k === 'o' ? C.white : C.lilac; g.fillText(r.k === 'o' ? 'OV' : 'UV', rx, l2); rx += g.measureText('OV').width + 14;
-          if (vlg[k]) drawLogo(g, vlg[k], rx, l2 - 14, 28, 28);   // committed elsewhere: his school's logo
         }
+        // committed elsewhere: his school's logo (its name when there is no logo)
+        if (lgs[k]) drawLogo(g, lgs[k], rx, l2 - lz / 2, lz, lz);
+        else if (r.c && r.c !== team) { g.fillStyle = C.lilac; g.fillText(fit(g, r.c, rmax - rx), rx, l2); }
       }
-      var yy = py;
-      if (nL) { head('LEADS', yy, 'EXP · RPM · ARK LEAN'); yy += hh0; for (var i = 0; i < nL; i++) row(LD[i], yy + i * lh, i, i); yy += nL * lh + 10; }
-      if (nV) { head('VISITS', yy, 'OV official · UV unofficial'); yy += hh0; for (var j = 0; j < nV; j++) row(VS[j], yy + j * lh, nL + j, j); }
+      var yy = py, k = 0;
+      secs.forEach(function (q, i) {
+        if (!got[i]) return;
+        head(q[0], yy, q[2]); yy += hh0;
+        for (var j = 0; j < got[i]; j++, k++) row(q[0], q[1][j], yy + j * lh, k, j);
+        yy += got[i] * lh + 10;
+      });
     }
+    if (!n) return F.canvas;
 
     // ---- right: the commits ----
     var RX = X + LW + 24, RW = F.w - LW - 24 - (pipeRight ? PW + 24 : 0);

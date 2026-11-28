@@ -52,6 +52,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - run: pip install -q numpy requests
       - name: On3 industry recruiting classes
         continue-on-error: true
         timeout-minutes: 12
@@ -64,6 +65,7 @@ jobs:
           python3 scripts/cfb_on3_pack.py --live $Y $((Y + 1)) $((Y + 2))
       - name: Recruit tabs and ARK stars
         run: |
+          python3 scripts/class_offboard.py || true   # the commits only On3's team lists name (class rankings)
           node scripts/cfb_recruit.mjs
           python3 scripts/class_cards.py   # each school's class for the class rankings dropdown + classGFX
           python3 scripts/snapshots.py offers || true   # forward log: offers, commitments and visits from ESPN's class lists
@@ -76,4 +78,4 @@ jobs:
       - name: Commit if anything changed
         run: |
           python3 scripts/data_push.py -m "Update the CFB recruit classes ($(date -u +%Y-%m-%d))" \
-            -- data/cfb_recruits.json data/recruit_pos.json static/data/cfb-recruits.json static/data/classes/cfb.json static/data/cfb-builder.json scripts/data/cfb_on3_live.json scripts/data/recruit_age_cfb.json scripts/data/recruit_wikidata_dob.json scripts/data/snaps/offers
+            -- data/cfb_recruits.json data/recruit_pos.json static/data/cfb-recruits.json static/data/classes/cfb.json data/class_offboard.json static/data/cfb-builder.json scripts/data/cfb_on3_live.json scripts/data/recruit_age_cfb.json scripts/data/recruit_wikidata_dob.json scripts/data/snaps/offers
