@@ -27,7 +27,8 @@
   // On3 recruit photos come through the site's own /api/photo (worker/site.js): On3's CDN sends CORS headers unreliably
   var IMG_WAIT = 8000;   // a photo or logo host that never answers: the card is drawn without it, not left waiting
   function loadPhoto(src) {
-    if (src) src = src.replace(/^https:\/\/on3static\.com\/(?=cdn-cgi\/image\/)/, '/api/photo/');
+    // a source given as a whole URL (CBB class rows: .../format=auto/https://on3static.com/uploads/...) is cut to its path, the only form /api/photo serves
+    if (src) src = src.replace(/(\/cdn-cgi\/image\/[^/]+\/)https?:\/\/on3static\.com\//, '$1').replace(/^https:\/\/on3static\.com\/(?=cdn-cgi\/image\/)/, '/api/photo/');
     return new Promise(function (res) { if (!src) return res(null); var i = new Image(); i.crossOrigin = 'anonymous'; i.onload = function () { res(i); }; i.onerror = function () { res(null); }; setTimeout(function () { res(null); }, IMG_WAIT); i.src = src; });
   }
   // an on-theme picture frame: raised bevel, a dark inner line, the photo cover-cropped from the top
