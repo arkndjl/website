@@ -18,7 +18,7 @@
       return sort === 'new' ? d : (stat(b, sort) - stat(a, sort)) || d;
     });
     order.forEach(function (a) {
-      var hay = a.getAttribute('data-q'), tags = (a.getAttribute('data-tags') || '').split('|');
+      var hay = a.__q || (a.__q = fold(a.getAttribute('data-q'))), tags = (a.getAttribute('data-tags') || '').split('|');
       var ok = q.every(function (w) { return hay.indexOf(w) >= 0; }) && (!kind || a.getAttribute('data-kind') === kind)
         && (!tag || tags.indexOf(tag) >= 0) && (!favOnly || f[a.getAttribute('data-post')]);
       a.hidden = !ok; if (ok) shown++;
