@@ -10,6 +10,10 @@ scripts/cbb_next_research.py (fit) and scripts/cbb_tabs.py (the VORX tab's Next 
                         its history input is last season's pXPM (board form, scripts/cbb_xpm.py)
 Nov 26 2026 (scripts/research/xpm_swap_nov26/next.py, next_inseason.py): pXPM in the roster row for last-season BPM, walk-forward
 2016-26 RMSE t 22 (11/11 seasons); pXPM for the 3-year BPM in the grid, t 13 to 26 at every season share (11/11).
+Nov 28 2026 (units sweep, scripts/research/units_nov28/cbb_next_line.py): the board's VORX is on dated position lines (#1386),
+so the fit's flat-line VORX is moved onto next season's line for his position by the minutes share it was projected from
+(to_line). Walk-forward 2016-26 on the position-line target: RMSE .5190 to .5139, t -10.9 by player, -4.6 by season, 10/11
+seasons; a refit on the position-line target did less (.5169, t -8.8).
 """
 import datetime as dt
 import json
@@ -31,6 +35,13 @@ def f(x, d=None):
         return d if math.isnan(v) else v
     except (TypeError, ValueError):
         return d
+
+
+def to_line(v, pos, mp, season):
+    """flat-line VORX -> VORX on season's replacement line for pos (G, F, C), at min% mp (the share the projection reads)"""
+    if v is None or mp is None: return v
+    import repl_levels as RL
+    return v + (REPL - RL.cbb_line(pos, season)) * mp / 100 * K
 
 
 def war(bpm, mp):
@@ -139,5 +150,6 @@ def live(games, prior, season, gl):
         n = len(tg.get(a[4], ())) or 1
         td = line(a[1] / a[0], a[2] / a[0], a[3] / a[0], a[0], n)
         x = pxrow(r, td, pv, pm)
-        out[(row[ci['name']], row[ci['team']])] = sum(u * v for u, v in zip(grid_coef(ins['grid'], n / G31), x))
+        v = sum(u * v for u, v in zip(grid_coef(ins['grid'], n / G31), x))
+        out[(row[ci['name']], row[ci['team']])] = to_line(v, POSMAP.get(r['role'], 'F'), td[3], season + 1)
     return out

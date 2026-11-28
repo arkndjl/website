@@ -1550,7 +1550,14 @@
    "due": "2026-12-15",
    "trigger": "refit scripts/cbb_next_research.py on the position-line target",
    "gate": "walk-forward 2016-26 RMSE on the position-line target no worse than the flat-line fit moved by the line (t <= -2 fails)",
-   "run_hint": "scripts/cbb_next_research.py, scripts/cbb_next.py war(), scripts/repl_levels.py cbb_line"
+   "run_hint": "scripts/cbb_next_research.py, scripts/cbb_next.py war(), scripts/repl_levels.py cbb_line",
+   "result": {
+    "d": "2026-11-28",
+    "v": "shipped",
+    "e": "RMSE .5190 to .5139 (moved onto the line; refit .5169)",
+    "tt": -10.9,
+    "pr": null
+   }
   }
  ]
 }
