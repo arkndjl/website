@@ -1,6 +1,6 @@
 +++
 title = "Process #1: Introducing ARKLOG / November updates"
-date = "2026-11-28T10:00:00-05:00"
+date = "2026-11-28T09:00:00-05:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["process", "arklog"]
@@ -11,7 +11,7 @@ month = "2026-11"
 showFullContent = false
 readingTime = false
 hideComments = true
-draft = true
+draft = false
 Toc = true
 +++
 
@@ -27,11 +27,11 @@ Every row is one merged change, with its date, its section of the site and its s
 
 ARKLOG is built from the pull requests that make every change, so nothing in it is typed in by hand. Reading a verdict out of a write-up by pattern got it wrong often, so I read every test through #1304 against its write-up and held the reviewed verdict, number and t in a fix file. From now on every test ends its write-up with one line that says what happened, and that line is taken as written.
 
-The scoreboard tab has the tallies and charts by week, sport, area and section, and each row, the scoreboard and each sport's sheet can be pulled as a GFX card. The updates tab lists these monthly posts beside each month's tallies.
+The calendar tab has every sport's league dates, every step the site takes when a season turns, and where each sport is right now. The scoreboard tab has the tallies and charts by week, sport, area and section, and each row, the scoreboard and each sport's sheet can be pulled as a GFX card. The updates tab lists these monthly posts beside each month's tallies.
 
 {{< image src="/img/process-1/arklog-scoreboard.png" alt="The ARKLOG scoreboard: totals of changes, tests shipped, part shipped and failed, with charts by week, sport, area and section" position="center" >}}
 
-In November there were 642 merged changes and 209 tests. 71 shipped, 98 part shipped and 40 failed. There were also 34 research studies. In October there were 623 changes and 220 tests, with 99 shipped, 75 part shipped and 46 failed.
+In November through the 28th there were 648 merged changes and 210 tests. 72 shipped, 98 part shipped and 40 failed. There were also 34 research studies. In October there were 623 changes and 220 tests, with 99 shipped, 75 part shipped and 46 failed.
 
 {{< postchart "p1-weeks" >}}
 
@@ -104,6 +104,16 @@ The cross-sport rule is that anything tried in one sport gets tried in every spo
 ### What Failed
 
 40 tests failed in November. Some of them were the soccer national team play test for prospect FV, deep completions in the soccer game model, the CS2 market tests against bookmaker closes, a gradual fade of the CFB absence charge, the CFB QB-change era weighting, expert track-record weights in the recruit leans, draft pay in dollars in Ret%, and a postseason-only title layer in every sport. Every one of them is in ARKLOG with its number.
+
+## Season Rollovers
+
+Every sport now moves from one season to the next on its own. Each sport has a calendar with its league dates and its phases (preseason, regular season, postseason and offseason), plus the season, draft year, recruit class and weekly post day that every board reads. A workflow runs twice a day and does each step on its date. It archives the finished season, moves the hard-coded years and checks that everything still builds and tests, and puts them back if anything fails. Anything that needs a hand step, like a refit, a freeze or new source ids, opens an issue ahead of time instead.
+
+Playoffs follow the real results now. The NFL fixes every playoff game that has been played and shows the score, the NHL plays each series on from its real game count, and the UEFA knockouts use the real ties and the legs already played. ESEA moves to the next season by itself, and the CS2 Majors are a list (Singapore, Buenos Aires, Shanghai).
+
+The CFB post moves to Monday from Dec 7 through the bowls and back to Wednesday at the 2027 opener. Recruit classes roll to 2028-2030, CFB on Jan 1 and CBB on Apr 7.
+
+{{< image src="/img/process-1/calendar.png" alt="ARKLOG calendar tab: every sport's league dates, the site's season steps and each sport's current phase" position="center" >}}
 
 ## Features
 
