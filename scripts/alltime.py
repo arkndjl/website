@@ -342,8 +342,9 @@ def cbb_players():
         q = sh[(r['team'], y)]     # rXPM (Nov 26 2026): BPM plus the team's minutes-weighted mean (GBPM - BPM), scripts/cbb_xpm.py
         rx = bpm + (q[0] / q[1] if q[1] else 0.0)
         x = cbb_tabs.wx({'xpm': rx}, m, num[y] / den[y] if den[y] else None)
-        war = (x - cbb_tabs.REPL) * m / 40 * .68 * wpp
-        out.append(dict(id=r['pid'], n=r['name'], y=y, tm=r['team'], pos=None, v=war, raw=round(rx, 1), w=m))
+        # replacement by position (G, F, C on Barttorvik's role), that season's line (scripts/repl_levels.py, Nov 28 2026)
+        war = (x - cbb_tabs.RL.cbb_line(cbb_tabs.POSMAP.get(r.get('role'), 'F'), y)) * m / 40 * .68 * wpp
+        out.append(dict(id=r['pid'], n=r['name'], y=y, tm=r['team'], pos=cbb_tabs.POSMAP.get(r.get('role')), v=war, raw=round(rx, 1), w=m))
     return out
 
 
@@ -948,13 +949,13 @@ def player_era(S, ref=(2012, 2026)):
     return dict(mu=round(m0, 3), sd=round(s0, 3))
 
 
-def era_scale(S, rate, vol, value, reg, grp=lambda s: '', ref=10, vq=.9):
+def era_scale(S, rate, vol, value, reg, grp=lambda s: '', ref=10, vq=.9, row=False):
     """Era adjustment, every sport (Noah Nov 20): a season's rate against that season's league, its volume against
     that season's volume, both put in the units of the last `ref` seasons, then the sport's own value formula.
       rate'  = mu_ref + sd_ref x (rate - season mean) / season SD   (regulars; SD pooled over the season +- WIN)
       vol'   = vol x q_ref / season q                                (q = the vq quantile of the regulars' volume)
       v      = value(rate', vol')
-    grp splits the pool (NHL skaters / goalies). vol None: rate only. Keeps v0 (as played).
+    grp splits the pool (NHL skaters / goalies). vol None: rate only. Keeps v0 (as played). row: value also gets the row.
     -> {group: dict(mu, sd, q)} for the reference seasons and the per-season terms"""
     out = {}
     for g in sorted({grp(x) for x in S}):
@@ -978,7 +979,7 @@ def era_scale(S, rate, vol, value, reg, grp=lambda s: '', ref=10, vq=.9):
             r = rate(x)
             if x['y'] not in mu or r is None: x['v'] = None; continue
             r2 = m0 + s0 * (r - mu[x['y']]) / sd[x['y']]
-            x['v'] = value(r2, vol(x) * q0 / q[x['y']]) if vol else r2
+            x['v'] = (value(r2, vol(x) * q0 / q[x['y']], x) if row else value(r2, vol(x) * q0 / q[x['y']])) if vol else r2
         out[g or 'all'] = dict(mu=round(m0, 3), sd=round(s0, 3), q=None if q0 is None else round(q0, 1), ref=[ys[0], ys[-1]],
                                by={y: [round(mu[y], 3), round(sd[y], 3), round(q[y], 1) if vol else None] for y in sorted(mu)})
     return out
@@ -1227,7 +1228,9 @@ def main():
                            lambda r, m: nba_xpm.VORX_K * (r - nba_xpm.VORX_REP) * m / 48, reg=lambda x: x.get('reg'))
     ERA['nhl'] = era_scale(src['nhlS'], lambda x: x['v'], None, None, reg=lambda x: x.get('reg'), grp=lambda x: 'G' if x.get('pos') == 'G' else 'S')
     wpp = json.load(gzip.open(os.path.join(HERE, 'data', 'cbb_tabs_2026.json.gz')))['wfit']['wpp']
-    ERA['cbb'] = era_scale(src['cbbS'], lambda x: x['raw'], lambda x: x['w'], lambda r, m: (r + 1.4) * m / 40 * .68 * wpp, reg=lambda x: x['w'] >= 400)
+    import repl_levels as RL   # today's units: today's replacement line at his position (Nov 28 2026)
+    ERA['cbb'] = era_scale(src['cbbS'], lambda x: x['raw'], lambda x: x['w'], lambda r, m, x: (r - RL.cbb_line(x.get('pos') or 'F')) * m / 40 * .68 * wpp,
+                           reg=lambda x: x['w'] >= 400, row=True)
     ERA['soccer'] = era_scale(src['soccerS'], lambda x: x['v'] / x['raw'] * 90 if x.get('raw') else None, lambda x: x['raw'] or 0,
                               lambda r, m: r * m / 90, reg=lambda x: (x.get('raw') or 0) >= 900)
     cs = cs2_players()
@@ -1251,7 +1254,7 @@ def main():
                                         'MoneyPuck + Hockey Reference', est=f"before {hf['first'] - 1}-{str(hf['first'])[2:]}: WAR from point shares (skaters r {hf['S']['r']:.2f}, goalies r {hf['G']['r']:.2f} on the seasons both have)",
                                         abouts=(f"NHL WAR from {hf['first'] - 1}-{str(hf['first'])[2:]}; earlier seasons est from point shares.", ''))
     res['nhl']['players']['fit'] = hf
-    res['cbb']['players'] = players_out(src['cbbS'], dict(l='VORX', t='wins over a replacement player: (XPM + 1.4) x minutes / 40 x .68 x wins a point (CBB VORX)', f='%.1f', rl='XPM', rt='XPM (rXPM): box plus-minus on team totals that track wins', rf='%.1f'),
+    res['cbb']['players'] = players_out(src['cbbS'], dict(l='VORX', t='wins over a replacement player at his position: (XPM - R) x minutes / 40 x .68 x wins a point (CBB VORX; R by position and season)', f='%.1f', rl='XPM', rt='XPM (rXPM): box plus-minus on team totals that track wins', rf='%.1f'),
                                         dict(l='VORX', t='career VORX, D-I seasons 2007-08 on', f='%.1f', s=1, pl='Peak', pt='best season VORX'),
                                         'Barttorvik', pos=False)
     car, nfit = nfl_career(src['nflpk'], src['nflwav'])

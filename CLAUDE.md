@@ -13,7 +13,7 @@
   mentions AI; one PROCESS #N article a month; every article gets an articleGFX card (each section's key words, a comma list).
 - Models ([docs/rules/models-tests.md](docs/rules/models-tests.md)): ship only what passes out-of-sample tests, point
   in time; 2026-27 is a lockbox; every failed or deferred test with a later look goes in data/retests.json; cross-sport rule; predictive metric in predictive contexts, descriptive in
-  descriptive; FV is absolute 20-80 true talent, mean headline, never class-relative or a shared cross-sport scale.
+  descriptive; FV is absolute 20-80 true talent, mean headline, never class-relative or a shared cross-sport scale. Replacement levels are refit on a schedule and by position (`scripts/repl_levels.py`, weekly; a split ships only after it passes).
 - Boards ([docs/rules/boards.md](docs/rules/boards.md)), metric definitions ([docs/rules/metrics.md](docs/rules/metrics.md)),
   sections ([docs/rules/sections.md](docs/rules/sections.md)), posting schedule and shipping
   ([docs/rules/workflow.md](docs/rules/workflow.md)): merge when done, then `python3 scripts/check_live.py`; retrigger
