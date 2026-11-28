@@ -6,7 +6,7 @@
   "desc": "XPM",
   "sample": "MP",
   "sport": "nba",
-  "asof": "2026-11-28T09:40:11Z",
+  "asof": "2026-11-28T09:42:56Z",
   "n": 482,
   "anchors": {
    "r": -1.4,
@@ -299,7 +299,7 @@
   "desc": "WAR",
   "sample": "TOI",
   "sport": "nhl",
-  "asof": "2026-11-28T09:40:12Z",
+  "asof": "2026-11-28T09:42:56Z",
   "n": 868,
   "anchors": {
    "r": 0.0,
@@ -314,7 +314,12 @@
     2014,
     2026
    ],
-   "unit": "WAR a full season"
+   "unit": "WAR a full season",
+   "G": {
+    "r": 0.0,
+    "s": 2.706,
+    "t": 3.442
+   }
   },
   "top": [
    {
@@ -372,15 +377,6 @@
     "age": 28
    },
    {
-    "n": "Jesper Wallstedt",
-    "tm": "MIN",
-    "pos": "G",
-    "ovr": 89,
-    "lo": null,
-    "hi": null,
-    "age": 23
-   },
-   {
     "n": "Macklin Celebrini",
     "tm": "SJS",
     "pos": "C",
@@ -408,15 +404,6 @@
     "age": 26
    },
    {
-    "n": "Jake Oettinger",
-    "tm": "DAL",
-    "pos": "G",
-    "ovr": 89,
-    "lo": null,
-    "hi": null,
-    "age": 27
-   },
-   {
     "n": "Evan Bouchard",
     "tm": "EDM",
     "pos": "D",
@@ -424,24 +411,6 @@
     "lo": 83,
     "hi": 94,
     "age": 26
-   },
-   {
-    "n": "Jeremy Swayman",
-    "tm": "BOS",
-    "pos": "G",
-    "ovr": 89,
-    "lo": null,
-    "hi": null,
-    "age": 27
-   },
-   {
-    "n": "Spencer Knight",
-    "tm": "CHI",
-    "pos": "G",
-    "ovr": 89,
-    "lo": null,
-    "hi": null,
-    "age": 25
    },
    {
     "n": "Lane Hutson",
@@ -453,24 +422,6 @@
     "age": 22
    },
    {
-    "n": "Joel Hofer",
-    "tm": "STL",
-    "pos": "G",
-    "ovr": 88,
-    "lo": null,
-    "hi": null,
-    "age": 26
-   },
-   {
-    "n": "Jacob Fowler",
-    "tm": "MTL",
-    "pos": "G",
-    "ovr": 88,
-    "lo": null,
-    "hi": null,
-    "age": 21
-   },
-   {
     "n": "David Pastrnak",
     "tm": "BOS",
     "pos": "R",
@@ -480,33 +431,6 @@
     "age": 30
    },
    {
-    "n": "Dustin Wolf",
-    "tm": "CGY",
-    "pos": "G",
-    "ovr": 87,
-    "lo": null,
-    "hi": null,
-    "age": 25
-   },
-   {
-    "n": "Stuart Skinner",
-    "tm": "WPG",
-    "pos": "G",
-    "ovr": 87,
-    "lo": null,
-    "hi": null,
-    "age": 27
-   },
-   {
-    "n": "Jet Greaves",
-    "tm": "CBJ",
-    "pos": "G",
-    "ovr": 87,
-    "lo": null,
-    "hi": null,
-    "age": 25
-   },
-   {
     "n": "Kirill Kaprizov",
     "tm": "MIN",
     "pos": "L",
@@ -514,51 +438,6 @@
     "lo": 80,
     "hi": 93,
     "age": 29
-   },
-   {
-    "n": "Logan Thompson",
-    "tm": "WSH",
-    "pos": "G",
-    "ovr": 87,
-    "lo": null,
-    "hi": null,
-    "age": 29
-   },
-   {
-    "n": "Lukas Dostal",
-    "tm": "ANA",
-    "pos": "G",
-    "ovr": 87,
-    "lo": null,
-    "hi": null,
-    "age": 26
-   },
-   {
-    "n": "Filip Gustavsson",
-    "tm": "MIN",
-    "pos": "G",
-    "ovr": 87,
-    "lo": null,
-    "hi": null,
-    "age": 28
-   },
-   {
-    "n": "Yaroslav Askarov",
-    "tm": "SJS",
-    "pos": "G",
-    "ovr": 86,
-    "lo": null,
-    "hi": null,
-    "age": 24
-   },
-   {
-    "n": "Jakub Dobes",
-    "tm": "MTL",
-    "pos": "G",
-    "ovr": 86,
-    "lo": null,
-    "hi": null,
-    "age": 25
    },
    {
     "n": "Robert Thomas",
@@ -586,6 +465,132 @@
     "lo": 80,
     "hi": 93,
     "age": 29
+   },
+   {
+    "n": "Nick Suzuki",
+    "tm": "MTL",
+    "pos": "C",
+    "ovr": 86,
+    "lo": 80,
+    "hi": 93,
+    "age": 27
+   },
+   {
+    "n": "Cale Makar",
+    "tm": "COL",
+    "pos": "D",
+    "ovr": 86,
+    "lo": 80,
+    "hi": 91,
+    "age": 27
+   },
+   {
+    "n": "Jesper Wallstedt",
+    "tm": "MIN",
+    "pos": "G",
+    "ovr": 85,
+    "lo": null,
+    "hi": null,
+    "age": 23
+   },
+   {
+    "n": "Jesper Bratt",
+    "tm": "NJD",
+    "pos": "L",
+    "ovr": 85,
+    "lo": 79,
+    "hi": 92,
+    "age": 28
+   },
+   {
+    "n": "Leo Carlsson",
+    "tm": "ANA",
+    "pos": "C",
+    "ovr": 85,
+    "lo": 79,
+    "hi": 92,
+    "age": 21
+   },
+   {
+    "n": "Tim St\u00fctzle",
+    "tm": "OTT",
+    "pos": "C",
+    "ovr": 85,
+    "lo": 79,
+    "hi": 92,
+    "age": 24
+   },
+   {
+    "n": "Lucas Raymond",
+    "tm": "DET",
+    "pos": "L",
+    "ovr": 85,
+    "lo": 78,
+    "hi": 92,
+    "age": 24
+   },
+   {
+    "n": "Jack Eichel",
+    "tm": "VGK",
+    "pos": "C",
+    "ovr": 85,
+    "lo": 78,
+    "hi": 91,
+    "age": 29
+   },
+   {
+    "n": "Jordan Kyrou",
+    "tm": "WSH",
+    "pos": "R",
+    "ovr": 85,
+    "lo": 78,
+    "hi": 91,
+    "age": 28
+   },
+   {
+    "n": "Zach Werenski",
+    "tm": "CBJ",
+    "pos": "D",
+    "ovr": 85,
+    "lo": 79,
+    "hi": 90,
+    "age": 29
+   },
+   {
+    "n": "Nikolaj Ehlers",
+    "tm": "CAR",
+    "pos": "L",
+    "ovr": 85,
+    "lo": 78,
+    "hi": 91,
+    "age": 30
+   },
+   {
+    "n": "Matthew Tkachuk",
+    "tm": "FLA",
+    "pos": "L",
+    "ovr": 85,
+    "lo": 78,
+    "hi": 91,
+    "age": 28
+   },
+   {
+    "n": "Zach Benson",
+    "tm": "BUF",
+    "pos": "L",
+    "ovr": 85,
+    "lo": 78,
+    "hi": 91,
+    "age": 21
+   },
+   {
+    "n": "Matt Boldy",
+    "tm": "MIN",
+    "pos": "L",
+    "ovr": 84,
+    "lo": 78,
+    "hi": 91,
+    "age": 25
    }
   ]
  },
@@ -596,7 +601,7 @@
   "desc": "XP/60",
   "sample": "Snaps",
   "sport": "nfl",
-  "asof": "2026-11-28T09:40:12Z",
+  "asof": "2026-11-28T09:42:56Z",
   "n": 1417,
   "anchors": {
    "r": -0.242,
@@ -888,7 +893,7 @@
   "desc": "SV",
   "sample": "Min",
   "sport": "soccer",
-  "asof": "2026-11-28T09:40:12Z",
+  "asof": "2026-11-28T09:42:56Z",
   "n": 300,
   "anchors": {
    "r": 0.0,
@@ -1179,7 +1184,7 @@
   "desc": "Rank",
   "sample": "Matches",
   "sport": "atp",
-  "asof": "2026-11-28T09:40:12Z",
+  "asof": "2026-11-28T09:42:56Z",
   "n": 200,
   "anchors": {
    "r": -1.0512,
@@ -1466,7 +1471,7 @@
   "desc": "Rank",
   "sample": "Matches",
   "sport": "wta",
-  "asof": "2026-11-28T09:40:12Z",
+  "asof": "2026-11-28T09:42:56Z",
   "n": 200,
   "anchors": {
    "r": -1.1786,
@@ -1753,7 +1758,7 @@
   "desc": "\u039490",
   "sample": "Maps",
   "sport": "cs2",
-  "asof": "2026-11-28T09:40:12Z",
+  "asof": "2026-11-28T09:42:56Z",
   "n": 400,
   "anchors": {
    "r": -2.91,

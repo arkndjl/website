@@ -15,7 +15,8 @@ past t = 1 on the others):
 The rate z then maps onto the grade piecewise linearly: replacement 60, the median starter 75, the mean of each
 season's best 97 (above it the upper slope goes on, capped at 99; below replacement the lower slope, floor 20).
 Starters: NBA the top 150 in minutes a season, NHL the top 12 F / 6 D / 1 G a team in TOI, soccer 1,800+ minutes,
-NFL regulars (40% of his side's snaps), tennis #25 on ARK, CS2 the median tier-1 player. NHL and soccer rates are put on
+NFL regulars (40% of his side's snaps), tennis #25 on ARK, CS2 the median tier-1 player. NHL goalies on their own range
+(the pooled scale put every starter at 86-89; held out the goalie order ranks next season's WAR a 60 at Spearman .17). NHL and soccer rates are put on
 full seasons first (WAR a 60 x a starter's TOI), so one scale holds every position. Band: the 80% band on true talent
 (tau^2 = t0 + t1 / (sample + c0), fit held out with coverage checked). NBA O / D: the grade with the other side at the
 median starter's (own-side next-season error t -21 O, -31 D against the total split).
@@ -172,7 +173,7 @@ def nhl_fit(pars):
             st_ = [x for v in by.values() for x in sorted(v, key=lambda r: -r['n'])[:NHL_SLOTS[g]]]
             if st_: full[g].append(st.median(r['n'] for r in st_))
     T = {g: round(st.mean(v), 0) for g, v in full.items()}
-    S, TT = [], []
+    S, TT, GS, GT = [], [], [], []
     for s, rows in per[-11:]:
         ws, top = [], []
         for g in full:
@@ -184,16 +185,25 @@ def nhl_fit(pars):
                     ws.append(zof(pars[g], r) * T[g] / 60)
             top += [zof(pars[g], r) * T[g] / 60 for r in rows if r['grp'] == g and r['n'] >= T[g] / 2]
         S.append(st.median(ws)); TT.append(max(top))
-    return {'r': 0.0, 's': round(st.mean(S), 3), 't': round(st.mean(TT), 3), 'toi': T, 'from': [per[-11][0], per[-1][0]], 'unit': 'WAR a full season'}
+        # goalies on their own range (replacement 0, the median starter, the season's best): pooled, every starter sat at 86-89
+        gs = []
+        by = {}
+        for r in rows:
+            if r['grp'] == 'G': by.setdefault(r['p'].get('tm'), []).append(r)
+        for v in by.values():
+            gs += [zof(pars['G'], r) * T['G'] / 60 for r in sorted(v, key=lambda r: -r['n'])[:1]]
+        GS.append(st.median(gs)); GT.append(max(zof(pars['G'], r) * T['G'] / 60 for r in rows if r['grp'] == 'G' and r['n'] >= T['G'] / 2))
+    return {'r': 0.0, 's': round(st.mean(S), 3), 't': round(st.mean(TT), 3), 'toi': T, 'from': [per[-11][0], per[-1][0]], 'unit': 'WAR a full season',
+            'G': {'r': 0.0, 's': round(st.mean(GS), 3), 't': round(st.mean(GT), 3)}}
 
 
 def nhl_build(pars, K):
     F = nhl_files(); cur = max(F); rows = nhl_rows(cur, F); out = []
     for r in rows:
-        p = r['p']; g = r['grp']; f = K['toi'][g] / 60
+        p = r['p']; g = r['grp']; f = K['toi'][g] / 60; KK = K['G'] if g == 'G' and K.get('G') else K
         z = zof(pars[g], r); t = tau(pars[g], r)
         out.append({'n': p['n'], 'id': p['id'], 'tm': p.get('tm'), 'pos': p.get('pos'), 'pg': g, 'age': p.get('age'),
-                    'ovr': gi(z * f, K), 'lo': gi((z - Z80 * t) * f, K) if t else None, 'hi': gi((z + Z80 * t) * f, K) if t else None,
+                    'ovr': gi(z * f, KK), 'lo': gi((z - Z80 * t) * f, KK) if t else None, 'hi': gi((z + Z80 * t) * f, KK) if t else None,
                     'm': r2(z * f, 2), 'x': r2(p.get('war'), 2), 'smp': p['toi'], 'g': p.get('gp'), 'ph': p.get('ph'), 'z': r2(z * f, 3)})
     return out, {'season': cur, 'label': f'{cur - 1}-{str(cur)[2:]}', 'metric': 'pWAR/82', 'desc': 'WAR', 'sample': 'TOI'}
 

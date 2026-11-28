@@ -31,7 +31,7 @@
      "short": "OVR is a 0-99 grade of a pro player's overall skill, read from his sport's most predictive rate. It is the pro counterpart of FV.",
      "body": [
       "Replacement level is 60, the median starter is 75 and the best player in a typical season is 97. Between those points the grade is linear in the rate. Above 97 the upper slope carries on to a cap of 99, and below replacement the lower slope carries on to a floor of 20. The points are set on past seasons (NBA 2016-2026, NHL 2014-2026, soccer 2015-2022) so the scale holds still through a season.",
-      "The NBA reads pXPM, the NHL pWAR a 60 put on a full season at a starter's TOI for his position (F 1129, D 1440, G 3134 minutes), the NFL pXP/60, soccer p/90 put on a full season, tennis ARK as log-odds by tour, and CS2 the RWA rating. Putting the NHL and soccer on full seasons first keeps a defenseman and a forward on one scale of wins.",
+      "The NBA reads pXPM, the NHL pWAR a 60 put on a full season at a starter's TOI for his position (F 1129, D 1440, G 3134 minutes), the NFL pXP/60, soccer p/90 put on a full season, tennis ARK as log-odds by tour, and CS2 the RWA rating. Putting the NHL and soccer on full seasons first keeps a defenseman and a forward on one scale of wins. Goalies have their own range (replacement 60, the median starting goalie 75, the best goalie in a typical season 97), because on the shared scale every starter sat at 86 to 89. The order is the same either way, and it is a weak one: held out, the goalie grade ranks next season's goalie WAR a 60 at a Spearman r of .17 (17 seasons, 1,500 minutes both years), against .48 for forwards and .43 for defensemen.",
       "Each idea was tested leaving one season out and scored three ways: next season's rate, next season's value (rate times playing time), and team results. It was kept only when it was better on one of the three with t of 2 or more and worse on none past 1. In the NBA nothing beat pXPM alone: this season's XPM t = 1.15, age t = -1.55, position t = -0.06, and a slope that grows with career minutes lost on team results (t = -2.74). NHL forwards and defensemen take that slope (forwards: value r t = 23.48, team R² t = 4.93), goalies take age (t = -2.71), and this season's WAR added nothing to the fixed pWAR (forwards t = 1.41). Soccer takes this season's SV, age and position: next-season error t = -4.65, team R² 0.801 to 0.808 (t = 5.08), 6 of 7 seasons.",
       "Starting rookies from their final draft FV, with its weight fading as pro minutes come in, failed in every sport against a plain rookie offset that fades the same way: NBA t = 0.66 on next season's rate, NHL forwards t = 0.54, soccer t = 3.33. Draft FV explains little of an NBA rookie's first season (r = 0.14 with his XPM). It is in the retests ledger.",
       "The band is the 80% range on true talent. With the season's noise added it covers 81% (NBA), 81% (NHL forwards) and 81% (soccer) of next-season rates held out. The NBA O and D grades are the grade with the other side at the median starter's. Next season's offense is read better from this season's offense than from the total (error t = -21.1, 17 of 17 seasons), and defense the same way (t = -31.0).",
@@ -3582,7 +3582,7 @@
      "some NHL games",
      "-",
      "-",
-     "88 / 300",
+     "90 / 300",
      "30-34: 32.1 -> 31.3 (n 440, NHL 64%)"
     ],
     [
@@ -3590,7 +3590,7 @@
      "no NHL games",
      "-",
      "-",
-     "189 / 300",
+     "190 / 300",
      "20-24: 23.0 -> 23.7 (n 804, NHL 24%)"
     ]
    ]
