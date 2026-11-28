@@ -1732,6 +1732,25 @@ table tbody tr:hover .fv-chip {
   }
 }
 
+/* slim bars inside player and log windows: thumb and track only, no arrow buttons */
+@media (min-width: 685px) {
+  .hvid__list::-webkit-scrollbar, .lzl__pane::-webkit-scrollbar, .wv-wall::-webkit-scrollbar { width: 10px; height: 10px; }
+  .hvid__list::-webkit-scrollbar-button, .lzl__pane::-webkit-scrollbar-button, .wv-wall::-webkit-scrollbar-button { display: none; }
+  .hvid__list::-webkit-scrollbar-track, .lzl__pane::-webkit-scrollbar-track, .wv-wall::-webkit-scrollbar-track { background: #120c22; background-image: none; }
+  .hvid__list::-webkit-scrollbar-thumb, .lzl__pane::-webkit-scrollbar-thumb, .wv-wall::-webkit-scrollbar-thumb {
+    background: #8f84d6; border: 2px solid; border-color: #c8c7ff #4a3a86 #4a3a86 #c8c7ff; min-height: 24px; }
+}
+
+/* phones: a thin pixel thumb on scrolling tables and windows (the page itself keeps the phone's overlay bar) */
+@media (max-width: 684px) {
+  body *::-webkit-scrollbar { width: 6px; height: 6px; }
+  body *::-webkit-scrollbar-track { background: var(--win-well); }
+  body *::-webkit-scrollbar-thumb { background: var(--accent); box-shadow: inset -2px -2px 0 #8f84d6; }
+  body *::-webkit-scrollbar-button { display: none; }
+  body *::-webkit-scrollbar-corner { background: var(--win-well); }
+}
+
+/* Firefox has no scrollbar pseudo-elements: theme colours on every scroller (inherited from html) */
 @supports not selector(::-webkit-scrollbar) {
   html {
     scrollbar-width: auto;
@@ -5497,6 +5516,76 @@ td.tbx__p { color: #7fffd4; font-weight: bold; }
 /* Process > ARKLOG > traffic > articles.exe (layouts/shortcodes/articlestats.html) */
 .astat td.astat__t { white-space: normal; min-width: 18ch; max-width: 36ch; }
 .astat td.astat__tags { white-space: normal; max-width: 22ch; color: color-mix(in srgb, var(--foreground) 70%, transparent); }
+
+/* ------------------------------------------------------------------
+   Pixel YouTube player (layouts/partials/ytp.html, assets/js/ytpix.js): a thumbnail facade with a pixel play
+   button until clicked, then the player with YouTube's controls off and this bar under it. */
+.ytp, .hvid { --yp-ink: #120c22; --yp-lil: #c8c7ff; --yp-teal: #7fffd4; --yp-mid: #8f84d6; --yp-lo: #4a3a86; --yp-hi: #e9e6ff;
+}
+.ytp { display: flex; flex-direction: column; background: var(--yp-ink); outline: none; }
+.ytp__screen, .hvid__screen { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #000; }
+.ytp__frame, .ytp__screen iframe, .hvid__screen iframe { position: absolute; inset: 0; display: block; width: 100%; height: 100%; border: 0; }
+.ytp__face { position: absolute; inset: 0; display: block; cursor: pointer; background: #000; }
+.post-content .ytp__face, .ytp__face:hover { text-decoration: none; }
+.ytp__face img { display: block; width: 100%; height: 100%; object-fit: cover; margin: 0; padding: 0; border: 0; box-shadow: none; max-width: none; }
+.ytp__face::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(180deg, transparent 0 2px, rgba(18, 12, 34, .28) 2px 4px); }
+.ytp__go { position: absolute; left: 50%; top: 50%; z-index: 1; display: flex; align-items: center; justify-content: center;
+  width: 76px; height: 54px; margin: -27px 0 0 -38px; color: var(--yp-teal, #7fffd4);
+  background: repeating-linear-gradient(180deg, #5a4a9a 0 2px, #54448f 2px 4px);
+  box-shadow: inset 2px 2px 0 #e9e6ff, inset -2px -2px 0 #120c22, inset 4px 4px 0 #8f84d6, inset -4px -4px 0 #4a3a86, 0 0 0 2px #120c22, 4px 4px 0 2px rgba(0, 0, 0, .5); }
+.ytp__go svg { width: 32px; height: 32px; fill: currentColor; filter: drop-shadow(2px 2px 0 #120c22); }
+.ytp__face:hover .ytp__go, .ytp__face:focus-visible .ytp__go { color: #fff; background: #57068c; }
+.ytp__face:focus-visible { outline: 2px solid #7fffd4; outline-offset: -2px; }
+.is-loading .ytp__go svg { animation: ytpblink .5s steps(2) infinite; }
+@keyframes ytpblink { 50% { opacity: .25; } }
+.ytp__bar { display: flex; align-items: center; gap: 6px; padding: 6px; font-size: .78em; color: var(--yp-teal);
+  background: repeating-linear-gradient(180deg, #5a4a9a 0 2px, #54448f 2px 4px); box-shadow: inset 2px 2px 0 var(--yp-mid), inset -2px -2px 0 var(--yp-lo); }
+.ytp__btn { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 24px; padding: 0; cursor: pointer; color: var(--yp-ink); border: 0;
+  background: repeating-linear-gradient(180deg, var(--yp-hi) 0 6px, var(--yp-lil) 6px 12px, #ada9ec 12px 24px);
+  box-shadow: inset 2px 2px 0 #fff, inset -2px -2px 0 var(--yp-lo), 0 0 0 2px var(--yp-ink); }
+.ytp__btn svg { width: 14px; height: 14px; fill: currentColor; }
+.ytp__btn--main { width: 40px; color: #1a5c4a; }
+.ytp__btn:hover, .ytp__btn:focus-visible { color: #57068c; outline: none; }
+.ytp__btn:active { box-shadow: inset 2px 2px 0 var(--yp-lo), inset -2px -2px 0 #fff, 0 0 0 2px var(--yp-ink); }
+.ytp__time { flex: none; min-width: 9ch; padding: 3px 6px; white-space: nowrap; letter-spacing: .04em;
+  background: repeating-linear-gradient(180deg, #07130f 0 2px, #0b1d17 2px 4px); box-shadow: inset 2px 2px 0 #000, inset -2px -2px 0 var(--yp-mid); }
+.ytp__seek, .hvid__seek { touch-action: none; }
+.ytp__seek { position: relative; flex: 1; min-width: 60px; height: 14px; cursor: pointer; background: var(--yp-ink); box-shadow: inset 2px 2px 0 #000, inset -2px -2px 0 var(--yp-mid); }
+.ytp__seek:focus-visible, .ytp__vol:focus-visible { outline: 2px solid var(--yp-teal); outline-offset: 1px; }
+.ytp__buf, .ytp__fill { position: absolute; left: 2px; top: 2px; bottom: 2px; width: 0; max-width: calc(100% - 4px); }
+.ytp__buf { background: repeating-linear-gradient(90deg, var(--yp-lo) 0 4px, transparent 4px 6px); }
+.ytp__fill { background: repeating-linear-gradient(90deg, var(--yp-teal) 0 4px, transparent 4px 6px); }
+.ytp__head { position: absolute; top: -2px; left: 0; width: 10px; height: 18px; margin-left: -5px; background: var(--yp-lil); box-shadow: inset -2px -2px 0 var(--yp-lo), inset 2px 2px 0 #fff, 0 0 0 1px var(--yp-ink); }
+.ytp__vol { flex: none; display: flex; align-items: flex-end; gap: 2px; height: 20px; padding: 2px 4px; cursor: pointer; touch-action: none;
+  background: var(--yp-ink); box-shadow: inset 2px 2px 0 #000, inset -2px -2px 0 var(--yp-mid); }
+.ytp__vol i { width: 4px; background: #2a2050; }
+.ytp__vol i:nth-child(1) { height: 4px; } .ytp__vol i:nth-child(2) { height: 6px; } .ytp__vol i:nth-child(3) { height: 8px; } .ytp__vol i:nth-child(4) { height: 10px; }
+.ytp__vol i:nth-child(5) { height: 12px; } .ytp__vol i:nth-child(6) { height: 14px; } .ytp__vol i:nth-child(7) { height: 16px; } .ytp__vol i:nth-child(8) { height: 16px; }
+.ytp__vol i.is-on { background: var(--yp-teal); }
+.ytp__yt { flex: none; display: inline-flex; align-items: center; gap: 4px; padding: 3px 6px; color: var(--yp-hi); text-decoration: none; white-space: nowrap;
+  background: var(--yp-ink); box-shadow: inset 2px 2px 0 #000, inset -2px -2px 0 var(--yp-mid); }
+.ytp__yt svg { width: 12px; height: 12px; fill: currentColor; }
+.ytp__yt:hover, .ytp__yt:focus-visible { color: var(--yp-teal); }
+.video-frame .ytp { margin: 0; }
+/* fullscreen: the screen fills the display, the bar stays under it */
+.ytp:fullscreen, .ytp.is-max { width: 100%; height: 100%; }
+.ytp:fullscreen .ytp__screen, .ytp.is-max .ytp__screen { flex: 1; aspect-ratio: auto; }
+.ytp.is-max, .hvid__deck.is-max { position: fixed; inset: 0; z-index: 9999; }
+html.ytp-max { overflow: hidden; }
+@media (max-width: 684px) {
+  .ytp__bar { flex-wrap: wrap; gap: 6px 6px; }
+  .ytp__seek { order: 9; flex-basis: 100%; height: 16px; }
+  .ytp__yt { margin-left: auto; }
+  .ytp__btn { width: 38px; height: 30px; } .ytp__btn--main { width: 50px; }
+  .ytp__go { width: 64px; height: 46px; margin: -23px 0 0 -32px; }
+}
+@media (prefers-reduced-motion: reduce) { .is-loading .ytp__go svg { animation: none; } }
+@media (max-width: 684px) {
+  .ytp__vol { display: none; }
+  .ytp__yt { font-size: 0; gap: 0; padding: 6px 8px; }
+  .ytp__yt svg { width: 14px; height: 14px; }
+  .hvid .hvid__vol { display: flex; }
 /* Article list strip (layouts/partials/postbar.html, assets/js/postbar.js): a bevelled bar over the posts */
 .pbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 8px; padding: 8px 10px;
   background: var(--win-face); border: 2px solid; border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light); box-shadow: 2px 2px 0 var(--win-dark); }

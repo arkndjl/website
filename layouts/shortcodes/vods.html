@@ -1,4 +1,4 @@
-{{- /* A video wall: the newest video in the player, every one as a pixel-framed thumbnail below (a click plays it
+{{- /* A video wall: the newest video in the pixel player (layouts/partials/ytp.html), every one as a pixel-framed thumbnail below (a click plays it
        in the player). Data: data/cs.json uploads ({id, t, date, nt}). only="nt" keeps 1NT match videos.
        {{< vods title="uploads.exe" only="nt" class="desk__wide" >}} */ -}}
 {{- $all := site.Data.cs.uploads -}}
@@ -11,7 +11,7 @@
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   {{- $f := index . 0 }}
-  <div class="vods__player"><iframe src="https://www.youtube-nocookie.com/embed/{{ $f.id }}" title="{{ $f.t }}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; fullscreen" allowfullscreen></iframe></div>
+  <div class="vods__player">{{ partial "ytp.html" (dict "id" $f.id "title" $f.t) }}</div>
   <ol class="vods__grid">
     {{- range $i, $x := . }}
     <li><a href="https://www.youtube.com/watch?v={{ .id }}" data-vid="{{ .id }}"{{ if eq $i 0 }} class="is-on"{{ end }} rel="noopener">

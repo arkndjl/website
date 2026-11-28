@@ -1,0 +1,2 @@
+{{- /* The click-to-load facade inside a pixel player screen: thumbnail + pixel play button. Context: dict "id" "title". */ -}}
+<a class="ytp__face" href="https://www.youtube.com/watch?v={{ .id }}" target="_blank" rel="noopener" aria-label="play {{ .title }}"><img src="https://i.ytimg.com/vi/{{ .id }}/hqdefault.jpg" alt="" width="480" height="360" loading="lazy" decoding="async"><span class="ytp__go" aria-hidden="true"><svg><use href="#icon-play"/></svg></span></a>
