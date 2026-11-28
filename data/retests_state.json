@@ -1,9 +1,9 @@
 {
 "asof":"2026-11-28",
-"n":87,
+"n":89,
 "count":{
 "watching":1,
-"waiting":86
+"waiting":88
 },
 "next":[
 "understat_return",
@@ -987,6 +987,38 @@
 "state":"waiting"
 },
 {
+"key":"nhl_pwar_goalie_form",
+"t":"NHL goalie pWAR with the last three seasons' WAR a 60 (and age) beside HPM",
+"sp":[
+"NHL"
+],
+"ar":"players",
+"kind":"retest",
+"how":"hand",
+"was":"Nov 28: both vs cal t -1.90, bage t -1.89 (leave one season out, 1,076 goalie-seasons); time split t -7.97 vs live but not vs cal",
+"trigger":"2026-27 finished, a 17th season of goalie pairs",
+"gate":"scripts/research/nhl_pwar_nov28/test.py: G both beats cal at t <= -2 leave one season out and on the time split, most seasons, slope .8-1.2",
+"due":"2027-07-07",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"fwd_nhl_pwar_ros",
+"t":"NHL pWAR in season: the calibrated rate against rest-of-season WAR a 60, from the weekly board vintages",
+"sp":[
+"NHL"
+],
+"ar":"players",
+"kind":"forward",
+"how":"hand",
+"was":"Nov 28: the calibration is fit on full seasons to next season's WAR; the in-season rate (partial season S in the Marcel) is not tested against the rest of the season",
+"trigger":"2026-27 weekly board vintages in scripts/data/snaps (pwar, pw0, toi, war by week)",
+"gate":"rest-of-season WAR a 60 by week: calibrated pWAR beats the raw rate (pw0, from hpm less the file's replacement) on minutes-weighted error, paired t <= -2, calibration slope .8-1.2 by WAR decile; refit the in-season form by season share if it fails",
+"due":"2027-07-07",
+"est":1,
+"state":"waiting"
+},
+{
 "key":"fwd_agency_sign_date",
 "t":"Agency first-seen dates for the sent count",
 "sp":[
@@ -1418,7 +1450,7 @@
 "ar":"teams",
 "kind":"retest",
 "how":"hand",
-"was":"Nov 28: NHL pWAR added nothing (right calls .682 with and without it, t .00); the season files' pWAR come from today's fit, so not strictly point in time. NBA and NFL have no past projections on file",
+"was":"Nov 28: NHL pWAR added nothing (right calls .682 with and without it, t .00); the season files' pWAR come from today's fit, so not strictly point in time. NBA and NFL have no past projections on file; rerun Nov 28 on the calibrated pWAR (WAR's scale): .688 with vs .682 without, t 1.01, 4/8 seasons, still short",
 "trigger":"two seasons of weekly board vintages in the forward logs (scripts/data/snaps), so the projection as it stood at each call is on file",
 "gate":"verdicts.py: agedpw beats agedp on right calls, paired t >= 2 and most seasons",
 "due":"2028-07-01",
