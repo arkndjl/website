@@ -172,7 +172,24 @@ def check_public(out):
     rss = os.path.join(out, 'index.xml')
     if not os.path.exists(rss): return ['public/index.xml (the RSS feed) is missing']
     if os.path.getsize(rss) > 2 ** 20: return [f'public/index.xml is {os.path.getsize(rss) / 2 ** 20:.1f} MiB: the feed lists articles with a summary (layouts/_default/rss.xml)']
-    return []
+    return check_leaks(out)
+
+
+def check_leaks(out):
+    """no Hugo template text in a built page or lazy tab (frag/): a bad find-and-replace in PR #1275 printed
+    '| default .school | default "uncommitted" }}">' in every recruit board's team cell (Nov 28)"""
+    import re
+    pat = re.compile(r'">\|<td|">\| default |\}\}">\}\}"|\{\{-? *(?:end|else|with|index|range|if|partial|default)\b')
+    errs = []
+    for d, _, fs in os.walk(out):
+        for f in fs:
+            if not f.endswith(('.html', '.txt')): continue
+            p = os.path.join(d, f)
+            try: t = open(p, encoding='utf-8', errors='ignore').read()
+            except OSError: continue
+            m = pat.search(t)
+            if m: errs.append(f'{os.path.relpath(p, out)}: template text in the page ({t[max(0, m.start() - 60):m.end() + 40]!r})')
+    return errs[:20]
 
 
 def check_boards():
