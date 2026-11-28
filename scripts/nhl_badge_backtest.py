@@ -125,7 +125,7 @@ def main():
                         continue
                     nxt = F1.get(pid)
                     y = (nxt['war'] if nxt else 0.0) * 82 / g1
-                    rows.append((pid, S, [p[c] for c in CTRL], z, y))
+                    rows.append((pid, S, [p.get('pw0', p['pwar']) if c == 'pwar' else p[c] for c in CTRL], z, y))
             zs[key] = {(pid, S): z for pid, S, _, z, _ in rows}
             X0 = np.array([x[2] for x in rows]); z = np.array([x[3] for x in rows]); y = np.array([x[4] for x in rows])
             cl = np.array([x[0] for x in rows]); s = np.array([x[1] for x in rows])
@@ -147,7 +147,7 @@ def main():
                     # a row in any passer's pool; a badge he has no line for (no power-play time) counts as average
                     if any((pid, S) in zs[k_] for k_ in keys):
                         nxt = F1.get(pid)
-                        rows.append((pid, S, [p[c] for c in CTRL] + [zs[k_].get((pid, S), 0.0) for k_ in keys], (nxt['war'] if nxt else 0.0) * 82 / g1))
+                        rows.append((pid, S, [p.get('pw0', p['pwar']) if c == 'pwar' else p[c] for c in CTRL] + [zs[k_].get((pid, S), 0.0) for k_ in keys], (nxt['war'] if nxt else 0.0) * 82 / g1))
             X = np.array([x[2] for x in rows]); y = np.array([x[3] for x in rows])
             cl = np.array([x[0] for x in rows]); s = np.array([x[1] for x in rows])
             # drop the weakest joint failure and refit until every badge left holds up next to the others

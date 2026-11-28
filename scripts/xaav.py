@@ -120,7 +120,8 @@ def nhl_grp(pos):
 def nhl_feats(p, p2, age):
     """inputs from the last full season's row p (and the one before, p2) of static/data/nhl-war"""
     gp = p.get('gp') or 0
-    return {'grp': p['grp'], 'age': age, 'war1': p.get('war') or 0.0, 'pwar': p.get('pwar') or 0.0,
+    return {'grp': p['grp'], 'age': age, 'war1': p.get('war') or 0.0, 'pwar': p.get('pw0', p.get('pwar')) or 0.0,   # raw pWAR (pw0 since Nov 28), what the fit is on
+           
             'p3': p.get('p3'), 'war2': (p2 or {}).get('war') or 0.0, 'has2': 1.0 if p2 else 0.0,
             'toi': p.get('toi') or 0.0, 'gp': gp, 'ppg': (p.get('pts') or 0) / gp if gp else 0.0,
             'toig': (p.get('toi') or 0) / gp if gp else 0.0}

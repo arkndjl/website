@@ -420,7 +420,7 @@ def outcome(r, W, cur):
         q = W.get(S, {}).get(r.get('id'))
         if q:
             k = 82 / SHORT.get(S, 82)
-            wins.append(k * (q.get(VALUE) or 0.0)); gps += q.get('gp') or 0
+            wins.append(k * (q.get('pw0', q.get(VALUE)) or 0.0)); gps += q.get('gp') or 0   # pw0: the raw pWAR this fit is on (Nov 28)
             gsx.append(k * (q.get('gsax') or 0.0))
     r['nhl_war'] = wins; r['nhl_gp'] = gps
     r['peak'] = sum((sorted(wins, reverse=True) + [0, 0, 0])[:3]) / 3
@@ -733,7 +733,7 @@ def nhl_so_far(rows, W):
         for k in range(1, 6):
             q = W.get(r['year'] + k, {}).get(r['id']) if r['id'] else None
             if q:
-                gp += q.get('gp') or 0; wl.append(q.get(VALUE) or 0.0)
+                gp += q.get('gp') or 0; wl.append(q.get('pw0', q.get(VALUE)) or 0.0)
             r['gp_k'][k] = gp; r['war_k'][k] = list(wl)
     durability(rows)
 

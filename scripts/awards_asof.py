@@ -222,8 +222,8 @@ def nhl_build(sims):
                          'gpg0': (q.get('g') or 0) / q['gp'] if q.get('gp') else None,
                          'gsx0': (q.get('gsax') or 0) / max(q.get('toi') or 1, 1) * 60 if q.get('gp') else None,
                          'rookie': rookie, 'key': k_,
-                         'pr0': (q.get('pwar') or 0) / q['toi'] if (q.get('toi') or 0) >= 200 else None,
-                         'wend': (w.get('pwar') or 0) / w['toi'] if w.get('toi') else 0.0}
+                         'pr0': (q.get('pw0', q.get('pwar')) or 0) / q['toi'] if (q.get('toi') or 0) >= 200 else None,
+                         'wend': (w.get('pw0', w.get('pwar')) or 0) / w['toi'] if w.get('toi') else 0.0}
                     if r['toi'] >= 100: rates[r['grp']].append(wv / r['toi'])
                     cands.append(c)
                 mean = {g: sum(v) / len(v) for g, v in rates.items()}
