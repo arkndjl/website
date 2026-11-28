@@ -6,7 +6,7 @@ authorTwitter = "ARKNDJL" #do not include @
 tags = ["design", "process", "arklog"]
 form = "process"
 keywords = ["design philosophy", "predictive", "descriptive", "future value", "sports betting", "anti-minimalism", "friction", "y2k", "windows 98", "organized maximalism", "cybergothic", "flat design", "liquid glass", "ai slop", "data density", "arkndjl"]
-description = "PROCESS #0: the design of arkndjl.net, the 2000s software, game menus and broadcasts it comes from, frictionless design, friction, organized maximalism, prediction and description, Future Value, skin in the game, and trust."
+description = "PROCESS #0: the design of arkndjl.net, the 2000s software, game menus and broadcasts it comes from, frictionless design, friction, organized maximalism, trust, prediction and description, impact and value, Future Value, testing and failure, and skin in the game."
 series = "process"
 showFullContent = false
 readingTime = false
@@ -19,9 +19,9 @@ keys = [
   "Windows 98, Madden, MLB 2K, PictoChat, MySpace, SNY, Liquid Glass",
   "friction, expression and personality, trust in the age of AI, bad design",
   "cybergothicism, organized maximalism, dense tables, one font, one palette, no emoji",
-  "predictive, descriptive, cumulative, rate-based, impact, value",
-  "every test, failed, Future Value, player value, team fit, context",
-  "skin in the game, sports betting, gambling, non-predatory",
+  "predictive, descriptive, luck, context-aware, rate-based, cumulative, XPM, VORX",
+  "Future Value, 20 to 80, absolute, team fit, context, held out, failed",
+  "skin in the game, sports betting, gambling, non-predatory, free",
   "December 1st, ARKLOG, eephus.io, playslugger.com, ST. CLAIRE, 1NT, LAURSEN_111, Your Team Should Tank",
 ]
 +++
@@ -68,21 +68,25 @@ In practice, all of this means that the whole site follows a small set of rules.
 
 ## Prediction, Description, and Value
 
-The same thinking runs through the numbers on the site. I split metrics into predictive and descriptive ones because of my philosophical tendencies as an economist towards modelling. Models that seek to be both predictive and descriptive often fail at being able to do both, and splitting metrics in this way allows for optimal modelling, allows predictive metrics to be more predictive and descriptive metrics to be more descriptive, and is also more comprehensive for audiences, since it provides a clear goal and target for each model.
+The same thinking runs through the numbers on the site. I split metrics into predictive and descriptive ones because of my philosophical tendencies as an economist towards modelling. Models that seek to be both predictive and descriptive often fail at being able to do both, and splitting metrics in this way allows for optimal modelling, allows predictive metrics to be more predictive and descriptive metrics to be more descriptive, and is also more comprehensive for audiences, since it provides a clear goal and target for each model. A descriptive metric should give a player full credit for what happened in a season, including the luck, because the luck happened, while a predictive metric should strip the luck out, shrink small samples toward what we would expect, and age the player forward, because the luck won't repeat.
 
-Certain contexts require predictive models and metrics, and certain contexts require descriptive models and metrics. Combining them or displaying them together provides confusion, so every board leads with the metric that fits its context, and making metric and model displays context-aware helps with reader comprehension and with the application of those metrics and models in the reader's own work.
+Certain contexts require predictive models and metrics, and certain contexts require descriptive models and metrics. Combining them or displaying them together provides confusion, and making metric and model displays context-aware helps with reader comprehension and with the application of those metrics and models in the reader's own work. Season boards, standouts, awards, and season value lead with the sport's most descriptive metric, while projections, FV, next up, and the mocks lead with its most predictive metric. Each sport's pick is decided by a test and not by preference, since every candidate, ours and the public ones, is scored on the same two held-out tests of how well it explains a season's team results and how well it predicts the next season, and none of the public metrics I tested leads in any sport.
 
-Cumulative and rate-based metrics are both often misused. Rate-based metrics are more important for measuring the actual "impact" level of a player in contexts where small samples become relevant, like the playoffs, career peaks, and peak performances, while cumulative metrics are more important for measuring the actual "value" of a player in contexts where large samples become relevant, like the regular season and whole careers.
+Cumulative and rate-based metrics are both often misused. Rate-based metrics are more important for measuring the actual "impact" level of a player in contexts where small samples become relevant, like the playoffs, career peaks, and peak performances, while cumulative metrics are more important for measuring the actual "value" of a player in contexts where large samples become relevant, like the regular season and whole careers. A rate metric like XPM measures how much impact a player has while he is on the floor, and a cumulative metric like VORX measures how much value he actually added, so it counts how long he was on the floor too. Every sport on the site has one of each, with VORX and XPM in the NBA, WAR and pXP/60 in the NFL, WAR and HPM in the NHL, GAR and GAR/90 in soccer, and RAR and RWA in Counter-Strike.
 
-## Failure, Future Value, and One Framework
+Ranking a regular season by a rate rewards players who barely played, and ranking a playoff run by a count rewards whoever played the most games. A rate also needs time before it means anything, since box score XPM takes about 14 games to be half signal, on-court plus-minus takes about 28, and points per 48 minutes takes 3, which is why the predictive versions of the rates shrink toward a prior by minutes and why the boards show the sample beside the number.
 
-Every test on the site is published, including the ones that failed, because people should know what has been tested, tried, and proven not to work. It helps them with their own research, and it shows everything that I've thought of trying, even when it doesn't work.
+## Future Value, One Framework, and Failure
 
-I believe the Future Value system is the best quantitative scale ever created for evaluating talent and projectability towards professional outcomes in sports. I test things that work across multiple sports and attempt to unify them and make them translatable, because I believe that all sports, at their core, are based on the same framework of player value, team fit, and context.
+I believe the Future Value system is the best quantitative scale ever created for evaluating talent and projectability towards professional outcomes in sports. FV grades how good a player will be at his peak as a pro, on the same 20 to 80 scale that scouts have used for decades, where 50 is an average regular, 60 is a plus player, 70 is a star, and 80 is generational, and every prospect board on the site uses it. FV on the site is absolute, so a player's grade comes from his true talent and never from where he ranks on his board or in his class, and a 60 means the same thing in a strong class and a weak one. The headline FV is the mean outcome, the scale is stretched at the top the way real outcomes are, and each sport keeps its own ladder.
+
+I test things that work across multiple sports and attempt to unify them and make them translatable, because I believe that all sports, at their core, are based on the same framework of player value, team fit, and context. When something works in one sport, I try it in every sport that has an analogue, and every metric and model that passes in one place gets tested as an input to the others, including FV, the game models, team ratings, awards, mocks, and next up. That is also why the site looks the same from sport to sport, since every page has the same groups in the same order, every board leads with its key stat, and every sport has a cumulative and a rate metric.
+
+Every change to a model or metric is tested held out, on seasons or games that it was not fit on, and it only ships if it wins. Of the 433 tests in ARKLOG so far, 172 shipped, 174 part shipped, and 87 failed outright, and the failures are published with the same detail as the wins, because people should know what has been tested, tried, and proven not to work. It helps them with their own research, and it shows everything that I've thought of trying, even when it doesn't work.
 
 ## Skin in the Game
 
-I think sports betting is bad for people, but I recognize that people are expressing a market desire for "skin in the game" in sports. People just want sports and their favorite teams and players to actually matter to them and to affect their lives tangibly, and I think my generation has lost that a bit with the slow death of the communal nature of sports, and they have nowhere to turn to fill the desire to have sports matter to them in the modern world other than gambling. I am actively working at my job and seeking out new opportunities to further contribute to making sports matter to people in non-predatory contexts.
+I think sports betting is bad for people, but I recognize that people are expressing a market desire for "skin in the game" in sports. People just want sports and their favorite teams and players to actually matter to them and to affect their lives tangibly, and I think my generation has lost that a bit with the slow death of the communal nature of sports, and they have nowhere to turn to fill the desire to have sports matter to them in the modern world other than gambling. I am actively working at my job and seeking out new opportunities to further contribute to making sports matter to people in non-predatory contexts, and that is also why everything on this site is free and why the news feed never posts betting lines.
 
 25% of people with gambling addictions commit suicide. I lost my best friend to suicide, I've had a gambling addiction in the past, and I love sports and want them to matter, so the societal issue of unregulated sports betting and prediction markets that has run rampant through my generation is incredibly personal to me.
 
