@@ -5,7 +5,7 @@
     python3 scripts/cs2_market_log.py           append to both ledgers (the cs2-market-log workflow)
     python3 scripts/cs2_market_log.py --test    self-check, no network
 
-1. Major stage markets: every Polymarket event whose title names the current Major (cs2_events.MAJOR) and that
+1. Major stage markets: every Polymarket event whose title names the current Major (cs2_events.current_major(), skipped while its ids are not out) and that
    lists 8+ outcomes (winner, qualify to a stage, reach the final) -> scripts/data/ledger/cs2/stage_markets.jsonl,
    one row a run and event: {t, ev, title, sha (sha256 of data/cs2_events.json at that moment), m: [[team, bid, ask,
    last trade]]}. Scored once after the Major ends against scripts/cs2_ledger.py's pre-stage copies.
@@ -86,17 +86,21 @@ def main():
     import cs2_events
     os.makedirs(STORE, exist_ok=True)
     stamp = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-    name = cs2_events.MAJOR['name']
+    mj = cs2_events.current_major()
+    name = mj['name'] if cs2_events.ready(mj) else None      # a Major whose ids are not out yet has no odds to log against
     sha = hashlib.sha256(open(EVENTS, 'rb').read()).hexdigest() if os.path.exists(EVENTS) else None
-    try:
-        ev = curl(SEARCH + urllib.parse.quote(name)).get('events') or []
-        rows = stage_rows(ev, name, stamp, sha)
-        with open(STAGE, 'a') as f:
-            for r in rows:
-                f.write(json.dumps(r, separators=(',', ':')) + '\n')
-        print('stage markets:', len(rows), 'events logged')
-    except (ValueError, OSError, subprocess.SubprocessError) as e:
-        print('stage markets: failed', e)
+    if not name:
+        print('stage markets: skipped, no Major with ids yet', (mj or {}).get('name'))
+    else:
+        try:
+            ev = curl(SEARCH + urllib.parse.quote(name)).get('events') or []
+            rows = stage_rows(ev, name, stamp, sha)
+            with open(STAGE, 'a') as f:
+                for r in rows:
+                    f.write(json.dumps(r, separators=(',', ':')) + '\n')
+            print('stage markets:', len(rows), 'events logged')
+        except (ValueError, OSError, subprocess.SubprocessError) as e:
+            print('stage markets: failed', e)
     last = {}
     for r in read(SHARE):
         last[r['id']] = r

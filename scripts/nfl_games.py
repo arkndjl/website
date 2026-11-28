@@ -4,6 +4,7 @@
 
     python3 scripts/nfl_games.py          # this week's projections (stdlib only; run by the cfb board job)
     python3 scripts/nfl_games.py --fit    # walk-forward backtest 2012-2025 against the closing line, refit (numpy)
+    python3 scripts/nfl_games.py --test   # the postseason sims and bracket on a made-up season (played games fixed)
 
 Data: nflverse (nfldata games.csv: scores, closing spread and total, starting QBs, rest, roof; stats_player_week:
 EPA by player and game; injuries: game status reports, 2016 on), ESPN's injury report, Rotoballer's NFL news. Every feature is known before kickoff.
@@ -1022,11 +1023,17 @@ def build():
     index_qbs(qbs, games); load_qb_teams(last)
     m = Model(**F['params'])
     upcoming = [g for g in games if int(g['season']) == last and g['home_score'] in ('', 'NA')]
-    if not upcoming:
-        return print('nfl games: no games left this season')
-    week = min(int(g['week']) for g in upcoming if g['game_type'] == 'REG') if any(g['game_type'] == 'REG' for g in upcoming) else int(upcoming[0]['week'])
+    # after the Super Bowl (to the next season's first kickoff) the board keeps the finished season: the last week's
+    # games, the standings, the real bracket and the champion, every result fixed; no injury reports
+    over = not upcoming
+    if over:
+        week = max(int(g['week']) for g in games if int(g['season']) == last)
+        print(f'nfl games: {last} season over, keeping its final views')
+    else:
+        week = min(int(g['week']) for g in upcoming if g['game_type'] == 'REG') if any(g['game_type'] == 'REG' for g in upcoming) else int(upcoming[0]['week'])
     nxt = [g for g in upcoming if int(g['week']) == week]
-    icost, iwho, qbst, isrc, icarry, rcost, rcarry = injury_costs(last, week, games, F['coef'].get('inj', 0.0))
+    icost, iwho, qbst, isrc, icarry, rcost, rcarry = (({}, {}, {}, {}, {}, {}, {}) if over else
+                                                       injury_costs(last, week, games, F['coef'].get('inj', 0.0)))
     qbinfo = resolve_qbs(games, last, week, qbst)
     hist = injury_history(games, [last], live=last)
     proj = {}
@@ -1390,30 +1397,108 @@ class League:
         return [self.T[i] for i in sorted(range(n), key=key.get)]
 
 
-def nfl_bracket(BK, tal, sims):
+PO_TYPES = ('WC', 'DIV', 'CON', 'SB')     # nflverse game_type: wild card, divisional, conference, Super Bowl
+
+
+def playoff_results(games, season):
+    """A season's playoff games played so far: {frozenset of the two teams: (winner, {team: points})}. Two clubs meet
+    once a postseason at most."""
+    out = {}
+    for g in games:
+        if int(g['season']) == season and g['game_type'] in PO_TYPES and g['home_score'] not in ('', 'NA'):
+            h, a = team(g['home_team']), team(g['away_team'])
+            hs, as_ = int(num(g['home_score'])), int(num(g['away_score']))
+            out[frozenset((h, a))] = (h if hs > as_ else a, {h: hs, a: as_})
+    return out
+
+
+def check_field(field, games, season):
+    """The seeds from the final standings against the real wild-card round (2-7, 3-6, 4-5): a game the seeds don't
+    produce is printed (a tiebreak step League leaves out), and that game falls back to the sims. -> the misses"""
+    want = {frozenset((s[i], s[7 - i])) for s in field.values() for i in (1, 2, 3)}
+    got = {frozenset((team(g['home_team']), team(g['away_team']))) for g in games
+           if int(g['season']) == season and g['game_type'] == 'WC'}
+    bad = sorted(' '.join(sorted(x)) for x in got - want)
+    if bad:
+        print('nfl games: the real wild-card games differ from the seeds:', bad, {c: ' '.join(s) for c, s in field.items()})
+    return bad
+
+
+def sim_playoffs(field, RL, shock, sd, hfa, rng, played=None, tal=None):
+    """One simulated postseason from the seeds (field: {'AFC': [7 clubs, seed 1 first], 'NFC': ...}): wild card 2-7
+    3-6 4-5 with 1 on a bye, then the top seed left hosts the lowest (the NFL's reseeding), the Super Bowl on a neutral
+    field. A game already played (played, playoff_results) goes to its real winner. tal (bracket.Tally) gets each
+    round reached. -> ([AFC champion, NFC champion], Super Bowl winner, exits: team -> the round it went out in, 1 wild
+    card, 2 divisional, 3 conference, 4 Super Bowl loser, 5 champion)"""
+    played = played or {}
+    exits, champs = {}, []
+
+    def play(h, a, rd, neutral=False):
+        p = played.get(frozenset((h, a)))
+        if p:
+            w = p[0]
+        else:
+            mu = RL[h] - RL[a] + shock[h] - shock[a] + (0 if neutral else hfa)
+            w = h if rng.gauss(mu, sd) > 0 else a
+        exits[a if w == h else h] = rd
+        return w
+    for conf in ('AFC', 'NFC'):
+        seeds = field[conf]
+        seed = {t: i for i, t in enumerate(seeds)}
+        alive = [seeds[0]] + [play(seeds[i], seeds[7 - i], 1) for i in (1, 2, 3)]
+        rd = 2
+        while len(alive) > 1:
+            if tal:
+                for t in alive:
+                    tal.reached(t, 'r2' if rd == 2 else 'r3')
+            alive.sort(key=seed.get)
+            alive = [play(alive[i], alive[-1 - i], rd) for i in range(len(alive) // 2)]
+            rd += 1
+        if tal:
+            tal.reached(alive[0], 'conf')
+        champs.append(alive[0])
+    sbw = play(champs[0], champs[1], 4, neutral=True)
+    exits[sbw] = 5
+    if tal:
+        tal.reached(sbw, 'sb')
+    return champs, sbw, exits
+
+
+def nfl_bracket(BK, tal, sims, played=None, save=True):
     """data/brackets/nfl.json: seed odds and the projected bracket (wild card 2-7 3-6 4-5, 1 on a bye; the top seed left
-    plays the lowest after it, the NFL's reseeding)"""
+    plays the lowest after it, the NFL's reseeding). A game already played carries its real winner and each side's
+    points (sc)."""
     proj, odds, sd = tal.project()
+    played = played or {}
+
+    def mark(g):
+        a, b = g['a'], g['b']
+        p = played.get(frozenset((a['t'], b['t']))) if a and b else None
+        if p:
+            g['w'] = p[0]; a['sc'] = p[1][a['t']]; b['sc'] = p[1][b['t']]
+        return g
     secs, champ = [], {}
     for conf in ('AFC', 'NFC'):
         sds = [r['t'] for r in proj[conf]]
         seed = {t: i + 1 for i, t in enumerate(sds)}
-        wc = [BK.game(sds[i], sds[7 - i], seed, odds, 'playoff', 'r2') for i in (1, 2, 3)]
+        wc = [mark(BK.game(sds[i], sds[7 - i], seed, odds, 'playoff', 'r2')) for i in (1, 2, 3)]
         bye = BK.game(sds[0], None, seed, odds, 'playoff', 'r2')
         alive = sorted([sds[0]] + [g['w'] for g in wc], key=seed.get)
-        dv = [BK.game(alive[0], alive[3], seed, odds, 'r2', 'r3'), BK.game(alive[1], alive[2], seed, odds, 'r2', 'r3')]
-        cg = BK.game(*sorted([g['w'] for g in dv], key=seed.get), seed, odds, 'r3', 'conf')
+        dv = [mark(BK.game(alive[0], alive[3], seed, odds, 'r2', 'r3')), mark(BK.game(alive[1], alive[2], seed, odds, 'r2', 'r3'))]
+        cg = mark(BK.game(*sorted([g['w'] for g in dv], key=seed.get), seed, odds, 'r3', 'conf'))
         champ[conf] = cg['w']
         secs.append({'name': conf, 'rounds': [{'name': 'Wild card', 'games': [bye] + wc}, {'name': 'Divisional', 'games': dv},
                                              {'name': 'Conference', 'games': [cg]}]})
     a, n = champ['AFC'], champ['NFC']
-    sbg = BK.game(a, n, {}, odds, 'conf', 'sb')
+    sbg = mark(BK.game(a, n, {}, odds, 'conf', 'sb'))
     secs.append({'name': 'Super Bowl', 'rounds': [{'name': 'Super Bowl', 'games': [sbg]}], 'champ': {'t': sbg['w'], 'p': odds.get(sbg['w'], {}).get('sb', 0.0)}})
     import datetime
     pay = BK.payload(datetime.date.today().isoformat(), sims, tal, proj, odds, sd, secs,
                      [['playoff', 'Playoff'], ['r2', 'Divisional'], ['r3', 'Conf game'], ['conf', 'Super Bowl'], ['sb', 'Title']],
                      {t: {'n': t, 'a': t, 'logo': f'/img/nfl/{t.lower()}.png'} for t in odds})
-    BK.save('nfl', pay)
+    if save:
+        BK.save('nfl', pay)
+    return pay
 
 
 def season_results(games, season):
@@ -1683,6 +1768,11 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None, ca
     left = [(k, g) for k, (g, r) in enumerate(zip(sg, res0)) if r is None]
     rsd = rating_sd(len(left) / max(1, len(sg)))
     hfa = b['home']
+    # playoff games already played go to their winners in every sim; once the regular season is done the field is the
+    # final standings' (League), checked against the real wild-card games
+    played = playoff_results(games, last)
+    if played and not left:
+        check_field(lg.seeds(res0, random.Random(1))[0], games, last)
     rest = lambda x: max(-7, min(7, num(x, 7) - 7))
     # this week's games with this week's starters and reports; later games with each team's QB1 (unless he's on IR),
     # each listed player at his chance to still be out that many games on (miss_later; scripts/nfl_inj_hazard.py)
@@ -1733,7 +1823,6 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None, ca
         field, w = lg.seeds(res, rng)
         for t in teams:
             wsum[t] += w[t]
-        champs, exits = [], {}
         tal.season()
         for conf in ('AFC', 'NFC'):
             seeds = field[conf]
@@ -1745,29 +1834,10 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None, ca
             for t in seeds:
                 cnt[t]['playoff'] += 1
             cnt[seeds[0]]['seed1'] += 1
-            seed = {t: i for i, t in enumerate(seeds)}
-
-            def play(h, a, rd, neutral=False):
-                mu = RL[h] - RL[a] + shock[h] - shock[a] + (0 if neutral else hfa)
-                w = h if rng.gauss(mu, sd) > 0 else a
-                exits[a if w == h else h] = rd
-                return w
-            alive = [seeds[0]] + [play(seeds[i], seeds[7 - i], 1) for i in (1, 2, 3)]
-            rd = 2
-            while len(alive) > 1:
-                for t in alive:
-                    tal.reached(t, 'r2' if rd == 2 else 'r3')
-                alive.sort(key=lambda t: seed[t])
-                alive = [play(alive[i], alive[-1 - i], rd) for i in range(len(alive) // 2)]
-                rd += 1
-            cnt[alive[0]]['conf'] += 1
-            tal.reached(alive[0], 'conf')
-            champs.append(alive[0])
-        sbw = (lambda h, a: h if rng.gauss(RL[h] - RL[a] + shock[h] - shock[a], sd) > 0 else a)(*champs)
+        champs, sbw, exits = sim_playoffs(field, RL, shock, sd, hfa, rng, played, tal)
+        for t in champs:
+            cnt[t]['conf'] += 1
         cnt[sbw]['sb'] += 1
-        tal.reached(sbw, 'sb')
-        exits[champs[0] if sbw == champs[1] else champs[1]] = 4
-        exits[sbw] = 5
         do = lg.draft_order(res, exits, drng)
         if len(orders) < ORDERS_KEPT:
             orders.append(' '.join(do))
@@ -1776,7 +1846,7 @@ def season_views(m, F, games, last, week, rec, qbinfo, inj=None, roster=None, ca
             top[t] += i < 5
     print(f'nfl games: {SIMS} season sims in {time.time() - t0:.1f}s (rating sd {rsd:.2f})')
     try:
-        nfl_bracket(BK, tal, SIMS)
+        nfl_bracket(BK, tal, SIMS, played)
     except Exception as e:            # the bracket keeps its last file rather than stop the build
         print('nfl bracket failed:', repr(e), flush=True)
 
@@ -1865,5 +1935,109 @@ def qbs_items():
             yield (gid, gsis), q
 
 
+def _test(sims=2000):
+    """The postseason on a made-up season: every club plays its 15 conference rivals and the stronger club always wins
+    (no ties in the standings), then the playoffs as played so far: half the wild-card round, through the divisional
+    round, through the Super Bowl. A club that is out has 0, a round already decided 1."""
+    import random
+    import bracket as BK
+    rng = random.Random(3)
+    rows_, Y = [], 2030
+    strength = {}
+    for c in ('AFC', 'NFC'):
+        ts = sorted(t for t, d in DIV_OF.items() if d.startswith(c))
+        rng.shuffle(ts)
+        strength.update({t: i for i, t in enumerate(ts)})
+        for i, h in enumerate(ts):
+            for a in ts[i + 1:]:
+                hw = strength[h] < strength[a]
+                rows_.append({'season': str(Y), 'game_type': 'REG', 'week': '1', 'home_team': h, 'away_team': a,
+                              'home_score': '24' if hw else '17', 'away_score': '17' if hw else '24', 'result': '7' if hw else '-7'})
+    sg, res0 = season_results(rows_, Y)
+    lg = League([(g['home_team'], g['away_team']) for g in sg])
+    field, _ = lg.seeds(res0, random.Random(1))
+    for c, sds in field.items():                 # the best record is the 1 seed; seeds 2-4 are division winners
+        assert len(sds) == 7 and strength[sds[0]] == 0, sds
+        assert len({DIV_OF[t] for t in sds[:4]}) == 4, sds
+
+    def game(gt, h, a, w):
+        return {'season': str(Y), 'game_type': gt, 'week': '19', 'home_team': h, 'away_team': a,
+                'home_score': '30' if w == h else '20', 'away_score': '20' if w == h else '30', 'result': ''}
+    # the real postseason: the 7 seed beats the 2 in each conference, every other game to the better seed
+    wc, dv, cg, champ = [], [], {}, {}
+    for c, sds in field.items():
+        seed = {t: i for i, t in enumerate(sds)}
+        alive = [sds[0]]
+        for i in (1, 2, 3):
+            w = sds[7 - i] if i == 1 else sds[i]
+            wc.append(game('WC', sds[i], sds[7 - i], w)); alive.append(w)
+        alive.sort(key=seed.get)
+        nxt = []
+        for i in (0, 1):
+            h, a = alive[i], alive[-1 - i]
+            dv.append(game('DIV', h, a, h)); nxt.append(h)
+        h, a = sorted(nxt, key=seed.get)
+        cg[c] = game('CON', h, a, h); champ[c] = h
+    sb = {'season': str(Y), 'game_type': 'SB', 'week': '22', 'home_team': champ['NFC'], 'away_team': champ['AFC'],
+          'home_score': '20', 'away_score': '23', 'result': ''}
+    afc = {t for t, d in DIV_OF.items() if d.startswith('AFC')}
+
+    def run(po):
+        played = playoff_results(rows_ + po, Y)
+        assert not check_field(field, rows_ + po, Y)
+        tal = BK.Tally({'AFC': 7, 'NFC': 7}, ['playoff', 'r2', 'r3', 'conf', 'sb'])
+        r = random.Random(5)
+        RL = {t: r.gauss(0, 4) for t in DIV_OF}
+        shock = dict.fromkeys(DIV_OF, 0.0)
+        for _ in range(sims):
+            tal.season()
+            for c in field:
+                tal.seeds(c, field[c])
+                for t in field[c]:
+                    tal.reached(t, 'playoff')
+            sim_playoffs(field, RL, shock, 13.0, 1.5, r, played, tal)
+        pay = nfl_bracket(BK, tal, sims, played, save=False)
+        return played, {t: pay['odds'].get(t, dict.fromkeys(('playoff', 'r2', 'r3', 'conf', 'sb'), 0.0)) for t in DIV_OF}, pay
+
+    def winners(games):
+        return {g['home_team'] if int(g['home_score']) > int(g['away_score']) else g['away_team'] for g in games}
+
+    def losers(games):
+        return {g['away_team'] if int(g['home_score']) > int(g['away_score']) else g['home_team'] for g in games}
+    afc_wc = [g for g in wc if g['home_team'] in afc]
+    nfc_wc = [g for g in wc if g['home_team'] not in afc]
+    # mid wild card: the AFC's three games played, the NFC's still to come
+    played, O, pay = run(afc_wc)
+    assert all(O[t]['r2'] == 0 for t in losers(afc_wc)), 'mid wc: a loser still alive'
+    assert all(O[t]['r2'] == 1 for t in winners(afc_wc)) and O[field['AFC'][0]]['r2'] == 1
+    assert all(0 < O[t]['r2'] < 1 for g in nfc_wc for t in (g['home_team'], g['away_team']))
+    assert all(O[t]['playoff'] == 0 and O[t]['sb'] == 0 for t in DIV_OF if t not in field['AFC'] + field['NFC'])
+    shown = [g for s_ in pay['sections'][:2] for g in s_['rounds'][0]['games'] if g['b']]
+    assert sum('sc' in g['a'] for g in shown) == 3 and all(g['w'] in winners(afc_wc) for g in shown if 'sc' in g['a'])
+    print('nfl postseason mid wild card ok:', ' '.join(sorted(losers(afc_wc))), 'out')
+    # after the divisional round
+    played, O, pay = run(wc + dv)
+    assert all(O[t]['r3'] == 0 and O[t]['sb'] == 0 for t in losers(wc + dv)), 'after div: a loser still alive'
+    assert all(O[t]['r3'] == 1 for t in winners(dv)) and all(0 < O[t]['conf'] < 1 for t in winners(dv))
+    assert abs(sum(O[t]['sb'] for t in DIV_OF) - 1) < 1e-6
+    print('nfl postseason after divisional ok:', ' '.join(sorted(winners(dv))), 'left')
+    # after the Super Bowl
+    played, O, pay = run(wc + dv + list(cg.values()) + [sb])
+    assert O[champ['AFC']]['sb'] == 1 and all(O[t]['sb'] == 0 for t in DIV_OF if t != champ['AFC'])
+    assert O[champ['NFC']]['conf'] == 1 and sum(O[t]['conf'] for t in DIV_OF) == 2
+    assert pay['sections'][-1]['champ'] == {'t': champ['AFC'], 'p': 1.0}, pay['sections'][-1]['champ']
+    gs = [g for s_ in pay['sections'] for r_ in s_['rounds'] for g in r_['games'] if g['b']]
+    assert len(gs) == 13 and all('sc' in g['a'] and 'sc' in g['b'] for g in gs)
+    assert all(g['w'] == played[frozenset((g['a']['t'], g['b']['t']))][0] for g in gs)
+    print('nfl postseason after Super Bowl ok: champion', champ['AFC'])
+    # a wild-card game the seeds don't produce is reported
+    bad = dict(wc[0], away_team=next(t for t in afc if t not in field['AFC']))
+    assert check_field(field, rows_ + [bad], Y)
+    print('nfl postseason tests ok')
+
+
 if __name__ == '__main__':
-    fit() if '--fit' in sys.argv else build()
+    if '--test' in sys.argv:
+        _test()
+    else:
+        fit() if '--fit' in sys.argv else build()

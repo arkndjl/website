@@ -1,0 +1,167 @@
+{
+ "sport": "nba",
+ "name": "NBA",
+ "page": "/arkboard/nba/",
+ "events": [
+  {
+   "d": "2026-10-20",
+   "k": "reg",
+   "t": "regular season starts"
+  },
+  {
+   "d": "2027-02-11",
+   "k": "deadline",
+   "t": "trade deadline",
+   "src": "https://www.nba.com/news/key-dates"
+  },
+  {
+   "d": "2027-02-19",
+   "k": "other",
+   "t": "All-Star weekend (Phoenix)",
+   "to": "2027-02-21",
+   "src": "https://www.nba.com/news/key-dates"
+  },
+  {
+   "d": "2027-04-11",
+   "k": "reg_end",
+   "t": "regular season ends",
+   "src": "https://pr.nba.com/2026-27-nba-regular-season-schedule/"
+  },
+  {
+   "d": "2027-04-13",
+   "k": "post",
+   "t": "play-in tournament",
+   "to": "2027-04-16",
+   "src": "https://www.nba.com/news/key-dates"
+  },
+  {
+   "d": "2027-04-17",
+   "k": "post",
+   "t": "playoffs start",
+   "est": 1
+  },
+  {
+   "d": "2027-06-03",
+   "k": "champ",
+   "t": "NBA Finals",
+   "to": "2027-06-20",
+   "est": 1
+  },
+  {
+   "d": "2027-06-23",
+   "k": "draft",
+   "t": "NBA draft",
+   "to": "2027-06-24",
+   "est": 1
+  },
+  {
+   "d": "2027-07-01",
+   "k": "other",
+   "t": "free agency, new league year",
+   "est": 1
+  },
+  {
+   "d": "2027-10-19",
+   "k": "reg",
+   "t": "2027-28 regular season starts",
+   "est": 1
+  }
+ ],
+ "keys": {
+  "phase": [
+   [
+    "2026-10-01",
+    "preseason"
+   ],
+   [
+    "2026-10-20",
+    "regular"
+   ],
+   [
+    "2027-04-13",
+    "postseason"
+   ],
+   [
+    "2027-06-21",
+    "offseason"
+   ],
+   [
+    "2027-10-01",
+    "preseason"
+   ],
+   [
+    "2027-10-19",
+    "regular"
+   ]
+  ],
+  "season": [
+   [
+    "2026-10-01",
+    2027
+   ],
+   [
+    "2027-10-01",
+    2028
+   ]
+  ],
+  "league_year": [
+   [
+    "2026-07-01",
+    2026
+   ],
+   [
+    "2027-07-01",
+    2027
+   ]
+  ],
+  "post": [
+   [
+    "2026-01-01",
+    "fri"
+   ]
+  ]
+ },
+ "steps": [
+  {
+   "id": "nba-bracket-real",
+   "on": "2027-04-12",
+   "do": "key",
+   "t": "NBA playoff bracket from the final standings"
+  },
+  {
+   "id": "nba-archive-2027",
+   "on": "2027-06-21",
+   "do": "archive",
+   "t": "archive the 2026-27 season",
+   "season": 2027,
+   "files": [
+    "data/nba_games.json",
+    "data/brackets/nba.json",
+    "data/futures_board_nba.json",
+    "static/data/nba-proj.json"
+   ]
+  },
+  {
+   "id": "nba-league-year-2027",
+   "on": "2027-07-01",
+   "do": "bump",
+   "t": "NBA and NHL league year 2027 (contracts, cap)",
+   "key": "league_year",
+   "lead": 14,
+   "test": [
+    "python3 -m py_compile scripts/xaav.py"
+   ]
+  }
+ ],
+ "bumps": [
+  {
+   "key": "league_year",
+   "file": "scripts/xaav.py",
+   "rx": "^LEAGUE_YEAR = (\\d{4})",
+   "off": 0,
+   "auto": 0,
+   "mode": "int",
+   "why": "cap tables end at 2027: add the new cap first"
+  }
+ ]
+}

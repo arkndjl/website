@@ -1,0 +1,393 @@
+{
+ "sport": "cbb",
+ "name": "CBB",
+ "page": "/arkboard/college-basketball/",
+ "events": [
+  {
+   "d": "2026-11-02",
+   "k": "reg",
+   "t": "regular season starts"
+  },
+  {
+   "d": "2026-11-11",
+   "k": "sign",
+   "t": "early signing period",
+   "to": "2026-11-18",
+   "est": 1
+  },
+  {
+   "d": "2027-03-02",
+   "k": "post",
+   "t": "conference tournaments",
+   "to": "2027-03-14",
+   "est": 1
+  },
+  {
+   "d": "2027-03-07",
+   "k": "reg_end",
+   "t": "regular season ends",
+   "est": 1
+  },
+  {
+   "d": "2027-03-14",
+   "k": "post",
+   "t": "Selection Sunday (76 teams)",
+   "src": "https://ncaa.com/news/basketball-men/article/2026-08-12/2027-selection-sunday-date-schedule-tv-times-march-madness"
+  },
+  {
+   "d": "2027-03-16",
+   "k": "post",
+   "t": "First Four",
+   "to": "2027-03-17",
+   "est": 1
+  },
+  {
+   "d": "2027-03-18",
+   "k": "post",
+   "t": "NCAA tournament first round",
+   "to": "2027-03-19",
+   "est": 1
+  },
+  {
+   "d": "2027-04-03",
+   "k": "post",
+   "t": "Final Four (Detroit)",
+   "src": "https://ncaa.com/news/basketball-men/article/2026-08-12/2027-selection-sunday-date-schedule-tv-times-march-madness"
+  },
+  {
+   "d": "2027-04-05",
+   "k": "champ",
+   "t": "national championship",
+   "src": "https://ncaa.com/news/basketball-men/article/2026-08-12/2027-selection-sunday-date-schedule-tv-times-march-madness"
+  },
+  {
+   "d": "2027-04-06",
+   "k": "portal",
+   "t": "transfer portal window",
+   "to": "2027-04-20",
+   "est": 1,
+   "src": "https://www.on3.com/news/ncaa-division-i-cabinet-adopts-new-transfer-portal-window-mens-womens-basketball/"
+  },
+  {
+   "d": "2027-04-14",
+   "k": "sign",
+   "t": "spring signing period",
+   "est": 1
+  },
+  {
+   "d": "2027-04-24",
+   "k": "deadline",
+   "t": "NBA early entry deadline",
+   "est": 1
+  },
+  {
+   "d": "2027-05-26",
+   "k": "deadline",
+   "t": "NCAA draft withdrawal deadline",
+   "est": 1
+  },
+  {
+   "d": "2027-06-23",
+   "k": "draft",
+   "t": "NBA draft",
+   "to": "2027-06-24",
+   "est": 1
+  },
+  {
+   "d": "2027-11-01",
+   "k": "reg",
+   "t": "2027-28 regular season starts",
+   "est": 1
+  }
+ ],
+ "keys": {
+  "phase": [
+   [
+    "2026-10-01",
+    "preseason"
+   ],
+   [
+    "2026-11-02",
+    "regular"
+   ],
+   [
+    "2027-03-14",
+    "postseason"
+   ],
+   [
+    "2027-04-06",
+    "offseason"
+   ],
+   [
+    "2027-10-01",
+    "preseason"
+   ],
+   [
+    "2027-11-01",
+    "regular"
+   ]
+  ],
+  "season": [
+   [
+    "2026-10-01",
+    2027
+   ],
+   [
+    "2027-10-01",
+    2028
+   ]
+  ],
+  "preseason": [
+   [
+    "2026-08-01",
+    2027
+   ],
+   [
+    "2027-08-01",
+    2028
+   ]
+  ],
+  "draft": [
+   [
+    "2026-07-01",
+    2027
+   ],
+   [
+    "2027-07-01",
+    2028
+   ]
+  ],
+  "last": [
+   [
+    "2026-04-07",
+    2026
+   ],
+   [
+    "2027-04-07",
+    2027
+   ]
+  ],
+  "class": [
+   [
+    "2026-04-07",
+    2027
+   ],
+   [
+    "2027-04-07",
+    2028
+   ]
+  ],
+  "now_class": [
+   [
+    "2026-10-01",
+    2026
+   ],
+   [
+    "2027-10-01",
+    2027
+   ]
+  ],
+  "post": [
+   [
+    "2026-01-01",
+    "thu"
+   ]
+  ]
+ },
+ "steps": [
+  {
+   "id": "cbb-bracket-real",
+   "on": "2027-03-14",
+   "do": "key",
+   "t": "NCAA tournament bracket (real bracket once listed)"
+  },
+  {
+   "id": "cbb-archive-2027",
+   "on": "2027-04-06",
+   "do": "archive",
+   "t": "archive the 2026-27 season",
+   "season": 2027,
+   "files": [
+    "data/cbb.json",
+    "data/cbb_live.json",
+    "data/cbb_games.json",
+    "data/brackets/cbb.json",
+    "data/cbb_teamtabs.json",
+    "static/data/cbb-all.json",
+    "data/cbb_players.json"
+   ]
+  },
+  {
+   "id": "cbb-class-2028",
+   "on": "2027-04-07",
+   "do": "bump",
+   "t": "recruit classes 2028-2030",
+   "key": "class"
+  },
+  {
+   "id": "cbb-freeze-2027",
+   "on": "2027-04-07",
+   "do": "alert",
+   "t": "freeze 2026-27 (cbb_tabs --freeze, cbb_xpm --freeze, cbb_games --fit) then LAST 2027",
+   "lead": 0,
+   "body": "cbb_tabs.py LAST, cbb_games.py LAST, cbb_xpm.py LAST_TARGET move to 2027 only after the frozen files exist: python3 scripts/cbb_tabs.py --freeze; python3 scripts/cbb_xpm.py --fit; python3 scripts/cbb_games.py --fit."
+  },
+  {
+   "id": "cbb-draft-2028",
+   "on": "2027-07-01",
+   "do": "bump",
+   "t": "CBB draft boards move to the 2028 draft",
+   "key": "draft",
+   "test": [
+    "python3 -m py_compile scripts/cbb_boards.py scripts/cbb_mock.py"
+   ]
+  },
+  {
+   "id": "cbb-preseason-2028",
+   "on": "2027-08-01",
+   "do": "bump",
+   "t": "CBB 2027-28 preseason board",
+   "key": "preseason",
+   "test": [
+    "python3 -m py_compile scripts/fetch_cbb.py scripts/cbb_intl.py"
+   ]
+  },
+  {
+   "id": "cbb-season-2028",
+   "on": "2027-10-01",
+   "do": "bump",
+   "t": "CBB live season 2027-28",
+   "key": "season",
+   "lead": 14,
+   "test": [
+    "python3 -m py_compile scripts/cbb_live.py scripts/cbb_games_live.py scripts/cbb_lineups.py scripts/cbb_lowdiv.py scripts/cbb_bracket_matrix.py"
+   ]
+  },
+  {
+   "id": "cbb-nowclass-2027",
+   "on": "2027-10-01",
+   "do": "bump",
+   "t": "2027 class becomes this season's freshmen",
+   "key": "now_class"
+  }
+ ],
+ "bumps": [
+  {
+   "key": "class",
+   "file": "content/arkboard-college-basketball.md",
+   "rx": "\\{\\{< wintabs tab=\"classes\"[\\s\\S]*?\\{\\{< /wintabs >\\}\\}",
+   "off": 0,
+   "auto": 1,
+   "mode": "shift",
+   "why": "class tabs"
+  },
+  {
+   "key": "class",
+   "file": "scripts/cbb_recruit_fit.py",
+   "rx": "^LIVE = \\[(\\d{4}), \\d{4}, \\d{4}\\]",
+   "off": 0,
+   "auto": 1,
+   "mode": "shift-line"
+  },
+  {
+   "key": "class",
+   "file": "scripts/recruit_commit_fit.py",
+   "rx": "^LIVE = \\((\\d{4}), \\d{4}, \\d{4}\\)",
+   "off": 0,
+   "auto": 1,
+   "mode": "shift-line"
+  },
+  {
+   "key": "class",
+   "file": "scripts/recruit_commit_fit.py",
+   "rx": "^YEARS = \\{'cfb': \\(2012, (\\d{4})\\), 'cbb': \\(2010, \\d{4}\\)\\}",
+   "off": 2,
+   "auto": 1,
+   "mode": "shift-line"
+  },
+  {
+   "key": "draft",
+   "file": "scripts/cbb_boards.py",
+   "rx": "^YEAR = (\\d{4})",
+   "off": 0,
+   "auto": 0,
+   "mode": "int",
+   "why": "needs the DRAFT date dict entry for the new year"
+  },
+  {
+   "key": "draft",
+   "file": "scripts/cbb_mock.py",
+   "rx": "^DRAFT = (\\d{4})",
+   "off": 0,
+   "auto": 0,
+   "mode": "int"
+  },
+  {
+   "key": "preseason",
+   "file": "scripts/fetch_cbb.py",
+   "rx": "^SEASON = (\\d{4})",
+   "off": 0,
+   "auto": 0,
+   "mode": "int",
+   "why": "hard date guard 2026-11-01 and age reference date"
+  },
+  {
+   "key": "preseason",
+   "file": "scripts/cbb_intl.py",
+   "rx": "^SEASON = (\\d{4})",
+   "off": 0,
+   "auto": 1,
+   "mode": "int"
+  },
+  {
+   "key": "season",
+   "file": "scripts/cbb_live.py",
+   "rx": "^SEASON = (\\d{4})",
+   "off": 0,
+   "auto": 0,
+   "mode": "int",
+   "why": "guard date 2026-11-04"
+  },
+  {
+   "key": "season",
+   "file": "scripts/cbb_games_live.py",
+   "rx": "^SEASON = (\\d{4})",
+   "off": 0,
+   "auto": 0,
+   "mode": "int",
+   "why": "needs last season final state from cbb_games --fit"
+  },
+  {
+   "key": "season",
+   "file": "scripts/cbb_lineups.py",
+   "rx": "^LIVE_SEASON = (\\d{4})",
+   "off": 0,
+   "auto": 1,
+   "mode": "int"
+  },
+  {
+   "key": "season",
+   "file": "scripts/cbb_lowdiv.py",
+   "rx": "^LIVE = (\\d{4})",
+   "off": 0,
+   "auto": 1,
+   "mode": "int"
+  },
+  {
+   "key": "season",
+   "file": "scripts/cbb_bracket_matrix.py",
+   "rx": "^SEASON = (\\d{4})",
+   "off": 0,
+   "auto": 1,
+   "mode": "int"
+  },
+  {
+   "key": "now_class",
+   "file": "scripts/cbb_recruit_fit.py",
+   "rx": "^NOW_CLASS = (\\d{4})",
+   "off": 0,
+   "auto": 1,
+   "mode": "int"
+  }
+ ]
+}

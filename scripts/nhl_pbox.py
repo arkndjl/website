@@ -54,7 +54,7 @@ def num(s):
 
 
 def season(d):
-    return d.year + 1 if d.month >= 8 else d.year
+    return D.current_season(d)          # one rollover rule (Aug 1) for every NHL script
 
 
 def day(d):

@@ -9,7 +9,7 @@ check in ops/odds-cron/worker.js (same issue titles, so the two can coexist).
     python3 scripts/data_health.py runs [--dry]      # every watched workflow's latest run: close recovered red runs
     python3 scripts/data_health.py deploy [--dry]    # is arkndjl.net serving main? (Cloudflare stuck or failing)
     python3 scripts/data_health.py report            # print every feed's age and limit (no GitHub calls)
-    python3 scripts/data_health.py rollover [--dry]  # season constants that the calendar has passed (ROLLOVER)
+    python3 scripts/data_health.py rollover [--dry]  # season calendar steps past their date and not done (season_roll.py)
     python3 scripts/data_health.py injuries [report] [--dry]   # each sport's injury sources and snapshot (INJ)
     python3 scripts/data_health.py test              # self-check, no GitHub calls
 
@@ -25,10 +25,9 @@ Alerts are GitHub issues (label data-alert), which notify the repo owner by mail
   "stale injuries: <sport>"  in season, RotoWire's injury news for the sport, the model's injury snapshot or one of
                           its sources has gone quiet (INJ). Dispatches odds-snap (news) or the sport's workflow.
   "deploy stuck"          main has a commit older than 90 minutes that the live site still doesn't serve.
-  "season rollover: <x>"  a season constant (ROLLOVER below) is behind the calendar. The yearly rollover carries
-                          more than the constant (new draft-year URLs, frozen priors, FV weights by year), so it is
-                          flagged for a build thread, not flipped blind; the data would otherwise stay fresh-looking
-                          while describing last season.
+  "season rollover: <id>" a season calendar step (data/seasons/<sport>.json) is two days past its date and not
+                          done: the season-roll runner failed, or the step needs a hand job (new source ids, a
+                          freeze). Opened by the runner itself too; closes once the step is in data/season_state.json.
 
 Repair (Nov 19 2026, Noah: "fix all stale feeds and set up ways to autofix them"):
   - a red run's failed log is classified first (classify): a network, rate-limit, 5xx or push-race failure reruns its
@@ -270,46 +269,34 @@ def hours_since(iso):
 MARK = '<!-- last-dispatch: '
 
 
-# season constants: (label, file, regex for the constant, expected value from the date)
-ROLLOVER = [
-    ('cfb season', 'scripts/fetch_cfb.mjs', r'const SEASON = (\d{4});', lambda d: d.year if d.month >= 8 else d.year - 1),
-    ('cfb teams season', 'scripts/cfb_teams.mjs', r'const SEASON = (\d{4});', lambda d: d.year if d.month >= 8 else d.year - 1),
-    ('cfb coaching season', 'scripts/cfb_coach.mjs', r'const SEASON = (\d{4});', lambda d: d.year if d.month >= 8 else d.year - 1),
-    ('cbb season', 'scripts/cbb_live.py', r'^SEASON = (\d{4})', lambda d: d.year + 1 if d.month >= 10 else d.year),
-    ('cbb games season', 'scripts/cbb_games_live.py', r'^SEASON = (\d{4})', lambda d: d.year + 1 if d.month >= 10 else d.year),
-    ('cbb preseason board', 'scripts/fetch_cbb.py', r'^SEASON = (\d{4})', lambda d: d.year + 1 if d.month >= 8 else d.year),
-    ('cbb internationals', 'scripts/cbb_intl.py', r'^SEASON = (\d{4})', lambda d: d.year + 1 if d.month >= 8 else d.year),
-    ('cbb draft boards', 'scripts/cbb_boards.py', r'^YEAR = (\d{4})', lambda d: d.year + 1 if d.month >= 7 else d.year),
-    ('cbb lineups season', 'scripts/cbb_lineups.py', r'^LIVE_SEASON = (\d{4})', lambda d: d.year + 1 if d.month >= 10 else d.year),
-    ('cbb low divisions season', 'scripts/cbb_lowdiv.py', r'^LIVE = (\d{4})', lambda d: d.year + 1 if d.month >= 10 else d.year),
-    ('cbb recruit class', 'scripts/cbb_recruit_fit.py', r'^NOW_CLASS = (\d{4})', lambda d: d.year if d.month >= 10 else d.year - 1),
-    # the live draft class: past classes run to the year before it, and it turns over after the late-June draft
-    ('hockey draft class', 'scripts/hockey_prospects.py', r'for y in range\(FIRST, (\d{4})\)', lambda d: d.year + 1 if d.month >= 7 else d.year),
-    ('hockey draft class (rank fit)', 'scripts/hockey_prospects.py', r'for y0 in range\(FIRST, (\d{4})\)', lambda d: d.year + 1 if d.month >= 7 else d.year),
-]
-
-
+# season rollovers (Nov 28 2026): the calendar in data/seasons/<sport>.json and its runner scripts/season_roll.py
+# (season-roll workflow) carry out every transition on its date and record it in data/season_state.json. This check is
+# the backstop: a step two days past its date and still not done (the runner is red, or a hand step is waiting) gets
+# "season rollover: <step id>", the same title the runner uses, so there is one issue per step. It closes once done.
 def check_rollover(now=NOW):
-    import re
+    sys.path.insert(0, HERE)
+    import season as SN
+    try:
+        done = json.load(open(os.path.join(ROOT, 'data', 'season_state.json'))).get('done', {})
+    except (OSError, ValueError):
+        done = {}
+    day = now.date() - dt.timedelta(days=2)
     out = []
-    for label, f, rx, want in ROLLOVER:
-        try:
-            m = re.search(rx, open(os.path.join(ROOT, f)).read(), re.M)
-        except OSError:
-            continue
-        if m and int(m.group(1)) < want(now):
-            out.append((label, f, int(m.group(1)), want(now)))
+    for sport, c in SN.load().items():
+        for st in c.get('steps', []):
+            if st['id'] not in done and dt.date.fromisoformat(st['on']) <= day:
+                out.append((st['id'], sport, st['on'], st.get('t', '')))
     return out
 
 
 def cmd_rollover():
     due = check_rollover()
     issues = open_issues()
-    for label, f, have, want in due:
-        print(f'{label}: {f} says {have}, the calendar says {want}')
-        if not find(issues, f'season rollover: {label}'):
-            open_issue(f'season rollover: {label}', f'`{f}` still builds the {have} season; by the calendar it is {want}. '
-                       f'Roll the season over (constant, draft-year sources, frozen priors), then this issue closes itself.')
+    for sid, sport, on, t in due:
+        print(f'{sid}: due {on}, not done ({t})')
+        if not find(issues, f'season rollover: {sid}'):
+            open_issue(f'season rollover: {sid}', f'{t}: due {on} in `data/seasons/{sport}.json` and still not done. '
+                       f'See the season roll workflow log (scripts/season_roll.py); this issue closes once the step is done.')
     for i in issues:
         if i['title'].startswith('season rollover: ') and i['title'][17:] not in {d[0] for d in due}:
             close_issue(i, 'Rolled over.')
@@ -481,7 +468,7 @@ WATCH = ['cbb board', 'cbb boards', 'cbb recruits', 'cfb board', 'cs2', 'esea se
          'model refits', 'build gate', 'wave', 'awards', 'cfb recruits', 'cs2 ark loop', 'esea research',
          'process refresh', 'recruit leans', 'recruit news', 'rotowire history', 'search index', 'site stats',
          'soccer extra', 'soccer intl', 'cbb bracket matrix', 'cs2 market log', 'darko log', 'dratings log',
-         'nhl lineups log']
+         'nhl lineups log', 'season roll']
 RED = ('failure', 'timed_out', 'startup_failure')
 RED_WORD = {'failure': 'failed', 'timed_out': 'timed out', 'startup_failure': 'failed to start',
             'cancelled': 'was cancelled by a job time limit'}
@@ -685,12 +672,9 @@ def cmd_test():
         if sp.get('fallback'):
             y = open(os.path.join(ROOT, '.github', 'workflows', sp['workflow'])).read()
             assert all(re.search(rf'^\s+{re.escape(x)}:\s*$', y, re.M) for x in sp['fallback']), (k, sp['fallback'])
-    # rollover rules: every constant is found, none due today, each due a year on
-    for label, f, rx, want in ROLLOVER:
-        assert re.search(rx, open(os.path.join(ROOT, f)).read(), re.M), (label, 'constant not found')
-    assert not check_rollover(NOW), check_rollover(NOW)
+    # rollover backstop: reads the season calendar; a date a year on finds steps due
     later = NOW.replace(year=NOW.year + 1)
-    assert len(check_rollover(later)) == len(ROLLOVER), [x[0] for x in ROLLOVER if x[0] not in {y[0] for y in check_rollover(later)}]
+    assert len(check_rollover(later)) > len(check_rollover(NOW)), 'season calendar steps'
     # every injury check names a sport in data/freshness.json and a snapshot with a stamp
     for k, sp in check_injuries().items():
         assert k in json.load(open(os.path.join(ROOT, 'data', 'freshness.json')))['sports'], k

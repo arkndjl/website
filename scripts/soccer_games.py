@@ -1698,15 +1698,25 @@ def post_pairs(L, lg, teams, groups, seat, dl, pts, gd, gf, rng, share, knobs):
 
 
 # --- UEFA: league phase, then the knockout bracket
-def tie(L, hi, lo, rng, n, dl, ix, venue_rows):
+KO_ROUNDS = ('po', 'r16', 'qf', 'sf', 'fin')
+KO_SIZE = {'po': 8, 'r16': 8, 'qf': 4, 'sf': 2, 'fin': 1}
+KO_REACH = {'r16': 'r16', 'qf': 'qf', 'sf': 'sf', 'fin': 'fin'}     # entrants of a round -> the reach odds key
+
+
+def tie(L, hi, lo, rng, n, dl, ix, venue_rows, leg1=None):
     """two-legged ties, n sims: lo hosts leg 1, hi (better league-phase rank) leg 2; extra time at hi, then
-    penalties as a coin flip. hi, lo: arrays of club indices (n). Returns the winner index array"""
+    penalties as a coin flip; no away goals. hi, lo: arrays of club indices (n). leg1: (lo goals, hi goals) when the
+    first leg has been played (only leg 2 is drawn). Returns the winner index array"""
     lam = venue_rows
     lh1, la1 = lam(lo, hi)              # leg 1: lo at home
     lh2, la2 = lam(hi, lo)              # leg 2: hi at home
     s1 = (dl[np.arange(n), lo] - dl[np.arange(n), hi]) / (2 * GPM)
-    g_lo = rng.poisson(lh1 * np.exp(s1)) + rng.poisson(la2 * np.exp(s1))
-    g_hi = rng.poisson(la1 * np.exp(-s1)) + rng.poisson(lh2 * np.exp(-s1))
+    if leg1 is None:
+        g_lo = rng.poisson(lh1 * np.exp(s1)) + rng.poisson(la2 * np.exp(s1))
+        g_hi = rng.poisson(la1 * np.exp(-s1)) + rng.poisson(lh2 * np.exp(-s1))
+    else:
+        g_lo = leg1[0] + rng.poisson(la2 * np.exp(s1))
+        g_hi = leg1[1] + rng.poisson(lh2 * np.exp(-s1))
     lvl = g_lo == g_hi
     e_hi = rng.poisson(lh2 * np.exp(-s1) / 3); e_lo = rng.poisson(la2 * np.exp(s1) / 3)
     pen = rng.random(n) < 0.5
@@ -1723,9 +1733,209 @@ def final(L, x, y, rng, n, dl, lamn):
     return np.where((gx > gy) | ((gx == gy) & ((ex_ > ey) | ((ex_ == ey) & pen))), x, y)
 
 
+def ko_start(S):
+    """the league phase ends in late January; a cup match from February 1 on is a knockout match"""
+    return f'{S}-02-01'
+
+
+def ko_round(r):
+    """ESPN's series title or season slug -> po / r16 / qf / sf / fin; a knockout match with neither and no leg is
+    the final"""
+    s = f"{r.get('ser') or ''} {r.get('slug') or ''}".lower().replace('-', ' ')
+    if 'playoff' in s or 'play off' in s:
+        return 'po'
+    if '16' in s:
+        return 'r16'
+    if 'quarter' in s:
+        return 'qf'
+    if 'semi' in s:
+        return 'sf'
+    if 'final' in s or not r.get('leg'):
+        return 'fin'
+    return None
+
+
+def lp_order(played, teams):
+    """final league-phase table, UEFA's order: points, goal difference, goals, away goals, wins, away wins, then the
+    opponents' points, goal difference and goals"""
+    T = {t: dict(p=0, gd=0, gf=0, agf=0, w=0, aw=0, opp=[]) for t in teams}
+    for r in played:
+        for t, o, gf, ga, away in ((r['h'], r['a'], r['hs'], r['as'], 0), (r['a'], r['h'], r['as'], r['hs'], 1)):
+            x = T[t]
+            x['p'] += 3 if gf > ga else 1 if gf == ga else 0
+            x['gd'] += gf - ga; x['gf'] += gf; x['opp'].append(o)
+            if gf > ga:
+                x['w'] += 1; x['aw'] += away
+            if away:
+                x['agf'] += gf
+    def key(t):
+        x = T[t]
+        return (x['p'], x['gd'], x['gf'], x['agf'], x['w'], x['aw'], sum(T[o]['p'] for o in x['opp']),
+                sum(T[o]['gd'] for o in x['opp']), sum(T[o]['gf'] for o in x['opp']))
+    return sorted(teams, key=lambda t: (tuple(-v for v in key(t)), t))
+
+
+def ko_ties(rows, ok):
+    """the knockout ties ESPN lists, by round: {round: [tie]}; tie = {lo (leg-1 host, or the final's home side), hi,
+    leg1: (lo, hi goals) once leg 1 is played, agg: (lo, hi) on the legs played, pen: (lo, hi) after a shoot-out,
+    w: the winner once decided}. Ties with a side outside ok (a placeholder) are left out"""
+    by = defaultdict(list)
+    for r in rows:
+        k = ko_round(r)
+        if k:
+            by[(k, frozenset((r['h'], r['a'])))].append(r)
+    out = defaultdict(list)
+    for (k, pair), legs in sorted(by.items(), key=lambda kv: (KO_ROUNDS.index(kv[0][0]), min(r['day'] for r in kv[1]))):
+        if len(pair) != 2 or not pair <= ok:
+            continue
+        legs.sort(key=lambda r: (r.get('leg') or 0, r['day']))
+        f = legs[0]
+        t = {'lo': f['h'], 'hi': f['a'], 'leg1': None, 'agg': None, 'pen': None, 'w': None}
+        if k == 'fin':
+            if f.get('hs') is not None:
+                t['agg'] = (f['hs'], f['as'])
+                if f.get('hp') is not None and f['hp'] != f['ap']:
+                    t['pen'] = (f['hp'], f['ap'])
+                hw = f['hs'] > f['as'] or f['hs'] == f['as'] and (t['pen'][0] > t['pen'][1] if t['pen'] else bool(f.get('hw')))
+                t['w'] = f['h'] if hw else f['a']
+            out[k].append(t)
+            continue
+        if f.get('hs') is None:
+            out[k].append(t)
+            continue
+        t['leg1'] = t['agg'] = (f['hs'], f['as'])
+        s = legs[1] if len(legs) > 1 else None
+        if s is not None and s.get('hs') is not None and s['h'] == t['hi']:
+            lo_g, hi_g = f['hs'] + s['as'], f['as'] + s['hs']
+            t['agg'] = (lo_g, hi_g)
+            if s.get('hp') is not None and s['hp'] != s['ap']:
+                t['pen'] = (s['ap'], s['hp'])
+            if lo_g != hi_g:
+                t['w'] = t['lo'] if lo_g > hi_g else t['hi']
+            elif t['pen']:
+                t['w'] = t['lo'] if t['pen'][0] > t['pen'][1] else t['hi']
+            else:
+                t['w'] = t['hi'] if s.get('hw') else t['lo']
+        out[k].append(t)
+    return dict(out)
+
+
+def ko_plan(order, real=None):
+    """the knockout tree from the league-phase order (club ids, 1st first) and the ties ESPN lists (ko_ties). A round
+    uses the real pairings once all its ties are listed and every side in them won a decided tie of the round
+    before (or has a bye); otherwise UEFA's seeding: play-off 9-16 v 17-24 (9 v 24, 10 v 23 shown; drawn within each
+    seeding pair in the sims), 1/2 v the 15-18 winners, 3/4 v 13-14/19-20, 5/6 v 11-12/21-22, 7/8 v 9-10/23-24, then
+    1/2 v 7/8 and 3/4 v 5/6 in each half. Nodes: {r, src: [a, b] (('t', club) or ('n', node)), key (best seed index
+    the tie can hold), grp (a pair of nodes whose b sides are drawn), tie (the real tie or None), kids}"""
+    real = real or {}
+    seed = {t: i for i, t in enumerate(order)}
+    nodes, rounds = [], {}
+
+    def add(r, a, b, key, grp=None, tie_=None, kids=()):
+        nodes.append({'r': r, 'src': [a, b], 'key': key, 'grp': grp, 'tie': tie_, 'kids': list(kids)})
+        return len(nodes) - 1
+
+    def from_real(r, prev, byes):
+        """real ties of round r, or None when they can't stand in for the drawn pairing yet"""
+        ts = real.get(r) or []
+        if len(ts) != KO_SIZE[r]:
+            return None
+        came = {t: (None, seed.get(t, 99)) for t in byes}
+        for i in prev:
+            if nodes[i]['tie'] is None or nodes[i]['tie']['w'] is None:
+                return None
+            came[nodes[i]['tie']['w']] = (i, nodes[i]['key'])
+        if any(t not in came for x in ts for t in (x['lo'], x['hi'])):
+            return None
+        out = []
+        for x in ts:
+            a, b = sorted((x['lo'], x['hi']), key=lambda t: came[t][1])
+            out.append(add(r, ('t', a), ('t', b), came[a][1], tie_=x, kids=[k for k in (came[a][0], came[b][0]) if k is not None]))
+        return out
+
+    po = None
+    if len(real.get('po') or []) == KO_SIZE['po']:
+        po = []
+        for x in real['po']:
+            a, b = sorted((x['lo'], x['hi']), key=lambda t: seed.get(t, 99))
+            po.append(add('po', ('t', a), ('t', b), seed.get(a, 99), tie_=x))
+    if po is None:
+        po = []
+        for k in range(4):
+            a, b = 8 + 2 * k, 23 - 2 * k
+            po.append(add('po', ('t', order[a]), ('t', order[b]), a, grp=('po', k)))
+            po.append(add('po', ('t', order[a + 1]), ('t', order[b - 1]), a + 1, grp=('po', k)))
+    rounds['po'] = po
+    r16 = from_real('r16', po, order[:8])
+    if r16 is None:
+        ps = sorted(po, key=lambda i: nodes[i]['key'])
+        r16 = []
+        for k in range(4):
+            g = ps[2 * (3 - k): 2 * (3 - k) + 2]
+            for j in range(2):
+                r16.append(add('r16', ('t', order[2 * k + j]), ('n', g[j]), 2 * k + j, grp=('r16', k), kids=[g[j]]))
+    rounds['r16'] = r16
+    qf = from_real('qf', r16, [])
+    if qf is None:
+        qf = []
+        rs = sorted(r16, key=lambda i: nodes[i]['key'])
+        for h in (0, 1):
+            hv = rs[h::2]
+            for x, y in ((hv[0], hv[3]), (hv[1], hv[2])):
+                qf.append(add('qf', ('n', x), ('n', y), min(nodes[x]['key'], nodes[y]['key']), kids=[x, y]))
+    rounds['qf'] = qf
+    sf = from_real('sf', qf, [])
+    if sf is None:
+        qs = sorted(qf, key=lambda i: nodes[i]['key'])
+        sf = [add('sf', ('n', qs[h]), ('n', qs[h + 2]), nodes[qs[h]]['key'], kids=[qs[h], qs[h + 2]]) for h in (0, 1)]
+    rounds['sf'] = sf
+    fin = from_real('fin', sf, [])
+    if fin is None:
+        fin = [add('fin', ('n', sf[0]), ('n', sf[1]), 0, kids=list(sf))]
+    rounds['fin'] = fin
+    return nodes, rounds
+
+
+def ko_sim(L, plan, ix, pos, rng, n, dl, lam, lamn, reach):
+    """every knockout tie in n sims on a fixed league-phase order: decided ties keep their winner, a tie with leg 1
+    played draws leg 2 only, the rest are drawn whole. Adds round entrants and the winner to reach"""
+    nodes, rounds = plan
+    ar = np.arange(n)
+    W = {}
+
+    def side(s):
+        return np.full(n, ix[s[1]]) if s[0] == 't' else W[s[1]]
+    for r in KO_ROUNDS:
+        A = {i: side(nodes[i]['src'][0]) for i in rounds[r]}
+        B = {i: side(nodes[i]['src'][1]) for i in rounds[r]}
+        grp = defaultdict(list)
+        for i in rounds[r]:
+            if nodes[i]['grp'] is not None:
+                grp[nodes[i]['grp']].append(i)
+        for g in grp.values():
+            if len(g) == 2:
+                sw = rng.random(n) < 0.5
+                B[g[0]], B[g[1]] = np.where(sw, B[g[1]], B[g[0]]), np.where(sw, B[g[0]], B[g[1]])
+        for i in rounds[r]:
+            if r in KO_REACH:
+                np.add.at(reach[KO_REACH[r]], A[i], 1); np.add.at(reach[KO_REACH[r]], B[i], 1)
+            t = nodes[i]['tie']
+            if t is not None and t['w'] is not None:
+                W[i] = np.full(n, ix[t['w']])
+            elif r == 'fin':
+                W[i] = final(L, A[i], B[i], rng, n, dl, lamn)
+            elif t is not None:
+                W[i] = tie(L, np.full(n, ix[t['hi']]), np.full(n, ix[t['lo']]), rng, n, dl, ix, lam, leg1=t['leg1'])
+            else:
+                better = pos[ar, A[i]] < pos[ar, B[i]]
+                W[i] = tie(L, np.where(better, A[i], B[i]), np.where(better, B[i], A[i]), rng, n, dl, ix, lam)
+    np.add.at(reach['win'], W[rounds['fin'][0]], 1)
+
+
 def uefa_odds(L, lg, S, rng, n=SIMS):
     rs = [r for r in L.rows if r['lg'] == lg and D.season_of(r['day'], lg) == S]
-    lp = [r for r in rs if (r.get('slug') or '').startswith('league') or r.get('slug') is None and not r.get('leg')]
+    lp = [r for r in rs if r['day'] < ko_start(S) and not r.get('leg') and not r.get('ser')
+          and ((r.get('slug') or '').startswith('league') or r.get('slug') is None)]
     if not lp:
         return None
     teams = sorted({r['h'] for r in lp} | {r['a'] for r in lp})
@@ -1739,6 +1949,10 @@ def uefa_odds(L, lg, S, rng, n=SIMS):
     gh, ga = sim_matches(L, fx, teams, rng, n, share)
     pos, pts, gd = rank_sim(teams, T0, fx, gh, ga, rng)
     nt = len(teams)
+    done = not fx                               # league phase over: the real table, then the real ties as they come
+    if done:
+        order = lp_order(played, teams)
+        pos = np.tile(np.array([order.index(t) for t in teams]), (n, 1))
     # the same strength draws in the knockouts (a fresh draw: the sims are independent of sim_matches' draws but
     # each club keeps one strength through its run)
     dl = rng.normal(0.0, rate_sd(share), (n, nt))
@@ -1754,45 +1968,52 @@ def uefa_odds(L, lg, S, rng, n=SIMS):
     seat = np.argsort(pos, axis=1)              # seat[s, k] = club finishing k-th (0-based)
     reach = {k: np.zeros(nt) for k in ('ko', 'top8', 'r16', 'qf', 'sf', 'fin', 'win')}
     ar = np.arange(n)
-    # knockout play-off: seeds 9-16 (one of each pair) against 17-24, pairs fixed by UEFA's bracket
-    po_winner = {}
-    for k, (p_hi, p_lo) in enumerate((((8, 9), (22, 23)), ((10, 11), (20, 21)), ((12, 13), (18, 19)), ((14, 15), (16, 17)))):
-        h1, h2 = seat[:, p_hi[0]], seat[:, p_hi[1]]
-        l1, l2 = seat[:, p_lo[0]], seat[:, p_lo[1]]
-        sw = rng.random(n) < 0.5
-        a1, a2 = np.where(sw, l1, l2), np.where(sw, l2, l1)
-        po_winner[k] = (tie(L, h1, a1, rng, n, dl, ix, lam), tie(L, h2, a2, rng, n, dl, ix, lam))
-    # round of 16: seeds 1/2 v play-off winners from 15-18, 3/4 v 13-14/19-20, 5/6 v 11-12/21-22, 7/8 v 9-10/23-24
-    halves = [[], []]
-    for k, (s1, s2) in enumerate(((0, 1), (2, 3), (4, 5), (6, 7))):
-        w1, w2 = po_winner[3 - k]
-        sw = rng.random(n) < 0.5
-        o1, o2 = np.where(sw, w1, w2), np.where(sw, w2, w1)
-        halves[0].append(tie(L, seat[:, s1], o1, rng, n, dl, ix, lam))
-        halves[1].append(tie(L, seat[:, s2], o2, rng, n, dl, ix, lam))
-    rank_of = pos                                   # better rank hosts the second leg
-    def ko(x, y):
-        hi_ = np.where(rank_of[ar, x] < rank_of[ar, y], x, y); lo_ = np.where(rank_of[ar, x] < rank_of[ar, y], y, x)
-        return tie(L, hi_, lo_, rng, n, dl, ix, lam)
-    sf = []
-    for hv in halves:
-        q1, q2 = ko(hv[0], hv[3]), ko(hv[1], hv[2])     # 1/2 v 7/8, 3/4 v 5/6
-        for q in (hv[0], hv[1], hv[2], hv[3]):
-            np.add.at(reach['qf'], q, 1)
-        np.add.at(reach['sf'], q1, 1); np.add.at(reach['sf'], q2, 1)
-        sf.append(ko(q1, q2))
-    for f in sf:
-        np.add.at(reach['fin'], f, 1)
-    np.add.at(reach['win'], final(L, sf[0], sf[1], rng, n, dl, lamn), 1)
+    plan = None
+    if done:
+        real = ko_ties([r for r in rs if r['day'] >= ko_start(S)], set(order[:24]))
+        plan = ko_plan(order, real)
+        ko_sim(L, plan, ix, pos, rng, n, dl, lam, lamn, reach)
+    else:
+        # knockout play-off: seeds 9-16 (one of each pair) against 17-24, pairs fixed by UEFA's bracket
+        po_winner = {}
+        for k, (p_hi, p_lo) in enumerate((((8, 9), (22, 23)), ((10, 11), (20, 21)), ((12, 13), (18, 19)), ((14, 15), (16, 17)))):
+            h1, h2 = seat[:, p_hi[0]], seat[:, p_hi[1]]
+            l1, l2 = seat[:, p_lo[0]], seat[:, p_lo[1]]
+            sw = rng.random(n) < 0.5
+            a1, a2 = np.where(sw, l1, l2), np.where(sw, l2, l1)
+            po_winner[k] = (tie(L, h1, a1, rng, n, dl, ix, lam), tie(L, h2, a2, rng, n, dl, ix, lam))
+        # round of 16: seeds 1/2 v play-off winners from 15-18, 3/4 v 13-14/19-20, 5/6 v 11-12/21-22, 7/8 v 9-10/23-24
+        halves = [[], []]
+        for k, (s1, s2) in enumerate(((0, 1), (2, 3), (4, 5), (6, 7))):
+            w1, w2 = po_winner[3 - k]
+            sw = rng.random(n) < 0.5
+            o1, o2 = np.where(sw, w1, w2), np.where(sw, w2, w1)
+            halves[0].append(tie(L, seat[:, s1], o1, rng, n, dl, ix, lam))
+            halves[1].append(tie(L, seat[:, s2], o2, rng, n, dl, ix, lam))
+        rank_of = pos                                   # better rank hosts the second leg
+        def ko(x, y):
+            hi_ = np.where(rank_of[ar, x] < rank_of[ar, y], x, y); lo_ = np.where(rank_of[ar, x] < rank_of[ar, y], y, x)
+            return tie(L, hi_, lo_, rng, n, dl, ix, lam)
+        sf = []
+        for hv in halves:
+            q1, q2 = ko(hv[0], hv[3]), ko(hv[1], hv[2])     # 1/2 v 7/8, 3/4 v 5/6
+            for q in (hv[0], hv[1], hv[2], hv[3]):
+                np.add.at(reach['qf'], q, 1)
+            np.add.at(reach['sf'], q1, 1); np.add.at(reach['sf'], q2, 1)
+            sf.append(ko(q1, q2))
+        for f in sf:
+            np.add.at(reach['fin'], f, 1)
+        np.add.at(reach['win'], final(L, sf[0], sf[1], rng, n, dl, lamn), 1)
+        for w1, w2 in po_winner.values():
+            np.add.at(reach['r16'], w1, 1); np.add.at(reach['r16'], w2, 1)
     for k in range(24):
         np.add.at(reach['ko'], seat[:, k], 1)
     for k in range(8):
         np.add.at(reach['top8'], seat[:, k], 1)
-    for w1, w2 in po_winner.values():
-        np.add.at(reach['r16'], w1, 1); np.add.at(reach['r16'], w2, 1)
-    reach['r16'] += reach['top8']
+    if not done:
+        reach['r16'] += reach['top8']
     try:
-        uefa_bracket(L, lg, teams, seat, reach, n)
+        uefa_bracket(L, lg, teams, seat, reach, n, plan)
     except Exception as e:            # the bracket keeps its last file rather than stop the build
         print(f'{lg} bracket failed:', repr(e), flush=True)
     out = {}
@@ -1809,10 +2030,11 @@ def uefa_odds(L, lg, S, rng, n=SIMS):
     return {'teams': out, 'left': len(fx), 'games': len(lp), 'cut': cut}
 
 
-def uefa_bracket(L, lg, teams, seat, reach, n):
-    """data/brackets/<ucl|uel|uecl>.json: league-phase place odds 1-24 and the projected knockout bracket (scripts/
-    bracket.py). The play-off and round-of-16 pairs within each seeding pair are drawn; shown as 9 v 24, 10 v 23 and
-    1 v the 15-18 tie's first winner, 2 v its second"""
+def uefa_bracket(L, lg, teams, seat, reach, n, plan=None):
+    """data/brackets/<ucl|uel|uecl>.json: league-phase place odds 1-24 and the knockout bracket (scripts/bracket.py),
+    from ko_plan: the projected order while the league phase runs, the real table and the listed ties after. Drawn
+    pairs are shown as 9 v 24, 10 v 23 and 1 v the 15-18 tie's first winner, 2 v its second. A decided tie has dec 1,
+    w its winner and agg the aggregate (a, b; pen the shoot-out); agg alone = leg 1 played"""
     import bracket as BK
     tal = BK.Tally({'League phase': 24}, ['ko'])
     tal.n = n
@@ -1826,29 +2048,33 @@ def uefa_bracket(L, lg, teams, seat, reach, n):
     seed = {t: i + 1 for i, t in enumerate(P)}
     odds = {t: {k: round(float(reach[k][i] / n), 3) for k in ('ko', 'top8', 'r16', 'qf', 'sf', 'fin', 'win')} for i, t in enumerate(teams)}
     odds = {t: o for t, o in odds.items() if o['ko'] >= 0.005 or t in seed}
-    po = []                                          # (9 v 24, 10 v 23), (11 v 22, 12 v 21), (13 v 20, 14 v 19), (15 v 18, 16 v 17)
-    for k in range(4):
-        a, b = 8 + 2 * k, 23 - 2 * k
-        po.append((BK.game(P[a], P[b], seed, odds, 'ko', 'r16'), BK.game(P[a + 1], P[b - 1], seed, odds, 'ko', 'r16')))
-    halves, hg = [[], []], [[], []]
-    for k in range(4):                              # 1/2 v the 15-18 winners, 3/4 v 13-14/19-20, 5/6 v 11-12/21-22, 7/8 v 9-10/23-24
-        g1, g2 = po[3 - k]
-        for h, (st, g) in enumerate(((2 * k, g1), (2 * k + 1, g2))):
-            gm = BK.game(P[st], g['w'], seed, odds, 'r16', 'qf')
-            halves[h].append(gm['w']); hg[h].append((gm, g))
-    # listed in tree order (each quarterfinal's two ties together): 1, 7, 3, 5 then 2, 8, 4, 6
-    tree = [hg[h][k] for h in (0, 1) for k in (0, 3, 1, 2)]
-    r16, pol = [x[0] for x in tree], [x[1] for x in tree]
-    qf, sfs = [], []
-    for hv in halves:
-        q = [BK.game(hv[0], hv[3], seed, odds, 'qf', 'sf'), BK.game(hv[1], hv[2], seed, odds, 'qf', 'sf')]
-        qf += q
-        sfs.append(BK.game(q[0]['w'], q[1]['w'], seed, odds, 'sf', 'fin'))
-    fg = BK.game(sfs[0]['w'], sfs[1]['w'], seed, odds, 'fin', 'win')
-    secs = [{'name': 'Knockouts', 'rounds': [
-        {'name': 'Play-off', 'games': pol}, {'name': 'Round of 16', 'games': r16},
-        {'name': 'Quarterfinals', 'games': qf}, {'name': 'Semifinals', 'games': sfs}, {'name': 'Final', 'games': [fg]}],
-        'champ': {'t': fg['w'], 'p': odds[fg['w']]['win']}}]
+    nodes, rounds = plan or ko_plan(P)
+    nxt = {'po': ('ko', 'r16'), 'r16': ('r16', 'qf'), 'qf': ('qf', 'sf'), 'sf': ('sf', 'fin'), 'fin': ('fin', 'win')}
+    G = {}
+    for r in KO_ROUNDS:
+        for i in rounds[r]:
+            nd = nodes[i]
+            a, b = (s[1] if s[0] == 't' else G[s[1]]['w'] for s in nd['src'])
+            g = BK.game(a, b, seed, odds, *nxt[r])
+            t = nd['tie']
+            if t is not None:
+                flip = t['lo'] != a                    # agg is (lo, hi): turn it to (a, b)
+                if t['agg'] is not None:
+                    g['agg'] = list(t['agg'][::-1] if flip else t['agg'])
+                if t['pen'] is not None:
+                    g['pen'] = list(t['pen'][::-1] if flip else t['pen'])
+                if t['w'] is not None:
+                    g['w'], g['dec'] = t['w'], 1
+            G[i] = g
+    # listed in tree order (each next-round tie's two feeders together): 1, 7, 3, 5 then 2, 8, 4, 6
+    order = {'fin': rounds['fin']}
+    for r, up in (('sf', 'fin'), ('qf', 'sf'), ('r16', 'qf'), ('po', 'r16')):
+        order[r] = [k for i in order[up] for k in nodes[i]['kids'] if nodes[k]['r'] == r]
+        order[r] += [i for i in rounds[r] if i not in order[r]]
+    names = {'po': 'Play-off', 'r16': 'Round of 16', 'qf': 'Quarterfinals', 'sf': 'Semifinals', 'fin': 'Final'}
+    fg = G[rounds['fin'][0]]
+    secs = [{'name': 'Knockouts', 'rounds': [{'name': names[r], 'games': [G[i] for i in order[r]]} for r in KO_ROUNDS],
+             'champ': {'t': fg['w'], 'p': odds.get(fg['w'], {}).get('win', 0.0)}}]
     nm = {t: {'n': (L.names.get(t) or [t, t])[0], 'a': (L.names.get(t) or [t, t])[1], 'logo': f'/img/soccer/{t}.png'} for t in teams}
     BK.save(D.SHORT.get(lg, lg).lower(), BK.payload(dt.date.today().isoformat(), n, tal, proj, odds, sd, secs,
             [['ko', 'Top 24'], ['top8', 'Top 8'], ['r16', 'R16'], ['qf', 'QF'], ['sf', 'SF'], ['fin', 'Final'], ['win', 'Win']], nm,
@@ -2108,8 +2334,120 @@ def build(days_ahead=4):
     print('wrote', OUT, len(games), 'matches', len(pw), 'clubs', len(txt) // 1024, 'KB')
 
 
+def _ko_test():
+    """python3 scripts/soccer_games.py --ko-test: synthetic league phase and knockout fixtures through uefa_odds,
+    nothing written (the bracket file is caught)"""
+    import bracket as BK
+    teams = [f't{i:02d}' for i in range(36)]
+    lp = []
+    for j in range(1, 5):                          # 8 matches a club, 144 in all
+        for i in range(36):
+            h, a = teams[i], teams[(i + j) % 36]
+            lp.append({'id': f'l{j}{i}', 'lg': 'uefa.champions', 'day': f'2026-{9 + j:02d}-{1 + i % 28:02d}', 'h': h, 'a': a,
+                       'slug': 'league-phase', 'hs': (36 - int(h[1:])) // 9, 'as': (36 - int(a[1:])) // 9})
+
+    class FL:
+        names = {}
+        P = {'rho': -0.04}
+
+        def __init__(self, rows):
+            self.rows = rows
+
+        def lam(self, r):
+            u = (int(r['a'][1:]) - int(r['h'][1:])) / 60
+            return 1.3 * math.exp(u + (0 if r.get('neu') else .12)), 1.3 * math.exp(-u)
+    got = {}
+    save0 = BK.save
+    BK.save = lambda k, p: got.__setitem__(k, p)
+
+    def ko(rnd, lo, hi, l1=None, l2=None, pen=None, day='2027-02-17'):
+        a = {'id': f'{rnd}{lo}', 'lg': 'uefa.champions', 'day': day, 'h': lo, 'a': hi, 'leg': 1, 'ser': rnd, 'slug': None}
+        b = {'id': f'{rnd}{hi}', 'lg': 'uefa.champions', 'day': day[:8] + '25', 'h': hi, 'a': lo, 'leg': 2, 'ser': rnd, 'slug': None}
+        if l1:
+            a['hs'], a['as'] = l1
+        if l2:
+            b['hs'], b['as'] = l2
+            if pen:
+                b['st'], b['hp'], b['ap'] = 'PEN', pen[0], pen[1]
+        return [a, b]
+    try:
+        rng = np.random.default_rng(1)
+        O = lp_order(lp, teams)
+        assert len(O) == 36 and O[0] == 't00'
+        # 1. league phase over, nothing drawn yet: the real table, UEFA's seeding
+        u = uefa_odds(FL(lp), 'uefa.champions', 2027, rng, n=2000)
+        T = u['teams']
+        assert u['left'] == 0 and all(T[t]['top8'] == 1 for t in O[:8]) and all(T[t]['ko'] == 0 for t in O[24:])
+        assert abs(sum(v['win'] for v in T.values()) - 1) < 1e-6 and all(T[t]['r16'] == 1 for t in O[:8])
+        g = got['ucl']['sections'][0]['rounds'][0]['games']
+        assert len(g) == 8 and not any(x.get('dec') for x in g)
+        # 2. the play-off as drawn (9 v 23, 10 v 24, ...): four ties decided (one on penalties), two with leg 1 played
+        pp = [(O[22], O[8]), (O[23], O[9]), (O[20], O[10]), (O[21], O[11]), (O[18], O[12]), (O[19], O[13]), (O[16], O[14]), (O[17], O[15])]
+        P_ = 'Knockout Round Playoffs'
+        po = ko(P_, *pp[0], (3, 0), (1, 0))                  # 23rd through 3-1
+        po += ko(P_, *pp[1], (1, 1), (1, 1), pen=(2, 4))      # level 2-2, 24th through on penalties
+        po += ko(P_, *pp[2], (0, 2), (0, 0))                  # 11th through
+        po += ko(P_, *pp[3], (0, 1), (2, 2))                  # 12th through 3-2
+        po += ko(P_, *pp[4], (0, 6))                          # leg 1 only: 13th 6-0 up
+        po += ko(P_, *pp[5], (6, 0))                          # leg 1 only: 20th 6-0 up
+        for p in pp[6:]:
+            po += ko(P_, *p)
+        tt = ko_ties(po, set(O[:24]))['po']
+        assert [x['w'] for x in tt[:4]] == [O[22], O[23], O[10], O[11]] and tt[1]['pen'] == (4, 2) and tt[1]['agg'] == (2, 2)
+        u = uefa_odds(FL(lp + po), 'uefa.champions', 2027, rng, n=2000)
+        T = u['teams']
+        assert T[O[22]]['r16'] == 1 and T[O[8]]['r16'] == 0 and T[O[23]]['r16'] == 1 and T[O[9]]['r16'] == 0
+        assert T[O[12]]['r16'] > .97 and T[O[19]]['r16'] > .97
+        g = got['ucl']['sections'][0]['rounds'][0]['games']
+        dec = [x for x in g if x.get('dec')]
+        assert len(dec) == 4 and all(x['w'] in (x['a']['t'], x['b']['t']) for x in dec)
+        x = next(x for x in dec if x['a']['t'] == O[9])
+        assert x['agg'] == [2, 2] and x['pen'] == [2, 4] and x['w'] == O[23]
+        # 3. play-off over, the round of 16 listed: 1st knocked out, the rest open; quarterfinals not drawn (UEFA's tree)
+        po = []
+        for lo, hi in pp:
+            po += ko(P_, lo, hi, (0, 1), (1, 0))             # every seeded side through
+        W = [hi for _, hi in pp]
+        rest = [(W[7], O[1]), (W[4], O[2]), (W[5], O[3]), (W[2], O[4]), (W[3], O[5]), (W[0], O[6]), (W[1], O[7])]
+        r16 = ko('Round of 16', W[6], O[0], (2, 0), (0, 1), day='2027-03-10')     # 15th knocks out 1st
+        for lo, hi in rest:
+            r16 += ko('Round of 16', lo, hi, day='2027-03-10')
+        u = uefa_odds(FL(lp + po + r16), 'uefa.champions', 2027, rng, n=2000)
+        T = u['teams']
+        assert T[O[0]]['qf'] == 0 and T[O[0]]['win'] == 0 and T[O[14]]['qf'] == 1
+        assert all(0 < T[hi]['qf'] < 1 for _, hi in rest) and abs(sum(v['win'] for v in T.values()) - 1) < 1e-6
+        R = got['ucl']['sections'][0]['rounds']
+        assert [len(r['games']) for r in R] == [8, 8, 4, 2, 1] and sum(1 for x in R[1]['games'] if x.get('dec')) == 1
+        # 4. everything played: the final decides the cup
+        r16 = ko('Round of 16', W[6], O[0], (2, 0), (0, 1), day='2027-03-10')
+        for lo, hi in rest:
+            r16 += ko('Round of 16', lo, hi, (0, 1), (1, 0), day='2027-03-10')
+        qf = ko('Quarterfinals', O[14], O[6], (0, 0), (0, 0), pen=(5, 4), day='2027-04-07')   # 15th out on penalties
+        qf += ko('Quarterfinals', O[4], O[2], (0, 1), (1, 0), day='2027-04-07')
+        qf += ko('Quarterfinals', O[7], O[1], (0, 1), (1, 0), day='2027-04-07')
+        qf += ko('Quarterfinals', O[5], O[3], (0, 1), (1, 0), day='2027-04-07')
+        sf = ko('Semifinals', O[6], O[2], (0, 1), (1, 0), day='2027-04-28') + ko('Semifinals', O[3], O[1], (2, 0), (0, 1), day='2027-04-28')
+        fin = [{'id': 'f', 'lg': 'uefa.champions', 'day': '2027-06-05', 'h': O[2], 'a': O[3], 'slug': None, 'hs': 1, 'as': 2, 'neu': 1}]
+        u = uefa_odds(FL(lp + po + r16 + qf + sf + fin), 'uefa.champions', 2027, rng, n=500)
+        T = u['teams']
+        assert T[O[3]]['win'] == 1 and T[O[2]]['fin'] == 1 and T[O[1]]['sf'] == 1 and T[O[1]]['fin'] == 0
+        assert T[O[6]]['sf'] == 1 and T[O[14]]['sf'] == 0
+        R = got['ucl']['sections'][0]['rounds']
+        assert all(x.get('dec') for r in R for x in r['games']) and got['ucl']['sections'][0]['champ']['t'] == O[3]
+        assert R[4]['games'][0]['agg'] in ([1, 2], [2, 1])
+        # 5. league phase still running: the projected path as before
+        part = [dict(r, hs=None, **{'as': None}) if r['id'].startswith('l4') else r for r in lp]
+        u = uefa_odds(FL(part), 'uefa.champions', 2027, rng, n=500)
+        assert u['left'] == 36 and abs(sum(v['win'] for v in u['teams'].values()) - 1) < 1e-6
+    finally:
+        BK.save = save0
+    print('uefa knockouts ok')
+
+
 if __name__ == '__main__':
-    if '--hist' in sys.argv:
+    if '--ko-test' in sys.argv:
+        _ko_test()
+    elif '--hist' in sys.argv:
         make_hist()
     elif '--fmxg' in sys.argv:
         patch_fmxg(sys.argv[sys.argv.index('--fmxg') + 1] if len(sys.argv) > sys.argv.index('--fmxg') + 1 else None)

@@ -192,3 +192,16 @@
   place), below zero they are paid more than they are worth (the agency got them paid). zNIL* = (sum + k x mean of all
   represented players) / (n + k), k by method of moments. Recruits count for talent only. GFX: `buildAgency` (one agency) and
   `buildAgencyBoard` (the board), both 16:9.
+
+## Season rollovers (calendar, phases, post days)
+
+- One calendar per sport: `data/seasons/<sport>.json` (league dates `events`, step `keys`: phase, season, draft, class,
+  post, esea...; site `steps`; `bumps` = hard-coded constants that follow a key). Read it through `scripts/season.py` /
+  `scripts/season.mjs` (`--get cfb class` in workflows), never a new month cutoff. Phases: preseason, regular, postseason, offseason.
+- `scripts/season_roll.py` (season-roll workflow, twice a day, catch-up safe) does each step once on its date: archive to
+  `scripts/data/history/<sport>/<season>/`, bump constants (all or none, compiled and tested, put back on failure), run,
+  alert (hand jobs, GitHub issue `lead` days ahead). State in `data/season_state.json`; ARKLOG > calendar shows it all.
+  `python3 scripts/season_roll.py --plan` and `--on DATE --dry` rehearse; `--test` after any calendar change.
+- A new hard-coded season constant goes in its sport's `bumps` (auto 0 when it needs a refit or new ids first). A
+  year-named file a workflow commits uses a glob. Weekly post day = calendar `post` (rank_moves.py, fetch_cfb.mjs).
+- Dates a league hasn't published carry `est: 1`; replace them when announced (NBA Finals/draft, NHL playoffs, ESEA S60...).

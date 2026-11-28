@@ -1,0 +1,128 @@
+{
+ "sport": "cs2",
+ "name": "CS2 / ESEA",
+ "page": "/arkboard/cs2/",
+ "events": [
+  {
+   "d": "2026-10-05",
+   "k": "reg",
+   "t": "ESEA Season 59",
+   "to": "2026-12-20",
+   "src": "https://www.dust2.us/news/68343/esea-releases-2026-calendar"
+  },
+  {
+   "d": "2026-11-25",
+   "k": "post",
+   "t": "ESEA S59 playoffs",
+   "to": "2026-12-20",
+   "est": 1
+  },
+  {
+   "d": "2026-11-25",
+   "k": "major",
+   "t": "PGL Major Singapore",
+   "to": "2026-12-13",
+   "src": "https://dotesports.com/?p=1613040"
+  },
+  {
+   "d": "2027-01-25",
+   "k": "reg",
+   "t": "ESEA Season 60",
+   "est": 1
+  },
+  {
+   "d": "2027-05-31",
+   "k": "major",
+   "t": "FiRe Major Buenos Aires",
+   "to": "2027-06-20",
+   "src": "https://cs.money/blog/esports/where-will-the-cs2-majors-be-held-in-2027/"
+  },
+  {
+   "d": "2027-11-22",
+   "k": "major",
+   "t": "Perfect World Major Shanghai",
+   "to": "2027-12-12",
+   "src": "https://insider-gaming.com/perfect-world-confirm-shanghai-major-2027/"
+  }
+ ],
+ "keys": {
+  "phase": [
+   [
+    "2026-10-05",
+    "regular"
+   ],
+   [
+    "2026-11-25",
+    "postseason"
+   ],
+   [
+    "2026-12-21",
+    "offseason"
+   ],
+   [
+    "2027-01-25",
+    "regular"
+   ]
+  ],
+  "season": [
+   [
+    "2026-01-01",
+    2026
+   ],
+   [
+    "2027-01-01",
+    2027
+   ]
+  ],
+  "esea": [
+   [
+    "2026-10-05",
+    59
+   ],
+   [
+    "2027-01-25",
+    60
+   ]
+  ],
+  "post": [
+   [
+    "2026-01-01",
+    "mon"
+   ]
+  ]
+ },
+ "steps": [
+  {
+   "id": "cs2-archive-esea59",
+   "on": "2026-12-21",
+   "do": "archive",
+   "t": "archive ESEA Season 59",
+   "season": 59,
+   "files": [
+    "data/esea.json",
+    "data/esea_rwa.json",
+    "data/esea_league_log.json"
+   ]
+  },
+  {
+   "id": "cs2-major-ids",
+   "on": "2027-05-31",
+   "do": "alert",
+   "t": "Buenos Aires Major ids for the market and pick'em logs",
+   "lead": 21,
+   "body": "scripts/cs2_events.py MAJORS: add the bo3.gg ids and stage dates for the Buenos Aires Major."
+  },
+  {
+   "id": "cs2-archive-2026",
+   "on": "2026-12-31",
+   "do": "archive",
+   "t": "archive the 2026 CS2 season",
+   "season": 2026,
+   "files": [
+    "data/cs2.json",
+    "data/cs2_players.json",
+    "data/cs2_value.json"
+   ]
+  }
+ ]
+}

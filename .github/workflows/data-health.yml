@@ -4,7 +4,7 @@
 #   - any feed in data/freshness.json passes its limit ("stale data: <sport>"; the sport's workflow is dispatched
 #     on open and at most once a day after), or
 #   - arkndjl.net still serves an older build 90 minutes after a commit to main ("deploy stuck"), or
-#   - a hard-coded season constant is behind the calendar ("season rollover: <x>"), or
+#   - a season calendar step (data/seasons, scripts/season_roll.py) is two days past its date and not done ("season rollover: <step>"), or
 #   - a sport's injury news, injury snapshot or one of its sources goes quiet in season ("stale injuries: <sport>").
 # Repair (Nov 19 2026): a failed run is read from its log and rerun once when the cause is transient; a stale sport's
 # workflow is redispatched 3 h after main moves past its red run, daily otherwise, with the sport's cached-source
@@ -18,7 +18,7 @@ on:
                 odds snap, picks refresh, soccer, soccer prospects, tennis, tennis prospects, model refits, build gate,
                 wave, awards, cfb recruits, cs2 ark loop, esea research, process refresh, recruit leans, recruit news,
                 rotowire history, search index, site stats, soccer extra, soccer intl, cbb bracket matrix,
-                cs2 market log, darko log, dratings log, nhl lineups log]
+                cs2 market log, darko log, dratings log, nhl lineups log, season roll]
     types: [completed]
   schedule:
     - cron: "13 */3 * * *"

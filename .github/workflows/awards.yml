@@ -56,4 +56,4 @@ jobs:
         if: steps.g.outputs.go == 'true'
         run: |
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
-          python3 scripts/data_push.py -m "Update the award races ($(date -u +%Y-%m-%d))" -- data/awards.json scripts/data/ledger/awards_2027.jsonl
+          python3 scripts/data_push.py -m "Update the award races ($(date -u +%Y-%m-%d))" -- data/awards.json "scripts/data/ledger/awards_*.jsonl"
