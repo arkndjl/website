@@ -6,23 +6,24 @@
 {{- $X := site.Data.recruit_extra | default dict -}}
 {{- $vis := index ($X.visits | default dict) $sport | default slice -}}
 {{- $cbx := index ($X.cb | default dict) $sport | default dict -}}
-{{- $all := slice }}{{ range $rows }}{{ $all = $all | append . }}{{ end }}{{ range $vis }}{{ $all = $all | append . }}{{ end -}}
+{{- $fps := index ($X.flips | default dict) $sport | default slice -}}
+{{- $all := slice }}{{ range $rows }}{{ $all = $all | append . }}{{ end }}{{ range $vis }}{{ $all = $all | append . }}{{ end }}{{ range $fps }}{{ $all = $all | append . }}{{ end -}}
 {{- $all = sort $all "d" "desc" -}}
 {{- with $all -}}
 {{- $V := index (site.Data.transactions.values | default dict) (printf "r%s" $sport) | default dict -}}
 {{- $icon := cond (eq $sport "cbb") "basketball" "football" -}}
-{{- $kt := dict "nil" "confirmed NIL deal, the season's amount" "commit" "→ committed" "decommit" "× decommitted" "flip" "→ flipped his commitment" "portal" "↓ entered the transfer portal" "transfer" "→ committed as a transfer" "rank" "△ ranking move" "sign" "⇒ signed" "reclass" "↑ reclassified" "cb" "◇ 247Sports Crystal Ball (alert only; the school is the headline's, else On3's latest RPM expert pick)" "visit" "● official visit (On3)" "unofficial" "○ unofficial visit (On3)" -}}
-{{- $kl := dict "cb" "crystal ball" "visit" "official visit" "unofficial" "visit" -}}
+{{- $kt := dict "nil" "confirmed NIL deal, the season's amount" "commit" "→ committed" "decommit" "× decommitted" "flip" "→ flipped his commitment" "portal" "↓ entered the transfer portal" "transfer" "→ committed as a transfer" "rank" "△ ranking move" "sign" "⇒ signed" "reclass" "↑ reclassified" "cb" "◇ 247Sports Crystal Ball (alert only; the school is the headline's or the post's, else On3's latest RPM expert pick); A ◇ B = a Crystal Ball to flip his commitment" "fp" "◇ On3/Rivals expert flip pick: experts whose latest pick, made since he committed, is another school (experts on it / experts who picked since)" "visit" "● official visit (On3)" "unofficial" "○ unofficial visit (On3)" -}}
+{{- $kl := dict "cb" "crystal ball" "fp" "flip pick" "visit" "official visit" "unofficial" "visit" -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "recruit transactions") "icon" $icon "filter" "Move,Class,School" "tab" ($.Get "tab") "gfxCols" "Date,Player,Pos,ARK,FV,Class,Move,School" "gfxDate" (lower ((time $d.asof).Format "Jan 2")) "gfxMax" "30") -}}
 <table class="cfb__table tx">
   <thead><tr>
-    <th>Date</th><th>Player</th><th>Pos</th><th title="ARK stars (recruit model)">ARK</th><th title="FV: recruits year-1 xFV, college players the board's FV (mean outcome)">FV</th><th title="recruiting class (old→new on a reclassification)">Class</th><th>Move</th><th title="→ commit · A → B flip · A × decommit · ⇒ sign · ◇ crystal ball (confidence) · ● official visit · ○ visit · A ↓ portal · ↑ reclass">School</th><th class="tx__x" title="247Sports, On3">Src</th>
+    <th>Date</th><th>Player</th><th>Pos</th><th title="ARK stars (recruit model)">ARK</th><th title="FV: recruits year-1 xFV, college players the board's FV (mean outcome)">FV</th><th title="recruiting class (old→new on a reclassification)">Class</th><th>Move</th><th title="→ commit · A → B flip · A × decommit · ⇒ sign · ◇ crystal ball (confidence) · A ◇ B flip pick · ● official visit · ○ visit · A ↓ portal · ↑ reclass">School</th><th class="tx__x" title="247Sports, On3">Src</th>
   </tr></thead>
   <tbody>
   {{- range $r := $all }}
   {{- $v := cond (isset . "a") (slice .a .f) (index $V (printf "%s|%s|%s" .d .n .k) | default slice) }}{{ $a := cond (gt (len $v) 0) (index $v 0) nil }}{{ $f := cond (gt (len $v) 1) (index $v 1) nil }}
   {{- $cls := .cls | default (cond (gt (len $v) 2) (index $v 2) nil) }}
-  {{- $to := .to }}{{ $tl := .tl }}{{ $conf := 0 }}{{ $pick := "" }}
+  {{- $to := .to }}{{ $tl := .tl }}{{ $conf := .c | default 0 }}{{ $pick := "" }}
   {{- if and (eq .k "cb") (not .to) }}{{ with index $cbx (printf "%s|%s" .d .n) }}{{ $to = index . 0 }}{{ $tl = index . 1 }}{{ $conf = index . 2 }}{{ $pick = index . 3 }}{{ end }}{{ end }}
   <tr>
     <td class="cfb__num" data-v="{{ .d }}">{{ lower ((time .d).Format "Jan 2") }}</td>
@@ -31,14 +32,15 @@
     <td data-v="{{ $a }}">{{ with $a }}{{ $lbl := cond (gt . 5) "5-star+" (printf "%g ARK stars" .) }}{{ if gt . 5 }}<span class="cfbrc__glow">{{ end }}<span class="cfbrc__ark{{ if gt . 5 }} is-plus{{ end }}" style="--n:{{ cond (gt . 5) 5 . }}" data-n="{{ . }}" role="img" aria-label="{{ $lbl }}" title="{{ $lbl }}"><i></i></span>{{ if gt . 5 }}<span class="cfbrc__plus" aria-hidden="true">+</span></span>{{ end }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ $f }}">{{ with $f }}{{ printf "%d" (int .) }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ $cls }}">{{ with .ocls }}{{ . }}→{{ end }}{{ $cls }}</td>
-    <td title="{{ index $kt .k }}"><span class="tx__k tx__k--{{ .k }}">{{ index $kl .k | default .k }}{{ with .amt }} ${{ lang.FormatNumber 1 (div . 1e6) }}M{{ end }}</span></td>
+    <td title="{{ index $kt .k }}"><span class="tx__k tx__k--{{ .k }}">{{ if and (eq .k "cb") .fr }}crystal ball flip{{ else }}{{ index $kl .k | default .k }}{{ end }}{{ with .amt }} ${{ lang.FormatNumber 1 (div . 1e6) }}M{{ end }}</span></td>
     {{- $fromC := "" }}{{ with .fr }}{{ $fromC = partial "inline/rcteam.html" (dict "t" . "l" $r.fl) }}{{ end }}
     {{- $toC := "" }}{{ with $to }}{{ $toC = partial "inline/rcteam.html" (dict "t" . "l" $tl) }}{{ end }}
     <td class="tx__mv" data-v="{{ $to | default .fr }}"{{ if $pick }} title="On3 RPM expert pick, {{ $pick }}"{{ end }}>
       {{- if eq .k "flip" }}{{ $fromC }}<span class="tx__g">→</span>{{ $toC }}
       {{- else if eq .k "decommit" }}{{ $fromC }}<span class="tx__g">×</span>
       {{- else if eq .k "portal" }}{{ $fromC }}<span class="tx__g">↓</span>
-      {{- else if eq .k "cb" }}<span class="tx__g">◇</span>{{ with $toC }}{{ . }}{{ with $conf }}<span class="cfb__dim">{{ . }}%</span>{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}
+      {{- else if eq .k "fp" }}{{ $fromC }}<span class="tx__g">◇</span>{{ $toC }}<span class="cfb__dim" title="experts on {{ $to }} of the experts who picked since he committed{{ with $conf }}, mean confidence {{ . }}%{{ end }}">{{ .x }}/{{ .of }}</span>
+      {{- else if eq .k "cb" }}{{ $fromC }}<span class="tx__g">◇</span>{{ with $toC }}{{ . }}{{ with $conf }}<span class="cfb__dim">{{ . }}%</span>{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}
       {{- else if eq .k "visit" }}<span class="tx__g">●</span>{{ $toC }}
       {{- else if eq .k "unofficial" }}<span class="tx__g">○</span>{{ $toC }}
       {{- else if eq .k "sign" }}<span class="tx__g">⇒</span>{{ $toC }}
@@ -46,12 +48,12 @@
       {{- else if eq .k "rank" }}<span class="tx__g">△</span>
       {{- else }}{{ with $fromC }}{{ . }}{{ end }}<span class="tx__g">→</span>{{ $toC }}{{ end -}}
     </td>
-    <td class="tx__x tx__src">{{ with .src }}{{ with index . "247" }}<a href="{{ . }}" rel="noopener" target="_blank">247</a>{{ end }}{{ with index . "on3" }} <a href="{{ . }}" rel="noopener" target="_blank">On3</a>{{ end }}{{ else }}On3{{ end }}</td>
+    <td class="tx__x tx__src">{{ with .src }}{{ with index . "247" }}<a href="{{ . }}" rel="noopener" target="_blank">247</a>{{ end }}{{ with index . "on3" }} <a href="{{ . }}" rel="noopener" target="_blank">On3</a>{{ end }}{{ with index . "x" }}<a href="{{ . }}" rel="noopener" target="_blank">X</a>{{ end }}{{ else }}On3{{ end }}</td>
   </tr>
   {{- end }}
   </tbody>
 </table>
 <style>.tx__mv{white-space:nowrap}.tx__mv .cfb__team{display:inline-flex;vertical-align:middle}.tx__g{display:inline-block;margin:0 .35em;opacity:.85}.tx__mv>.tx__g:first-child{margin-left:0}</style>
-{{- partial "wintable-close.html" (dict "rows" (len $all) "fresh" "recruit_news" "note" "247Sports · On3 · " "about" "247Sports and On3 headlines (Google News search RSS), last 120 days, and On3 visits of the class tabs' recruits, last 30 days. A move both sites report is one row; a decommitment and a commitment elsewhere within a day are one flip. Commits, flips and decommits from the last 21 days, and reclassifications, move the recruit's school or class on the class tabs when ESPN or On3 hasn't caught up. Crystal ball: a 247Sports Crystal Ball headline on a board player; school = the headline's, else On3's latest RPM expert pick (confidence); alert only, moves nothing.") -}}
+{{- partial "wintable-close.html" (dict "rows" (len $all) "fresh" "recruit_news" "note" "247Sports · On3 · " "about" "247Sports and On3 headlines (Google News search RSS), last 120 days, and On3 visits of the class tabs' recruits, last 30 days. A move both sites report is one row; a decommitment and a commitment elsewhere within a day are one flip. Commits, flips and decommits from the last 21 days, and reclassifications, move the recruit's school or class on the class tabs when ESPN or On3 hasn't caught up. Crystal ball: a 247Sports Crystal Ball headline on a board player; school = the headline's or the post's, else On3's latest RPM expert pick (confidence); alert only, moves nothing. Crystal ball flip: one for a school other than his commitment. Flip pick: On3/Rivals experts whose latest pick, made since he committed, is another school, last 120 days.") -}}
 {{- end -}}
 {{- define "partials/inline/rcteam.html" -}}<span class="cfb__team">{{ with .l }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .t }}</span></span>{{- end -}}
