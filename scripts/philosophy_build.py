@@ -116,10 +116,9 @@ def count_rate_figs(V):
     d = load('static/data/nba-xpm/2026.json')
     P = d['players']
     pts = [{'x': r['mp'], 'y': r['xpm']} for r in P if r.get('xpm') is not None]
-    figs['cr-scatter'] = {'svg': LB.chart_svg({
-        'title': f'{d["label"]} XPM by minutes', 'x_label': 'minutes', 'y_label': 'XPM',
-        'series': [{'points': sorted(pts, key=lambda p: p['x'])}]}).replace('lc-line', 'lc-none'),
-        'legend': [f'{len(pts)} players'], 'keys': [0], 'note': d['label']}
+    figs['cr-scatter'] = {'svg': scatter_svg({
+        'title': f'{d["label"]} XPM by minutes', 'x_label': 'minutes', 'y_label': 'XPM', 'points': pts}),
+        'legend': [f'{len(pts)} players'], 'keys': [3], 'note': d['label']}
     top_r = sorted(P, key=lambda r: -r['xpm'])[:10]
     top_c = sorted(P, key=lambda r: -r['vorx'])[:10]
     rows = [[i + 1, a['n'], f'{a["xpm"]:+.1f}', f'{a["mp"]:,}', b['n'], f'{b["vorx"]:.1f}', f'{b["mp"]:,}']
@@ -170,13 +169,9 @@ def testing_figs(V):
 
 
 def design_figs(V):
-    """the palette and the one font, read from static/style.css"""
-    css = (ROOT / 'static/style.css').read_text()
-    root = css[css.index(':root'):css.index('}', css.index(':root'))]
-    tok = dict(re.findall(r'--([a-z-]+):\s*(#[0-9a-fA-F]{3,8})', root))
-    sw = [(k, v) for k, v in tok.items()][:8]
-    V.update({'palette_n': len(sw)})
-    return {'palette': {'swatches': [{'name': k, 'hex': v} for k, v in sw]}}
+    """the house rules spec sheet, the same chart PROCESS #0 shows (scripts/post_charts.py process0_charts)"""
+    import post_charts
+    return {'spec': post_charts.process0_charts()['p0-spec']}
 
 
 def fill(s, V):
@@ -201,12 +196,14 @@ def main():
     for t in text['tabs']:
         blocks = []
         for b in t['blocks']:
-            if 'fig' in b:
+            if b.get('img'):        # a picture (the ARKPHILOSOPHY card, scripts/philosophy_gfx.py)
+                blocks.append(dict(b))
+            elif 'fig' in b:
                 if b['fig'] not in figs:
                     raise KeyError(f'philosophy: no figure {b["fig"]}')
                 blocks.append({'fig': b['fig'], **figs[b['fig']], **({'cap': fill(b['cap'], V)} if b.get('cap') else {})})
             else:
-                blocks.append({k: fill(v, V) for k, v in b.items()})
+                blocks.append({k: fill(v, V) if isinstance(v, str) else v for k, v in b.items()})
         tabs.append({**{k: v for k, v in t.items() if k != 'blocks'}, 'blocks': blocks})
     OUT.write_text(json.dumps({'tabs': tabs, 'values': V}, ensure_ascii=False, indent=1, allow_nan=False))
     print(f'philosophy: {len(tabs)} tabs, {len(figs)} figures, {len(V)} values')

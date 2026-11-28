@@ -12,9 +12,17 @@ draft = false
 
 {{< glossfind tabs="fv=FV|value=player value|players=player odds|teams=team ratings|games=game models|drafts=drafts and mocks|method=testing|data=data and names|abbr=abbreviations" >}}
 
-{{< wintabs groups="Overview:overview,sports|Metrics:FV,FV scales,player value,player odds|Models:team ratings,game models,drafts and mocks,testing|Research:all studies,football,basketball,hockey,baseball,soccer,tennis,esports|Data:data sources,data and names,abbreviations" side="true" class="libtabs" label="Process views" >}}
+{{< wintabs groups="Overview:overview,sports|Philosophy:predict and describe,count and rate,projection,one framework,shipping,friction,human,skin in the game|Metrics:FV,FV scales,player value,player odds|Models:team ratings,game models,drafts and mocks,testing|Research:all studies,football,basketball,hockey,baseball,soccer,tennis,esports|Data:data sources,data and names,abbreviations" side="true" class="libtabs" label="Process views" >}}
 {{< procover tab="overview" >}}
 {{< lazytab tab="sports" >}}{{< procsports tab="sports" >}}{{< /lazytab >}}
+{{< lazytab tab="predict and describe" >}}{{< procphil tab="predict and describe" >}}{{< /lazytab >}}
+{{< lazytab tab="count and rate" >}}{{< procphil tab="count and rate" >}}{{< /lazytab >}}
+{{< lazytab tab="projection" >}}{{< procphil tab="projection" >}}{{< /lazytab >}}
+{{< lazytab tab="one framework" >}}{{< procphil tab="one framework" >}}{{< /lazytab >}}
+{{< lazytab tab="shipping" >}}{{< procphil tab="shipping" >}}{{< /lazytab >}}
+{{< lazytab tab="friction" >}}{{< procphil tab="friction" >}}{{< /lazytab >}}
+{{< lazytab tab="human" >}}{{< procphil tab="human" >}}{{< /lazytab >}}
+{{< lazytab tab="skin in the game" >}}{{< procphil tab="skin in the game" >}}{{< /lazytab >}}
 {{< lazytab tab="FV" >}}{{< libglossary tab="FV" section="fv" >}}{{< /lazytab >}}
 {{< lazytab tab="FV scales" >}}{{< libglossary tab="FV scales" fv="true" >}}{{< /lazytab >}}
 {{< lazytab tab="player value" >}}{{< libglossary tab="player value" section="value" >}}{{< /lazytab >}}

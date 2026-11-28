@@ -26,6 +26,10 @@
   `/arkboard/process/`, short link `arkndjl.net/process`, menu identifier `arkboard-process`. Never call it "Library" (that is
   ARKLIBRARY), "Lab", "Reference" or "ARKPROCESS". `/reference`, `/library`, `/lab`, `/arkboard/reference/`,
   `/arkboard/library/` and `/arkboard/lab/` redirect to it in `static/_redirects`.
+- Philosophy (Noah, Nov 28): Overview | Philosophy | Metrics ... Text in Noah's words is `research/philosophy.json` (numbers as
+  `{key}` placeholders), filled with figures from the fit files by `scripts/philosophy_build.py` into `data/philosophy.json`,
+  drawn by `layouts/shortcodes/procphil.html`; process-refresh.yml reruns it. The 16:9 ARKPHILOSOPHY card
+  (`static/img/process/arkphilosophy.png`) is `python3 scripts/philosophy_gfx.py` (Playwright; rerun by hand).
 - Side strip (Nov 27): Overview (overview, sports) | Metrics (FV, FV scales, player value, player odds) | Models (team ratings,
   game models, drafts and mocks, testing) | Research | Data (data sources, data and names, abbreviations). The page is written by
   `scripts/library_build.py` from `data/library.json`; rerun it rather than hand-editing. A new glossary section goes in SIDE

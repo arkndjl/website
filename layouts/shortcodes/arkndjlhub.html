@@ -101,7 +101,7 @@
     {{- else if $l.img }}<img src="{{ $l.img | relURL }}" alt="" loading="lazy">{{ end }}
   </span>
   <span class="ah-p__body">
-    <span class="ah-p__top"><span>{{ printf "%02d" (add $i 1) }} · {{ $c.Params.group }}</span></span>
+    <span class="ah-p__top"><span>{{ printf "%02d" (add $i 1) }}{{ with $c.Params.group }} · {{ . }}{{ end }}</span></span>
     <span class="ah-p__name">{{ with $c.Params.icon }}<svg aria-hidden="true"><use href="#icon-{{ replace (path.Base .) ".svg" "" }}"/></svg>{{ end }}{{ $c.Params.gname | default $c.Name }}</span>
     {{- with $l.sub }}<span class="ah-p__sub">{{ . }}</span>{{ end }}
   </span>

@@ -1,5 +1,5 @@
 +++
-title = "about/contact"
+title = "about me/contact"
 description = "about and contact for arkndjl (Noah Dengler), New York City: Baseball Operations Analyst at Driveline, Data Science Consultant at Agentiq Sports, NYU mathematics & economics student, builder of eephus.io / MLB PROSPX and ARKBOARD. Email, Instagram, X, LinkedIn and other links."
 draft = false
 +++
