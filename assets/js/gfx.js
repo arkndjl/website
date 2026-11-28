@@ -2493,13 +2493,14 @@
     // columns right to left: [header, width, value, colour, star header]
     var cols = [
       [scH, 200, function (d) { return d.s.toFixed(1); }, C.teal, 0, 1],
-      ['DEPTH', 160, function (d) { return d.dp ? '#' + d.dp : '–'; }, C.white],
-      ['TOP END', 180, function (d) { return d.te ? '#' + d.te : '–'; }, C.white],
-      [avgH, 190, function (d) { return d.avg != null ? d.avg.toFixed(1) : '–'; }, C.white],
-      ['4', 110, function (d) { return String(d.a4); }, C.white, 1],
-      ['5', 110, function (d) { return String(d.a5); }, C.white, 1],
-      ['5', 130, function (d) { return String(d.a6); }, PT[1], 2],
-      ['COMMITS', 190, function (d) { return String(d.n); }, C.white]
+      ['DEPTH', 140, function (d) { return d.dp ? '#' + d.dp : '–'; }, C.white],
+      ['TOP END', 160, function (d) { return d.te ? '#' + d.te : '–'; }, C.white],
+      [avgH, 160, function (d) { return d.avg != null ? d.avg.toFixed(1) : '–'; }, C.white],
+      ['0-2.5', 135, function (d) { return String(d.al || 0); }, C.white, 1],
+      ['3-4', 110, function (d) { return String(d.am || 0); }, C.white, 1],
+      ['4.5-5', 130, function (d) { return String(d.ah || 0); }, C.white, 1],
+      ['5', 105, function (d) { return String(d.a6); }, PT[1], 2],
+      ['COMMITS', 165, function (d) { return String(d.n); }, C.white]
     ];
     var hh = 60, gap = 10, n = rows.length, rh = Math.min(190, Math.floor((F.h - hh - (n - 1) * gap) / n)), pad = 14;
     var right = F.x + F.w - pad - 6;
@@ -2594,63 +2595,115 @@
     var data = await (window.__arkClassData ? window.__arkClassData(src) : fetch(src).then(function (r) { return r.json(); }));
     var Y = (data.y || {})[yr], d = Y && Y.t[team]; if (!d || !d.r.length) return null;
     var F = await frame(2400, 1350, yr + ' ' + team + ' class', win.getAttribute('data-gfx-date'), tabLink(win));
-    var g = F.g, R = d.r.slice(0, 32), n = R.length, tiles = n <= 4;
+    var g = F.g, R = d.r.slice(0, 32), n = R.length;
+    var LD = (d.ld || []).slice(), VS = (d.v || []).slice(), pipe = LD.length || VS.length, pipeLeft = pipe && n > 8, pipeRight = pipe && n <= 8, tiles = n <= 4 && !pipe;
     F.canvas._name = (yr + '-' + team).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     var lim = tr.querySelector('img.cfb__logo'), logo = await loadImg(lim && lim.getAttribute('src'));
     var photos = await Promise.all(R.map(function (r) { return on3Photo(r.i, tiles ? 640 : n <= 8 ? 320 : 160); }));
     var scH = (txt(win.querySelector('thead th:nth-child(4)')) || 'CLASS').toUpperCase();
-    var LW = 520, pad = 20, X = F.x, Y0 = F.y, HH = F.h;
+    var LW = 600, pad = 20, X = F.x, Y0 = F.y, HH = F.h, bot = Y0 + HH - pad, PW = 640, PX = F.x + F.w - PW;
 
-    // ---- left: school, class rank and score, the counts, position groups ----
+    // ---- left: school, rank / score / xNIL, ARK star buckets, the class numbers, position groups, leads, visits ----
     well(g, X, Y0, LW, HH);
-    var ls = 168, lx = X + pad, nx = lx + ls + 22, nw = LW - pad - (nx - X);
+    var cw = LW - 2 * pad, lx = X + pad, ls = 120, nx = lx + ls + 20, nw = LW - pad - (nx - X);
     if (logo) drawLogo(g, logo, lx, Y0 + pad, ls, ls);
-    g.font = '56px ' + FONT; g.fillStyle = C.white;
-    var nl = wrap(g, team, nw).slice(0, 2), ny = Y0 + pad + (nl.length > 1 ? 34 : 58);
-    nl.forEach(function (t, i) { g.fillText(fit(g, t, nw), nx, ny + i * 58); });
-    g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, [d.conf, yr].filter(Boolean).join(' · '), nw), nx, ny + nl.length * 58 - 4);
-    var y = Y0 + pad + ls + 18, pw = (LW - 2 * pad - 12) / 2, ph = 150;
-    [['RANK', '#' + d.rk, 'of ' + Y.of], [scH, d.s.toFixed(1), '']].forEach(function (p, i) {
-      var px = X + pad + i * (pw + 12);
-      g.fillStyle = C.dark; g.fillRect(px, y, pw, ph); g.fillStyle = C.teal; g.fillRect(px, y + ph - 6, pw, 6);
-      g.font = '26px ' + FONT; g.fillStyle = C.lilac; g.fillText(p[0], px + 16, y + 26);
-      g.font = '88px ' + FONT; g.fillStyle = C.teal; g.fillText(p[1], px + 16, y + 92);
-      if (p[2]) { g.font = '26px ' + FONT; g.fillStyle = C.lilac; g.fillText(p[2], px + pw - 16 - g.measureText(p[2]).width, y + 26); }
+    g.font = '52px ' + FONT; g.fillStyle = C.white;
+    var nl = wrap(g, team, nw).slice(0, 2), ny = Y0 + pad + (nl.length > 1 ? 28 : 44);
+    nl.forEach(function (t, i) { g.fillText(fit(g, t, nw), nx, ny + i * 52); });
+    g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, [d.conf, yr].filter(Boolean).join(' · '), nw), nx, ny + nl.length * 52 - 2);
+    var y = Y0 + pad + ls + 16, pw = (cw - 20) / 3, ph = 112;
+    [['RANK', '#' + d.rk, 'of ' + Y.of, 1], [scH, d.s.toFixed(1), '', 1], ['xNIL', d.x ? money(d.x) : '–', '', 0]].forEach(function (p, i) {
+      var px = lx + i * (pw + 10);
+      g.fillStyle = p[3] ? C.dark : TINT.nil; g.fillRect(px, y, pw, ph); if (p[3]) { g.fillStyle = C.teal; g.fillRect(px, y + ph - 6, pw, 6); }
+      g.font = '24px ' + FONT; g.fillStyle = C.lilac; g.fillText(p[0], px + 14, y + 22);
+      if (p[2]) g.fillText(p[2], px + pw - 14 - g.measureText(p[2]).width, y + 22);
+      var vs = 66; g.font = vs + 'px ' + FONT; while (vs > 30 && g.measureText(p[1]).width > pw - 28) { vs -= 2; g.font = vs + 'px ' + FONT; }
+      g.fillStyle = p[3] ? C.teal : C.white; g.fillText(p[1], px + 14, y + 22 + (ph - 28) / 2 + 4);
     });
     y += ph + 12;
-    var T = [['COMMITS', String(d.n), C.white], ['5', String(d.a6), PT[1], 2], ['5', String(d.a5), C.white, 1], ['4', String(d.a4), C.white, 1],
-      ['AVG xFV', d.avg != null ? d.avg.toFixed(1) : '–', C.white], ['TOP END', d.te ? '#' + d.te : '–', C.white], ['DEPTH', d.dp ? '#' + d.dp : '–', C.white], ['xNIL', d.x ? money(d.x) : '–', C.white]];
-    var tw = (LW - 2 * pad - 3 * 8) / 4, th = 100;
-    T.forEach(function (t, i) {
-      var tx = X + pad + (i % 4) * (tw + 8), ty = y + Math.floor(i / 4) * (th + 8), mid = tx + tw / 2;
-      g.fillStyle = t[3] ? TINT.nil : 'rgba(200,199,255,0.10)'; g.fillRect(tx, ty, tw, th);
-      g.font = '46px ' + FONT; g.fillStyle = t[3] && t[1] === '0' ? 'rgba(200,199,255,0.4)' : t[2]; g.fillText(t[1], Math.round(mid - g.measureText(t[1]).width / 2), ty + 38);
-      g.font = '24px ' + FONT; g.fillStyle = t[3] === 2 ? PT[1] : C.lilac;
-      if (t[3]) {   // 5 [star] + in pixels
-        var w0 = g.measureText(t[0]).width, pwd = t[3] === 2 ? g.measureText('+').width + 2 : 0, x0 = Math.round(mid - (w0 + 25 + pwd) / 2);
-        g.fillText(t[0], x0, ty + 78); pxStar(g, x0 + w0 + 4, ty + 78 - 12, 21, 1, PLAT); if (pwd) g.fillText('+', x0 + w0 + 27, ty + 78);
-      } else g.fillText(t[0], Math.round(mid - g.measureText(t[0]).width / 2), ty + 78);
-    });
-    y += 2 * th + 8 + 18;
-    // position groups: commits, FV points as a bar against the class's biggest group, mean FV
-    var G = d.g || [], gx = X + pad, gw = LW - 2 * pad, top = Math.max.apply(null, G.map(function (q) { return q[2]; }).concat([1]));
-    g.font = '24px ' + FONT; g.fillStyle = C.lilac; g.fillText('POS', gx, y + 14);
-    var c1 = gx + 108, c3 = gx + gw, bx0 = gx + 168, bw0 = gw - 168 - 96;
-    g.fillText('N', c1 + 34 - g.measureText('N').width, y + 14); g.fillText('FV PTS', bx0, y + 14); g.fillText('AVG', c3 - g.measureText('AVG').width, y + 14);
-    y += 34;
-    var gh = Math.max(24, Math.min(46, Math.floor((Y0 + HH - pad - y) / Math.max(1, G.length)))), gf = Math.min(32, gh - 6);
+    // ARK star buckets, then the class's counts and ranks: [value, label, label colour, star mode (1 star, 2 star +), value colour]
+    var tw = (cw - 3 * 8) / 4, th = 84;
+    function tileRow(T, ty) {
+      T.forEach(function (t, i) {
+        var tx = lx + i * (tw + 8), mid = tx + tw / 2;
+        g.fillStyle = t[3] ? TINT.ark : 'rgba(200,199,255,0.10)'; g.fillRect(tx, ty, tw, th);
+        g.font = '42px ' + FONT; g.fillStyle = t[3] && t[0] === '0' ? 'rgba(200,199,255,0.4)' : (t[4] || C.white); g.fillText(t[0], Math.round(mid - g.measureText(t[0]).width / 2), ty + 32);
+        g.font = '22px ' + FONT; g.fillStyle = t[2];
+        if (t[3]) {   // label + a pixel star (+ for 5-star+)
+          var w0 = g.measureText(t[1]).width, sw = 19 + 3, pwd = t[3] === 2 ? g.measureText('+').width + 2 : 0, x0 = Math.round(mid - (w0 + sw + pwd) / 2);
+          g.fillText(t[1], x0, ty + 66); pxStar(g, x0 + w0 + 3, ty + 66 - 10, 19, 1, t[3] === 2 ? PT[1] : PLAT); if (pwd) g.fillText('+', x0 + w0 + sw + 1, ty + 66);
+        } else g.fillText(t[1], Math.round(mid - g.measureText(t[1]).width / 2), ty + 66);
+      });
+    }
+    tileRow([[String(d.a6 || 0), '5', PT[1], 2, PT[1]], [String(d.ah || 0), '4.5-5', C.lilac, 1], [String(d.am || 0), '3-4', C.lilac, 1], [String(d.al || 0), '0-2.5', C.lilac, 1]], y);
+    y += th + 8;
+    tileRow([[String(d.n), 'COMMITS', C.lilac], [d.avg != null ? d.avg.toFixed(1) : '–', 'AVG xFV', C.lilac], [d.te ? '#' + d.te : '–', 'TOP END', C.lilac], [d.dp ? '#' + d.dp : '–', 'DEPTH', C.lilac]], y);
+    y += th + 16;
+    // position groups: commits, FV points as a bar against the class's biggest group, mean FV (two columns when leads or visits need the room)
+    var G = d.g || [], top = Math.max.apply(null, G.map(function (q) { return q[2]; }).concat([1])), gcols = pipeLeft && G.length > 4 ? 2 : 1;
+    var grow = Math.ceil(G.length / gcols), gw = (cw - (gcols - 1) * 20) / gcols;
+    var gh = gcols > 1 ? 30 : Math.max(24, Math.min(46, Math.floor((pipeLeft ? 260 : bot - y - 34) / Math.max(1, grow)))), gf = Math.min(30, gh - 6);
+    for (var c0 = 0; c0 < gcols; c0++) {
+      var gx = lx + c0 * (gw + 20), c1 = gx + Math.round(gw * 0.2), bx0 = gx + Math.round(gw * 0.36), bw0 = Math.round(gw * 0.42);
+      g.font = '22px ' + FONT; g.fillStyle = C.lilac; g.fillText('POS', gx, y + 12); g.fillText('N', c1 + 26 - g.measureText('N').width, y + 12);
+      g.fillText('FV PTS', bx0, y + 12); g.fillText('AVG', gx + gw - g.measureText('AVG').width, y + 12);
+    }
+    y += 28;
     G.forEach(function (q, i) {
-      var gy = y + i * gh + gh / 2;
-      if (i % 2 === 0) { g.fillStyle = 'rgba(36,26,58,0.45)'; g.fillRect(gx - 6, y + i * gh, gw + 12, gh); }
+      var c0 = Math.floor(i / grow), r0 = i % grow, gx = lx + c0 * (gw + 20), c1 = gx + Math.round(gw * 0.2), bx0 = gx + Math.round(gw * 0.36), bw0 = Math.round(gw * 0.42), gy = y + r0 * gh + gh / 2;
+      if (r0 % 2 === 0) { g.fillStyle = 'rgba(36,26,58,0.45)'; g.fillRect(gx - 6, y + r0 * gh, gw + 12, gh); }
       g.font = gf + 'px ' + FONT; g.fillStyle = C.teal; g.fillText(q[0], gx, gy);
-      g.fillStyle = C.white; var ct = String(q[1]); g.fillText(ct, c1 + 34 - g.measureText(ct).width, gy);
+      g.fillStyle = C.white; var ct = String(q[1]); g.fillText(ct, c1 + 26 - g.measureText(ct).width, gy);
       var bh = Math.max(8, Math.round(gh * 0.36)), bl = Math.max(6, Math.round(bw0 * Math.max(0, q[2]) / top / 6) * 6);
       g.fillStyle = C.dark; g.fillRect(bx0, Math.round(gy - bh / 2), bw0, bh); g.fillStyle = C.teal; g.fillRect(bx0, Math.round(gy - bh / 2), Math.min(bw0, bl), bh);
-      g.fillStyle = C.lilac; var av = q[3].toFixed(1); g.fillText(av, c3 - g.measureText(av).width, gy);
+      g.fillStyle = C.lilac; var av = q[3].toFixed(1); g.fillText(av, gx + gw - g.measureText(av).width, gy);
     });
+    y += grow * gh + 18;
+    // leads and visits (the pipeline): in the left panel under a big class, in a column of their own beside a small one
+    if (pipeLeft) await drawPipe(lx, y, cw, bot - y);
+    else if (pipeRight) { well(g, PX, Y0, PW, HH); await drawPipe(PX + pad, Y0 + pad, PW - 2 * pad, HH - 2 * pad); }
+    async function drawPipe(px, py, pw, ph) {
+      var lh = 62, hh0 = 32, nB = (LD.length ? 1 : 0) + (VS.length ? 1 : 0), fitRows = Math.max(0, Math.floor((ph - nB * (hh0 + 10)) / lh));
+      var nL = Math.min(LD.length, VS.length ? Math.max(Math.ceil(fitRows / 2), fitRows - VS.length) : fitRows), nV = Math.min(VS.length, fitRows - nL);
+      var rows = LD.slice(0, nL).concat(VS.slice(0, nV));
+      var imgs = await Promise.all(rows.map(function (r) { return on3Photo(r.i, 128); }));
+      var vlg = await Promise.all(rows.map(function (r, i) { return i >= nL && r.c && r.c !== team && r.cl ? loadImg(r.cl) : null; }));
+      var MON = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'], today = data.asof || '';
+      function head(t, ry, right) {
+        g.fillStyle = C.dark; g.fillRect(px, ry, pw, hh0 - 4);
+        g.font = '22px ' + FONT; g.fillStyle = C.lilac; g.fillText(t, px + 10, ry + (hh0 - 4) / 2 + 1);
+        if (right) g.fillText(right, px + pw - 10 - g.measureText(right).width, ry + (hh0 - 4) / 2 + 1);
+      }
+      // two lines a recruit: name and FV; position, ARK stars and the lead or the visit
+      function row(r, ry, k, i) {
+        if (i % 2) { g.fillStyle = 'rgba(36,26,58,0.35)'; g.fillRect(px, ry, pw, lh); }
+        var ps = lh - 10, tx = px + ps + 14, l1 = ry + 20, l2 = ry + lh - 18;
+        faceBox(g, imgs[k], px + 4, ry + 5, ps, ps, r.n);
+        g.font = '30px ' + FONT; var fv = String(r.f), fw = g.measureText(fv).width;
+        g.fillStyle = C.teal; g.fillText(fv, px + pw - 8 - fw, ry + lh / 2 + 1);
+        g.font = '26px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, r.n, px + pw - 8 - fw - 20 - tx), tx, l1);
+        g.font = '22px ' + FONT; g.fillStyle = C.teal; g.fillText(r.p, tx, l2);
+        var sx = tx + g.measureText(r.p).width + 12, ss = 14, sw = 5 * (ss + 2) + 12;
+        arkStars(g, r.a || 0, sx, l2, ss, 2, { x: sx - 4, y: l2 - 11, w: sw + 2, h: 22, fills: i % 2 ? [C.well, 'rgba(36,26,58,0.35)'] : [C.well] });
+        var rx = sx + sw + 8, rmax = px + pw - 8 - fw - 20;
+        g.font = '22px ' + FONT;
+        if (k < nL) {
+          var tags = [r.e ? 'EXP ' + r.e[0] + '/' + r.e[1] : null, r.r != null ? 'RPM ' + r.r + '%' : null, r.l != null ? 'ARK ' + r.l + '%' : null].filter(Boolean).join(' · ');
+          g.fillStyle = C.lilac; g.fillText(fit(g, tags, rmax - rx), rx, l2);
+        } else {
+          var up = r.d >= today, dd = MON[+r.d.slice(5, 7) - 1] + ' ' + (+r.d.slice(8, 10));
+          g.fillStyle = up ? C.teal : C.lilac; g.fillText(dd, rx, l2); rx += g.measureText(dd).width + 12;
+          g.fillStyle = r.k === 'o' ? C.white : C.lilac; g.fillText(r.k === 'o' ? 'OV' : 'UV', rx, l2); rx += g.measureText('OV').width + 14;
+          if (vlg[k]) drawLogo(g, vlg[k], rx, l2 - 14, 28, 28);   // committed elsewhere: his school's logo
+        }
+      }
+      var yy = py;
+      if (nL) { head('LEADS', yy, 'EXP · RPM · ARK LEAN'); yy += hh0; for (var i = 0; i < nL; i++) row(LD[i], yy + i * lh, i, i); yy += nL * lh + 10; }
+      if (nV) { head('VISITS', yy, 'OV official · UV unofficial'); yy += hh0; for (var j = 0; j < nV; j++) row(VS[j], yy + j * lh, nL + j, j); }
+    }
 
     // ---- right: the commits ----
-    var RX = X + LW + 24, RW = F.w - LW - 24;
+    var RX = X + LW + 24, RW = F.w - LW - 24 - (pipeRight ? PW + 24 : 0);
     function sub(r, wide) { return [r.h, !R.some(function (q) { return !q.w; }) ? String(r.w) : null, r.hs, (wide || !r.hs) ? r.o : null].filter(Boolean); }
     if (tiles) {
       var gp = 20, cw = Math.min(700, Math.floor((RW - (n - 1) * gp) / n)), x0 = RX + Math.round((RW - (n * cw + (n - 1) * gp)) / 2);
@@ -2682,7 +2735,7 @@
       return F.canvas;
     }
     var cols = n <= 8 ? 1 : 2, per = Math.ceil(n / cols), cg = 20, cw2 = Math.floor((RW - (cols - 1) * cg) / cols), hh = 46, rg = 6;
-    var rh = Math.min(190, Math.floor((HH - hh - (per - 1) * rg) / per)), s = Math.min(rh / 56, cw2 / 814);
+    var rh = Math.min(190, Math.floor((HH - hh - (per - 1) * rg) / per)), s = Math.min(rh / 56, cw2 / 814, 1.3);   // a few tall rows: text stops growing, the photo keeps the row's height
     var P = function (v) { return Math.round(v * s); }, sc = Math.min(s, 1.6), Q = function (v) { return Math.round(v * sc); };   // one wide column: the number cells stop growing, the name takes the room
     var ss2 = Math.max(14, Math.floor(21 * sc / 7) * 7), sg2 = Math.max(2, Q(3)), stW = 5 * (ss2 + sg2) + Q(26);
     // columns right to left: [header, width, group]
@@ -2697,7 +2750,7 @@
     R.forEach(function (r, i) {
       var c = Math.floor(i / per), x = RX + c * (cw2 + cg), y2 = Y0 + hh + (i % per) * (rh + rg), mid = y2 + rh / 2;
       well(g, x, y2, cw2, rh);
-      var fs = rh - 2 * Math.max(4, P(4)), fx = x + P(8);
+      var fs = Math.min(rh - 2 * Math.max(4, P(4)), 150), fx = x + P(8);
       faceBox(g, photos[i], fx, Math.round(mid - fs / 2), fs, fs, r.n);
       // the number cells, right-aligned under their headers
       var right = x + cw2 - P(6), cx = right, ct = y2 + Math.max(4, P(5)), ch = rh - 2 * Math.max(4, P(5)), gapd = starGap(r);

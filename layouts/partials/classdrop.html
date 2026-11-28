@@ -18,7 +18,7 @@
     return v > 0 ? '<span class="cfb__up">+' + v + '</span>' : v < 0 ? '<span class="cfb__down">−' + (-v) + '</span>' : '0';
   }
   function shut(table) { table.querySelectorAll('tr.cfb__detail').forEach(function (d) { d.remove(); }); }
-  function render(team, yr, Y, t) {
+  function render(team, yr, Y, t, today) {
     var hs = t.r.some(function (r) { return r.hs; }), wt = t.r.every(function (r) { return r.w; });
     var head = '<tr><th>Recruit</th><th>ARK</th><th>Pos</th><th>Ht</th>' + (wt ? '<th>Wt</th>' : '') + (hs ? '<th>High school</th>' : '') + '<th>Hometown</th>' +
       '<th>xFV</th><th>Y1 FV</th><th title="industry stars">Stars</th><th title="ARK stars minus industry stars (5-star+ counts as 5)">Δ★</th><th>xNIL</th></tr>';
@@ -27,9 +27,20 @@
         (hs ? '<td>' + esc(r.hs || '—') + '</td>' : '') + '<td>' + esc(r.o || '—') + '</td><td class="cfb__num"><b>' + r.f + '</b></td><td class="cfb__num">' + r.y + '</td>' +
         '<td class="cfb__num">' + (r.s == null ? '<span class="cfb__dim">—</span>' : r.s + (r.sp ? '+' : '')) + '</td><td class="cfb__num">' + gap(r) + '</td><td class="cfb__num">' + (r.x ? money(r.x) : '—') + '</td></tr>';
     }).join('');
+    var who = function (r) { return '<td>' + esc(r.n) + '</td><td>' + stars(r.a || 0) + '</td><td>' + esc(r.p) + '</td><td class="cfb__num"><b>' + r.f + '</b></td>'; };
+    var ld = (t.ld || []).map(function (r) {
+      return '<tr>' + who(r) + '<td class="cfb__num">' + (r.e ? r.e[0] + '/' + r.e[1] : '—') + '</td><td class="cfb__num">' + (r.r != null ? r.r + '%' : '—') + '</td><td class="cfb__num">' + (r.l != null ? r.l + '%' : '—') + '</td></tr>';
+    }).join('');
+    var vs = (t.v || []).map(function (r) {
+      return '<tr>' + who(r) + '<td class="cfb__num' + (r.d >= today ? ' cfb__up' : '') + '">' + esc(r.d) + '</td><td>' + (r.k === 'o' ? 'official' : 'unofficial') + '</td><td>' + (r.c ? esc(r.c) : '<span class="cfb__dim">—</span>') + '</td></tr>';
+    }).join('');
+    var tbl = function (h, b) { return '<div class="clsd"><table class="clsd__t"><thead><tr>' + h + '</tr></thead><tbody>' + b + '</tbody></table></div>'; };
+    var pr = '<th>Recruit</th><th>ARK</th><th>Pos</th><th>xFV</th>';
     return '<p class="cfb__dhead"><b>' + esc(team) + '</b> · ' + esc(yr) + ' · #' + t.rk + ' of ' + Y.of +
       ' <button type="button" class="cfb__btn cfb__cardbtn" data-gfx data-gfx-mode="class" title="class card graphic (16:9)">classGFX</button></p>' +
-      '<div class="clsd"><table class="clsd__t"><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>';
+      '<div class="clsd"><table class="clsd__t"><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>' +
+      (ld ? '<p class="cfb__dhead">leads</p>' + tbl(pr + '<th title="On3 and Rivals experts picking the school, of those with a pick">Experts</th><th title="On3 RPM">RPM</th><th title="ARK lean">Lean</th>', ld) : '') +
+      (vs ? '<p class="cfb__dhead">visits</p>' + tbl(pr + '<th>Date</th><th>Visit</th><th>Committed</th>', vs) : '');
   }
   document.addEventListener('click', function (e) {
     var t = e.target; if (!t.closest) return;
@@ -47,7 +58,7 @@
       var Y = (d.y || {})[yr], c = Y && Y.t[team];
       if (!box.isConnected) return;
       if (!c) { shut(table); return; }
-      box.innerHTML = render(team, yr, Y, c);
+      box.innerHTML = render(team, yr, Y, c, d.asof || '');
     }).catch(function () { if (box.isConnected) shut(table); });
   });
   // a filter, a class year or a search reorders the rows: the open class closes
