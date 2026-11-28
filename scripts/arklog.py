@@ -65,7 +65,7 @@ SECTIONS = [
     ('site', r'tip/donate|Ko-fi|about/contact|\babout\b|main menu|\bmenu\b|social icons|\bhome ?page\b|\bhome\b|site search|'
              r'search (bar|index)|site data|site stats|\bARKLOG\b|favicon|\blogo\b|\bPost:|\barticles?\b|eephus|Instagram|'
              r'deploy|build gate|Cloudflare|\bnav\b|header|footer|ticker|\bnews\b|redirect|uniform|gothic|pixel art|'
-             r'ARKNDJL|Brand exports|site-?wide|every page|\bfonts?\b|analytics|Knicks'),
+             r'ARKNDJL|Brand exports|site-?wide|every page|\bfonts?\b|analytics|Knicks|Site Worker'),
 ]
 SEC_ORDER = ['ARKBOARD', '1NT', 'LAURSEN_111', 'ST. CLAIRE', 'ARKLIBRARY', 'ARKNDJL', 'YTST', 'site']
 LOGGED = lambda r: r.get('k') not in ('study', 'content')   # a change to the site (studies and content rows are not)
@@ -681,6 +681,7 @@ def selftest():
     assert parse({'n': 5, 't': 'Franchise Fantasy: draft room', 'at': '2026-11-27T00:00:00Z', 'b': ''}) is None
     r = parse({'n': 4, 't': 'CFB depth chart tab on phones', 'at': '2026-11-27T00:00:00Z', 'b': 'Rows wrap at 390px.'})
     assert r['v'] == '' and r['ar'] == 'site', r
+    assert section_of('Site Worker: /api/feeds lists the binding names it sees', []) == 'site'
     assert section_of('articleGFX: card only, no post text', []) == 'site' and section_of('ARKLOG milestones, and Process off the ARKBOARD menu', []) == 'site'
     assert section_of('Process: glossary search', []) == 'ARKBOARD'
     assert body_lines('Fit the class weight.\n\nARKLOG: failed · t = 0.75') == [('', 'Fit the class weight.')]
