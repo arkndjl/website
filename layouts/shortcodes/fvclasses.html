@@ -9,7 +9,7 @@
 {{- $y0 := index .years 0 }}{{ $y1 := index .years 1 -}}
 {{- $span := printf "drafts %v-%s" $y0 (substr (string $y1) 2 2) -}}
 {{- partial "wintable-open.html" (dict "title" (printf "all-time FV :: draft classes %v-%v" $y0 $y1) "icon" $icon "filter" "Class" "tab" ($.Get "tab") "class" "fvcl"
-    "gfxCols" "RK,Class,Best,Overall,Top,Depth,Became,Best career" "gfxMax" "30" "gfxDate" $span "gfxTall" true) -}}
+    "gfxCols" "RK,Class,Best,Overall,Top,Depth,Became,Best career" "gfxMax" "30" "gfxDate" $span "gfxTall" true "gfxNoun" "classes") -}}
 <table class="cfb__table fvcl">
   <thead><tr>
     <th>RK</th><th>Class</th>
