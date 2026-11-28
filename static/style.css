@@ -5383,3 +5383,16 @@ th.tbx__grp, td.tbx__grp { padding-left: 8px; }
 }
 td.tbx__p { color: #7fffd4; font-weight: bold; }
 .cfb__table tr.cfb__detail .clsd__t th, .cfb__table tr.cfb__detail .clsd__t td { white-space: nowrap !important; max-width: none !important; min-width: 0 !important; position: static !important; box-shadow: none !important; display: table-cell !important; }
+/* Process > Philosophy (layouts/shortcodes/procphil.html, data/philosophy.json) */
+.phil__body { max-width: 74ch; }
+.phil__q { margin: 0 0 12px; padding: 6px 10px; color: var(--foreground); font-size: 1.15em; background: var(--win-well); border-left: 4px solid var(--foreground); }
+.phil__q:not(:first-child) { margin-top: 18px; }
+.phil__h { margin: 16px 0 6px; font-size: 1em; font-weight: 400; color: #fff; letter-spacing: .06em; text-transform: uppercase; }
+.phil__p { margin: 0 0 10px; line-height: 1.55; }
+.phil__cap { margin: 8px 0 0; font-size: .9em; color: var(--accent); }
+.phil__src { margin: 12px 0 0; padding: 6px 0 0; list-style: none; font-size: .85em; color: var(--accent); border-top: 1px solid var(--win-dark); }
+.phil__tbl td, .phil__tbl th { white-space: nowrap; }
+.phil__tbl .phil__g { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+.phil__tbl .phil__g0 { border-left: 2px solid var(--win-light); }
+.phil__fig .libchart { max-height: 360px; }
+.phil__img { display: block; width: 100%; height: auto; image-rendering: pixelated; }

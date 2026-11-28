@@ -1,0 +1,206 @@
+{
+ "_": "Process > Philosophy, in Noah's words (interview Nov 28 2026, /mnt/project-files/philosophy/interview-answers.md). Numbers are {key} placeholders filled by scripts/philosophy_build.py from the fit files; never type one in.",
+ "tabs": [
+  {
+   "tab": "predict and describe",
+   "title": "predict_describe.txt",
+   "blocks": [
+    {
+     "fig": "arkphilosophy",
+     "img": "img/process/arkphilosophy.png",
+     "alt": "ARKPHILOSOPHY: eight panels, one for each Philosophy tab, with its pull line and a small figure"
+    },
+    {
+     "q": "A metric gets one job. It either explains what happened or it predicts what will happen."
+    },
+    {
+     "p": "I split metrics this way because of how I think about modeling as an economist. A model that tries to be both predictive and descriptive usually ends up failing at both. Giving each one a single target lets the predictive metrics be as predictive as they can be and the descriptive metrics be as descriptive as they can be. It also makes them easier to understand, because every number on the site has one clear goal."
+    },
+    {
+     "p": "The two goals pull against each other. A descriptive metric should give a player full credit for what happened in a season, including the luck, because the luck happened. A predictive metric should strip the luck out, shrink small samples toward what we'd expect, and age the player forward, because the luck won't repeat. Any metric that does both is compromising on each."
+    },
+    {
+     "fig": "ctx-nba",
+     "cap": "In the NBA, rXPM explains a season's team net rating with an R² of {nba_rxpm_d} and pXPM predicts the next season at {nba_pxpm_p}. On-court plus-minus describes almost as well as rXPM ({nba_pm_d}) and falls to {nba_pm_p} when it has to predict."
+    },
+    {
+     "fig": "ctx-nhl",
+     "cap": "Hockey shows the split most clearly. WAR explains a season at {nhl_war_d} and predicts the next one at {nhl_war_p}. pWAR gives up some description ({nhl_pwar_d}) to predict at {nhl_pwar_p}."
+    },
+    {
+     "h": "One metric for each context"
+    },
+    {
+     "p": "Some contexts need a predictive metric and some need a descriptive one. Showing both side by side, or blending them, just creates confusion. So every board on the site is context-aware. Season boards, standouts, awards and season value lead with the sport's most descriptive metric. Projections, FV, next up and the mocks lead with its most predictive metric. The reader always knows what the number in front of them is for, and can use it the right way in their own work."
+    },
+    {
+     "p": "Each sport's pick is decided by a test, not by preference. Every candidate, ours and the public ones, is scored on the same two held-out tests: how well it explains a season's team results, and how well it predicts the next season. The winners are on the Process overview, and none of the public metrics I tested leads in any sport."
+    },
+    {
+     "fig": "ctx-soccer",
+     "cap": "Soccer: SVAR explains a season at {soc_svar_d}. The FotMob rating explains only {soc_fm_d} of it, but predicts the next season about as well as anything."
+    },
+    {
+     "link": "g-most-predictive-and-most-descriptive-metric-by-sport",
+     "label": "the test"
+    }
+   ]
+  },
+  {
+   "tab": "count and rate",
+   "title": "count_rate.txt",
+   "blocks": [
+    {
+     "q": "A rate measures impact. A count measures value."
+    },
+    {
+     "p": "Both kinds of metrics get misused all the time. A rate metric like XPM measures how much impact a player has while he is on the floor. A cumulative metric like VORX measures how much value he actually added, so it counts how long he was on the floor too. Every sport on the site has one of each: VORX and XPM in the NBA, WAR and pXP/60 in the NFL, WAR and HPM in the NHL, GAR and GAR/90 in soccer, RAR and RWA in Counter-Strike."
+    },
+    {
+     "p": "Rate metrics matter more when small samples are what count: the playoffs, a career peak, a best season, a single great stretch. Cumulative metrics matter more over large samples: a regular season, a career. Ranking a regular season by a rate rewards players who barely played, and ranking a playoff run by a count rewards whoever played the most games."
+    },
+    {
+     "fig": "cr-top",
+     "cap": "{cr_label}: the top 10 by XPM, with no minutes floor, next to the top 10 by VORX. {cr_small_name} has an XPM of {cr_small_xpm} in {cr_small_mp} minutes."
+    },
+    {
+     "fig": "cr-scatter",
+     "cap": "Every player's XPM against his minutes in {cr_label}. The spread is widest on the left, where the samples are smallest."
+    },
+    {
+     "p": "A rate also needs time before it means anything. Box score XPM takes about {stab_xpm} games to be half signal, on-court plus-minus takes about {stab_pm}, and points per 48 minutes takes {stab_pts}. That is why the predictive versions of the rates shrink toward a prior by minutes and the boards show the sample beside the number."
+    },
+    {
+     "fig": "cr-stab"
+    }
+   ]
+  },
+  {
+   "tab": "projection",
+   "title": "future_value.txt",
+   "blocks": [
+    {
+     "q": "The 20-80 Future Value scale is the best quantitative scale anyone has made for talent."
+    },
+    {
+     "p": "FV grades how good a player will be at his peak as a pro, on the same 20 to 80 scale scouts have used for decades: 50 is an average regular, 60 is a plus player, 70 is a star and 80 is generational. I think it is the best quantitative scale ever created for evaluating talent and how a player projects toward professional outcomes, so every prospect board on the site uses it."
+    },
+    {
+     "p": "FV on the site is absolute. A player's grade comes from his true talent and never from where he ranks on his board or in his class, so a 60 means the same thing in a strong class and a weak one. The headline FV is the mean outcome, the scale is stretched at the top the way real outcomes are, and each sport keeps its own ladder. I don't put every sport on one shared scale or turn FV into a share of a team."
+    },
+    {
+     "link": "g-fv-future-value",
+     "label": "FV"
+    }
+   ]
+  },
+  {
+   "tab": "one framework",
+   "title": "every_sport.txt",
+   "blocks": [
+    {
+     "q": "Every sport is built on the same framework: player value, team fit and context."
+    },
+    {
+     "p": "I believe all sports, at their core, run on the same framework of player value, team fit and context. So when something works in one sport, I try it in every sport that has an analogue. Every metric and model that passes in one place gets tested as an input to the others: FV, the game models, team ratings, awards, mocks and next up."
+    },
+    {
+     "p": "That is also why the site looks the same from sport to sport. Every page has the same groups in the same order, every board leads with its key stat, and every sport has a cumulative and a rate metric. Once you learn how to read one sport, you can read all of them."
+    }
+   ]
+  },
+  {
+   "tab": "shipping",
+   "title": "testing.txt",
+   "blocks": [
+    {
+     "q": "Nothing ships unless it beats what was there before on data it never saw."
+    },
+    {
+     "p": "Every change to a model or metric is tested held out, on seasons or games it was not fit on, and it only ships if it wins. Most of what I try doesn't. Of the {tests} tests in ARKLOG, {shipped} shipped, {mixed} part shipped and {failed} failed outright."
+    },
+    {
+     "p": "The failures are published with the same detail as the wins. People should know what has been tested, tried and proven not to work, because it helps them with their own research, and because it shows everything I've thought of trying even when it didn't work."
+    },
+    {
+     "fig": "t-hist",
+     "cap": "The |t| of the number that decided each test, where a write-up states one."
+    },
+    {
+     "fig": "verdicts"
+    },
+    {
+     "link": "../../arklog/",
+     "label": "ARKLOG",
+     "ext": true
+    }
+   ]
+  },
+  {
+   "tab": "friction",
+   "title": "friction.txt",
+   "blocks": [
+    {
+     "q": "Friction is a form of expression and personality."
+    },
+    {
+     "p": "The site's look comes from everything I loved about design growing up in the 2000s: Windows 98 and the Gateway computers that ran it, the menus in 2000s Madden and MLB 2K, the Nintendo DS and PictoChat, MSN Messenger, MySpace, SNY's broadcast graphics, and the game and design magazines of the time. Every one of them had texture, borders and depth, and you could tell who made it and when."
+    },
+    {
+     "p": "What replaced them is a homogenized, minimalist slop that I blame mostly on Apple's design philosophy taking over the world after the iPhone. Rounded corners, Liquid Glass and a lot of empty space, sold as \"frictionless.\" What frictionless really does is force people to choose convenience over customizability and detail. It dumbs down design, principles and even features."
+    },
+    {
+     "p": "I think friction is good. My designs have it on purpose, because it makes the numbers easier to read and because it refuses to conform to modernist ideas of simplicity. The only friction I don't like is bad design, and that isn't the same thing. I believe in cybergothicism and organized maximalism: everything available at once, with a structure underneath it you can learn."
+    },
+    {
+     "p": "I made this site for myself and people like me. I love informationally dense tables because they let you dig into the data right away, all in one place."
+    },
+    {
+     "fig": "spec"
+    },
+    {
+     "link": "../../posts/process-0-design-philosophy/",
+     "label": "PROCESS #0",
+     "ext": true
+    }
+   ]
+  },
+  {
+   "tab": "human",
+   "title": "human.txt",
+   "blocks": [
+    {
+     "q": "The internet should feel alive and real and human."
+    },
+    {
+     "p": "People should be able to tell that something was designed and built by a person with a specific vision, and not generated by the whims and homogenized taste of AI and techbro culture. That is part of why the site looks the way it does, and it is the whole reason it reads the way it does."
+    },
+    {
+     "p": "The scouting reports are numbers and percentiles, like a scouting report. There are no intros or blurbs on the boards, and the method is written out here in Process. Every article and every ARKLOG entry is written in my voice. The world and the internet should not feel dead and buried under AI language."
+    }
+   ]
+  },
+  {
+   "tab": "skin in the game",
+   "title": "skin_in_the_game.txt",
+   "blocks": [
+    {
+     "q": "People want sports to matter to them. Betting is the only place most of them can find that, and it hurts them."
+    },
+    {
+     "p": "I think sports betting is bad for people. I also recognize that people are expressing a real market demand for skin in the game. People want sports and their favorite teams and players to actually matter to them and affect their lives. I think my generation has lost some of that with the slow death of the communal side of sports, and in the modern world there is nowhere else for that desire to go except gambling."
+    },
+    {
+     "p": "This is personal to me. I lost my best friend to suicide, and I've had a gambling addiction in the past. In a Swedish study of 2,099 people with gambling disorder, about one in five attempted suicide over twelve years. I love sports and I want them to matter, so the unregulated sports betting and prediction markets that have run through my generation are something I care about more than anything else on this site."
+    },
+    {
+     "p": "That is why everything here is free, and why the news feed never posts betting lines. Through my job and the work I look for outside it, I'm trying to help make sports matter to people in ways that don't prey on them."
+    },
+    {
+     "src": "Håkansson, A., and Karlsson, A. \"Suicide Attempt in Patients With Gambling Disorder: Associations With Comorbidity Including Substance Use Disorders.\" Frontiers in Psychiatry 11 (2020).",
+     "href": "https://www.frontiersin.org/articles/10.3389/fpsyt.2020.593533/full"
+    }
+   ]
+  }
+ ]
+}
