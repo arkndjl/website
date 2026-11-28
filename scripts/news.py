@@ -272,7 +272,7 @@ def recruits(since):
                 if dec: k, r = 'flip', dict(r, fr=dec['fr'], fl=dec.get('fl')); t = '%s flips %s → %s' % (who, r['fr'], r['to'])
             w = 45 if k in ('cb', 'fp') else ({'flip': 76, 'decommit': 66}.get(k, 70)) if on else 40   # a Crystal Ball is a lean, not a move: never MAJOR
             out.append(item('rc|%s|%s|%s|%s' % (sp, r['d'], slug(r['n']), k), r['d'], 'arkboard', 'recruit', TAG[sp], ' '.join(t.split()), w,
-                            'recruit · %s' % k + (' · on board' if on else ''), PAGE[sp] + '#recruit-transactions',
+                            'recruit · %s' % {'cb': 'crystal ball', 'fp': 'flip pick'}.get(k, k) + (' · on board' if on else ''), PAGE[sp] + '#recruit-transactions',
                             logo=r.get('fl') if k == 'flip' else (r.get('tl') or r.get('fl')), logo2=r.get('tl') if k == 'flip' else None, sp=sp))
             out[-1]['n'] = r['n']
     return out
@@ -585,6 +585,9 @@ def build(state, plays='fetch'):
         w = o['t'].split()
         return any(names.same(n, ' '.join(w[:j])) for n in now_rc for j in (2, 3, 4) if len(w) >= j)
     keep = [o for k, o in old.items() if k not in ids and o['d'] >= since and not (o['cat'] == 'fv' and o['d'] == today) and not superseded(o)]
+    for o in keep:   # items kept from before Nov 28 carry the raw move code in the subtitle
+        if o['cat'] == 'recruit':
+            o['s'] = o.get('s', '').replace('recruit · cb', 'recruit · crystal ball').replace('recruit · fp', 'recruit · flip pick')
     items = [i for i in new + keep if i['d'] >= since and i['d'] <= today]
     items.sort(key=lambda i: (i['d'], i['w'] >= MAJOR, i['at']), reverse=True)
     days = []
