@@ -4875,7 +4875,7 @@
     var figs = artFigures(art);
     var F = await frame(2400, 1350, 'ARTICLE' + (d.s ? ' :: ' + String(d.s).toUpperCase() : ''), d.d, d.l);
     var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 40, gap = 24;
-    var lw = figs.length ? Math.round(w * 0.5) : w, rx = x + lw + gap, rw = w - lw - gap;
+    var lw = figs.length ? Math.round(w * (quotes.length > 5 ? 0.55 : 0.5)) : w, rx = x + lw + gap, rw = w - lw - gap;
     // left: the series tag (the part of the title before its colon), the title, then each section's heading over its line
     well(g, x, y, lw, h);
     var m = /^(.{2,24}?)\s*:\s+(.+)$/.exec(d.t), kick = m ? m[1] : '', title = m ? m[2] : d.t, cw = lw - 2 * pad, cy = y + pad;
