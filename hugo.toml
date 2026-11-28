@@ -158,7 +158,7 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
             icon = "img/icons/arkboard.svg"
         # ARKBOARD children, grouped by params.group (menu.html, mobile-menu.html, arknav.html draw one labelled row
         # per group, in weight order; gname = the name inside its group): all sports (30-32), then each sport's
-        # prospects page before its pro league (football 33-34, basketball 35-36, hockey 37-38, soccer 39-40), baseball 41, tennis 42-43 (prospects 42), esports 44
+        # prospects page before its pro league (football 33-34, basketball 35-36, hockey 37-38, soccer 39-40), baseball 41 (college, then eephus.io), tennis 42-43 (prospects 42), esports 44
         [[languages.en.menu.main]]
           identifier = "arkboard-predictions"
           parent = "ARKBOARD"
@@ -290,6 +290,16 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
             group = "baseball"
             gname = "College · MLB Draft"
         [[languages.en.menu.main]]
+          identifier = "eephus"
+          parent = "ARKBOARD"
+          name = "eephus.io"
+          url = "/eephus/"
+          weight = 41
+          [languages.en.menu.main.params]
+            icon = "img/eephus-favicon.png"
+            group = "baseball"
+            gname = "eephus.io"
+        [[languages.en.menu.main]]
           identifier = "arkboard-tennis-prospects"
           parent = "ARKBOARD"
           name = "Tennis Prospects"
@@ -340,13 +350,6 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
           weight = 15
           [languages.en.menu.main.params]
             icon = "img/icons/laursen.svg"
-        [[languages.en.menu.main]]
-          identifier = "eephus"
-          name = "eephus.io"
-          url = "/eephus/"
-          weight = 26
-          [languages.en.menu.main.params]
-            icon = "img/eephus-favicon.png"
         [[languages.en.menu.main]]
           identifier = "tip"
           name = "donate"

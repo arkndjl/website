@@ -64,6 +64,11 @@
   and correct it in `research/arklog_fix.json`. Every test through #1304 was read against its write-up on Nov 27 and is
   held there (`v`, `e`, `tt`); do not regenerate those entries.
 - Hidden pages (Franchise Fantasy, the ST. CLAIRE style guide) never appear in the log (`OUT` in arklog.py).
+- Copy cleanups (taglines, blurbs, intros, rewrites into Noah's words) are never logged, and no row mentions AI (Noah, Nov 28):
+  `NOAI` drops the row, `AI_LINE` drops a description line; earlier rows are hidden in the fix file.
+- Content rows (`k: "content"`, `content_rows` in arklog.py, Noah Nov 28): YouTube uploads (ARKNDJL, LAURSEN_111, YTST), LAURSEN_111
+  Twitch streams, 1NT ESEA matches, articles, and ST. CLAIRE releases (a track in content/arkndjl-music.md with `date = "YYYY-MM-DD"`).
+  Read from the social pulls, data/esea.json and content/; they sit beside the changes but never count as changes or tests.
 - Process updates: one post a month ("PROCESS #N: ... / <month> updates", PROCESS in capitals), front matter `series = "process"` and
   `month = "YYYY-MM"`, listed by ARKLOG > updates. It covers every section of the site that month: models and metrics,
   features, bug fixes, 1NT, ST. CLAIRE, videos and articles released, social data, site data, with site screenshots and
