@@ -5,29 +5,95 @@
 Reads static/data/cfb-recruits.json (every graded recruit, scripts/cfb_recruit.mjs) and data/cbb_recruits.json
 (scripts/cbb_recruit_fit.py) and writes static/data/classes/cfb.json and cbb.json:
 
-  {asof, y: {<class year>: {of: schools ranked, t: {<school>: {rk, s, n, a6, a5, a4, avg, te, dp, x, conf,
+  {asof, y: {<class year>: {of: schools ranked, t: {<school>: {rk, s, n, a6, ah, am, al, avg, te, dp, x, conf,
      g: [[position group, commits, FV points, mean FV], ...],
      r: [{n name, p position, g group, h height, w weight, o hometown, hs high school, f FV, y Y1 FV, x xNIL,
-          a ARK stars, s industry stars, sp industry 5-star+, i On3 photo path}, ...] best first}}}}}
+          a ARK stars, s industry stars, sp industry 5-star+, i On3 photo path}, ...] best first,
+     ld: uncommitted recruits the school leads for, best first: {n, p, a, f, i, e: [experts on it, experts with a pick]
+         (On3/Rivals, data/recruit_expert_picks.json), r: On3 RPM % (data/recruit_rpm.json), l: ARK lean %
+         (data/recruit_commit_leans.json)},
+     v: visits to the school, upcoming first (date >= today), then the last VISIT_DAYS days' officials:
+        {d date, k o official | u unofficial, n, p, a, f, i, c school he is committed to, cl its logo when it is another school}}}}}}
+
+a6 = 5-star+, ah = 4.5-5, am = 3-4, al = unranked to 2.5 ARK stars (copied from the class rankings rows).
+Visits come from On3's live pull of uncommitted recruits and the weekly pull of committed ones
+(scripts/data/recruit_on3_live.json.gz, recruit_on3_committed.json.gz), joined by scripts/names.py.
 
 The class numbers (rank, score, star counts, top end, depth) are copied from the class rankings rows, never
 recomputed. Rerun after either recruit file changes (cfb-recruits.yml, cbb-recruits.yml). --test checks the
 files against the class rankings.
 """
+import datetime as dt
+import gzip
 import json
 import os
 import re
 import sys
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import names  # noqa: E402
+from player_moves import school_slugs  # noqa: E402
+VISIT_DAYS = 30
+LEADS, VISITS = 8, 10
 OUT = os.path.join(ROOT, 'static', 'data', 'classes')
 CFB_G = ['QB', 'RB', 'WR', 'TE', 'OL', 'EDGE', 'DL', 'LB', 'CB', 'S', 'ATH', 'K', 'P', 'LS']
 CBB_G = ['PG', 'CG', 'SG', 'SF', 'PF', 'C']
+BUCKETS = ('a6', 'ah', 'am', 'al')
 
 
-def load(*p):
-    with open(os.path.join(ROOT, *p)) as f:
-        return json.load(f)
+def load(*p, default=None):
+    f = os.path.join(ROOT, *p)
+    try:
+        return json.load(gzip.open(f, 'rt') if f.endswith('.gz') else open(f, encoding='utf-8'))
+    except (OSError, ValueError):
+        if default is None: raise
+        return default
+
+
+def who(r, sp):
+    return {'n': r['name'], 'p': r['pos'].split('-')[0] if sp == 'cfb' else r['pos'], 'a': r.get('ark'),
+            'f': round(r['xfv'] if sp == 'cfb' else r['fv']), 'i': img(r.get('img'))}
+
+
+def leads(sp, yr, lst):
+    """{school: [lead rows]}: the uncommitted recruits the experts, On3's RPM or the ARK lean put at the school"""
+    src = [(k, (load('data', f, default={}).get(sp) or {}).get(str(yr)) or {}) for k, f in
+           (('e', 'recruit_expert_picks.json'), ('r', 'recruit_rpm.json'), ('l', 'recruit_commit_leans.json'))]
+    out = {}
+    for r in lst:
+        if r.get('team'): continue
+        row = {}
+        for k, m in src:
+            v = m.get(r['name'])
+            if not v: continue
+            sch = v[0]
+            row.setdefault(sch, who(r, sp))[k] = [v[1], v[2]] if k == 'e' else round(v[1])
+        for sch, x in row.items(): out.setdefault(sch, []).append(x)
+    for sch in out:
+        out[sch].sort(key=lambda x: (-sum(k in x for k in 'erl'), -(x['a'] or 0), -x['f']))
+        out[sch] = out[sch][:LEADS]
+    return out
+
+
+def visits(sp, yr, lst, today):
+    """{school: [visit rows]}: upcoming visits, then the last VISIT_DAYS days' officials"""
+    slugs, since = school_slugs(), (dt.date.fromisoformat(today) - dt.timedelta(days=VISIT_DAYS)).isoformat()
+    m, out, seen = names.Matcher(lst, team=None), {}, set()
+    for f in ('recruit_on3_live.json.gz', 'recruit_on3_committed.json.gz'):
+        for o in (load('scripts', 'data', f, default={}).get(sp) or {}).get(str(yr)) or []:
+            r, _ = m.find(o.get('name'))
+            if not r or (o.get('state') and r.get('home') and not r['home'].endswith(o['state'])): continue
+            for v in o.get('visits') or []:
+                sch, d, k = slugs.get(v[0]), v[2], 'o' if v[1] == 'Official' else 'u'
+                if not sch or not d or (d < today and (k == 'u' or d < since)) or (r['name'], sch, d) in seen: continue
+                seen.add((r['name'], sch, d))
+                out.setdefault(sch, []).append(dict(who(r, sp), d=d, k=k, c=r.get('team') or None, cl=(r.get('logo') or None) if r.get('team') and r.get('team') != sch else None))
+    for sch in out:
+        up = sorted((x for x in out[sch] if x['d'] >= today), key=lambda x: (x['d'], -x['f']))
+        past = sorted((x for x in out[sch] if x['d'] < today), key=lambda x: x['d'], reverse=True)
+        out[sch] = [{k: v for k, v in x.items() if v is not None} for x in (up + past)[:VISITS]]
+    return out
 
 
 def feet(inches):
@@ -73,11 +139,12 @@ def cfb():
                 'n': r['name'], 'p': r['pos'].split('-')[0], 'g': r.get('g') or r['pos'], 'h': feet(r.get('ht')), 'w': r.get('wt'),
                 'o': r.get('home'), 'f': round(r['xfv']), 'y': round(r['fvOn']), 'x': r.get('xnil'), 'a': r.get('ark'),
                 's': r.get('stars'), 'i': img(r.get('img')), 'fx': r['xfv']})
-        T = {}
+        T, LD, VS = {}, leads('cfb', yr, lst), visits('cfb', yr, lst, d['asof'])
         for t in teams:
             g, rows = pack(by.get(t['team'], []), CFB_G, floor)
-            T[t['team']] = {'rk': t['classRk'], 's': t['classXfv'], 'n': t['classN'], 'a6': t.get('a6', 0), 'a5': t.get('a5', 0), 'a4': t.get('a4', 0),
-                            'avg': t.get('avgXfv'), 'te': t.get('topRk'), 'dp': t.get('depthRk'), 'x': t.get('classXnil'), 'conf': t.get('conf'), 'g': g, 'r': rows}
+            T[t['team']] = {'rk': t['classRk'], 's': t['classXfv'], 'n': t['classN'], **{k: t.get(k, 0) for k in BUCKETS},
+                            'avg': t.get('avgXfv'), 'te': t.get('topRk'), 'dp': t.get('depthRk'), 'x': t.get('classXnil'), 'conf': t.get('conf'), 'g': g, 'r': rows,
+                            'ld': LD.get(t['team'], []), 'v': VS.get(t['team'], [])}
         out['y'][str(yr)] = {'of': len(teams), 't': T}
     return out
 
@@ -99,11 +166,12 @@ def cbb():
                 'n': r['name'], 'p': r['pos'], 'g': r['pos'], 'h': r.get('ht'), 'w': r.get('wt'), 'o': r.get('home'), 'hs': r.get('hs'),
                 'f': round(r['fv']), 'y': round(r['y1fv']), 'x': r.get('xnil'), 'a': r.get('ark'), 's': r.get('stars'),
                 'sp': 1 if r.get('fsp') else None, 'i': img(r.get('img')), 'fx': r['fv']})
-        T = {}
+        T, LD, VS = {}, leads('cbb', c['year'], c['list']), visits('cbb', c['year'], c['list'], d['asof'])
         for t in teams:
             g, rows = pack(by.get(t['team'], []), CBB_G, floor)
-            T[t['team']] = {'rk': t['rk'], 's': round(t['ets'], 1), 'n': t['n'], 'a6': t.get('a6', 0), 'a5': t.get('a5', t.get('ark5', 0)), 'a4': t.get('a4', t.get('ark4', 0)),
-                            'avg': t.get('avgFv'), 'te': t.get('topRk'), 'dp': t.get('depthRk'), 'x': t.get('xnil'), 'conf': t.get('conf'), 'g': g, 'r': rows}
+            T[t['team']] = {'rk': t['rk'], 's': round(t['ets'], 1), 'n': t['n'], **{k: t.get(k, 0) for k in BUCKETS},
+                            'avg': t.get('avgFv'), 'te': t.get('topRk'), 'dp': t.get('depthRk'), 'x': t.get('xnil'), 'conf': t.get('conf'), 'g': g, 'r': rows,
+                            'ld': LD.get(t['team'], []), 'v': VS.get(t['team'], [])}
         out['y'][str(c['year'])] = {'of': len(teams), 't': T}
     return out
 
@@ -114,6 +182,8 @@ def check(name, out):
         for team, t in Y['t'].items():
             if len(t['r']) != t['n']:
                 bad.append('%s %s %s: %d commits listed, class rankings say %d' % (name, yr, team, len(t['r']), t['n']))
+            if sum(t[k] for k in BUCKETS) != t['n']:
+                bad.append('%s %s %s: star buckets add to %d, not %d' % (name, yr, team, sum(t[k] for k in BUCKETS), t['n']))
             if sum(g[1] for g in t['g']) != len(t['r']):
                 bad.append('%s %s %s: position groups do not add up' % (name, yr, team))
             for r in t['r']:

@@ -133,7 +133,7 @@
     <th>RK</th><th>Team</th><th title="conference">Conf</th>
     <th class="cfb__g" title="the class's FV points: each commit's FV above the 20 floor, summed">Pts</th>
     <th title="committed recruits On3 ranks">Commits</th>
-    <th title="commits at 5-star+ (ARK)">5-star+</th><th title="commits at 5 ARK stars">5-star</th><th title="commits at 4-4½ ARK stars">4-star</th>
+    <th title="commits at 5-star+ (ARK)">5★+</th><th title="commits at 4.5 or 5 ARK stars">4.5-5★</th><th title="commits at 3, 3.5 or 4 ARK stars">3-4★</th><th title="commits at 2.5 ARK stars or fewer, unranked (1 star) included">0-2.5★</th>
     <th title="mean FV of the commits">Avg xFV</th>
     <th title="rank by the two best commits' FV points">Top end</th><th title="rank by the rest of the class's FV points">Depth</th>
     <th title="chance at least one commit reaches the NBA">NBA%</th>
@@ -147,13 +147,13 @@
          rows' data-yr) show one class at a time, RK counted within the class and filters */}}
   {{- $by := .teamsBy | default (dict (string (index .classes 0).year) .teams) }}{{ $n := 0 }}
   {{- range $c := .classes }}{{ range index $by (string $c.year) }}{{ $n = add $n 1 }}
-  <tr data-yr="{{ $c.year }}" data-cr="{{ dict "s" .ets "n" .n "a6" (.a6 | default 0) "a5" (.a5 | default .ark5) "a4" (.a4 | default .ark4) "avg" .avgFv "te" .topRk "dp" .depthRk "top" (.top3 | default .top) | jsonify }}">
+  <tr data-yr="{{ $c.year }}" data-cr="{{ dict "s" .ets "n" .n "a6" (.a6 | default 0) "ah" (.ah | default 0) "am" (.am | default 0) "al" (.al | default 0) "avg" .avgFv "te" .topRk "dp" .depthRk "top" (.top3 | default .top) | jsonify }}">
     <td class="cfb__rk">{{ .rk }}</td>
     <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
     <td>{{ .conf }}</td>
     <td class="cfb__num cfb__g" data-v="{{ .ets }}">{{ partial "num.html" (slice "%.1f" .ets) }}</td>
     <td class="cfb__num">{{ .n }}</td>
-    <td class="cfb__num">{{ .a6 | default 0 }}</td><td class="cfb__num">{{ .a5 | default .ark5 }}</td><td class="cfb__num">{{ .a4 | default .ark4 }}</td>
+    <td class="cfb__num">{{ .a6 | default 0 }}</td><td class="cfb__num">{{ .ah | default 0 }}</td><td class="cfb__num">{{ .am | default 0 }}</td><td class="cfb__num">{{ .al | default 0 }}</td>
     <td class="cfb__num" data-v="{{ .avgFv }}">{{ with .avgFv }}{{ partial "num.html" (slice "%.1f" .) }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ with .topRk }}{{ sub 0 . }}{{ end }}">{{ with .topRk }}#{{ . }}{{ end }}</td><td class="cfb__num" data-v="{{ with .depthRk }}{{ sub 0 . }}{{ end }}">{{ with .depthRk }}#{{ . }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ .pNba }}">{{ math.Round (mul .pNba 100) }}%</td>

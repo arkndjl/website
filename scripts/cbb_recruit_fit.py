@@ -1096,10 +1096,12 @@ TOP_END = 2
 
 
 def class_parts(xs):
-    """The class-rankings card's parts: ARK star counts (5-star+, 5, 4 to 4.5), mean FV, the three best commits, and the
+    """The class-rankings card's parts: ARK star counts (5-star+, 4.5-5, 3-4, unranked-2.5), mean FV, the three best commits, and the
     class's FV points split into its top end (the TOP_END best commits) and its depth (the rest)."""
     xs = sorted(xs, key=lambda x: -x['ets'])
-    return {'a6': sum(1 for x in xs if x['ark'] > 5), 'a5': sum(1 for x in xs if x['ark'] == 5), 'a4': sum(1 for x in xs if 4 <= x['ark'] < 5),
+    # ARK star buckets (Noah, Nov 28): 5-star+ | 4.5-5 | 3-4 (3, 3.5, 4) | unranked-2.5; every half star lands in one
+    return {'a6': sum(1 for x in xs if x['ark'] > 5), 'ah': sum(1 for x in xs if 4.5 <= x['ark'] <= 5), 'am': sum(1 for x in xs if 3 <= x['ark'] < 4.5),
+            'al': sum(1 for x in xs if not (x['ark'] or 0) >= 3),
             'avgFv': round(sum(x['fv'] for x in xs) / len(xs), 1),
             'topEnd': round(sum(x['ets'] for x in xs[:TOP_END]), 4), 'depth': round(sum(x['ets'] for x in xs[TOP_END:]), 4),
             'top3': [[x['name'], x['pos'], x['fv'], x['ark']] for x in sorted(xs, key=lambda x: (-x['ark'], -x['ets']))[:3]]}
@@ -1123,7 +1125,6 @@ def class_ranks(lst, bt):
                       'top': [[x['name'], x['pos'], x['fv']] for x in xs[:3]], 'best': min(x['rk'] or 999 for x in xs),
                       'xnil': sum(x['xnil'] for x in xs), 'v1': round(sum(x['path'][0]['v'] for x in xs), 2),
                       'min1': round(sum(x['path'][0]['on'] * x['path'][0]['min'] for x in xs), 1),
-                      'ark5': sum(1 for x in xs if x['ark'] >= 5), 'ark4': sum(1 for x in xs if 4 <= x['ark'] < 5),
                       **class_parts(xs)})
     trows.sort(key=lambda x: -x['ets'])
     for i, x in enumerate(trows): x['rk'] = i + 1

@@ -709,13 +709,15 @@ export async function recruitBoard({ fit, rows, teams, builder, season, asof, of
     counts: { class: klass.filter(x => x.tid).length, open: klass.filter(x => !x.tid).length, committed: cls.length, redshirts: redshirts.length, young: young.length, future: future.map(f => f.n) },
     ...(Object.keys(cfbdCover).length ? { cfbd: Object.values(cfbdCover) } : {}) };
 }
-// the class-rankings card's parts: ARK star counts (5-star+, 5, 4 to 4.5), mean xFV, the three best commits (ARK stars, then xFV: the board's order), and the
+// the class-rankings card's parts: ARK star counts (5-star+, 4.5-5, 3-4, unranked-2.5), mean xFV, the three best commits (ARK stars, then xFV: the board's order), and the
 // class score split into its top end (the TOP_END best commits' FV points over the floor) and its depth (the rest)
 const TOP_END = 5;
 function classParts(xs, floor) {
   xs = xs.slice().sort((a, b) => b.xfv - a.xfv);
   const pts = a => r1(a.reduce((s, x) => s + (x.xfv - floor), 0));
-  return { a6: xs.filter(x => x.ark > 5).length, a5: xs.filter(x => x.ark === 5).length, a4: xs.filter(x => x.ark >= 4 && x.ark < 5).length,
+  // ARK star buckets (Noah, Nov 28): 5-star+ | 4.5-5 | 3-4 (3, 3.5, 4) | unranked-2.5 (1 = no grade); every half star lands in one
+  return { a6: xs.filter(x => x.ark > 5).length, ah: xs.filter(x => x.ark >= 4.5 && x.ark <= 5).length, am: xs.filter(x => x.ark >= 3 && x.ark < 4.5).length,
+    al: xs.filter(x => !(x.ark >= 3)).length,
     avgXfv: xs.length ? r1(xs.reduce((s, x) => s + x.xfv, 0) / xs.length) : null,
     topEnd: pts(xs.slice(0, TOP_END)), depth: pts(xs.slice(TOP_END)),
     top: xs.slice().sort((a, b) => (b.ark || 0) - (a.ark || 0) || b.xfv - a.xfv).slice(0, 3).map(x => ({ name: x.name, pos: x.pos, xfv: x.xfv, ark: x.ark ?? null })) };
