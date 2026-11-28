@@ -1,0 +1,34 @@
+{{- /* Process > ARKLOG > milestones: social, site and log numbers passing round marks, and the next mark for each, from
+       data/milestones.json (scripts/milestones.py; nothing typed in). {{< arklogmiles tab="milestones" >}} */ -}}
+{{- $m := site.Data.milestones -}}
+{{- $btns := `<span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>` | safeHTML -}}
+{{- with $m }}
+<div class="desk libgrid proc" data-tab="{{ $.Get "tab" }}">
+<div class="win proc__wide">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-site"/></svg>next.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="libfv__wrap"><table class="libfv miles">
+    <thead><tr><th>section</th><th>milestone</th><th title="where it stands now">now</th><th title="share of the way there">to go</th><th title="projected date (the follower ETAs come from the social goal model)">ETA</th></tr></thead>
+    <tbody>
+    {{- range .next }}
+    <tr><td>{{ .sec }}</td><td{{ with .of }} title="{{ . }}"{{ end }}>{{ .t }}</td><td>{{ lang.FormatNumber 0 .now }}</td>
+      <td><div class="proc__cell miles__cell"><span class="proc__r"><i style="width:{{ math.Min 100 (math.Round (mul 100 (div (float .now) .goal))) }}%"></i></span><span class="proc__n">{{ lang.FormatNumber 0 (sub .goal .now) }}</span></div></td>
+      <td>{{ with .eta }}{{ dateFormat "Jan 2 2006" . }}{{ else }}-{{ end }}</td></tr>
+    {{- end }}
+    </tbody>
+  </table></div>
+  <div class="win__status"><span>{{ len .next }} next</span><span>updated {{ dateFormat "Jan 2 2006" .asof }}</span></div>
+</div>
+<div class="win proc__wide">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-site"/></svg>milestones.exe<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="libfv__wrap"><table class="libfv miles">
+    <thead><tr><th>date</th><th>section</th><th>milestone</th></tr></thead>
+    <tbody>
+    {{- range .rows }}
+    <tr><td{{ if .est }} title="estimated date"{{ end }}>{{ if .est }}~{{ end }}{{ dateFormat "Jan 2 2006" .d }}</td><td>{{ .sec }}</td><td>{{ .t }}</td></tr>
+    {{- end }}
+    </tbody>
+  </table></div>
+  <div class="win__status"><span>{{ len .rows }} milestones</span><span>~ = estimated date</span></div>
+</div>
+</div>
+{{- end -}}
