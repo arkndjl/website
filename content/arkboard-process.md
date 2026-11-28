@@ -1,12 +1,12 @@
 +++
 title = "Process"
 url = "/process/"
-description = "Process: the philosophy behind arkndjl.net, ARKLOG (every change and test on the site with its held-out number), research studies on strategy questions in every sport, each tested on play-by-play data with sample sizes and confidence intervals; the glossary and methodology behind every ARKBOARD metric, model and grade, with the FV conversion scale for each prospect board; and every data source the boards use, linked."
+description = "Process: philosophy, ARKLOG (every change and test on arkndjl.net with its held-out number), the glossary and methodology behind every metric and model, FV scales, research studies and data sources."
 keywords = ["arkboard", "process", "arklog", "philosophy", "changelog", "backtests", "research", "sports analytics research", "methodology", "glossary", "fv scale", "future value", "data sources", "goalie pull", "fourth down", "two point conversion", "foul up three", "win probability"]
 draft = false
 +++
 
-{{< winpane title="process.exe" icon="process" sprite="px/hero-library" status="" class="winpane--art" />}}
+{{< procview >}}
 
 {{< glossfind tabs="fv=FV|value=player value|players=player odds|teams=team ratings|games=game models|drafts=drafts and mocks|method=testing|data=data and names|abbr=abbreviations" >}}
 

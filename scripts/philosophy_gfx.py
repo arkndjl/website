@@ -1,4 +1,4 @@
-"""The 16:9 ARKPHILOSOPHY card (static/img/process/arkphilosophy.png): one panel a Philosophy tab, its pull line and a
+"""The 16:9 ARKPHILOSOPHY card (static/img/process/arkphilosophy.png): one panel a Philosophy tab, a line from Noah's interview and a
 small figure, numbers read from data/philosophy.json (scripts/philosophy_build.py). Rendered with Playwright.
 
     python3 scripts/philosophy_gfx.py
@@ -22,6 +22,14 @@ def bar(label, v, cls=''):
             f'</span><span class="bn">{n3(v)}</span></div>')
 
 
+def sprite(tab):
+    """the tab's pixel sprite (scripts/process_art.py), first frame, 96 px"""
+    import re
+    s = (ROOT / f'layouts/partials/px/phil-{tab.replace(" ", "-")}.html').read_text()
+    s = re.sub(r'width="\d+" height="\d+"', 'width="96" height="96"', s, count=1)
+    return f'<div class="spr">{s}</div>'
+
+
 def figs(V):
     f = {}
     f['predict and describe'] = ('<div class="cap">NHL, held-out R²</div>' + bar('WAR describe', V['nhl_war_d']) +
@@ -31,16 +39,16 @@ def figs(V):
                            f'<div><b>VORX</b><span>count</span><span>value</span></div></div>'
                            f'<div class="cap">{html.escape(V["cr_small_name"])}: {V["cr_small_xpm"]} XPM in {V["cr_small_mp"]} min</div>')
     ticks = ''.join(f'<span style="left:{(g - 20) / 60 * 100:.1f}%"><i></i>{g}</span>' for g in range(20, 81, 10))
-    f['projection'] = f'<div class="fv"><div class="fvb"></div><div class="fvt">{ticks}</div></div><div class="cap">50 regular · 60 plus · 70 star · 80 generational</div>'
+    f['projection'] = f'<div class="fv"><div class="fvb"></div><div class="fvt">{ticks}</div></div>'
     f['one framework'] = '<div class="tri"><span>player value</span><span>team fit</span><span>context</span></div><div class="cap">CFB CBB NFL NBA NHL soccer tennis CS2</div>'
     t = V['tests']
     seg = ''.join(f'<i class="{c}" style="width:{V[k] / t * 100:.1f}%"></i>' for k, c in (('shipped', 's'), ('mixed', 'm'), ('failed', 'f')))
     f['shipping'] = (f'<div class="big">{t}<small>tests</small></div><div class="stack">{seg}</div>'
                      f'<div class="cap"><em class="s">{V["shipped"]} shipped</em> <em class="m">{V["mixed"]} part</em> <em class="f">{V["failed"]} failed</em></div>')
     sw = ''.join(f'<i style="background:{c}"></i>' for c in ('#4a3b6b', '#57068c', '#7fffd4', '#c8c7ff', '#b46cff', '#ff9ec7', '#b9f2ff'))
-    f['friction'] = f'<div class="sw">{sw}</div><div class="cap">border-radius 0 · one font · no emoji</div>'
-    f['human'] = '<div class="type">&gt; written by a person<span>_</span></div><div class="cap">no blurbs · no AI copy</div>'
-    f['skin in the game'] = '<div class="big">$0<small>free</small></div><div class="cap">no betting lines in the news</div>'
+    f['friction'] = f'<div class="sw">{sw}</div>'
+    f['human'] = sprite('human')
+    f['skin in the game'] = sprite('skin in the game')
     return f
 
 
@@ -59,7 +67,7 @@ body { width: 1600px; height: 900px; font-family: P, monospace; color: #c8c7ff; 
 .p { background: #3a2d56; border: 3px solid; border-color: #241a3a #c8c7ff #c8c7ff #241a3a; display: flex; flex-direction: column; }
 .pt { background: #241a3a; color: #7fffd4; font-size: 17px; padding: 4px 8px; display: flex; justify-content: space-between; }
 .pt em { font-style: normal; color: #b46cff; }
-.q { color: #fff; font-size: 24px; line-height: 1.35; padding: 12px 14px 6px; }
+.q { color: #fff; font-size: 21px; line-height: 1.35; padding: 12px 14px 6px; }
 .f { margin-top: auto; padding: 4px 12px 12px; font-size: 15px; }
 .cap { color: #c8c7ff; font-size: 14px; margin-top: 6px; }
 .b { display: grid; grid-template-columns: 104px 1fr 40px; gap: 6px; align-items: center; margin-top: 4px; font-size: 13px; }
@@ -79,6 +87,7 @@ body { width: 1600px; height: 900px; font-family: P, monospace; color: #c8c7ff; 
 .cap em { font-style: normal; background: none !important; } .cap em.s { color: #7fffd4; } .cap em.m { color: #cf9bff; } .cap em.f { color: #ff9ec7; }
 .sw { display: flex; gap: 4px; } .sw i { flex: 1; height: 34px; border: 2px solid #241a3a; }
 .type { background: #241a3a; color: #7fffd4; font-size: 18px; padding: 10px 8px; } .type span { color: #fff; }
+.spr svg { display: block; image-rendering: pixelated; } .spr .px__f { display: none; } .spr .px__f:first-child { display: inline; }
 .ft { display: flex; justify-content: space-between; font-size: 15px; padding: 0 22px 10px; color: #c8c7ff; }
 """
 
@@ -88,7 +97,7 @@ def main():
     V, F = d['values'], figs(d['values'])
     panels = []
     for i, t in enumerate(d['tabs'], 1):
-        q = next(b['q'] for b in t['blocks'] if 'q' in b)
+        q = t['card']          # Noah's own words (interview, Nov 28 2026), research/philosophy.json
         panels.append(f'<div class="p"><div class="pt"><span>{html.escape(t["title"])}</span><em>{i:02d}</em></div>'
                       f'<div class="q">{html.escape(q)}</div><div class="f">{F[t["tab"]]}</div></div>')
     page = (f'<!doctype html><html><head><meta charset="utf-8"><style>{CSS % (ROOT / "static/fonts/mspgothic-pixel.woff2")}</style></head>'

@@ -8,6 +8,7 @@
 <div class="win proc__wide phil__text">
   <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>{{ .title }}<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
   <div class="libstudy__body phil__body">
+  {{- $px := printf "px/phil-%s.html" (replace $tab " " "-") }}{{ if templates.Exists (printf "partials/%s" $px) }}<div class="phil__px" aria-hidden="true">{{ partial $px . }}</div>{{ end }}
   {{- $links := slice }}{{ $srcs := slice }}
   {{- range .blocks }}
     {{- with .q }}<p class="phil__q">{{ . }}</p>{{ end }}
