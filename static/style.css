@@ -4021,7 +4021,7 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 .nbaxpm__tm { display: none; }
 .nbaxpm__od { display: block; font-size: 0.8em; white-space: nowrap; }
 @media (max-width: 684px) {
-  .nbaxpm__table .nbaxpm__team, .nbaxpm__table .nbaxpm__src, .nbaxpm__table .nbaxpm__ph { display: none; }
+  .nbaxpm__table .nbaxpm__team { display: none; }   /* the team rides under the name; every number stays, the table scrolls (no stat toggles, Nov 28 2026) */
   .nbaxpm__tm { display: block; font-size: 0.85em; }
   .cfb__table td.cfb__name .nbaxpm__tm { white-space: normal; }   /* a long club + league line wraps inside the pinned cell (it ran under the next column) */
   /* badge medals ride on the team line, so a long name doesn't widen the table */
@@ -4171,19 +4171,12 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 }
 /* NBA XPM: a season whose BPM/DPM haven't posted yet (XPM is the prior) drops those columns */
 .nbaxpm__table.no-proj .c-pxpm, .nbaxpm__table.no-proj .c-p3, .nbaxpm__table.no-dpm .c-dpm, .nbaxpm__table.no-bpm .c-bpm { display: none; }
-/* contract value ({{< nbasurplus >}}): on phones only the surplus the view ranks by */
-@media (max-width: 684px) {
-  .nbasur__table:not([data-key=sur]) .c-sur, .nbasur__table:not([data-key=csur]) .c-csur { display: none; }
-}
-/* G League ({{< gleague >}}): team, parent club, age and draft slot under the name; on phones NBA% plus the odds the view ranks by */
+/* G League ({{< gleague >}}): team, parent club, age and draft slot under the name */
 .nbagl .nbaxpm__tm { display: block; font-size: 0.85em; }
 .nbagl__ct { display: inline-block; margin-left: 6px; padding: 0 4px; font-size: 0.72em; line-height: 1.3; vertical-align: 1px; letter-spacing: 0.05em; color: var(--win-dark); box-shadow: 2px 2px 0 var(--win-title); }
 .nbagl__ct::after { content: attr(data-g); }   /* text in CSS so the name, search and GFX text stay the name */
 .nbagl__ct--tw { background: #7fffd4; }
 .nbagl__ct--nba { background: #c8c7ff; }
-@media (max-width: 684px) {
-  .nbagl__table:not([data-key=p5]) .c-p5, .nbagl__table:not([data-key=xv]) .c-xv { display: none; }
-}
 
 /* backup watch: the playing-time columns fold away on phones */
 @media (max-width: 640px) { .bw .bw__x { display: none; } }
