@@ -171,6 +171,10 @@
   card, `buildRCard` in `assets/js/gfx.js`: FV to the whole number with Y1 FV (CFB) or IF NBA (CBB) under it, GRADES,
   PROJECTION (FV scale, FV and Y1 FV or NBA odds, year-1 cells; no year 2-3 projection for recruits, Noah Nov 26), PREDICTIONS while uncommitted, MOVES and VISITS (officials first, then the latest unofficial, six in all; committed recruits from the weekly On3 pull in recruit-leans.yml), FV INPUTS. It is a
   projection card: predictive numbers only. Age reads the rows' `age` and `ageRel` (years over the class median); absent = not drawn.
+- Recruit positions (Nov 28): the Pos cell on the CFB and CBB class tables (and so the recruit card) shows the projected college
+  position, `scripts/recruit_pos.py` -> `data/recruit_pos.json` ("<class>|<name>": label, hover odds), partial `recpos.html`. A second
+  spot shows at 30% (CFB: DB/WR, S/LB) or 35% (CBB: G, G/F, F, PF/C); the listed code stays when the projection agrees. Fit by hand
+  (`--fit`, cfbfastR rosters + Barttorvik roles); the recruit workflows only apply it. Not an FV input (failed both sports Nov 28).
 - Moves on every player card come from `static/data/moves/<sport>.json`, written by `scripts/player_moves.py` (rerun by the
   recruit news workflow) from files already in the repo; headline and transaction rows are kept in
   `scripts/data/player_moves_hist.json.gz`. A new kind of move needs a label in `MV_LAB` (gfx.js).

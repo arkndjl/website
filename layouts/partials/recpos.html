@@ -1,0 +1,7 @@
+{{- /* A recruit's Pos cell: the projected college position (scripts/recruit_pos.py -> data/recruit_pos.json, key
+       "<class>|<name>"), its odds in the hover; the listed position as before when there is no projection.
+       Pass (dict "sport" "cfb"|"cbb" "cls" <class year> "name" .name "pos" .pos). */ -}}
+{{- $e := index (index (site.Data.recruit_pos | default dict) .sport | default dict) (printf "%v|%s" .cls .name) -}}
+{{- with $e -}}
+<span class="rc-pp" title="{{ index . 1 }}">{{ if gt (len .) 2 }}{{ partial "rpos.html" $.pos }}{{ else }}{{ index . 0 }}{{ end }}</span>
+{{- else -}}{{ partial "rpos.html" .pos }}{{- end -}}
