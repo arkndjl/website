@@ -45,7 +45,7 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
 
 [params]
   contentTypeName = "posts"
-  showMenuItems = 8
+  showMenuItems = 9
   showLanguageSelector = false
   fullWidthTheme = false
   centerTheme = true
@@ -153,7 +153,7 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
           identifier = "ARKBOARD"
           name = "ARKBOARD"
           url = "/arkboard/"
-          weight = 12
+          weight = 13
           [languages.en.menu.main.params]
             icon = "img/icons/arkboard.svg"
         # ARKBOARD children, grouped by params.group (menu.html, mobile-menu.html, arknav.html draw one labelled row
@@ -193,7 +193,7 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
           identifier = "arkboard-process"
           parent = "ARKBOARD"
           name = "Process"
-          url = "/arkboard/process/"
+          url = "/process/"
           weight = 33
           [languages.en.menu.main.params]
             icon = "img/icons/process.svg"
@@ -340,14 +340,14 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
           identifier = "1nt"
           name = "1NT"
           url = "/1nt/"
-          weight = 13
+          weight = 14
           [languages.en.menu.main.params]
             icon = "img/icons/1nt.png"
         [[languages.en.menu.main]]
           identifier = "laursen"
           name = "LAURSEN_111"
           url = "/laursen_111/"
-          weight = 14
+          weight = 15
           [languages.en.menu.main.params]
             icon = "img/icons/laursen.svg"
         [[languages.en.menu.main]]
@@ -358,13 +358,6 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
           [languages.en.menu.main.params]
             icon = "img/eephus-favicon.png"
         [[languages.en.menu.main]]
-          identifier = "site"
-          name = "ARKLOG"
-          url = "/arklog/"
-          weight = 60
-          [languages.en.menu.main.params]
-            icon = "img/icons/site.svg"
-        [[languages.en.menu.main]]
           identifier = "tip"
           name = "donate"
           url = "/tip/"
@@ -372,6 +365,14 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
           [languages.en.menu.main.params]
             icon = "img/icons/tip.svg"
             class = "menu-tip"
+        # Process (Nov 28 2026): the method, the philosophy and ARKLOG in one section, right under donate
+        [[languages.en.menu.main]]
+          identifier = "process"
+          name = "Process"
+          url = "/process/"
+          weight = 12
+          [languages.en.menu.main.params]
+            icon = "img/icons/process.svg"
         # hidden (Noah Nov 17): Franchise Fantasy; to restore, uncomment this entry and set draft = false in content/franchise-fantasy.md
         # [[languages.en.menu.main]]
         #   identifier = "franchise-fantasy"

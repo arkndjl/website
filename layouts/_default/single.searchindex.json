@@ -14,7 +14,7 @@
 {{- if and (in (slice "page" "home" "section") .Kind) (not .Params.searchExclude) (not .Draft) -}}
 {{- $u := .RelPermalink -}}
 {{- $g := "o" -}}
-{{- if hasPrefix $u "/arkboard/process/" }}{{ $g = "x" }}{{ else if hasPrefix $u "/arkboard/" }}{{ $g = "b" }}{{ else if hasPrefix $u "/stclaire/" }}{{ $g = "s" }}{{ else if hasPrefix $u "/arklibrary/" }}{{ $g = "l" }}{{ else if hasPrefix $u "/1nt/" }}{{ $g = "n" }}{{ else if hasPrefix $u "/laursen_111/" }}{{ $g = "z" }}{{ else if eq .Section "posts" }}{{ $g = "a" }}{{ end -}}
+{{- if hasPrefix $u "/process/" }}{{ $g = "x" }}{{ else if hasPrefix $u "/arkboard/" }}{{ $g = "b" }}{{ else if hasPrefix $u "/stclaire/" }}{{ $g = "s" }}{{ else if hasPrefix $u "/arklibrary/" }}{{ $g = "l" }}{{ else if hasPrefix $u "/1nt/" }}{{ $g = "n" }}{{ else if hasPrefix $u "/laursen_111/" }}{{ $g = "z" }}{{ else if eq .Section "posts" }}{{ $g = "a" }}{{ end -}}
 {{- $short := replaceRE ` :: (ARKBOARD|ST\. CLAIRE)$` "" .Title -}}
 {{- if eq .Kind "home" }}{{ $short = "home" }}{{ end -}}
 {{- $icon := index $icons $u | default "" -}}

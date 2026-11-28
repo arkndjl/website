@@ -3784,7 +3784,7 @@
   // head (term + what it stands for + sports), WHAT / USE lines, formula, held-out test vs similar metrics,
   // a picture (distribution, calibration, bars or scale), top 10, footnote
   async function buildExplain(d) {
-    var F = await frame(1800, 2400, 'ARKBOARD PROCESS :: GLOSSARY', '', 'arkndjl.net/process' + (d.id ? '#' + d.id : ''));
+    var F = await frame(1800, 2400, 'PROCESS :: GLOSSARY', '', 'arkndjl.net/process' + (d.id ? '#' + d.id : ''));
     var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 32, gap = 20, cy = y;
     var num = function (v, dec, sign, unit) {
       if (typeof v === 'string') return v;
@@ -3974,7 +3974,7 @@
     var d; try { d = JSON.parse(btn.getAttribute('data-gfx-term') || '{}'); } catch (e) { return null; }
     if (!d.t) return null;
     if (d.x) return btn.hasAttribute('data-gfx-wide') ? buildWide(d) : buildExplain(d);
-    var F = await frame(2400, 1350, 'ARKBOARD PROCESS :: GLOSSARY', '', 'arkndjl.net/process' + (d.id ? '#' + d.id : ''));
+    var F = await frame(2400, 1350, 'PROCESS :: GLOSSARY', '', 'arkndjl.net/process' + (d.id ? '#' + d.id : ''));
     var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 40;
     var ab = d.ab || String(d.t).replace(/\s*\(.*$/, ''), name = d.name || ((/\(([^)]*)\)/.exec(d.t) || [])[1]) || '';
     var num = function (v, unit) {
@@ -4104,7 +4104,7 @@
     var d; try { d = JSON.parse(btn.getAttribute('data-gfx-log') || '{}'); } catch (e) { return null; }
     if (!d.t) return null;
     var study = d.k === 'study', key = study ? d.id : d.n;
-    var F = await frame(2400, 1350, 'ARKLOG' + (d.sec ? ' :: ' + String(d.sec).toUpperCase() : ''), String(d.d || '').replace(/,? \d+:\d+.*$/, ''), 'arkndjl.net/arklog' + (key ? '#log-' + key : ''));
+    var F = await frame(2400, 1350, 'ARKLOG' + (d.sec ? ' :: ' + String(d.sec).toUpperCase() : ''), String(d.d || '').replace(/,? \d+:\d+.*$/, ''), 'arkndjl.net/process#' + (key ? 'log-' + key : 'log'));
     var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 40;
     // head: tags, then the title in the largest of 88/72/56 px that fits three lines
     var tags = (d.sp || []).slice(0, 4).map(function (s) { return String(s).toUpperCase(); }), vt = study ? (d.v === 'w' ? 'STUDY · WEAK' : 'STUDY') : VLAB[d.v] || String(d.ar || '').toUpperCase();
@@ -4186,7 +4186,7 @@
     var d; try { d = JSON.parse(btn.getAttribute('data-gfx-board') || '{}'); } catch (e) { return null; }
     if (!d.tests) return null;
     var day = ''; try { day = new Date(d.asof).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'America/New_York' }); } catch (e) {}
-    var F = await frame(2400, 1350, 'ARKLOG :: SCOREBOARD', day, 'arkndjl.net/arklog#scoreboard');
+    var F = await frame(2400, 1350, 'ARKLOG :: SCOREBOARD', day, 'arkndjl.net/process#scoreboard');
     var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, gap = 24;
     var tiles = [['CHANGES', d.changes, C.white], ['TESTS', d.tests, C.white], ['SHIPPED', d.shipped, VCOL.s], ['PART SHIPPED', d.mixed, VCOL.m], ['FAILED', d.failed, VCOL.f], ['STUDIES', d.studies, C.white]];
     var tw = (w - gap * (tiles.length - 1)) / tiles.length, th = 280;
@@ -4204,7 +4204,7 @@
   async function buildSheet(win, btn) {
     var d; try { d = JSON.parse(btn.getAttribute('data-gfx-sheet') || '{}'); } catch (e) { return null; }
     if (!d.sport) return null;
-    var F = await frame(2400, 1350, 'ARKBOARD PROCESS :: ' + String(d.sport).toUpperCase(), '', 'arkndjl.net/process#sheet-' + String(d.sport).toLowerCase());
+    var F = await frame(2400, 1350, 'PROCESS :: ' + String(d.sport).toUpperCase(), '', 'arkndjl.net/process#sheet-' + String(d.sport).toLowerCase());
     var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 40, gap = 24, L = d.lead, lg = d.log || {};
     var hw = Math.round(w * 0.3), HH = L ? 420 : 300;
     well(g, x, y, hw, HH);
@@ -4251,7 +4251,7 @@
   // an explainer term as a 16:9 card (the 3:4 card is buildExplain): term, what, use and formula on the left,
   // the held-out test against similar metrics over the top five on the right
   async function buildWide(d) {
-    var F = await frame(2400, 1350, 'ARKBOARD PROCESS :: GLOSSARY', '', 'arkndjl.net/process' + (d.id ? '#' + d.id : ''));
+    var F = await frame(2400, 1350, 'PROCESS :: GLOSSARY', '', 'arkndjl.net/process' + (d.id ? '#' + d.id : ''));
     var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 36, gap = 24, lw = Math.round(w * 0.5), rx = x + lw + gap, rw = w - lw - gap;
     var cap = function (t, X, Y, col) { g.font = '32px ' + FONT; g.fillStyle = col || C.lilac; g.fillText(String(t).toUpperCase(), X, Y); };
     var num = function (v, dec, sign) { if (typeof v === 'string') return v; v = +v; var s = dec == null ? (Math.abs(v) >= 10 ? (Math.round(v * 10) / 10).toString() : (Math.round(v * 1000) / 1000).toString()) : v.toFixed(dec); s = s.replace(/^(-?)0\./, '$1.').replace('-', '−'); return sign && v > 0 ? '+' + s : s; };

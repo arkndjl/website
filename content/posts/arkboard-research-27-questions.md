@@ -13,11 +13,11 @@ Toc = true
 draft = false
 +++
 
-{{< card url="/arkboard/process/" title="ARKBOARD Process" >}}
+{{< card url="/process/" title="ARKBOARD Process" >}}
 Research, glossary and methodology, data sources.
 {{< /card >}}
 
-The Research tab on [Process](/arkboard/process/) answers one strategy question per study with play-by-play data. This post collects all 27 as of November 2, 2026: the question, the answer, the key number with its 95% confidence interval and sample size, and a link to the study on Process, where each one has its chart.
+The Research tab on [Process](/process/) answers one strategy question per study with play-by-play data. This post collects all 27 as of November 2, 2026: the question, the answer, the key number with its 95% confidence interval and sample size, and a link to the study on Process, where each one has its chart.
 
 Each study compares decisions from the same game state (score, time, field position, count, economy), so the teams that choose an option aren't just better teams. Every number carries its n, and CIs are clustered by game or match where plays repeat. Each result is also checked on two halves of the sample, usually earlier and later seasons. Five of the 27 don't pass that check or have a CI that includes zero; they're marked below and kept, since a null answer is still an answer.
 
@@ -30,33 +30,33 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 | Study | Answer | Key number | Robust |
 |---|---|---|---|
-| [NFL 4th downs](/arkboard/process/#rq-nfl-fourth-down) | In states where going gains 1+ WP point, teams went 25% of the time in 2015-16 and 45% in 2024-25. | 3.4 WP pts lost per team-game, 2024-25 | yes |
-| [NFL down 14: go for two first](/arkboard/process/#rq-nfl-down-14-go-for-two) | Yes. With two TDs and a stop, going for 2 first wins 59% vs 47% kicking. Teams went for 2 54% of the time in 2025-26. | +12.1 pts win chance, given two TDs | yes |
-| [NFL surprise onside kicks](/arkboard/process/#rq-nfl-onside-surprise) | Yes, 25% vs 9% (2015-23), but below the ~32% break-even for an early onside. Net WPA not different from zero. | 25% surprise onside recovered, 2015-23 | yes |
-| [NFL QB sneak](/arkboard/process/#rq-nfl-qb-sneak) | Yes. Sneaks convert 82%, other runs 69%, passes 56%. Sneak share of these plays was 8% in 2015, 14% in 2025. | +12.5 pts conversion, sneak vs other runs | yes |
-| [NFL two-point tries](/arkboard/process/#rq-nfl-two-point) | No clear edge. 2-pt tries score 0.96 points per try, XPs 0.94; difference +0.02 (-0.03 to +0.07). | +0.02 pts per try, 2-pt minus XP | no |
-| [NBA up 3: foul or defend](/arkboard/process/#rq-nba-foul-up-3) | No clear edge: leader wins 92.7% fouling, 91.4% defending; +2.3 pp at equal time (CI -2.4 to +6.4). | +2.3 pp leader win, foul minus defend | no |
-| [NBA timeout after a run](/arkboard/process/#rq-nba-timeout-after-run) | No: after an 8+ pt run, a timeout nets -0.31 pts over the next 2:00 vs playing on (CI -0.40 to -0.23). | -0.31 pts next 2:00, timeout vs play on | yes |
-| [NBA 2-for-1](/arkboard/process/#rq-nba-two-for-one) | Yes: quick shot nets +0.33 pts per quarter-end vs a full possession (CI +0.26 to +0.39). | +0.33 pts per quarter end, quick vs full | yes |
-| [CBB up 3: foul or defend](/arkboard/process/#rq-cbb-foul-up-3) | Foul: leader wins 93.6% fouling, 92.4% defending; +2.8 pp at equal time (CI +0.8 to +4.6). | +2.8 pp leader win, foul minus defend | yes |
-| [CBB icing the shooter](/arkboard/process/#rq-cbb-ft-icing) | Icing does not work: iced shooters +2.3 pp vs un-iced, relative to own FT% (CI +0.0 to +4.6). | +2.3 pp vs own FT%, iced minus not iced | yes |
-| [NHL goalie pull](/arkboard/process/#rq-nhl-goalie-pull) | Pull at 3:18 down one, 6:27 down two. Teams pull at 1:52 and 2:39. | 3:18 optimal pull, down 1 | yes |
-| [NHL goalie pull on a power play](/arkboard/process/#rq-nhl-pp-goalie-pull) | Yes with 3:00 or less left: 6v4 adds 8 pts of tie chance at 2:00. Past 4:00 the gain is not clear. | +8 pts tie chance, 6v4 at 2:00 | yes |
-| [MLB stolen bases](/arkboard/process/#rq-mlb-stolen-bases) | Slightly. Steals of 2nd succeed 75.9% vs 71.7% break-even, +2.6 runs per team-season. At 1 out, no edge. | 75.9% steal of 2nd success, 2023-25 | yes |
-| [MLB intentional walks](/arkboard/process/#rq-mlb-ibb) | Mostly no. Runner on 2nd, 1 out: IBB costs the defense 2.0 win-prob pts. Other states: no gain distinguishable from 0. | -2.0 WP pts, runner on 2nd, 1 out | yes |
-| [MLB times through the order](/arkboard/process/#rq-mlb-tto) | For an average starter, yes. 3rd time: +.022 wOBA vs 1st (same pitcher), .339 vs relievers .323. | +.022 wOBA, 3rd time vs 1st | yes |
-| [MLB sacrifice bunts](/arkboard/process/#rq-mlb-sac-bunt) | No. Bunt tries cost 0.3 to 0.9 win-prob pts per try vs swinging; late and close, up to 1.9. | -0.3 WP pts per try, runner on 1st | yes |
-| [Soccer protecting a lead](/arkboard/process/#rq-soccer-protecting-lead) | Yes after 75': xG share 46% vs 53% expected. Costs 0.05 xPts from 75', but actual points held. | 46% leader xG share after 75', expected 53% | yes |
-| [Soccer after a goal](/arkboard/process/#rq-soccer-after-conceding) | No momentum swing. Team that just conceded scores 0.95x baseline in the next 10 min; scorer 1.06x. Restart dips the first 3 min. | 0.95x goals by the conceding team, next 10 min | no |
-| [Soccer first sub timing](/arkboard/process/#rq-soccer-first-sub-timing) | Trailing teams sub first by 60', level and leading by 65'. A first sub before 60' adds +0.04 xG diff; no goal effect found. | +0.04 xG diff, first sub before 60' | no |
-| [Tennis first serve on second serve](/arkboard/process/#rq-tennis-second-serve-first-serve) | No. 6 of 188 men and 4 of 112 women would gain. Median player loses 6.8 pts (men), 5.3 (women) per 100. | 6 of 188 men who would gain | yes |
-| [Tennis hold after breaking](/arkboard/process/#rq-tennis-hold-after-break) | No. Same player and match: hold rate after breaking is +0.7 pts (men), +0.5 (women) vs after opponent holds. | +0.7 pts hold rate after breaking, men | yes |
-| [Tennis serve direction](/arkboard/process/#rq-tennis-serve-direction-mix) | Wide and T: yes, within 1 pt for the same server. Body: no, 4.2 pts lower (men), 4.1 (women). | -4.2 pts, body vs wide and T, men | yes |
-| [CS2 pistol round](/arkboard/process/#rq-cs2-pistol-value) | First pistol winner takes the map 59.5%: 57.1% on CT, 61.9% on T. | 61.9% map win, pistol 1 won on T | yes |
-| [CS2 buy after losing the pistol](/arkboard/process/#rq-cs2-pistol-loser-buy) | Buying on round 2: +26.8 pp in round 2, -16.5 pp in round 3, map win -0.8 pp (not different from 0). | -0.8 pp map win, buy vs save | no |
-| [CS2 equipment gap](/arkboard/process/#rq-cs2-equipment-gap) | Full buy vs full buy: CT wins 51.7%. At equal dollar value CT wins 48.5%; an eco beats a full buy 5.6%. | 51.7% CT round win, full buy vs full buy | yes |
-| [CS2 losing streaks](/arkboard/process/#rq-cs2-loss-streak) | No tilt. After 3+ straight losses a team wins +0.9 pp vs an economy and score model. | +1.1 pp vs model after 3 straight losses | yes |
-| [CS2 starting side](/arkboard/process/#rq-cs2-side-first) | Start T. T-first teams win 52.4% of maps; 55.8% on overpass, 50.0% on anubis. | 52.4% map win, T-first team | yes |
+| [NFL 4th downs](/process/#rq-nfl-fourth-down) | In states where going gains 1+ WP point, teams went 25% of the time in 2015-16 and 45% in 2024-25. | 3.4 WP pts lost per team-game, 2024-25 | yes |
+| [NFL down 14: go for two first](/process/#rq-nfl-down-14-go-for-two) | Yes. With two TDs and a stop, going for 2 first wins 59% vs 47% kicking. Teams went for 2 54% of the time in 2025-26. | +12.1 pts win chance, given two TDs | yes |
+| [NFL surprise onside kicks](/process/#rq-nfl-onside-surprise) | Yes, 25% vs 9% (2015-23), but below the ~32% break-even for an early onside. Net WPA not different from zero. | 25% surprise onside recovered, 2015-23 | yes |
+| [NFL QB sneak](/process/#rq-nfl-qb-sneak) | Yes. Sneaks convert 82%, other runs 69%, passes 56%. Sneak share of these plays was 8% in 2015, 14% in 2025. | +12.5 pts conversion, sneak vs other runs | yes |
+| [NFL two-point tries](/process/#rq-nfl-two-point) | No clear edge. 2-pt tries score 0.96 points per try, XPs 0.94; difference +0.02 (-0.03 to +0.07). | +0.02 pts per try, 2-pt minus XP | no |
+| [NBA up 3: foul or defend](/process/#rq-nba-foul-up-3) | No clear edge: leader wins 92.7% fouling, 91.4% defending; +2.3 pp at equal time (CI -2.4 to +6.4). | +2.3 pp leader win, foul minus defend | no |
+| [NBA timeout after a run](/process/#rq-nba-timeout-after-run) | No: after an 8+ pt run, a timeout nets -0.31 pts over the next 2:00 vs playing on (CI -0.40 to -0.23). | -0.31 pts next 2:00, timeout vs play on | yes |
+| [NBA 2-for-1](/process/#rq-nba-two-for-one) | Yes: quick shot nets +0.33 pts per quarter-end vs a full possession (CI +0.26 to +0.39). | +0.33 pts per quarter end, quick vs full | yes |
+| [CBB up 3: foul or defend](/process/#rq-cbb-foul-up-3) | Foul: leader wins 93.6% fouling, 92.4% defending; +2.8 pp at equal time (CI +0.8 to +4.6). | +2.8 pp leader win, foul minus defend | yes |
+| [CBB icing the shooter](/process/#rq-cbb-ft-icing) | Icing does not work: iced shooters +2.3 pp vs un-iced, relative to own FT% (CI +0.0 to +4.6). | +2.3 pp vs own FT%, iced minus not iced | yes |
+| [NHL goalie pull](/process/#rq-nhl-goalie-pull) | Pull at 3:18 down one, 6:27 down two. Teams pull at 1:52 and 2:39. | 3:18 optimal pull, down 1 | yes |
+| [NHL goalie pull on a power play](/process/#rq-nhl-pp-goalie-pull) | Yes with 3:00 or less left: 6v4 adds 8 pts of tie chance at 2:00. Past 4:00 the gain is not clear. | +8 pts tie chance, 6v4 at 2:00 | yes |
+| [MLB stolen bases](/process/#rq-mlb-stolen-bases) | Slightly. Steals of 2nd succeed 75.9% vs 71.7% break-even, +2.6 runs per team-season. At 1 out, no edge. | 75.9% steal of 2nd success, 2023-25 | yes |
+| [MLB intentional walks](/process/#rq-mlb-ibb) | Mostly no. Runner on 2nd, 1 out: IBB costs the defense 2.0 win-prob pts. Other states: no gain distinguishable from 0. | -2.0 WP pts, runner on 2nd, 1 out | yes |
+| [MLB times through the order](/process/#rq-mlb-tto) | For an average starter, yes. 3rd time: +.022 wOBA vs 1st (same pitcher), .339 vs relievers .323. | +.022 wOBA, 3rd time vs 1st | yes |
+| [MLB sacrifice bunts](/process/#rq-mlb-sac-bunt) | No. Bunt tries cost 0.3 to 0.9 win-prob pts per try vs swinging; late and close, up to 1.9. | -0.3 WP pts per try, runner on 1st | yes |
+| [Soccer protecting a lead](/process/#rq-soccer-protecting-lead) | Yes after 75': xG share 46% vs 53% expected. Costs 0.05 xPts from 75', but actual points held. | 46% leader xG share after 75', expected 53% | yes |
+| [Soccer after a goal](/process/#rq-soccer-after-conceding) | No momentum swing. Team that just conceded scores 0.95x baseline in the next 10 min; scorer 1.06x. Restart dips the first 3 min. | 0.95x goals by the conceding team, next 10 min | no |
+| [Soccer first sub timing](/process/#rq-soccer-first-sub-timing) | Trailing teams sub first by 60', level and leading by 65'. A first sub before 60' adds +0.04 xG diff; no goal effect found. | +0.04 xG diff, first sub before 60' | no |
+| [Tennis first serve on second serve](/process/#rq-tennis-second-serve-first-serve) | No. 6 of 188 men and 4 of 112 women would gain. Median player loses 6.8 pts (men), 5.3 (women) per 100. | 6 of 188 men who would gain | yes |
+| [Tennis hold after breaking](/process/#rq-tennis-hold-after-break) | No. Same player and match: hold rate after breaking is +0.7 pts (men), +0.5 (women) vs after opponent holds. | +0.7 pts hold rate after breaking, men | yes |
+| [Tennis serve direction](/process/#rq-tennis-serve-direction-mix) | Wide and T: yes, within 1 pt for the same server. Body: no, 4.2 pts lower (men), 4.1 (women). | -4.2 pts, body vs wide and T, men | yes |
+| [CS2 pistol round](/process/#rq-cs2-pistol-value) | First pistol winner takes the map 59.5%: 57.1% on CT, 61.9% on T. | 61.9% map win, pistol 1 won on T | yes |
+| [CS2 buy after losing the pistol](/process/#rq-cs2-pistol-loser-buy) | Buying on round 2: +26.8 pp in round 2, -16.5 pp in round 3, map win -0.8 pp (not different from 0). | -0.8 pp map win, buy vs save | no |
+| [CS2 equipment gap](/process/#rq-cs2-equipment-gap) | Full buy vs full buy: CT wins 51.7%. At equal dollar value CT wins 48.5%; an eco beats a full buy 5.6%. | 51.7% CT round win, full buy vs full buy | yes |
+| [CS2 losing streaks](/process/#rq-cs2-loss-streak) | No tilt. After 3+ straight losses a team wins +0.9 pp vs an economy and score model. | +1.1 pp vs model after 3 straight losses | yes |
+| [CS2 starting side](/process/#rq-cs2-side-first) | Start T. T-first teams win 52.4% of maps; 55.8% on overpass, 50.0% on anubis. | 52.4% map win, T-first team | yes |
 
 ## Football
 
@@ -71,7 +71,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** nflverse play-by-play, 2015 to 2026 wk 8, Q1-Q4 4th downs (no penalties/kneels), 44,765 plays, 3,148 games.
 
-[On Process](/arkboard/process/#rq-nfl-fourth-down)
+[On Process](/process/#rq-nfl-fourth-down)
 {{< /rq >}}
 
 ### NFL down 14: go for two first
@@ -85,7 +85,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** nflverse play-by-play, 2015 to 2026 wk 8; 193 Q4 PATs at down 8; 1,458 2-pt tries.
 
-[On Process](/arkboard/process/#rq-nfl-down-14-go-for-two)
+[On Process](/process/#rq-nfl-down-14-go-for-two)
 {{< /rq >}}
 
 ### NFL surprise onside kicks
@@ -99,7 +99,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** nflverse play-by-play, 2015 to 2026 wk 8, 691 onside kicks.
 
-[On Process](/arkboard/process/#rq-nfl-onside-surprise)
+[On Process](/process/#rq-nfl-onside-surprise)
 {{< /rq >}}
 
 ### NFL QB sneak
@@ -113,7 +113,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** nflverse play-by-play, 2015 to 2026 wk 8, 3rd/4th-and-1 runs and passes, WP 5-95%, 10,488 plays.
 
-[On Process](/arkboard/process/#rq-nfl-qb-sneak)
+[On Process](/process/#rq-nfl-qb-sneak)
 {{< /rq >}}
 
 ### NFL two-point tries
@@ -127,7 +127,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** nflverse play-by-play, 2015 to 2026 wk 8, 1,458 two-point tries and 14,618 extra points.
 
-[On Process](/arkboard/process/#rq-nfl-two-point)
+[On Process](/process/#rq-nfl-two-point)
 {{< /rq >}}
 
 ## Basketball
@@ -143,7 +143,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** ESPN play-by-play via sportsdataverse, NBA, 2011-12 to 2025-26, 1,804 games.
 
-[On Process](/arkboard/process/#rq-nba-foul-up-3)
+[On Process](/process/#rq-nba-foul-up-3)
 {{< /rq >}}
 
 ### NBA timeout after a run
@@ -157,7 +157,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** ESPN play-by-play via sportsdataverse, NBA 2011-12 to 2025-26, 16,242 games, 33,103 runs.
 
-[On Process](/arkboard/process/#rq-nba-timeout-after-run)
+[On Process](/process/#rq-nba-timeout-after-run)
 {{< /rq >}}
 
 ### NBA 2-for-1
@@ -171,7 +171,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** ESPN play-by-play via sportsdataverse, NBA 2011-12 to 2025-26, 19,166 games, 19,944 inbound possessions.
 
-[On Process](/arkboard/process/#rq-nba-two-for-one)
+[On Process](/process/#rq-nba-two-for-one)
 {{< /rq >}}
 
 ### CBB up 3: foul or defend
@@ -185,7 +185,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** ESPN play-by-play via sportsdataverse, CBB, 2011-12 to 2025-26, 7,116 games.
 
-[On Process](/arkboard/process/#rq-cbb-foul-up-3)
+[On Process](/process/#rq-cbb-foul-up-3)
 {{< /rq >}}
 
 ### CBB icing the shooter
@@ -199,7 +199,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** ESPN play-by-play via sportsdataverse, CBB, 2011-12 to 2025-26, 61,420 first free throws.
 
-[On Process](/arkboard/process/#rq-cbb-ft-icing)
+[On Process](/process/#rq-cbb-ft-icing)
 {{< /rq >}}
 
 ## Hockey
@@ -215,7 +215,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** NHL API play-by-play + shift charts, regular seasons 2021-22 to 2024-25, 5,248 games; pull times from goalie shifts.
 
-[On Process](/arkboard/process/#rq-nhl-goalie-pull)
+[On Process](/process/#rq-nhl-goalie-pull)
 {{< /rq >}}
 
 ### NHL goalie pull on a power play
@@ -229,7 +229,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** NHL API play-by-play + shift charts, regular seasons 2021-22 to 2024-25, 5,248 games.
 
-[On Process](/arkboard/process/#rq-nhl-pp-goalie-pull)
+[On Process](/process/#rq-nhl-pp-goalie-pull)
 {{< /rq >}}
 
 ## Baseball
@@ -245,7 +245,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** Retrosheet play-by-play, 2021-2025 regular season, 15,011 steal attempts in clean states. Retrosheet: the information used here was obtained free of charge from and is copyrighted by Retrosheet (www.retrosheet.org).
 
-[On Process](/arkboard/process/#rq-mlb-stolen-bases)
+[On Process](/process/#rq-mlb-stolen-bases)
 {{< /rq >}}
 
 ### MLB intentional walks
@@ -259,7 +259,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** Retrosheet play-by-play, 2015-2025 regular season, 6,129 intentional walks to non-pitchers in innings 1-9. Retrosheet: the information used here was obtained free of charge from and is copyrighted by Retrosheet (www.retrosheet.org).
 
-[On Process](/arkboard/process/#rq-mlb-ibb)
+[On Process](/process/#rq-mlb-ibb)
 {{< /rq >}}
 
 ### MLB times through the order
@@ -273,7 +273,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** Retrosheet play-by-play, 2015-2025 regular season, 1,109,963 starter PAs (1st-3rd time), 24,958 games. Retrosheet: the information used here was obtained free of charge from and is copyrighted by Retrosheet (www.retrosheet.org).
 
-[On Process](/arkboard/process/#rq-mlb-tto)
+[On Process](/process/#rq-mlb-tto)
 {{< /rq >}}
 
 ### MLB sacrifice bunts
@@ -287,7 +287,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** Retrosheet play-by-play, 2015-2025 regular season, 158,989 PAs with runners on and 0 out, 9,669 bunt tries. Retrosheet: the information used here was obtained free of charge from and is copyrighted by Retrosheet (www.retrosheet.org).
 
-[On Process](/arkboard/process/#rq-mlb-sac-bunt)
+[On Process](/process/#rq-mlb-sac-bunt)
 {{< /rq >}}
 
 ## Soccer
@@ -303,7 +303,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** StatsBomb open data, 23 full seasons/tournaments (2015/16 EPL, Serie A, Ligue 1; men's WC/Euro/Copa/AFCON; ISL; women's leagues and tournaments), 2,856 matches with clean event data.
 
-[On Process](/arkboard/process/#rq-soccer-protecting-lead)
+[On Process](/process/#rq-soccer-protecting-lead)
 {{< /rq >}}
 
 ### Soccer after a goal
@@ -317,7 +317,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** StatsBomb open data, 23 full seasons/tournaments (2015/16 EPL, Serie A, Ligue 1; men's WC/Euro/Copa/AFCON; ISL; women's leagues and tournaments), 2,856 matches, 527,256 team-minutes.
 
-[On Process](/arkboard/process/#rq-soccer-after-conceding)
+[On Process](/process/#rq-soccer-after-conceding)
 {{< /rq >}}
 
 ### Soccer first sub timing
@@ -331,7 +331,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** StatsBomb open data, 23 full seasons/tournaments (2015/16 EPL, Serie A, Ligue 1; men's WC/Euro/Copa/AFCON; ISL; women's leagues and tournaments), 2,659 matches, 4,853 team-matches at the 60' landmark.
 
-[On Process](/arkboard/process/#rq-soccer-first-sub-timing)
+[On Process](/process/#rq-soccer-first-sub-timing)
 {{< /rq >}}
 
 ## Tennis
@@ -347,7 +347,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** Match Charting Project points, 1960-2026 (71% of matches 2015+), 11,785 matches; servers with 500+ second serves.
 
-[On Process](/arkboard/process/#rq-tennis-second-serve-first-serve)
+[On Process](/process/#rq-tennis-second-serve-first-serve)
 {{< /rq >}}
 
 ### Tennis hold after breaking
@@ -361,7 +361,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** Match Charting Project points, 11,270 matches, 249,107 service games.
 
-[On Process](/arkboard/process/#rq-tennis-hold-after-break)
+[On Process](/process/#rq-tennis-hold-after-break)
 {{< /rq >}}
 
 ### Tennis serve direction
@@ -375,7 +375,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** Match Charting Project points, 11,785 charted matches, 1,857,004 first serves with a direction.
 
-[On Process](/arkboard/process/#rq-tennis-serve-direction-mix)
+[On Process](/process/#rq-tennis-serve-direction-mix)
 {{< /rq >}}
 
 ## Counter-Strike
@@ -391,7 +391,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** bo3.gg round data, S/A/B-tier pro maps, 2023-10-16 to 2026-11-02, 17,525 maps
 
-[On Process](/arkboard/process/#rq-cs2-pistol-value)
+[On Process](/process/#rq-cs2-pistol-value)
 {{< /rq >}}
 
 ### CS2 buy after losing the pistol
@@ -405,7 +405,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** bo3.gg round data, S/A/B-tier pro maps, 2023-10-16 to 2026-11-02, 17,525 maps, 34,640 pistol-loss halves (16,992 CT)
 
-[On Process](/arkboard/process/#rq-cs2-pistol-loser-buy)
+[On Process](/process/#rq-cs2-pistol-loser-buy)
 {{< /rq >}}
 
 ### CS2 equipment gap
@@ -419,7 +419,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** bo3.gg round data, S/A/B-tier pro maps, 2023-10-16 to 2026-11-02, 17,525 maps, 327,073 rounds
 
-[On Process](/arkboard/process/#rq-cs2-equipment-gap)
+[On Process](/process/#rq-cs2-equipment-gap)
 {{< /rq >}}
 
 ### CS2 losing streaks
@@ -433,7 +433,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** bo3.gg round data, S/A/B-tier pro maps, 2023-10-16 to 2026-11-02, 17,525 maps, 327,073 rounds
 
-[On Process](/arkboard/process/#rq-cs2-loss-streak)
+[On Process](/process/#rq-cs2-loss-streak)
 {{< /rq >}}
 
 ### CS2 starting side
@@ -447,7 +447,7 @@ Robust = the main CI excludes zero and the result holds in both halves of the sa
 
 **Data.** bo3.gg round data, S/A/B-tier pro maps, 2023-10-16 to 2026-11-02, 17,525 maps
 
-[On Process](/arkboard/process/#rq-cs2-side-first)
+[On Process](/process/#rq-cs2-side-first)
 {{< /rq >}}
 
 ## Across sports
@@ -458,4 +458,4 @@ Three patterns show up in more than one sport.
 - **Giving up an out or a base costs win probability.** Sacrifice bunts lose 0.3 to 0.9 WP pts per try and intentional walks lose 2.0 in the most common spot. Both have fallen: bunt tries from 9.1% to 6.5% of these PAs since 2015, intentional walks from 826 to 393 a season.
 - **There is no momentum or tilt to manage.** Tennis players hold slightly more often right after breaking (+0.7 pts), soccer teams that just conceded score at 0.95x their baseline, and CS2 teams after three straight round losses win 1.1 pp more than the economy model. An NBA timeout after an 8+ point run nets 0.31 pts less over the next two minutes than playing on.
 
-New studies go on [Process](/arkboard/process/) first. I'll add them here as they're published.
+New studies go on [Process](/process/) first. I'll add them here as they're published.

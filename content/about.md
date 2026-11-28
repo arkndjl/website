@@ -43,7 +43,7 @@ draft = false
 - recruits: ARK stars and FV for every recruit, class rankings with their own GFX, and high school ARK stars graded back to the 2008 class for 27,937 college football and 5,561 college basketball players.
 - drafts: NFL and NBA mock drafts (predictive, blended, conviction) with trades.
 - [predictions](/arkboard-predictions/): every game model against the market, picks sized by Kelly on calibrated edge, each judged against the closing line.
-- method: every model change is tested out of sample and ships only if it beats the current model held out. [ARKLOG](/arklog/) has every change since May 2026: 1,266 changes and 429 tests, 170 shipped, 173 part shipped, 86 failed. [Process](/arkboard/process/) holds the method, a glossary of every metric with its numbers read from the live fits, and the research.
+- method: every model change is tested out of sample and ships only if it beats the current model held out. [ARKLOG](/process/#log) has every change since May 2026: 1,266 changes and 429 tests, 170 shipped, 173 part shipped, 86 failed. [Process](/process/) holds the method, a glossary of every metric with its numbers read from the live fits, and the research.
 - also on the site: [1NT](/1nt/) and [LAURSEN_111](/laursen_111/) (my Counter-Strike team and stream), [ST. CLAIRE](/stclaire/) (music, art, wave), [ARKLIBRARY](/arklibrary/), a news feed written from the site's data, and site search.
 - [writing](/posts/): sabermetrics, prospects, the Mets and economics, including [introducing XPM](/posts/introducing-xpm/), [introducing college XPM](/posts/introducing-cbb-xpm/), [aWOBA](/posts/awoba-intro/) and [The State Of Analytics Across Team Sports](/posts/state-of-analytics-across-team-sports/).
 {{< /winpane >}}
