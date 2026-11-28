@@ -1,7 +1,7 @@
 +++
 title = "ARKLIST :: ARKBOARD"
 url = "/arkboard/arklist/"
-description = "ARKLIST: the ARKBOARD's hand-picked favourites from every sport, college players and prospects together: college football (FBS, FCS and recruits in the 2027-29 classes), college basketball (D-I and internationals), NFL, NBA, NHL, soccer, hockey prospects and soccer prospects."
+description = "ARKLIST: my favourite players and prospects in college football (FBS, FCS and recruits in the 2027-29 classes), college basketball (D-I and internationals), NFL, NBA, NHL, soccer, hockey prospects and soccer prospects."
 keywords = ["arklist", "arkboard", "favourite prospects", "college football", "college basketball", "recruits", "nfl", "nba"]
 draft = false
 +++
