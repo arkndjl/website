@@ -80,8 +80,7 @@ export default {
     const url = new URL(request.url);
     if (url.pathname.replace(/\/+$/, "") === "/api/kofi") return kofi(request, env);
     if (url.pathname.replace(/\/+$/, "") === "/api/supporters") {
-      const list = await env.SUPPORTERS.get(env.SUPPORTERS.idFromName("kofi")).top(25);
-      return json(list, 200, { "cache-control": "public, max-age=60" });
+      return json(await supporters(request, env), 200, { "cache-control": "public, max-age=60" });
     }
     if (url.pathname.startsWith("/api/photo/")) return photo(url, request);
     if (!url.pathname.startsWith("/api/plays")) return env.ASSETS.fetch(request);
@@ -115,10 +114,42 @@ export default {
 };
 
 // Ko-fi webhook (Ko-fi Settings > API > Webhook URL = https://arkndjl.net/api/kofi). Ko-fi posts form data
-// with one field, data = JSON {verification_token, message_id, from_name, amount, currency, is_public, type}.
-// Checked against the KOFI_TOKEN worker secret. Every payment is stored; /api/supporters lists only names from
-// public payments (is_public true), ranked by total, names only, no amounts.
+// with one field, data = JSON {verification_token, message_id, kofi_transaction_id, from_name, amount, currency,
+// is_public, type, timestamp}. Checked against the KOFI_TOKEN worker secret. Every payment is stored.
+// /api/supporters = {donors, gifts}: donations and memberships only (no shop orders or commissions), top 10 donors by
+// total and top 10 single donations. A payment marked private (is_public false) is listed with no name (n = "").
 // Ko-fi's "Send Single Donation Test" posts from "Jo Example"; it is stored but never listed.
+// Past payments from Ko-fi's CSV export: static/data/kofi-past.json (scripts/kofi_past.py), merged by transaction id.
+const KOFI_SKIP = new Set(["shop order", "commission"]);
+
+async function supporters(request, env) {
+  let rows = await env.SUPPORTERS.get(env.SUPPORTERS.idFromName("kofi")).rows();
+  try {
+    const r = await env.ASSETS.fetch(new Request(new URL("/data/kofi-past.json", request.url)));
+    if (r.ok) {
+      const seen = new Set(rows.map((x) => x.id));
+      rows = rows.concat(((await r.json()).rows || []).filter((x) => x && !seen.has(String(x.id))));
+    }
+  } catch {}
+  rows = rows.filter((x) => Number(x.amount) > 0 && !KOFI_SKIP.has(String(x.type || "").toLowerCase())
+    && String(x.name || "").trim().toLowerCase() !== "jo example");
+  const nm = (x) => (x.pub ? String(x.name || "").trim() : "");
+  const by = new Map();
+  for (const x of rows) {
+    const n = nm(x), cur = x.currency || "USD";
+    // private donors are not merged with each other: each name stays its own row, shown with no name
+    const k = (n ? "p:" + n.toLowerCase() : "x:" + String(x.name || x.id).toLowerCase()) + "|" + cur;
+    const o = by.get(k) || { n, a: 0, c: cur, k: 0, t: 0 };
+    o.a += Number(x.amount); o.k += 1; o.t = Math.max(o.t, x.t || 0);
+    by.set(k, o);
+  }
+  const r2 = (v) => Math.round(v * 100) / 100;
+  const donors = [...by.values()].sort((a, b) => b.a - a.a || a.t - b.t).slice(0, 10).map((o) => ({ ...o, a: r2(o.a) }));
+  const gifts = rows.slice().sort((a, b) => b.amount - a.amount || a.t - b.t).slice(0, 10)
+    .map((x) => ({ n: nm(x), a: r2(Number(x.amount)), c: x.currency || "USD", t: x.t || 0 }));
+  return { donors, gifts };
+}
+
 async function kofi(request, env) {
   if (request.method !== "POST") return json({ error: "method" }, 405, { allow: "POST" });
   if (!env.KOFI_TOKEN) return json({ error: "not set up" }, 503);
@@ -128,11 +159,12 @@ async function kofi(request, env) {
   const amount = Number(d.amount);
   if (!d.message_id || !Number.isFinite(amount)) return json({ error: "bad data" }, 400);
   await env.SUPPORTERS.get(env.SUPPORTERS.idFromName("kofi")).add({
-    id: String(d.message_id).slice(0, 80),
+    id: String(d.kofi_transaction_id || d.message_id).slice(0, 80),
     name: String(d.from_name || "").trim().slice(0, 40),
     amount, currency: String(d.currency || "USD").slice(0, 8),
     pub: d.is_public === true || d.is_public === "true" ? 1 : 0,
     t: Date.parse(d.timestamp) || Date.now(),
+    type: String(d.type || "").slice(0, 20),
   });
   return json({ ok: true });
 }
@@ -142,14 +174,14 @@ export class Supporters extends DurableObject {
     super(ctx, env);
     this.sql = ctx.storage.sql;
     this.sql.exec(`CREATE TABLE IF NOT EXISTS tips (id TEXT PRIMARY KEY, name TEXT, amount REAL, currency TEXT, pub INTEGER, t INTEGER)`);
+    const cols = this.sql.exec(`PRAGMA table_info(tips)`).toArray().map((c) => c.name);
+    if (!cols.includes("type")) this.sql.exec(`ALTER TABLE tips ADD COLUMN type TEXT`);
   }
   add(r) {
-    this.sql.exec(`INSERT OR IGNORE INTO tips (id, name, amount, currency, pub, t) VALUES (?, ?, ?, ?, ?, ?)`, r.id, r.name, r.amount, r.currency, r.pub, r.t);
+    this.sql.exec(`INSERT OR IGNORE INTO tips (id, name, amount, currency, pub, t, type) VALUES (?, ?, ?, ?, ?, ?, ?)`, r.id, r.name, r.amount, r.currency, r.pub, r.t, r.type);
   }
-  top(n) {
-    const out = [];
-    for (const r of this.sql.exec(`SELECT name, SUM(amount) a, MAX(t) t FROM tips WHERE pub = 1 AND name != '' AND lower(name) != 'jo example' GROUP BY lower(name) ORDER BY a DESC, t ASC LIMIT ?`, n)) out.push(r.name);
-    return out;
+  rows() {
+    return this.sql.exec(`SELECT id, name, amount, currency, pub, t, type FROM tips`).toArray();
   }
 }
 

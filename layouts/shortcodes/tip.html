@@ -5,17 +5,45 @@
 </div>
 {{- end -}}
 <p class="tip__note">thank you so much for considering donating! all money will go towards my NYU tuition and keeping all of my websites, articles, and research free with no ads :)</p>
+{{- /* Top donors and donations from Ko-fi: /api/supporters (worker/site.js). Private payments show as anonymous. */ -}}
 <div class="tip-top" hidden>
-  <h2>top supporters</h2>
-  <ol class="tip-top__list"></ol>
+{{- range slice (dict "k" "donors" "t" "top donors" "h" "Total" "x" "Gifts") (dict "k" "gifts" "t" "top donations" "h" "Amount" "x" "Date") }}
+<div class="win wintable tip-top__win" data-tip="{{ .k }}">
+  <div class="win__title">
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-coin"/></svg>{{ .t }}<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
+  </div>
+  <div class="wintable__scroll">
+    <table class="cfb__table tip-top__t">
+      <thead><tr><th>RK</th><th>Name</th><th>{{ .h }}</th><th{{ if eq .x "Gifts" }} title="number of donations"{{ end }}>{{ .x }}</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div class="win__status" title="Ko-fi donations and memberships. Private donations show as anonymous."><span data-tip-count></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+</div>
+{{- end }}
 </div>
 <script>
 (function () {
   var box = document.querySelector('.tip-top'); if (!box) return;
-  fetch('/api/supporters').then(function (r) { return r.ok ? r.json() : []; }).then(function (names) {
-    if (!names || !names.length) return;
-    var ol = box.querySelector('ol');
-    names.forEach(function (n) { var li = document.createElement('li'); li.textContent = n; ol.appendChild(li); });
+  function money(a, c) {
+    try { return new Intl.NumberFormat('en-US', { style: 'currency', currency: c || 'USD', minimumFractionDigits: a % 1 ? 2 : 0 }).format(a); }
+    catch (e) { return a + ' ' + (c || ''); }
+  }
+  function day(t) { return t ? new Date(t).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''; }
+  function cell(tr, v, cls) { var td = document.createElement('td'); td.textContent = v; if (cls) td.className = cls; tr.appendChild(td); }
+  fetch('/api/supporters').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+    if (!d || !d.donors || !d.donors.length) return;
+    ['donors', 'gifts'].forEach(function (k) {
+      var win = box.querySelector('[data-tip="' + k + '"]'), tb = win.querySelector('tbody');
+      d[k].forEach(function (o, i) {
+        var tr = document.createElement('tr'); if (i < 3) tr.className = 'is-top';
+        cell(tr, i + 1, 'cfb__rk'); cell(tr, o.n || 'anonymous', o.n ? '' : 'tip-top__anon'); cell(tr, money(o.a, o.c), 'tip-top__a');
+        cell(tr, k === 'donors' ? o.k : day(o.t));
+        tb.appendChild(tr);
+      });
+      win.querySelector('[data-tip-count]').textContent = d[k].length + ' rows';
+    });
     box.hidden = false;
   }).catch(function () {});
 })();
