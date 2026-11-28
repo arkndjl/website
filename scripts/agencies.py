@@ -44,6 +44,7 @@ ALIAS = {
     'young money apaa': 'Young Money APAA Sports', 'young money apaa sports': 'Young Money APAA Sports', 'ymapaa': 'Young Money APAA Sports',
     'vaynersports': 'VaynerSports', 'vayner sports': 'VaynerSports',
     'everett sports marketing': 'Everett Sports Marketing', 'esm': 'Everett Sports Marketing',
+    'rosenhaus sports representation': 'Rosenhaus Sports', 'valiant management': 'Valiant Management Group',
     'lift sports': 'LIFT Sports Management', 'lift sports management': 'LIFT Sports Management',
     'octagon': 'Octagon', 'octagon football': 'Octagon', 'octagon basketball': 'Octagon',
     'the familie': 'The Familie', 'familie': 'The Familie',
@@ -190,13 +191,20 @@ def draft_picks(sp, year):
     return picks
 
 
-def match_drafts(ledger, sp, picks):
-    """Ledger college players (no recruit class) found among the picks, with the agency the ledger gives them now."""
+def cutoff(sp, year):
+    """the start of the draft process: an agency signed after it (the pro agent) did not send the player"""
+    return '%d-12-01' % (year - 1) if sp == 'cfb' else '%d-03-15' % year
+
+
+def match_drafts(ledger, sp, picks, year=None):
+    """Ledger college players (no recruit class) found among the picks, with the agency the ledger gave them before the
+    draft process (a ledger row dated after the cutoff is the pro agent and does not count)."""
     m = names.Matcher(picks, pos=None, sport='football' if sp == 'cfb' else 'basketball')
     rank = {'high': 3, 'medium': 2, 'low': 1}
     best = {}
     for e in ledger:
         if e.get('sport') != sp or not e.get('agency') or e.get('cls'): continue
+        if year and (e.get('source_date') or '9999') > cutoff(sp, year): continue
         k = names.key(e['player'])
         o = best.get(k)
         if o is None or (rank.get(e.get('confidence'), 0), e.get('source_date') or '') > (rank.get(o.get('confidence'), 0), o.get('source_date') or ''):
@@ -220,7 +228,7 @@ def record_drafts(ledger, today=None):
         if y < FIRST or today < dt.date(y, mo, dy) or y in pros['done'].get(lg, []): continue
         picks = draft_picks(sp, y)
         if picks is None: continue
-        got = match_drafts(ledger, sp, picks)
+        got = match_drafts(ledger, sp, picks, y)
         pros['rows'] += [dict(r, sport=sp, league=lg, year=y) for r in got]
         pros['done'].setdefault(lg, []).append(y); changed = True
         print('%s %d draft: %d of %d picks were ledger clients' % (lg, y, len(got), len(picks)))
@@ -310,7 +318,8 @@ def board(clients, pros=(), sp='cfb', pool=()):
                          logos=sorted({c['logo'] for c in l if c['logo']})[:12]))
     # drafted clients: an agency whose clients have all gone pro still gets a row
     dr = defaultdict(list)
-    for r in pros: dr[canon(r['agency'])].append(r)
+    for r in pros:
+        if r.get('conf') != 'low': dr[canon(r['agency'])].append(r)   # low confidence: kept in the file, not counted
     have = {r['agency'] for r in rows}
     for a in dr:
         if a not in have:
@@ -319,7 +328,7 @@ def board(clients, pros=(), sp='cfb', pool=()):
     for r in rows:
         d = dr.get(r['agency'], [])
         r['pro'] = len(d); r['pro1'] = sum(1 for p in d if p['round'] == 1)
-        r['proPct'] = round(len(d) / (len(d) + r['nCol']), 3) if d else None
+        r['proPct'] = round(len(d) / (len(d) + r['nCol']), 3) if d and r['nCol'] else None   # no college clients on file: no share
     pf = plus_scores(rows, by, sp, pool)
     lead = 'dealP' if 'dealP' in pf else 'breakoutP' if 'breakoutP' in pf else None
     rows.sort(key=lambda r: (r['agency'] in SPECIAL, -(r[lead] if lead and r.get(lead) is not None else -1e12), -(r['fv'] or 0), -r['n']))
@@ -360,8 +369,10 @@ def _test():
            dict(player='Jeremiyah Love', school='Notre Dame', sport='cfb', agency='CAA', confidence='high', cls=2026)]
     got = match_drafts(led, 'cfb', picks)
     assert [(g['player'], g['agency'], g['round']) for g in got] == [('Jeremiyah Love', 'CAA Sports', 1)], got   # same name, other school: not him
+    late = [dict(player='Jeremiyah Love', school='Notre Dame', sport='cfb', agency='CAA', confidence='high', source_date='2026-01-10')]
+    assert match_drafts(late, 'cfb', picks, 2026) == []          # signed after Dec 1: the pro agent, not counted
     rows, _ = board([], [dict(agency='CAA', round=1)])
-    assert rows[0]['agency'] == 'CAA Sports' and rows[0]['pro'] == 1 and rows[0]['pro1'] == 1 and rows[0]['proPct'] == 1.0
+    assert rows[0]['agency'] == 'CAA Sports' and rows[0]['pro'] == 1 and rows[0]['pro1'] == 1 and rows[0]['proPct'] is None   # no college clients on file
     print('ok')
 
 
