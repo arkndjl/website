@@ -66,7 +66,7 @@
     (o.y || []).forEach(function (r) { if (r && /^[\w-]{6,20}$/.test(r[0]) && !st.y[r[0]]) { st.y[r[0]] = { t: r[1], n: r[2], k: r[3], d: r[4], at: t }; n++; } });
     (o.f || []).forEach(function (r) {
       if (!r || !r[0] || !r[2] || (r[1] !== 'p' && r[1] !== 't')) return;
-      var v = { b: r[0], k: r[1], n: r[2], s: r[3], i: r[4], u: /^\//.test(r[5] || '') ? r[5] : '', p: r[6], at: t }, id = itemId(v);
+      var v = { b: r[0], k: r[1], n: r[2], s: r[3], i: r[4], u: /^\/(?![/\\])/.test(r[5] || '') ? r[5] : '', p: r[6], at: t }, id = itemId(v);
       if (!st.f[id]) { st.f[id] = v; n++; }
     });
     (o.a || []).forEach(function (s) { if (typeof s === 'string' && /^[\w.-]+$/.test(s) && !arts[s]) { newArts.push(s); n++; } });
