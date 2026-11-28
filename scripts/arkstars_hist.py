@@ -779,7 +779,9 @@ def main():
     elif upd and '--cbb-only' not in sys.argv:
         # the classes from this season's freshmen on are merged again; the older ones keep their rows and take the new
         # team lists' transfers (the cache holds only what scripts/on3_commits.mjs pulled in this run)
-        season = int(json.load(open(R.ALL))['asof'][:4]); base, meta = read_pack(); yrs = range(season, LAST + 1)
+        # this CFB season's freshmen (class = season) from the season calendar, the same first year the workflow pulls
+        import season as SN
+        season = SN.season('cfb'); base, meta = read_pack(); yrs = range(season, LAST + 1)
         allrows, _ = build(yrs, pseudo=False, base=base, prog=meta['prog'])
         print('pack', write_pack(allrows, meta['prog'], set(yrs)))
     if '--cbb-only' not in sys.argv: join(pull='--pull' in sys.argv or upd)
