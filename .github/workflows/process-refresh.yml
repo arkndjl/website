@@ -10,7 +10,7 @@ on:
     - cron: "50 */6 * * *"
   workflow_dispatch:
   workflow_run:
-    workflows: ["cfb board", "cbb board", "cbb boards", "nfl", "nba xpm", "nhl", "soccer", "soccer prospects", "tennis", "tennis prospects", "cs2", "cs2 ark loop", "model refits"]
+    workflows: ["cfb board", "cbb board", "cbb boards", "nfl", "nba xpm", "nhl", "soccer", "soccer prospects", "tennis", "tennis prospects", "cs2", "cs2 ark loop", "model refits", "esea season"]
     types: [completed]
 
 permissions:

@@ -11,7 +11,7 @@
   function day(d) { try { return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'America/New_York' }); } catch (e) { return d.slice(5, 10); } }
   function stamp(d) { try { return new Date(d).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' }) + ' ET'; } catch (e) { return d; } }
   function eff(r) { return r.k === 'study' ? (r.a || '') : (r.x || ''); }
-  function key(r) { return r.k === 'study' ? r.id : String(r.n); }
+  function key(r) { return r.k === 'study' || r.k === 'content' ? r.id : String(r.n); }
   function load(src) {
     if (!loading) loading = fetch(src).then(function (x) { if (!x.ok) throw x.status; return x.json(); }).then(function (j) {
       data = j.rows || [];
@@ -29,7 +29,8 @@
       if (st.v === 't' && !test) return false;
       if ((st.v === 's' || st.v === 'm' || st.v === 'f') && !(test && r.v === st.v)) return false;
       if (st.v === 'study' && r.k !== 'study') return false;
-      if (st.v === 'o' && (test || r.k === 'study')) return false;
+      if (st.v === 'o' && (test || r.k === 'study' || r.k === 'content')) return false;
+      if (st.v === 'c' && r.k !== 'content') return false;
       if (st.mo && r.d.slice(0, 7) !== st.mo) return false;
       if (st.sec && r.sec !== st.sec) return false;
       if (st.sp && (r.sp || []).indexOf(st.sp) < 0) return false;
@@ -42,13 +43,13 @@
         l: (r.l || []).slice(0, 4) };
     }
     function row(r) {
-      var study = r.k === 'study', li = el('li', 'plrow plrow--' + (study ? 'study' : r.v || 'o')); li.id = 'log-' + key(r);
+      var study = r.k === 'study', li = el('li', 'plrow plrow--' + (study ? 'study' : r.k === 'content' ? 'content' : r.v || 'o')); li.id = 'log-' + key(r);
       var b = el('button', 'plrow__head'); b.type = 'button'; b.setAttribute('aria-expanded', 'false');
       b.appendChild(el('span', 'plrow__date', day(r.d)));
       var tg = el('span', 'plrow__tags'); (r.sp && r.sp.length ? r.sp : r.sec && r.sec !== 'ARKBOARD' ? [r.sec] : []).slice(0, 4).forEach(function (s) { tg.appendChild(el('i', '', s)); }); b.appendChild(tg);
       b.appendChild(el('span', 'plrow__title', r.t));
       b.appendChild(el('span', 'plrow__eff' + (r.e && r.e[3] === 0 ? ' is-down' : ''), eff(r)));
-      b.appendChild(el('span', 'plrow__v', study ? (r.v === 'w' ? 'study · weak' : 'study') : VL[r.v] || (r.sec && r.sec !== 'ARKBOARD' ? r.sec : AR[r.ar]) || ''));
+      b.appendChild(el('span', 'plrow__v', r.k === 'content' ? r.c : study ? (r.v === 'w' ? 'study · weak' : 'study') : VL[r.v] || (r.sec && r.sec !== 'ARKBOARD' ? r.sec : AR[r.ar]) || ''));
       li.appendChild(b);
       b.addEventListener('click', function () { toggle(li, r); });
       return li;
@@ -71,6 +72,7 @@
         bar.appendChild(g);
         var a = el('a', 'cfb__btn rq__link', 'link'); a.href = '#log-' + key(r); bar.appendChild(a);
         if (r.k === 'study') { var s = el('a', 'cfb__btn rq__link', 'study'); s.href = '#rq-' + r.id; bar.appendChild(s); }
+        if (r.u) { var o = el('a', 'cfb__btn rq__link', r.c === 'article' ? 'read' : r.c === 'match' ? 'match room' : r.c === 'release' ? 'listen' : 'watch'); o.href = r.u; if (!/^\//.test(r.u)) { o.target = '_blank'; o.rel = 'noopener'; } bar.appendChild(o); }
         if (r.rec && repo) { var rc = el('a', 'cfb__btn rq__link', 'research record'); rc.href = repo + '/tree/main/scripts/research/' + r.rec; rc.target = '_blank'; rc.rel = 'noopener'; bar.appendChild(rc); }
         if (r.n && repo) { var pr = el('a', 'cfb__btn rq__link', '#' + r.n); pr.href = repo + '/pull/' + r.n; pr.target = '_blank'; pr.rel = 'noopener'; pr.title = 'the change on GitHub'; bar.appendChild(pr); }
         box.appendChild(bar); li.appendChild(box);

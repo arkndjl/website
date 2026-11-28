@@ -67,7 +67,8 @@ SECTIONS = [
              r'deploy|build gate|Cloudflare|\bnav\b|header|footer|ticker|\bnews\b|redirect|uniform|gothic|pixel art|'
              r'ARKNDJL|Brand exports|site-?wide|every page|\bfonts?\b|analytics|Knicks'),
 ]
-SEC_ORDER = ['ARKBOARD', '1NT', 'LAURSEN_111', 'ST. CLAIRE', 'ARKLIBRARY', 'site']
+SEC_ORDER = ['ARKBOARD', '1NT', 'LAURSEN_111', 'ST. CLAIRE', 'ARKLIBRARY', 'ARKNDJL', 'YTST', 'site']
+LOGGED = lambda r: r.get('k') not in ('study', 'content')   # a change to the site (studies and content rows are not)
 
 
 def section_of(title, sports):
@@ -473,6 +474,74 @@ def study_rows(prs):
     return rows
 
 
+def content_rows():
+    """What went out, next to what changed (Noah, Nov 28): YouTube uploads on the ARKNDJL, LAURSEN_111 and YTST channels,
+    LAURSEN_111 Twitch streams, 1NT ESEA matches, articles and ST. CLAIRE releases. Read from files already in the repo
+    (the social pulls, data/esea.json, content/posts, content/arkndjl-music.md); nothing typed in. k = 'content', c = kind."""
+    import datetime as dt
+    import tomllib
+    rows = []
+    iso = lambda ms: dt.datetime.fromtimestamp(ms / 1000, dt.UTC).strftime('%Y-%m-%dT%H:%M:%SZ')
+    for key, sec in (('arkndjl', 'ARKNDJL'), ('laursen', 'LAURSEN_111'), ('ytst', 'YTST')):
+        f = ROOT / f'data/{key}_socials.json'
+        d = json.loads(f.read_text()) if f.exists() else {}
+        for vid, y in (d.get('yt') or {}).items():
+            if not y.get('pub') or not y.get('title'):
+                continue
+            t = re.sub(r'(?:\s+#\w+)+\s*$', '', y['title']).strip() or y['title']
+            kind = 'short' if y.get('short') else 'episode' if sec == 'YTST' else 'video'
+            rows.append({'k': 'content', 'id': f'yt-{vid}', 'd': iso(y['pub']), 't': t, 'c': kind, 'sec': sec, 'sp': [], 'ar': 'site',
+                         'v': '', 'u': f'https://youtu.be/{vid}'})
+        for s in ((d.get('tw') or {}).get('sessions') or []):
+            if not s.get('peak') and s['e'] == s['s']:   # one empty sample, not a stream
+                continue
+            mins = round((s['e'] - s['s']) / 60000)
+            ln = f' for {mins // 60}h {mins % 60:02d}m' if mins >= 10 else ''
+            g = s.get('g') or 'Twitch'
+            rows.append({'k': 'content', 'id': f'tw-{s["s"]}', 'd': iso(s['s']), 'c': 'stream', 'sec': sec, 'sp': [], 'ar': 'site', 'v': '',
+                         't': f'Streamed {g}{ln}, peak {s.get("peak", 0)} viewers', 'u': 'https://www.twitch.tv/laursen_111'})
+    f = ROOT / 'data/esea.json'
+    e = json.loads(f.read_text()) if f.exists() else {}
+    for m in e.get('matches') or []:
+        if m.get('status') != 'FINISHED' or not m.get('score'):
+            continue
+        a, b = m['score']
+        opp = (m.get('opp') or {}).get('name') or 'TBD'
+        stage = f'ESEA S{e.get("season")} {"playoffs" if m.get("stage") == "Playoffs" else "regular season"}'
+        if a + b == 1:
+            t = f'1NT {"won by forfeit against" if a > b else "lost by forfeit to"} {opp} ({stage})'
+        else:
+            t = f'1NT {"beat" if a > b else "lost to"} {opp} {a}-{b} ({stage})'
+        rows.append({'k': 'content', 'id': f'm-{m["id"]}', 'd': iso(m['at']), 't': t, 'c': 'match', 'sec': '1NT', 'sp': ['CS2'],
+                     'ar': 'site', 'v': '', 'u': m.get('url')})
+    for f in sorted((ROOT / 'content/posts').glob('*.md')):
+        txt = f.read_text()
+        m = re.match(r'\+\+\+\n(.*?)\n\+\+\+', txt, re.S)
+        if not m:
+            continue
+        fm = tomllib.loads(m.group(1))
+        if fm.get('draft') or fm.get('searchExclude') or OUT.search(fm.get('title', '')) or not fm.get('date'):
+            continue
+        d = dt.datetime.fromisoformat(str(fm['date'])).astimezone(dt.UTC).strftime('%Y-%m-%dT%H:%M:%SZ')
+        if d > dt.datetime.now(dt.UTC).strftime('%Y-%m-%dT%H:%M:%SZ'):
+            continue
+        url = fm.get('url') or f'/posts/{(fm.get("slug") or f.stem).lower()}/'
+        rows.append({'k': 'content', 'id': f'post-{f.stem.lower()}', 'd': d, 't': fm['title'], 'c': 'article', 'sec': 'site', 'sp': [],
+                     'ar': 'site', 'v': '', 'u': url})
+    f = ROOT / 'content/arkndjl-music.md'
+    if f.exists():   # a track counts as a release once its front matter has a date (date = "YYYY-MM-DD")
+        m = re.match(r'\+\+\+\n(.*?)\n\+\+\+', f.read_text(), re.S)
+        for tr in (tomllib.loads(m.group(1)).get('tracks') or []) if m else []:
+            if tr.get('date'):
+                d = str(tr['date'])[:10] + 'T12:00:00Z'
+                rows.append({'k': 'content', 'id': f'rel-{tr["title"].lower()}', 'd': d, 't': f'{tr["title"]} by {tr.get("artist", "arkndjl")}',
+                             'c': 'release', 'sec': 'ST. CLAIRE', 'sp': [], 'ar': 'site', 'v': '', 'u': tr.get('soundcloud') or tr.get('youtube')})
+    for r in rows:
+        if not r.get('u'):
+            r.pop('u', None)
+    return [r for r in rows if not NOAI.search(r['t'])]
+
+
 def build():
     prs = load_cache()
     fix = json.loads(FIX.read_text()) if FIX.exists() else {}
@@ -493,6 +562,7 @@ def build():
             r['x'] = x
         rows.append(r)
     rows += study_rows(prs)
+    rows += content_rows()
     rows.sort(key=lambda r: r['d'], reverse=True)
     asof = rows[0]['d'] if rows else ''
     (ROOT / 'static/data').mkdir(parents=True, exist_ok=True)
@@ -503,7 +573,7 @@ def build():
     cnt = lambda rs: {'s': sum(r['v'] == 's' for r in rs), 'm': sum(r['v'] == 'm' for r in rs), 'f': sum(r['v'] == 'f' for r in rs)}
     weeks = {}
     for r in rows:
-        if r.get('k') == 'study':
+        if not LOGGED(r):
             continue
         w = weeks.setdefault(week_of(r['d']), {'shipped': 0, 'mixed': 0, 'failed': 0, 'other': 0})
         w[{'s': 'shipped', 'm': 'mixed', 'f': 'failed'}.get(r['v'], 'other')] += 1
@@ -515,19 +585,19 @@ def build():
                 for c in [cnt([r for r in tests if s in r['sp']])] if sum(c.values())]
     by_area = [[AREA_NAME[a], {'shipped': c['s'], 'mixed': c['m'], 'failed': c['f']}] for a in AREA_NAME
                for c in [cnt([r for r in tests if r['ar'] == a])] if sum(c.values())]
-    by_sec = [[k, {'tests': sum(1 for r in tests if r['sec'] == k), 'other': sum(1 for r in rows if r['sec'] == k and r not in tests and r.get('k') != 'study')}]
+    by_sec = [[k, {'tests': sum(1 for r in tests if r['sec'] == k), 'other': sum(1 for r in rows if r['sec'] == k and r not in tests and LOGGED(r))}]
               for k in SEC_ORDER if any(r['sec'] == k for r in rows)]
     tw = [[mlab(w), {k: d[k] for k in ('shipped', 'mixed', 'failed')}] for w, d in wk if d['shipped'] + d['mixed'] + d['failed']]
     aw = [[mlab(w), {'tests': d['shipped'] + d['mixed'] + d['failed'], 'other': d['other']}] for w, d in wk]
     slim = lambda r: {k: r[k] for k in ('n', 'd', 't', 'sec', 'sp', 'ar', 'v', 'e', 'tt', 'x', 'k', 'id', 'a') if k in r}
     out = {
-        'asof': asof, 'rows': len(rows), 'changes': sum(1 for r in rows if r.get('k') != 'study'),
+        'asof': asof, 'rows': len(rows), 'changes': sum(1 for r in rows if LOGGED(r)), 'content': sum(1 for r in rows if r.get('k') == 'content'),
         'tests': len(tests), **{k: v for k, v in zip(('shipped', 'mixed', 'failed'), cnt(tests).values())},
         'studies': sum(1 for r in rows if r.get('k') == 'study'),
         'first': rows[-1]['d'][:10] if rows else '',
         'sports': {s: {**cnt([r for r in tests if s in r['sp']]), 'all': sum(1 for r in rows if s in r['sp'])} for s in sp_order},
         'sections': {k: sum(1 for r in rows if r['sec'] == k) for k in SEC_ORDER},
-        'months': [{'mo': m, 'changes': sum(1 for r in rs if r.get('k') != 'study'), **cnt([r for r in rs if r in tests]),
+        'months': [{'mo': m, 'changes': sum(1 for r in rs if LOGGED(r)), 'content': sum(1 for r in rs if r.get('k') == 'content'), **cnt([r for r in rs if r in tests]),
                     'studies': sum(1 for r in rs if r.get('k') == 'study'),
                     'sections': {k: sum(1 for r in rs if r['sec'] == k) for k in SEC_ORDER if any(r['sec'] == k for r in rs)}}
                    for m in sorted({r['d'][:7] for r in rows}, reverse=True) for rs in [[r for r in rows if r['d'][:7] == m]]],

@@ -178,7 +178,7 @@ def arklog(rows, nxt):
     rs = sorted(json.loads(f.read_text()).get('rows') or [], key=lambda r: r['d'])
     c = t = 0
     for r in rs:
-        if r.get('k') == 'study':
+        if r.get('k') in ('study', 'content'):
             continue
         c += 1
         if c in LOG_CH:
