@@ -10,7 +10,9 @@
 {{- range $chs }}{{ $c := . }}{{ $rows := slice }}
   {{- range $id, $x := .yt }}
     {{- if and (not $x.short) (not (findRE `(?i)#shorts?\b` $x.title)) $x.pub }}
-      {{- $rows = $rows | append (dict "id" $id "t" $x.title "pub" $x.pub "k" $c.k "n" $c.n "s" $c.s) }}
+      {{- $tg := index site.Data.video_tags.channels $c.k | default slice }}
+      {{- range site.Data.video_tags.rules }}{{ if and (findRE .m $x.title) (not (in $tg .t)) }}{{ $tg = $tg | append .t }}{{ end }}{{ end }}
+      {{- $rows = $rows | append (dict "id" $id "t" $x.title "pub" $x.pub "k" $c.k "n" $c.n "s" $c.s "tg" $tg) }}
     {{- end }}
   {{- end }}
   {{- if eq $c.k "ytst" }}
@@ -26,6 +28,8 @@
 {{- /* the 16 newest, plus each channel's 4 newest when they fell outside, so every channel button has its own list */ -}}
 {{- $all := $v }}{{ $v = first 16 $v -}}
 {{- range $chs }}{{ range first 4 (where $all "k" .k) }}{{ if not (where $v "id" .id) }}{{ $v = $v | append . }}{{ end }}{{ end }}{{ end -}}
+{{- $tags := dict }}{{ range $v }}{{ range .tg }}{{ $tags = merge $tags (dict . (add (index $tags . | default 0) 1)) }}{{ end }}{{ end -}}
+{{- $tl := slice }}{{ range $k, $n := $tags }}{{ $tl = $tl | append (dict "t" $k "n" $n) }}{{ end -}}
 {{- with $v }}
 {{- $f := index . 0 }}
 <div class="win hvid" id="video">
@@ -54,17 +58,23 @@
       <div class="hvid__lcd">
         <div class="hvid__lcd-top"><span class="hvid__time">0:00</span><span class="hvid__eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="hvid__dur">-:--</span></div>
         <div class="hvid__marq"><span>{{ $f.t }}</span></div>
-        <div class="hvid__lcd-bot"><b class="hvid__ch hvid__ch--{{ $f.k }}">{{ $f.n }}</b><i class="hvid__date">{{ (time.AsTime (int (div $f.pub 1000))).Format "Jan 2 2006" }}</i></div>
+        <div class="hvid__lcd-bot"><b class="hvid__ch hvid__ch--{{ $f.k }}">{{ $f.n }}</b><i class="hvid__date">{{ (time.AsTime (int (div $f.pub 1000))).Format "Jan 2 2006" }}</i><span class="hvid__tags">{{ range $f.tg }}#{{ . }} {{ end }}</span></div>
       </div>
       <div class="hvid__modes" role="group" aria-label="channel">
         <button type="button" data-ch="" aria-pressed="true">all</button>
         {{- range $chs }}{{ if .yt }}<button type="button" data-ch="{{ .k }}" aria-pressed="false"{{ if ne .b .n }} title="{{ .n }}"{{ end }}>{{ .b }}</button>{{ end }}{{ end }}
         {{- with site.Data.arkmixes_upcoming }}<button type="button" data-ch="upcoming" aria-pressed="false">upcoming</button>{{ end }}
       </div>
+      <form class="hvid__bar" hidden onsubmit="return false" role="search" aria-label="search and filter videos">
+        <input type="search" name="q" placeholder="find" autocomplete="off" aria-label="search videos">
+        <select name="tag" aria-label="tag"><option value="">#all</option>{{ range sort $tl "n" "desc" }}<option value="{{ .t }}">#{{ .t }} ({{ .n }})</option>{{ end }}</select>
+        <button type="button" name="fav" aria-pressed="false" title="only the videos you favorited" aria-label="only your favorited videos"><i aria-hidden="true"></i></button>
+      </form>
       <ol class="hvid__list">
         {{- range $i, $x := . }}
-        <li data-ch="{{ .k }}"><a href="https://www.youtube.com/watch?v={{ .id }}" data-vid="{{ .id }}" data-n="{{ .n }}" data-k="{{ .k }}" data-d="{{ (time.AsTime (int (div .pub 1000))).Format "Jan 2 2006" }}"{{ if eq $i 0 }} class="is-on"{{ end }} rel="noopener"><span class="hvid__no"></span><span class="hvid__t">{{ .t }}</span><b class="hvid__ch hvid__ch--{{ .k }}">{{ .s }}</b></a></li>
+        <li data-ch="{{ .k }}" data-tags="{{ delimit .tg "," }}"><a href="https://www.youtube.com/watch?v={{ .id }}" data-vid="{{ .id }}" data-n="{{ .n }}" data-k="{{ .k }}" data-d="{{ (time.AsTime (int (div .pub 1000))).Format "Jan 2 2006" }}"{{ if eq $i 0 }} class="is-on"{{ end }} rel="noopener"><span class="hvid__no"></span><span class="hvid__t">{{ .t }}</span><b class="hvid__ch hvid__ch--{{ .k }}">{{ .s }}</b></a></li>
         {{- end }}
+        <li class="hvid__none" hidden>no videos</li>
       </ol>
       {{- with site.Data.arkmixes_upcoming }}
       <ol class="hvid__list hvid__up" hidden>
@@ -122,7 +132,7 @@
 .hvid__marq span{display:inline-block;padding-left:100%;animation:hvmq 14s steps(140) infinite}
 @keyframes hvmq{to{transform:translateX(-100%)}}
 .hvid__lcd-bot{display:flex;align-items:center;gap:8px;font-size:.72em;letter-spacing:.06em}
-.hvid__date{font-style:normal;color:#4fbf9c}
+.hvid__date{flex:none;font-style:normal;color:#4fbf9c;white-space:nowrap}
 .hvid__ch{font-weight:normal;padding:0 3px;color:#000;white-space:nowrap}
 .hvid__ch--laursen{background:#7fffd4}
 .hvid__ch--arkndjl{background:#c8c7ff}
@@ -131,6 +141,20 @@
 .hvid__modes button{flex:1 1 auto;font:inherit;font-size:.7em;letter-spacing:.04em;padding:2px 4px;cursor:pointer;color:var(--hv-ink);background:#ada9ec;border:0;
   box-shadow:inset 2px 2px 0 var(--hv-hi),inset -2px -2px 0 var(--hv-lo),0 0 0 2px var(--hv-ink)}
 .hvid__modes button[aria-pressed="true"]{color:var(--hv-teal);background:var(--hv-ink);box-shadow:inset 2px 2px 0 #000,inset -2px -2px 0 var(--hv-mid),0 0 0 2px var(--hv-ink)}
+.hvid__bar{display:flex;gap:4px;margin:0}
+.hvid__bar[hidden]{display:none}
+.hvid__bar input,.hvid__bar select{min-width:0;height:22px;font:inherit;font-size:.7em;padding:0 4px;color:var(--hv-teal);background:var(--hv-ink);border:0;border-radius:0;
+  box-shadow:inset 2px 2px 0 #000,inset -2px -2px 0 var(--hv-mid),0 0 0 2px var(--hv-ink)}
+.hvid__bar input{flex:1 1 0}.hvid__bar select{flex:0 1 auto;max-width:48%;cursor:pointer}
+.hvid__bar input::placeholder{color:#4fbf9c}
+.hvid__bar input:focus-visible,.hvid__bar select:focus-visible{outline:2px solid var(--hv-teal);outline-offset:0}
+.hvid__bar button{flex:none;display:inline-flex;align-items:center;justify-content:center;width:26px;height:22px;padding:0;cursor:pointer;border:0;background:#ada9ec;
+  box-shadow:inset 2px 2px 0 var(--hv-hi),inset -2px -2px 0 var(--hv-lo),0 0 0 2px var(--hv-ink)}
+.hvid__bar button i{display:block;width:9px;height:9px;background:var(--hv-lo);-webkit-mask:var(--ark-star) center/9px 9px no-repeat;mask:var(--ark-star) center/9px 9px no-repeat}
+.hvid__bar button[aria-pressed="true"]{background:var(--hv-ink);box-shadow:inset 2px 2px 0 #000,inset -2px -2px 0 var(--hv-mid),0 0 0 2px var(--hv-ink)}
+.hvid__bar button[aria-pressed="true"] i{-webkit-mask:none;mask:none;background:var(--ark-star-on) center/9px 9px no-repeat}
+.hvid__tags{min-width:0;margin-left:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--hv-lil)}
+.hvid__none{padding:2px 4px!important;color:var(--hv-mid)}
 .hvid__list{flex:1;min-height:0;max-height:178px;overflow-y:auto;list-style:none;margin:0;padding:2px;font-size:.78em;
   background:var(--hv-ink);box-shadow:inset 2px 2px 0 #000,inset -2px -2px 0 var(--hv-mid),0 0 0 2px var(--hv-ink)}
 @supports not selector(::-webkit-scrollbar){.hvid__list{scrollbar-color:var(--hv-mid) var(--hv-ink)}}
@@ -152,7 +176,8 @@
   .hvid__side{display:contents}
   .hvid__lcd{order:-1}
   .hvid__deck{order:0}
-  .hvid__modes{order:1}.hvid__list{order:2;max-height:114px}
+  .hvid__modes{order:1}.hvid__bar{order:2}.hvid__list{order:3;max-height:114px}
+  .hvid__bar input,.hvid__bar select{height:28px;font-size:.8em}.hvid__bar button{width:34px;height:28px}
   .hvid__time{font-size:1.5em}
   .hvid__btn{width:40px;height:30px}.hvid__btn--main{width:52px}
   .hvid__modes button{padding:4px}
@@ -182,7 +207,7 @@
   var pl = new Y(sc, first ? first.getAttribute('data-vid') : '', first ? first.querySelector('.hvid__t').textContent : '', {
     ontick: function (t, d) { if (!dragging) draw(t, d); }, onstate: state, onvol: vol, onend: function () { step(1, true); }
   });
-  function rows() { return Array.prototype.filter.call(w.querySelectorAll('.hvid__list:not(.hvid__up) li'), function (li) { return !li.hidden; }); }
+  function rows() { return Array.prototype.filter.call(w.querySelectorAll('.hvid__list:not(.hvid__up) li[data-ch]'), function (li) { return !li.hidden; }); }
   function load(a, auto) {
     w.querySelectorAll('.hvid__list a.is-on').forEach(function (x) { x.classList.remove('is-on'); }); a.classList.add('is-on');
     var t = a.querySelector('.hvid__t').textContent;
@@ -190,6 +215,7 @@
     w.querySelector('.hvid__marq span').textContent = t;
     var c = w.querySelector('.hvid__lcd-bot .hvid__ch'); c.textContent = a.getAttribute('data-n'); c.className = 'hvid__ch hvid__ch--' + a.getAttribute('data-k');
     w.querySelector('.hvid__date').textContent = a.getAttribute('data-d');
+    w.querySelector('.hvid__tags').textContent = (a.parentNode.getAttribute('data-tags') || '').split(',').filter(Boolean).map(function (t) { return '#' + t; }).join(' ');
     draw(0, 0); state();
     var l = w.querySelector('.hvid__list'), li = a.parentNode, y = li.getBoundingClientRect().top - l.getBoundingClientRect().top + l.scrollTop; if (y < l.scrollTop || y + li.offsetHeight > l.scrollTop + l.clientHeight) l.scrollTop = y - 2;
     w.dispatchEvent(new CustomEvent('hvid:load', { bubbles: true, detail: { vid: a.getAttribute('data-vid') } }));
@@ -216,13 +242,32 @@
   w.querySelector('.hvid__list').addEventListener('click', function (e) {
     var a = e.target.closest('a[data-vid]'); if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return; e.preventDefault(); load(a, true);
   });
-  function pick(b) {
-    ch = b.getAttribute('data-ch'); var n = 0;
-    w.querySelectorAll('.hvid__modes button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-    var up = ch === 'upcoming', vl = w.querySelector('.hvid__list:not(.hvid__up)'), ul = w.querySelector('.hvid__up');
+  // the strip under the channel buttons: search (title and tags), one tag, and this browser's favorited videos (favs.js)
+  var bar = w.querySelector('.hvid__bar'), bq = bar.querySelector('input'), bt = bar.querySelector('select'), bf = bar.querySelector('button');
+  bar.hidden = false;
+  function filt() {
+    var up = ch === 'upcoming', vl = w.querySelector('.hvid__list:not(.hvid__up)'), ul = w.querySelector('.hvid__up'), n = 0;
     if (ul) { ul.hidden = !up; vl.hidden = up; }
-    w.querySelectorAll('.hvid__list:not(.hvid__up) li').forEach(function (li) { var ok = up || !ch || li.getAttribute('data-ch') === ch; li.hidden = !ok; if (ok) li.querySelector('.hvid__no').textContent = ('0' + (++n)).slice(-2); });
+    bar.hidden = up;
+    var q = bq.value.trim().toLowerCase().replace(/^#/, ''), tg = bt.value, fv = bf.getAttribute('aria-pressed') === 'true' && window.arkFav;
+    w.querySelectorAll('.hvid__list:not(.hvid__up) li[data-ch]').forEach(function (li) {
+      var a = li.querySelector('a'), tags = (li.getAttribute('data-tags') || '').split(',');
+      var ok = !ch || li.getAttribute('data-ch') === ch;
+      if (ok && tg) ok = tags.indexOf(tg) >= 0;
+      if (ok && q) ok = q.split(/\s+/).every(function (x) { return (a.querySelector('.hvid__t').textContent + ' ' + a.getAttribute('data-n') + ' ' + tags.join(' ')).toLowerCase().indexOf(x) >= 0; });
+      if (ok && fv) ok = window.arkFav.video(a.getAttribute('data-vid'));
+      li.hidden = !ok; if (ok) li.querySelector('.hvid__no').textContent = ('0' + (++n)).slice(-2);
+    });
+    w.querySelector('.hvid__none').hidden = up || n > 0;
   }
+  function pick(b) {
+    ch = b.getAttribute('data-ch');
+    w.querySelectorAll('.hvid__modes button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    filt();
+  }
+  bq.addEventListener('input', filt); bt.addEventListener('change', filt);
+  bf.addEventListener('click', function () { bf.setAttribute('aria-pressed', bf.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); filt(); });
+  if (window.arkFav) window.arkFav.on(function () { if (bf.getAttribute('aria-pressed') === 'true') filt(); });
   w.querySelector('.hvid__modes').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) pick(b); });
   pick(w.querySelector('.hvid__modes button'));
   vol(pl.vol);

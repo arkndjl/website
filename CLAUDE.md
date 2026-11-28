@@ -265,6 +265,10 @@
 - Article lists (home and /posts/) have a strip on top (`layouts/partials/postbar.html`, `assets/js/postbar.js`): search, type, tag,
   sort (newest, views, favorites) and a favorited toggle (this browser's stars). Type is the post's front matter `form` (board, method,
   research, analysis, essay, process, list, video, tool; `kind` is reserved by Hugo). Every post is on one page (`pagerSize = 100`).
+  Tags are the search terms: give each post its sport, league, topic, metric names (xpm, fv, war) and teams or players it is about.
+- video.exe (`layouts/partials/home-video.html`) has the same kind of strip under its channel buttons: find, tag, favorited (favs.js).
+  Video tags are never typed per video: `data/video_tags.json` gives each channel its tags and a regex on the title adds the rest
+  (ARKMIX -> arkmix); a new kind of video gets a rule there. The playing video's tags show on the LCD.
 
 ## articleGFX (every article)
 

@@ -1,0 +1,25 @@
+{
+  "channels": {
+    "laursen": ["laursen_111", "cs2"],
+    "arkndjl": ["arkndjl"],
+    "ytst": ["ytst", "podcast", "nba"]
+  },
+  "rules": [
+    {"t": "arkmix", "m": "(?i)arkmix"},
+    {"t": "sportsmix", "m": "(?i)sportsmix"},
+    {"t": "highlights", "m": "(?i)highlight|mix\\b|sportsmix"},
+    {"t": "edit", "m": "^[^|]+ - ARKNDJL$"},
+    {"t": "cfb", "m": "(?i)college football|\\bcfb\\b|hs highlights|recruit"},
+    {"t": "recruiting", "m": "(?i)hs highlights|recruit|\\d\\*"},
+    {"t": "nfl", "m": "(?i)\\bnfl\\b|kadarius toney"},
+    {"t": "eephus.io", "m": "(?i)eephus"},
+    {"t": "mlb", "m": "(?i)eephus|\\bmlb\\b|baseball"},
+    {"t": "1nt", "m": "\\b1NT\\b"},
+    {"t": "esea", "m": "(?i)\\besea\\b"},
+    {"t": "vod", "m": "(?i)\\bvod\\b|\\bbo[13]\\b|\\bgame \\d+|playoffs"},
+    {"t": "playoffs", "m": "(?i)playoffs"},
+    {"t": "clips", "m": "(?i)clips|compilation"},
+    {"t": "trade deadline", "m": "(?i)trade deadline"},
+    {"t": "embiid", "m": "(?i)embiid"}
+  ]
+}
