@@ -16,6 +16,13 @@
   // the short link a graphic prints: the sport's short path plus the tab it came from (#<tab>), or a player (#<board>:p=<key>)
   function tabLink(win) { var t = win && win.closest('[data-tab]'); t = t && t.getAttribute('data-tab'); return SITE + (t && !/(1nt|laursen_111)$/.test(SITE) ? '#' + String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : ''); }
   function txt(el) { return (el && el.textContent || '').replace(/\s+/g, ' ').trim(); }
+  // HTML entities left in JSON a page carries (TA&amp;M) come out as their characters, in every string of the object
+  function unent(o) {
+    if (typeof o === 'string') return /&[#a-z0-9]+;/i.test(o) ? o.replace(/&(amp|lt|gt|quot|#39|apos);/g, function (m, e) { return { amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'", apos: "'" }[e]; }) : o;
+    if (Array.isArray(o)) return o.map(unent);
+    if (o && typeof o === 'object') Object.keys(o).forEach(function (k) { o[k] = unent(o[k]); });
+    return o;
+  }
   // a photo from another site (ESPN, Wikimedia) loads with CORS so the canvas can still be saved
   // On3 recruit photos come through the site's own /api/photo (worker/site.js): On3's CDN sends CORS headers unreliably
   var IMG_WAIT = 8000;   // a photo or logo host that never answers: the card is drawn without it, not left waiting
@@ -41,8 +48,10 @@
     g.fillStyle = C.teal; [[x + 4, y + 4], [x + w - 10, y + 4], [x + 4, y + h - 10], [x + w - 10, y + h - 10]].forEach(function (p) { g.fillRect(p[0], p[1], 6, 6); });
   }
   // team logos are drawn smooth at full resolution, as served; the rest of the card stays pixel-sharp
+  // a logo keeps its own shape: fitted inside the w x h box and centred in it (a wide mark is never squashed square)
   function drawLogo(g, img, x, y, w, h) {
-    var sm = g.imageSmoothingEnabled;
+    var sm = g.imageSmoothingEnabled, iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+    if (iw && ih) { var r = Math.min(w / iw, h / ih), dw = iw * r, dh = ih * r; x += (w - dw) / 2; y += (h - dh) / 2; w = dw; h = dh; }
     g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
     g.drawImage(img, x, y, w, h);
     g.imageSmoothingEnabled = sm;
@@ -371,7 +380,7 @@
       g.font = sz + 'px ' + FONT;
       return cols.map(function (ci, k) {
         var m = g.measureText(capHead(heads[ci])).width;
-        cdata.forEach(function (row) { var c = row[k]; m = Math.max(m, g.measureText(c.t).width + (c.img ? sz * 0.95 + 10 : 0) + (c.flag ? sz + 10 : 0) + (c.chip ? 24 : 0) + tagsW(c, sz)); g.font = sz + 'px ' + FONT; });
+        cdata.forEach(function (row) { var c = row[k]; m = Math.max(m, g.measureText(c.t).width + (c.img ? sz * 0.95 + Math.round(sz * 0.3) : 0) + (c.flag ? sz + 10 : 0) + (c.chip ? 24 : 0) + tagsW(c, sz)); g.font = sz + 'px ' + FONT; });
         return m + sz * 0.7;
       });
     }
@@ -439,11 +448,13 @@
         var x = x0;
         row.forEach(function (c, k) {
           var tx = x + size * 0.45, cy = y + rowH / 2, kd = kinds[k], num = kd !== 'id';
+          var blank = /^[-–—·]?$/.test(c.t) && !c.img && !c.chip && !c.tags;
+          if (num && blank && k !== lead) { x += colW[k]; return; }   // nothing to show: no empty box, the row stays quiet
           if (num) {   // the cell
             var bx = Math.round(x + cm), bw = Math.round(colW[k] - 2 * cm), by = Math.round(y + cv), bh = Math.round(rowH - 2 * cv);
             g.fillStyle = k === lead ? C.dark : TINT[kd]; g.fillRect(bx, by, bw, bh);
             if (k === lead) { g.fillStyle = C.teal; g.fillRect(bx, by + bh - ul, bw, ul); cy -= ul / 2; }
-            var cw0 = g.measureText(c.t).width + (c.img ? size * 0.95 + 10 : 0) + tagsW(c, size);
+            var cw0 = g.measureText(c.t).width + (c.img ? size * 0.95 + Math.round(size * 0.3) : 0) + tagsW(c, size);
             tx = Math.round(x + (colW[k] - Math.min(cw0, bw - 4)) / 2);
           }
           if (c.chip) {
@@ -452,7 +463,7 @@
             g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(tx - 12, cy + ch / 2 - 3, tw, 3);
             g.fillStyle = c.ink; g.fillText(c.t, tx, cy);
           } else {
-            if (c.img) { var s = size * 0.95; drawLogo(g, c.img, tx, cy - s / 2, s, s); tx += s + 10; }
+            if (c.img) { var s = size * 0.95; drawLogo(g, c.img, tx, cy - s / 2, s, s); tx += s + Math.round(size * 0.3); }
             if (c.flag) { var fh = Math.round(size * 0.69); g.save(); g.imageSmoothingEnabled = false; g.drawImage(c.flag, tx, Math.round(cy - fh / 2), size, fh); g.restore(); tx += size + 10; }
             // names white, the rest of the identity lilac; numbers white, the lead metric teal, a value below zero pink
             var neg = /^[−-]\.?\d/.test(c.t) && !c.img, nameCol = NAME_COL.test(heads[cols[k]]) || (k === 1 && !num);
@@ -605,8 +616,18 @@
     baseball: ['.....dddddd.....', '...ddwwwwwwdd...', '..dwwwwwwwwwwd..', '.dwtwwwwwwwwtwd.', '.dttwwwwwwwwttd.', 'dwwwtwwwwwwtwwwd', 'dwwttwwwwwwttwwd', 'dwwwtwwwwwwtwwwd', 'dwwttwwwwwwttwwd', 'dwwwtwwwwwwtwwwd', 'dwtttwwwwwwtttwd', '.dwtwwwwwwwwtwd.', '.dttwwwwwwwwttd.', '..dwwwwwwwwwwd..', '...ddwwwwwwdd...', '.....dddddd.....'],
     cs2: ['...t............', '..t.t.dddd......', '...tttdlld.ll...', '......dlldd..l..', '.....dddddd...l.', '....dmmmpmmmd.l.', '...dmwmmpmmmmdl.', '..dmwmmmpmmmmmd.', '..dmmmmmpmmmmmd.', '..dpppppppppppd.', '..dmmmmmpmmmmmd.', '..dmmmmmpmmmmmd.', '...dmmmmpmmmmd..', '....dmmmpmmmd...', '.....ddddddd....', '................']
   };
+  // a page that holds every sport (Predictions, ARKBOARD home): the ball comes from the graphic's own tab names and window title
+  var GFX_WIN = null;
   function sportBall() {
-    var p = location.pathname;
+    var p = location.pathname, k = pageBall(p);
+    if (k || !GFX_WIN) return k;
+    var bits = [txt(GFX_WIN.querySelector('.win__title-text'))], n = GFX_WIN;
+    while (n && n !== document.body) { if (n.getAttribute && n.getAttribute('data-tab')) bits.push(n.getAttribute('data-tab')); n = n.parentElement; }
+    var t = ' ' + bits.join(' ').toLowerCase().replace(/[^a-z0-9]+/g, ' ') + ' ';
+    return / (cfb|nfl|college football) /.test(t) ? 'football' : / (cbb|nba|college basketball) /.test(t) ? 'basketball' : / (nhl|hockey) /.test(t) ? 'puck'
+      : / (soccer|epl|ucl|mls) /.test(t) ? 'soccer' : / (tennis|atp|wta) /.test(t) ? 'tennis' : / (mlb|baseball) /.test(t) ? 'baseball' : / (cs2|esea|counter strike) /.test(t) ? 'cs2' : '';
+  }
+  function pageBall(p) {
     return /college-football|arkboard\/nfl/.test(p) ? 'football' : /college-basketball|arkboard\/nba/.test(p) ? 'basketball'
       : /arkboard\/nhl|hockey-prospects/.test(p) ? 'puck' : /arkboard\/soccer/.test(p) ? 'soccer' : /arkboard\/tennis/.test(p) ? 'tennis'
       : /arkboard\/baseball/.test(p) ? 'baseball' : /arkboard\/(cs2|counter)|^\/1nt|^\/laursen_111/i.test(p) ? 'cs2' : '';
@@ -2355,7 +2376,7 @@
   async function buildGames(win, btn) {
     var cards = [].slice.call(win.querySelectorAll('[data-gfx-game]')).filter(function (c) { return !c.hidden; }).slice(0, 8);
     if (!cards.length) return null;
-    var games = cards.map(function (c) { return JSON.parse(c.getAttribute('data-gfx-game')); });
+    var games = cards.map(function (c) { return unent(JSON.parse(c.getAttribute('data-gfx-game'))); });
     var title = txt(win.querySelector('.win__title-text')).replace(/_$/, '').trim();
     var F = await frame(2160, 2700, title + (win.getAttribute('data-gfx-order') === 'soon' ? ' :: up next' : ' :: top games'), win.getAttribute('data-gfx-date'));
     var g = F.g, n = games.length, cols = n > 4 ? 2 : 1, rowsN = Math.ceil(n / cols), gap = 24;
@@ -2405,7 +2426,7 @@
   // ---- one game (cfbgames.html / nflgames.html data-gfx-one): both sides, kickoff, win probability, the model against the market ----
   async function buildGame(win, btn) {
     var card = btn.closest('[data-gfx-one]'); if (!card) return null;
-    var d = JSON.parse(card.getAttribute('data-gfx-one'));
+    var d = unent(JSON.parse(card.getAttribute('data-gfx-one')));
     var F = await frame(2160, 2700, d.lg + ' :: ' + d.a.n + ' at ' + d.h.n, win.getAttribute('data-gfx-date') || d.date);
     var g = F.g, x = F.x, y = F.y, w = F.w, gap = 24, pad = 40;
     // the two sides: logo, ARK rank, name, record; "at" between
@@ -2457,10 +2478,13 @@
       var tx = x + (i % 2) * (tw + gap), ty = y + Math.floor(i / 2) * (tH + gap);
       var tw2 = tiles.length % 2 && i === tiles.length - 1 ? w : tw;   // an odd last tile spans the row
       well(g, tx, ty, tw2, tH);
-      g.font = Math.round(40 * tk) + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText(t.l, tx + pad, ty + tH * 0.22);
-      var vs = Math.round(68 * tk); do { g.font = vs + 'px ' + FONT; } while (g.measureText(t.v).width > tw2 - 2 * pad && (vs -= 4) >= 40);   // long values step down before they clip
-      g.fillStyle = C.white; g.fillText(fit(g, t.v, tw2 - 2 * pad), tx + pad, ty + tH * 0.52);
-      g.font = Math.round(44 * tk) + 'px ' + FONT; g.fillStyle = C.teal; g.fillText(fit(g, t.s || '', tw2 - 2 * pad), tx + pad, ty + tH * 0.8);
+      // label, value and note stacked as one block, centred in the tile (a tile with no note has no gap under it)
+      var ls = Math.round(40 * tk), ss = Math.round(44 * tk), vs = Math.round(76 * tk);
+      g.font = vs + 'px ' + FONT; while (g.measureText(t.v).width > tw2 - 2 * pad && vs > 40) { vs -= 4; g.font = vs + 'px ' + FONT; }   // long values step down before they clip
+      var blk = ls + 0.9 * ls + vs + (t.s ? 0.8 * ss + ss : 0), by0 = ty + (tH - blk) / 2;
+      g.font = ls + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, t.l, tw2 - 2 * pad), tx + pad, by0 + ls / 2);
+      g.font = vs + 'px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, t.v, tw2 - 2 * pad), tx + pad, by0 + 1.9 * ls + vs / 2);
+      if (t.s) { g.font = ss + 'px ' + FONT; g.fillStyle = C.teal; g.fillText(fit(g, t.s, tw2 - 2 * pad), tx + pad, by0 + 1.9 * ls + vs + 0.8 * ss + ss / 2); }
     });
     if (d.pick) {
       var py = bottom + gap;
@@ -2829,7 +2853,7 @@
     var top = Math.max.apply(null, teams.map(function (t) { return t.s; }).concat([1]));
     var logos = await Promise.all(teams.map(function (t) { return loadImg(t.l); }));
     var hasAp = teams.some(function (t) { return t.ap; }), hasC = teams.some(function (t) { return t.c; });
-    function pollTxt(t) { return [hasAp ? 'AP ' + (t.ap || '–') : '', hasC ? 'Coaches ' + (t.c || '–') : ''].filter(Boolean).join(' · '); }   // only polls that are out
+    function pollTxt(t) { if (!t.ap && !t.c) return ''; return [hasAp ? 'AP ' + (t.ap || '–') : '', hasC ? 'Coaches ' + (t.c || '–') : ''].filter(Boolean).join(' · '); }   // only polls that are out
     teams.forEach(function (t, i) {
       var cx = F.x + Math.floor(i / per) * (cw + gap), cy = F.y + (i % per) * (rh + 12);
       well(g, cx, cy, cw, rh);
@@ -3074,9 +3098,11 @@
     tiles.forEach(function (t, i) {
       var tx = x + (i % cols) * (tw + gp), ty = y + Math.floor(i / cols) * (th + gp);
       g.fillStyle = C.face; g.fillRect(tx, ty, tw, th); bevel(g, tx, ty, tw, th, true, 3);
-      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(t[0], tx + 20, ty + 40);
-      var vf = Math.min(64, th - 72); g.font = vf + 'px ' + FONT; while (vf > 36 && g.measureText(t[1]).width > tw - 40) { vf -= 4; g.font = vf + 'px ' + FONT; }
-      g.fillStyle = t[2] || C.white; g.fillText(fit(g, t[1], tw - 40), tx + 20, ty + th - 20 - vf / 2);
+      // label over value as one block, centred in the tile; a tall tile gets a bigger value instead of empty space
+      var vf = Math.max(36, Math.min(88, th - 72, Math.round(th * 0.42))); g.font = vf + 'px ' + FONT; while (vf > 36 && g.measureText(t[1]).width > tw - 40) { vf -= 4; g.font = vf + 'px ' + FONT; }
+      var by0 = ty + Math.max(8, (th - (32 + 14 + vf)) / 2);
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, t[0], tw - 40), tx + 20, by0 + 16);
+      g.font = vf + 'px ' + FONT; g.fillStyle = t[2] || C.white; g.fillText(fit(g, t[1], tw - 40), tx + 20, by0 + 32 + 14 + vf / 2);
     });
     return Math.ceil(tiles.length / cols) * (th + gp);
   }
@@ -5025,6 +5051,7 @@
 
   document.addEventListener('click', async function (e) {
     var btn = e.target.closest('[data-gfx]'); if (!btn) return;
+    GFX_WIN = null;
     if (btn.getAttribute('data-gfx-mode') === 'article') {
       btn.disabled = true; var al = btn.textContent; btn.textContent = '…';
       try { var arc = await buildArticle(btn); if (arc) preview(arc, 'arkndjl-' + (artData(btn).n || 'article')); }
@@ -5032,6 +5059,7 @@
       return;
     }
     var win = btn.closest('.win'); if (!win) return;
+    GFX_WIN = win;
     btn.disabled = true; var label = btn.textContent; btn.textContent = '…';
     try {
       var mode = btn.getAttribute('data-gfx-mode');
