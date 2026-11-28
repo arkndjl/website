@@ -28,7 +28,18 @@ _NPOS = ', '.join(f'{g} {round((math.exp(v) - 1) * 100):+d}%' for g, v in ld('da
 _nbm = lambda k: sum((lo + hi) / 2 for lo, hi in _NB[k]['teams'].values()) / len(_NB[k]['teams'])
 _VX = ld('data/nba_vorx_research.json')                         # VORX on rXPM (scripts/nba_vorx_research.py)             # rXPM team adjustment (scripts/nba_rxpm_research.py)
 _NT = ld('data/nba_trade_fit.json')                         # NBA draft-night trades (scripts/nba_draft_trades.py)
-_AGY = ld('data/agencies_board.json')['sports']               # NIL agencies (scripts/agencies.py)
+_AGY = ld('data/agencies_board.json')['sports']
+_AGTR = ld('research/agency_tendency.json')
+def _agt():
+    out = []
+    for sp, nm in (('cfb', 'Football'), ('cbb', 'Basketball')):
+        parts = []
+        for k in ('Deal', 'Situation', 'Reach', 'Breakout', 'Stability'):
+            t = _AGTR.get(sp, {}).get(k)
+            if t: parts.append('%s r %.2f, p %.3f%s' % (k, t['r'], t['p'], ' (shipped)' if t.get('ship') else ''))
+        out.append(nm + ': ' + '; '.join(parts) + '.')
+    return ' '.join(out) + ' Situation is growth in FV over last season against players with the same FV and class, Reach is a power conference spot against players with the same FV and position, and Stability is staying at his school against players with the same FV and class.'
+_AGT = _agt()               # NIL agencies (scripts/agencies.py)
 _DR = ld('data/dect_fit.json')                             # DECT, declare / even / college / transfer in dollars (scripts/dect.py)
 _TBX = {'cfb': ld('static/data/cfb-builder.json').get('nxFit') or {}, 'cbb': ld('static/data/cbb-builder.json').get('nxFit') or {}}   # scripts/team_builder_next.py
 _DX = {k: ld(f'scripts/research/dect_features_nov27/results_{k}.json') for k in ('ret', 'cbb_move', 'cfb_move')}   # DECT as a feature (failed; scripts/research/dect_features_nov27)
@@ -289,12 +300,13 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
        'Checked against the College Sports Commission\'s pay percentiles by position, On3 valuations and reported deals.',
        'FCS players at an FBS-starter FV are priced at 40% of the FBS rate. CBB xNIL is minutes share × (BPM + 3) at the school\'s price.'],
       'CFB board, team talent, team builder, fv to xNIL charts; CBB recruits', ['CFB', 'CBB']),
-    E('NIL agencies', 'Agencies ranked by their college clients\' zNIL, with the talent they represent.',
+    E('NIL agencies', 'Agencies ranked by tendency scores built from their clients, with the talent they represent.',
       ['Each client is one row in a ledger, named by the agency\'s own client page, an announcement or a report, with the source and its date. Family means a relative handles his deals and None means a source says he has no agent. A player no source names is left out.',
-       f'zNIL* is the mean zNIL of the agency\'s college clients pulled toward the mean of every represented player: (sum + k × mean) / (n + k). k is the spread of clients inside an agency over the spread between agencies, held at 8 or more until eight agencies have three or more clients: {_AGY["cfb"]["fit"]["k"]:g} in football and {_AGY["cbb"]["fit"]["k"]:g} in basketball.',
-       'Above zero the clients are worth more on the market than they are paid, so the agency has put them where they can play. Below zero they are paid more than they are worth, so the agency has got them paid.',
-       'Recruits count toward talent (FV, ARK stars, xNIL) but not zNIL, since they have no yNIL yet. Low-confidence rows count toward talent only.',
-       'Drafted counts the agency\'s college clients picked in the NFL or NBA draft, with the agency the ledger had for him on draft day. It starts with the 2027 drafts and earlier drafts are not counted. 1st rd is the first-round picks, and Pro% is drafted over drafted plus the college clients on file now.',
+       'Each score is a plus score, 100 + 25 × (s - the mean agency) / SD, so 100 is the average agency. s is the mean over the agency\'s clients pulled toward the mean of every represented client: (sum + k × mean) / (n + k), with k the spread inside agencies over the spread between them (8 or more until eight agencies have three or more clients).',
+       'Deal+ uses each college client\'s -zNIL over the sport\'s zNIL SD. Above 100 the agency gets its clients paid more than they are worth. Breakout+ uses FV minus the mean FV of board players with the same ARK stars and class. Above 100 its clients play above their high school grade.',
+       'A score is shown only where it held up on a split-half test: each agency\'s clients are split in two at random and the two half means are correlated across agencies, against 300 shuffles of the clients between agencies, and it has to clear p < .05 both weighted by clients and unweighted. ' + _AGT,
+       'Drafted counts clients picked in the NFL or NBA draft who signed with the agency before the draft process began (declaring, or Dec 1 for football and Mar 15 for basketball). It does not count an agency a player signed with to go pro. The 2022-26 drafts are first-round picks from dated sources; from 2027 every pick is recorded on draft day. Pro% is drafted over drafted plus the college clients on file now.',
+       'Recruits count toward talent (FV, ARK stars) only. Low-confidence rows count toward talent only.',
        f'On file now: {len(_AGY["cfb"]["clients"])} football and {len(_AGY["cbb"]["clients"])} basketball players and recruits, {len(_AGY["cfb"]["agencies"])} and {len(_AGY["cbb"]["agencies"])} agencies.'],
       'CFB and CBB agencies tabs, player and recruit cards', ['CFB', 'CBB']),
     E('Season AV (college)', 'A college player\'s on-field value for a season: snap share × position weight × quality.',

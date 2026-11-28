@@ -202,10 +202,13 @@
 - Drafted clients are tracked forward from the 2027 drafts, never backfilled (Noah, Nov 28): once a year's NFL / NBA draft is complete
   on ESPN, `record_drafts` in `scripts/agencies.py` writes every ledger college client who was picked to `data/agency_pros.json` with
   the agency on file that day and marks the year done; the board shows Drafted, 1st rd and Pro% (drafted / (drafted + college clients now)).
-- zNIL = xNIL - yNIL as everywhere: above zero the clients are worth more than they are paid (the agency found them the right
-  place), below zero they are paid more than they are worth (the agency got them paid). zNIL* = (sum + k x mean of all
-  represented players) / (n + k), k by method of moments. Recruits count for talent only. GFX: `buildAgency` (one agency) and
-  `buildAgencyBoard` (the board), both 16:9.
+- The board shows tendency scores, not x/y/zNIL (Noah, Nov 28): plus scores, 100 = the average agency, 25 = one SD, each the agency's
+  mean client value shrunk by (sum + k x mean) / (n + k). Deal+ = -zNIL / SD (paid above worth), Breakout+ = FV - mean FV at his ARK
+  stars and class. A score shows only for a sport where it passed the split-half test (`scripts/research/agencies_nov28/tendency.py`
+  -> `research/agency_tendency.json`, p < .05 weighted and unweighted; rerun by hand when the ledger grows). Situation+ (FV growth),
+  Reach+ (power-conference spot) and Stability+ (stayed) failed Nov 28; CBB had nothing pass. Recruits count for talent only.
+  Drafted counts only agencies signed before the draft process (declaring; Dec 1 football, Mar 15 basketball), never the pro agent.
+  GFX: `buildAgency` (one agency) and `buildAgencyBoard` (the board), both 16:9.
 
 ## Season rollovers (calendar, phases, post days)
 
