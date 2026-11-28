@@ -27,7 +27,8 @@
 .lzl__usr i{background:#4cff7a;box-shadow:0 0 0 1px #000;animation:lzlpulse 2s steps(2) infinite}
 @keyframes lzlpulse{50%{background:#1f8f3c}}
 .lzl__main{display:flex;flex-direction:column;min-width:0}
-.lzl__pane{position:relative;height:440px;overflow-y:auto;padding:10px 12px 14px;background:#0a0d0e repeating-linear-gradient(180deg,transparent 0 23px,var(--lzl-line) 23px 24px);scrollbar-color:var(--n1-lilac) #0a0d0e}
+.lzl__pane{position:relative;height:440px;overflow-y:auto;padding:10px 12px 14px;background:#0a0d0e repeating-linear-gradient(180deg,transparent 0 23px,var(--lzl-line) 23px 24px)}
+@supports not selector(::-webkit-scrollbar){.lzl__pane{scrollbar-color:var(--n1-lilac) #0a0d0e}}
 .lzl__day{display:flex;align-items:center;gap:8px;margin:6px 0 10px;color:var(--n1-grey);font-size:.8em;letter-spacing:.12em;text-transform:uppercase}
 .lzl__day::before,.lzl__day::after{content:"";flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--n1-line) 0 4px,transparent 4px 8px)}
 .lzl__m{position:relative;max-width:640px;margin:0 0 14px;padding-top:18px;transform-origin:0 0}

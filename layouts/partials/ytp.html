@@ -1,0 +1,17 @@
+{{- /* Pixel YouTube player (assets/js/ytpix.js): a thumbnail facade with a pixel play button, the iframe loaded only on
+       click, and a pixel control bar (play/pause, time, seek, volume, YouTube link, fullscreen). Without JS the facade
+       links to the video on YouTube. Context: dict "id" "title" ("class" optional). */ -}}
+{{- $id := .id -}}
+<div class="ytp{{ with .class }} {{ . }}{{ end }}" data-vid="{{ $id }}" data-title="{{ .title }}" tabindex="-1">
+  <div class="ytp__screen">{{ partial "ytp-face.html" (dict "id" $id "title" .title) }}</div>
+  <div class="ytp__bar">
+    <button type="button" class="ytp__btn ytp__btn--main" data-yp="play" aria-label="play"><svg aria-hidden="true"><use href="#icon-play"/></svg></button>
+    <span class="ytp__time">0:00 / -:--</span>
+    <div class="ytp__seek" role="slider" tabindex="0" aria-label="seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i class="ytp__buf"></i><i class="ytp__fill"></i><i class="ytp__head" aria-hidden="true"></i></div>
+    <button type="button" class="ytp__btn" data-yp="mute" aria-label="mute"><svg aria-hidden="true"><use href="#icon-vol"/></svg></button>
+    <div class="ytp__vol" role="slider" tabindex="0" aria-label="volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="75">{{ range seq 8 }}<i></i>{{ end }}</div>
+    <a class="ytp__yt" href="https://www.youtube.com/watch?v={{ $id }}" target="_blank" rel="noopener" title="watch on YouTube"><svg aria-hidden="true"><use href="#icon-youtube"/></svg>YouTube</a>
+    <button type="button" class="ytp__btn" data-yp="full" aria-label="fullscreen"><svg aria-hidden="true"><use href="#icon-full"/></svg></button>
+  </div>
+</div>
+{{- partial "js.html" "ytpix" -}}

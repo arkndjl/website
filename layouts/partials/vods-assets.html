@@ -1,7 +1,6 @@
 {{- /* CSS + click-to-play script for .vods video walls (vods shortcode). Include once per page. */ -}}
 <style>
-.vods__player{aspect-ratio:16/9;background:#000}
-.vods__player iframe{display:block;width:100%;height:100%;border:0}
+.vods__player{background:#000}
 .vods__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;list-style:none;margin:0;padding:12px}
 .vods__grid li::before{content:none!important}
 .vods__grid a{display:flex;flex-direction:column;gap:4px;color:var(--foreground);text-decoration:none;height:100%;padding:4px;background:var(--win-well);box-shadow:inset 2px 2px 0 var(--win-dark),inset -2px -2px 0 var(--win-light)}
@@ -16,9 +15,12 @@
 <script>
 document.addEventListener('click', function (e) {
   var a = e.target.closest && e.target.closest('.vods__grid a[data-vid]'); if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return;
-  var w = a.closest('.vods'), f = w.querySelector('.vods__player iframe'); if (!f) return;
+  var w = a.closest('.vods'), y = w.querySelector('.ytp'); if (!y || !window.YTPix) return;
   e.preventDefault();
-  f.src = 'https://www.youtube-nocookie.com/embed/' + a.getAttribute('data-vid') + '?autoplay=1';
+  var pl = window.YTPix.mount(y), t = a.querySelector('.vods__t').textContent;
+  y.setAttribute('data-vid', a.getAttribute('data-vid')); y.setAttribute('data-title', t);
+  var yt = y.querySelector('.ytp__yt'); if (yt) yt.href = 'https://www.youtube.com/watch?v=' + a.getAttribute('data-vid');
+  pl.load(a.getAttribute('data-vid'), true, t);
   w.querySelectorAll('.vods__grid a.is-on').forEach(function (x) { x.classList.remove('is-on'); }); a.classList.add('is-on');
   w.querySelector('.vods__player').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 });

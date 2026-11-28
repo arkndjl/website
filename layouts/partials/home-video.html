@@ -1,8 +1,9 @@
 {{- /* Home page video.exe as a small desktop media player skin: screen, LCD, seek bar, transport, channel modes and a
        track list. Newest long-form YouTube uploads (no Shorts) from LAURSEN_111, ARKNDJL and Your Team Should Tank,
        newest loaded first. Data: data/laursen_socials.json + data/arkndjl_socials.json + data/ytst_socials.json `yt` (channel RSS every 20 min in esea.yml; short =
-       the feed's /shorts/ link, or the API check in scripts/laursen_social_plan.mjs). The transport drives the embed
-       through the YouTube iframe postMessage API (enablejsapi=1), no API script; a finished video plays the next. */ -}}
+       the feed's /shorts/ link, or the API check in scripts/laursen_social_plan.mjs). The screen is a click-to-load
+       facade until played; then the YouTube IFrame API player (controls=0, assets/js/ytpix.js) is driven by the
+       transport, seek bar, volume and fullscreen here; a finished video plays the next. */ -}}
 {{- $chs := slice (dict "k" "laursen" "n" "LAURSEN_111" "b" "LAURSEN_111" "s" "L111" "h" "LAURSEN_111" "yt" site.Data.laursen_socials.yt) (dict "k" "arkndjl" "n" "ARKNDJL" "b" "ARKNDJL" "s" "ARK" "h" "ARKNDJL" "yt" site.Data.arkndjl_socials.yt) (dict "k" "ytst" "n" "Your Team Should Tank" "b" "YTST" "s" "YTST" "h" "YourTeamShouldTankPodcast" "yt" site.Data.ytst_socials.yt) -}}
 {{- $v := slice -}}
 {{- /* YTST episodes are numbered by upload order (oldest = #1), or by the "#N" in the title when it has one */ -}}
@@ -34,7 +35,7 @@
   </div>
   <div class="hvid__skin">
     <div class="hvid__deck">
-      <div class="hvid__bezel"><div class="hvid__screen"><iframe src="https://www.youtube-nocookie.com/embed/{{ $f.id }}?enablejsapi=1&playsinline=1&rel=0" title="{{ $f.t }}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; fullscreen" allowfullscreen></iframe></div></div>
+      <div class="hvid__bezel"><div class="hvid__screen">{{ partial "ytp-face.html" (dict "id" $f.id "title" $f.t) }}</div></div>
       <div class="hvid__seek" role="slider" tabindex="0" aria-label="seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i class="hvid__fill"></i><i class="hvid__head" aria-hidden="true"></i></div>
       <div class="hvid__ctl">
         <button type="button" class="hvid__btn" data-hv="prev" aria-label="previous"><svg><use href="#icon-prev"/></svg></button>
@@ -42,6 +43,9 @@
         <button type="button" class="hvid__btn" data-hv="stop" aria-label="stop"><svg><use href="#icon-stop"/></svg></button>
         <button type="button" class="hvid__btn" data-hv="next" aria-label="next"><svg><use href="#icon-next"/></svg></button>
         <span class="hvid__grille" aria-hidden="true"></span>
+        <button type="button" class="hvid__btn hvid__btn--sm" data-hv="mute" aria-label="mute"><svg><use href="#icon-vol"/></svg></button>
+        <span class="ytp__vol hvid__vol" role="slider" tabindex="0" aria-label="volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="75">{{ range seq 8 }}<i></i>{{ end }}</span>
+        <button type="button" class="hvid__btn hvid__btn--sm" data-hv="full" aria-label="fullscreen"><svg><use href="#icon-full"/></svg></button>
         <span class="hvid__led" aria-hidden="true"></span>
       </div>
     </div>
@@ -81,8 +85,12 @@
   clip-path:polygon(0 6px,2px 6px,2px 4px,4px 4px,4px 2px,6px 2px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 2px,calc(100% - 4px) 2px,calc(100% - 4px) 4px,calc(100% - 2px) 4px,calc(100% - 2px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 2px) calc(100% - 6px),calc(100% - 2px) calc(100% - 4px),calc(100% - 4px) calc(100% - 4px),calc(100% - 4px) calc(100% - 2px),calc(100% - 6px) calc(100% - 2px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 2px),4px calc(100% - 2px),4px calc(100% - 4px),2px calc(100% - 4px),2px calc(100% - 6px),0 calc(100% - 6px))}
 .hvid__deck,.hvid__side{display:flex;flex-direction:column;gap:8px;min-width:0}
 .hvid__bezel{padding:6px;background:var(--hv-ink);box-shadow:inset 2px 2px 0 var(--hv-lo),inset -2px -2px 0 var(--hv-hi),0 0 0 2px var(--hv-ink)}
-.hvid__screen{aspect-ratio:16/9;background:#000;box-shadow:0 0 0 2px var(--hv-lo)}
-.hvid__screen iframe{display:block;width:100%;height:100%;border:0}
+.hvid__screen{box-shadow:0 0 0 2px var(--hv-lo)}
+.hvid__btn--sm{width:28px}
+.hvid__vol{height:22px}
+.hvid__deck:fullscreen,.hvid__deck.is-max{justify-content:center;padding:12px;background:var(--hv-ink)}
+.hvid__deck:fullscreen .hvid__bezel,.hvid__deck.is-max .hvid__bezel{flex:1;display:flex;min-height:0}
+.hvid__deck:fullscreen .hvid__screen,.hvid__deck.is-max .hvid__screen{flex:1;aspect-ratio:auto}
 .hvid__seek{position:relative;height:12px;cursor:pointer;background:var(--hv-ink);box-shadow:inset 2px 2px 0 #000,inset -2px -2px 0 var(--hv-mid)}
 .hvid__seek:focus-visible{outline:2px solid var(--hv-teal)}
 .hvid__fill{position:absolute;left:2px;top:2px;bottom:2px;width:0;max-width:calc(100% - 4px);background:repeating-linear-gradient(90deg,var(--hv-teal) 0 4px,transparent 4px 6px)}
@@ -123,7 +131,8 @@
   box-shadow:inset 2px 2px 0 var(--hv-hi),inset -2px -2px 0 var(--hv-lo),0 0 0 2px var(--hv-ink)}
 .hvid__modes button[aria-pressed="true"]{color:var(--hv-teal);background:var(--hv-ink);box-shadow:inset 2px 2px 0 #000,inset -2px -2px 0 var(--hv-mid),0 0 0 2px var(--hv-ink)}
 .hvid__list{flex:1;min-height:0;max-height:178px;overflow-y:auto;list-style:none;margin:0;padding:2px;font-size:.78em;
-  background:var(--hv-ink);box-shadow:inset 2px 2px 0 #000,inset -2px -2px 0 var(--hv-mid),0 0 0 2px var(--hv-ink);scrollbar-width:thin;scrollbar-color:var(--hv-mid) var(--hv-ink)}
+  background:var(--hv-ink);box-shadow:inset 2px 2px 0 #000,inset -2px -2px 0 var(--hv-mid),0 0 0 2px var(--hv-ink)}
+@supports not selector(::-webkit-scrollbar){.hvid__list{scrollbar-color:var(--hv-mid) var(--hv-ink)}}
 .hvid__list li{margin:0;padding:0}
 .hvid__list[hidden]{display:none}
 .hvid__up li{display:flex;align-items:center;gap:6px;padding:2px 4px;color:var(--hv-lil);white-space:nowrap}
@@ -151,44 +160,38 @@
 </style>
 <script>
 (function () {
-  var w = document.getElementById('video'); if (!w) return;
-  var f = w.querySelector('iframe'), seek = w.querySelector('.hvid__seek'), fill = w.querySelector('.hvid__fill'), head = w.querySelector('.hvid__head');
+  function init() {
+  var w = document.getElementById('video'); if (!w || !window.YTPix) return;
+  var Y = window.YTPix.Player, fmt = Y.fmt;
+  var sc = w.querySelector('.hvid__screen'), seek = w.querySelector('.hvid__seek'), fill = w.querySelector('.hvid__fill'), head = w.querySelector('.hvid__head');
   var tEl = w.querySelector('.hvid__time'), dEl = w.querySelector('.hvid__dur'), play = w.querySelector('[data-hv="play"]');
-  var st = { t: 0, d: 0, s: -1 }, ch = '';
-  function fmt(s) { if (!isFinite(s) || s <= 0) return s === 0 ? '0:00' : '-:--'; s = Math.floor(s); var h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, x = ('0' + s % 60).slice(-2); return h ? h + ':' + ('0' + m).slice(-2) + ':' + x : m + ':' + x; }
-  function cmd(fn, args) { if (f.contentWindow) f.contentWindow.postMessage(JSON.stringify({ event: 'command', func: fn, args: args || [] }), '*'); }
-  function listen() { if (f.contentWindow) f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 'hvid', channel: 'widget' }), '*'); }
-  f.addEventListener('load', function () { listen(); setTimeout(listen, 600); });
-  function draw() {
-    var p = st.d ? Math.min(1, st.t / st.d) : 0;
+  var vm = w.querySelector('.hvid__vol'), muteB = w.querySelector('[data-hv="mute"]'), deck = w.querySelector('.hvid__deck');
+  var ch = '', dragging = false, first = w.querySelector('.hvid__list a.is-on');
+  function draw(t, d) {
+    var p = d ? Math.min(1, t / d) : 0;
     fill.style.width = 'calc(' + (p * 100) + '% - ' + (p * 4) + 'px)'; head.style.left = 'calc(' + (p * 100) + '% + ' + (5 - p * 10) + 'px)';
     seek.setAttribute('aria-valuenow', Math.round(p * 100));
-    tEl.textContent = fmt(st.t || 0); dEl.textContent = fmt(st.d);
-    var on = st.s === 1 || st.s === 3; w.classList.toggle('is-play', on);
+    tEl.textContent = fmt(t || 0); dEl.textContent = d ? fmt(d) : '-:--';
+  }
+  function state() {
+    var on = pl.playing(); w.classList.toggle('is-play', on);
     play.setAttribute('aria-label', on ? 'pause' : 'play'); play.querySelector('use').setAttribute('href', on ? '#icon-pause' : '#icon-play');
   }
-  window.addEventListener('message', function (e) {
-    if (e.source !== f.contentWindow) return;
-    var m; try { m = typeof e.data === 'string' ? JSON.parse(e.data) : e.data; } catch (x) { return; }
-    if (!m) return;
-    var i = m.info;
-    if (m.event === 'onStateChange') i = { playerState: m.info };
-    if (!i || typeof i !== 'object') return;
-    if (i.currentTime != null) st.t = i.currentTime;
-    if (i.duration) st.d = i.duration;
-    if (i.playerState != null) { if (i.playerState === 0 && st.s !== 0) { st.s = 0; step(1, true); } st.s = i.playerState; }
-    draw();
+  function vol(v) { Y.paintVol(vm, v); var m = v.m || !v.v; muteB.setAttribute('aria-label', m ? 'unmute' : 'mute'); muteB.querySelector('use').setAttribute('href', m ? '#icon-mute' : '#icon-vol'); }
+  var pl = new Y(sc, first ? first.getAttribute('data-vid') : '', first ? first.querySelector('.hvid__t').textContent : '', {
+    ontick: function (t, d) { if (!dragging) draw(t, d); }, onstate: state, onvol: vol, onend: function () { step(1, true); }
   });
   function rows() { return Array.prototype.filter.call(w.querySelectorAll('.hvid__list:not(.hvid__up) li'), function (li) { return !li.hidden; }); }
   function load(a, auto) {
     w.querySelectorAll('.hvid__list a.is-on').forEach(function (x) { x.classList.remove('is-on'); }); a.classList.add('is-on');
     var t = a.querySelector('.hvid__t').textContent;
-    f.src = 'https://www.youtube-nocookie.com/embed/' + a.getAttribute('data-vid') + '?enablejsapi=1&playsinline=1&rel=0' + (auto ? '&autoplay=1' : '');
-    f.title = t; w.querySelector('.hvid__marq span').textContent = t;
+    pl.load(a.getAttribute('data-vid'), auto, t);
+    w.querySelector('.hvid__marq span').textContent = t;
     var c = w.querySelector('.hvid__lcd-bot .hvid__ch'); c.textContent = a.getAttribute('data-n'); c.className = 'hvid__ch hvid__ch--' + a.getAttribute('data-k');
     w.querySelector('.hvid__date').textContent = a.getAttribute('data-d');
-    st = { t: 0, d: 0, s: -1 }; draw();
+    draw(0, 0); state();
     var l = w.querySelector('.hvid__list'), li = a.parentNode; if (li.offsetTop < l.scrollTop || li.offsetTop + li.offsetHeight > l.scrollTop + l.clientHeight) l.scrollTop = li.offsetTop - 2;
+    w.dispatchEvent(new CustomEvent('hvid:load', { bubbles: true, detail: { vid: a.getAttribute('data-vid') } }));
   }
   function step(d, auto) {
     var r = rows(); if (!r.length) return;
@@ -199,13 +202,16 @@
   w.querySelector('.hvid__ctl').addEventListener('click', function (e) {
     var b = e.target.closest('[data-hv]'); if (!b) return;
     var k = b.getAttribute('data-hv');
-    if (k === 'play') { if (st.s === 1 || st.s === 3) cmd('pauseVideo'); else if (st.s === -1 && !st.d) load(w.querySelector('.hvid__list a.is-on') || rows()[0].querySelector('a'), true); else cmd('playVideo'); }
-    else if (k === 'stop') { cmd('pauseVideo'); cmd('seekTo', [0, true]); st.t = 0; st.s = 2; draw(); }
-    else step(k === 'next' ? 1 : -1);
+    if (k === 'play') pl.toggle();
+    else if (k === 'stop') { pl.stop(); }
+    else if (k === 'mute') pl.mute();
+    else if (k === 'full') b.querySelector('use').setAttribute('href', Y.full(deck) ? '#icon-unfull' : '#icon-full');
+    else if (k === 'next' || k === 'prev') step(k === 'next' ? 1 : -1);
   });
-  function seekTo(x) { if (!st.d) return; var r = seek.getBoundingClientRect(), p = Math.max(0, Math.min(1, (x - r.left) / r.width)); st.t = p * st.d; cmd('seekTo', [st.t, true]); draw(); }
-  seek.addEventListener('click', function (e) { seekTo(e.clientX); });
-  seek.addEventListener('keydown', function (e) { if (!st.d) return; var k = e.key === 'ArrowRight' ? 10 : e.key === 'ArrowLeft' ? -10 : 0; if (!k) return; e.preventDefault(); st.t = Math.max(0, Math.min(st.d, st.t + k)); cmd('seekTo', [st.t, true]); draw(); });
+  Y.slide(seek, function (p, drag) { if (!pl.d) return; dragging = drag; draw(p * pl.d, pl.d); if (!drag) pl.seek(p * pl.d); });
+  seek.addEventListener('keydown', function (e) { var k = e.key === 'ArrowRight' ? 10 : e.key === 'ArrowLeft' ? -10 : 0; if (!k || !pl.d) return; e.preventDefault(); pl.seek(pl.t + k); });
+  Y.slide(vm, function (p) { pl.setVol(Math.ceil(p * 8) * 12.5, false); });
+  vm.addEventListener('keydown', function (e) { var k = { ArrowRight: 12.5, ArrowUp: 12.5, ArrowLeft: -12.5, ArrowDown: -12.5 }[e.key]; if (k == null) return; e.preventDefault(); pl.setVol((pl.vol.m ? 0 : pl.vol.v) + k, false); });
   w.querySelector('.hvid__list').addEventListener('click', function (e) {
     var a = e.target.closest('a[data-vid]'); if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return; e.preventDefault(); load(a, true);
   });
@@ -218,6 +224,10 @@
   }
   w.querySelector('.hvid__modes').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) pick(b); });
   pick(w.querySelector('.hvid__modes button'));
+  vol(pl.vol);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
 </script>
+{{- partial "js.html" "ytpix" -}}
 {{- end }}

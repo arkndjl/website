@@ -36,7 +36,8 @@
 .wv-nx span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.85rem}
 .wv-nx i{font-style:normal;color:var(--wv-g);font-size:.75rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* the frequency wall */
-.wv-wall{display:grid;grid-auto-flow:column;grid-auto-columns:88px;gap:6px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x proximity;scrollbar-color:var(--wv-m2) var(--wv-k)}
+.wv-wall{display:grid;grid-auto-flow:column;grid-auto-columns:88px;gap:6px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x proximity}
+@supports not selector(::-webkit-scrollbar){.wv-wall{scrollbar-color:var(--wv-m2) var(--wv-k)}}
 .wv-f{scroll-snap-align:start}
 .wv-f{position:relative;display:grid;justify-items:center;gap:4px;padding:8px 4px 6px;background:var(--wv-d);border:2px solid;border-color:var(--wv-m2) var(--wv-k) var(--wv-k) var(--wv-m2);color:var(--wv-l);cursor:pointer;font:inherit;font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;min-width:0}
 .wv-f:hover,.wv-f:focus-visible{border-color:var(--wv-a) var(--wv-k) var(--wv-k) var(--wv-a);outline:0}
