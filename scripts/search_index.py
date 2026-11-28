@@ -19,6 +19,9 @@ Rows are [board, name, sub, img, w, pid?, q?]:
 Stdlib only. Run by .github/workflows/search-index.yml after the board workflows."""
 import glob, json, os, re, sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from names import key as name_key   # the shared name matcher (scripts/names.py)
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'static/data/search-players.json')
 
@@ -146,9 +149,12 @@ def pro(ix):
         if d:
             items = [(p['n'], sub(p.get('pos'), p.get(tk)), f'/img/{sp}/{str(p.get(tk) or "").lower()}.png', p.get(met), None)
                      for p in d.get('players') or []]
-            if sp == 'nfl':   # QBs have their own board (QBs tab, layouts/shortcodes/nflqb.html)
-                qb = [it for it, p in zip(items, d.get('players') or []) if p.get('pos') == 'QB']
-                items = [it for it, p in zip(items, d.get('players') or []) if p.get('pos') != 'QB']
+            if sp == 'nfl':   # QBs have their own board (QBs tab, layouts/shortcodes/nflqb.html: 60+ plays or a start); WAR leaders shows no QB,
+                # so a QB on neither board (a backup with a handful of snaps) is left out rather than linked to an empty table
+                onqb = {name_key(r.get('n')) for r in (load('data/nfl_qb.json') or {}).get('rows') or []}
+                pl = d.get('players') or []
+                qb = [it for it, p in zip(items, pl) if p.get('pos') == 'QB' and name_key(p['n']) in onqb]
+                items = [it for it, p in zip(items, pl) if p.get('pos') != 'QB']
                 print(sp, 'qbs', ix.add(page, 'QBs', qb))
             print(sp, 'players', ix.add(page, tab, items))
         g = load(f'data/{sp}_games.json')
@@ -178,7 +184,7 @@ def soccer(ix):
     sp = load('data/soccer_prospects.json')
     if sp:
         print('soccer prospects', ix.add('arkboard-soccer-prospects', 'big board',
-                                         [(p['name'], sub(p.get('pos'), p.get('club')), logo(p.get('club')), p.get('fvx'), None) for p in sp.get('board') or []]))
+                                         [(p['name'], sub(p.get('pos'), p.get('club')), logo(p.get('club')), p.get('fvx'), None) for p in (sp.get('board') or [])[:500]]))   # the board shows its top 500 (soccerboard.html max)
 
 
 def hockey(ix):
@@ -217,7 +223,7 @@ def cs2(ix):
     g = load('data/cs2.json')
     if g:
         print('cs2 teams', ix.add('arkboard-counter-strike', 'ARK Ranking',
-                                  [(t['n'], sub(t.get('rg')), f'/img/cs2/{t["k"]}.png' if t.get('logo') else None, t.get('ark'), None) for t in g.get('teams') or []], 't'))
+                                  [(t['n'], sub(t.get('rg')), f'/img/cs2/{t["k"]}.png' if t.get('logo') else None, t.get('ark'), None) for t in (g.get('teams') or [])[:300]], 't'))   # the ranking shows 300 (cs2rank.html top)
 
 
 def main():
