@@ -25,7 +25,19 @@ Names are Noah's. Don't rename a metric without his call; renamed ones keep an a
   **ARC** (.25) is a game-model input only.
 - **CBB XPM** = rXPM: BPM + team mean (GBPM - BPM), per side. **CBB pXPM**: predictive; the box form stays in FV
   and the game prior. **xXPM**: next-season projection. **CBB VORX** (was WAR) =
-  (shrunk XPM + 1.4) x min/40 x .68 x .0187.
+  (shrunk XPM - R) x min/40 x .68 x .0187, R by position (G, F, C): -1.4 + the position's offset among the 9th-12th men,
+  last three finished seasons (Nov 28 2026).
+- Qualified NBA and CBB boards sort by XPM, all-player and value boards by VORX; XPM sits before VORX (Noah, Nov 28).
+
+## Replacement levels (Noah, Nov 28 2026)
+
+- Every stat with a replacement level is recalibrated on a schedule and is position-aware: the level is a fitted, dated
+  parameter from the current qualified or freely available pool, by position. `scripts/repl_levels.py` writes
+  `data/repl_levels.json` (every sport's lines and a change-only history), weekly inside process-refresh.yml; never a
+  new workflow.
+- A position split or a refit level ships only after it passes held out (models-tests.md); a failed one is registered in
+  `data/retests.json`. Nov 28: CBB VORX by position passed; NBA VORX by position and a refit level failed (NBA keeps
+  -1.4, tracked); NHL, NFL and soccer WAR were already by position and refit in their own runs; NHL's lines pooled over every season beat the last three seasons on next season's line (F RMSE .051 vs .060, D .085 vs .082, G .173 vs .178), so they stay pooled.
 
 ## Football
 

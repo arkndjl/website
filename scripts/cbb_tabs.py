@@ -43,6 +43,13 @@ Definitions
            .624). Shrunk the same 100 minutes; R = -1.4, the 9th man's shrunk rXPM; wins a point refit by --freeze. This
            season's shift comes from the game logs (team mean game O/D BPM minus the team's lines' mean O/D BPM), saved in
            scripts/data/cbb_xpm_shift.json for a run with no game logs.
+           Nov 28 2026 (Noah: replacement by position, refit on a schedule; scripts/research/repl_nov28/cbb.py): R is by
+           position, -1.4 + each position's offset in the 9th-12th men by team minutes (shrunk rXPM) over the last three
+           finished seasons (scripts/repl_levels.py -> data/repl_levels.json, weekly; 2026-27: G -1.95, F -1.22, C -.74).
+           Against the flat -1.4, leave one season out 2012-26: same-season team W% t 5.8 (14/15), with season fixed
+           effects t 3.3; next season's W% on returning VORX t 4.3 (12/13), fixed effects t 2.4. A refit flat level failed
+           the same-season test (t -2.8 to -5.2), so the level stays -1.4. The frozen 2025-26 file is moved onto the lines
+           (rewar) until the next --freeze.
     WAA    the same over an average player (R = 0).
     Stat+  100 + 25 z, z = XPM (rXPM; BPM before Nov 26 2026, r .998) against the minutes-weighted mean and sd of his position (G, F, C) in 2025-26 among
            players with 10%+ of team minutes (the CFB board's Stat+ scale). This season's lines use this season's own
@@ -75,8 +82,10 @@ TEAM_OUT = os.path.join(ROOT, 'data', 'cbb_teamtabs.json')
 FROZEN = os.path.join(HERE, 'data', f'cbb_tabs_{LAST}.json.gz')
 PRIOR = os.path.join(HERE, 'cbb_prior.json.gz')
 SHIFT = os.path.join(HERE, 'data', 'cbb_xpm_shift.json')   # this season's team rXPM shifts, kept for runs with no game logs (--cols)
-REPL = -1.4         # 9th man's shrunk rXPM, 2025-26 (VORX's input; see VORX above; GBPM's was -1.6)
+REPL = -1.4         # the level: 9th man's shrunk rXPM, 2025-26 (VORX's input; see VORX above; GBPM's was -1.6); by position below
+import repl_levels as RL   # VORX's lines by position (G, F, C): REPL + each position's offset, data/repl_levels.json (see VORX above)
 GBPM_K = 100.0      # minutes of shrink toward the season's mean GBPM (VORX's input; see VORX above)
+QUAL = 0.4          # qualified: 40% of team minutes (the VORX/XPM leaders' 'qualified' floor)
 PACE = 68.0        # possessions a 40 for every team (not the team's own pace: see VORX above)
 WPP = 1.0          # wins a point of margin: fit in freeze() and read from the frozen file
 FIT_YEARS = range(2017, LAST + 1)   # team-seasons the wins-a-point slope is fit on (Barttorvik season files + game logs)
@@ -132,9 +141,21 @@ def gmu(lines, mins_of=lambda l: (l.get('mp') or 0) * (l.get('gp') or 0)):
     return sum(x * m for x, m in xs) / w if w else None
 
 
-def war(bpm, minutes, repl=REPL):
+def war(bpm, minutes, repl=None, pos=None, season=None):
+    """VORX; repl None = the position's line (G, F, C; F when unknown) that season, 0 = WAA"""
     if bpm is None or not minutes: return None
+    if repl is None: repl = RL.cbb_line(pos, season)
     return (bpm - repl) * minutes / 40 * PACE / 100 * WPP
+
+
+def pos_of(L, fallback='F'):
+    return POSMAP.get((L or {}).get('role')) or fallback
+
+
+def rewar(w, minutes, pos, season=None):
+    """a VORX worked out on the flat -1.4 line (the frozen file's), moved onto the position's line"""
+    if w is None or not minutes: return w
+    return r1(w + (REPL - RL.cbb_line(pos, season)) * minutes / 40 * PACE / 100 * WPP, 2)
 
 
 def fit_wpp(years=FIT_YEARS):
@@ -150,7 +171,7 @@ def fit_wpp(years=FIT_YEARS):
         for l in ls:
             if l['gp'] and l['mp'] and wx(l) is not None:
                 mins = l['mp'] * l['gp']
-                X[l['team']] += (wx(l, mins, mu) - REPL) * mins / 40 * PACE / 100   # points over replacement
+                X[l['team']] += (wx(l, mins, mu) - RL.cbb_line(pos_of(l), y)) * mins / 40 * PACE / 100   # points over replacement
         rec, seen = defaultdict(lambda: [0, 0]), set()
         for g in games:
             k = (g[GC['team']], g[GC['muid']])
@@ -258,7 +279,7 @@ def stat_line(L, mu=None):
             'xpm': r1(L.get('xpm')), 'oxpm': r1(L.get('oxpm')), 'dxpm': r1(L.get('dxpm')), 'bpm': r1(L['bpm']), 'gbpm': r1(L.get('gbpm')), 'obpm': r1(L['obpm']), 'dbpm': r1(L['dbpm']), 'ortg': r1(L['ortg']), 'usg': r1(L['usg']), 'ts': r1(L['ts']),
             'tp': r1((L['tp'] or 0) * 100) if L['tpa'] else None, 'tpa': int(L['tpa'] or 0), 'ft': r1((L['ft'] or 0) * 100) if L['fta'] else None,
             'astp': r1(L['ast']), 'to': r1(L['to']), 'stl': r1(L['stl']), 'blk': r1(L['blk']), 'orb': r1(L['orb']), 'ftr': r1(L['ftr']),
-            'war': r1(war(wx(L, mins, mu), mins), 2), 'waa': r1(war(wx(L, mins, mu), mins, 0), 2)}
+            'war': r1(war(wx(L, mins, mu), mins, pos=pos_of(L), season=L.get('year')), 2), 'waa': r1(war(wx(L, mins, mu), mins, 0), 2)}
 
 
 def freeze():
@@ -281,7 +302,7 @@ def freeze():
         if P:
             pm = (P['mp'] or 0) * (P['gp'] or 0)
             p = {'team': P['team'], 'gp': int(P['gp'] or 0), 'mpg': r1(P['mp']), 'bpm': r1(P['bpm']), 'xpm': r1(P.get('xpm')), 'usg': r1(P['usg']), 'mp': round(pm),
-                 'war': r1(war(wx(P, pm, mu_prev), pm), 2)}
+                 'war': r1(war(wx(P, pm, mu_prev), pm, pos=pos_of(P), season=P.get('year')), 2)}
         out.append({'pid': str(L['pid']), 'n': L['name'], 'bt': L['team'], 'conf': L['conf'], 'yr': L['yr'], 'role': L['role'],
                     'pos': POSMAP.get(L['role'], 'F'), 'ht': L['ht'], 'dob': L['dob'], 'min_per': r1(L['min_per']), 's': s, 'prev': p})
     top = sorted(games, key=lambda g: -game_score(g))[:400]
@@ -289,7 +310,7 @@ def freeze():
            'win': g[GC['win1']], **gline(g)} for g in top]
     os.makedirs(os.path.dirname(FROZEN), exist_ok=True)
     with gzip.open(FROZEN, 'wt') as fh:
-        json.dump({'season': LAST, 'asof': now(), 'norms': norms, 'wfit': fit, 'mu': mu_last, 'tempo': {k: round(v, 2) for k, v in tempo.items()}, 'lines': out, 'top': tg},
+        json.dump({'season': LAST, 'asof': now(), 'replPos': 1, 'norms': norms, 'wfit': fit, 'mu': mu_last, 'tempo': {k: round(v, 2) for k, v in tempo.items()}, 'lines': out, 'top': tg},
                   fh, separators=(',', ':'))
     print(f'{FROZEN}: {len(out)} lines, {len(tg)} top games, Stat+ norms {norms}, VORX fit {fit}')
 
@@ -310,6 +331,10 @@ def main():
     global WPP
     WPP = F['wfit']['wpp']
     wf = F['wfit']
+    if not F.get('replPos'):   # frozen on the flat -1.4 line: move last season's VORX onto the position lines
+        for l in F['lines']:
+            l['s']['war'] = rewar(l['s'].get('war'), l['s'].get('mp'), l['pos'], LAST)
+            if l.get('prev'): l['prev']['war'] = rewar(l['prev'].get('war'), l['prev'].get('mp'), l['pos'], LAST - 1)
     B = board()
     pre, pidof, bt = prior()
     by_pid = {}
@@ -393,7 +418,7 @@ def main():
         s = {'gp': L['gp'], 'mp': round(mins), 'mpg': L['mpg'], 'pts': L.get('ppg'), 'reb': L.get('rpg'), 'ast_g': L.get('apg'), 'bpm': L['bpm'],
              'xpm': r1(L.get('xpm')), 'oxpm': r1(L.get('oxpm')), 'dxpm': r1(L.get('dxpm')), 'obpm': L['obpm'], 'dbpm': L['dbpm'], 'ortg': L['ortg'], 'usg': L['usg'], 'ts': L.get('ts'), 'tp': L['tp'] if L.get('tpa') else None,
              'tpa': L.get('tpa'), 'ft': L.get('ft'), 'astp': L.get('ast'), 'to': L.get('to'), 'stl': L.get('stl'), 'blk': L.get('blk'),
-             'orb': L.get('orb'), 'ftr': L.get('ftr'), 'war': r1(war(wx(L, mins, mu_now), mins), 2), 'waa': r1(war(wx(L, mins, mu_now), mins, 0), 2),
+             'orb': L.get('orb'), 'ftr': L.get('ftr'), 'war': r1(war(wx(L, mins, mu_now), mins, pos=spos(r, L) or 'F'), 2), 'waa': r1(war(wx(L, mins, mu_now), mins, 0), 2),
              'nx': r1(nx_now.get((r['name'], r['team'])), 2)}
         now_rows.append(srow(r['name'], r['team'], r['pos'], age(r), r['conf'], r.get('photo'), r.get('logo'), s, r['fv'], norms_now, spos(r, L)))
     last_rows = []
@@ -424,9 +449,12 @@ def main():
                     {'s': LAST, 'l': label(LAST), 'rows': last_rows, 'mdef': 400}]})
 
     # ---- VORX leaders
-    wcols = [col('war', 'VORX', f"wins over a replacement player: (XPM + {-REPL:.1f}) x minutes / 40 x {PACE / 100:.2f} x {WPP:.4f} wins a point; the slope that makes team VORX + {wf['a']} x games track wins ({wf['teams']:,} team-seasons {label(wf['years'][0])} to {label(wf['years'][1])}, r {wf['r']}); XPM shrunk {GBPM_K:.0f} minutes toward the season's mean; replacement = the 9th man's XPM, so a team of replacement players wins {wf['a'] * 100:.1f}% of its games", 's2'),
+    tg_last = defaultdict(int)
+    for l in F['lines']: tg_last[l['bt']] = max(tg_last[l['bt']], l['s'].get('gp') or 0)
+    g_last = statistics.median(tg_last.values()) if tg_last else 31
+    wcols = [col('xpm', 'XPM', XT, 's1'), col('oxpm', 'O-XPM', 'offensive XPM', 's1'), col('dxpm', 'D-XPM', 'defensive XPM', 's1'),
+             col('war', 'VORX', f"wins over a replacement player at his position: (XPM - R) x minutes / 40 x {PACE / 100:.2f} x {WPP:.4f} wins a point; the slope that makes team VORX + {wf['a']} x games track wins ({wf['teams']:,} team-seasons {label(wf['years'][0])} to {label(wf['years'][1])}, r {wf['r']}); XPM shrunk {GBPM_K:.0f} minutes toward the season's mean; R = the 9th-12th men's XPM at his position, last three seasons (G {RL.cbb_line('G'):.2f}, F {RL.cbb_line('F'):.2f}, C {RL.cbb_line('C'):.2f}); a team of replacement players wins about {wf['a'] * 100:.1f}% of its games", 's2'),
              col('waa', 'WAA', 'wins over an average D-I player: XPM x the same minutes and pace', 's2'),
-             col('xpm', 'XPM', XT, 's1'), col('oxpm', 'O-XPM', 'offensive XPM', 's1'), col('dxpm', 'D-XPM', 'defensive XPM', 's1'),
              col('splus', 'Stat+', 'XPM against his position, 100 + 25 z', '0'),
              col('mpg', 'MPG', 'minutes a game'), col('gp', 'G', 'games', 'i'), col('fv', 'FV', 'FV now', 'i')]
     # Next (next season's VORX, a projection) sits on the pXPM subtab: the leaders tab is this season only (Nov 27 2026, context rule)
@@ -435,9 +463,13 @@ def main():
     write('war', {
         'title': 'VORX/XPM leaders', 'key': 'war', 'def': '',
         'views': [['war', 'VORX', 'wins over replacement'], ['waa', 'WAA', 'wins over average'], ['xpm', 'XPM', 'XPM'], ['oxpm', 'O-XPM', 'offensive XPM'], ['dxpm', 'D-XPM', 'defensive XPM']],
+        # Noah, Nov 28 2026: one table with every number a column (flat: no view buttons, a header ranks by it), XPM before
+        # VORX; a qualified board (40% of team minutes) ranks by XPM, the all-player board by VORX (qkey)
+        'qkey': 'xpm', 'flat': 1,
         'cols': wcols, 'pos': ['G', 'F', 'C'],
-        'min': {'k': 'mp', 'l': 'min ≥', 'def': 0, 'opts': [[0, 'any'], [100, '100'], [300, '300'], [600, '600']]},
-        'seasons': [{'s': SEASON, 'l': label(SEASON), 'rows': slim(now_rows)}, {'s': LAST, 'l': label(LAST), 'rows': slim(last_rows), 'mdef': 100}]})
+        'min': {'k': 'mp', 'l': 'min ≥', 'def': 0, 'opts': [['q', 'qualified'], [0, 'any'], [100, '100'], [300, '300'], [600, '600']]},
+        'seasons': [{'s': SEASON, 'l': label(SEASON), 'rows': slim(now_rows), 'qual': round(QUAL * 40 * gnow)},
+                    {'s': LAST, 'l': label(LAST), 'rows': slim(last_rows), 'mdef': 100, 'qual': round(QUAL * 40 * g_last)}]})
 
     # ---- pXPM: the preseason projection of every player with a D-I season behind him
     PT = "pXPM: projected XPM this season from his last three seasons, minutes, class, box profile, team and recruit rating; fit to next-season BPM, frozen before the season"
@@ -596,7 +628,7 @@ def main():
         prow.append({'n': r['name'], 'tm': r['team'], 'pos': r['pos'], 'age': age(r), 'ph': r.get('photo'), 'lo': r.get('logo'), 'div': move,
                      'sub': f"from {t2e.get(L['team'], L['team'])}" + (f" ({fc})" if fc else ''),
                      'pxpm': r1((pxof(r) or [None])[0]), 'xpm': s.get('xpm') if s else None, 'xnow': r1((r.get('now') or {}).get('xpm')),
-                     'war': s['war'] if s else r1(war(wx(L, L['gp'] * L['mpg'], F.get('mu')), L['gp'] * L['mpg']), 2), 'bpm': L['bpm'], 'mpg': L['mpg'], 'ppg': L.get('ppg'),
+                     'war': s['war'] if s else r1(war(wx(L, L['gp'] * L['mpg'], F.get('mu')), L['gp'] * L['mpg'], pos=pos_of(L, r.get('pos')), season=LAST), 2), 'bpm': L['bpm'], 'mpg': L['mpg'], 'ppg': L.get('ppg'),
                      'splus': splus(s['xpm'] if s and s.get('xpm') is not None else L['bpm'], spos(r, L)), 'fv': r['fv']})
     write('portal', {
         'title': 'portal', 'key': 'pxpm', 'def': '',
@@ -663,7 +695,7 @@ def teams(B, F, by_pid, pidof, bt, t2e, asof):
     for r in tal_rows: r.pop('trk', None); r.pop('rk', None)
     out = {'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'sport': 'cbb', 'season': SEASON, 'label': label(SEASON), 'src': 'Barttorvik',
            'views': {
-               'returning': {'plain': 1, 'about': 'Returning: last season\'s (2025-26) minutes and VORX still on the roster, by Barttorvik player id; transfers in = incoming D-I transfers\' VORX at their old schools. VORX = wins over a replacement player (XPM + 1.4) x minutes x .68 x wins a point; see the VORX leaders tab.',
+               'returning': {'plain': 1, 'about': 'Returning: last season\'s (2025-26) minutes and VORX still on the roster, by Barttorvik player id; transfers in = incoming D-I transfers\' VORX at their old schools. VORX = wins over a replacement player at his position, (XPM - R) x minutes x .68 x wins a point; see the VORX leaders tab.',
                              'cols': [{'k': 'rmin', 'h': 'Ret Min%', 't': 'share of last season\'s minutes returning', 'f': '.1f', 'key': 1},
                                       {'k': 'rwar', 'h': 'Ret VORX', 't': 'last season\'s VORX returning', 'f': '.1f'},
                                       {'k': 'lwar', 'h': 'Lost VORX', 't': 'last season\'s VORX gone (graduated, pro, transferred out)', 'f': '.1f'},

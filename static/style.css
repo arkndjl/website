@@ -3119,6 +3119,11 @@ table.trophycase__hist td.trophycase__post {
 .fvo i.fvo__s3 { background: #b3d8ee; }
 .fvo i.fvo__s4 { background: #7fffd4; }
 /* FV scorecard (layouts/shortcodes/fvcard.html): realized share vs predicted odds by FV band */
+/* draft classes (fvclasses.html): draft-day columns tinted lilac, the careers teal, each group boxed */
+.fvcl td.fvcl__d { background: rgba(200, 162, 255, 0.07); }
+.fvcl td.fvcl__o { background: rgba(127, 255, 212, 0.06); }
+.fvcl th.fvcl__d:nth-child(4), .fvcl td.fvcl__d:nth-child(4), .fvcl th.fvcl__o:nth-child(9), .fvcl td.fvcl__o:nth-child(9) { border-left: 2px solid var(--win-dark); }
+.wintable .fvcl td.cfb__name, .wintable .fvcl th { white-space: nowrap; }
 .fvsc { font-size: 0.9em; }
 .fvsc td { vertical-align: top; }
 .wintable .fvsc th, .wintable .fvsc td { padding-left: 4px; padding-right: 4px; }
@@ -4022,9 +4027,16 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
   /* badge medals ride on the team line, so a long name doesn't widen the table */
   .nbaxpm__table b + .cfb__medals { display: none; }
   .nbaxpm__table th, .nbaxpm__table td { padding-left: 4px; padding-right: 4px; }
-  /* XPM and the number the view ranks by; the other splits are a tap away */
-  .nbaxpm__table:not([data-key=pxpm]) .c-pxpm, .nbaxpm__table:not([data-key=p3]) .c-p3, .nbaxpm__table:not([data-key=oxpm]) .c-oxpm, .nbaxpm__table:not([data-key=dxpm]) .c-dxpm, .nbaxpm__table:not([data-key=sxpm]) .c-sxpm, .nbaxpm__table:not([data-key=vorx]) .c-vorx { display: none; }
+  /* one table, every number a column (Noah, Nov 28 2026): the player column stays pinned while the numbers scroll;
+     compact rows (no photo, a smaller two-line name cell) */
+  .nbaxpm__table td:nth-child(2), .nbaxpm__table thead th:nth-child(2) { position: sticky; left: 0; z-index: 2; background: var(--win-well); box-shadow: 2px 0 0 var(--win-dark); }
+  .nbaxpm__table thead th:nth-child(2) { z-index: 4; background: var(--background); }
+  .nbaxpm__table td:nth-child(2) { white-space: normal; min-width: 36vw; max-width: 40vw; font-size: 0.85em; line-height: 1.15; }
+  .nbaxpm__table td:nth-child(2) .pxframe--row, .nbaxpm__table td:nth-child(2) .cfb__medals { display: none; }
+  .nbaxpm__table td:nth-child(2) .nbaxpm__tm { white-space: nowrap; font-size: 0.85em; }
+  .nbaxpm__table td { padding-top: 3px; padding-bottom: 3px; }
 }
+.nbaxpm__table th.is-key { color: var(--accent); }
 
 /* NFL fantasy projections ({{< nflfantasy >}}): injury tags beside the name; on phones each player is a card:
    rank, player and points; position, team and opponent; the projected line and the chance he plays */

@@ -266,16 +266,16 @@
    "card": "People should know what has been tested, tried, and proven to not work.",
    "blocks": [
     {
-     "p": "Every change to a model or metric is tested held out, on seasons or games it was not fit on, and it only ships if it wins. Of the 440 tests in ARKLOG, 176 shipped, 175 part shipped and 89 failed outright."
+     "p": "Every change to a model or metric is tested held out, on seasons or games it was not fit on, and it only ships if it wins. Of the 444 tests in ARKLOG, 178 shipped, 176 part shipped and 90 failed outright."
     },
     {
      "p": "The failures are published with the same detail as the wins. People should know what has been tested, tried and proven not to work, because it helps them with their own research, and because it shows everything I've thought of trying even when it didn't work."
     },
     {
      "fig": "t-hist",
-     "svg": "<svg class=\"libchart\" viewBox=\"0 0 336 200\" shape-rendering=\"crispEdges\" role=\"img\" aria-label=\"Tests by |t|\"><rect class=\"lc-grid\" x=\"44\" y=\"166\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"170\" text-anchor=\"end\">0</text><rect class=\"lc-grid\" x=\"44\" y=\"127\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"131\" text-anchor=\"end\">5</text><rect class=\"lc-grid\" x=\"44\" y=\"88\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"92\" text-anchor=\"end\">10</text><rect class=\"lc-grid\" x=\"44\" y=\"49\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"53\" text-anchor=\"end\">15</text><rect class=\"lc-grid\" x=\"44\" y=\"10\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"14\" text-anchor=\"end\">20</text><rect class=\"lc-axis\" x=\"44\" y=\"10\" width=\"2\" height=\"157\"/><rect class=\"lc-axis\" x=\"44\" y=\"166\" width=\"282\" height=\"2\"/><rect class=\"lc-bar lc-s0\" x=\"53\" y=\"150\" width=\"30\" height=\"16\"/><rect class=\"lc-bar lc-s0\" x=\"100\" y=\"127\" width=\"30\" height=\"39\"/><rect class=\"lc-bar lc-s0\" x=\"147\" y=\"65\" width=\"30\" height=\"101\"/><rect class=\"lc-bar lc-s0\" x=\"194\" y=\"41\" width=\"30\" height=\"125\"/><rect class=\"lc-bar lc-s0\" x=\"241\" y=\"33\" width=\"30\" height=\"133\"/><rect class=\"lc-bar lc-s0\" x=\"288\" y=\"65\" width=\"30\" height=\"101\"/><text class=\"lc-tick\" x=\"69\" y=\"180\" text-anchor=\"middle\">0-1</text><text class=\"lc-tick\" x=\"116\" y=\"180\" text-anchor=\"middle\">1-2</text><text class=\"lc-tick\" x=\"163\" y=\"180\" text-anchor=\"middle\">2-3</text><text class=\"lc-tick\" x=\"210\" y=\"180\" text-anchor=\"middle\">3-5</text><text class=\"lc-tick\" x=\"257\" y=\"180\" text-anchor=\"middle\">5-10</text><text class=\"lc-tick\" x=\"304\" y=\"180\" text-anchor=\"middle\">10+</text><text class=\"lc-label\" x=\"185\" y=\"196\" text-anchor=\"middle\">|t| of the deciding number</text><text class=\"lc-label\" x=\"10\" y=\"88\" text-anchor=\"middle\" transform=\"rotate(-90 10 88)\">tests</text></svg>",
+     "svg": "<svg class=\"libchart\" viewBox=\"0 0 336 200\" shape-rendering=\"crispEdges\" role=\"img\" aria-label=\"Tests by |t|\"><rect class=\"lc-grid\" x=\"44\" y=\"166\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"170\" text-anchor=\"end\">0</text><rect class=\"lc-grid\" x=\"44\" y=\"127\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"131\" text-anchor=\"end\">5</text><rect class=\"lc-grid\" x=\"44\" y=\"88\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"92\" text-anchor=\"end\">10</text><rect class=\"lc-grid\" x=\"44\" y=\"49\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"53\" text-anchor=\"end\">15</text><rect class=\"lc-grid\" x=\"44\" y=\"10\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"14\" text-anchor=\"end\">20</text><rect class=\"lc-axis\" x=\"44\" y=\"10\" width=\"2\" height=\"157\"/><rect class=\"lc-axis\" x=\"44\" y=\"166\" width=\"282\" height=\"2\"/><rect class=\"lc-bar lc-s0\" x=\"53\" y=\"143\" width=\"30\" height=\"23\"/><rect class=\"lc-bar lc-s0\" x=\"100\" y=\"127\" width=\"30\" height=\"39\"/><rect class=\"lc-bar lc-s0\" x=\"147\" y=\"57\" width=\"30\" height=\"109\"/><rect class=\"lc-bar lc-s0\" x=\"194\" y=\"33\" width=\"30\" height=\"133\"/><rect class=\"lc-bar lc-s0\" x=\"241\" y=\"26\" width=\"30\" height=\"140\"/><rect class=\"lc-bar lc-s0\" x=\"288\" y=\"65\" width=\"30\" height=\"101\"/><text class=\"lc-tick\" x=\"69\" y=\"180\" text-anchor=\"middle\">0-1</text><text class=\"lc-tick\" x=\"116\" y=\"180\" text-anchor=\"middle\">1-2</text><text class=\"lc-tick\" x=\"163\" y=\"180\" text-anchor=\"middle\">2-3</text><text class=\"lc-tick\" x=\"210\" y=\"180\" text-anchor=\"middle\">3-5</text><text class=\"lc-tick\" x=\"257\" y=\"180\" text-anchor=\"middle\">5-10</text><text class=\"lc-tick\" x=\"304\" y=\"180\" text-anchor=\"middle\">10+</text><text class=\"lc-label\" x=\"185\" y=\"196\" text-anchor=\"middle\">|t| of the deciding number</text><text class=\"lc-label\" x=\"10\" y=\"88\" text-anchor=\"middle\" transform=\"rotate(-90 10 88)\">tests</text></svg>",
      "legend": [
-      "66 tests with a stated t"
+      "70 tests with a stated t"
      ],
      "keys": [
       0
@@ -285,7 +285,7 @@
     },
     {
      "fig": "verdicts",
-     "svg": "<svg class=\"libchart\" viewBox=\"0 0 336 200\" shape-rendering=\"crispEdges\" role=\"img\" aria-label=\"Verdicts by month\"><rect class=\"lc-grid\" x=\"44\" y=\"166\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"170\" text-anchor=\"end\">0</text><rect class=\"lc-grid\" x=\"44\" y=\"127\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"131\" text-anchor=\"end\">25</text><rect class=\"lc-grid\" x=\"44\" y=\"88\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"92\" text-anchor=\"end\">50</text><rect class=\"lc-grid\" x=\"44\" y=\"49\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"53\" text-anchor=\"end\">75</text><rect class=\"lc-grid\" x=\"44\" y=\"10\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"14\" text-anchor=\"end\">100</text><rect class=\"lc-axis\" x=\"44\" y=\"10\" width=\"2\" height=\"157\"/><rect class=\"lc-axis\" x=\"44\" y=\"166\" width=\"282\" height=\"2\"/><rect class=\"lc-bar lc-s0\" x=\"68\" y=\"46\" width=\"30\" height=\"120\"/><rect class=\"lc-bar lc-s0\" x=\"209\" y=\"12\" width=\"30\" height=\"154\"/><rect class=\"lc-bar lc-s1\" x=\"100\" y=\"10\" width=\"30\" height=\"156\"/><rect class=\"lc-bar lc-s1\" x=\"241\" y=\"49\" width=\"30\" height=\"117\"/><rect class=\"lc-bar lc-s2\" x=\"132\" y=\"99\" width=\"30\" height=\"67\"/><rect class=\"lc-bar lc-s2\" x=\"273\" y=\"94\" width=\"30\" height=\"72\"/><text class=\"lc-tick\" x=\"116\" y=\"180\" text-anchor=\"middle\">11</text><text class=\"lc-tick\" x=\"257\" y=\"180\" text-anchor=\"middle\">10</text><text class=\"lc-label\" x=\"185\" y=\"196\" text-anchor=\"middle\">month</text><text class=\"lc-label\" x=\"10\" y=\"88\" text-anchor=\"middle\" transform=\"rotate(-90 10 88)\">tests</text></svg>",
+     "svg": "<svg class=\"libchart\" viewBox=\"0 0 336 200\" shape-rendering=\"crispEdges\" role=\"img\" aria-label=\"Verdicts by month\"><rect class=\"lc-grid\" x=\"44\" y=\"166\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"170\" text-anchor=\"end\">0</text><rect class=\"lc-grid\" x=\"44\" y=\"114\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"118\" text-anchor=\"end\">50</text><rect class=\"lc-grid\" x=\"44\" y=\"62\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"66\" text-anchor=\"end\">100</text><rect class=\"lc-grid\" x=\"44\" y=\"10\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"14\" text-anchor=\"end\">150</text><rect class=\"lc-axis\" x=\"44\" y=\"10\" width=\"2\" height=\"157\"/><rect class=\"lc-axis\" x=\"44\" y=\"166\" width=\"282\" height=\"2\"/><rect class=\"lc-bar lc-s0\" x=\"68\" y=\"84\" width=\"30\" height=\"82\"/><rect class=\"lc-bar lc-s0\" x=\"209\" y=\"63\" width=\"30\" height=\"103\"/><rect class=\"lc-bar lc-s1\" x=\"100\" y=\"61\" width=\"30\" height=\"105\"/><rect class=\"lc-bar lc-s1\" x=\"241\" y=\"88\" width=\"30\" height=\"78\"/><rect class=\"lc-bar lc-s2\" x=\"132\" y=\"120\" width=\"30\" height=\"46\"/><rect class=\"lc-bar lc-s2\" x=\"273\" y=\"118\" width=\"30\" height=\"48\"/><text class=\"lc-tick\" x=\"116\" y=\"180\" text-anchor=\"middle\">11</text><text class=\"lc-tick\" x=\"257\" y=\"180\" text-anchor=\"middle\">10</text><text class=\"lc-label\" x=\"185\" y=\"196\" text-anchor=\"middle\">month</text><text class=\"lc-label\" x=\"10\" y=\"88\" text-anchor=\"middle\" transform=\"rotate(-90 10 88)\">tests</text></svg>",
      "legend": [
       "shipped",
       "part shipped",
@@ -391,12 +391,12 @@
   "stab_xpm": 14,
   "stab_pm": 28,
   "stab_pts": 3,
-  "tests": 440,
-  "shipped": 176,
-  "mixed": 175,
-  "failed": 89,
+  "tests": 444,
+  "shipped": 178,
+  "mixed": 176,
+  "failed": 90,
   "failed_pct": 20,
-  "changes": "1,320",
+  "changes": "1,328",
   "ship_pct": 40
  }
 }

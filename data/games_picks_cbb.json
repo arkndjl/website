@@ -1,9 +1,9 @@
 {
  "sport": "cbb",
  "name": "college basketball",
- "asof": "2026-11-28T07:55:44Z",
+ "asof": "2026-11-28T08:14:22Z",
  "recenter": {
-  "2026-11-28": 1.38
+  "2026-11-28": 1.4
  },
  "monitor": {
   "clocks": {
@@ -1830,7 +1830,7 @@
  },
  "model": {
   "asof": "2026-11-28T03:35:06Z",
-  "ageH": 4.3,
+  "ageH": 4.7,
   "stale": false
  },
  "picks": [],
@@ -1943,22 +1943,6 @@
    "tm": 136.4
   },
   {
-   "id": "401921414",
-   "sport": "cbb",
-   "kick": "2026-11-28T18:00:00Z",
-   "home": "Radford",
-   "away": "Hampton",
-   "mk": "spread",
-   "side": "home",
-   "line": -1.5,
-   "price": -131.0,
-   "edge": 7.4,
-   "x": 4.0,
-   "why": "no edge at -131",
-   "m": 5.9,
-   "tm": 133.9
-  },
-  {
    "id": "401924811",
    "sport": "cbb",
    "kick": "2026-11-28T20:30:00Z",
@@ -2021,6 +2005,22 @@
    "why": "no edge at -142",
    "m": 21.0,
    "tm": 147.9
+  },
+  {
+   "id": "401921414",
+   "sport": "cbb",
+   "kick": "2026-11-28T18:00:00Z",
+   "home": "Radford",
+   "away": "Hampton",
+   "mk": "spread",
+   "side": "home",
+   "line": 1.5,
+   "price": -116.0,
+   "edge": 4.4,
+   "x": 4.0,
+   "why": "no edge at -116",
+   "m": 5.9,
+   "tm": 133.9
   },
   {
    "id": "401921065",
@@ -2111,7 +2111,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -116.0,
+   "price": -121.0,
    "edge": 3.4,
    "x": 3.5,
    "why": "edge under 3.5 (inj: with)",
@@ -2207,7 +2207,7 @@
    "mk": "spread",
    "side": "home",
    "line": 8.5,
-   "price": -121.0,
+   "price": -116.0,
    "edge": 4.1,
    "x": 5.0,
    "why": "edge under 5 (line: 4-9)",
@@ -2319,7 +2319,7 @@
    "mk": "spread",
    "side": "home",
    "line": 26.5,
-   "price": -116.0,
+   "price": -112.0,
    "edge": 3.5,
    "x": 5.5,
    "why": "edge under 5.5 (inj: none)",
@@ -2392,7 +2392,7 @@
    "mk": "spread",
    "side": "home",
    "line": 26.5,
-   "price": -116.0,
+   "price": -112.0,
    "edge": 3.5,
    "ev": null,
    "units": 0.0,
@@ -2680,7 +2680,7 @@
    "mk": "spread",
    "side": "away",
    "line": 7.5,
-   "price": -154.0,
+   "price": -161.0,
    "edge": 0.9,
    "ev": null,
    "units": 0.0,
@@ -2752,7 +2752,7 @@
    "mk": "spread",
    "side": "home",
    "line": 8.5,
-   "price": -121.0,
+   "price": -116.0,
    "edge": 4.1,
    "ev": null,
    "units": 0.0,
@@ -2764,7 +2764,7 @@
    "mk": "total",
    "side": "under",
    "line": 148.5,
-   "price": -116.0,
+   "price": -112.0,
    "edge": 2.6,
    "ev": null,
    "units": 0.0,
@@ -2811,9 +2811,9 @@
   "401921414": {
    "mk": "spread",
    "side": "home",
-   "line": -1.5,
-   "price": -131.0,
-   "edge": 7.4,
+   "line": 1.5,
+   "price": -116.0,
+   "edge": 4.4,
    "ev": null,
    "units": 0.0,
    "home": "Radford",
@@ -2858,10 +2858,10 @@
   },
   "401920310": {
    "mk": "spread",
-   "side": "away",
-   "line": 27.5,
-   "price": -142.0,
-   "edge": 2.8,
+   "side": "home",
+   "line": 23.5,
+   "price": -227.0,
+   "edge": 1.2,
    "ev": null,
    "units": 0.0,
    "home": "Georgia Tech",
@@ -2872,7 +2872,7 @@
    "mk": "spread",
    "side": "home",
    "line": -3.5,
-   "price": -116.0,
+   "price": -121.0,
    "edge": 3.4,
    "ev": null,
    "units": 0.0,
@@ -3125,7 +3125,7 @@
  },
  "timing": {
   "minEdge": 3,
-  "snapshots": 29199,
+  "snapshots": 29222,
   "buckets": [
    {
     "when": "24h+",
@@ -3138,11 +3138,11 @@
    },
    {
     "when": "6-24h",
-    "clvN": 6059,
-    "clvRet": -0.0043,
-    "clvT": -2.16,
-    "clv": 0.65,
-    "beat": 0.398,
+    "clvN": 6069,
+    "clvRet": -0.0039,
+    "clvT": -1.97,
+    "clv": 0.66,
+    "beat": 0.399,
     "still": 0.397
    },
    {
@@ -21994,7 +21994,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-28T07:55:44Z",
+ "checked": "2026-11-28T08:14:22Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
