@@ -685,7 +685,7 @@
     if (ys.length) { ys.sort(); return ys[0] === ys[ys.length - 1] ? ys[0] : ys[0].slice(0, 4) + '-' + endYear(ys[ys.length - 1]); }
     var m = title.match(/\b(19|20)\d{2}(-(19|20)?\d{2})?\b/); return m ? m[0] : '';
   }
-  async function frame(w, h, title, stamp, link) {
+  async function frame(w, h, title, stamp, link, tab) {
     W = w; H = h;
     try { await document.fonts.load('48px "MS PGothic Pixel"'); } catch (e) {}   // draw only once the site face is in; never a fallback face
     await document.fonts.ready;
@@ -697,7 +697,7 @@
     for (var gx = 0; gx < W; gx += 16) for (var gy = 0; gy < H; gy += 16) g.fillRect(gx, gy, 2, 2);
     var wx = PAD, wy = PAD, ww = W - 2 * PAD, wh = H - 2 * PAD - 56;
     g.fillStyle = C.face; g.fillRect(wx, wy, ww, wh); bevel(g, wx, wy, ww, wh, true);
-    titleBar(g, wx, wy, ww, title, seasonWeek(), logo);
+    titleBar(g, wx, wy, ww, title, tab || seasonWeek(), logo);
     g.font = '32px ' + FONT; g.fillStyle = C.lilac;
     g.fillText(link || SITE, PAD, H - PAD - 8);
     var right = '@ARKNDJL' + (stamp ? ' · ' + stamp : '');
@@ -4987,73 +4987,268 @@
   }
   // ---- pro team builder card (teams > team builder, 4:5): the money, five seasons committed, the verdicts on the biggest
   //      contracts and the deals ending, and the future picks (scripts/pro_builder.py -> static/data/builder/<lg>.json) ----
-  async function buildProBuilder(win, btn) {
-    var lg = btn.getAttribute('data-gfx-lg'), S = (window.__arkPro || {})[lg]; if (!S) return null;
-    var D = S.D, t = S.t, P = S.P, LG = lg.toUpperCase(), cap = D.cap, dash = '—', gap = 20;
-    var F = await frame(2160, 2700, LG + ' :: ' + t.tm + ' team builder', String(D.asof || '').slice(0, 10), SITE + '#team-builder');
-    F.canvas._name = lg + '-' + String(t.tm).toLowerCase();
-    var g = F.g, x = F.x + 40, y = F.y + 70, w = F.w - 80;
-    well(g, F.x, F.y, F.w, F.h);
-    var m = function (v, d) { return v == null ? dash : '$' + (+v).toFixed(d == null ? 1 : d) + 'M'; }, sg = function (v) { return v == null ? dash : (v > 0 ? '+' : v < 0 ? '−' : '') + '$' + Math.abs(v).toFixed(1) + 'M'; };
-    var VDN = { E: 'EXTEND', W: 'LET WALK', K: 'KEEP', T: 'TRADE' }, VDC = { E: C.teal, W: C.down, K: C.lilac, T: '#ffd34d' };
-    var logo = t.logo ? await loadImg(t.logo) : null, LS = 300, ly = y - 60;
+  // pro team builder cards (layouts/shortcodes/probuilder.html; 4:5): the plan, the window and the depth chart
+  var PB_VDN = { E: 'EXTEND', W: 'LET WALK', K: 'KEEP', T: 'TRADE' }, PB_VDC = { E: C.teal, W: C.down, K: C.lilac, T: '#ffd34d' };
+  function pbM(v, d) { return v == null ? '—' : (v < 0 ? '−' : '') + '$' + Math.abs(+v).toFixed(d == null ? 1 : d) + 'M'; }
+  function pbS(v) { return v == null ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + '$' + Math.abs(v).toFixed(1) + 'M'; }
+  function pbKey(n) { return String(n || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').replace(/[^a-z]/g, ''); }
+  function pbPh(lg, p) { return !p || !p.ph ? null : lg === 'nfl' ? 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_240/league/' + p.ph : 'https://a.espncdn.com/combiner/i?img=/i/headshots/' + lg + '/players/full/' + p.ph + '.png&w=350&h=254&scale=crop'; }
+  // a verdict badge of fixed width, its middle on cy
+  function pbBadge(g, vd, x, cy, bw, bh) {
+    var top = Math.round(cy - bh / 2);
+    g.fillStyle = PB_VDC[vd]; g.fillRect(x, top, bw, bh); bevel(g, x, top, bw, bh, true, 3);
+    g.font = Math.round(bh * 0.6) + 'px ' + FONT; g.fillStyle = C.dark; g.textAlign = 'center'; g.fillText(PB_VDN[vd], x + bw / 2, top + bh / 2 + 1); g.textAlign = 'left';
+  }
+  function pbCore(g, x, cy, size) {
+    g.font = size + 'px ' + FONT; var w = g.measureText('CORE').width + 14, h = Math.round(size * 1.3);
+    var gr = g.createLinearGradient(x, cy - h / 2, x + w, cy + h / 2); gr.addColorStop(0, '#f4f2ff'); gr.addColorStop(0.55, '#c9c6e6'); gr.addColorStop(1, '#ffffff');
+    g.fillStyle = gr; g.fillRect(x, Math.round(cy - h / 2), w, h); g.fillStyle = C.dark; g.fillText('CORE', x + 7, cy + 1); return w;
+  }
+  // the head: logo, name, a line under it, a plaque on the right
+  async function pbHead(F, D, t, lg, plaque) {
+    var g = F.g, x = F.x + 40, w = F.w - 80, LS = 260, ly = F.y + 30;
+    var logo = t.logo ? await loadImg(t.logo) : null;
     g.fillStyle = C.face; g.fillRect(x, ly, LS, LS); bevel(g, x, ly, LS, LS, true, 6);
     g.fillStyle = C.dark; g.fillRect(x + 12, ly + 12, LS - 24, LS - 24);
-    if (logo) { var lr = Math.min(224 / logo.width, 224 / logo.height); drawLogo(g, logo, x + (LS - logo.width * lr) / 2, ly + (LS - logo.height * lr) / 2, logo.width * lr, logo.height * lr); }
+    if (logo) { var lr = Math.min(196 / logo.width, 196 / logo.height); drawLogo(g, logo, x + (LS - logo.width * lr) / 2, ly + (LS - logo.height * lr) / 2, logo.width * lr, logo.height * lr); }
     else { g.font = '84px ' + FONT; g.fillStyle = C.lilac; g.textAlign = 'center'; g.fillText(String(t.tm).slice(0, 4), x + LS / 2, ly + LS / 2); g.textAlign = 'left'; }
-    var pw = 330, tx = x + LS + 40, tw = w - LS - 40 - pw - 36, N = D.teams.length;
-    g.fillStyle = tierCol(Math.round(100 * (N - t.pvRk) / Math.max(N - 1, 1))) || C.teal; g.fillRect(x + w - pw, ly, pw, LS); bevel(g, x + w - pw, ly, pw, LS, true, 6);
-    g.fillStyle = C.dark; g.textAlign = 'center'; g.font = '36px ' + FONT; g.fillText('PICKS', x + w - pw / 2, ly + 44);
-    g.font = '120px ' + FONT; g.fillText('#' + t.pvRk, x + w - pw / 2, ly + 140);
-    g.font = '32px ' + FONT; g.fillText('of ' + N + ' · ' + m(t.pv), x + w - pw / 2, ly + 240); g.textAlign = 'left';
-    var tname = t.name || t.tm, nsz = 96; g.font = nsz + 'px ' + FONT; while (nsz > 64 && g.measureText(tname).width > tw) { nsz -= 4; g.font = nsz + 'px ' + FONT; }
-    g.fillStyle = C.white; g.fillText(fit(g, tname, tw), tx, y);
-    g.font = '48px ' + FONT; g.fillStyle = C.teal;
-    wrap(g, [D.label, m(t.pay) + ' · ' + Math.round(100 * t.pay / cap) + '% of the cap', P.length + ' contracts'].join(' · '), tw).slice(0, 3).forEach(function (l, i) { g.fillText(l, tx, y + 110 + i * 62); });
-    y = ly + LS + 50;
-    var rule = function (label, right) { cardRule(g, x, y, w, label, right); y += 50; };
+    var pw = 330, tx = x + LS + 40, tw = w - LS - 40 - pw - 36;
+    g.fillStyle = plaque.col; g.fillRect(x + w - pw, ly, pw, LS); bevel(g, x + w - pw, ly, pw, LS, true, 6);
+    g.fillStyle = C.dark; g.textAlign = 'center'; g.font = '34px ' + FONT; g.fillText(plaque.h, x + w - pw / 2, ly + 42);
+    g.font = '104px ' + FONT; g.fillText(plaque.t, x + w - pw / 2, ly + 128);
+    g.font = '30px ' + FONT; g.fillText(plaque.sub, x + w - pw / 2, ly + 214); g.textAlign = 'left';
+    var tname = t.name || t.tm, nsz = 92; g.font = nsz + 'px ' + FONT; while (nsz > 60 && g.measureText(tname).width > tw) { nsz -= 4; g.font = nsz + 'px ' + FONT; }
+    g.fillStyle = C.white; g.fillText(fit(g, tname, tw), tx, ly + 70);
+    g.font = '44px ' + FONT; g.fillStyle = C.teal;
+    wrap(g, plaque.line, tw).slice(0, 2).forEach(function (l, i) { g.fillText(l, tx, ly + 160 + i * 58); });
+    return ly + LS + 56;
+  }
+  function pbPlaque(D, t) {
+    var N = D.teams.length, rk = t.valRk[0];
+    return { col: rk <= D.window ? C.teal : t.mode === 'window' ? C.lilac : C.down, h: 'VALUE ' + D.years[0], t: '#' + rk, sub: 'of ' + N + ' · ' + t.mode.toUpperCase(),
+      line: [D.label, pbM(t.pay) + ' · ' + Math.round(100 * t.pay / D.cap) + '% of the cap', t.coreN + ' core'].join(' · ') };
+  }
+  async function buildProBuilder(win, btn) {
+    var lg = btn.getAttribute('data-gfx-lg'), S = (window.__arkPro || {})[lg]; if (!S) return null;
+    var D = S.D, t = S.t, P = S.P, LG = lg.toUpperCase(), cap = D.cap, gap = 20, N = D.teams.length;
+    var F = await frame(2160, 2700, LG + ' :: ' + t.tm + ' team plan', String(D.asof || '').slice(0, 10), SITE + '#team-builder', D.label);
+    F.canvas._name = lg + '-' + String(t.tm).toLowerCase();
+    var g = F.g, x = F.x + 40, w = F.w - 80;
+    well(g, F.x, F.y, F.w, F.h);
+    var y = await pbHead(F, D, t, lg, pbPlaque(D, t));
+    var rule = function (label, right) { cardRule(g, x, y, w, label, right); y += 46; };
     rule('MONEY');
-    var cells = [{ h: 'payroll', t: m(t.pay), sub: 'cap $' + cap + 'M' }];
-    if (lg === 'nhl') cells.push({ h: 'space', t: m(t.space, 2), color: (t.space || 0) < 0 ? C.down : C.teal }, { h: 'dead', t: m(t.dead), color: t.dead ? C.down : C.white });
-    else if (lg === 'nba') cells.push({ h: 'space', t: sg(cap - t.pay), color: cap - t.pay < 0 ? C.down : C.teal }, { h: 'tax room', t: sg(t.tax), color: t.tax < 0 ? C.down : C.teal });
-    else cells.push({ h: 'cap left', t: sg(cap - t.pay), color: C.teal, sub: 'active only' });
-    cells.push({ h: 'coming off', t: m(t.exp), sub: t.nfa + ' deals' });
-    y += cellGrid(g, cells, x, y, w, cells.length, 200, gap) + 60;
-    rule('COMMITTED', 'CAP $' + cap + 'M');
-    var bh = 300, n = D.years.length, cw = (w - (n - 1) * 40) / n, top = Math.max(cap * 1.15, Math.max.apply(null, t.c)), base = y + bh, capY = Math.round(base - bh * cap / top);
-    g.fillStyle = C.white; g.fillRect(x, capY, w, 4);
-    D.years.forEach(function (yr, i) {
-      var bx = Math.round(x + i * (cw + 40)), v = t.c[i] || 0, blocks = Math.max(0, Math.floor(Math.round(bh * v / top) / 14));
-      for (var k = 0; k < blocks; k++) { g.fillStyle = v > cap ? C.down : i === 0 ? C.teal : C.lilac; g.fillRect(bx, base - (k + 1) * 14 + 3, Math.round(cw), 11); }
-      g.font = '40px ' + FONT; g.textAlign = 'center'; var lab = v ? v.toFixed(1) : '0', lw2 = g.measureText(lab).width + 20, ly2 = base - blocks * 14 - 30;
-      g.fillStyle = C.well; g.fillRect(bx + cw / 2 - lw2 / 2, ly2 - 24, lw2, 48); g.fillStyle = C.white; g.fillText(lab, bx + cw / 2, ly2);
-      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(yr, bx + cw / 2, base + 34); g.textAlign = 'left';
-    });
-    y = base + 90;
-    // the verdicts: the biggest contracts with one, two columns, the deals ending first
+    var cells = [{ h: 'payroll', t: pbM(t.pay), sub: 'cap $' + cap + 'M' }];
+    if (lg === 'nhl') cells.push({ h: 'space', t: pbM(t.space, 2), color: (t.space || 0) < 0 ? C.down : C.teal });
+    else if (lg === 'nba') cells.push({ h: 'tax room', t: pbS(t.tax), color: t.tax < 0 ? C.down : C.teal, sub: 'space ' + pbS(cap - t.pay) });
+    else cells.push({ h: 'cap left', t: pbS(cap - t.pay), color: C.teal, sub: 'active contracts' });
+    cells.push({ h: 'coming off', t: pbM(t.exp), sub: t.nfa + ' deals' }, { h: D.years[1] + ' room', t: pbS(cap - (t.c[1] || 0)), color: cap - (t.c[1] || 0) < 0 ? C.down : C.teal, sub: 'committed ' + pbM(t.c[1]) });
+    y += cellGrid(g, cells, x, y, w, cells.length, 170, gap) + 54;
+    // the verdicts: two columns, every row the same height, headshot left, the badge in a fixed column on the right
     var vd = t.vd || {};
-    rule('VERDICTS', ['E', 'W', 'K', 'T'].map(function (k) { return (vd[k] || 0) + ' ' + VDN[k].toLowerCase(); }).join(' · '));
-    var withV = P.filter(function (p) { return p.vd; }), half = (w - 60) / 2, bottom = F.y + F.h - 360, y0 = y;
-    var cols = [['ENDING ' + D.years[0], withV.filter(function (p) { return p.left <= 1; }), x], ['UNDER CONTRACT', withV.filter(function (p) { return p.left > 1; }), x + half + 60]];
-    cols.forEach(function (L) {
-      var yy = y0; g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(L[0], L[2], yy); yy += 64;
-      L[1].slice(0, 9).forEach(function (p) {
-        if (yy + 80 > bottom) return;
-        var tag = VDN[p.vd]; g.font = '34px ' + FONT; var tw2 = g.measureText(tag).width + 20;
-        g.fillStyle = VDC[p.vd]; g.fillRect(L[2] + half - tw2, yy - 38, tw2, 50); g.fillStyle = C.dark; g.fillText(tag, L[2] + half - tw2 + 10, yy - 2);
-        g.font = '40px ' + FONT; g.fillStyle = C.white; var nm = fit(g, p.n, half - tw2 - 120), nmw = g.measureText(nm).width; g.fillText(nm, L[2], yy);
-        g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(p.pos, L[2] + nmw + 16, yy + 2);
-        var sub = [p.h[0] != null ? m(p.h[0]) : '', p.left > 1 ? 'thru ' + (p.thru || '') : (p.x != null ? 'xAAV ' + m(p.x) : ''), 'surplus ' + sg(p.s), p.dev ? D.vl + ' ' + p.dev.map(function (d) { return d.toFixed(1); }).join(' > ') : ''].filter(Boolean).join(' · ');
-        g.font = '30px ' + FONT; g.fillStyle = p.s < 0 ? C.down : C.teal; g.fillText(fit(g, sub, half), L[2], yy + 40); yy += 90;
+    rule('VERDICTS', ['E', 'W', 'K', 'T'].map(function (k) { return (vd[k] || 0) + ' ' + PB_VDN[k].toLowerCase(); }).join(' · '));
+    var withV = P.filter(function (p) { return p.vd; }), half = Math.floor((w - 60) / 2), bottom;
+    var cols = [['ENDING ' + D.years[0], withV.filter(function (p) { return p.left <= 1 || p.fa; }), x], ['UNDER CONTRACT', withV.filter(function (p) { return !(p.left <= 1 || p.fa); }), x + half + 60]];
+    var npk = Math.min((t.picks || []).length, 14), bottom = F.y + F.h - 30 - 46 - Math.max(1, Math.ceil(npk / 7)) * 112 - 30;
+    var y0 = y + 40, nMax = Math.max(cols[0][1].length, cols[1][1].length, 1), RH = Math.max(124, Math.min(200, Math.floor((bottom - y0) / Math.max(nMax, 6))));
+    var rows = Math.floor((bottom - y0) / RH), BW = 230, BH = 54, PH = RH - 20;
+    var imgs = await Promise.all(cols.map(function (L) { return Promise.all(L[1].slice(0, rows).map(function (p) { return loadPhoto(pbPh(lg, p)); })); }));
+    cols.forEach(function (L, ci) {
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(L[0], L[2], y + 4);
+      L[1].slice(0, rows).forEach(function (p, i) {
+        var ry = y0 + i * RH, cy = ry + RH / 2;
+        if (i % 2) { g.fillStyle = 'rgba(36,26,58,0.45)'; g.fillRect(L[2], ry, half, RH); }
+        photoFrame(g, imgs[ci][i], L[2], ry + 10, Math.round(PH * 1.2), PH);
+        var tx = L[2] + Math.round(PH * 1.2) + 20, tw = half - (tx - L[2]) - BW - 20;
+        var pl = p.pos + (p.age ? ' · ' + p.age : ''); g.font = '28px ' + FONT; var plw = g.measureText(pl).width + 18 + (p.core ? 100 : 0);
+        g.font = '40px ' + FONT; g.fillStyle = C.white; var nm = fit(g, p.n, tw - plw), nmw = g.measureText(nm).width; g.fillText(nm, tx, cy - 34);
+        g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(p.pos + (p.age ? ' · ' + p.age : ''), tx + nmw + 14, cy - 32);
+        if (p.core) pbCore(g, tx + nmw + 28 + g.measureText(p.pos + (p.age ? ' · ' + p.age : '')).width, cy - 32, 24);
+        var exp = p.left <= 1 || p.fa;
+        var l2 = [p.h[0] != null ? pbM(p.h[0]) : '', exp ? (p.fst || 'FA') : 'thru ' + (p.thru || ''), exp && p.x != null ? 'xAAV ' + pbM(p.x) + (p.xt ? ' x ' + Math.round(p.xt) : '') : ''].filter(Boolean).join(' · ');
+        var l3 = ['vs repl ' + pbS(p.s), p.lean ? 'leans ' + PB_VDN[p.lean].toLowerCase() : '', p.fit && p.fit.length ? 'fits ' + p.fit.join(' ') : ''].filter(Boolean).join(' · ');
+        g.font = '26px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, l2, tw), tx, cy + 8);
+        g.fillStyle = p.s < 0 ? C.down : C.teal; g.fillText(fit(g, l3, tw), tx, cy + 44);
+        pbBadge(g, p.vd, L[2] + half - BW, cy, BW, BH);
       });
+      if (L[1].length > rows) { g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText('+' + (L[1].length - rows) + ' more', L[2], y0 + rows * RH + 18); }
+      if (!L[1].length) { g.font = '34px ' + FONT; g.fillStyle = C.lilac; g.fillText('none', L[2], y0 + 40); }
     });
-    // the picks
-    y = bottom + 30; rule('PICKS', m(t.pv) + ' · #' + t.pvRk + ' of ' + N);
-    var pk = (t.picks || []).slice().sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; }), line = [], ys = {};
-    pk.forEach(function (k) { (ys[k[0]] = ys[k[0]] || []).push('R' + k[1] + (k[2] !== t.tm ? ' ' + k[2] : '')); });
-    Object.keys(ys).forEach(function (yr) { line.push(yr + ': ' + ys[yr].join(', ')); });
-    g.font = '36px ' + FONT; g.fillStyle = C.white;
-    wrap(g, line.join('   ') || 'none', w).slice(0, 4).forEach(function (l, i) { g.fillText(l, x, y + 20 + i * 52); });
+    // the picks, one box a pick with its value
+    y = bottom + 30; rule('PICKS', pbM(t.pv) + ' · #' + t.pvRk + ' of ' + N);
+    var pk = (t.picks || []).slice().sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; }).slice(0, 14);
+    var pc = 7, pwid = Math.floor((w - (pc - 1) * 16) / pc), phh = 96;
+    pk.forEach(function (k, i) {
+      var bx = x + (i % pc) * (pwid + 16), by = y + Math.floor(i / pc) * (phh + 16);
+      g.fillStyle = k[1] === 1 ? C.teal : C.lilac; g.fillRect(bx, by, pwid, phh); bevel(g, bx, by, pwid, phh, true, 3);
+      g.fillStyle = C.dark; g.font = '34px ' + FONT; g.fillText(fit(g, k[0] + ' R' + k[1] + (k[2] !== t.tm ? ' ' + k[2] : ''), pwid - 24), bx + 14, by + 30);
+      g.font = '28px ' + FONT; g.fillText(fit(g, (k[4] ? '#' + k[4] + ' · ' : '') + pbM(k[5]) + (k[3] ? ' · cond' : ''), pwid - 24), bx + 14, by + 70);
+    });
+    if (!pk.length) { g.font = '34px ' + FONT; g.fillStyle = C.white; g.fillText('none on file', x, y + 30); }
+    return F.canvas;
+  }
+  async function buildProWindow(win, btn) {
+    var lg = btn.getAttribute('data-gfx-lg'), S = (window.__arkPro || {})[lg]; if (!S) return null;
+    var D = S.D, t = S.t, P = S.P, LG = lg.toUpperCase(), cap = D.cap, N = D.teams.length, yrs = D.years;
+    var F = await frame(2160, 2700, LG + ' :: ' + t.tm + ' window', String(D.asof || '').slice(0, 10), SITE + '#team-builder', D.label);
+    F.canvas._name = lg + '-' + String(t.tm).toLowerCase() + '-window';
+    var g = F.g, x = F.x + 40, w = F.w - 80;
+    well(g, F.x, F.y, F.w, F.h);
+    var y = await pbHead(F, D, t, lg, pbPlaque(D, t));
+    var rule = function (label, right) { cardRule(g, x, y, w, label, right); y += 50; };
+    // value under contract by season against the league's top ten line, the window shaded
+    rule('VALUE UNDER CONTRACT', D.vl + ' · TOP ' + D.window + ' SHADED');
+    var n = 3, cw = Math.floor((w - (n - 1) * 60) / n), bh = 520, base = y + bh + 40;
+    var tops = [0, 1, 2].map(function (i) { return D.teams.map(function (o) { return o.val[i] || 0; }).sort(function (a, b) { return b - a; }); });
+    var mx = Math.max.apply(null, tops.map(function (a) { return a[0]; })) || 1;
+    for (var i = 0; i < n; i++) {
+      var bx = x + i * (cw + 60), v = t.val[i] || 0, inW = t.valRk[i] <= D.window, line = tops[i][D.window - 1];
+      if (inW) { g.fillStyle = 'rgba(127,255,212,0.14)'; g.fillRect(bx - 20, y, cw + 40, bh + 100); }
+      var blocks = Math.max(0, Math.floor(bh * Math.max(v, 0) / mx / 16));
+      for (var k = 0; k < blocks; k++) { g.fillStyle = inW ? C.teal : C.lilac; g.fillRect(bx + 40, base - (k + 1) * 16 + 3, cw - 80, 12); }
+      var ly = Math.round(base - bh * line / mx); g.fillStyle = C.white; g.fillRect(bx, ly, cw, 4);
+      g.font = '28px ' + FONT; g.fillStyle = C.white; g.textAlign = 'right'; g.fillText('top ' + D.window + ' ' + line.toFixed(1), bx + cw, ly + 26);
+      g.font = '56px ' + FONT; g.textAlign = 'center'; g.fillStyle = C.white;
+      var vy = Math.max(base - blocks * 16 - 40, y + 36);
+      if (vy > ly - 8 && vy - 52 < ly + 34) vy = ly - 26;           // keep the value clear of the top-ten line and its label
+      g.fillText(v.toFixed(1), bx + cw / 2, Math.max(vy, y + 36));
+      g.font = '40px ' + FONT; g.fillStyle = inW ? C.teal : C.lilac; g.fillText(yrs[i] + ' · #' + t.valRk[i], bx + cw / 2, base + 46); g.textAlign = 'left';
+    }
+    y = base + 130;
+    // the timeline table: five seasons
+    rule('TIMELINE');
+    var byY = {}; t.picks.forEach(function (k) { (byY[String(k[0])] = byY[String(k[0])] || []).push(k); });
+    function yk(s) { var a = String(s).split('-'); return a.length > 1 ? String(+a[0] + 1) : String(s); }
+    var L = [['committed', yrs.map(function (s, i) { return (t.c[i] || 0).toFixed(1); })], ['cap room', yrs.map(function (s, i) { var r = cap - (t.c[i] || 0); return (r < 0 ? '−' : '+') + Math.abs(r).toFixed(0); })],
+             ['contracts', t.nUnder.map(String)], ['core', yrs.map(function (s, i) { return String(P.filter(function (p) { return p.core && i < p.h.length && p.h[i] != null; }).length); })],
+             ['picks', yrs.map(function (s) { var k = byY[yk(s)] || []; return k.length ? k.length + ' · ' + k.filter(function (q) { return q[1] === 1; }).length + ' R1' : '—'; })]];
+    var lw = 300, ccw = Math.floor((w - lw) / yrs.length), RH = 80;
+    yrs.forEach(function (s, i) { if (i < 3 && t.valRk[i] <= D.window) { g.fillStyle = 'rgba(127,255,212,0.14)'; g.fillRect(x + lw + i * ccw, y - 34, ccw, RH * (L.length + 1)); } });
+    g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.textAlign = 'center';
+    yrs.forEach(function (s, i) { g.fillText(s, x + lw + i * ccw + ccw / 2, y); });
+    y += RH;
+    L.forEach(function (r) {
+      g.textAlign = 'left'; g.font = '34px ' + FONT; g.fillStyle = C.lilac; g.fillText(r[0], x, y);
+      g.textAlign = 'center'; g.font = '40px ' + FONT;
+      r[1].forEach(function (c, i) { g.fillStyle = /^−/.test(c) ? C.down : C.white; g.fillText(c, x + lw + i * ccw + ccw / 2, y); });
+      y += RH;
+    });
+    g.textAlign = 'left'; y += 20;
+    // needs and scenarios side by side
+    var half = Math.floor((w - 60) / 2);
+    cardRule(g, x, y, half, 'NEEDS', D.years[1]); cardRule(g, x + half + 60, y, half, 'SCENARIOS', D.years[1]); y += 60;
+    var G = D.groups, per = Math.min(G.length, 5), gw = Math.floor((half - (per - 1) * 12) / per), gh = 110;
+    G.forEach(function (gp, i) {
+      var z = t.need[gp], bx = x + (i % per) * (gw + 12), by = y + Math.floor(i / per) * (gh + 12);
+      var lit = z != null && (z <= -0.4 || z >= 0.4);
+      g.fillStyle = z == null ? C.well : z <= -1 ? C.down : z <= -0.4 ? '#c98bd8' : z < 0.4 ? C.well : z < 1 ? '#3f9d8f' : C.teal; g.fillRect(bx, by, gw, gh); bevel(g, bx, by, gw, gh, true, 3);
+      g.textAlign = 'center'; g.font = '34px ' + FONT; g.fillStyle = lit ? C.dark : C.white; g.fillText(gp, bx + gw / 2, by + 34);
+      g.font = '30px ' + FONT; g.fillText(z == null ? '—' : (z > 0 ? '+' : '') + z.toFixed(1), bx + gw / 2, by + 78); g.textAlign = 'left';
+    });
+    var SC = [['plan', 'verdicts'], ['all', 're-sign all'], ['walk', 'let walk'], ['space', 'max space']], sx = x + half + 60, sy = y + 10;
+    var CX = [0, 300, 470, 630, 790].map(function (c) { return Math.round(c * half / 930); });
+    g.font = '28px ' + FONT; g.fillStyle = C.lilac; [['payroll', 1], ['room', 2], ['value', 3], ['rank', 4]].forEach(function (h) { g.fillText(h[0], sx + CX[h[1]], sy); }); sy += 56;
+    SC.forEach(function (s) { var r = t.sc[s[0]];
+      g.font = '36px ' + FONT; g.fillStyle = C.white; g.fillText(s[1], sx, sy);
+      g.fillText(r[0].toFixed(1), sx + CX[1], sy); g.fillStyle = r[1] < 0 ? C.down : C.teal; g.fillText((r[1] < 0 ? '−' : '+') + Math.abs(r[1]).toFixed(0), sx + CX[2], sy);
+      g.fillStyle = C.white; g.fillText(r[2].toFixed(1), sx + CX[3], sy); g.fillStyle = r[4] <= D.window ? C.teal : C.white; g.fillText('#' + r[4], sx + CX[4], sy); sy += 64; });
+    y = Math.max(y + Math.ceil(G.length / per) * (gh + 12), sy) + 40;
+    rule('PLAN');
+    var cells = [{ h: 'core share', t: t.coreSh == null ? '—' : Math.round(100 * t.coreSh) + '%', sub: t.coreN + ' core' }, { h: 'value age', t: t.vwAge == null ? '—' : t.vwAge.toFixed(1), sub: 'league ' + D.lgAge },
+                 { h: 'pick capital', t: pbM(t.pv), sub: '#' + t.pvRk + ' of ' + N }, { h: 'mode', t: t.mode.toUpperCase(), color: t.mode === 'now' ? C.teal : t.mode === 'window' ? C.lilac : C.down }];
+    var ch = Math.max(150, Math.min(220, F.y + F.h - 30 - y));
+    cellGrid(g, cells, x, y, w, 4, ch, 20);
+    return F.canvas;
+  }
+  async function buildProDepth(win, btn) {
+    var lg = btn.getAttribute('data-gfx-lg'), S = (window.__arkPro || {})[lg]; if (!S || !S.DEP) return null;
+    var D = S.D, t = S.t, P = S.P, T = S.DEP, LG = lg.toUpperCase();
+    var F = await frame(2160, 2700, LG + ' :: ' + t.tm + ' depth chart', String(D.asof || '').slice(0, 10), SITE + '#team-builder', D.label);
+    F.canvas._name = lg + '-' + String(t.tm).toLowerCase() + '-depth';
+    var g = F.g, x = F.x + 40, w = F.w - 80;
+    well(g, F.x, F.y, F.w, F.h);
+    var y = await pbHead(F, D, t, lg, pbPlaque(D, t));
+    var by = {}; P.forEach(function (p) { by[pbKey(p.n)] = p; });
+    var U = {}; T.units.forEach(function (u) { U[u.u || 'main'] = u.s; });
+    // one node: the spot, the starter, the backup under him, a verdict strip at the foot
+    function node(s, cx, cy, nw, nh) {
+      var bx = Math.round(cx - nw / 2), byy = Math.round(cy - nh / 2), st = s[1][0], p = st && by[pbKey(st[0])];
+      g.fillStyle = C.face; g.fillRect(bx, byy, nw, nh); bevel(g, bx, byy, nw, nh, true, 4);
+      g.font = '26px ' + FONT; g.fillStyle = C.lilac; g.fillText(s[0], bx + 12, byy + 24);
+      if (p && p.core) pbCore(g, bx + nw - 84, byy + 24, 20);
+      g.font = '32px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, st ? st[0] : '—', nw - 24), bx + 12, byy + 60);
+      var b2 = s[1][1]; if (b2 && nh >= 130) { g.font = '24px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, b2[0], nw - 24), bx + 12, byy + 94); }
+      if (p && p.vd) { g.fillStyle = PB_VDC[p.vd]; g.fillRect(bx + 4, byy + nh - 30, nw - 8, 26); g.font = '22px ' + FONT; g.fillStyle = C.dark; g.textAlign = 'center'; g.fillText(fit(g, PB_VDN[p.vd] + (p.h[0] != null ? ' · ' + pbM(p.h[0]) : ''), nw - 16), bx + nw / 2, byy + nh - 16); g.textAlign = 'left'; }
+    }
+    var bottom = F.y + F.h - 30;
+    if (lg === 'nfl') {
+      var o = U.offense || [], d = U.defense || [], st2 = U['special teams'] || [];
+      var pick = function (arr, lab) { return arr.filter(function (s) { return s[0] === lab; })[0]; };
+      var nw = 252, nh = 150, sp = nw + 20, cx0 = x + w / 2;
+      cardRule(g, x, y, w, 'OFFENSE'); var oy = y + 30, oh = 640;
+      g.fillStyle = 'rgba(127,255,212,0.05)'; g.fillRect(x, oy, w, oh);
+      var los = oy + 30 + nh / 2;
+      [['LT', -2], ['LG', -1], ['C', 0], ['RG', 1], ['RT', 2]].forEach(function (q) { var s = pick(o, q[0]); if (s) node(s, cx0 + q[1] * sp, los, nw, nh); });
+      var wr = o.filter(function (s) { return s[0] === 'WR'; }), te = pick(o, 'TE'), qb = pick(o, 'QB'), rb = pick(o, 'RB');
+      var side = Math.round((w - 5 * sp) / 2) - 20, lx = x + side / 2 + 10, rx = x + w - side / 2 - 10;
+      if (wr[0]) node(wr[0], lx, los, side, nh); if (wr[1]) node(wr[1], rx, los, side, nh);
+      if (te) node(te, rx, los + 180, side, nh); if (wr[2]) node(wr[2], lx, los + 180, side, nh);
+      if (qb) node(qb, cx0, los + 210, nw, nh); if (rb) node(rb, cx0, los + 400, nw, nh);
+      y = oy + oh + 40; cardRule(g, x, y, w, 'DEFENSE'); var dy = y + 30, dh = 760;
+      g.fillStyle = 'rgba(200,199,255,0.05)'; g.fillRect(x, dy, w, dh);
+      var dl = d.filter(function (s) { return /^(DE|DT|NT|EDGE|DL|LDE|RDE|LDT|RDT)$/.test(s[0]); }).slice(0, 4), lb = d.filter(function (s) { return /LB$/.test(s[0]); }).slice(0, 3),
+          cb = d.filter(function (s) { return s[0] === 'CB'; }), nb = pick(d, 'NB'), sf = d.filter(function (s) { return /^(SS|FS|S)$/.test(s[0]); });
+      var l1 = dy + 30 + nh / 2;
+      dl.forEach(function (s, i) { node(s, cx0 + (i - (dl.length - 1) / 2) * sp, l1, nw, nh); });
+      lb.forEach(function (s, i) { node(s, cx0 + (i - (lb.length - 1) / 2) * sp, l1 + 190, nw, nh); });
+      if (cb[0]) node(cb[0], lx, l1 + 95, side, nh); if (cb[1]) node(cb[1], rx, l1 + 95, side, nh);
+      if (nb) node(nb, rx, l1 + 285, side, nh);
+      sf.slice(0, 2).forEach(function (s, i) { node(s, cx0 + (i ? 1 : -1) * (sp * 0.75), l1 + 400, nw, nh); });
+      y = dy + dh + 40; cardRule(g, x, y, w, 'SPECIAL TEAMS'); y += 30;
+      var stl = st2.filter(function (s) { return /^(K|P|LS|KR|PR)$/.test(s[0]); }), sw = Math.floor((w - (stl.length - 1) * 16) / Math.max(stl.length, 1)), shh = Math.min(170, bottom - y);
+      stl.forEach(function (s, i) { node(s, x + i * (sw + 16) + sw / 2, y + shh / 2, sw, shh); });
+    } else if (lg === 'nhl') {
+      var f = U.forwards || [], dd = U.defense || [], gg = U.goalies || [], s3 = Math.floor((w - 2 * 24) / 3);
+      var nl = Math.min(4, Math.max.apply(null, f.map(function (s) { return s[1].length; }).concat([0]))), nd = Math.min(3, Math.max.apply(null, dd.map(function (s) { return s[1].length; }).concat([0])));
+      var RHn = Math.max(120, Math.min(170, Math.floor((bottom - y - 3 * 70) / (nl + nd + 1)))), s2 = Math.floor((w - 24) / 2);
+      cardRule(g, x, y, w, 'FORWARD LINES'); y += 30;
+      for (var li = 0; li < nl; li++) { f.forEach(function (s, j) { var r = s[1][li]; if (r) node([s[0] + ' · L' + (li + 1), [r]], x + j * (s3 + 24) + s3 / 2, y + RHn / 2, s3, RHn - 16); }); y += RHn; }
+      y += 30; cardRule(g, x, y, w, 'DEFENSE PAIRS'); y += 30;
+      for (var pi = 0; pi < nd; pi++) { dd.forEach(function (s, j) { var r = s[1][pi]; if (r) node([s[0] + ' · P' + (pi + 1), [r]], x + j * (s2 + 24) + s2 / 2, y + RHn / 2, s2, RHn - 16); }); y += RHn; }
+      y += 30; cardRule(g, x, y, w, 'GOALIES'); y += 30;
+      ((gg[0] || ['G', []])[1]).slice(0, 2).forEach(function (r, j) { node([j ? 'BACKUP' : 'STARTER', [r]], x + j * (s2 + 24) + s2 / 2, y + RHn / 2, s2, RHn - 16); });
+    } else {
+      // NBA: the five starters with headshots, then the rotation behind them
+      var sl = U.main || T.units[0].s, seen = {}, st5 = sl.map(function (s) { var r = s[1].filter(function (q) { return !seen[q[0]]; })[0] || s[1][0]; if (r) seen[r[0]] = 1; return [s[0], r]; });
+      cardRule(g, x, y, w, 'STARTERS'); y += 40;
+      var cw5 = Math.floor((w - 4 * 20) / 5), phh5 = Math.round(cw5 * 0.9);
+      var im = await Promise.all(st5.map(function (s) { return loadPhoto(pbPh(lg, s[1] && by[pbKey(s[1][0])])); }));
+      st5.forEach(function (s, i) {
+        var bx = x + i * (cw5 + 20), p = s[1] && by[pbKey(s[1][0])];
+        photoFrame(g, im[i], bx, y, cw5, phh5);
+        var ty = y + phh5 + 44;
+        g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(s[0], bx, ty);
+        if (p && p.core) pbCore(g, bx + cw5 - 86, ty, 22);
+        g.font = '38px ' + FONT; g.fillStyle = C.white; wrap(g, s[1] ? s[1][0] : '—', cw5).slice(0, 2).forEach(function (l, k) { g.fillText(l, bx, ty + 50 + k * 44); });
+        if (p) { g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, pbM(p.h[0]) + ' · ' + (p.thru || ''), cw5), bx, ty + 150); if (p.vd) pbBadge(g, p.vd, bx, ty + 212, cw5, 52); }
+      });
+      y += phh5 + 330;
+      cardRule(g, x, y, w, 'ROTATION'); y += 40;
+      var bench = []; sl.forEach(function (s) { s[1].forEach(function (q) { if (!seen[q[0]]) { seen[q[0]] = 1; bench.push([s[0], q]); } }); });
+      var cw2 = Math.floor((w - 60) / 2), BW = 220, nb2 = Math.ceil(Math.min(bench.length, 12) / 2), RH2 = Math.max(90, Math.min(190, Math.floor((bottom - y) / Math.max(nb2, 1))));
+      var rows2 = Math.floor((bottom - y) / RH2), list2 = bench.slice(0, rows2 * 2);
+      var im2 = await Promise.all(list2.map(function (b) { return loadPhoto(pbPh(lg, by[pbKey(b[1][0])])); }));
+      list2.forEach(function (b, i) {
+        var col = i % 2, bx = x + col * (cw2 + 60), ry = y + Math.floor(i / 2) * RH2, cy = ry + RH2 / 2, p = by[pbKey(b[1][0])], ph2 = RH2 - 24, pw2 = Math.round(ph2 * 1.2);
+        if (Math.floor(i / 2) % 2) { g.fillStyle = 'rgba(36,26,58,0.45)'; g.fillRect(bx, ry, cw2, RH2); }
+        photoFrame(g, im2[i], bx, ry + 12, pw2, ph2);
+        var tx2 = bx + pw2 + 20, tw2 = cw2 - pw2 - BW - 40;
+        g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(b[0] + (p && p.age ? ' · ' + p.age : ''), tx2, cy - 36);
+        g.font = '38px ' + FONT; g.fillStyle = C.white; g.fillText(fit(g, b[1][0], tw2), tx2, cy + 2);
+        if (p) { g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, pbM(p.h[0]) + ' · ' + (p.thru || ''), tw2), tx2, cy + 40); }
+        if (p && p.vd) pbBadge(g, p.vd, bx + cw2 - BW, cy, BW, 50);
+      });
+    }
     return F.canvas;
   }
   async function buildAgency(win, btn) {
@@ -5285,6 +5480,8 @@
       if (mode === 'sheet') { var sc = await buildSheet(win, btn); if (sc) preview(sc, 'arkboard-process-' + String(JSON.parse(btn.getAttribute('data-gfx-sheet') || '{}').sport || 'sport').toLowerCase()); return; }
       if (mode === 'agency' || mode === 'agencyboard') { var ac = mode === 'agency' ? await buildAgency(win, btn) : await buildAgencyBoard(win, btn); if (ac) { var ad = agData(btn.getAttribute('data-gfx-sport')) || {}; preview(ac, 'arkboard-' + (ad.sport || '') + '-' + (mode === 'agency' ? 'agency-' + String(((ad.agencies || [])[+btn.getAttribute('data-gfx-i')] || {}).agency || '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'agencies')); } return; }
       if (mode === 'probuilder') { var pb = await buildProBuilder(win, btn); if (pb) preview(pb, 'arkboard-team-builder-' + (pb._name || 'team')); return; }
+      if (mode === 'prowindow') { var pw2 = await buildProWindow(win, btn); if (pw2) preview(pw2, 'arkboard-team-window-' + (pw2._name || 'team')); return; }
+      if (mode === 'prodepth') { var pd = await buildProDepth(win, btn); if (pd) preview(pd, 'arkboard-depth-chart-' + (pd._name || 'team')); return; }
       if (mode === 'payroll') { var pc2 = await buildPayroll(win, btn); if (pc2) preview(pc2, 'arkboard-payroll-' + (pc2._name || 'team')); return; }
       if (mode === 'watch') { var wc = await buildWatch(win, btn); if (wc) preview(wc, 'arkboard-games-to-watch'); return; }
       var canvas = mode === 'term' ? await buildTerm(win, btn) : mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'class' ? await buildClassCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn) : mode === 'bracket' ? await buildBracket(win, btn) : mode === 'pickem' ? await buildPickem(win, btn) : mode === 'perf' ? await buildPerf(win, btn) : mode === 'depth' ? await buildDepth(win, btn)
