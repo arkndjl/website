@@ -11,7 +11,10 @@ draft = false
 {{< winpane title="counter_strike.exe" icon="cs" sprite="px/hero-cs" status="Valve VRS · Liquipedia" class="winpane--art" />}}
 
 {{< wintabs groups="players:RWA leaders,prospects,all-time players,ARKLIST|rosters:transactions|games:games,game table|teams:ARK Ranking,map pool,rounds,events,all-time teams|market:transfer values|model:model,player model" side="true" label="Counter-Strike views" >}}
+{{< wintabs tab="RWA leaders" tabs="RWA leaders,OVR" sub="true" label="RWA leaders views" >}}
 {{< cs2players title="RWA leaders" tab="RWA leaders" >}}
+{{< lazytab tab="OVR" >}}{{< ovr sport="cs2" title="Counter-Strike :: OVR" tab="OVR" >}}{{< /lazytab >}}
+{{< /wintabs >}}
 {{< cs2players view="prospects" title="prospects" tab="prospects" >}}
 {{< arklist sport="cs2" title="ARKLIST" tab="ARKLIST" >}}
 {{< wintabs tab="all-time players" tabs="peak seasons,careers" sub="true" label="all-time players views" >}}

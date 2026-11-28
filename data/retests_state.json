@@ -1,9 +1,9 @@
 {
 "asof":"2026-11-28",
-"n":95,
+"n":98,
 "count":{
 "watching":1,
-"waiting":91,
+"waiting":94,
 "shipped":3
 },
 "next":[
@@ -210,6 +210,23 @@
 "state":"waiting"
 },
 {
+"key":"ovr_tennis_cs2_ideas",
+"t":"Tennis and CS2 OVR: this season's descriptive rate (PA, season RWA), sample shrink and age beside ARK / RWA, and a talent band",
+"sp":[
+"Tennis",
+"CS2"
+],
+"ar":"players",
+"kind":"retest",
+"how":"hand",
+"was":"Nov 28: not run; OVR reads ARK and the RWA rating as tested, anchors from the current board",
+"trigger":"a season-by-season player file for each (tennis_ratings history by year, cs2 player ratings by month)",
+"gate":"the OVR gate on next-season (tennis) or next-six-months (CS2) results",
+"due":"2027-01-15",
+"est":0,
+"state":"waiting"
+},
+{
 "key":"cfb_recruit_tail",
 "t":"Tail-only fix for recruit visits and picks",
 "sp":[
@@ -399,6 +416,22 @@
 "how":"hand",
 "trigger":"the 2026 NFL season from week 11 is over",
 "gate":"every shipped model scored once, hash recorded first; batch b at .05 / (1 + earlier batches)",
+"due":"2027-02-28",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"ovr_nfl_ideas",
+"t":"NFL OVR: this season's XP/60, career-snap shrink, age and sub-position offsets beside pXP/60, and the talent band",
+"sp":[
+"NFL"
+],
+"ar":"players",
+"kind":"retest",
+"how":"hand",
+"was":"Nov 28: not run; the repo holds three seasons of rate history (scripts/data/nfl_rate_hist.json.gz, 2023-25), one usable pair outside the lockbox",
+"trigger":"2026 season finished and a past-season pxp file per season (2016-25 from scripts/nfl_rate_research.py's pull)",
+"gate":"the OVR gate in scripts/research/ovr_nov28/suite.py",
 "due":"2027-02-28",
 "est":1,
 "state":"waiting"
@@ -912,6 +945,24 @@
 "was":"t .59",
 "trigger":"one more NBA season (2026-27) in the team tests",
 "gate":"scripts/research/repl_nov28/nba.py qposoff3 against the flat -1.4: same-season team W% t >= 2 with season fixed effects and next-season W% t > -2, ahead in most seasons",
+"due":"2027-07-04",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"ovr_rookie_fv_prior",
+"t":"OVR: rookies start from their final draft FV, its weight fading as pro minutes come in (k / (k + career sample)), against a plain rookie offset with the same fade",
+"sp":[
+"NBA",
+"NHL",
+"Soccer"
+],
+"ar":"players",
+"kind":"retest",
+"how":"hand",
+"was":"Nov 28: failed in every sport against the offset (NBA t .66 k 1000 best, NHL F t .54, NHL D, G, soccer t 3.33); NBA draft FV r .14 with first-season XPM",
+"trigger":"2026-27 finished: one more season of rookie pairs in every sport",
+"gate":"scripts/research/ovr_nov28/run.py rookie grid: FV term beats the offset alone (passes the OVR gate: better on next-season rate, value r or team R2 at t >= 2, worse on none past 1)",
 "due":"2027-07-04",
 "est":1,
 "state":"waiting"

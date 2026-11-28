@@ -1625,6 +1625,58 @@
    "trigger": "the next soccer prospects refit (Challenger Pro League, 3. Liga, Regionalliga, Austrian 2. Liga, Serie C, Primera Federacion and Czech second tier minutes now count at the replacement floor)",
    "gate": "lg_share from the mean squad-value club rating of the league; class-out t >= 2, forward top-50 not worse",
    "run_hint": "python3 scripts/soccer_prospects.py --fit (rlg_td in features())"
+  },
+  {
+   "key": "ovr_rookie_fv_prior",
+   "t": "OVR: rookies start from their final draft FV, its weight fading as pro minutes come in (k / (k + career sample)), against a plain rookie offset with the same fade",
+   "sp": [
+    "NBA",
+    "NHL",
+    "Soccer"
+   ],
+   "ar": "players",
+   "kind": "retest",
+   "how": "hand",
+   "was": "Nov 28: failed in every sport against the offset (NBA t .66 k 1000 best, NHL F t .54, NHL D, G, soccer t 3.33); NBA draft FV r .14 with first-season XPM",
+   "after": "nba:champ:2027",
+   "lag": 14,
+   "est": 1,
+   "trigger": "2026-27 finished: one more season of rookie pairs in every sport",
+   "gate": "scripts/research/ovr_nov28/run.py rookie grid: FV term beats the offset alone (passes the OVR gate: better on next-season rate, value r or team R2 at t >= 2, worse on none past 1)",
+   "run_hint": "python3 scripts/research/ovr_nov28/run.py nba nhlF nhlD nhlG soccer"
+  },
+  {
+   "key": "ovr_nfl_ideas",
+   "t": "NFL OVR: this season's XP/60, career-snap shrink, age and sub-position offsets beside pXP/60, and the talent band",
+   "sp": [
+    "NFL"
+   ],
+   "ar": "players",
+   "kind": "retest",
+   "how": "hand",
+   "was": "Nov 28: not run; the repo holds three seasons of rate history (scripts/data/nfl_rate_hist.json.gz, 2023-25), one usable pair outside the lockbox",
+   "after": "nfl:champ:2027",
+   "lag": 14,
+   "est": 1,
+   "trigger": "2026 season finished and a past-season pxp file per season (2016-25 from scripts/nfl_rate_research.py's pull)",
+   "gate": "the OVR gate in scripts/research/ovr_nov28/suite.py",
+   "run_hint": "add an nfl loader to scripts/research/ovr_nov28/run.py"
+  },
+  {
+   "key": "ovr_tennis_cs2_ideas",
+   "t": "Tennis and CS2 OVR: this season's descriptive rate (PA, season RWA), sample shrink and age beside ARK / RWA, and a talent band",
+   "sp": [
+    "Tennis",
+    "CS2"
+   ],
+   "ar": "players",
+   "kind": "retest",
+   "how": "hand",
+   "was": "Nov 28: not run; OVR reads ARK and the RWA rating as tested, anchors from the current board",
+   "due": "2027-01-15",
+   "trigger": "a season-by-season player file for each (tennis_ratings history by year, cs2 player ratings by month)",
+   "gate": "the OVR gate on next-season (tennis) or next-six-months (CS2) results",
+   "run_hint": "add loaders to scripts/research/ovr_nov28/run.py"
   }
  ]
 }
