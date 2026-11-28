@@ -75,6 +75,16 @@ def _ovr():
         out.append('OVR is not an FV anchor yet. For %d NBA rookies from the %d to %d drafts, the FV on file ranks OVR after three seasons at a Spearman r of %.2f, and the pre-draft rank does better on the same players (%.2f, t = %.2f, FV ahead in %d of %d classes). FV 45 to 49 rookies were starters (OVR 75 or more) %d%% of the time, and FV 30 to 34 rookies %d%%.' % (
             A['withPre'], A['classes'][0], A['classes'][1], A['spearFVpre'], A['spearPre'], A['fvVsPre']['t'], A['fvVsPre']['wins'], A['fvVsPre']['of'],
             round(100 * A['bands']['45']['starter']), round(100 * A['bands']['30']['starter'])))
+    R2 = R.get('round2') or {}
+    if R2.get('nba') and R2.get('nhlF'):
+        a, b = R2['nba']['tests'], R2['nhlF']['tests']
+        out.append('A second round tried five more inputs against the live grade. Minutes a game (what his coaches think of him) passed in the NBA on team results (t = %.2f) and for NHL forwards on next season\'s rate (t = %.2f) and value (t = %.2f). Age times the rate passed in the NBA (t = %.2f), because a veteran\'s good rate carries forward less than a young player\'s. Last season\'s trend, a separate weight on defense and HPM beside pWAR did not pass, and nothing passed for defensemen, goalies or soccer.' % (
+            a['role']['tTeam'], b['role']['t'], b['role']['tR'], a['ageP']['t']))
+    PC = ld('research/nfl_poscredit.json')
+    if PC:
+        sl = PC['slopes']
+        out.append('NFL OVR is on one scale for every position. A slope for each position group on next season\'s team margin did not beat one slope for all of them (t = %.2f, %d of %d seasons). The running back slope came out at %.2f (standard error %.2f) against %.2f for all groups together, which says the board may give backs credit that belongs to the line, but a running back slope of its own did not pass either (t = %.2f, %d of %d seasons).' % (
+            PC['tSplit'], PC['wins'], PC['of'], sl['RB']['b'], sl['RB']['se'], PC['pooledSlope'], PC['tRB'], PC['winsRB'], PC['of']))
     return out
 _PE = ld('research/payroll_efficiency.json')                 # payroll efficiency held out (scripts/research/payrolls_nov28/test.py)
 def _paytest():

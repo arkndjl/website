@@ -1728,6 +1728,42 @@
    "trigger": "the pWAR fit in scripts/nhl_war.py with the term added",
    "gate": "next-season WAR error t <= -2 leaving one season out, worse on none past 1",
    "run_hint": "scripts/research/ovr_nov28/suite.py shrink feature in the pWAR fit"
+  },
+  {
+   "key": "nfl_rb_credit",
+   "t": "NFL WAR: running backs on their own exchange rate to next season's team margin (the board may credit backs with the line's work)",
+   "sp": [
+    "NFL"
+   ],
+   "ar": "players",
+   "kind": "retest",
+   "how": "hand",
+   "was": "Nov 28: per-group slopes did not beat one slope (t -.25); RB slope -1.68 (SE 1.14) against 2.09 pooled; RB slope of its own t -1.33, 6 of 9 seasons (a second look, not pre-registered)",
+   "after": "nfl:champ:2027",
+   "lag": 14,
+   "est": 1,
+   "trigger": "2026 season finished: one more target season, the RB split scored forward as registered here",
+   "gate": "RB slope of its own beats one slope on held-out team margin error, t <= -2",
+   "run_hint": "python3 scripts/research/nfl_poscredit_nov28/prep.py 2026 && python3 scripts/research/nfl_poscredit_nov28/test.py"
+  },
+  {
+   "key": "ovr_round2_ideas",
+   "t": "OVR round 2 ideas that failed: last season's trend, a separate defense weight, HPM beside pWAR, and minutes a game for NHL D, G and soccer",
+   "sp": [
+    "NBA",
+    "NHL",
+    "Soccer"
+   ],
+   "ar": "players",
+   "kind": "retest",
+   "how": "hand",
+   "was": "Nov 28: NBA trend team t 3.24 but value r t -1.02, split worse on rate (t 3.68); NHL F split rate t -3.53 but team t -2.21; D, G and soccer nothing passed",
+   "after": "nba:champ:2027",
+   "lag": 14,
+   "est": 1,
+   "trigger": "2026-27 finished: one more season pair",
+   "gate": "the OVR gate against the live form",
+   "run_hint": "python3 scripts/research/ovr_nov28/round2.py"
   }
  ]
 }

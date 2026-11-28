@@ -1843,5 +1843,506 @@
     "starter": 0.0
    }
   }
+ },
+ "round2": {
+  "nba": {
+   "live": [],
+   "tests": {
+    "role": {
+     "vs": "live",
+     "mse": 1.730572,
+     "base": 1.730972,
+     "t": -0.32,
+     "wins": 8,
+     "of": 17,
+     "r": 0.792,
+     "rBase": 0.792,
+     "tR": 0.39,
+     "team": 0.5,
+     "teamBase": 0.494,
+     "tTeam": 4.72,
+     "pass": true
+    },
+    "trend": {
+     "vs": "live",
+     "mse": 1.729785,
+     "base": 1.730972,
+     "t": -0.37,
+     "wins": 11,
+     "of": 17,
+     "r": 0.791,
+     "rBase": 0.792,
+     "tR": -1.02,
+     "team": 0.499,
+     "teamBase": 0.494,
+     "tTeam": 3.24,
+     "pass": false
+    },
+    "ageP": {
+     "vs": "live",
+     "mse": 1.727613,
+     "base": 1.730972,
+     "t": -2.41,
+     "wins": 14,
+     "of": 17,
+     "r": 0.792,
+     "rBase": 0.792,
+     "tR": 1.54,
+     "team": 0.495,
+     "teamBase": 0.494,
+     "tTeam": 0.61,
+     "pass": true
+    },
+    "split": {
+     "vs": "live",
+     "mse": 1.73169,
+     "base": 1.730972,
+     "t": 3.68,
+     "wins": 0,
+     "of": 17,
+     "r": 0.791,
+     "rBase": 0.792,
+     "tR": -1.62,
+     "team": 0.494,
+     "teamBase": 0.494,
+     "tTeam": -2.05,
+     "pass": false
+    }
+   },
+   "combo": {
+    "vs": "live",
+    "mse": 1.727552,
+    "base": 1.730972,
+    "t": -2.08,
+    "wins": 12,
+    "of": 17,
+    "r": 0.792,
+    "rBase": 0.792,
+    "tR": 1.74,
+    "team": 0.5,
+    "teamBase": 0.494,
+    "tTeam": 3.67,
+    "feats": [
+     "role",
+     "ageP"
+    ]
+   },
+   "ship": [
+    "role",
+    "ageP"
+   ],
+   "beta": [
+    -0.09015,
+    0.98098,
+    0.08974,
+    -0.00683
+   ],
+   "feats": [
+    "role",
+    "ageP"
+   ],
+   "consts": {
+    "medn": 1305.5,
+    "K": 4272.5,
+    "pos": [
+     "C",
+     "F",
+     "G"
+    ],
+    "age0": 27.0,
+    "mpg": 22.029
+   }
+  },
+  "nhlF": {
+   "live": [
+    "shrink"
+   ],
+   "tests": {
+    "role": {
+     "vs": "live",
+     "mse": 0.005124,
+     "base": 0.005157,
+     "t": -4.34,
+     "wins": 16,
+     "of": 18,
+     "r": 0.625,
+     "rBase": 0.618,
+     "tR": 4.85,
+     "team": 0.302,
+     "teamBase": 0.298,
+     "tTeam": 0.62,
+     "pass": true
+    },
+    "trend": {
+     "vs": "live",
+     "mse": 0.005149,
+     "base": 0.005157,
+     "t": -1.44,
+     "wins": 11,
+     "of": 18,
+     "r": 0.619,
+     "rBase": 0.618,
+     "tR": 0.16,
+     "team": 0.298,
+     "teamBase": 0.298,
+     "tTeam": 0.13,
+     "pass": false
+    },
+    "ageP": {
+     "vs": "live",
+     "mse": 0.005159,
+     "base": 0.005157,
+     "t": 1.45,
+     "wins": 4,
+     "of": 18,
+     "r": 0.618,
+     "rBase": 0.618,
+     "tR": -0.45,
+     "team": 0.298,
+     "teamBase": 0.298,
+     "tTeam": -0.19,
+     "pass": false
+    },
+    "split": {
+     "vs": "live",
+     "mse": 0.005125,
+     "base": 0.005157,
+     "t": -3.53,
+     "wins": 13,
+     "of": 18,
+     "r": 0.626,
+     "rBase": 0.618,
+     "tR": 5.19,
+     "team": 0.284,
+     "teamBase": 0.298,
+     "tTeam": -2.21,
+     "pass": false
+    },
+    "hpm": {
+     "vs": "live",
+     "mse": 0.005159,
+     "base": 0.005157,
+     "t": 1.19,
+     "wins": 9,
+     "of": 18,
+     "r": 0.618,
+     "rBase": 0.618,
+     "tR": -2.48,
+     "team": 0.298,
+     "teamBase": 0.298,
+     "tTeam": -0.81,
+     "pass": false
+    }
+   },
+   "combo": {
+    "vs": "live",
+    "mse": 0.005124,
+    "base": 0.005157,
+    "t": -4.34,
+    "wins": 16,
+    "of": 18,
+    "r": 0.625,
+    "rBase": 0.618,
+    "tR": 4.85,
+    "team": 0.302,
+    "teamBase": 0.298,
+    "tTeam": 0.62,
+    "feats": [
+     "role"
+    ]
+   },
+   "ship": [
+    "role"
+   ],
+   "beta": [
+    0.00279,
+    0.9543,
+    -0.07878,
+    0.0327
+   ],
+   "feats": [
+    "shrink",
+    "role"
+   ],
+   "consts": {
+    "medn": 874.0,
+    "K": 2756.0,
+    "pos": [
+     "C",
+     "L",
+     "R"
+    ],
+    "age0": 27.0,
+    "mpg": 14.27
+   }
+  },
+  "nhlD": {
+   "live": [
+    "shrink"
+   ],
+   "tests": {
+    "role": {
+     "vs": "live",
+     "mse": 0.003411,
+     "base": 0.003409,
+     "t": 1.88,
+     "wins": 10,
+     "of": 18,
+     "r": 0.458,
+     "rBase": 0.459,
+     "tR": -3.8,
+     "team": 0.208,
+     "teamBase": 0.209,
+     "tTeam": -1.02,
+     "pass": false
+    },
+    "trend": {
+     "vs": "live",
+     "mse": 0.003401,
+     "base": 0.003409,
+     "t": -1.95,
+     "wins": 12,
+     "of": 18,
+     "r": 0.46,
+     "rBase": 0.459,
+     "tR": 0.79,
+     "team": 0.203,
+     "teamBase": 0.209,
+     "tTeam": -1.37,
+     "pass": false
+    },
+    "ageP": {
+     "vs": "live",
+     "mse": 0.003412,
+     "base": 0.003409,
+     "t": 1.93,
+     "wins": 10,
+     "of": 18,
+     "r": 0.458,
+     "rBase": 0.459,
+     "tR": -3.61,
+     "team": 0.208,
+     "teamBase": 0.209,
+     "tTeam": -0.58,
+     "pass": false
+    },
+    "split": {
+     "vs": "live",
+     "mse": 0.00341,
+     "base": 0.003409,
+     "t": 0.45,
+     "wins": 11,
+     "of": 18,
+     "r": 0.457,
+     "rBase": 0.459,
+     "tR": -2.93,
+     "team": 0.209,
+     "teamBase": 0.209,
+     "tTeam": -0.01,
+     "pass": false
+    },
+    "hpm": {
+     "vs": "live",
+     "mse": 0.003403,
+     "base": 0.003409,
+     "t": -1.21,
+     "wins": 10,
+     "of": 18,
+     "r": 0.456,
+     "rBase": 0.459,
+     "tR": -1.36,
+     "team": 0.208,
+     "teamBase": 0.209,
+     "tTeam": -0.26,
+     "pass": false
+    }
+   },
+   "ship": []
+  },
+  "nhlG": {
+   "live": [
+    "age"
+   ],
+   "tests": {
+    "role": {
+     "vs": "live",
+     "mse": 0.003502,
+     "base": 0.0035,
+     "t": 0.65,
+     "wins": 10,
+     "of": 18,
+     "r": 0.369,
+     "rBase": 0.378,
+     "tR": -1.93,
+     "team": 0.084,
+     "teamBase": 0.085,
+     "tTeam": -0.05,
+     "pass": false
+    },
+    "trend": {
+     "vs": "live",
+     "mse": 0.003489,
+     "base": 0.0035,
+     "t": -1.48,
+     "wins": 12,
+     "of": 18,
+     "r": 0.37,
+     "rBase": 0.378,
+     "tR": -1.41,
+     "team": 0.093,
+     "teamBase": 0.085,
+     "tTeam": 1.81,
+     "pass": false
+    },
+    "ageP": {
+     "vs": "live",
+     "mse": 0.003503,
+     "base": 0.0035,
+     "t": 1.65,
+     "wins": 10,
+     "of": 18,
+     "r": 0.373,
+     "rBase": 0.378,
+     "tR": -3.2,
+     "team": 0.082,
+     "teamBase": 0.085,
+     "tTeam": -1.56,
+     "pass": false
+    },
+    "split": {
+     "vs": "live",
+     "mse": 0.0035,
+     "base": 0.0035,
+     "t": 0.0,
+     "wins": 0,
+     "of": 18,
+     "r": 0.378,
+     "rBase": 0.378,
+     "tR": 0.0,
+     "team": 0.085,
+     "teamBase": 0.085,
+     "tTeam": 0.0,
+     "pass": false
+    },
+    "hpm": {
+     "vs": "live",
+     "mse": 0.003484,
+     "base": 0.0035,
+     "t": -1.39,
+     "wins": 11,
+     "of": 18,
+     "r": 0.385,
+     "rBase": 0.378,
+     "tR": 0.94,
+     "team": 0.09,
+     "teamBase": 0.085,
+     "tTeam": 0.87,
+     "pass": false
+    }
+   },
+   "ship": []
+  },
+  "soccer": {
+   "live": [
+    "holistic",
+    "age",
+    "pos"
+   ],
+   "tests": {
+    "trend": {
+     "vs": "live",
+     "mse": 0.002408,
+     "base": 0.002443,
+     "t": -1.62,
+     "wins": 6,
+     "of": 7,
+     "r": 0.723,
+     "rBase": 0.722,
+     "tR": 0.94,
+     "team": 0.808,
+     "teamBase": 0.808,
+     "tTeam": -0.3,
+     "pass": false
+    },
+    "ageP": {
+     "vs": "live",
+     "mse": 0.002442,
+     "base": 0.002443,
+     "t": -1.15,
+     "wins": 6,
+     "of": 7,
+     "r": 0.722,
+     "rBase": 0.722,
+     "tR": -1.27,
+     "team": 0.808,
+     "teamBase": 0.808,
+     "tTeam": -0.52,
+     "pass": false
+    }
+   },
+   "ship": []
+  }
+ },
+ "topend": {
+  "nba": {
+   "piece": {
+    "team": 0.6865,
+    "val": 0.6894
+   },
+   "lowline": {
+    "team": 0.6921,
+    "val": 0.7348,
+    "tTeam": 0.91,
+    "tVal": 23.52,
+    "winsTeam": 9,
+    "of": 15
+   },
+   "topline": {
+    "team": 0.6993,
+    "val": 0.7946,
+    "tTeam": 1.16,
+    "tVal": 34.53,
+    "winsTeam": 9,
+    "of": 15
+   },
+   "pct": {
+    "team": 0.6813,
+    "val": 0.6898,
+    "tTeam": -0.71,
+    "tVal": 0.13,
+    "winsTeam": 6,
+    "of": 15
+   }
+  },
+  "nhl": {
+   "piece": {
+    "team": 0.3649,
+    "val": 0.5184
+   },
+   "lowline": {
+    "team": 0.3637,
+    "val": 0.5388,
+    "tTeam": -0.09,
+    "tVal": 9.25,
+    "winsTeam": 5,
+    "of": 13
+   },
+   "topline": {
+    "team": 0.377,
+    "val": 0.5499,
+    "tTeam": 0.89,
+    "tVal": 10.92,
+    "winsTeam": 9,
+    "of": 13
+   },
+   "pct": {
+    "team": 0.3534,
+    "val": 0.5281,
+    "tTeam": -2.0,
+    "tVal": 3.71,
+    "winsTeam": 4,
+    "of": 13
+   }
+  }
  }
 }
