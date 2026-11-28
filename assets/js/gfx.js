@@ -338,11 +338,11 @@
 
     // layout
     var n = data.length, groups = n > 34 ? 2 : 1, per = Math.ceil(n / groups);
-    W = n <= 13 ? 2400 : 2160; var portrait = n > 13;
+    var tall = win.hasAttribute('data-gfx-tall'), portrait = n > 13 || tall; W = portrait ? 2160 : 2400;   // data-gfx-tall: a short table on the 4:5 card
     var HEAD = TBAR + 20, SUB = 60, FOOT = 64, PADI = 24;
     var rowTarget = portrait ? (groups === 2 ? 72 : 76) : 80;
     var tableH = (per + 1) * rowTarget;
-    H = portrait ? Math.min(2700, Math.max(1600, 2 * PAD + HEAD + SUB + tableH + 2 * PADI + FOOT)) : 1350;
+    H = tall ? 2700 : portrait ? Math.min(2700, Math.max(1600, 2 * PAD + HEAD + SUB + tableH + 2 * PADI + FOOT)) : 1350;
     var DL = 46, DETH = deals.length ? 40 + 56 + deals.length * DL : 0;   // the trade list's height
     H += DETH;
     var canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
@@ -374,7 +374,7 @@
       });
     }
     g.fillStyle = C.well; g.fillRect(ix, iy, iw, ih); bevel(g, ix, iy, iw, ih, false);
-    var gw = (iw - 2 * PADI - (groups - 1) * 40) / groups, rowH = Math.min(groups === 1 && !portrait ? 92 : 104, (ih - 2 * PADI) / (per + 1));
+    var gw = (iw - 2 * PADI - (groups - 1) * 40) / groups, rowH = Math.min(tall ? 200 : groups === 1 && !portrait ? 92 : 104, (ih - 2 * PADI) / (per + 1));
     var cols = idx.slice(), cdata = data.map(function (r) { return r.slice(); });
     var sum = function (a) { return a.reduce(function (x, y) { return x + y; }, 0); };
     function widths(sz) {

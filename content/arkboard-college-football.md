@@ -92,9 +92,12 @@ cover = "/og/college-football.png"
 {{< lazytab tab="returning" >}}
 {{< cfbreturning title="returning" tab="returning" >}}
 {{< /lazytab >}}
+{{< wintabs tab="all-time FV" tabs="all-time FV,draft classes" sub="true" label="all-time FV views" >}}
 {{< lazytab tab="all-time FV" >}}
 {{< fvalltime sport="cfb" tab="all-time FV" >}}
 {{< /lazytab >}}
+{{< fvclasses sport="cfb" tab="draft classes" >}}
+{{< /wintabs >}}
 {{< lazytab tab="transactions" >}}
 {{< transactions sport="cfb" title="transactions" tab="transactions" >}}
 {{< /lazytab >}}

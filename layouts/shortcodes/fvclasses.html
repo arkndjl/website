@@ -1,0 +1,54 @@
+{{- /* Draft classes ranked by strength (data/fv_classes.json, scripts/fv_classes.py), the all-time FV group.
+       {{< fvclasses sport="cfb|cbb|hockey" tab="draft classes" >}}
+       Top = the class's 10 best draft-day grades, Depth = the next 40, Overall = both (points over FV 40 that grades like
+       them became, fit by grading era); Out top / Out depth / Became = the same on the careers, once the class has an outcome. */ -}}
+{{- $sport := $.Get "sport" -}}
+{{- $icon := index (dict "cfb" "football" "cbb" "basketball" "hockey" "hockey") $sport -}}
+{{- with index site.Data.fv_classes $sport -}}
+{{- $d := . -}}
+{{- $y0 := index .years 0 }}{{ $y1 := index .years 1 -}}
+{{- $span := printf "drafts %v-%s" $y0 (substr (string $y1) 2 2) -}}
+{{- partial "wintable-open.html" (dict "title" (printf "all-time FV :: draft classes %v-%v" $y0 $y1) "icon" $icon "filter" "Class" "tab" ($.Get "tab") "class" "fvcl"
+    "gfxCols" "RK,Class,Best,Overall,Top,Depth,Became,Best career" "gfxMax" "30" "gfxDate" $span "gfxTall" true) -}}
+<table class="cfb__table fvcl">
+  <thead><tr>
+    <th>RK</th><th>Class</th>
+    <th title="the class's best draft-day grade">Best</th>
+    <th class="fvcl__d" data-term="CLASS TOP" title="rank by the class's 10 best draft-day grades, as points over FV 40">Top</th>
+    <th class="fvcl__d" data-term="CLASS DEPTH" title="rank by grades 11-50, as points over FV 40">Depth</th>
+    <th class="fvcl__d cfb__g" data-term="CLASS OVERALL" title="the class's 50 best draft-day grades, as points over FV 40, summed">Overall</th>
+    <th class="fvcl__d cfb__num" title="mean exact FV of the class's 10 best">FV 10</th>
+    <th class="fvcl__d cfb__num" title="players graded 50+ on draft day">50+</th>
+    <th class="fvcl__o" data-term="CLASS BECAME" title="rank by the class's 10 best careers, points over FV 40">Out top</th>
+    <th class="fvcl__o" data-term="CLASS BECAME" title="rank by careers 11-50, points over FV 40">Out depth</th>
+    <th class="fvcl__o cfb__num" data-term="CLASS BECAME" title="the class's 50 best careers, points over FV 40, summed">Became</th>
+    <th class="fvcl__o" title="the class's best career, on the FV scale">Best career</th>
+  </tr></thead>
+  <tbody>
+  {{- range .classes }}
+  <tr>
+    <td class="cfb__rk">{{ .allR }}</td>
+    <td><b>{{ .y }}</b></td>
+    <td class="cfb__name"><span class="fv-chip" data-fv="{{ mul (div (int .bestFv) 5) 5 }}">{{ .bestFv }}</span> {{ .best }}</td>
+    <td class="fvcl__d cfb__num" data-v="{{ sub 0 .topR }}" title="{{ partial "num.html" (slice "%.0f" .top) }} points">#{{ .topR }}</td>
+    <td class="fvcl__d cfb__num" data-v="{{ sub 0 .depR }}" title="{{ partial "num.html" (slice "%.0f" .dep) }} points">#{{ .depR }}</td>
+    <td class="fvcl__d cfb__num" data-v="{{ .all }}"><b>{{ partial "num.html" (slice "%.0f" .all) }}</b></td>
+    <td class="fvcl__d cfb__num" data-v="{{ .fv10 }}">{{ partial "num.html" (slice "%.1f" .fv10) }}</td>
+    <td class="fvcl__d cfb__num">{{ .n50 }}</td>
+    {{- if isset . "oall" }}
+    <td class="fvcl__o cfb__num" data-v="{{ sub 0 .otopR }}" title="{{ partial "num.html" (slice "%.0f" .otop) }} points">#{{ .otopR }}</td>
+    <td class="fvcl__o cfb__num" data-v="{{ sub 0 .odepR }}" title="{{ partial "num.html" (slice "%.0f" .odep) }} points">#{{ .odepR }}</td>
+    <td class="fvcl__o cfb__num" data-v="{{ .oall }}" title="#{{ .oallR }} of the classes with an outcome"><b>{{ partial "num.html" (slice "%.0f" .oall) }}</b></td>
+    <td class="fvcl__o cfb__name"><span class="fv-chip" data-fv="{{ mul (div (int .obestOut) 5) 5 }}">{{ .obestOut }}</span> {{ .obest }}{{ if .prov }} <span class="cfb__dim" title="under 8 seasons since the draft: careers still moving">prov</span>{{ end }}</td>
+    {{- else }}
+    <td class="fvcl__o cfb__dim" data-v="-99">–</td><td class="fvcl__o cfb__dim" data-v="-99">–</td><td class="fvcl__o cfb__dim" data-v="-1">pending</td><td class="fvcl__o cfb__dim">–</td>
+    {{- end }}
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- $g := .gate.adj -}}
+{{- partial "wintable-close.html" (dict "rows" (len .classes) "note" (printf "%s · %d classes, %d with an outcome" $span (len .classes) (len .mature))
+    "about" (printf "Each class is the all-time FV list at its draft, each player at his draft-day grade. Points: what grades like these became over FV 40, fit by grading era, a class with an outcome held out of its own fit. Top: the class's 10 best grades. Depth: grades 11-50. Overall: the 50 best. Became: the same on the careers (the 10 and 50 best, a re-draft); prov = under 8 seasons since the draft. Era check: rank spread across early, middle and late classes H %.2f against the era-blind line %.2f. %s" (float $g.h) (float $g.line)
+      (cond (eq $sport "cfb") "QB, RB, WR, TE, EDGE, DT and LB only (OL, CB and S have no PFN lines before 2024). 2021 had no combine." (cond (eq $sport "hockey") "Rounds 1-2 and every later pick graded 35+; Became also counts later picks who reached 45+." "College players and internationals on the boards; careers through the 2020 draft.")))) -}}
+{{- end -}}

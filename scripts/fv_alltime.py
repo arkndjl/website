@@ -18,6 +18,7 @@ missed the final season and the combine), the other boards at his best season's 
 data/fv_scale.json); fvx is the exact mean, and the check compares it with what the careers became.
 
     python3 scripts/fv_alltime.py [--cfb-rows=<file from cfb_fv_refit.mjs --alltime>] [--cfb-combine] -> data/fv_alltime.json
+(then scripts/fv_classes.py -> data/fv_classes.json, the draft classes ranked on these lists)
 The CFB rows are kept in scripts/data/cfb_alltime_rows.json.gz, so the other boards refresh without the CFB rebuild;
 --cfb-rows and --cfb-combine add each last season's combine (nflverse) to them (cfb_combine).
 """
@@ -314,6 +315,8 @@ def main():
     s = json.dumps(out, separators=(',', ':'), allow_nan=False)
     open(OUT, 'w').write(s)
     print('wrote', OUT, len(s) // 1024, 'KB')
+    import fv_classes   # draft classes ranked on these lists (data/fv_classes.json)
+    fv_classes.main()
 
 
 if __name__ == '__main__':
