@@ -16,6 +16,9 @@ book never bets on news the line didn't have. A game's first row also carries it
 opening numbers (open: {...}); a finished game gets one row {t, id, fin: [home, away]}. The close is a game's last row
 before its start. Unchanged games write nothing, so a row's numbers hold until the next row.
 
+NHL joined Nov 28 2026 (forward logs): its moneyline, puck line and total, with the model's margin and total, had no
+timed archive (the NHL build keeps only the latest line in data/nhl_games.json).
+
 Cadence: the workflow runs every 30 minutes through the US afternoon and evening (UTC 13-04) and a few times
 overnight. The plan asked for 15 minutes near the open and the start; on a private repo that costs about 2,900
 Actions minutes a month, twice the 30-minute schedule, so 30 it is until the minutes allow more.
@@ -29,13 +32,14 @@ import urllib.request
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 DENSE = os.path.join(HERE, 'data', 'odds_dense')
-SPORTS = ('cfb', 'nfl', 'cbb', 'nba')
-ESPN = {'cfb': 'football/college-football', 'nfl': 'football/nfl', 'cbb': 'basketball/mens-college-basketball', 'nba': 'basketball/nba'}
+SPORTS = ('cfb', 'nfl', 'cbb', 'nba', 'nhl')
+ESPN = {'cfb': 'football/college-football', 'nfl': 'football/nfl', 'cbb': 'basketball/mens-college-basketball', 'nba': 'basketball/nba', 'nhl': 'hockey/nhl'}
 # the scoreboard's query per sport: FBS only for college football, all of Division I for college basketball
-QUERY = {'cfb': '&groups=80&limit=400', 'nfl': '&limit=100', 'cbb': '&groups=50&limit=500', 'nba': '&limit=100'}
+QUERY = {'cfb': '&groups=80&limit=400', 'nfl': '&limit=100', 'cbb': '&groups=50&limit=500', 'nba': '&limit=100', 'nhl': '&limit=100'}
 # days around today to read: yesterday for finals, then the next lines that are likely posted
-DAYS = {'cfb': (-1, 6), 'nfl': (-1, 6), 'cbb': (-1, 2), 'nba': (-1, 2)}
-SEASON = {'cfb': (8, 9, 10, 11, 12, 1), 'nfl': (9, 10, 11, 12, 1, 2), 'cbb': (11, 12, 1, 2, 3, 4), 'nba': (10, 11, 12, 1, 2, 3, 4, 5, 6)}
+DAYS = {'cfb': (-1, 6), 'nfl': (-1, 6), 'cbb': (-1, 2), 'nba': (-1, 2), 'nhl': (-1, 2)}
+SEASON = {'cfb': (8, 9, 10, 11, 12, 1), 'nfl': (9, 10, 11, 12, 1, 2), 'cbb': (11, 12, 1, 2, 3, 4), 'nba': (10, 11, 12, 1, 2, 3, 4, 5, 6),
+          'nhl': (10, 11, 12, 1, 2, 3, 4, 5, 6)}
 KEYS = ('L', 'oH', 'oA', 'T', 'oO', 'oU', 'mlH', 'mlA', 'm', 'tm', 'src')
 UA = 'Mozilla/5.0 (arkndjl.net arkboard)'
 

@@ -146,6 +146,11 @@ jobs:
       - name: Injury tags
         continue-on-error: true
         run: python3 scripts/injury_tags.py
+      # forward logs (scripts/snapshots.py): injury statuses as just tagged and news items as first seen, change-only
+      # rows in scripts/data/snaps/{inj,news}/ for point-in-time tests (news timing against line moves, return hazards)
+      - name: Forward logs
+        continue-on-error: true
+        run: python3 scripts/snapshots.py live
       # Games to watch (Standings): the week's best games across sports from the game files, sims and injury tags
       # (scripts/watch_games.py -> data/watch.json; after the injury tags so the stars reflect the newest statuses)
       - name: Games to watch
@@ -167,4 +172,4 @@ jobs:
                scripts/data/odds_novig scripts/data/odds_novig_ladder scripts/data/odds_pm_ladder scripts/data/odds_tp data/novig_ladder_test.json data/novig_paper.json \
                scripts/data/props scripts/data/ledger/derivs_b2_result.json data/props_paper.json data/props_paper_nfl.json data/props_paper_nhl.json data/games_picks_nflprops.json scripts/data/refs \
                data/games_picks_cfb.json data/games_picks_nfl.json data/games_picks_cbb.json data/games_picks_nba.json data/games_picks_tennis.json scripts/data/odds \
-               data/cbb_games.json data/cbb_injuries.json scripts/data/cbb_injury_log
+               data/cbb_games.json data/cbb_injuries.json scripts/data/cbb_injury_log scripts/data/snaps/inj scripts/data/snaps/news
