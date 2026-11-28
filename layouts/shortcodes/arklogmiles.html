@@ -10,7 +10,7 @@
     <thead><tr><th>section</th><th>milestone</th><th title="where it stands now">now</th><th title="share of the way there">to go</th><th title="projected date (the follower ETAs come from the social goal model)">ETA</th></tr></thead>
     <tbody>
     {{- range .next }}
-    <tr><td>{{ .sec }}</td><td{{ with .of }} title="{{ . }}"{{ end }}>{{ .t }}</td><td>{{ lang.FormatNumber 0 .now }}</td>
+    <tr><td>{{ .sec }}</td><td class="miles__t"{{ with .of }} title="{{ . }}"{{ end }}>{{ .t }}</td><td>{{ lang.FormatNumber 0 .now }}</td>
       <td><div class="proc__cell miles__cell"><span class="proc__r"><i style="width:{{ math.Min 100 (math.Round (mul 100 (div (float .now) .goal))) }}%"></i></span><span class="proc__n">{{ lang.FormatNumber 0 (sub .goal .now) }}</span></div></td>
       <td>{{ with .eta }}{{ dateFormat "Jan 2 2006" . }}{{ else }}-{{ end }}</td></tr>
     {{- end }}
@@ -24,7 +24,7 @@
     <thead><tr><th>date</th><th>section</th><th>milestone</th></tr></thead>
     <tbody>
     {{- range .rows }}
-    <tr><td{{ if .est }} title="estimated date"{{ end }}>{{ if .est }}~{{ end }}{{ dateFormat "Jan 2 2006" .d }}</td><td>{{ .sec }}</td><td>{{ .t }}</td></tr>
+    <tr><td{{ if .est }} title="estimated date"{{ end }}>{{ if .est }}~{{ end }}{{ dateFormat "Jan 2 2006" .d }}</td><td>{{ .sec }}</td><td class="miles__t">{{ .t }}</td></tr>
     {{- end }}
     </tbody>
   </table></div>
