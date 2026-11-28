@@ -290,8 +290,8 @@ def plus_scores(rows, by, sp, pool):
 
 
 def components(clients, pros, sp, pool):
-    """per agency: the shipped tendency scores as a total, clients x the shrunk edge (n x sum(v - mu) / ((n + k) x sd)), so the
-    same edge counts for more the more players it covers;
+    """per agency: the shipped tendency scores as the shrunk edge e = sum(v - mu) / ((n + k) x sd), times the clients when e is
+    above zero, so the same edge counts for more the more players it covers and a below-average edge is not multiplied;
     sent = picks the agency had before the draft process; vol = log(1 + clients). score = the mean of the z-scored parts the
     sport uses (shipped tendencies + sent; COMPOSITE)."""
     fs = tendencies(pool); by = defaultdict(list)
@@ -308,7 +308,10 @@ def components(clients, pros, sp, pool):
         for a, l in vals.items():
             # clients x the shrunk edge = n x sum(v - mu) / (n + k), in SDs: one client counts for 1 / (1 + k) of himself,
             # a big roster for close to all of its total
-            out[a][name.lower()] = len(l) * sum(v - mu for v in l) / ((len(l) + k) * sd) if l else 0.0
+            # an edge above the mean counts once per client (volume); one below it counts once, as the shrunk mean, so a big
+            # roster is not charged per player for the depth players every big roster carries (Noah, Nov 28)
+            e = sum(v - mu for v in l) / ((len(l) + k) * sd) if l else 0.0
+            out[a][name.lower()] = e * len(l) if e > 0 else e
     for p in pros: out[canon(p['agency'])]['sent'] = out[canon(p['agency'])].get('sent', 0) + 1
     for a, l in by.items(): out[a]['vol'] = math.log1p(len(l))
     use = [k.lower() for k in shipped(sp)] + ['sent']
