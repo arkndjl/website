@@ -7,7 +7,8 @@ data/post_charts.json {id: {svg, legend}} and placed with {{< postchart "<id>" >
 
 xpm-*: the XPM stabilization post, from data/nba_xpm_stability_research.json and the pXPM shrink fits
 (old k 600 = nba_xpm.SHRINK_K; next-season RMSEs and the new pXPM from scripts/nba_pxpm_research.py).
-cbb-*: the college XPM post, from data/cbb_xpm_research.json."""
+cbb-*: the college XPM post, from data/cbb_xpm_research.json.
+p1-*: Process #1, from the ARKLOG, site stats and LAURSEN_111 social files."""
 import json, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
 import library_build as LB
@@ -69,11 +70,80 @@ def cbb_xpm_charts():
     return out
 
 
+def process1_charts():
+    """p1-*: Process #1 (November 2026), from data/arklog.json, data/site_stats.json and data/laursen_socials.json"""
+    import datetime as dt
+    out = {}
+    a = json.load(open(os.path.join(ROOT, 'data', 'arklog.json')))
+    wk = [w for w in a['weeks'] if '2026-10-26' <= w[0] <= '2026-11-23']
+    lab = lambda d: dt.date.fromisoformat(d).strftime('%b %-d')
+    out['p1-weeks'] = {'legend': ['shipped', 'part shipped', 'failed'], 'svg': LB.chart_svg({
+        'title': 'Tests by week', 'type': 'bar', 'x_label': 'week of', 'y_label': 'tests',
+        'series': [{'points': [{'x': lab(w[0]), 'y': w[1][k]} for w in wk]} for k in ('shipped', 'mixed', 'failed')]})}
+    s = json.load(open(os.path.join(ROOT, 'data', 'site_stats.json')))['days']
+    mo = {}
+    for d, v in s.items():
+        if d >= '2026-06':
+            m = mo.setdefault(d[:7], [0, 0]); m[0] += v.get('pv', 0); m[1] += 1
+    out['p1-traffic'] = {'legend': ['page views a day'], 'svg': LB.chart_svg({
+        'title': 'Page views a day by month', 'type': 'bar', 'x_label': 'month', 'y_label': 'page views',
+        'series': [{'points': [{'x': dt.date.fromisoformat(m + '-01').strftime('%b'), 'y': round(v[0] / v[1])} for m, v in sorted(mo.items())]}]})}
+    rows = json.load(open(os.path.join(ROOT, 'static', 'data', 'arklog.json')))['rows']
+    sec = {}
+    for r in rows:
+        if r['d'][:7] == '2026-11' and r.get('n'):
+            sec[r['sec']] = sec.get(r['sec'], 0) + 1
+    out['p1-sections'] = {'legend': ['merged changes'], 'svg': LB.chart_svg({
+        'title': 'November changes by section', 'type': 'bar', 'x_label': '', 'y_label': 'changes',
+        'series': [{'points': [{'x': {'ARKBOARD': 'ARKBOARD', 'LAURSEN_111': 'LAURSEN', 'ST. CLAIRE': 'ST. CLAIRE'}.get(k, k), 'y': v}
+                               for k, v in sorted(sec.items(), key=lambda t: -t[1])]}]})}
+    ls = json.load(open(os.path.join(ROOT, 'data', 'laursen_socials.json')))['series']
+    day = {}
+    for p in ls:
+        day[dt.datetime.fromtimestamp(p['t'] / 1000, dt.timezone.utc).day] = p
+    nets = [('twitch', 'Twitch'), ('tiktok', 'TikTok'), ('x', 'X'), ('youtube', 'YouTube')]
+    out['p1-laursen'] = {'legend': [n for _, n in nets], 'svg': LB.chart_svg({
+        'title': 'LAURSEN_111 followers by day', 'x_label': 'November', 'y_label': 'followers',
+        'series': [{'points': [{'x': d, 'y': p[k]} for d, p in sorted(day.items()) if p.get(k) is not None]} for k, _ in nets]})}
+    return out
+
+
+def process0_charts():
+    """p0-spec: the house rules as a spec sheet, read from static/style.css (palette tokens, border-radius rules)"""
+    import re
+    css = open(os.path.join(ROOT, 'static', 'style.css')).read()
+    radii = re.findall(r'border-radius:\s*([^;]+);', css)
+    flat = sum(r.strip() in ('0', '0px') for r in radii)
+    sw = [('background', '#4a3b6b'), ('title bar', '#57068c'), ('well', '#3a2d56'), ('frame', '#241a3a'),
+          ('teal', '#7fffd4'), ('lilac', '#c8c7ff'), ('purple', '#b46cff'), ('platinum', '#b9f2ff')]
+    for name, hx in sw:   # every swatch must still be in the stylesheet
+        assert hx.lower() in css.lower(), hx
+    W, H = 336, 200
+    o = [f'<svg class="libchart" viewBox="0 0 {W} {H}" shape-rendering="crispEdges" role="img" aria-label="spec sheet" style="width:100%;max-width:672px">',
+         f'<rect x="0" y="0" width="{W}" height="{H}" fill="#241a3a"/><rect x="2" y="2" width="{W - 4}" height="{H - 4}" fill="#4a3b6b"/>',
+         f'<rect x="4" y="4" width="{W - 8}" height="16" fill="#57068c"/><text x="10" y="16" fill="#fff" font-size="11">spec.exe_</text>']
+    for i, ch in enumerate('_□×'):
+        x = W - 52 + i * 15
+        o.append(f'<rect x="{x}" y="6" width="12" height="12" fill="#c8c7ff"/><text x="{x + 6}" y="16" fill="#241a3a" font-size="10" text-anchor="middle">{ch}</text>')
+    for i, (name, hx) in enumerate(sw):
+        x, y = 12 + (i % 4) * 79, 30 + (i // 4) * 50
+        o.append(f'<rect x="{x}" y="{y}" width="70" height="26" fill="#241a3a"/><rect x="{x + 2}" y="{y + 2}" width="66" height="22" fill="{hx}"/>')
+        o.append(f'<text x="{x}" y="{y + 37}" fill="#c8c7ff" font-size="10">{name}</text><text x="{x}" y="{y + 47}" fill="#7fffd4" font-size="10">{hx}</text>')
+    o.append(f'<rect x="12" y="134" width="312" height="1" fill="#c8c7ff"/>')
+    o.append('<text x="12" y="152" fill="#7fffd4" font-size="12">font  MS PGothic Pixel, one face everywhere</text>')
+    o.append(f'<text x="12" y="170" fill="#7fffd4" font-size="12">corners  border-radius 0 in {flat} of {len(radii)} rules</text>')
+    o.append('<text x="12" y="188" fill="#7fffd4" font-size="12">emoji  0, every icon is pixel art</text>')
+    o.append('</svg>')
+    return {'p0-spec': {'svg': ''.join(o)}}
+
+
 if __name__ == '__main__':
     fn = os.path.join(ROOT, 'data', 'post_charts.json')
     try: allc = json.load(open(fn))
     except (OSError, ValueError): allc = {}
     allc.update(xpm_charts())
     allc.update(cbb_xpm_charts())
+    allc.update(process1_charts())
+    allc.update(process0_charts())
     json.dump(allc, open(fn, 'w'), indent=1)
     print(sorted(allc))
