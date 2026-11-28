@@ -1,9 +1,9 @@
 {
 "asof":"2026-11-28",
-"n":101,
+"n":103,
 "count":{
 "watching":1,
-"waiting":97,
+"waiting":99,
 "shipped":3
 },
 "next":[
@@ -448,6 +448,22 @@
 "was":"Nov 28: not run; the repo holds three seasons of rate history (scripts/data/nfl_rate_hist.json.gz, 2023-25), one usable pair outside the lockbox",
 "trigger":"2026 season finished and a past-season pxp file per season (2016-25 from scripts/nfl_rate_research.py's pull)",
 "gate":"the OVR gate in scripts/research/ovr_nov28/suite.py",
+"due":"2027-02-28",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"nfl_rb_credit",
+"t":"NFL WAR: running backs on their own exchange rate to next season's team margin (the board may credit backs with the line's work)",
+"sp":[
+"NFL"
+],
+"ar":"players",
+"kind":"retest",
+"how":"hand",
+"was":"Nov 28: per-group slopes did not beat one slope (t -.25); RB slope -1.68 (SE 1.14) against 2.09 pooled; RB slope of its own t -1.33, 6 of 9 seasons (a second look, not pre-registered)",
+"trigger":"2026 season finished: one more target season, the RB split scored forward as registered here",
+"gate":"RB slope of its own beats one slope on held-out team margin error, t <= -2",
 "due":"2027-02-28",
 "est":1,
 "state":"waiting"
@@ -978,6 +994,24 @@
 "was":"Nov 28: FV on file for 2011-2024 rookies ranks third-season OVR at Spearman 0.23, the pre-draft rank at 0.42 on the same rows (t -3.94, FV ahead in 2 of 14 classes); not used as an anchor",
 "trigger":"2026-27 finished and point-in-time draft-year FV restated on today's CBB FV model for past classes",
 "gate":"FV ranks third-season OVR at least as well as the pre-draft rank (t > -1) before OVR outcomes are used to set FV tiers",
+"due":"2027-07-04",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"ovr_round2_ideas",
+"t":"OVR round 2 ideas that failed: last season's trend, a separate defense weight, HPM beside pWAR, and minutes a game for NHL D, G and soccer",
+"sp":[
+"NBA",
+"NHL",
+"Soccer"
+],
+"ar":"players",
+"kind":"retest",
+"how":"hand",
+"was":"Nov 28: NBA trend team t 3.24 but value r t -1.02, split worse on rate (t 3.68); NHL F split rate t -3.53 but team t -2.21; D, G and soccer nothing passed",
+"trigger":"2026-27 finished: one more season pair",
+"gate":"the OVR gate against the live form",
 "due":"2027-07-04",
 "est":1,
 "state":"waiting"
