@@ -1279,6 +1279,38 @@
    "trigger": "one more full season in each panel (NFL 2026, NBA and NHL 2026-27, MLS 2026)",
    "gate": "scripts/research/payrolls_nov28/test.py 'eff' form: beats record + payroll held out, t <= -2 and better in most seasons, in any league",
    "run_hint": "python3 scripts/research/payrolls_nov28/test.py"
+  },
+  {
+   "key": "cfb_dev_curve",
+   "t": "CFB player development curve in the team builder (FV by season from class, age and level)",
+   "sp": [
+    "CFB"
+   ],
+   "ar": "teams",
+   "kind": "deferred",
+   "how": "hand",
+   "was": "untestable: no season-by-season FV before the 2025 board",
+   "after": "cfb:champ:2028",
+   "lag": 30,
+   "trigger": "two season-end FV vintages on file (2026 and 2027 boards, scripts/data/snaps board vintages)",
+   "gate": "scripts/research/team_years_nov28/prereg.md D1 form on FV: squared error lower than the class means, t >= 2 clustered by team, every season but one; then the team chain no worse (t > -1)",
+   "run_hint": "python3 scripts/research/team_years_nov28/dev.py (add the CFB vintages)"
+  },
+  {
+   "key": "cbb_dev_curve_chain",
+   "t": "CBB development curve inside the team builder's roster chain",
+   "sp": [
+    "CBB"
+   ],
+   "ar": "teams",
+   "kind": "retest",
+   "how": "hand",
+   "was": "player level passed (k=1 t 6.04, k=2 t 4.75); in the team chain t -1.76 next season, 2.44 and 1.48 at 2 and 3 seasons",
+   "after": "cbb:champ:2027",
+   "lag": 30,
+   "trigger": "the 2026-27 season is out of the lockbox (one more origin)",
+   "gate": "team chain with the curve against the class-mean chain: t > -1 at every horizon and t >= 2 at one",
+   "run_hint": "python3 scripts/research/team_years_nov28/test.py cbb && python3 scripts/research/team_years_nov28/test.py cbb --curve"
   }
  ]
 }

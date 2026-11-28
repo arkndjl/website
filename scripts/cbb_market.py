@@ -649,8 +649,8 @@ def main():
         why = lambda p: 'draft' if (p.get('draft') or 0) >= max(p['pMove'], 0.3) else 'eligibility' if p.get('cls') == 'Sr' and p['pGone'] >= p['pMove'] else 'transfer' if p['pMove'] >= p['pGone'] else 'leaves D-I'
         out_b.append({'t': t, 'id': pw['id'], 'logo': pw.get('logo'), 'conf': pw.get('conf'), 'coach': CO.get(t, {}).get('name'), 'rk': pw['rk'],
                       'budget': money(budget), 'spend': money(spend), 'now': round(pw['rating'], 1), 'ret': round(ark(r_ret), 1), 'after': round(ark(rate(cur)), 1),
-                      'back': [{'name': p['name'], 'pos': p['pos'], 'cls': p.get('cls'), 'fv': p.get('fv'), 'bpm': round(nxt(p), 1), 'p': round(p['pBack'], 2), 'x': p['xnil']} for p in back],
-                      'leave': [{'name': p['name'], 'pos': p['pos'], 'cls': p.get('cls'), 'fv': p.get('fv'), 'why': why(p), 'back': round(p['pBack'], 2), 'tp': round(p['pMove'], 2), 'x': p['xnil']} for p in leave],
+                      'back': [{'name': p['name'], 'pos': p['pos'], 'cls': p.get('cls'), 'fv': p.get('fv'), 'bpm': round(nxt(p), 1), 'p': round(p['pBack'], 2), 'x': p['xnil'], 'mn': round(p['min'], 3), 'age': p.get('age') and round(p['age'], 1)} for p in back],
+                      'leave': [{'name': p['name'], 'pos': p['pos'], 'cls': p.get('cls'), 'fv': p.get('fv'), 'why': why(p), 'back': round(p['pBack'], 2), 'tp': round(p['pMove'], 2), 'x': p['xnil'], 'bpm': round(nxt(p), 1), 'mn': round(p['min'], 3), 'age': p.get('age') and round(p['age'], 1)} for p in leave],
                       'commits': cm, 'plan': plan})
     out_b.sort(key=lambda x: x['rk'])
 
