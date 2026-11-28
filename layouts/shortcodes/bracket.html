@@ -34,7 +34,7 @@
               <b class="bk-s">{{ $s.seed }}</b>
               {{- with $t.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="18" height="18" loading="lazy" onerror="this.style.display='none'">{{ end }}
               <span class="bk-n">{{ $t.a | default $t.n }}</span>
-              <span class="bk-p">{{ if ge $s.p 0.995 }}&gt;99{{ else if lt $s.p 0.005 }}&lt;1{{ else }}{{ partial "num.html" (slice "%.0f" (mul $s.p 100)) }}{{ end }}%</span>
+              <span class="bk-p">{{ if isset $s "sc" }}{{ $s.sc }}{{ else }}{{ if ge $s.p 0.995 }}&gt;99{{ else if lt $s.p 0.005 }}&lt;1{{ else }}{{ partial "num.html" (slice "%.0f" (mul $s.p 100)) }}{{ end }}%{{ end }}</span>
             </div>
             {{- else }}<div class="bk-t bk-t--bye"><span class="bk-n">bye</span></div>{{ end }}{{ end }}
           </div>
@@ -58,7 +58,7 @@
     </div>
   {{- end }}
   </div>
-  <div class="win__status" title="projected seeds: the seeding with the most expected exact seeds across the sims · each game to the side more likely to reach the next round · % = chance to reach that round"><span>{{ lang.FormatNumber 0 $D.sims }} simulated seasons</span><span class="cfb__asof">updated {{ $asof }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status" title="projected seeds: the seeding with the most expected exact seeds across the sims · each game to the side more likely to reach the next round · % = chance to reach that round · a played game shows its score"><span>{{ lang.FormatNumber 0 $D.sims }} simulated seasons</span><span class="cfb__asof">updated {{ $asof }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 
 {{- /* seed odds: every team with a 0.5%+ chance in */ -}}
