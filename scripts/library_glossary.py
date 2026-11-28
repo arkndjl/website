@@ -43,6 +43,23 @@ _AGT = _agt()
 _AGCR = ld('research/agency_composite.json')
 _AGCOMP = ('A check on the 2022-26 search, which is not used: built from the clients on file and the 2022-24 sends, it ranks the %d agencies by the first-round picks they sent in 2025-26 at Spearman %.2f (p %.3f, %d agencies with such a pick). Sends alone %.2f, Deal %.2f, Breakout %.2f, client count %.2f.'
         % (_AGCR['n'], _AGCR['score']['rho'], _AGCR['score']['p'], _AGCR['agencies with a 2025-26 pick'], _AGCR['sent']['rho'], _AGCR['deal']['rho'], _AGCR['breakout']['rho'], _AGCR['vol']['rho']))               # NIL agencies (scripts/agencies.py)
+_OVR = ld('research/ovr_research.json'); _OVF = ld('data/ovr_fit.json')     # OVR (scripts/ovr.py, scripts/research/ovr_nov28)
+def _ovr():
+    R, K = _OVR, _OVF['anchors']
+    t = lambda sp, k, f='t': R[sp]['tests'][k][f]
+    rk = lambda sp: min(R[sp]['rookie']['grid'], key=lambda g: g['mse'])
+    c = R['soccer'].get('combo') or {}
+    return [
+        'Replacement level is 60, the median starter is 75 and the best player in a typical season is 97. Between those points the grade is linear in the rate. Above 97 the upper slope carries on to a cap of 99, and below replacement the lower slope carries on to a floor of 20. The points are set on past seasons (NBA %d-%d, NHL %d-%d, soccer %d-%d) so the scale holds still through a season.' % (tuple(K['nba']['from']) + tuple(K['nhl']['from']) + tuple(K['soccer']['from'])),
+        'The NBA reads pXPM, the NHL pWAR a 60 put on a full season at a starter\'s TOI for his position (F %d, D %d, G %d minutes), the NFL pXP/60, soccer p/90 put on a full season, tennis ARK as log-odds by tour, and CS2 the RWA rating. Putting the NHL and soccer on full seasons first keeps a defenseman and a forward on one scale of wins.' % (K['nhl']['toi']['F'], K['nhl']['toi']['D'], K['nhl']['toi']['G']),
+        'Each idea was tested leaving one season out and scored three ways: next season\'s rate, next season\'s value (rate times playing time), and team results. It was kept only when it was better on one of the three with t of 2 or more and worse on none past 1. In the NBA nothing beat pXPM alone: this season\'s XPM t = %.2f, age t = %.2f, position t = %.2f, and a slope that grows with career minutes lost on team results (t = %.2f). NHL forwards and defensemen take that slope (forwards: value r t = %.2f, team R\u00b2 t = %.2f), goalies take age (t = %.2f), and this season\'s WAR added nothing to the fixed pWAR (forwards t = %.2f). Soccer takes this season\'s SV, age and position: next-season error t = %.2f, team R\u00b2 %.3f to %.3f (t = %.2f), %d of %d seasons.' % (
+            t('nba', 'holistic'), t('nba', 'age'), t('nba', 'pos'), t('nba', 'shrink', 'tTeam'), t('nhlF', 'shrink', 'tR'), t('nhlF', 'shrink', 'tTeam'), t('nhlG', 'age'), t('nhlF', 'holistic'),
+            c.get('t', 0), c.get('teamBase', 0), c.get('team', 0), c.get('tTeam', 0), c.get('wins', 0), c.get('of', 0)),
+        'Starting rookies from their final draft FV, with its weight fading as pro minutes come in, failed in every sport against a plain rookie offset that fades the same way: NBA t = %.2f on next season\'s rate, NHL forwards t = %.2f, soccer t = %.2f. Draft FV explains little of an NBA rookie\'s first season (r = %.2f with his XPM). It is in the retests ledger.' % (
+            rk('nba')['vsOffset']['t'], rk('nhlF')['vsOffset']['t'], rk('soccer')['vsOffset']['t'], R['nba']['rookie']['rFvRate']),
+        'The band is the 80%% range on true talent. With the season\'s noise added it covers %.0f%% (NBA), %.0f%% (NHL forwards) and %.0f%% (soccer) of next-season rates held out. The NBA O and D grades are the grade with the other side at the median starter\'s. Next season\'s offense is read better from this season\'s offense than from the total (error t = %.1f, %d of %d seasons), and defense the same way (t = %.1f).' % (
+            100 * R['nba']['bands']['cover80'], 100 * R['nhlF']['bands']['cover80'], 100 * R['soccer']['bands']['cover80'], R['nba']['sub']['o']['t'], R['nba']['sub']['o']['wins'], R['nba']['sub']['o']['of'], R['nba']['sub']['d']['t']),
+        'The NFL, tennis and CS2 use their tested ratings as they are. The history on hand does not hold enough seasons to rerun these tests for them, so their points come from the current board: replacement is the snap-weighted mean of non-regulars for the NFL, #100 on ARK for tennis and the replacement line for CS2, and the starter is the median regular, #25 on ARK and the median tier-1 player. They are in the retests ledger.']
 _PE = ld('research/payroll_efficiency.json')                 # payroll efficiency held out (scripts/research/payrolls_nov28/test.py)
 def _paytest():
     nm = {'nba': 'NBA', 'nhl': 'NHL', 'nfl': 'NFL', 'mls': 'MLS'}
@@ -231,6 +248,9 @@ sections.append({'id': 'fv', 'title': 'FV and grades', 'entries': [
        'A strong class gets more high grades. Age and the drivers that pass held out move the grade.'],
       'Every prospect board: CFB, CBB, hockey prospects, soccer prospects, tennis prospects; recruit tabs; MLB boards',
       ['CFB', 'CBB', 'Hockey', 'Soccer', 'Tennis', 'MLB']),
+    E('OVR (overall)', 'OVR is a 0-99 grade of a pro player\'s overall skill, read from his sport\'s most predictive rate. It is the pro counterpart of FV.',
+      _ovr(), 'NBA, NFL, NHL projections > OVR; soccer leaders > OVR; tennis ATP / WTA OVR; Counter-Strike RWA leaders > OVR',
+      ['NBA', 'NFL', 'NHL', 'Soccer', 'Tennis', 'CS2']),
     E('Outcome ladder', 'The outcome ladder is the realized result each FV tier stands for, set by how rare it is on each board.',
       ['CFB: the NFL career (All-Pro, Pro Bowl, seasons as a starter), from the 2012-18 drafts.',
        'CBB: peak NBA XPM, as rare as the matching NBA role (7+ All-NBA teams = 80), for careers ending 2008-16.',

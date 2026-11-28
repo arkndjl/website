@@ -18,7 +18,10 @@ cover = "/og/nba.png"
 {{< nbamatchups title="matchups" tab="matchups" >}}
 {{< /lazytab >}}
 {{< /wintabs >}}
+{{< wintabs tab="projections" tabs="projections,OVR" sub="true" label="projections views" >}}
 {{< pctl sport="nba" icon="basketball" title="projections" tab="projections" >}}
+{{< lazytab tab="OVR" >}}{{< ovr sport="nba" title="NBA :: OVR" tab="OVR" >}}{{< /lazytab >}}
+{{< /wintabs >}}
 {{< wintabs tab="payrolls" tabs="payrolls,cap space,contracts" sub="true" label="payrolls views" >}}
 {{< lazytab tab="payrolls" >}}{{< payrolls lg="nba" view="teams" tab="payrolls" >}}{{< /lazytab >}}
 {{< lazytab tab="cap space" >}}{{< payrolls lg="nba" view="space" tab="cap space" >}}{{< /lazytab >}}

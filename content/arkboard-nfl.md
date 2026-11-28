@@ -12,7 +12,10 @@ cover = "/og/nfl.png"
 {{< winpane title="nfl.exe :: 2026" icon="football" sprite="px/hero-football" status="nflverse · PFR AV" class="winpane--art" />}}
 
 {{< wintabs groups="players:leaders,projections,standouts,awards,all-time players,ARKLIST|rosters:depth chart,personnel,transactions|games:games,game table|teams:ARK Ranking,units,team builder,all-time|market:payrolls,free agents,contract value" side="true" label="NFL views" >}}
+{{< wintabs tab="projections" tabs="projections,OVR" sub="true" label="projections views" >}}
 {{< pctl sport="nfl" icon="football" title="projections" tab="projections" >}}
+{{< lazytab tab="OVR" >}}{{< ovr sport="nfl" title="NFL :: OVR" tab="OVR" >}}{{< /lazytab >}}
+{{< /wintabs >}}
 {{< wintabs tab="payrolls" tabs="payrolls,cap space,contracts" sub="true" label="payrolls views" >}}
 {{< lazytab tab="payrolls" >}}{{< payrolls lg="nfl" view="teams" tab="payrolls" >}}{{< /lazytab >}}
 {{< lazytab tab="cap space" >}}{{< payrolls lg="nfl" view="space" tab="cap space" >}}{{< /lazytab >}}

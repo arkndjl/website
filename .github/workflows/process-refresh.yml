@@ -33,6 +33,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
+          python3 scripts/ovr.py        # OVR boards (data/ovr/*.json) from the boards just rebuilt
           python3 scripts/agencies.py   # agency board: client FV / x/y/zNIL from the boards just rebuilt
           python3 scripts/library_glossary.py
           python3 scripts/retests.py --state   # ARKLOG > retests: tests added to the registry since the last retests run
@@ -59,7 +60,7 @@ jobs:
         run: python3 scripts/snapshots.py daily
       - name: Commit if anything changed
         run: |
-          git add data/agencies_board.json data/agency_pros.json static/data/agencies.json research/library.json data/library.json content/arkboard-process.md data/philosophy.json data/milestones.json data/glossary_gfx.json static/data/arklog.json data/arklog.json scripts/data/arklog_prs.json.gz data/retests_state.json scripts/data/snaps data/snapshots.json data/repl_levels.json
+          git add data/ovr data/ovr.json data/agencies_board.json data/agency_pros.json static/data/agencies.json research/library.json data/library.json content/arkboard-process.md data/philosophy.json data/milestones.json data/glossary_gfx.json static/data/arklog.json data/arklog.json scripts/data/arklog_prs.json.gz data/retests_state.json scripts/data/snaps data/snapshots.json data/repl_levels.json
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes
