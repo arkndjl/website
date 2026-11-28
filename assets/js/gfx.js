@@ -4956,13 +4956,14 @@
     // committed by season against this season's cap: pixel columns, the cap a lilac line
     if (!mls) {
       rule('COMMITTED', 'CAP $' + D.cap + 'M');
-      var bh = 360, n = D.years.length, cw = (w - (n - 1) * 40) / n, top = Math.max(D.cap * 1.15, Math.max.apply(null, t.c)), base = y + bh;
+      var bh = 360, n = D.years.length, cw = (w - (n - 1) * 40) / n, top = Math.max(D.cap * 1.15, Math.max.apply(null, t.c)), base = y + 60 + bh;   // 60: the tallest bar's label under the heading
       var capY = Math.round(base - bh * D.cap / top);
       g.fillStyle = C.white; g.fillRect(x, capY, w, 4);
       D.years.forEach(function (yr, i) {
         var bx = Math.round(x + i * (cw + 40)), v = t.c[i] || 0, hh = Math.round(bh * v / top), blocks = Math.max(0, Math.floor(hh / 14));
         for (var k = 0; k < blocks; k++) { g.fillStyle = v > D.cap ? C.down : i === 0 ? C.teal : C.lilac; g.fillRect(bx, base - (k + 1) * 14 + 3, Math.round(cw), 11); }
         g.font = '40px ' + FONT; g.textAlign = 'center'; var lab = v ? v.toFixed(1) : '0', lw2 = g.measureText(lab).width + 20, ly2 = base - blocks * 14 - 30;
+        if (ly2 + 24 > capY - 4 && ly2 - 24 < capY + 8) ly2 = capY - 34;   // a label the cap line would cross sits above it
         g.fillStyle = C.well; g.fillRect(bx + cw / 2 - lw2 / 2, ly2 - 24, lw2, 48); g.fillStyle = C.white; g.fillText(lab, bx + cw / 2, ly2);
         g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(yr, bx + cw / 2, base + 34); g.textAlign = 'left';
       });
