@@ -4796,17 +4796,18 @@
     // left: the name and the numbers
     var ns = 96; g.font = ns + 'px ' + FONT; while (ns > 48 && g.measureText(a.agency).width > lw - 20) { ns -= 4; g.font = ns + 'px ' + FONT; }
     g.fillStyle = C.teal; g.fillText(fit(g, a.agency, lw - 20), x + 10, y + ns * 0.6);
-    var pl = (D.fit && D.fit.plus) || {}, lead = D.fit && D.fit.lead, ldN = lead === 'dealP' ? 'Deal+' : lead === 'breakoutP' ? 'Breakout+' : '';
+    var pl = (D.fit && D.fit.plus) || {}, lead = D.fit && D.fit.lead, ldN = lead === 'agencyP' ? 'Agency+' : lead === 'dealP' ? 'Deal+' : lead === 'breakoutP' ? 'Breakout+' : '';
     var rk = lead ? D.agencies.filter(function (r) { return r[lead] != null && r.agency !== 'Family' && r.agency !== 'None'; }).indexOf(a) : -1;
     g.font = '36px ' + FONT; g.fillStyle = C.lilac;
     g.fillText(fit(g, [rk >= 0 ? '#' + (rk + 1) + ' ' + ldN : '', a.n + ' clients', a.nRec ? a.nRec + (a.nRec === 1 ? ' recruit' : ' recruits') : ''].filter(Boolean).join(' · '), lw - 20), x + 10, y + ns * 1.2 + 20);
     var ty = y + ns * 1.2 + 60, th = Math.round((y + h - ty - 2 * gap) / 3), tw = Math.round((lw - 2 * gap) / 3);
     var pc = function (v) { return v == null ? C.white : v >= 100 ? C.teal : C.down; }, ps = function (v) { return v == null ? '—' : String(v); };
     var T = [];
+    if (pl.agencyP) T.push(['AGENCY+', ps(a.agencyP), pc(a.agencyP)]);
     if (pl.dealP) T.push(['DEAL+', ps(a.dealP), pc(a.dealP)]);
     if (pl.breakoutP) T.push(['BREAKOUT+', ps(a.breakoutP), pc(a.breakoutP)]);
     T.push(['CLIENTS', String(a.n)], ['FV SUM', a.fv == null ? '—' : String(Math.round(a.fv))], ['TOP FV', a.fvTop == null ? '—' : String(Math.round(a.fvTop))],
-      ['ARK', a.ark == null ? '—' : a.ark.toFixed(1)], ['5-STAR+', String(a.ark5 || 0)], ['DRAFTED', String(a.pro || 0)], ['1ST RD', String(a.pro1 || 0)]);
+      ['ARK', a.ark == null ? '—' : a.ark.toFixed(1)], ['5-STAR+', String(a.ark5 || 0)], ['DRAFTED', String(a.pro || 0)]);
     T = T.slice(0, 9);
     T.forEach(function (t, i) { agTile(g, x + (i % 3) * (tw + gap), ty + Math.floor(i / 3) * (th + gap), tw, th, t[0], t[1], t[2]); });
     // right: the clients by FV
@@ -4837,22 +4838,24 @@
     var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, hh = 60, n = R.length, rh = n ? Math.min(96, Math.floor((h - hh - 10) / n)) : 96, fsz = Math.round(rh * 0.46);
     well(g, x, y, w, h);
     var num = [];
-    if (pl.dealP) num.push(['DEAL+', function (r) { return r.dealP == null ? '—' : String(r.dealP); }, function (r) { return r.dealP == null ? C.white : r.dealP >= 100 ? C.teal : C.down; }, 1]);
-    if (pl.breakoutP) num.push(['BREAKOUT+', function (r) { return r.breakoutP == null ? '—' : String(r.breakoutP); }, function (r) { return r.breakoutP == null ? C.white : r.breakoutP >= 100 ? C.teal : C.down; }, !pl.dealP]);
+    var pcol = function (k) { return function (r) { return r[k] == null ? C.white : r[k] >= 100 ? C.teal : C.down; }; }, pv = function (k) { return function (r) { return r[k] == null ? '—' : String(r[k]); }; };
+    if (pl.agencyP) num.push(['AGENCY+', pv('agencyP'), pcol('agencyP'), 1]);
+    if (pl.dealP) num.push(['DEAL+', pv('dealP'), pcol('dealP')]);
+    if (pl.breakoutP) num.push(['BREAKOUT+', pv('breakoutP'), pcol('breakoutP')]);
     num.push(['CLIENTS', function (r) { return String(r.n); }], ['FV SUM', function (r) { return r.fv == null ? '—' : String(Math.round(r.fv)); }],
       ['ARK', function (r) { return r.ark == null ? '—' : r.ark.toFixed(1); }], ['DRAFTED', function (r) { return String(r.pro || 0); }]);
-    var x0 = x + w * 0.38, x1 = x + w * 0.79, step = (x1 - x0) / (num.length - 1 || 1);
+    var x0 = x + w * (num.length > 5 ? 0.33 : 0.38), x1 = x + w * 0.79, step = (x1 - x0) / (num.length - 1 || 1);
     var cols = [['#', x + 30, 'l'], ['AGENCY', x + 110, 'l']];
     num.forEach(function (c, i) { cols.push([c[0], x0 + i * step, 'r']); });
     cols.push(['TOP CLIENTS', x + w * 0.81, 'l']);
-    g.font = '30px ' + FONT; g.fillStyle = C.lilac;
+    g.font = (num.length > 5 ? 26 : 30) + 'px ' + FONT; g.fillStyle = C.lilac;
     cols.forEach(function (c) { g.textAlign = c[2] === 'r' ? 'right' : 'left'; g.fillText(c[0], c[1], y + 38); }); g.textAlign = 'left';
     var logos = await Promise.all(R.map(function (r) { return Promise.all((r.top || []).map(function (p) { return p[3] ? loadImg(p[3]) : null; })); }));
     R.forEach(function (r, k) {
       var cy = y + hh + k * rh + rh / 2;
       g.fillStyle = k % 2 ? 'rgba(200,199,255,0.06)' : 'rgba(0,0,0,0)'; g.fillRect(x + 12, cy - rh / 2, w - 24, rh);
       g.font = fsz + 'px ' + FONT; g.fillStyle = k < 3 ? C.teal : C.lilac; g.fillText(String(k + 1), cols[0][1], cy);
-      g.fillStyle = C.white; g.fillText(fit(g, r.agency, x0 - cols[1][1] - 180), cols[1][1], cy);
+      g.fillStyle = C.white; g.fillText(fit(g, r.agency, x0 - cols[1][1] - 120), cols[1][1], cy);
       g.textAlign = 'right';
       num.forEach(function (c, i) {
         g.font = (c[3] ? Math.round(fsz * 1.15) : fsz) + 'px ' + FONT; g.fillStyle = c[2] ? c[2](r) : C.white; g.fillText(c[1](r), x0 + i * step, cy);

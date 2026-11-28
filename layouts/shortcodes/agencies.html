@@ -38,12 +38,13 @@
 {{- else -}}
 {{- $rows := .agencies -}}
 {{- $pl := $fit.plus | default dict -}}
-{{- $gc := "RK,Agency,Clients,FV sum,ARK" -}}{{- with $pl.breakoutP }}{{ $gc = "RK,Agency,Breakout+,Clients,FV sum,ARK" }}{{ end }}{{- with $pl.dealP }}{{ $gc = replace $gc "Agency," "Agency,Deal+," }}{{ end -}}
+{{- $gc := "RK,Agency,Agency+,Clients,FV sum,ARK" -}}{{- with $pl.breakoutP }}{{ $gc = "RK,Agency,Agency+,Breakout+,Clients,FV sum,ARK" }}{{ end }}{{- with $pl.dealP }}{{ $gc = replace $gc "Agency+," "Agency+,Deal+," }}{{ end -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "agencies") "icon" $icon "filter" "find" "tab" ($.Get "tab") "gfxCols" $gc "gfxDate" $date "gfxMax" "25") -}}
 <p class="agency__bar"><button type="button" class="cfb__btn" data-gfx data-gfx-mode="agencyboard" data-gfx-sport="{{ $sp }}" title="agency board PNG, 16:9">GFX 16:9</button></p>
 <script type="application/json" id="agency-data-{{ $sp }}">{{ dict "sport" $sp "fit" $fit "agencies" $rows "clients" .clients "date" $date | jsonify | safeJS }}</script>
 <table class="cfb__table agency">
   <thead><tr><th>RK</th><th>Agency</th>
+    <th title="Agency+ = 100 + 25 x (c - mean agency c) / SD, c = the mean of the z-scored parts{{ with $pl.agencyP }} ({{ delimit .parts ", " }}){{ end }}. Deal and breakout parts are clients x the shrunk edge, n x sum(v - mu) / (n + k), so an edge counts for more over more players; sent = first-round picks the agency had before the draft process">Agency+</th>
     {{- with $pl.dealP }}<th title="Deal+ = 100 + 25 x (s - mean agency s) / SD, s = (sum + k x mean) / (n + k) of each college client's -zNIL / the sport's zNIL SD, k = {{ .k }}. Above 100 the agency gets its clients paid more than they are worth">Deal+</th>{{ end }}
     {{- with $pl.breakoutP }}<th title="Breakout+ = 100 + 25 x (s - mean agency s) / SD, s = (sum + k x mean) / (n + k) of each college client's FV - the mean FV of board players with his ARK stars and class, k = {{ .k }}. Above 100 its clients play above their high school grade">Breakout+</th>{{ end }}
     <th title="represented players and recruits">Clients</th><th title="college players / recruits">Col / Rec</th>
@@ -57,8 +58,9 @@
   <tr>
     <td class="cfb__rk">{{ if or (eq .agency "Family") (eq .agency "None") }}—{{ else }}{{ add $i 1 }}{{ end }}</td>
     <td class="agency__name"><b>{{ .agency }}</b></td>
-    {{- with $pl.dealP }}<td class="cfb__num is-key" data-l="Deal+" data-v="{{ $a.dealP }}">{{ with $a.dealP }}<b>{{ . }}</b>{{ else }}—{{ end }}</td>{{ end }}
-    {{- with $pl.breakoutP }}<td class="cfb__num{{ if not $pl.dealP }} is-key{{ end }}" data-l="Breakout+" data-v="{{ $a.breakoutP }}">{{ with $a.breakoutP }}{{ . }}{{ else }}—{{ end }}</td>{{ end }}
+    <td class="cfb__num is-key" data-l="Agency+" data-v="{{ .agencyP }}">{{ with .agencyP }}<b>{{ . }}</b>{{ else }}—{{ end }}</td>
+    {{- with $pl.dealP }}<td class="cfb__num" data-l="Deal+" data-v="{{ $a.dealP }}">{{ with $a.dealP }}<b>{{ . }}</b>{{ else }}—{{ end }}</td>{{ end }}
+    {{- with $pl.breakoutP }}<td class="cfb__num" data-l="Breakout+" data-v="{{ $a.breakoutP }}">{{ with $a.breakoutP }}{{ . }}{{ else }}—{{ end }}</td>{{ end }}
     <td class="cfb__num" data-v="{{ .n }}">{{ .n }}</td>
     <td class="cfb__num">{{ .nCol }} / {{ .nRec }}</td>
     <td class="cfb__num" data-v="{{ .fv }}">{{ with .fv }}{{ partial "num.html" (slice "%.0f" .) }}{{ else }}—{{ end }}</td>

@@ -39,7 +39,10 @@ def _agt():
             if t: parts.append('%s r %.2f, p %.3f%s' % (k, t['r'], t['p'], ' (shipped)' if t.get('ship') else ''))
         out.append(nm + ': ' + '; '.join(parts) + '.')
     return ' '.join(out) + ' Situation is growth in FV over last season against players with the same FV and class, Reach is a power conference spot against players with the same FV and position, and Stability is staying at his school against players with the same FV and class.'
-_AGT = _agt()               # NIL agencies (scripts/agencies.py)
+_AGT = _agt()
+_AGCR = ld('research/agency_composite.json')
+_AGCOMP = ('Tested forward: built from the clients on file and the 2022-24 sends, it ranks the %d agencies by the first-round picks they sent in 2025-26 at Spearman %.2f (p %.3f, %d agencies with such a pick). Sends alone %.2f, Deal %.2f, Breakout %.2f, client count %.2f.'
+        % (_AGCR['n'], _AGCR['score']['rho'], _AGCR['score']['p'], _AGCR['agencies with a 2025-26 pick'], _AGCR['sent']['rho'], _AGCR['deal']['rho'], _AGCR['breakout']['rho'], _AGCR['vol']['rho']))               # NIL agencies (scripts/agencies.py)
 _DR = ld('data/dect_fit.json')                             # DECT, declare / even / college / transfer in dollars (scripts/dect.py)
 _TBX = {'cfb': ld('static/data/cfb-builder.json').get('nxFit') or {}, 'cbb': ld('static/data/cbb-builder.json').get('nxFit') or {}}   # scripts/team_builder_next.py
 _DX = {k: ld(f'scripts/research/dect_features_nov27/results_{k}.json') for k in ('ret', 'cbb_move', 'cfb_move')}   # DECT as a feature (failed; scripts/research/dect_features_nov27)
@@ -305,6 +308,7 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
        'Each score is a plus score, 100 + 25 × (s - the mean agency) / SD, so 100 is the average agency. s is the mean over the agency\'s clients pulled toward the mean of every represented client: (sum + k × mean) / (n + k), with k the spread inside agencies over the spread between them (8 or more until eight agencies have three or more clients).',
        'Deal+ uses each college client\'s -zNIL over the sport\'s zNIL SD. Above 100 the agency gets its clients paid more than they are worth. Breakout+ uses FV minus the mean FV of board players with the same ARK stars and class. Above 100 its clients play above their high school grade.',
        'A score is shown only where it held up on a split-half test: each agency\'s clients are split in two at random and the two half means are correlated across agencies, against 300 shuffles of the clients between agencies, and it has to clear p < .05 both weighted by clients and unweighted. ' + _AGT,
+       'Agency+ is the composite. Each part is z-scored across agencies and averaged: Deal and Breakout as a total, clients × the shrunk edge, n × sum(v - mean) / (n + k), so the same edge counts for more the more players it covers, and sent, the first-round picks the agency had before the draft process. A sport uses only the tendency scores that passed, so basketball is sent alone for now. ' + _AGCOMP,
        'Drafted counts clients picked in the NFL or NBA draft who signed with the agency before the draft process began (declaring, or Dec 1 for football and Mar 15 for basketball). It does not count an agency a player signed with to go pro. The 2022-26 drafts are first-round picks from dated sources; from 2027 every pick is recorded on draft day. Pro% is drafted over drafted plus the college clients on file now.',
        'Recruits count toward talent (FV, ARK stars) only. Low-confidence rows count toward talent only.',
        f'On file now: {len(_AGY["cfb"]["clients"])} football and {len(_AGY["cbb"]["clients"])} basketball players and recruits, {len(_AGY["cfb"]["agencies"])} and {len(_AGY["cbb"]["agencies"])} agencies.'],
