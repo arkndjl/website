@@ -427,6 +427,24 @@ def sport_of(t, rows, asked):
     return asked
 
 
+def one_sport(out, pools):
+    """a headline under both sports: each run asks both sports' queries and a headline the rules can't place stays with
+    the sport that asked it, so over several runs it lands in both (Amaya Manuel, a women's basketball recruit, under
+    cfb and cbb). It goes to the sport sport_of names, or to neither when it names none (no board has him or her)"""
+    ts = [{r['t'] for r in out[s] if r.get('t') and r.get('k') != 'nil'} for s in ('cfb', 'cbb')]
+    for t in ts[0] & ts[1]:
+        cb = any(r.get('t') == t and r.get('k') == 'cb' for s in ('cfb', 'cbb') for r in out[s])
+        rows = {s: (parse_cb if cb else parse)(t, p) for s, p in pools.items()}
+        s = sport_of(t, {x: (v[0] if v else None) for x, v in rows.items()}, None)
+        if s is None:       # else the one sport where his other headlines are (Yoshawn Hudson: "4-star RB ... commits to Tulane")
+            n = next((r['n'] for sp in ('cfb', 'cbb') for r in out[sp] if r.get('t') == t), None)
+            other = [sp for sp in ('cfb', 'cbb') if any(r.get('t') != t and r.get('t') not in ts[0] & ts[1] and names.same(r['n'], n) for r in out[sp])]
+            s = other[0] if len(other) == 1 else None
+        for sp in ('cfb', 'cbb'):
+            if sp != s: out[sp] = [r for r in out[sp] if r.get('t') != t]
+    return out
+
+
 def pull(today, days=7):
     pools = {s: Pool(s) for s in SPORT_WORD}
     since = (today - dt.timedelta(days=days + 3)).isoformat()
@@ -507,9 +525,10 @@ def main():
     out = {'asof': dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}
     days = int(sys.argv[sys.argv.index('--days') + 1]) if '--days' in sys.argv else 7
     pulled = pull(today, days)
+    pools = {}
     for sport in ('cfb', 'cbb'):
         new = pulled[sport]
-        pool = Pool(sport)       # earlier rows read again with today's patterns (a fixed false match drops out)
+        pool = pools[sport] = Pool(sport)       # earlier rows read again with today's patterns (a fixed false match drops out)
         kept = []
         for r in old.get(sport) or []:
             if r.get('d', '') < cut: continue
@@ -569,6 +588,7 @@ def main():
         rows.sort(key=lambda r: (r['d'], r['n']), reverse=True)
         out[sport] = [{k: v for k, v in r.items() if v is not None} for r in rows]
         print(f'{sport}: {len(new)} moves pulled, {len(rows)} kept', file=sys.stderr)
+    one_sport(out, pools)
     if not (out['cfb'] or out['cbb']) and (old.get('cfb') or old.get('cbb')):
         sys.exit('recruit news: nothing parsed, keeping the old file')
     with open(OUT, 'w', encoding='utf-8') as f:
@@ -648,7 +668,17 @@ def _test():
               [{'n': 'D.J. Jacobs', 'k': 'decommit', 'fr': 'Ohio State', 'd': '2026-11-26', 'src': {'on3': 'y'}, '_v': {'2026-11-26': 3}}], kept=True)
     if k[0]['d'] != '2026-11-26':
         bad += 1; print('FAIL fresh date', k)
-    print(f'{len(cases) + 5 - bad}/{len(cases) + 5} ok')
+    q = P(); q.sport = 'cbb'; q.rows = []; q.by = {}
+    t1, t2 = 'Top 2027 recruit Amaya Manuel commits to Tennessee', 'Five-star Cayden Daughtry commits to Arkansas'
+    o = {s: [{'n': n, 'k': 'commit', 'to': to, 't': t, 'd': '2026-11-11'} for n, to, t in (('Amaya Manuel', 'Tennessee', t1), ('Cayden Daughtry', 'Arkansas', t2))]
+         for s in ('cfb', 'cbb')}
+    t3 = 'Yoshawn Hudson decommits from Mississippi State'
+    for s in ('cfb', 'cbb'): o[s].append({'n': 'Yoshawn Hudson', 'k': 'decommit', 'fr': 'Mississippi State', 't': t3, 'd': '2026-11-17'})
+    o['cfb'].append({'n': 'Yoshawn Hudson', 'k': 'commit', 'to': 'Tulane', 't': '4-star RB Yoshawn Hudson commits to Tulane', 'd': '2026-11-23'})
+    one_sport(o, {'cfb': p, 'cbb': q})
+    if [r['n'] for r in o['cfb']] != ['Cayden Daughtry', 'Yoshawn Hudson', 'Yoshawn Hudson'] or o['cbb']:
+        bad += 1; print('FAIL both sports', o)
+    print(f'{len(cases) + 6 - bad}/{len(cases) + 6} ok')
     sys.exit(1 if bad else 0)
 
 
