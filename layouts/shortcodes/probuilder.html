@@ -92,6 +92,42 @@
         return '<tr><td>' + k[0] + '</td><td class="cfb__num">' + k[1] + '</td><td class="cfb__team">' + (f ? logo(f.logo) : '') + '<span>' + esc(k[2]) + (k[2] === t.tm ? '' : '') + '</span>' + (k[3] ? ' <span class="cfb__dim" title="conditions on the pick">cond</span>' : '') + '</td><td class="cfb__num">' + (k[4] || '') + '</td><td class="cfb__num is-key">' + m(k[5]) + '</td></tr>'; }).join('') +
       '</tbody></table></div>';
   }
+  // every column sorts (board rule, Nov 28 2026): a header click sorts the rows by it, a second click flips; numbers
+  // high first, words A-Z; blanks last either way. The pick holds across teams and panes with the same table
+  var SORT = {};
+  function cellVal(td) {
+    if (!td) return null;
+    var v = td.getAttribute('data-v'); if (v != null && v !== '') return +v;
+    var s = td.textContent.replace(/[−–]/g, '-').trim(); if (!s || s === '—' || s === '-') return null;
+    var n = s.replace(/^\+/, '').replace(/^(-?)\$/, '$1').replace(/M.*$/, '').replace(/,/g, '');
+    var m0 = n.match(/^-?\d*\.?\d+/);   // a cap hit with an option tag after it (30.0PO) reads as its number
+    return m0 ? +m0[0] : s.toLowerCase();
+  }
+  function sortable(tb) {
+    if (!tb) return;
+    var ths = [].slice.call(tb.tHead.rows[0].cells), id = tab === 'picks' ? 'picks' : 'roster';
+    function apply() {
+      var st = SORT[id]; ths.forEach(function (th, i) { th.removeAttribute('aria-sort'); if (st && st.i === i) th.setAttribute('aria-sort', st.d > 0 ? 'ascending' : 'descending'); });
+      if (!st) return;
+      var rows = [].slice.call(tb.tBodies[0].rows).map(function (r, k) { return [r, cellVal(r.cells[st.i]), k]; });
+      rows.sort(function (a, b) {
+        if (a[1] == null || b[1] == null) return a[1] == null && b[1] == null ? a[2] - b[2] : a[1] == null ? 1 : -1;
+        var c = typeof a[1] === 'number' && typeof b[1] === 'number' ? a[1] - b[1] : String(a[1]).localeCompare(String(b[1]));
+        return c * st.d || a[2] - b[2];
+      });
+      rows.forEach(function (r) { tb.tBodies[0].appendChild(r[0]); });
+    }
+    ths.forEach(function (th, i) {
+      th.setAttribute('data-sort', 'c' + i); th.tabIndex = 0; th.style.cursor = 'pointer';
+      function go() {
+        var st = SORT[id], first = cellVal([].slice.call(tb.tBodies[0].rows).map(function (r) { return r.cells[i]; }).filter(function (c) { return cellVal(c) != null; })[0]);
+        SORT[id] = st && st.i === i ? { i: i, d: -st.d } : { i: i, d: typeof first === 'number' ? -1 : 1 };
+        apply();
+      }
+      th.addEventListener('click', go); th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+    });
+    apply();
+  }
   function render() {
     var t = team(), P = players(t), body = win.querySelector('[data-pb-body]');
     var TABS = [['roster', 'contracts', P.length], ['depth', 'depth chart', ''], ['expiring', 'expiring', P.filter(function (p) { return p.left <= 1; }).length], ['picks', 'picks', t.picks.length]];
@@ -99,6 +135,7 @@
     body.innerHTML = board(t, P) +
       '<div class="tbx__tabs" role="tablist">' + TABS.map(function (x) { return '<button type="button" class="tbx__tab" role="tab" data-pb-tab="' + x[0] + '" aria-selected="' + (tab === x[0]) + '">' + x[1] + (x[2] !== '' ? '<i>' + x[2] + '</i>' : '') + '</button>'; }).join('') + '</div>' +
       '<div class="tbx__pane">' + pane + '</div>';
+    sortable(body.querySelector('.tbx__pane table'));
     window.__arkPro = window.__arkPro || {}; window.__arkPro[LG] = { D: D, t: t, P: P };
     win.querySelector('[data-pb-status]').textContent = D.label + ' · ' + (D.src || '') + ' · picks: ' + (D.pickSrc || '');
     if (window.__arkTerms && window.__arkTerms.scan) window.__arkTerms.scan(body);
