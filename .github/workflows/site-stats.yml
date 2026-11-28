@@ -35,9 +35,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BACKFILL_DAYS: ${{ inputs.backfill || '7' }}
         run: python3 scripts/site_stats.py
+      - name: Article views and favorites   # the Worker's /api/posts counts, sampled for ARKLOG milestones
+        run: python3 scripts/post_stats.py
       - name: Commit if anything changed
         run: |
-          git add data/site_stats.json
+          git add data/site_stats.json data/post_stats.json
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes

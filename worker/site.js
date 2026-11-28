@@ -1,4 +1,5 @@
-// Site worker: static assets (public/) plus /api/plays, the ST. CLAIRE song play counter, and /api/photo (On3 recruit photos).
+// Site worker: static assets (public/) plus /api/plays, the ST. CLAIRE song play counter, /api/posts (article views and
+// favorites, PostStats below) and /api/photo (On3 recruit photos).
 // Only /api/* runs this code (run_worker_first in wrangler.toml); every other path is served straight from assets.
 //   GET  /api/plays          -> {"ambro_sia": 12, "PHOENiX": 9}
 //   POST /api/plays/<slug>   -> {"slug": "...", "plays": 13, "counted": true}
@@ -83,6 +84,7 @@ export default {
       return json(await supporters(request, env), 200, { "cache-control": "public, max-age=60" });
     }
     if (url.pathname.startsWith("/api/photo/")) return photo(url, request);
+    if (url.pathname.replace(/\/+$/, "") === "/api/posts" || url.pathname.startsWith("/api/posts/")) return posts(url, request, env);
     if (!url.pathname.startsWith("/api/plays")) return env.ASSETS.fetch(request);
     const stub = env.PLAYS.get(env.PLAYS.idFromName("stclaire"));
     const rest = url.pathname.slice("/api/plays".length).replace(/^\/+|\/+$/g, "");
@@ -112,6 +114,98 @@ export default {
     return json({ slug: rest, ...out });
   },
 };
+
+// /api/posts: article views and favorites (layouts/partials/poststats.html, assets/js/poststats.js).
+//   GET  /api/posts                    -> {"introducing-xpm": {"v": 412, "f": 9}, ...}
+//   POST /api/posts/<slug>/view        -> {"v", "f", "counted"}: one view per visitor (hashed IP + user agent, salted per
+//                                         day) per article per day, at most 60 a visitor a day, bots and other origins skipped
+//   POST /api/posts/<slug>/fav {id, on} -> {"v", "f", "on"}: id is the browser's own random id (local storage), so one
+//                                         favorite per browser and taking it back works on any later day; per IP a day at
+//                                         most 5 favorites of one article and 40 favorite clicks in all
+// <slug> must be a page at /posts/<slug>/. scripts/post_stats.py reads the GET into data/post_stats.json for milestones.
+const POST_ID = /^[a-f0-9]{16,32}$/;
+
+async function ipDay(request) {
+  const ip = request.headers.get("cf-connecting-ip") || "0";
+  const day = new Date().toISOString().slice(0, 10);
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`fav|${day}|${ip}`));
+  return [...new Uint8Array(buf).slice(0, 12)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function posts(url, request, env) {
+  const stub = env.POSTS.get(env.POSTS.idFromName("posts"));
+  const parts = url.pathname.slice("/api/posts".length).replace(/^\/+|\/+$/g, "").split("/");
+  if (request.method === "GET" && !parts[0]) return json(await stub.all(), 200, { "cache-control": "public, max-age=30" });
+  if (request.method !== "POST") return json({ error: "method" }, 405, { allow: "GET, POST" });
+  const [slug, act] = parts;
+  if (parts.length !== 2 || !SLUG.test(slug) || (act !== "view" && act !== "fav")) return json({ error: "path" }, 400);
+  const origin = request.headers.get("origin");
+  let originHost = "";
+  try { originHost = origin ? new URL(origin).host : ""; } catch { originHost = ""; }
+  if (!origin || originHost !== url.host) return json({ error: "origin" }, 403);
+  const page = await env.ASSETS.fetch(new Request(new URL(`/posts/${slug}/`, url), { method: "HEAD" }));
+  if (!page.ok) return json({ error: "unknown post" }, 404);
+  const bot = looksLikeBot(request.headers.get("user-agent"));
+  const now = Date.now();
+  if (act === "view") {
+    if (bot) return json({ ...(await stub.one(slug)), counted: false });
+    return json(await stub.view(slug, await visitorKey(request), now));
+  }
+  let body = {};
+  try { body = await request.json(); } catch { body = {}; }
+  const id = String(body.id || "");
+  if (!POST_ID.test(id) || bot) return json({ error: "id" }, 400);
+  return json(await stub.fav(slug, id, body.on !== false, await ipDay(request), now));
+}
+
+export class PostStats extends DurableObject {
+  constructor(ctx, env) {
+    super(ctx, env);
+    this.sql = ctx.storage.sql;
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS views (slug TEXT PRIMARY KEY, n INTEGER NOT NULL DEFAULT 0)`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS seen (who TEXT NOT NULL, slug TEXT NOT NULL, t INTEGER NOT NULL, PRIMARY KEY (who, slug))`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS favs (id TEXT NOT NULL, slug TEXT NOT NULL, t INTEGER NOT NULL, PRIMARY KEY (id, slug))`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS clicks (ip TEXT NOT NULL, slug TEXT NOT NULL, add_ INTEGER NOT NULL, t INTEGER NOT NULL)`);
+    this.sql.exec(`CREATE INDEX IF NOT EXISTS clicks_ip ON clicks (ip)`);
+    this.sql.exec(`CREATE INDEX IF NOT EXISTS favs_slug ON favs (slug)`);
+  }
+
+  all() {
+    const out = {};
+    for (const r of this.sql.exec(`SELECT slug, n FROM views`)) out[r.slug] = { v: r.n, f: 0 };
+    for (const r of this.sql.exec(`SELECT slug, COUNT(*) AS c FROM favs GROUP BY slug`)) (out[r.slug] ||= { v: 0, f: 0 }).f = r.c;
+    return out;
+  }
+
+  one(slug) {
+    const v = this.sql.exec(`SELECT n FROM views WHERE slug = ?`, slug).toArray()[0];
+    const f = this.sql.exec(`SELECT COUNT(*) AS c FROM favs WHERE slug = ?`, slug).toArray()[0];
+    return { v: v ? v.n : 0, f: f ? f.c : 0 };
+  }
+
+  view(slug, who, now) {
+    // the visitor key changes at midnight UTC, so a day's rows are all that is kept
+    this.sql.exec(`DELETE FROM seen WHERE t < ?`, now - 26 * 3600 * 1000);
+    const mine = this.sql.exec(`SELECT slug FROM seen WHERE who = ?`, who).toArray();
+    if (mine.some((r) => r.slug === slug) || mine.length >= 60) return { ...this.one(slug), counted: false };
+    this.sql.exec(`INSERT INTO seen (who, slug, t) VALUES (?, ?, ?)`, who, slug, now);
+    this.sql.exec(`INSERT INTO views (slug, n) VALUES (?, 1) ON CONFLICT(slug) DO UPDATE SET n = n + 1`, slug);
+    return { ...this.one(slug), counted: true };
+  }
+
+  fav(slug, id, on, ip, now) {
+    this.sql.exec(`DELETE FROM clicks WHERE t < ?`, now - 26 * 3600 * 1000);
+    const has = this.sql.exec(`SELECT 1 FROM favs WHERE id = ? AND slug = ?`, id, slug).toArray().length > 0;
+    if (has === on) return { ...this.one(slug), on };
+    const c = this.sql.exec(`SELECT slug, add_ FROM clicks WHERE ip = ?`, ip).toArray();
+    if (on && (c.length >= 40 || c.filter((r) => r.slug === slug && r.add_).length >= 5)) return { ...this.one(slug), on: false, limited: true };
+    if (!on && c.length >= 40) return { ...this.one(slug), on: true, limited: true };
+    this.sql.exec(`INSERT INTO clicks (ip, slug, add_, t) VALUES (?, ?, ?, ?)`, ip, slug, on ? 1 : 0, now);
+    if (on) this.sql.exec(`INSERT INTO favs (id, slug, t) VALUES (?, ?, ?)`, id, slug, now);
+    else this.sql.exec(`DELETE FROM favs WHERE id = ? AND slug = ?`, id, slug);
+    return { ...this.one(slug), on };
+  }
+}
 
 // Ko-fi webhook (Ko-fi Settings > API > Webhook URL = https://arkndjl.net/api/kofi). Ko-fi posts form data
 // with one field, data = JSON {verification_token, message_id, kofi_transaction_id, from_name, amount, currency,

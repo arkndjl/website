@@ -9,6 +9,8 @@ in the repo and written to data/milestones.json (layouts/shortcodes/arklogmiles.
               began the post's own time is the start and the date is an estimate). Post views are not tracked (Noah, Nov 28)
   site        the first day over 250, 500, 1,000, 1,500 and 2,000 page views or visitors, and total page views and
               visitors passing round numbers (data/site_stats.json days)
+  articles    the first article to pass 100, 250, 500, 1k, 2.5k, 5k and 10k views and 5, 10, 25, 50 and 100 favorites
+              (data/post_stats.json, scripts/post_stats.py samples of the Worker's /api/posts counts)
   ARKLOG      total changes and tests passing round numbers (static/data/arklog.json rows)
   next        each account's next follower goal with its ETA (goals.next), and the next round number for the rest
 
@@ -36,6 +38,8 @@ LIKES = [25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]
 REPOSTS = [5, 10, 25, 50, 100, 250, 500, 1000]
 DAY = [250, 500, 1000, 1500, 2000, 2500, 5000, 10000]
 TOTAL = [1000, 5000, 10000, 25000, 50000, 75000, 100000, 150000, 200000, 250000, 500000, 1000000]
+ART_V = [100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000]
+ART_F = [5, 10, 25, 50, 100, 250, 500, 1000]
 LOG_CH = [100, 250, 500, 1000, 1500, 2000, 2500, 5000]
 LOG_T = [50, 100, 250, 500, 750, 1000]
 
@@ -150,6 +154,23 @@ def site(rows, nxt):
         del avg
 
 
+def articles(rows, nxt):
+    f = ROOT / 'data/post_stats.json'
+    if not f.exists():
+        return
+    ps = (json.loads(f.read_text()).get('posts') or {}).values()
+    for i, ths, lab in ((1, ART_V, 'views'), (2, ART_F, 'favorites')):
+        items = [(p['t'], [[h[0], h[i]] for h in p.get('h') or []]) for p in ps if p.get('h')]
+        for th, (name, t, by) in first_cross(items, ths):
+            rows.append({'d': day(t), 'sec': 'site', 'k': lab, 'est': by, 't': f'First article over {n(th)} {lab}: {name}'})
+        if items:
+            top = max(items, key=lambda it: it[1][-1][1])
+            up = next((th for th in ths if th > top[1][-1][1]), None)
+            if up:
+                nxt.append({'sec': 'site', 't': f'article: {n(up)} {lab}', 'now': top[1][-1][1], 'goal': up,
+                            'eta': None, 'p': None, 'of': top[0]})
+
+
 def arklog(rows, nxt):
     f = ROOT / 'static/data/arklog.json'
     if not f.exists():
@@ -176,6 +197,7 @@ def main():
     rows, nxt = [], []
     social(rows, nxt)
     site(rows, nxt)
+    articles(rows, nxt)
     arklog(rows, nxt)
     rows.sort(key=lambda r: (r['d'], r['t']), reverse=True)
     nxt.sort(key=lambda x: (x['eta'] or '9999', -x['now'] / x['goal']))
