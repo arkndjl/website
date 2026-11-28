@@ -5826,3 +5826,20 @@ td.tbx__pc { background: rgba(127, 255, 212, calc(var(--a) * .32)); }
 .tbx__rg small { display: block; color: #8a7cc4; font-size: 10px; }
 .tbx__rc.is-deep { background: #1a1238; }
 .tbx__rc--tgt { border-style: dotted; border-color: #40e0d0; } .tbx__rc--tgt em { background: #40e0d0; color: #12082b; }
+/* pro team builder: timeline window, core tag, trade fits, need heatmap, depth starters */
+.pb__head { display: flex; align-items: center; gap: 8px; margin: 10px 0 0; font-size: 1.2em; }
+.pb__mode { font-size: 0.62em; padding: 0 5px; letter-spacing: 0.1em; text-transform: uppercase; color: #241a3a; background: #c0b0ff; }
+.pb__mode--now { background: #7fffd4; } .pb__mode--rebuild { background: #ff9ec7; }
+.pb__core { display: inline-block; padding: 0 3px; font-size: 0.68em; line-height: 1.35; letter-spacing: 0.06em; text-transform: uppercase; color: #241a3a; background: linear-gradient(135deg, #f4f2ff, #c9c6e6 55%, #ffffff); vertical-align: 1px; cursor: help; }
+.pb__table td.pb__win, .pb__table th.pb__win { background: color-mix(in srgb, #7fffd4 16%, transparent); }
+.pb__tl th[scope="row"] { text-align: left; font-weight: normal; color: #c0b0ff; white-space: nowrap; }
+.pb__fit { display: inline-flex; align-items: center; gap: 2px; margin-right: 6px; font: inherit; font-size: 0.85em; color: inherit; background: none; border: 0; padding: 0; white-space: nowrap; }
+button.pb__fit { cursor: pointer; text-decoration: underline dotted; }
+.pb__fit .cfb__logo { width: 14px; height: 14px; }
+.pb__heat { background: color-mix(in srgb, var(--h, transparent) 45%, transparent); }
+.pb__man { display: flex; flex-direction: column; gap: 1px; }
+.pb__man--st .pb__mn { color: #fff; }
+.pb__mm { display: flex; align-items: center; gap: 6px; font-size: 0.9em; }
+.pb__lnk { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline dotted; }
+.pb__sel { font: inherit; font-size: 0.85em; color: var(--foreground); background: var(--win-well); border: 1px solid #4a3a7a; }
+.pb__signed { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0; }

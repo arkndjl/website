@@ -494,7 +494,7 @@ def live(year, board, rows):
                     'age': round(age, 2) if age else None, 'gp': int(p['gp']), 'pts': int(p['pts']),
                     'pm': int(p['pm']) if p.get('pm') is not None else None, 'pim': int(p['pim']) if p.get('pim') is not None else None,
                     'prevLine': int(q['prev'] is not None),
-                    'nhle': round(82 * H.nhle_of(p['lg']) * p['pts'] / p['gp'], 1) if p['gp'] else None,
+                    **H.nhle_show(82 * H.nhle_of(p['lg']) * p['pts'] / p['gp'] if p['gp'] else None, f['nhle'] * 10, p['gp']),
                     'xslot': None, 'fvx': round(x, 2), 'fv': FS.fv_of('hockey', x), **odds,
                     'parts': sorted(parts, key=lambda q: -abs(q[1])), 'prov': 1})
     out.sort(key=lambda r: -r['fvx'])

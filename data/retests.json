@@ -1437,7 +1437,14 @@
    "lag": 30,
    "trigger": "the 2026-27 season in the NBA payroll panel (one more decision year with three seasons seen)",
    "gate": "scripts/research/pro_builder_nov28/verdicts.py: agedp beats carry and last on right calls, paired t >= 2 and most seasons",
-   "run_hint": "python3 scripts/research/pro_builder_nov28/verdicts.py nba"
+   "run_hint": "python3 scripts/research/pro_builder_nov28/verdicts.py nba",
+   "result": {
+    "d": "2026-11-28",
+    "v": "s",
+    "e": "superseded: verdicts against the replacement line at his position, right calls .648 to .679 against carry",
+    "tt": 2.82,
+    "pr": 1398
+   }
   },
   {
    "key": "builder_verdict_market_line",
@@ -1454,7 +1461,71 @@
    "lag": 30,
    "trigger": "one more full season in each panel (NFL 2026, NBA 2026-27)",
    "gate": "verdicts.py 'market': agedp beats carry and last, paired t >= 2 and most seasons",
-   "run_hint": "python3 scripts/research/pro_builder_nov28/verdicts.py nfl nba"
+   "run_hint": "python3 scripts/research/pro_builder_nov28/verdicts.py nfl nba",
+   "result": {
+    "d": "2026-11-28",
+    "v": "s",
+    "e": "replacement line by position: NFL right calls .551 to .613 (t 5.38, by position t 2.37), NBA .648 to .679 (t 2.82, pooled line)",
+    "tt": 5.38,
+    "pr": 1398
+   }
+  },
+  {
+   "key": "builder_verdict_nhl_replacement",
+   "t": "Pro team builder: NHL verdicts against the replacement line at his position (F / D / G) in place of the priced projection against his pay",
+   "sp": [
+    "NHL"
+   ],
+   "ar": "teams",
+   "kind": "retest",
+   "how": "hand",
+   "was": "Nov 28: right calls .616 against .599 carrying the season forward, t 1.88, 5 of 8 seasons (passed NFL t 5.38, NBA t 2.82)",
+   "after": "nhl:champ:2027",
+   "lag": 30,
+   "trigger": "the 2026-27 season in the NHL payroll panel",
+   "gate": "replace.py: agedp beats carry, paired t >= 2 and most seasons",
+   "run_hint": "python3 scripts/research/pro_builder_nov28/replace.py nhl",
+   "result": {
+    "d": "2026-11-28",
+    "v": "s",
+    "e": "line on deals with a new team: right calls .599 to .622 against carry, by position t 2.29",
+    "tt": 2.69,
+    "pr": 1398
+   }
+  },
+  {
+   "key": "builder_verdict_nba_market",
+   "t": "Pro team builder: NBA replacement line fit only on deals that came with a new team (the market a team can buy) in place of every new deal",
+   "sp": [
+    "NBA"
+   ],
+   "ar": "teams",
+   "kind": "retest",
+   "how": "hand",
+   "was": "Nov 28: right calls .668 against .652 carrying the season forward, t 1.38, 4 of 6 seasons (passed NFL t 3.18, NHL t 2.69)",
+   "after": "nba:champ:2027",
+   "lag": 30,
+   "trigger": "the 2026-27 season in the NBA payroll panel",
+   "gate": "replace.py LINE=moved: agedp beats carry, paired t >= 2 and most seasons",
+   "run_hint": "LINE=moved python3 scripts/research/pro_builder_nov28/replace.py nba"
+  },
+  {
+   "key": "builder_future_score",
+   "t": "Pro team builder: future score (age curve times stay rate on every player, summed) against win share over the next three seasons",
+   "sp": [
+    "NBA",
+    "NHL",
+    "NFL"
+   ],
+   "ar": "teams",
+   "kind": "retest",
+   "how": "hand",
+   "was": "Nov 28: failed all three against last season's record (NBA t -1.58, NHL t 3.47, NFL t 3.68); stay rate by pay tier failed too",
+   "after": "nba:champ:2027",
+   "lag": 30,
+   "trigger": "one more full season in each payroll panel, and a pick and cap room history if one is built",
+   "gate": "future.py: roster or roster+ beats now and carry on absolute error, paired t <= -2 and most seasons",
+   "run_hint": "python3 scripts/research/pro_builder_nov28/future.py"
   },
   {
    "key": "builder_dev_projection",
@@ -1505,6 +1576,55 @@
    "est": 1,
    "trigger": "2026-27 weekly board vintages in scripts/data/snaps (pwar, pw0, toi, war by week)",
    "gate": "rest-of-season WAR a 60 by week: calibrated pWAR beats the raw rate (pw0, from hpm less the file's replacement) on minutes-weighted error, paired t <= -2, calibration slope .8-1.2 by WAR decile; refit the in-season form by season share if it fails"
+  },
+  {
+   "key": "u17wc_event_stats",
+   "t": "U17 World Cup event stats in prospect FV",
+   "sp": [
+    "Soccer"
+   ],
+   "ar": "fv",
+   "kind": "forward",
+   "how": "hand",
+   "was": "not testable (one tournament, no outcomes)",
+   "due": "2030-07-01",
+   "est": 1,
+   "trigger": "the 2026 U17 World Cup cohort reaches the prospect outcome window (after the 2029-30 season)",
+   "gate": "frozen prereg U17E index adds t >= 2 nation-out on the Jan 15 2027 snapshot, top-50 outcome not lower",
+   "run_hint": "scripts/research/u17wc_nov28 (file saved after the final in project storage, soccer-u17wc-2026/)"
+  },
+  {
+   "key": "hockey_nhle_ratio",
+   "t": "NHLe refit as a ratio of summed points (and pooled league names)",
+   "sp": [
+    "NHL"
+   ],
+   "ar": "fv",
+   "kind": "retest",
+   "how": "hand",
+   "was": "draft class-out t -1.98 (ratio), -1.24 (ratio with age), -2.41 (pooled names) vs the live pairs factors",
+   "after": "nhl:draft:2027",
+   "lag": 14,
+   "due": "2027-07-08",
+   "est": 1,
+   "trigger": "the 2026-27 season adds a year of league movers to the landing pages",
+   "gate": "strict class-out (factors refit without the class's careers) t >= 2, 8 of 12, top-64 and point in time (factors through 2015-16, grade 2016-19) not worse",
+   "run_hint": "python3 scripts/hockey_nhle.py --test2"
+  },
+  {
+   "key": "soccer_lg_unrated",
+   "t": "Squad-value league strength for unrated senior leagues in soccer prospect FV",
+   "sp": [
+    "Soccer"
+   ],
+   "ar": "fv",
+   "kind": "deferred",
+   "how": "hand",
+   "was": "not run: the Transfermarkt dump refit is a full soccer prospects run",
+   "due": "2026-12-14",
+   "trigger": "the next soccer prospects refit (Challenger Pro League, 3. Liga, Regionalliga, Austrian 2. Liga, Serie C, Primera Federacion and Czech second tier minutes now count at the replacement floor)",
+   "gate": "lg_share from the mean squad-value club rating of the league; class-out t >= 2, forward top-50 not worse",
+   "run_hint": "python3 scripts/soccer_prospects.py --fit (rlg_td in features())"
   }
  ]
 }

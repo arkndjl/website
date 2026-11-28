@@ -1,8 +1,9 @@
 {{- /* Pro team builder (NFL, NBA, NHL): {{< probuilder lg="nba|nfl|nhl" tab="team builder" >}}
        Fetches static/data/builder/<lg>.json (scripts/pro_builder.py) and static/data/depth/<lg>.json when opened. Pick a team:
-       the money (payroll, space, dead money, committed by season), the verdict on every contract (extend, let walk, keep,
-       trade: research/pro_builder_verdicts.json), the depth chart with each player's verdict, the deals that end this
-       season, and the future picks with their value. GFX = buildProBuilder in gfx.js (4:5). */ -}}
+       the money, the plan metrics, then tabs: timeline (five seasons, the window shaded), contracts (verdicts against the
+       replacement his money buys, core tags, trade fits), depth chart, expiring, picks, scenarios, sandbox (drop, trade,
+       re-sign or sign and every number moves), and the league (now / window / rebuild, the need heatmap).
+       GFX = buildProBuilder (plan), buildProWindow (timeline) and buildProDepth (depth chart) in gfx.js, all 4:5. */ -}}
 {{- $lg := .Get "lg" -}}
 {{- $icon := index (dict "nhl" "hockey" "nba" "basketball" "nfl" "football") $lg -}}
 <div class="win pb" data-pb="{{ $lg }}" data-pb-src="{{ printf "data/builder/%s.json" $lg | relURL }}" data-pb-depth="{{ printf "data/depth/%s.json" $lg | relURL }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}>
@@ -14,7 +15,9 @@
     <label class="cfb__field cfb__field--grow"><span>team</span><select data-pb-team><option value="">loading…</option></select></label>
     <button type="button" class="cfb__btn" data-pb-step="-1" title="previous team" aria-label="previous team">◀</button>
     <button type="button" class="cfb__btn" data-pb-step="1" title="next team" aria-label="next team">▶</button>
-    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="probuilder" data-gfx-lg="{{ $lg }}" title="team builder graphic (4:5)">GFX plan</button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="probuilder" data-gfx-lg="{{ $lg }}" title="team plan graphic (4:5)">GFX plan</button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="prowindow" data-gfx-lg="{{ $lg }}" title="timeline and window graphic (4:5)">GFX window</button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="prodepth" data-gfx-lg="{{ $lg }}" title="depth chart graphic (4:5)">GFX depth</button>
   </form>
   <div class="pb__body" data-pb-body><p class="cfb__none">loading…<noscript> (needs JavaScript)</noscript></p></div>
   <div class="win__status"><span data-pb-status>team builder</span><span class="cfb__asof" data-pb-asof></span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
@@ -23,23 +26,33 @@
 (function () {
   var win = document.querySelector('[data-pb="{{ $lg }}"]'); if (!win || win.__pb) return; win.__pb = true;
   var LG = '{{ $lg }}', VL = { nba: 'VORX', nfl: 'WAR', nhl: 'WAR' }[LG], VLAST = { nba: '2025-26', nfl: '2025', nhl: '2025-26' }[LG];
-  var VD = { E: ['Extend', 'last season of his deal; three seasons at his xAAV return more than they cost'], W: ['Let walk', 'last season of his deal; at his xAAV he returns less than he costs'],
-             K: ['Keep', 'under contract past this season; returns more than he costs'], T: ['Trade', 'under contract past this season; returns less than he costs'] };
-  var D = null, DEP = null, tab = 'roster';
+  var VD = { E: ['Extend', 'last season of his deal; at his xAAV he returns more than the replacement that money buys'], W: ['Let walk', 'last season of his deal; at his xAAV he returns less than the replacement that money buys'],
+             K: ['Keep', 'under contract past this season; returns more than the replacement his money buys'], T: ['Trade', 'under contract past this season; returns less than the replacement his money buys'] };
+  var MODE = { now: 'now', window: 'window', rebuild: 'rebuild' };
+  var D = null, DEP = null, tab = 'timeline', lmode = '', SB = {}, SIGN = [], lsort = 'v0';
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function $m(v, d) { return (v < 0 ? '−' : '') + '$' + Math.abs(+v).toFixed(d == null ? 1 : d) + 'M'; }
+  function $m(v, d) { return v == null ? '—' : (v < 0 ? '−' : '') + '$' + Math.abs(+v).toFixed(d == null ? 1 : d) + 'M'; }
   function m(v, d) { return v == null ? '<span class="cfb__dim">—</span>' : (+v).toFixed(d == null ? 1 : d); }
   function sg(v) { return v == null ? '<span class="cfb__dim">—</span>' : v < 0 ? '<span class="cfb__down">' + (+v).toFixed(1) + '</span>' : '+' + (+v).toFixed(1); }
   function key(n) { return String(n || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b\.?/g, '').replace(/[^a-z]/g, ''); }
   function logo(src) { return src ? '<img class="cfb__logo" src="' + esc(src) + '" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">' : ''; }
+  function face(p) {
+    var u = !p.ph ? '' : LG === 'nfl' ? 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + p.ph : 'https://a.espncdn.com/combiner/i?img=/i/headshots/' + LG + '/players/full/' + p.ph + '.png&w=96&h=70&scale=crop';
+    return '<span class="pxframe pxframe--row"><img src="' + esc(u || '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>';
+  }
   function chip(p) { if (!p.vd) return '<span class="cfb__dim">—</span>'; var v = VD[p.vd];
-    return '<span class="pb__vd pb__vd--' + p.vd + '" title="' + esc(v[0] + ': ' + v[1] + (p.s != null ? ' (' + (p.s >= 0 ? '+' : '−') + '$' + Math.abs(p.s).toFixed(1) + 'M)' : '')) + '">' + v[0] + '</span>'; }
+    return '<span class="pb__vd pb__vd--' + p.vd + '" title="' + esc(v[0] + ': ' + v[1] + (p.s != null ? ' (' + (p.s >= 0 ? '+' : '−') + '$' + Math.abs(p.s).toFixed(1) + 'M)' : '') + (p.lean ? '; core, kept; the read leans ' + VD[p.lean][0].toLowerCase() : '')) + '">' + v[0] + '</span>'; }
+  function core(p) { return p.core ? ' <span class="pb__core" title="core: top two on the team and the league\'s top 15% in projected value over three seasons, 31 or under; never traded or let go">core</span>' : ''; }
   function why() {
+    if (D.read === 'repl') return 'three seasons: value read from his ' + VLAST + ' ' + VL + ', age and price, less what the same money bought ' + (D.line === 'moved' ? 'in deals with a new team' : 'in new deals') + ' at ' + (D.posLines ? 'his position' : 'any position') + ', at $' + D.rate + 'M a win';
     if (D.read === 'last') return 'one season: ' + VLAST + ' ' + VL + ' at $' + D.rate + 'M a win, less his cap hit above the minimum';
     return 'three seasons: value read from his ' + VLAST + ' ' + VL + ', age and the price, at $' + D.rate + 'M a win, less pay above the minimum (xAAV past his deal)';
   }
-  function team() { var s = win.querySelector('[data-pb-team]').value; return D.teams.filter(function (t) { return t.tm === s; })[0] || D.teams[0]; }
+  function teamOf(c) { return D.teams.filter(function (t) { return t.tm === c; })[0]; }
+  function team() { return teamOf(win.querySelector('[data-pb-team]').value) || D.teams[0]; }
   function players(t) { return D.players.filter(function (p) { return p.tm === t.tm; }).sort(function (a, b) { return (b.h[0] || 0) - (a.h[0] || 0); }); }
+  function sv(p, i) { return i < p.h.length && p.h[i] != null && p.dev ? (p.dev[Math.min(i, 2)] || 0) : 0; }
+  function shade(rk) { return rk != null && rk <= D.window ? ' pb__win' : ''; }
   function board(t, P) {
     var cap = D.cap, yrs = D.years, n = D.teams.length;
     var cells = [['payroll', $m(t.pay), Math.round(100 * t.pay / cap) + '% of $' + cap + 'M']];
@@ -48,48 +61,69 @@
     else cells.push(['cap left', $m(cap - t.pay), 'active contracts']);
     cells.push(['coming off', $m(t.exp), t.nfa + ' deals end ' + yrs[0]]);
     cells.push(['picks', $m(t.pv), '#' + t.pvRk + ' of ' + n + ' · ' + t.picks.length + ' picks']);
-    var vd = t.vd || {}, cnt = ['E', 'W', 'K', 'T'].map(function (k) { return '<span class="tbx__stat"><b>' + (vd[k] || 0) + '</b><span>' + VD[k][0].toLowerCase() + '</span></span>'; }).join('');
+    var plan = [['mode', MODE[t.mode], 'value rank ' + t.valRk.join(' · ')], ['core', t.coreN + ' · ' + (t.coreSh == null ? '—' : Math.round(100 * t.coreSh) + '%'), 'share of projected value'],
+                ['age', t.vwAge == null ? '—' : t.vwAge.toFixed(1), 'value-weighted · league ' + D.lgAge], ['verdicts', ['E', 'W', 'K', 'T'].map(function (k) { return (t.vd[k] || 0) + ' ' + k; }).join(' '), 'extend · walk · keep · trade']];
     var top = Math.max(cap * 1.1, Math.max.apply(null, t.c)), bars = yrs.map(function (y, i) { var v = t.c[i] || 0;
       return '<span>' + esc(y) + '</span><span class="tbx__bar" title="' + esc(y + ': $' + v.toFixed(1) + 'M committed') + '"><i style="width:' + Math.max(1, Math.min(100, v / top * 100)).toFixed(0) + '%;--c:' + (v > cap ? '#ff9ec7' : i ? '#c0b0ff' : '#7fffd4') + '"></i></span><span class="tbx__n">' + v.toFixed(1) + '</span><span class="tbx__rk">' + (cap - v >= 0 ? '+' : '') + (cap - v).toFixed(0) + '</span>'; }).join('');
-    return '<div class="tbx__board"><div class="tbx__box tbx__box--str"><h4>money</h4><div class="tbx__stats">' +
-      cells.map(function (c) { return '<span class="tbx__stat"><b>' + c[1] + '</b><span>' + esc(c[0] + ' · ' + c[2]) + '</span></span>'; }).join('') + '</div></div>' +
+    function box(c, h, cs) { return '<div class="tbx__box ' + c + '"><h4>' + h + '</h4><div class="tbx__stats">' + cs.map(function (c) { return '<span class="tbx__stat"><b>' + c[1] + '</b><span>' + esc(c[0] + ' · ' + c[2]) + '</span></span>'; }).join('') + '</div></div>'; }
+    return '<div class="tbx__board">' + box('tbx__box--str', 'money', cells) +
       '<div class="tbx__box tbx__box--val"><h4 title="committed $M by season, and room under this season\'s cap">committed</h4><div class="tbx__bridge">' + bars + '</div></div>' +
-      '<div class="tbx__box tbx__box--nil"><h4 title="' + esc(why()) + '">verdicts</h4><div class="tbx__stats">' + cnt + '</div></div></div>';
+      box('tbx__box--nil', 'plan', plan) + '</div>';
+  }
+  function timeline(t, P) {
+    var yrs = D.years, byY = {};
+    t.picks.forEach(function (k) { var y = String(k[0]); byY[y] = byY[y] || []; byY[y].push(k); });
+    function yk(y) { var a = String(y).split('-'); return a.length > 1 ? String(+a[0] + 1) : String(y); }
+    var rows = [
+      ['committed', yrs.map(function (y, i) { return m(t.c[i]); }), '$M under contract'],
+      ['cap room', yrs.map(function (y, i) { return sg(D.cap - (t.c[i] || 0)); }), '$M at this season\'s cap'],
+      ['contracts', t.nUnder.map(String), 'players under contract'],
+      ['value', t.val.map(function (v, i) { return i < 3 ? m(v) : '<span class="cfb__dim">' + m(v) + '</span>'; }), 'projected ' + VL + ' of the players under contract (age curve)'],
+      ['value rank', yrs.map(function (y, i) { return i < 3 ? '#' + t.valRk[i] : '<span class="cfb__dim">—</span>'; }), 'of ' + D.teams.length + '; shaded = top ' + D.window + ' (the window)'],
+      ['core', yrs.map(function (y, i) { return String(P.filter(function (p) { return p.core && i < p.h.length && p.h[i] != null; }).length); }), 'core players under contract'],
+      ['picks', yrs.map(function (y) { var k = byY[yk(y)] || []; return k.length ? k.map(function (x) { return 'R' + x[1] + (x[2] !== t.tm ? ' ' + esc(x[2]) : ''); }).join(', ') : '<span class="cfb__dim">—</span>'; }), 'the draft after that season']];
+    return '<div class="wintable__scroll"><table class="cfb__table pb__table pb__tl"><thead><tr><th></th>' + yrs.map(function (y, i) { return '<th class="' + shade(t.valRk[i]) + '">' + esc(y) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      rows.map(function (r) { return '<tr><th scope="row" title="' + esc(r[2]) + '">' + esc(r[0]) + '</th>' + r[1].map(function (c, i) { return '<td class="cfb__num' + shade(i < 3 ? t.valRk[i] : null) + '">' + c + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>';
   }
   function roster(t, P, only) {
-    var yrs = D.years, rows = P.filter(function (p) { return !only || p.left <= 1; });
+    var yrs = D.years, rows = P.filter(function (p) { return !only || p.left <= 1 || p.fa; });
     if (!rows.length) return '<p class="cfb__none">none</p>';
     var h = '<div class="wintable__scroll"><table class="cfb__table pay__table pb__table"><thead><tr><th>Player</th><th>Pos</th><th>Age</th>' +
-      '<th class="pay__k" data-term="VERDICT" title="' + esc(why()) + '">Verdict</th><th data-term="SURPLUS" title="$M, ' + esc(why()) + '">Surplus</th>' +
-      '<th class="cfb__g" title="' + VL + ', ' + VLAST + '">' + VL + '</th>' + yrs.slice(0, 3).map(function (y, i) { return '<th class="pb__dev' + (i ? '' : ' cfb__g') + '" title="projected ' + VL + ', ' + esc(y) + ': the age curve on his ' + VLAST + ' ' + VL + '">' + esc(y.slice(-2)) + '</th>'; }).join('') + '<th class="cfb__g" data-term="XAAV" title="what he would sign for as a free agent now, $M a year">xAAV</th>' +
-      yrs.map(function (y, i) { return '<th class="' + (i ? '' : 'cfb__g') + '" title="cap hit ' + esc(y) + ', $M">' + esc(y) + '</th>'; }).join('') + '<th title="last season of the deal">Thru</th></tr></thead><tbody>';
+      '<th class="pay__k" data-term="VERDICT" title="' + esc(why()) + '">Verdict</th><th data-term="VS REPL" title="$M over his replacement: ' + esc(why()) + '">vs Repl</th>' +
+      (only ? '<th class="cfb__g" title="status after this season">Status</th><th data-term="XAAV" title="what he would sign for as a free agent now, $M a year">xAAV</th><th title="expected years of his next deal">Yrs</th>' : '') +
+      '<th class="cfb__g" title="' + VL + ', ' + VLAST + '">' + VL + '</th>' + yrs.slice(0, 3).map(function (y, i) { return '<th class="pb__dev' + (i ? '' : ' cfb__g') + '" title="projected ' + VL + ', ' + esc(y) + ': the age curve on his ' + VLAST + ' ' + VL + '">' + esc(y.slice(-2)) + '</th>'; }).join('') +
+      (only ? '' : '<th class="cfb__g" data-term="XAAV" title="what he would sign for as a free agent now, $M a year">xAAV</th>' + yrs.map(function (y, i) { return '<th class="' + (i ? '' : 'cfb__g') + '" title="cap hit ' + esc(y) + ', $M">' + esc(y) + '</th>'; }).join('') + '<th title="last season of the deal">Thru</th>') +
+      '<th class="cfb__g" title="trade calls: the three teams with the biggest need at his position that can take his cap hit">Fits</th></tr></thead><tbody>';
     rows.forEach(function (p) {
-      var st = p.left <= 1 ? ' <span class="pay__tag" title="' + esc((p.st || 'free agent') + ' after ' + yrs[0]) + '">' + esc(p.st || 'FA') + '</span>' : '';
-      h += '<tr><td><b>' + esc(p.n) + '</b>' + st + (p.ltir ? ' <span class="cfb__dim">LTIR</span>' : '') + '</td><td>' + esc(p.pos) + '</td><td class="cfb__num">' + (p.age == null ? '—' : p.age) + '</td>' +
-        '<td>' + chip(p) + '</td><td class="cfb__num is-key" data-v="' + (p.s == null ? '' : p.s) + '">' + sg(p.s) + '</td><td class="cfb__num cfb__g">' + m(p.v) + '</td>' + [0, 1, 2].map(function (i) { var d = p.dev && p.dev[i]; return '<td class="cfb__num pb__dev' + (i ? '' : ' cfb__g') + '">' + (d == null ? '<span class="cfb__dim">—</span>' : (d - (i ? p.dev[i - 1] : p.v) >= 0 ? '' : '<span class="cfb__down">') + d.toFixed(1) + (d - (i ? p.dev[i - 1] : p.v) >= 0 ? '' : '</span>')) + '</td>'; }).join('') + '<td class="cfb__num cfb__g">' + m(p.x) + '</td>' +
-        p.h.map(function (v, i) { var o = p.o && p.o[i]; return '<td class="cfb__num' + (i ? '' : ' cfb__g') + '"' + (o ? ' title="' + esc(o) + '"' : '') + '>' + (v == null ? '' : v.toFixed(1) + (o ? '<span class="pay__opt">' + esc(o) + '</span>' : '')) + '</td>'; }).join('') +
-        '<td>' + esc(p.thru || '') + '</td></tr>';
+      var st = (p.left <= 1 || p.fa) && !only ? ' <span class="pay__tag" title="' + esc((p.fst || p.st || 'free agent') + ' after ' + yrs[0]) + '">' + esc(p.fst || p.st || 'FA') + '</span>' : '';
+      h += '<tr><td class="cfb__name">' + face(p) + '<b>' + esc(p.n) + '</b>' + core(p) + st + (p.ltir ? ' <span class="cfb__dim">LTIR</span>' : '') + '</td><td>' + esc(p.pos) + '</td><td class="cfb__num">' + (p.age == null ? '—' : p.age) + '</td>' +
+        '<td>' + chip(p) + '</td><td class="cfb__num is-key" data-v="' + (p.s == null ? '' : p.s) + '">' + sg(p.s) + '</td>' +
+        (only ? '<td class="cfb__g">' + esc(p.fst || p.st || '') + '</td><td class="cfb__num">' + m(p.x) + '</td><td class="cfb__num">' + m(p.xt) + '</td>' : '') +
+        '<td class="cfb__num cfb__g">' + m(p.v) + '</td>' + [0, 1, 2].map(function (i) { var d = p.dev && p.dev[i]; return '<td class="cfb__num pb__dev' + (i ? '' : ' cfb__g') + '">' + (d == null ? '<span class="cfb__dim">—</span>' : (d - (i ? p.dev[i - 1] : p.v) >= 0 ? '' : '<span class="cfb__down">') + d.toFixed(1) + (d - (i ? p.dev[i - 1] : p.v) >= 0 ? '' : '</span>')) + '</td>'; }).join('') +
+        (only ? '' : '<td class="cfb__num cfb__g">' + m(p.x) + '</td>' + p.h.map(function (v, i) { var o = p.o && p.o[i]; return '<td class="cfb__num' + (i ? '' : ' cfb__g') + '"' + (o ? ' title="' + esc(o) + '"' : '') + '>' + (v == null ? '' : v.toFixed(1) + (o ? '<span class="pay__opt">' + esc(o) + '</span>' : '')) + '</td>'; }).join('') + '<td>' + esc(p.thru || '') + '</td>') +
+        '<td class="cfb__g">' + (p.fit ? p.fit.map(function (c) { var f = teamOf(c); return '<span class="pb__fit" title="' + esc(f ? f.name : c) + '">' + (f ? logo(f.logo) : '') + esc(c) + '</span>'; }).join('') : '') + '</td></tr>';
     });
     return h + '</tbody></table></div>';
   }
+  function depthTeam(t) { return DEP && (DEP.teams || []).filter(function (x) { return x.t === (t.dt || t.tm); })[0]; }
   function depth(t, P) {
-    var T = DEP && (DEP.teams || []).filter(function (x) { return x.t === t.tm; })[0];
+    var T = depthTeam(t);
     if (!T) return '<p class="cfb__none">no depth chart</p>';
     var by = {}; P.forEach(function (p) { by[key(p.n)] = p; });
     return '<div class="pb__depth">' + T.units.map(function (u) {
       return (u.u ? '<h4 class="pb__unit">' + esc(u.u) + '</h4>' : '') + '<div class="pb__grid">' + u.s.map(function (s) {
-        return '<div class="pb__pos"><b>' + esc(s[0]) + '</b>' + s[1].slice(0, 4).map(function (r) { var p = by[key(r[0])];
-          return '<span class="pb__man">' + esc(r[0]) + (r[3] ? ' <span class="cfb__dim">' + esc(r[3]) + '</span>' : '') + ' ' + (p ? chip(p) + (p.h[0] != null ? ' <span class="cfb__dim">$' + p.h[0].toFixed(1) + 'M</span>' : '') : '') + '</span>'; }).join('') + '</div>';
+        return '<div class="pb__pos"><b>' + esc(s[0]) + '</b>' + s[1].slice(0, 4).map(function (r, i) { var p = by[key(r[0])];
+          return '<span class="pb__man' + (i ? '' : ' pb__man--st') + '"><span class="pb__mn">' + esc(r[0]) + (r[3] ? ' <span class="cfb__dim">' + esc(r[3]) + '</span>' : '') + (p && p.core ? ' <span class="pb__core">core</span>' : '') + '</span>' +
+            (p ? '<span class="pb__mm">' + chip(p) + (p.h[0] != null ? '<span class="cfb__dim">$' + p.h[0].toFixed(1) + 'M · ' + esc(p.thru || '') + '</span>' : '') + '</span>' : '') + '</span>'; }).join('') + '</div>';
       }).join('') + '</div>';
     }).join('') + '</div>';
   }
   function picks(t) {
     if (!t.picks.length) return '<p class="cfb__none">none</p>';
-    var nm = {}; D.teams.forEach(function (x) { nm[x.tm] = x; });
     return '<div class="wintable__scroll"><table class="cfb__table pb__table"><thead><tr><th>Year</th><th>Rd</th><th>From</th><th title="projected overall slot (NBA: median of the season sims; NFL 2027: this season\'s xW order); blank = the round\'s mean slot">Slot</th>' +
       '<th class="pay__k" data-term="PICK VALUE" title="$M: the slot\'s value over the cheap years at $' + D.rate + 'M a win, less its rookie pay above the minimum">Value</th></tr></thead><tbody>' +
-      t.picks.map(function (k) { var f = nm[k[2]];
-        return '<tr><td>' + k[0] + '</td><td class="cfb__num">' + k[1] + '</td><td class="cfb__team">' + (f ? logo(f.logo) : '') + '<span>' + esc(k[2]) + (k[2] === t.tm ? '' : '') + '</span>' + (k[3] ? ' <span class="cfb__dim" title="conditions on the pick">cond</span>' : '') + '</td><td class="cfb__num">' + (k[4] || '') + '</td><td class="cfb__num is-key">' + m(k[5]) + '</td></tr>'; }).join('') +
+      t.picks.map(function (k) { var f = teamOf(k[2]);
+        return '<tr><td>' + k[0] + '</td><td class="cfb__num">' + k[1] + '</td><td class="cfb__team">' + (f ? logo(f.logo) : '') + '<span>' + esc(k[2]) + '</span>' + (k[3] ? ' <span class="cfb__dim" title="conditions on the pick">cond</span>' : '') + '</td><td class="cfb__num">' + (k[4] || '') + '</td><td class="cfb__num is-key">' + m(k[5]) + '</td></tr>'; }).join('') +
       '</tbody></table></div>';
   }
   // every column sorts (board rule, Nov 28 2026): a header click sorts the rows by it, a second click flips; numbers
@@ -128,15 +162,72 @@
     });
     apply();
   }
+  function scenarios(t) {
+    var y1 = D.years[1], L = [['plan', 'verdicts as called', 'keeps and extensions (at xAAV); trade calls and let-walk calls gone'], ['all', 're-sign all', 'every deal kept, every expiring deal re-signed at xAAV'],
+      ['walk', 'let walk', 'contracts only, no expiring deal re-signed'], ['space', 'max space', 'only the keeps and the core under contract']];
+    return '<div class="wintable__scroll"><table class="cfb__table pb__table"><thead><tr><th>' + esc(y1) + '</th><th class="pay__k" title="$M committed next season">Payroll</th><th title="$M under this season\'s cap">Room</th><th title="players">N</th><th title="projected ' + VL + ' next season of the players kept">Value</th><th title="rank of that value in the league (each team in the same scenario)">Rank</th></tr></thead><tbody>' +
+      L.map(function (s) { var x = t.sc[s[0]]; return '<tr><td title="' + esc(s[2]) + '"><b>' + esc(s[1]) + '</b></td><td class="cfb__num is-key">' + m(x[0]) + '</td><td class="cfb__num">' + sg(x[1]) + '</td><td class="cfb__num">' + x[3] + '</td><td class="cfb__num">' + m(x[2]) + '</td><td class="cfb__num' + shade(x[4]) + '">#' + x[4] + '</td></tr>'; }).join('') + '</tbody></table></div>';
+  }
+  // sandbox: drop, trade (cap hit off), re-sign at xAAV, sign a free agent from another team at xAAV for his expected years
+  function sandbox(t, P) {
+    var yrs = D.years, cap = D.cap, n = yrs.length, c = [], v = [0, 0, 0];
+    for (var i = 0; i < n; i++) c.push(0);
+    P.forEach(function (p) {
+      var a = SB[p.n] || (p.left <= 1 || p.fa ? (p.vd === 'E' ? 're-sign' : 'walk') : 'keep');
+      for (var i = 0; i < n; i++) {
+        var under = i < p.h.length && p.h[i] != null;
+        if ((a === 'keep' || a === 're-sign' && under) && under) { c[i] += p.h[i]; if (i < 3) v[i] += sv(p, i); }
+        else if (a === 're-sign' && i >= 1 && i <= Math.max(1, Math.round(p.xt || 2))) { c[i] += p.x || 0; if (i < 3) v[i] += p.dev ? p.dev[i] || 0 : 0; }
+        else if (a === 'walk' && under && i === 0) { c[i] += p.h[i]; v[i] += sv(p, i); }
+      }
+    });
+    SIGN.forEach(function (q) { var p = D.players.filter(function (x) { return x.n === q; })[0]; if (!p) return;
+      for (var i = 1; i < n && i <= Math.max(1, Math.round(p.xt || 2)); i++) { c[i] += p.x || 0; if (i < 3) v[i] += p.dev ? p.dev[i] || 0 : 0; } });
+    var rk = v.map(function (x, i) { return 1 + D.teams.filter(function (o) { return o.tm !== t.tm && (o.val[i] || 0) > x; }).length; });
+    var opts = function (p) { var exp = p.left <= 1 || p.fa, cur = SB[p.n] || (exp ? (p.vd === 'E' ? 're-sign' : 'walk') : 'keep');
+      return (exp ? ['re-sign', 'walk', 'trade'] : ['keep', 'trade', 'drop']).map(function (o) { return '<option' + (o === cur ? ' selected' : '') + '>' + o + '</option>'; }).join(''); };
+    var fa = D.players.filter(function (p) { return p.tm !== t.tm && (p.left <= 1 || p.fa) && p.fst !== 'RFA' && p.x != null && p.dev; }).sort(function (a, b) { return (b.dev[1] || 0) - (a.dev[1] || 0); }).slice(0, 60);
+    return '<div class="wintable__scroll"><table class="cfb__table pb__table pb__tl"><thead><tr><th></th>' + yrs.map(function (y, i) { return '<th class="' + shade(i < 3 ? rk[i] : null) + '">' + esc(y) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      '<tr><th scope="row">payroll</th>' + c.map(function (x) { return '<td class="cfb__num is-key">' + x.toFixed(1) + '</td>'; }).join('') + '</tr>' +
+      '<tr><th scope="row">room</th>' + c.map(function (x) { return '<td class="cfb__num">' + sg(cap - x) + '</td>'; }).join('') + '</tr>' +
+      '<tr><th scope="row">value</th>' + yrs.map(function (y, i) { return '<td class="cfb__num' + shade(i < 3 ? rk[i] : null) + '">' + (i < 3 ? v[i].toFixed(1) + ' <span class="cfb__dim">#' + rk[i] + '</span>' : '<span class="cfb__dim">—</span>') + '</td>'; }).join('') + '</tr></tbody></table></div>' +
+      '<form class="cfb__bar" onsubmit="return false"><label class="cfb__field cfb__field--grow"><span>sign</span><select data-pb-sign><option value="">a free agent after ' + esc(yrs[0]) + '…</option>' +
+      fa.map(function (p) { return '<option value="' + esc(p.n) + '">' + esc(p.n + ' · ' + p.pos + ' · ' + p.tm + ' · $' + p.x.toFixed(1) + 'M x ' + (p.xt == null ? '?' : p.xt.toFixed(1))) + '</option>'; }).join('') + '</select></label>' +
+      '<button type="button" class="cfb__btn" data-pb-reset>reset</button></form>' +
+      (SIGN.length ? '<p class="pb__signed">' + SIGN.map(function (q) { return '<button type="button" class="pb__fit" data-pb-unsign="' + esc(q) + '" title="remove">' + esc(q) + ' ×</button>'; }).join('') + '</p>' : '') +
+      '<div class="wintable__scroll"><table class="cfb__table pb__table"><thead><tr><th>Player</th><th>Verdict</th><th>Move</th><th>' + esc(yrs[0]) + '</th><th title="xAAV">xAAV</th><th>Thru</th></tr></thead><tbody>' +
+      P.map(function (p) { return '<tr><td class="cfb__name">' + face(p) + '<b>' + esc(p.n) + '</b>' + core(p) + '</td><td>' + chip(p) + '</td><td><select class="pb__sel" data-pb-sb="' + esc(p.n) + '">' + opts(p) + '</select></td><td class="cfb__num">' + m(p.h[0]) + '</td><td class="cfb__num">' + m(p.x) + '</td><td>' + esc(p.thru || '') + '</td></tr>'; }).join('') + '</tbody></table></div>';
+  }
+  function league() {
+    var G = D.groups, T = D.teams.filter(function (t) { return !lmode || t.mode === lmode; });
+    var S = { v0: function (t) { return -(t.val[0] || 0); }, v1: function (t) { return -(t.val[1] || 0); }, v2: function (t) { return -(t.val[2] || 0); }, core: function (t) { return -(t.coreSh || 0); },
+      age: function (t) { return t.vwAge || 99; }, pv: function (t) { return -(t.pv || 0); }, room: function (t) { return -(D.cap - (t.c[1] || 0)); } };
+    G.forEach(function (g) { S['n' + g] = function (t) { return t.need[g]; }; });
+    T = T.slice().sort(function (a, b) { return S[lsort](a) - S[lsort](b); });
+    function hcell(z) { var c = z == null ? '' : z <= -1 ? '#ff9ec7' : z <= -0.4 ? '#c98bd8' : z < 0.4 ? '' : z < 1 ? '#3f9d8f' : '#7fffd4';
+      return '<td class="cfb__num pb__heat"' + (c ? ' style="--h:' + c + '"' : '') + '>' + (z == null ? '' : (z > 0 ? '+' : '') + z.toFixed(1)) + '</td>'; }
+    function th(k, l, tt, cls) { return '<th class="' + (cls || '') + (lsort === k ? ' pay__k' : '') + '" data-pb-sort="' + k + '" title="' + esc(tt) + '">' + l + '</th>'; }
+    return '<div class="tbx__tabs">' + [['', 'all'], ['now', 'now'], ['window', 'window'], ['rebuild', 'rebuild']].map(function (x) { return '<button type="button" class="tbx__tab" data-pb-mode="' + x[0] + '" aria-pressed="' + (lmode === x[0]) + '" aria-selected="' + (lmode === x[0]) + '">' + x[1] + '<i>' + D.teams.filter(function (t) { return !x[0] || t.mode === x[0]; }).length + '</i></button>'; }).join('') + '</div>' +
+      '<div class="wintable__scroll"><table class="cfb__table pb__table"><thead><tr><th>Team</th><th title="now: top ' + D.window + ' in value this season; window: top ' + D.window + ' in a later season; rebuild: neither">Mode</th>' +
+      D.years.slice(0, 3).map(function (y, i) { return th('v' + i, esc(y.slice(-5)), 'projected ' + VL + ' of the players under contract, ' + y + '; shaded = top ' + D.window, i ? '' : 'cfb__g'); }).join('') +
+      th('core', 'Core', 'share of projected value in core players', 'cfb__g') + th('age', 'Age', 'value-weighted age; league ' + D.lgAge) + th('pv', 'Picks', '$M pick capital') + th('room', 'Room', '$M room under this season\'s cap next season') +
+      G.map(function (g, i) { return th('n' + g, esc(g), 'need at ' + g + ': value under contract next season, z against the league (red = need)', i ? '' : 'cfb__g'); }).join('') + '</tr></thead><tbody>' +
+      T.map(function (t) { return '<tr><td class="cfb__team">' + logo(t.logo) + '<button type="button" class="pb__lnk" data-pb-go="' + esc(t.tm) + '">' + esc(t.tm) + '</button></td><td>' + esc(MODE[t.mode]) + '</td>' +
+        [0, 1, 2].map(function (i) { return '<td class="cfb__num' + (i ? '' : ' cfb__g') + shade(t.valRk[i]) + '">' + m(t.val[i]) + '</td>'; }).join('') +
+        '<td class="cfb__num cfb__g">' + (t.coreSh == null ? '—' : Math.round(100 * t.coreSh) + '%') + '</td><td class="cfb__num">' + m(t.vwAge) + '</td><td class="cfb__num">' + m(t.pv) + '</td><td class="cfb__num">' + sg(D.cap - (t.c[1] || 0)) + '</td>' +
+        G.map(function (g) { return hcell(t.need[g]); }).join('') + '</tr>'; }).join('') + '</tbody></table></div>';
+  }
   function render() {
     var t = team(), P = players(t), body = win.querySelector('[data-pb-body]');
-    var TABS = [['roster', 'contracts', P.length], ['depth', 'depth chart', ''], ['expiring', 'expiring', P.filter(function (p) { return p.left <= 1; }).length], ['picks', 'picks', t.picks.length]];
-    var pane = tab === 'depth' ? depth(t, P) : tab === 'expiring' ? roster(t, P, true) : tab === 'picks' ? picks(t) : roster(t, P, false);
-    body.innerHTML = board(t, P) +
+    var nExp = P.filter(function (p) { return p.left <= 1 || p.fa; }).length;
+    var TABS = [['timeline', 'timeline', ''], ['roster', 'contracts', P.length], ['depth', 'depth chart', ''], ['expiring', 'expiring', nExp], ['picks', 'picks', t.picks.length], ['scen', 'scenarios', ''], ['sandbox', 'sandbox', ''], ['league', 'league', '']];
+    var pane = { timeline: timeline, depth: depth, picks: picks, scen: scenarios, sandbox: sandbox, league: league }[tab];
+    pane = pane ? pane(t, P) : roster(t, P, tab === 'expiring');
+    body.innerHTML = '<div class="pb__head">' + logo(t.logo) + '<b>' + esc(t.name) + '</b><span class="pb__mode pb__mode--' + t.mode + '">' + esc(MODE[t.mode]) + '</span></div>' + board(t, P) +
       '<div class="tbx__tabs" role="tablist">' + TABS.map(function (x) { return '<button type="button" class="tbx__tab" role="tab" data-pb-tab="' + x[0] + '" aria-selected="' + (tab === x[0]) + '">' + x[1] + (x[2] !== '' ? '<i>' + x[2] + '</i>' : '') + '</button>'; }).join('') + '</div>' +
       '<div class="tbx__pane">' + pane + '</div>';
-    sortable(body.querySelector('.tbx__pane table'));
-    window.__arkPro = window.__arkPro || {}; window.__arkPro[LG] = { D: D, t: t, P: P };
+    if (/^(roster|expiring|picks)$/.test(tab)) sortable(body.querySelector('.tbx__pane table'));
+    window.__arkPro = window.__arkPro || {}; window.__arkPro[LG] = { D: D, t: t, P: P, DEP: depthTeam(t) };
     win.querySelector('[data-pb-status]').textContent = D.label + ' · ' + (D.src || '') + ' · picks: ' + (D.pickSrc || '');
     if (window.__arkTerms && window.__arkTerms.scan) window.__arkTerms.scan(body);
   }
@@ -146,11 +237,23 @@
       D = x[0]; DEP = x[1];
       var sel = win.querySelector('[data-pb-team]');
       sel.innerHTML = D.teams.map(function (t) { return '<option value="' + esc(t.tm) + '">' + esc(t.name || t.tm) + '</option>'; }).join('');
-      var want = (location.search.match(/[?&]team=([A-Z]+)/) || [])[1]; if (want) sel.value = want;
+      var want = (location.search.match(/[?&]team=([A-Z]+)/) || [])[1]; if (want && teamOf(want)) sel.value = want;
       win.querySelector('[data-pb-asof]').textContent = String(D.asof || '').slice(0, 10);
-      sel.addEventListener('change', render);
-      win.querySelectorAll('[data-pb-step]').forEach(function (b) { b.addEventListener('click', function () { var i = sel.selectedIndex + +b.getAttribute('data-pb-step'); sel.selectedIndex = (i + sel.options.length) % sel.options.length; render(); }); });
-      win.addEventListener('click', function (e) { var b = e.target.closest('[data-pb-tab]'); if (b) { tab = b.getAttribute('data-pb-tab'); render(); } });
+      function fresh() { SB = {}; SIGN = []; render(); }
+      sel.addEventListener('change', fresh);
+      win.querySelectorAll('[data-pb-step]').forEach(function (b) { b.addEventListener('click', function () { var i = sel.selectedIndex + +b.getAttribute('data-pb-step'); sel.selectedIndex = (i + sel.options.length) % sel.options.length; fresh(); }); });
+      win.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-pb-tab]'); if (b) { tab = b.getAttribute('data-pb-tab'); render(); return; }
+        b = e.target.closest('[data-pb-mode]'); if (b) { lmode = b.getAttribute('data-pb-mode'); render(); return; }
+        b = e.target.closest('[data-pb-sort]'); if (b) { lsort = b.getAttribute('data-pb-sort'); render(); return; }
+        b = e.target.closest('[data-pb-go]'); if (b) { sel.value = b.getAttribute('data-pb-go'); tab = 'timeline'; fresh(); return; }
+        b = e.target.closest('[data-pb-reset]'); if (b) { SB = {}; SIGN = []; render(); return; }
+        b = e.target.closest('[data-pb-unsign]'); if (b) { var q = b.getAttribute('data-pb-unsign'); SIGN = SIGN.filter(function (x) { return x !== q; }); render(); }
+      });
+      win.addEventListener('change', function (e) {
+        var s = e.target.closest('[data-pb-sb]'); if (s) { SB[s.getAttribute('data-pb-sb')] = s.value; render(); return; }
+        s = e.target.closest('[data-pb-sign]'); if (s && s.value && SIGN.indexOf(s.value) < 0) { SIGN.push(s.value); render(); }
+      });
       render();
     }).catch(function () { win.querySelector('[data-pb-body]').innerHTML = '<p class="cfb__none">team builder unavailable</p>'; });
   }

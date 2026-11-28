@@ -1,9 +1,10 @@
 {
 "asof":"2026-11-28",
-"n":89,
+"n":95,
 "count":{
 "watching":1,
-"waiting":88
+"waiting":91,
+"shipped":3
 },
 "next":[
 "understat_return",
@@ -11,7 +12,7 @@
 "thunderpick_recheck",
 "dect_transfer_cost",
 "tennis_year_end",
-"soccer_props_novig"
+"soccer_lg_unrated"
 ],
 "rows":[
 {
@@ -91,6 +92,22 @@
 "gate":"birth-year-out t >= 2, 12/19, forward top-50 not worse; Holm at .05 inside the family; ATP tree blend on forward MSE t >= 2",
 "ledger":"tennis_year_end",
 "due":"2026-12-07",
+"est":0,
+"state":"waiting"
+},
+{
+"key":"soccer_lg_unrated",
+"t":"Squad-value league strength for unrated senior leagues in soccer prospect FV",
+"sp":[
+"Soccer"
+],
+"ar":"fv",
+"kind":"deferred",
+"how":"hand",
+"was":"not run: the Transfermarkt dump refit is a full soccer prospects run",
+"trigger":"the next soccer prospects refit (Challenger Pro League, 3. Liga, Regionalliga, Austrian 2. Liga, Serie C, Primera Federacion and Czech second tier minutes now count at the replacement floor)",
+"gate":"lg_share from the mean squad-value club rating of the league; class-out t >= 2, forward top-50 not worse",
+"due":"2026-12-14",
 "est":0,
 "state":"waiting"
 },
@@ -448,7 +465,14 @@
 "gate":"verdicts.py 'market': agedp beats carry and last, paired t >= 2 and most seasons",
 "due":"2027-03-16",
 "est":0,
-"state":"waiting"
+"result":{
+"d":"2026-11-28",
+"v":"s",
+"e":"replacement line by position: NFL right calls .551 to .613 (t 5.38, by position t 2.37), NBA .648 to .679 (t 2.82, pooled line)",
+"tt":5.38,
+"pr":1398
+},
+"state":"shipped"
 },
 {
 "key":"cbb_vorx_level",
@@ -1053,6 +1077,22 @@
 "state":"waiting"
 },
 {
+"key":"hockey_nhle_ratio",
+"t":"NHLe refit as a ratio of summed points (and pooled league names)",
+"sp":[
+"NHL"
+],
+"ar":"fv",
+"kind":"retest",
+"how":"hand",
+"was":"draft class-out t -1.98 (ratio), -1.24 (ratio with age), -2.41 (pooled names) vs the live pairs factors",
+"trigger":"the 2026-27 season adds a year of league movers to the landing pages",
+"gate":"strict class-out (factors refit without the class's careers) t >= 2, 8 of 12, top-64 and point in time (factors through 2015-16, grade 2016-19) not worse",
+"due":"2027-07-10",
+"est":1,
+"state":"waiting"
+},
+{
 "key":"cbb_intl_young",
 "t":"ANGT and FIBA youth at a young age (CBB international)",
 "sp":[
@@ -1065,6 +1105,40 @@
 "trigger":"the 2023-24 international classes mature (summer 2027)",
 "gate":"class folds t >= 2 and top-30 not worse",
 "due":"2027-07-15",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"builder_verdict_nba_market",
+"t":"Pro team builder: NBA replacement line fit only on deals that came with a new team (the market a team can buy) in place of every new deal",
+"sp":[
+"NBA"
+],
+"ar":"teams",
+"kind":"retest",
+"how":"hand",
+"was":"Nov 28: right calls .668 against .652 carrying the season forward, t 1.38, 4 of 6 seasons (passed NFL t 3.18, NHL t 2.69)",
+"trigger":"the 2026-27 season in the NBA payroll panel",
+"gate":"replace.py LINE=moved: agedp beats carry, paired t >= 2 and most seasons",
+"due":"2027-07-20",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"builder_future_score",
+"t":"Pro team builder: future score (age curve times stay rate on every player, summed) against win share over the next three seasons",
+"sp":[
+"NBA",
+"NHL",
+"NFL"
+],
+"ar":"teams",
+"kind":"retest",
+"how":"hand",
+"was":"Nov 28: failed all three against last season's record (NBA t -1.58, NHL t 3.47, NFL t 3.68); stay rate by pay tier failed too",
+"trigger":"one more full season in each payroll panel, and a pick and cap room history if one is built",
+"gate":"future.py: roster or roster+ beats now and carry on absolute error, paired t <= -2 and most seasons",
+"due":"2027-07-20",
 "est":1,
 "state":"waiting"
 },
@@ -1082,7 +1156,14 @@
 "gate":"scripts/research/pro_builder_nov28/verdicts.py: agedp beats carry and last on right calls, paired t >= 2 and most seasons",
 "due":"2027-07-20",
 "est":1,
-"state":"waiting"
+"result":{
+"d":"2026-11-28",
+"v":"s",
+"e":"superseded: verdicts against the replacement line at his position, right calls .648 to .679 against carry",
+"tt":2.82,
+"pr":1398
+},
+"state":"shipped"
 },
 {
 "key":"payroll_wins_over_pay",
@@ -1118,6 +1199,29 @@
 "due":"2027-07-20",
 "est":1,
 "state":"waiting"
+},
+{
+"key":"builder_verdict_nhl_replacement",
+"t":"Pro team builder: NHL verdicts against the replacement line at his position (F / D / G) in place of the priced projection against his pay",
+"sp":[
+"NHL"
+],
+"ar":"teams",
+"kind":"retest",
+"how":"hand",
+"was":"Nov 28: right calls .616 against .599 carrying the season forward, t 1.88, 5 of 8 seasons (passed NFL t 5.38, NBA t 2.82)",
+"trigger":"the 2026-27 season in the NHL payroll panel",
+"gate":"replace.py: agedp beats carry, paired t >= 2 and most seasons",
+"due":"2027-07-23",
+"est":1,
+"result":{
+"d":"2026-11-28",
+"v":"s",
+"e":"line on deals with a new team: right calls .599 to .622 against carry, by position t 2.29",
+"tt":2.69,
+"pr":1398
+},
+"state":"shipped"
 },
 {
 "key":"recruit_pos_fv_cbb",
@@ -1455,6 +1559,22 @@
 "gate":"verdicts.py: agedpw beats agedp on right calls, paired t >= 2 and most seasons",
 "due":"2028-07-01",
 "est":0,
+"state":"waiting"
+},
+{
+"key":"u17wc_event_stats",
+"t":"U17 World Cup event stats in prospect FV",
+"sp":[
+"Soccer"
+],
+"ar":"fv",
+"kind":"forward",
+"how":"hand",
+"was":"not testable (one tournament, no outcomes)",
+"trigger":"the 2026 U17 World Cup cohort reaches the prospect outcome window (after the 2029-30 season)",
+"gate":"frozen prereg U17E index adds t >= 2 nation-out on the Jan 15 2027 snapshot, top-50 outcome not lower",
+"due":"2030-07-01",
+"est":1,
 "state":"waiting"
 }
 ],

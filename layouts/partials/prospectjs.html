@@ -80,17 +80,18 @@
     pmpg: 'plus-minus a game', pimpg: 'penalty minutes a game', nhm_na: 'no CHL line the year before', nany: 'NHL debut', comp: 'comps', pnS: 'NHL preseason games', dur: 'games played (share of schedule)',
     cs: 'draft class strength', gsvc: 'save% over league average' };
   var HK_TIP = 'Outcome tiers on the FV scale by peak NHL WAR in his first seven seasons (30 = some NHL games, 40 = top 45 of a class, 50 = top 20, a regular, 60 = top 5, a first-liner). Odds from the 2008-19 picks: what players graded like him became, out of class. Players graded on a stage model after the draft use the same odds by grade.';
+  function hkNh(r) { return (r.nhleEst ? '~' : '') + f1(r.nhle); }   // ~ = estimated (short season or an earlier line)
   var HK_TIERS = ['no NHL', 'cup of coffee', 'depth NHLer', 'regular', 'first-liner'];
   var POSN = { D: 'defenseman', G: 'goalie', C: 'centre', LW: 'left wing', RW: 'right wing', F: 'forward' };
   function hkSay(r) {
     return function (k, up) {
       switch (k) {
         case 'slot': return r.rk ? 'Tankathon No. ' + r.rk + ': a board rank that points to pick ' + r.xslot : 'picked No. ' + r.pick;
-        case 'nhle': return r.nhle != null ? f1(r.nhle) + ' NHLe ' + (r.k === 0 ? 'in his draft year' : 'this season') + ' (' + (r.pts != null ? r.pts + ' pts in ' : '') + r.gp + ' GP, ' + r.league + ')' : r.nh0 != null ? f1(r.nh0) + ' NHLe in his draft year' : r.pos === 'G' ? 'a goalie: no skater scoring line (the goalie term carries his position)' : 'no scoring line yet';
+        case 'nhle': return r.nhle != null ? hkNh(r) + ' NHLe ' + (r.k === 0 ? 'in his draft year' : 'this season') + ' (' + (r.pts != null ? r.pts + ' pts in ' : '') + r.gp + ' GP, ' + r.league + ')' : r.nh0 != null ? f1(r.nh0) + ' NHLe in his draft year' : r.pos === 'G' ? 'a goalie: no skater scoring line (the goalie term carries his position)' : 'no scoring line yet';
         case 'chl': return up ? 'outside the CHL: no CHL scoring discount' : 'CHL scoring, which translates worse than its NHLe says';
         case 'pos': return 'a ' + (POSN[r.pos] || r.pos) + ' (position effect)';
         case 'fv0': return 'draft grade ' + r.fv0 + ' (pick ' + r.pick + ')';
-        case 'nh': return r.nhle != null ? f1(r.nhle) + ' NHLe last season (' + (r.league || '-') + ')' : r.pos === 'G' ? 'a goalie: no skater scoring line (the goalie term carries his position)' : 'no scoring line last season';
+        case 'nh': return r.nhle != null ? hkNh(r) + ' NHLe last season (' + (r.league || '-') + ')' : r.pos === 'G' ? 'a goalie: no skater scoring line (the goalie term carries his position)' : 'no scoring line last season';
         case 'pro': return up ? 'already playing pro (' + r.league + ')' : 'not yet in a pro league';
         case 'gp': return r.nhlgp + ' NHL games so far';
         case 'nany': return up ? 'has played in the NHL' : 'no NHL games yet';
@@ -100,7 +101,7 @@
         case 'war': return (r.war != null ? sgn(r.war, 2) : '0') + ' NHL pWAR so far';
         case 'wjc': return up ? 'made the World Juniors roster' : 'no World Juniors spot';
         case 'progp': return (r.progp || 0) + ' pro games last season';
-        case 'nhgrow': return 'NHLe ' + (r.nh0 != null ? f1(r.nh0) : '-') + ' in his draft year to ' + (r.nhle != null ? f1(r.nhle) : '-') + ' last season';
+        case 'nhgrow': return 'NHLe ' + (r.nh0 != null ? f1(r.nh0) : '-') + ' in his draft year to ' + (r.nhle != null ? hkNh(r) : '-') + ' last season';
         case 'ahls': return 'AHL shots a game ' + (up ? 'above' : 'below') + ' the league rate' + (r.ahls != null ? ' (' + sgn(r.ahls, 2) + ')' : '');
         case 'age': return 'age ' + fa(r);
         case 'agenh': return (r.age ? 'age ' + fa(r) : 'age unknown') + (up ? ': the production comes young' : ': older for the production');
@@ -190,7 +191,7 @@
       var note = r.prov ? 'each input: its push on the grade against an average off-board CHL draft-eligible of 2008-19 (' + hkSum(r, b) + '). A provisional grade: an OLS fit on what off-board draft-eligibles became, so it is the mean outcome, most of them 20 (no NHL games); NHLe is shrunk toward that group\'s typical NHLe until he has about 20 games.'
         : null;
       return '<p class="cfb__dhead"><b>' + esc(r.name) + '</b> · ' + esc(r.posFull || r.pos) + ' · ' + esc(r.club) + ' (' + esc(r.league) + ') · FV ' + r.fv + ' · NHL ' + pc(r.p40) + ' · Reg ' + pc(r.p50) + '</p>' +
-        '<p class="cfb__role">this season: ' + (r.gp ? r.gp + ' GP, ' + r.pts + ' pts' + (r.nhle != null ? ' · ' + f1(r.nhle) + ' NHLe' : '') : 'no games yet') +
+        '<p class="cfb__role">this season: ' + (r.gp ? r.gp + ' GP, ' + r.pts + ' pts' + (r.nhle != null ? ' · ' + hkNh(r) + ' NHLe' : '') : 'no games yet') +
         (r.prov ? ' · provisional: not on Tankathon\'s board' : ' · Tankathon No. ' + r.rk + ', a board rank that points to pick ' + r.xslot) + (r.ht ? ' · ' + htIn(r.ht) + (r.wt ? ', ' + r.wt + ' lb' : '') : '') + (r.age ? ' · age ' + fa(r) : '') + '.</p>' +
         outlook(hkKnots(r), B, HK_TIERS, [0, 1, 2, 3, 4], HK_TIP) + report(p, hkSay(r)) +
         fvBox(r, b, r.fvx != null ? r.fvx - b.sum : null, [scaleStep(r)], note || 'each input: its push on the grade against an average 2008-19 pick, the draft slot read from the slot his board rank points to (' + hkSum(r, b) +
@@ -199,9 +200,9 @@
     'hk-pipe': function (r, B) {
       var p = (r.parts || []).map(function (x) { return [x[0], x[1], HK_LAB[x[0]] || x[0]]; }), b = bars(p);
       var link = r.id ? ' · <a href="https://www.nhl.com/player/' + esc(r.id) + '" rel="noopener">NHL.com ↗</a>' : '';
-      var line = r.k ? 'latest season (' + r.k + ' since the draft): ' + esc(r.league || 'no league line') + (r.gp ? ', ' + r.gp + ' GP' : '') + (r.nhle != null ? ' · ' + f1(r.nhle) + ' NHLe' : '') +
+      var line = r.k ? 'latest season (' + r.k + ' since the draft): ' + esc(r.league || 'no league line') + (r.gp ? ', ' + r.gp + ' GP' : '') + (r.nhle != null ? ' · ' + hkNh(r) + ' NHLe' : '') +
         (r.etoi ? ' · ' + f1(r.etoi) + ' min TOI' : '') + (r.esog ? ', ' + (+r.esog).toFixed(2) + ' shots on goal a game' : '') + (r.exg != null ? ', ' + f1(r.exg) + ' xG' : '') + (r.chip != null ? ' · CHIP ' + f1(r.chip) + ' (College Hockey News)' : '') + (r.progp ? ' · ' + r.progp + ' pro games' : '') + (r.wjc ? ' · World Juniors' : '')
-        : 'draft year: ' + esc(r.league || '-') + (r.gp ? ', ' + r.gp + ' GP' : '') + (r.nhle != null ? ' · ' + f1(r.nhle) + ' NHLe' : '');
+        : 'draft year: ' + esc(r.league || '-') + (r.gp ? ', ' + r.gp + ' GP' : '') + (r.nhle != null ? ' · ' + hkNh(r) + ' NHLe' : '');
       var ph = r.ph ? '<span class="pxframe pxframe--card"><img src="https://img.a.transfermarkt.technology/portrait/header/' + esc(r.ph) + '" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>' : '';
       return ph + '<p class="cfb__dhead"><b>' + esc(r.name) + '</b>' + (r.nat ? ' <img class="flag" src="/img/flags/' + esc(r.nat) + '.png" alt="' + esc(r.nat) + '" width="16" height="11">' : '') + ' · ' + esc(r.pos) + ' · ' + esc(r.team) + ' · FV ' + r.fv + ' (draft ' + r.fv0 + ') · NHL ' + pc(r.p40) + ' · Reg ' + pc(r.p50) + link + '</p>' +
         '<p class="cfb__role">drafted ' + r.year + ', pick ' + r.pick + ' by ' + esc(r.team) + (r.age ? ' · age ' + fa(r) : '') + ' · NHL so far: ' + r.nhlgp + ' GP' + (r.war != null ? ', ' + sgn(r.war, 2) + ' WAR' : '') + '.</p>' +

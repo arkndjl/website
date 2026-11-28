@@ -121,7 +121,8 @@ HAND = {'NHL': 1.0, 'KHL': .772, 'Rus-KHL': .772, 'Russia': .772, 'SHL': .566, '
         'U20 SM-sarja': .15, 'U20 SM-liiga': .15, 'Fin-Jr.': .15, 'Czechia U20': .12, 'CzRep-Jr.': .12,
         'Swiss-Jr.': .12, 'Slovakia-Jr.': .1, 'BCHL': .10, 'NAHL': .10, 'AJHL': .09, 'OJHL': .08, 'CCHL': .08,
         'ON-Jr.A': .08, 'MJHL': .07, 'SJHL': .07, 'CJHL': .08, 'QJHL': .07, 'EJHL': .07, 'USPHL': .06,
-        'HockeyEttan': .1, 'Swe-U18': .08, '18U AAA': .04}
+        'HockeyEttan': .1, 'Swe-U18': .08, '18U AAA': .04, 'Swiss U20': .12, 'Slovakia U20': .1, 'DEL2': .2, 'DNL': .08,
+        'USHS': .05}
 TOURN = re.compile(r'^(U-?1[78]|U-?20|WJC|WJ18|WC|OG|Hlinka|IIHF|WHC|U17|U18|5 Nations|4 Nations|World|Int|Olympics)', re.I)
 CHL, EPRO = {'OHL', 'WHL', 'QMJHL'}, {'KHL', 'Rus-KHL', 'Russia', 'SHL', 'Sweden', 'Liiga', 'Finland', 'SM-liiga', 'NL', 'Swiss',
                                          'Czechia', 'CzRep', 'Czech', 'DEL', 'Germany', 'VHL', 'Russia2', 'HockeyAllsvenskan',
@@ -130,6 +131,32 @@ CHL, EPRO = {'OHL', 'WHL', 'QMJHL'}, {'KHL', 'Rus-KHL', 'Russia', 'SHL', 'Sweden
 NCAA = {'NCAA', 'WCHA', 'CCHA', 'H-East', 'ECAC', 'NCHC', 'Big Ten', 'BIG10', 'Atlantic', 'AHA', 'Hockey East'}
 USJR = {'USHL', 'NTDP', 'USDP', 'USNTDP', 'NAHL', 'BCHL', 'AJHL', 'OJHL', 'CCHL', 'ON-Jr.A', 'MJHL', 'SJHL', 'CJHL', 'QJHL',
         'EJHL', 'USPHL', '18U AAA'}
+
+
+# one name a league (Nov 28 2026): the NHL landing pages name the same league several ways across eras (SHL / Sweden,
+# Liiga / Finland, NL / Swiss / NLA, Hockey East / NCAA) and Tankathon names Swedish and Finnish junior its own way; the
+# NHLe fit and the factor lookup both read the canonical name, so a league's movers are pooled and every spelling gets
+# the same factor
+CANON = {'Rus-KHL': 'KHL', 'Russia': 'KHL', 'Sweden': 'SHL', 'SEL': 'SHL', 'Finland': 'Liiga', 'SM-liiga': 'Liiga',
+         'Swiss': 'NL', 'NLA': 'NL', 'CzRep': 'Czechia', 'Czech': 'Czechia', 'Extraliga': 'Czechia', 'Germany': 'DEL',
+         'EBEL': 'ICEHL', 'Austria': 'ICEHL', 'Sweden-2': 'HockeyAllsvenskan', 'Allsvenskan': 'HockeyAllsvenskan',
+         'HA': 'HockeyAllsvenskan', 'Finland-2': 'Mestis', 'Russia2': 'VHL', 'CzRep-2': 'Czechia2', 'Czech2': 'Czechia2',
+         'Slovak': 'Slovakia', 'Germany2': 'DEL2',
+         'H-East': 'NCAA', 'Hockey East': 'NCAA', 'ECAC': 'NCAA', 'CCHA': 'NCAA', 'NCHC': 'NCAA', 'Big Ten': 'NCAA',
+         'BIG10': 'NCAA', 'WCHA': 'NCAA', 'Atlantic': 'NCAA', 'AHA': 'NCAA',
+         'USDP': 'NTDP', 'USNTDP': 'NTDP', 'U.S. National U18 Team': 'NTDP',
+         'J20 SuperElit': 'J20 Nationell', 'Swe-Jr.': 'J20 Nationell', 'U20 Nationell': 'J20 Nationell', 'SuperElit': 'J20 Nationell',
+         'Sweden J20': 'J20 Nationell', 'Fin-Jr.': 'U20 SM-sarja', 'U20 SM-liiga': 'U20 SM-sarja', 'Jr. A SM-liiga': 'U20 SM-sarja',
+         'Russia-Jr.': 'MHL', 'CzRep-Jr.': 'Czechia U20', 'Czech U20': 'Czechia U20', 'Swiss-Jr.': 'Swiss U20',
+         'U20-Elit': 'Swiss U20', 'Slovakia-Jr.': 'Slovakia U20', 'Ger-Jr.': 'DNL', 'DNL U20': 'DNL'}
+
+
+def canon(lg):
+    if lg in CANON:
+        return CANON[lg]
+    if lg and (lg.startswith('High-') or lg.startswith('USHS')):
+        return 'USHS'
+    return lg
 
 
 def hand_of(lg):
@@ -142,14 +169,34 @@ def hand_of(lg):
 
 PRO_CUT = .38
 NHLE_FILE = os.path.join(ROOT, 'data', 'hockey_nhle.json')
-FITTED = json.load(open(NHLE_FILE))['factors'] if os.path.exists(NHLE_FILE) else {}
+_NF = json.load(open(NHLE_FILE)) if os.path.exists(NHLE_FILE) else {}
+FITTED = _NF.get('factors') or {}
+FITTED_N = {k: v[1] for k, v in (_NF.get('raw') or {}).items()}     # movers behind each fitted league
+FITTED_LAST = _NF.get('last') or {}                                  # the last season under that name
 
 
 def nhle_of(lg):
     """the fitted translation factor; a league the fit has no movers for keeps its hand constant on the fitted scale"""
     if lg in FITTED:
         return FITTED[lg]
+    # a spelling the fit never saw (the NHL API's 2025-26 renames, J20 Nationell -> U20 Nationell and Fin-Jr. ->
+    # U20 SM-sarja; Tankathon's own labels) takes the factor of the same league under its newest fitted name
+    c = canon(lg)
+    alts = [k for k in FITTED if k != lg and canon(k) == c]
+    if alts:
+        return FITTED[max(alts, key=lambda k: (FITTED_LAST.get(k, 0), FITTED_N.get(k, 0), k))]
     return hand_of(lg) * FITTED.get('_unk', 1.0)
+
+
+def nhle_show(raw, shrunk, gp, prev=None):
+    """the NHLe a board row shows (Nov 28 2026: every skater has one). 20+ games: his own line. Fewer: the shrunk NHLe the
+    grade reads (his line pulled toward the prior with NHLE_K games), marked estimated. No games this season: last
+    season's line when the source gives it (display only; the grade keeps the prior), else the prior."""
+    if gp and gp >= NHLE_K and raw is not None:
+        return {'nhle': round(raw, 1)}
+    if prev:
+        return {'nhle': round(prev[0], 1), 'nhleEst': 1, 'nhleOf': prev[1]}
+    return {'nhle': round(shrunk, 1) if shrunk is not None else None, 'nhleEst': 1, 'nhleRaw': round(raw, 1) if raw is not None else None}
 
 
 def is_pro(lg):
@@ -948,7 +995,13 @@ def tankathon():
         yr = re.findall(r'class="year">(\d{4})', chunk); mo = g(r'class="month">([A-Z]{3})')
         vals = dict(re.findall(r'<div class="label">([A-Za-z%]+)</div><div class="value total"[^>]*>([^<]*)', chunk))
         num = lambda k: float(vals[k]) if vals.get(k) not in (None, '', '-') else None
-        out.append({'rk': int(rk), 'name': nm.replace('&#39;', "'"), 'pos': pos.strip().split('/')[0], 'posFull': pos.strip(),
+        # no games this season: Tankathon shows last season's line under a dated label ("25-26 GP")
+        prev = re.search(r'<div class="label">(\d\d-\d\d) GP</div><div class="value total"[^>]*>([^<]*)', chunk) if 'GAMES' not in vals else None
+        if prev:
+            pv = {'season': prev.group(1), 'gp': float(prev.group(2)) if prev.group(2).strip() not in ('', '-') else None,
+                  'p': num('POINTS'), 'g': num('GOALS')}
+            vals = {}
+        out.append({'prev': pv if prev else None,'rk': int(rk), 'name': nm.replace('&#39;', "'"), 'pos': pos.strip().split('/')[0], 'posFull': pos.strip(),
                     'club': club.strip().replace('&amp;', '&'), 'league': (g(r'league-name">([^<]*)') or '').replace('\u2011', '-'),
                     'ht': hti, 'wt': int(g(r'class="weight">(\d+)')) if g(r'class="weight">(\d+)') else None,
                     'birth': f"{yr[0]}-{mon.get(mo, 6):02d}-15" if yr else None,
@@ -1076,7 +1129,9 @@ def build():
         p40, p50 = odds(fitd, x)
         board.append({'rk': t['rk'], 'name': t['name'], 'pos': 'D' if r['D'] else t['pos'], 'posFull': t['posFull'], 'club': t['club'],
                       'league': t['league'], 'grp': group_of(lg), 'ht': t['ht'], 'wt': t['wt'], 'age': round(r['age'], 1) if r['age'] else None,
-                      'gp': int(gp), 'pts': int(t['p']) if t['p'] is not None else None, 'nhle': round(nh_raw, 1) if nh_raw is not None else None,
+                      'gp': int(gp), 'pts': int(t['p']) if t['p'] is not None and gp else None,
+                      **({} if g else nhle_show(nh_raw, r['d0']['nhle'], gp, (82 * nhle_of(lg) * t['prev']['p'] / t['prev']['gp'], t['prev']['season'] + ': ' + str(int(t['prev']['p'])) + ' points in ' + str(int(t['prev']['gp'])) + ' games')
+                                  if t.get('prev') and t['prev'].get('gp') and t['prev'].get('p') is not None else None)),
                       'nat': t.get('nat'), 'xslot': round(math.exp(ls)), 'fvx': round(x, 2), 'fv': FS.fv_of('hockey', x), 'p40': round(p40, 3), 'p50': round(p50, 3),
                       'p30': round(sig('p30', x), 3), 'p60': round(sig('p60', x), 3), 'parts': parts(fitd['coef'], fitd['kept'], f, mean0)})
     # provisional grades (Oct 25 2026): draft-eligibles in the CHL, AHL and Liiga feeds who are not on Tankathon's board,
@@ -1129,6 +1184,15 @@ def build():
         px = (r.get('px') or {}).get(k) or {}
         p40, p50 = odds(fitd, x)
         q = r['post'].get(k) if k else r['d0']
+        # no line of 5+ games that season (hurt, or a season in a league the NHL API does not carry): his latest earlier
+        # line, marked estimated with its season (display only; the grade reads the missing line as it was fit)
+        nest = {}
+        if not r['G'] and (q or {}).get('nhle') is None:
+            back = [(r['post'].get(j), r['year'] + j) for j in range(k - 1, 0, -1)] + [(r.get('d0'), r['year']), (r.get('dm1'), r['year'] - 1)]
+            for qq, se in back:
+                if qq and qq.get('nhle') is not None:
+                    nest = {'nhle': round(qq['nhle'], 1), 'nhleEst': 1, 'nhleOf': f"{se - 1}-{se % 100:02d}: {qq['lg']}, {qq['gp']} games"}
+                    break
         tm = W.get(cur, {}).get(r['id'], {}).get('tm') if r['id'] else None
         etoi, esog = euro_line(r, r['year'] + k, (q or {}).get('lg'))
         exg, chip = ncaa_extra(r, r['year'] + k, (q or {}).get('lg'))
@@ -1136,7 +1200,7 @@ def build():
                      'nat': nat(r.get('country')),
                      'age': round(age_at(r['birth'], cur - 1), 2) if r['birth'] else None, 'k': k,
                      'league': (q or {}).get('lg'), 'gp': (q or {}).get('gp'),
-                     'ahls': (r['px'].get(k) or {}).get('ahls') if k else None, 'etoi': etoi, 'esog': esog, 'exg': exg, 'chip': chip, 'nhle': round(q['nhle'], 1) if q and not r['G'] else None,
+                     'ahls': (r['px'].get(k) or {}).get('ahls') if k else None, 'etoi': etoi, 'esog': esog, 'exg': exg, 'chip': chip, 'nhle': round(q['nhle'], 1) if q and not r['G'] else None, **nest,
                      'nhlgp': gp_all, 'fv0': FS.fv_of('hockey', x0), 'fv0x': round(x0, 2), 'fvx': round(x, 2), 'fv': FS.fv_of('hockey', x), 'p40': round(p40, 3), 'p50': round(p50, 3),
                      'p30': round(sig('p30', x), 3), 'p60': round(sig('p60', x), 3), 'parts': pp,
                      'nh0': round(r['d0']['nhle'], 1) if not r['G'] and (r.get('d0') or {}).get('nhle') is not None else None,
