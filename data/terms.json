@@ -470,7 +470,15 @@
   "Surplus": {
    "n": "Surplus value",
    "d": "What his projected play is worth minus what he is paid, over the years left on his deal.",
-   "g": "Contract value (surplus)"
+   "g": "Contract value (surplus)",
+   "when": [
+    {
+     "m": "a win above the minimum|price of a win|at \\$",
+     "n": "Surplus",
+     "d": "What the play is worth at the league's price of a win, minus what it costs above minimum players.",
+     "g": "Surplus / Eff+"
+    }
+   ]
   },
   "xAAV": {
    "n": "Expected AAV",
@@ -3388,6 +3396,77 @@
     "hockey-prospects",
     "standings",
     "home"
+   ]
+  },
+  "Eff+": {
+   "n": "Payroll efficiency plus",
+   "d": "A team's Surplus on the plus scale, where 100 is the league average and 25 is one standard deviation.",
+   "g": "Surplus / Eff+"
+  },
+  "$/W": {
+   "n": "Dollars a win",
+   "d": "What a roster costs above minimum players for each win of value it had last season.",
+   "g": "Surplus / Eff+"
+  },
+  "AAV": {
+   "n": "Average Annual Value",
+   "d": "The contract's total value divided by its years.",
+   "g": "Payroll"
+  },
+  "Gtd": {
+   "n": "Guaranteed",
+   "d": "The money he is owed even if he is cut.",
+   "g": "Payroll"
+  },
+  "LTIR": {
+   "n": "Long-Term Injured Reserve",
+   "d": "The cap hits of players out long term, which a team can spend past the cap to replace.",
+   "g": "Payroll"
+  },
+  "Cap%": {
+   "n": "Share of the cap",
+   "d": "The payroll as a share of this season's salary cap.",
+   "g": "Payroll"
+  },
+  "Status": {
+   "n": "Free-agent status",
+   "d": "What he becomes when the deal ends: UFA, RFA, ERFA, or a player or team option.",
+   "g": "Payroll",
+   "only": [
+    "nba",
+    "nfl",
+    "nhl"
+   ],
+   "part": false
+  },
+  "UFA": {
+   "n": "Unrestricted free agent",
+   "d": "He can sign with any team when the deal ends.",
+   "g": "Payroll",
+   "inline": false
+  },
+  "RFA": {
+   "n": "Restricted free agent",
+   "d": "His team can match any offer when the deal ends.",
+   "g": "Payroll",
+   "inline": false
+  },
+  "Deal": {
+   "n": "Deal surplus",
+   "d": "What his play is expected to be worth over the seasons left on his deal, aged, minus what he is paid above the minimum.",
+   "g": "Surplus / Eff+",
+   "only": [
+    "nba",
+    "nhl"
+   ]
+  },
+  "Risk": {
+   "n": "Dead-money risk",
+   "d": "Cap dollars after this season that his age curve expects to buy no value.",
+   "g": "Surplus / Eff+",
+   "only": [
+    "nba",
+    "nhl"
    ]
   },
   "CLASS TOP": {

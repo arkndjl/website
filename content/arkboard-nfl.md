@@ -11,8 +11,14 @@ cover = "/og/nfl.png"
 
 {{< winpane title="nfl.exe :: 2026" icon="football" sprite="px/hero-football" status="nflverse · PFR AV" class="winpane--art" />}}
 
-{{< wintabs groups="players:leaders,projections,standouts,awards,all-time players,ARKLIST|rosters:depth chart,personnel,transactions|games:games,game table|teams:ARK Ranking,units,all-time|market:contract value" side="true" label="NFL views" >}}
+{{< wintabs groups="players:leaders,projections,standouts,awards,all-time players,ARKLIST|rosters:depth chart,personnel,transactions|games:games,game table|teams:ARK Ranking,units,all-time|market:payrolls,free agents,contract value" side="true" label="NFL views" >}}
 {{< pctl sport="nfl" icon="football" title="projections" tab="projections" >}}
+{{< wintabs tab="payrolls" tabs="payrolls,cap space,contracts" sub="true" label="payrolls views" >}}
+{{< lazytab tab="payrolls" >}}{{< payrolls lg="nfl" view="teams" tab="payrolls" >}}{{< /lazytab >}}
+{{< lazytab tab="cap space" >}}{{< payrolls lg="nfl" view="space" tab="cap space" >}}{{< /lazytab >}}
+{{< lazytab tab="contracts" >}}{{< payrolls lg="nfl" view="contracts" tab="contracts" >}}{{< /lazytab >}}
+{{< /wintabs >}}
+{{< lazytab tab="free agents" >}}{{< payrolls lg="nfl" view="fa" tab="free agents" >}}{{< /lazytab >}}
 {{< xaav sport="nfl" title="contract value" tab="contract value" >}}
 {{< wintabs tab="standouts" tabs="standouts,next up,rookies" sub="true" label="standouts views" >}}
 {{< rookies sport="nfl" icon="football" title="rookies" tab="rookies" >}}

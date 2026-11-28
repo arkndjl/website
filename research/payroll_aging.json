@@ -1,0 +1,279 @@
+{
+ "nfl": {
+  "k1": {
+   "n": 3395,
+   "maeAged": 0.0921,
+   "maeFlat": 0.093,
+   "t": -2.14,
+   "won": "6/7"
+  },
+  "k2": {
+   "n": 3210,
+   "maeAged": 0.0845,
+   "maeFlat": 0.0867,
+   "t": -4.5,
+   "won": "6/6"
+  },
+  "k3": {
+   "n": 2919,
+   "maeAged": 0.0729,
+   "maeFlat": 0.0754,
+   "t": -4.6,
+   "won": "5/5"
+  },
+  "curve": {
+   "1": {
+    "0-24": [
+     0.0645,
+     0.5082
+    ],
+    "25-27": [
+     0.0381,
+     0.4756
+    ],
+    "28-30": [
+     0.0269,
+     0.458
+    ],
+    "31-33": [
+     0.0152,
+     0.4994
+    ],
+    "34-99": [
+     0.0057,
+     0.6951
+    ]
+   },
+   "2": {
+    "0-24": [
+     0.0656,
+     0.3778
+    ],
+    "25-27": [
+     0.0321,
+     0.3743
+    ],
+    "28-30": [
+     0.0158,
+     0.3477
+    ],
+    "31-33": [
+     0.0037,
+     0.356
+    ],
+    "34-99": [
+     -0.0071,
+     0.5309
+    ]
+   },
+   "3": {
+    "0-24": [
+     0.0555,
+     0.3176
+    ],
+    "25-27": [
+     0.0241,
+     0.2879
+    ],
+    "28-30": [
+     0.0111,
+     0.2125
+    ],
+    "31-33": [
+     -0.0043,
+     0.3038
+    ],
+    "34-99": [
+     -0.006,
+     0.3754
+    ]
+   }
+  },
+  "pass": true
+ },
+ "note": "Does an age curve read a player's value over the years left on his deal better than his last season carried forward?\nThe question behind a full-deal surplus and a dead-money risk: both need each later season's expected value.\n\n    python3 scripts/research/payrolls_nov28/aging.py [nba nhl nfl]   -> research/payroll_aging.json\n\nPlayer-season rows from the panels (panel_<lg>.json.gz): value v in season s and his age that season (NBA: the VORX\nfiles, NHL: the WAR files, NFL: OverTheCap birth dates through nflverse). Target: his value k = 1, 2, 3 seasons later,\nsummed over teams, 0 when he no longer plays (a player who leaves the league is replaced at replacement level).\nRows: players with pay above twice the minimum in season s (the contracts a team carries forward).\n  flat  v(s+k) = a_k + b_k v(s)                     the season carried forward, shrunk\n  aged  v(s+k) = a_k,age + b_k,age v(s)            the same by age group (<= 24, 25-27, 28-30, 31-33, 34+)\nWalk-forward: fit on seasons before s, test on s (first five seasons fit only). Ships when aged beats flat on held-out\nMAE with paired t <= -2 for k = 1 and k = 3 and wins most seasons. The risk read is reported too: the share of the dollars\nthe aged form calls dead (pay above the minimum with expected value at the league rate below it) that turned out dead.",
+ "nba": {
+  "k1": {
+   "n": 2707,
+   "maeAged": 1.1219,
+   "maeFlat": 1.1358,
+   "t": -2.05,
+   "won": "6/8"
+  },
+  "k2": {
+   "n": 2375,
+   "maeAged": 1.1864,
+   "maeFlat": 1.2267,
+   "t": -3.3,
+   "won": "7/7"
+  },
+  "k3": {
+   "n": 2030,
+   "maeAged": 1.2088,
+   "maeFlat": 1.282,
+   "t": -4.14,
+   "won": "6/6"
+  },
+  "curve": {
+   "1": {
+    "0-24": [
+     0.5957,
+     0.8377
+    ],
+    "25-27": [
+     0.2772,
+     0.805
+    ],
+    "28-30": [
+     0.11,
+     0.7372
+    ],
+    "31-33": [
+     0.0483,
+     0.7163
+    ],
+    "34-99": [
+     -0.09,
+     0.7184
+    ]
+   },
+   "2": {
+    "0-24": [
+     0.8646,
+     0.8113
+    ],
+    "25-27": [
+     0.1832,
+     0.7699
+    ],
+    "28-30": [
+     0.0302,
+     0.6145
+    ],
+    "31-33": [
+     -0.1369,
+     0.6363
+    ],
+    "34-99": [
+     -0.1717,
+     0.5698
+    ]
+   },
+   "3": {
+    "0-24": [
+     0.9465,
+     0.8076
+    ],
+    "25-27": [
+     0.1308,
+     0.677
+    ],
+    "28-30": [
+     -0.0398,
+     0.5102
+    ],
+    "31-33": [
+     -0.1877,
+     0.5037
+    ],
+    "34-99": [
+     -0.131,
+     0.3844
+    ]
+   }
+  },
+  "pass": true
+ },
+ "nhl": {
+  "k1": {
+   "n": 4412,
+   "maeAged": 1.0655,
+   "maeFlat": 1.0835,
+   "t": -5.47,
+   "won": "9/10"
+  },
+  "k2": {
+   "n": 3966,
+   "maeAged": 1.0389,
+   "maeFlat": 1.07,
+   "t": -6.59,
+   "won": "9/9"
+  },
+  "k3": {
+   "n": 3517,
+   "maeAged": 0.9832,
+   "maeFlat": 1.0287,
+   "t": -7.73,
+   "won": "8/8"
+  },
+  "curve": {
+   "1": {
+    "0-24": [
+     0.6494,
+     0.585
+    ],
+    "25-27": [
+     0.5991,
+     0.496
+    ],
+    "28-30": [
+     0.4002,
+     0.4866
+    ],
+    "31-33": [
+     0.3348,
+     0.4305
+    ],
+    "34-99": [
+     0.2527,
+     0.3542
+    ]
+   },
+   "2": {
+    "0-24": [
+     0.7045,
+     0.5735
+    ],
+    "25-27": [
+     0.5648,
+     0.4166
+    ],
+    "28-30": [
+     0.3257,
+     0.4088
+    ],
+    "31-33": [
+     0.2245,
+     0.3676
+    ],
+    "34-99": [
+     0.1184,
+     0.2661
+    ]
+   },
+   "3": {
+    "0-24": [
+     0.7448,
+     0.5107
+    ],
+    "25-27": [
+     0.4935,
+     0.3818
+    ],
+    "28-30": [
+     0.2484,
+     0.3812
+    ],
+    "31-33": [
+     0.1501,
+     0.2743
+    ],
+    "34-99": [
+     0.0787,
+     0.1723
+    ]
+   }
+  },
+  "pass": true
+ }
+}

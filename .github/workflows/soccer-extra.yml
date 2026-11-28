@@ -27,5 +27,8 @@ jobs:
       - name: Tables
         continue-on-error: true
         run: python3 scripts/soccer_extra.py mls speed scorers
+      - name: MLS payrolls
+        continue-on-error: true
+        run: python3 scripts/payrolls.py mls && python3 scripts/payrolls.py --stale 160 soccer   # big five wages: Salary Sport, once a week
       - name: Commit if anything changed
-        run: python3 scripts/data_push.py -m "Update the soccer source tables ($(date -u +%Y-%m-%d))" -- data/soccer_extra.json
+        run: python3 scripts/data_push.py -m "Update the soccer source tables ($(date -u +%Y-%m-%d))" -- data/soccer_extra.json data/payrolls/mls.json data/payrolls/soccer.json

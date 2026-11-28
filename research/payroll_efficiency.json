@@ -1,0 +1,209 @@
+{
+ "nba": {
+  "n": 270,
+  "years": "2018-2026",
+  "maeBase": 0.0926,
+  "eff": {
+   "mae": 0.0914,
+   "t": -0.67,
+   "won": "5/9",
+   "pass": false
+  },
+  "surplus": {
+   "mae": 0.0827,
+   "t": -3.21,
+   "won": "8/9",
+   "pass": true
+  },
+  "value": {
+   "mae": 0.0823,
+   "t": -3.26,
+   "won": "8/9",
+   "pass": true
+  },
+  "surplusVsValue": {
+   "t": 1.8,
+   "won": "3/9"
+  },
+  "effYoY": 0.455,
+  "coefSurplus": [
+   0.2825,
+   -0.0061,
+   0.2011,
+   0.1648
+  ],
+  "ratePerWin": {
+   "2013": 3.377,
+   "2014": 3.362,
+   "2015": 3.559,
+   "2016": 3.906,
+   "2017": 4.965,
+   "2018": 5.471,
+   "2019": 5.902,
+   "2020": 6.875,
+   "2021": 7.219,
+   "2022": 6.445,
+   "2023": 7.523,
+   "2024": 8.126,
+   "2025": 8.817,
+   "2026": 9.213
+  },
+  "meanPayCap": 1.132
+ },
+ "note": "Payroll efficiency, held out, point in time: does a team's surplus (value bought beyond what the league pays for it)\ntell us more about next season's wins than last season's record and next season's payroll already do?\n\n    python3 scripts/research/payrolls_nov28/test.py [nba nfl nhl mls]   -> research/payroll_efficiency.json\n\nPer team-season s (panel_<lg>.json.gz, PANEL.md):\n  above  = sum over players of max(pay - min, 0)                        what he costs beyond a minimum player\n  value  = sum of value over replacement (WAR, VORX, g+ above replacement)\n  rate_s = league above / league value                                 the league's $ a win that season\n  surplus_s = rate_s x value - above                                    sums to 0 over the league\nForms, each predicting win% in s+1 (MLS: points a match), fit on earlier seasons only (walk-forward, first 4 seasons fit only):\n  base     win% s, payroll s+1 / cap (the roster's payroll is known before the season)\n  eff      base + wins over payroll s (win% s less the season's fit on payroll s / cap: front-office efficiency)\n  surplus  base + surplus s / cap of the team's s+1 roster (each s+1 player's value in s, anywhere, against his s+1 pay)\n  value    base + the s+1 roster's value in s (the same roster read without pay: what the pay half adds over it)\nA form ships when it beats base on held-out MAE with paired t <= -2 and wins most held-out seasons. Also reported: the\nyear-to-year correlation of wins over payroll (is efficiency a lasting trait of a front office).",
+ "mls": {
+  "n": 238,
+  "years": "2018-2026",
+  "maeBase": 0.2546,
+  "eff": {
+   "mae": 0.2576,
+   "t": 1.7,
+   "won": "3/9",
+   "pass": false
+  },
+  "surplus": {
+   "mae": 0.2536,
+   "t": -0.24,
+   "won": "5/9",
+   "pass": false
+  },
+  "value": {
+   "mae": 0.254,
+   "t": -0.12,
+   "won": "5/9",
+   "pass": false
+  },
+  "surplusVsValue": {
+   "t": -1.07,
+   "won": "5/9"
+  },
+  "effYoY": 0.273,
+  "coefSurplus": [
+   1.002,
+   0.2386,
+   0.0152,
+   0.0056
+  ],
+  "ratePerWin": {
+   "2013": 0.479,
+   "2014": 0.425,
+   "2015": 0.625,
+   "2016": 0.643,
+   "2017": 0.931,
+   "2018": 1.134,
+   "2019": 0.584,
+   "2020": 2.366,
+   "2021": 1.586,
+   "2022": 1.903,
+   "2023": 1.72,
+   "2024": 14.223,
+   "2025": 1.62,
+   "2026": 4.504
+  },
+  "meanPayCap": 3.014
+ },
+ "nfl": {
+  "n": 287,
+  "years": "2018-2026",
+  "maeBase": 0.1454,
+  "eff": {
+   "mae": 0.1455,
+   "t": 0.06,
+   "won": "6/9",
+   "pass": false
+  },
+  "surplus": {
+   "mae": 0.1447,
+   "t": -0.68,
+   "won": "6/9",
+   "pass": false
+  },
+  "value": {
+   "mae": 0.1444,
+   "t": -0.87,
+   "won": "6/9",
+   "pass": false
+  },
+  "surplusVsValue": {
+   "t": 0.95,
+   "won": "4/9"
+  },
+  "effYoY": 0.323,
+  "coefSurplus": [
+   -0.0027,
+   0.1936,
+   0.4766,
+   0.1513
+  ],
+  "ratePerWin": {
+   "2013": 19.044,
+   "2014": 20.7,
+   "2015": 21.151,
+   "2016": 20.882,
+   "2017": 22.773,
+   "2018": 23.747,
+   "2019": 25.514,
+   "2020": 26.686,
+   "2021": 21.101,
+   "2022": 23.225,
+   "2023": 24.724,
+   "2024": 27.413,
+   "2025": 31.672,
+   "2026": 53.857
+  },
+  "meanPayCap": 0.868
+ },
+ "nhl": {
+  "n": 342,
+  "years": "2016-2026",
+  "maeBase": 0.0686,
+  "eff": {
+   "mae": 0.0687,
+   "t": 0.51,
+   "won": "5/11",
+   "pass": false
+  },
+  "surplus": {
+   "mae": 0.0662,
+   "t": -2.68,
+   "won": "10/11",
+   "pass": true
+  },
+  "value": {
+   "mae": 0.0648,
+   "t": -3.25,
+   "won": "10/11",
+   "pass": true
+  },
+  "surplusVsValue": {
+   "t": 3.7,
+   "won": "0/11"
+  },
+  "effYoY": 0.313,
+  "coefSurplus": [
+   0.0625,
+   0.169,
+   0.3135,
+   0.127
+  ],
+  "ratePerWin": {
+   "2011": 1.735,
+   "2012": 1.88,
+   "2013": 3.39,
+   "2014": 2.106,
+   "2015": 2.273,
+   "2016": 2.324,
+   "2017": 2.469,
+   "2018": 2.353,
+   "2019": 2.547,
+   "2020": 3.134,
+   "2021": 4.012,
+   "2022": 2.568,
+   "2023": 2.69,
+   "2024": 2.728,
+   "2025": 2.811,
+   "2026": 3.096
+  },
+  "meanPayCap": 1.01
+ }
+}

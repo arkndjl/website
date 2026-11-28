@@ -1,0 +1,45 @@
+{{- /* Big five wages (scripts/payrolls.py soccer -> data/payrolls/soccer.json, Salary Sport estimates):
+       {{< soccerwages view="clubs|players" tab="..." >}}. clubs: one row a club; players: the 30 highest paid at each club. */ -}}
+{{- with site.Data.payrolls.soccer -}}
+{{- $D := . -}}
+{{- $date := lower ((time $D.asof).Format "Jan 2, 2006") -}}
+{{- $about := "Salary Sport's basic-wage estimates (bonuses out), published in pounds and shown in euros at its own 1.2 rate. Estimates, not club figures. SVAR = the player's 2025-26 season value over replacement in goals." -}}
+{{- if eq ($.Get "view") "players" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "player wages") "icon" "soccer" "filter" "League,Team,Pos" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Player,Wage,Pos,Team,Age,Thru,SVAR" "gfxDate" $date "gfxMax" "25" "class" "pay") -}}
+<table class="cfb__table pay__table pay__table--pl">
+  <thead><tr><th>RK</th><th>Player</th><th class="pay__k" title="estimated basic wage, 2026-27, €M a year">Wage</th><th>Pos</th><th>Team</th><th title="the club's league, 2026-27">League</th><th>Age</th>
+    <th title="estimated basic wage, €K a week">€K/wk</th><th title="month the contract ends">Thru</th><th class="cfb__g" data-term="SVAR" title="SVAR, 2025-26 (big five only)">SVAR</th></tr></thead>
+  <tbody>
+  {{- range $i, $p := sort $D.players "w" "desc" }}
+  <tr><td class="cfb__rk">{{ add $i 1 }}</td>
+    <td><b>{{ $p.n }}</b>{{ if $p.fa }} <span class="pay__tag" title="contract ends {{ $p.thru }}">FA</span>{{ end }}</td>
+    <td class="cfb__num is-key pay__k" data-v="{{ index $p.h 0 }}">{{ printf "%.1f" (index $p.h 0) }}</td>
+    <td>{{ $p.pos }}</td>
+    <td class="cfb__team">{{ with $p.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span>{{ $p.tm }}</span></td>
+    <td>{{ $p.lg }}</td><td class="cfb__num">{{ $p.age }}</td>
+    <td class="cfb__num" data-v="{{ $p.wk }}">{{ $p.wk }}</td><td>{{ $p.thru }}</td>
+    <td class="cfb__num cfb__g" data-v="{{ $p.v }}">{{ if ne $p.v nil }}{{ printf "%.1f" $p.v }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td></tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $D.players) "note" (printf "%s · estimates · updated %s" $D.label $date) "about" $about) -}}
+{{- else -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "club wages") "icon" "soccer" "filter" "League" "rerank" true "tab" ($.Get "tab") "gfxCols" "RK,Team,Wages,League,Top,Off,FA,SVAR" "gfxDate" $date "gfxMax" "25" "class" "pay") -}}
+<table class="cfb__table pay__table">
+  <thead><tr><th title="rank by estimated wage bill">RK</th><th>Team</th><th class="pay__k" title="estimated basic wage bill, 2026-27, €M a year (every listed player)">Wages</th><th title="the club's league, 2026-27">League</th>
+    <th title="highest estimated wage at the club, €M a year">Top</th><th title="estimated wages of the contracts that end by June 2027, €M">Off</th><th title="contracts that end by June 2027">FA</th>
+    <th title="players listed">N</th><th class="cfb__g" data-term="SVAR" title="the listed players' SVAR, 2025-26 (big five only)">SVAR</th></tr></thead>
+  <tbody>
+  {{- range $i, $t := $D.teams }}
+  <tr><td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__team">{{ with $t.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span>{{ $t.name }}</span></td>
+    <td class="cfb__num is-key pay__k" data-v="{{ $t.pay }}">{{ printf "%.1f" $t.pay }}</td><td>{{ $t.lg }}</td>
+    <td class="cfb__num" data-v="{{ $t.top }}">{{ printf "%.1f" $t.top }}</td><td class="cfb__num" data-v="{{ $t.exp }}">{{ printf "%.1f" $t.exp }}</td>
+    <td class="cfb__num">{{ $t.nfa }}</td><td class="cfb__num">{{ $t.n }}</td>
+    <td class="cfb__num cfb__g" data-v="{{ $t.val }}">{{ printf "%.1f" $t.val }}</td></tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $D.teams) "note" (printf "%s · estimates · updated %s" $D.label $date) "about" $about) -}}
+{{- end -}}
+{{- end -}}

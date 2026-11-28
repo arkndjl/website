@@ -96,6 +96,15 @@ POT_MIN = 0.05   # a school under a 5% chance is not a target
 POT_N = 15
 
 
+def top_by_year(rows):
+    """the POT_N likeliest-and-best targets of each class"""
+    out = []
+    for y in sorted({o['yr'] for o in rows}):
+        L = sorted([o for o in rows if o['yr'] == y], key=lambda o: -((o['p'] or 0) * (o['fv'] or 0) + (o['fv'] or 0) / 1e3))
+        out += L[:POT_N]
+    return out
+
+
 def visit_rates():
     """(official?, k) -> share of committed recruits' visited schools that he signed with, both sports pooled; k = his
     count of official visits (unofficial-only schools: his unofficial count), 5 = five or more. k = 1 official reads
@@ -203,6 +212,184 @@ def cfb_room(src):
     return room, set(dw)
 
 
+# ------------------------------------------------------------------------------------------- seasons 2 and 3
+# scripts/team_years.py (the roster chain) with the fit in data/team_years_fit.json (scripts/research/team_years_nov28):
+# a season k out = mean + sd x (a + b z(strength now) + c z(roster chain talent k)), z across this builder's teams
+import team_years as TY  # noqa: E402
+
+CFB_G = {'QB': 'QB', 'RB': 'RB', 'FB': 'RB', 'WR': 'WR', 'TE': 'TE', 'OT': 'OL', 'OG': 'OL', 'C': 'OL', 'OL': 'OL', 'IOL': 'OL', 'DE': 'EDGE',
+         'EDGE': 'EDGE', 'OLB': 'LB', 'DT': 'DL', 'DL': 'DL', 'ILB': 'LB', 'LB': 'LB', 'CB': 'CB', 'DB': 'CB', 'S': 'S', 'ATH': 'WR', 'K': 'K', 'P': 'P'}
+CBB_G = {'PG': 'G', 'SG': 'G', 'G': 'G', 'G/F': 'G', 'SF': 'F', 'PF': 'F', 'F': 'F', 'PF/C': 'C', 'C': 'C'}
+
+
+def rec_pos(sp, year, name, fallback):
+    """the projected college position (data/recruit_pos.json, PR #1364), first spot of a hybrid label"""
+    v = RPOS.get(sp, {}).get(f'{year}|{name}')
+    lab = (v[0] if v else fallback) or ''
+    return lab.split('/')[0] if sp == 'cfb' else lab
+
+
+RPOS = J('data', 'recruit_pos.json')
+
+
+def rec_lab(sp, year, name, fallback):
+    """the projected position label as the class tables show it (hybrids kept)"""
+    v = RPOS.get(sp, {}).get(f'{year}|{name}')
+    return v[0] if v else fallback
+
+
+def season_proj(T, now, tal, fit, key):
+    """{id(team): {k: z}} for k = 1, 2, 3 (k = 1: the roster chain's own next season, beside the plan)"""
+    zs = lambda d: (lambda v: {i: (x - v.mean()) / (v.std() or 1) for i, x in d.items()})(__import__('numpy').array(list(d.values()), float))
+    zn, out = zs({id(t): now(t) for t in T}), {}
+    for k in (1, 2, 3):
+        zt = zs({id(t): tal[k].get(key(t), 0.0) for t in T})
+        for t in T: out.setdefault(id(t), {})[k] = TY.predict(fit['h'][str(k)], zn[id(t)], zt[id(t)])
+    return out
+
+
+def put_years(T, Z, now_of, conf, pw, games, unit, rnd):
+    import numpy as np
+    v = np.array([now_of(t) for t in T], float); m, sd = float(v.mean()), float(v.std())
+    for k in (1, 2, 3):
+        S = {id(t): m + sd * Z[id(t)][k] for t in T}
+        xw = sched(T, lambda o: S[id(o)], conf, pw, games); rk = rank(T, lambda o: S[id(o)])
+        for t in T: t['nx']['y%d' % k] = {unit: rnd(S[id(t)]), 'rk': rk[id(t)], 'xw': round(xw(t, S[id(t)]), 1)}
+
+
+def cfb_years(D, T, conf, pw):
+    """seasons 2 and 3 and the roster by season (static/data/cfb-builder-ros.json: per team, every graded player and
+    commit with P(on this roster) in each of the next three seasons)"""
+    fit = J('data', 'team_years_fit.json').get('cfb')
+    if not fit: return None
+    stay = {int(c): v for c, v in fit['live']['stay'].items()}; dev = {int(c): v for c, v in fit['live']['dev'].items()}
+    by = TY.cfb_index(J('scripts', 'data', 'cfb_recruits_cfbd.json.gz', gz=True))
+    A = J('static', 'data', 'cfb-all.json'); c = {k: i for i, k in enumerate(A['cols'])}
+    tids = {t['team']: str(t['tid']) for t in T}; y0 = int(D['next']) - 1
+    rows, ros = [], defaultdict(list)
+    for r in A['rows']:
+        tm = r[c['team']]
+        if tm not in tids: continue
+        cl = TY.CFB_CLS.get(r[c['cls']] or '')
+        if not cl: continue
+        _, comp = TY.cfb_recruit(by, r[c['name']], tm, y0)
+        p0 = r[c['stayP']]
+        rows.append({'t': tids[tm], 'c': cl, 'v': TY.cfb_value(comp), 'p0': p0})
+        p1 = p0 if p0 is not None else stay[cl]; p2 = p1 * stay[min(4, cl + 1)]; p3 = p2 * stay[min(4, cl + 2)]
+        dl = r[c['dectL']] if 'dectL' in c else None
+        ros[tids[tm]].append([r[c['name']], r[c['pos']], r[c['cls']], r[c['fv']], round(p1, 2), round(p2, 2), round(p3, 2), 'back', dl])
+    R = J('static', 'data', 'cfb-recruits.json'); nx = int(R['next'])
+    groups = [(nx, R.get('class') or [])] + [(int(f['year']), f.get('list') or []) for f in R.get('future') or []]
+    for yr, L in groups:
+        for x in L:
+            if not x.get('tid') or x.get('status') not in ('committed', 'signed', 'enrolled'): continue
+            if yr == nx: rows.append({'t': str(x['tid']), 'c': 1, 'new': 1, 'v': TY.cfb_value(x.get('comp'))})
+            k = yr - nx; ps = [0.0] * k + [1.0]
+            while len(ps) < 3: ps.append(ps[-1] * stay[min(4, len(ps) - k)])
+            ros[str(x['tid'])].append([x['name'], CFB_G.get(rec_pos('cfb', yr, x['name'], x.get('pos')), x.get('g')), 'HS ' + str(yr), r1(x.get('xfv')), *[round(v, 2) for v in ps[:3]], 'cls', None])
+    later = defaultdict(list)
+    for yr, L in groups[1:]:
+        for x in L:
+            if x.get('tid') and x.get('status') in ('committed', 'signed', 'enrolled'):
+                later[str(x['tid'])].append({'name': x['name'], 'pos': rec_lab('cfb', yr, x['name'], x.get('pos')), 'yr': yr, 'fv': r1(x.get('xfv')), 'y1': r1(x.get('fvOn')),
+                                             'ark': x.get('ark'), 'stars': x.get('stars'), 'rk': x.get('rank'), 'x': x.get('xnil')})
+    for t in T: t['cls2'] = sorted(later.get(str(t['tid']), []), key=lambda c: (c['yr'], -(c['fv'] or 0)))
+    tal = {k: TY.chain(rows, stay, dev, k) for k in (1, 2, 3)}
+    Z = season_proj(T, lambda t: t['nx']['now']['e'], tal, fit, lambda t: str(t['tid']))
+    put_years(T, Z, lambda t: t['nx']['now']['e'], conf, pw, CFB_GAMES, 'e', round)
+    for t in T:
+        for pl in t.get('plan') or []:
+            cl = min(4, TY.CFB_CLS.get(pl.get('cls') or '', 3) + 1)
+            ros[str(t['tid'])].append([pl['name'], pl.get('slot') or pl.get('pos'), pl.get('cls'), r1(pl.get('fv')), 1.0, round(stay[cl], 2), round(stay[cl] * stay[min(4, cl + 1)], 2), 'new', None])
+    for t in T:   # targets: P(signs here), then the freshman stay chain
+        for o in (t.get('pot') or {}).get('next', []) + (t.get('pot') or {}).get('later', []):
+            if not o.get('p'): continue
+            k = o['yr'] - nx; ps = [0.0] * k + [o['p']]
+            while len(ps) < 3: ps.append(ps[-1] * stay[min(4, len(ps) - k)])
+            ros[str(t['tid'])].append([o['name'], CFB_G.get(rec_pos('cfb', o['yr'], o['name'], o.get('pos')), o.get('pos')), 'HS ' + str(o['yr']), o.get('fv'), *[round(v, 2) for v in ps[:3]], 'tgt', None])
+    out = {tid: sorted(L, key=lambda x: -(x[3] or 0)) for tid, L in ros.items()}
+    json.dump({'cols': ['name', 'pos', 'cls', 'fv', 'p1', 'p2', 'p3', 'kind', 'dect'], 'next': nx, 'teams': out},
+              open(os.path.join(SD, 'cfb-builder-ros.json'), 'w'), separators=(',', ':'), allow_nan=False)
+    return {'stay': fit['live']['stay'], 'h': {k: {x: v[x] for x in ('pass', 't', 'r2_0', 'r2_1', 'n')} for k, v in fit['h'].items()}}
+
+
+DEVC = TY.curve_of(J('data', 'team_years_dev.json').get('cbb'))
+
+
+def dev_path(v1, c1, age1, m):
+    """pXPM in each of the next three seasons: next season's projection, then the development curve (class, age,
+    level, role; data/team_years_dev.json, passed held out) a season at a time"""
+    if v1 is None or not DEVC: return [v1, None, None]
+    out, v, c, a = [round(v1, 1)], v1, min(4, c1), age1
+    for _ in range(2):
+        v += DEVC(c, a, v, m); c = min(4, c + 1); a = a + 1 if a else None; out.append(round(v, 1))
+    return out
+
+
+def cbb_years(D, T, conf, pw):
+    fit = J('data', 'team_years_fit.json').get('cbb')
+    if not fit: return None
+    stay = {int(c): v for c, v in fit['live']['stay'].items()}; dev = {int(c): v for c, v in fit['live']['dev'].items()}
+    F = J('data', 'cbb_market_fit.json'); fb, fm = F['fresh']['bpm'], F['fresh']['min']
+    sch = F.get('minsched') or [0.78, 0.74, 0.68, 0.6, 0.52, 0.42, 0.32, 0.22, 0.14, 0.08, 0.05, 0.03, 0.02]
+    REP = -3.0
+    rows, ros = [], defaultdict(list)
+    for t in T:
+        L = [(x, x['p']) for x in t.get('back') or []] + [(x, x['back']) for x in t.get('leave') or []]
+        L.sort(key=lambda a: -(a[0].get('bpm') if a[0].get('bpm') is not None else -9))
+        for i, (x, p0) in enumerate(L):
+            cl = TY.CLS.get(x.get('cls'))
+            if not cl: continue
+            if x.get('bpm') is not None:
+                m = x['mn'] if x.get('mn') is not None else (sch[i] if i < len(sch) else 0.0)
+                rows.append({'t': t['t'], 'c': cl, 'v': x['bpm'] - REP, 'm': m, 'p0': p0})
+            p2 = p0 * stay[min(4, cl + 1)]; p3 = p2 * stay[min(4, cl + 2)]
+            vs = dev_path(x.get('bpm'), cl + 1, (x.get('age') or 0) + 1 or None, x.get('mn') or 0.0)
+            ros[t['t']].append([x['name'], x.get('pos'), x.get('cls'), x.get('fv'), round(p0, 2), round(p2, 2), round(p3, 2), 'back', (x.get('dect') or [None])[0], *vs])
+    R = J('data', 'cbb_recruits.json'); nx = int(D['season'])
+    for g in R.get('classes') or []:
+        yr = int(g['year'])
+        for x in g.get('list') or []:
+            if not x.get('team') or yr < nx or yr > nx + 2: continue
+            if yr == nx and x.get('rk'):
+                l = -math.log(x['rk'])
+                rows.append({'t': x['team'], 'c': 1, 'new': 1, 'v': fb[0] + fb[1] * l - REP, 'm': (fm[0] + fm[1] * l) / 100})
+            k = yr - nx; ps = [0.0] * k + [1.0]
+            while len(ps) < 3: ps.append(ps[-1] * stay[min(4, len(ps) - k)])
+            vs = [None, None, None]
+            if x.get('rk'):
+                l = -math.log(x['rk']); vs = [None] * k + dev_path(round(fb[0] + fb[1] * l, 1), 1, None, (fm[0] + fm[1] * l) / 100)[:3 - k]
+            ros[x['team']].append([x['name'], CBB_G.get(rec_pos('cbb', yr, x['name'], x.get('pos')), x.get('pos')), 'HS ' + str(yr), x.get('fv'), *[round(v, 2) for v in ps[:3]], 'cls', None, *vs])
+    later = defaultdict(list)
+    for g in R.get('classes') or []:
+        yr = int(g['year'])
+        if yr <= nx: continue
+        for x in g.get('list') or []:
+            if x.get('team'):
+                later[x['team']].append({'name': x['name'], 'pos': rec_lab('cbb', yr, x['name'], x.get('pos')), 'yr': yr, 'fv': r1(x.get('fv')), 'y1': r1(x.get('y1fv')),
+                                         'ark': x.get('ark'), 'stars': x.get('stars'), 'rk': x.get('rk'), 'x': x.get('xnil')})
+    for t in T: t['cls2'] = sorted(later.get(t['t'], []), key=lambda c: (c['yr'], -(c['fv'] or 0)))
+    tal = {k: TY.chain(rows, stay, dev, k) for k in (1, 2, 3)}
+    Z = season_proj(T, lambda t: t['now'], tal, fit, lambda t: t['t'])
+    put_years(T, Z, lambda t: t['now'], conf, pw, CBB_GAMES, 'r', lambda v: round(v, 1))
+    for t in T:
+        for pl in t.get('plan') or []:
+            cl = min(4, TY.CLS.get(pl.get('cls') or '', 3) + 1)
+            ros[t['t']].append([pl['name'], pl.get('pos'), pl.get('cls'), pl.get('fv'), 1.0, round(stay[cl], 2), round(stay[cl] * stay[min(4, cl + 1)], 2), 'keep' if pl.get('kind') == 'keep' else 'new', None,
+                                *dev_path(pl.get('bpm'), cl, None, 0.5)])
+    for t in T:
+        for o in (t.get('pot') or {}).get('next', []) + (t.get('pot') or {}).get('later', []):
+            if not o.get('p'): continue
+            k = o['yr'] - nx; ps = [0.0] * k + [o['p']]
+            while len(ps) < 3: ps.append(ps[-1] * stay[min(4, len(ps) - k)])
+            ros[t['t']].append([o['name'], CBB_G.get(rec_pos('cbb', o['yr'], o['name'], o.get('pos')), o.get('pos')), 'HS ' + str(o['yr']), o.get('fv'), *[round(v, 2) for v in ps[:3]], 'tgt', None,
+                                *([None] * k + dev_path(o.get('bpm'), 1, None, 0.5))[:3]])
+    out = {tm: sorted(L, key=lambda x: -(x[3] or 0)) for tm, L in ros.items()}
+    json.dump({'cols': ['name', 'pos', 'cls', 'fv', 'p1', 'p2', 'p3', 'kind', 'dect', 'v1', 'v2', 'v3'], 'next': nx, 'teams': out, 'vLab': 'pXPM'},
+              open(os.path.join(SD, 'cbb-builder-ros.json'), 'w'), separators=(',', ':'), allow_nan=False)
+    return {'stay': fit['live']['stay'], 'h': {k: {x: v[x] for x in ('pass', 't', 'r2_0', 'r2_1', 'n')} for k, v in fit['h'].items()}}
+
+
 RATES = None
 CBB_ID = {}   # team key -> ESPN id (the CBB class rows name the school only)
 
@@ -249,7 +436,7 @@ def cfb():
         cls = {}
         for x in R.get('class') or []:
             if x.get('tid') and x.get('status') in ('committed', 'signed', 'enrolled'):
-                cls.setdefault(x['tid'], []).append({'name': x['name'], 'pos': x.get('pos'), 'fv': r1(x.get('xfv')), 'y1': r1(x.get('fvOn')), 'on': x.get('pOn'),
+                cls.setdefault(x['tid'], []).append({'name': x['name'], 'pos': rec_lab('cfb', int(R['next']), x['name'], x.get('pos')), 'fv': r1(x.get('xfv')), 'y1': r1(x.get('fvOn')), 'on': x.get('pOn'),
                                                      'ark': x.get('ark'), 'stars': x.get('stars'), 'rk': x.get('rank'), 'x': x.get('xnil')})
         for t in T: t['cls'] = sorted(cls.get(t['tid'], []), key=lambda c: -(c['fv'] or 0))
     except (OSError, ValueError): pass
@@ -259,7 +446,7 @@ def cfb():
         room, G = cfb_room(None)
         cls_by = {int(R['next']): R.get('class') or []}
         for f in R.get('future') or []: cls_by[int(f['year'])] = f.get('list') or []
-        nxt_y = int(R['next']); later = [y for y in sorted(cls_by) if y > nxt_y][:1]
+        nxt_y = int(R['next']); later = [y for y in sorted(cls_by) if y > nxt_y][:2]
         src = pot_sources('cfb', {y: cls_by[y] for y in [nxt_y] + later})
         byT = defaultdict(lambda: {'next': [], 'later': []})
         for y, rows in src.items():
@@ -281,8 +468,7 @@ def cfb():
                             best = max(best, room(base + [o['y1']], g, pz['repl']) - room(base, g, pz['repl']))
                         o['av'] = round(o['p'] * (o['on'] or 0) * best, 2); o['g'] = round(o['av'] * b[1]); gain += o['av']
                     rows.append(o)
-                rows.sort(key=lambda o: -((o['p'] or 0) * (o['fv'] or 0) + (o['fv'] or 0) / 1e3))
-                pot[k] = rows[:POT_N]
+                pot[k] = top_by_year(rows)
             t['pot'] = pot; t['_e']['pot'] = t['_e']['plan'] + b[1] * gain
             t['potX'] = int(round(sum((o['p'] or 0) * (o['x'] or 0) for o in pot['next']), -3))
         xw = sched(T, lambda o: o['_e']['pot'], conf, pw, CFB_GAMES); rk = rank(T, lambda o: o['_e']['pot'])
@@ -306,7 +492,9 @@ def cfb():
                     if v and x.get('kind') == 'back': x['dect'] = v
     except (OSError, ValueError, KeyError): pass
     for t in T: t.pop('_e', None)
-    D['nxFit'] = {'b': [round(v, 3) for v in b], 'r2': round(r2, 3), 'n': len(fit), 'games': CFB_GAMES, 'replQ': REPL_Q, 'warPerAv': WK,
+    try: yrs = cfb_years(D, T, conf, pw)
+    except (OSError, ValueError, KeyError) as e: print('cfb years', repr(e)); yrs = None
+    D['nxFit'] = {'years': yrs, 'b': [round(v, 3) for v in b], 'r2': round(r2, 3), 'n': len(fit), 'games': CFB_GAMES, 'replQ': REPL_Q, 'warPerAv': WK,
                   'pot': pot_fit(T, 'cfb')}
     json.dump(D, open(p, 'w'), separators=(',', ':'), allow_nan=False)
     return D['nxFit']
@@ -340,7 +528,7 @@ def cbb():
             if c.get('year') != D['season']: continue
             for x in c.get('list') or []:
                 if x.get('team'):
-                    cls.setdefault(x['team'], {})[x['name']] = {'fv': r1(x.get('fv')), 'y1': r1(x.get('y1fv')), 'ark': x.get('ark'), 'stars': x.get('stars')}
+                    cls.setdefault(x['team'], {})[x['name']] = {'pos': rec_lab('cbb', c['year'], x['name'], x.get('pos')), 'fv': r1(x.get('fv')), 'y1': r1(x.get('y1fv')), 'ark': x.get('ark'), 'stars': x.get('stars')}
         for t in T:
             for cm in t.get('commits') or []:
                 cm.update({k: v for k, v in (cls.get(t['t'], {}).get(cm['name']) or {}).items() if v is not None})
@@ -355,7 +543,7 @@ def cbb():
         ra, rk_ = lsq([[1.0, rate(cur(t))] for t in T], [t['after'] for t in T])
         R = json.load(open(os.path.join(ROOT, 'data', 'cbb_recruits.json')))
         cls_by = {int(c['year']): c.get('list') or [] for c in R.get('classes') or []}
-        nxt_y = int(D['season']); later = [y for y in sorted(cls_by) if y > nxt_y][:1]
+        nxt_y = int(D['season']); later = [y for y in sorted(cls_by) if y > nxt_y][:2]
         src = pot_sources('cbb', {y: cls_by[y] for y in [nxt_y] + later if y in cls_by})
         byT = defaultdict(lambda: {'next': [], 'later': []})
         for y, rows in src.items():
@@ -371,8 +559,7 @@ def cbb():
                         o['bpm'] = round(fb[0] + fb[1] * -math.log(r['rk']), 1)
                         o['g'] = round(o['p'] * rk_ * (rate(c0 + [o['bpm']]) - r0), 2); gain += o['g']
                     rows.append(o)
-                rows.sort(key=lambda o: -((o['p'] or 0) * (o['fv'] or 0) + (o['fv'] or 0) / 1e3))
-                pot[k] = rows[:POT_N]
+                pot[k] = top_by_year(rows)
             t['pot'] = pot; t['_pot'] = t['after'] + gain
             t['potX'] = int(round(sum((o['p'] or 0) * (o['x'] or 0) for o in pot['next']), -3))
         xw = sched(T, lambda o: o['_pot'], conf, pw, CBB_GAMES); rk = rank(T, lambda o: o['_pot'])
@@ -395,7 +582,9 @@ def cbb():
             for x in L:
                 v = dk.get((x['name'], t['t']))
                 if v: x['dect'] = v
-    D['nxFit'] = {'games': CBB_GAMES, 'poss': CBB_POSS, 'sd': CBB_SD, 'replQ': REPL_Q, 'pot': potfit}
+    try: yrs = cbb_years(D, T, conf, pw)
+    except (OSError, ValueError, KeyError) as e: print('cbb years', repr(e)); yrs = None
+    D['nxFit'] = {'years': yrs, 'games': CBB_GAMES, 'poss': CBB_POSS, 'sd': CBB_SD, 'replQ': REPL_Q, 'pot': potfit}
     json.dump(D, open(p, 'w'), separators=(',', ':'), allow_nan=False)
     return D['nxFit']
 

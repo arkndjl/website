@@ -4904,6 +4904,83 @@
     var fs = Math.min(84, h - 70); g.font = fs + 'px ' + FONT; while (fs > 36 && g.measureText(val).width > w - 40) { fs -= 4; g.font = fs + 'px ' + FONT; }
     g.fillStyle = col || C.white; g.fillText(val, x + 20, y + 38 + (h - 38) / 2 + 4);
   }
+  // ---- team financial card (payrolls tab, 4:5): payroll, space, efficiency, five seasons committed against the cap,
+  //      the biggest contracts and the ones coming off (scripts/payrolls.py -> data/payrolls/<lg>.json) ----
+  async function buildPayroll(win, btn) {
+    var lg = btn.getAttribute('data-gfx-lg'), el = document.getElementById('pay-gfx-' + lg); if (!el) return null;
+    var D = JSON.parse(el.textContent), sel = document.querySelector('[data-pay-team="' + lg + '"]');
+    var t = D.teams.filter(function (q) { return q.tm === (sel ? sel.value : ''); })[0] || D.teams[0]; if (!t) return null;
+    var LG = { nhl: 'NHL', nba: 'NBA', nfl: 'NFL', mls: 'MLS' }[lg] || lg.toUpperCase(), N = D.teams.length, mls = lg === 'mls';
+    var F = await frame(2160, 2700, LG + ' :: ' + t.tm + ' payroll', win.getAttribute('data-gfx-date'), SITE + (mls ? '#mls-payrolls' : '#payrolls'));
+    F.canvas._name = lg + '-' + String(t.tm).toLowerCase();
+    var g = F.g, x = F.x + 40, y = F.y + 70, w = F.w - 80, dash = '—', gap = 20;
+    well(g, F.x, F.y, F.w, F.h);
+    var m = function (v, d) { return v == null ? dash : '$' + (+v).toFixed(d == null ? 1 : d) + 'M'; }, sg = function (v) { return v == null ? dash : (v > 0 ? '+' : v < 0 ? '−' : '') + '$' + Math.abs(v).toFixed(1) + 'M'; };
+    // logo in a raised frame, the team and its line; the plaque: Eff+ where it passed, else the payroll rank
+    var logo = t.logo ? await loadImg(t.logo) : D.logo ? await loadImg('/img/' + lg + '/' + String(t.tm).toLowerCase() + '.png') : null, LS = 300, ly = y - 60;
+    g.fillStyle = C.face; g.fillRect(x, ly, LS, LS); bevel(g, x, ly, LS, LS, true, 6);
+    g.fillStyle = C.dark; g.fillRect(x + 12, ly + 12, LS - 24, LS - 24);
+    if (logo) { var lr = Math.min(224 / logo.width, 224 / logo.height); drawLogo(g, logo, x + (LS - logo.width * lr) / 2, ly + (LS - logo.height * lr) / 2, logo.width * lr, logo.height * lr); }
+    else { g.font = '84px ' + FONT; g.fillStyle = C.lilac; g.textAlign = 'center'; g.fillText(String(t.tm).slice(0, 4), x + LS / 2, ly + LS / 2); g.textAlign = 'left'; }
+    var pw = 330, ph = LS, tx = x + LS + 40, tw = w - LS - 40 - pw - 36;
+    var good = D.ship && t.eff != null ? Math.max(0, Math.min(100, Math.round(50 + (t.eff - 100) * 2))) : null, pcol = tierCol(good) || C.teal;
+    g.fillStyle = pcol; g.fillRect(x + w - pw, ly, pw, ph); bevel(g, x + w - pw, ly, pw, ph, true, 6);
+    g.fillStyle = C.dark; g.textAlign = 'center'; g.font = '36px ' + FONT; g.fillText(D.ship ? 'EFF+' : 'PAYROLL', x + w - pw / 2, ly + 44);
+    g.font = '120px ' + FONT; g.fillText(D.ship ? String(t.eff) : '#' + t.rk, x + w - pw / 2, ly + 140);
+    g.font = '32px ' + FONT; g.fillText(D.ship ? '#' + t.rk + ' of ' + N : 'of ' + N, x + w - pw / 2, ly + 240); g.textAlign = 'left';
+    var tname = / /.test(t.name || '') ? t.name : t.tm, nsz = 96; g.font = nsz + 'px ' + FONT; while (nsz > 64 && g.measureText(tname).width > tw) { nsz -= 4; g.font = nsz + 'px ' + FONT; }
+    g.fillStyle = C.white; g.fillText(fit(g, tname, tw), tx, y);
+    g.font = '48px ' + FONT; g.fillStyle = C.teal;
+    var line = [D.label, m(t.pay) + (mls ? ' guaranteed' : D.cap ? ' · ' + Math.round(100 * t.pay / D.cap) + '% of the cap' : ''), (t.n || 0) + (mls ? ' players' : ' contracts')];
+    wrap(g, line.join(' · '), tw).slice(0, 3).forEach(function (l, i) { g.fillText(l, tx, y + 110 + i * 62); });
+    y = ly + LS + 50;
+    var rule = function (label, right) { cardRule(g, x, y, w, label, right); y += 50; };
+    // the money: payroll, room, dead money, and the value it bought
+    rule('PAYROLL');
+    var cells = [{ h: D.pay, t: m(t.pay), sub: mls ? 'MLSPA' : D.cap ? 'cap $' + D.cap + 'M' : '' }];
+    if (lg === 'nhl') cells.push({ h: 'space', t: m(t.space, 2), color: (t.space || 0) < 0 ? C.down : C.teal }, { h: 'dead', t: m(t.dead), color: t.dead ? C.down : C.white }, { h: 'LTIR', t: m(t.ltir) });
+    if (lg === 'nba') cells.push({ h: 'space', t: sg(-0 + D.cap - t.pay), color: D.cap - t.pay < 0 ? C.down : C.teal }, { h: 'tax room', t: sg(t.tax), color: t.tax < 0 ? C.down : C.teal, sub: '$' + D.tax + 'M line' }, { h: '2nd apron', t: sg(t.apron2), color: t.apron2 < 0 ? C.down : C.teal, sub: '$' + D.apron2 + 'M' });
+    if (lg === 'nfl') cells.push({ h: 'cap left', t: sg(D.cap - t.pay), sub: 'active only', color: C.teal }, { h: 'coming off', t: m(t.exp), sub: t.nfa + ' contracts' });
+    if (mls) cells.push({ h: 'base', t: m(t.base) });
+    y += cellGrid(g, cells, x, y, w, cells.length, 200, gap) + 60;
+    var vc = [{ h: D.vl + ' ' + D.vlast, t: t.val == null ? dash : (+t.val).toFixed(1), sub: 'the roster now' }];
+    if (D.ship) vc.push({ h: 'surplus', t: sg(t.surp), color: (t.surp || 0) < 0 ? C.down : C.teal, sub: '$' + (+D.rate).toFixed(2) + 'M a win' }, { h: '$ a win', t: t.dpw == null ? dash : m(t.dpw), sub: 'above the minimum' });
+    if (D.deal) vc.push({ h: 'risk', t: m(t.risk), color: t.risk ? C.down : C.white, sub: 'aged, after this season' });
+    if (!mls && lg !== 'nfl') vc.push({ h: 'coming off', t: m(t.exp), sub: t.nfa + ' contracts' });
+    if (mls) { var t3 = (t.top || []).slice(0, 3).reduce(function (a, r) { return a + r[2]; }, 0); vc.push({ h: 'top three', t: t.pay ? Math.round(100 * t3 / t.pay) + '%' : dash, sub: 'of the guaranteed pay' }, { h: 'players', t: String(t.n || 0) }); }
+    rule('VALUE');
+    y += cellGrid(g, vc, x, y, w, vc.length, 200, gap) + 60;
+    // committed by season against this season's cap: pixel columns, the cap a lilac line
+    if (!mls) {
+      rule('COMMITTED', 'CAP $' + D.cap + 'M');
+      var bh = 360, n = D.years.length, cw = (w - (n - 1) * 40) / n, top = Math.max(D.cap * 1.15, Math.max.apply(null, t.c)), base = y + bh;
+      var capY = Math.round(base - bh * D.cap / top);
+      g.fillStyle = C.white; g.fillRect(x, capY, w, 4);
+      D.years.forEach(function (yr, i) {
+        var bx = Math.round(x + i * (cw + 40)), v = t.c[i] || 0, hh = Math.round(bh * v / top), blocks = Math.max(0, Math.floor(hh / 14));
+        for (var k = 0; k < blocks; k++) { g.fillStyle = v > D.cap ? C.down : i === 0 ? C.teal : C.lilac; g.fillRect(bx, base - (k + 1) * 14 + 3, Math.round(cw), 11); }
+        g.font = '40px ' + FONT; g.textAlign = 'center'; var lab = v ? v.toFixed(1) : '0', lw2 = g.measureText(lab).width + 20, ly2 = base - blocks * 14 - 30;
+        g.fillStyle = C.well; g.fillRect(bx + cw / 2 - lw2 / 2, ly2 - 24, lw2, 48); g.fillStyle = C.white; g.fillText(lab, bx + cw / 2, ly2);
+        g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(yr, bx + cw / 2, base + 34); g.textAlign = 'left';
+      });
+      y = base + 90;
+    }
+    // the biggest contracts and the ones coming off
+    var half = (w - 60) / 2, lists = [['TOP CONTRACTS', t.top || [], x], ['COMING OFF', t.off || [], x + half + 60]], bottom = F.y + F.h - 40, y0 = y;
+    if (mls) { half = w; lists = [['TOP EARNERS', t.top || [], x]]; }
+    lists.forEach(function (L) {
+      var yy = y0; cardRule(g, L[2], yy, half, L[0], L[1].length ? '' : 'NONE'); yy += 76;
+      L[1].forEach(function (r) {
+        if (yy + 90 > bottom) return;
+        var val = m(r[2], 2); g.font = '44px ' + FONT; var vw = g.measureText(val).width; g.fillStyle = C.teal; g.fillText(val, L[2] + half - vw, yy);
+        g.font = '40px ' + FONT; g.fillStyle = C.white; var nm = fit(g, r[0], half - vw - 120), nmw = g.measureText(nm).width; g.fillText(nm, L[2], yy);
+        g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(r[1], L[2] + nmw + 16, yy + 2);
+        var sub = [r[3] ? 'thru ' + r[3] : '', r[4] || '', r[5] != null ? (D.deal ? 'deal ' : 'surplus ') + sg(r[5]) : ''].filter(Boolean).join(' · ');
+        g.font = '30px ' + FONT; g.fillStyle = r[5] != null && r[5] < 0 ? C.down : C.lilac; g.fillText(fit(g, sub, half), L[2], yy + 42); yy += 96;
+      });
+    });
+    return F.canvas;
+  }
   async function buildAgency(win, btn) {
     var D = agData(btn.getAttribute('data-gfx-sport')); if (!D) return null;
     var a = D.agencies[+btn.getAttribute('data-gfx-i')]; if (!a) return null;
@@ -5132,6 +5209,7 @@
       if (mode === 'logboard') { var lb = await buildBoard(win, btn); if (lb) preview(lb, 'arklog-scoreboard'); return; }
       if (mode === 'sheet') { var sc = await buildSheet(win, btn); if (sc) preview(sc, 'arkboard-process-' + String(JSON.parse(btn.getAttribute('data-gfx-sheet') || '{}').sport || 'sport').toLowerCase()); return; }
       if (mode === 'agency' || mode === 'agencyboard') { var ac = mode === 'agency' ? await buildAgency(win, btn) : await buildAgencyBoard(win, btn); if (ac) { var ad = agData(btn.getAttribute('data-gfx-sport')) || {}; preview(ac, 'arkboard-' + (ad.sport || '') + '-' + (mode === 'agency' ? 'agency-' + String(((ad.agencies || [])[+btn.getAttribute('data-gfx-i')] || {}).agency || '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'agencies')); } return; }
+      if (mode === 'payroll') { var pc2 = await buildPayroll(win, btn); if (pc2) preview(pc2, 'arkboard-payroll-' + (pc2._name || 'team')); return; }
       if (mode === 'watch') { var wc = await buildWatch(win, btn); if (wc) preview(wc, 'arkboard-games-to-watch'); return; }
       var canvas = mode === 'term' ? await buildTerm(win, btn) : mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'class' ? await buildClassCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn) : mode === 'bracket' ? await buildBracket(win, btn) : mode === 'pickem' ? await buildPickem(win, btn) : mode === 'perf' ? await buildPerf(win, btn) : mode === 'depth' ? await buildDepth(win, btn)
         : mode === 'lz-social' ? await buildSocial(win, btn) : mode === 'esea-box' ? await buildEseaBox(win, btn) : mode === 'esea-season' ? await buildEseaSeason(win, btn)
