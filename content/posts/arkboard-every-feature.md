@@ -5,7 +5,7 @@ author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["arkboard", "cfb", "nfl", "cbb", "nba", "nhl", "hockey", "soccer", "tennis", "cs2", "draft", "predictions"]
 keywords = ["arkboard", "future value", "20-80 scale", "college football", "college basketball", "nfl", "nba", "nhl", "hockey prospects", "soccer", "soccer prospects", "tennis", "counter-strike", "war", "xpm", "gar", "mock draft", "nil", "game model", "predictions", "kelly"]
-description = "Every ARKBOARD page: the FV scale and how each board builds it, WAR, XPM, GAR and the other value metrics, the mock drafts, NIL, recruits, team ratings and season odds, the game models, and the Predictions page. How each one is calculated and how it tested."
+description = "How each ARKBOARD tab is calculated and how it tested held out: FV, WAR, XPM, GAR, mock drafts, NIL, recruits, team ratings, season odds, game models and Predictions."
 showFullContent = false
 readingTime = false
 hideComments = true
@@ -14,12 +14,12 @@ draft = false
 +++
 
 {{< card url="/arkboard/" title="ARKBOARD" >}}
-Every board, model and prediction, by sport.
+CFB · CBB · NFL · NBA · NHL · hockey prospects · soccer · soccer prospects · tennis · CS2 · Predictions
 {{< /card >}}
 
 This post covers every ARKBOARD page: what each tab shows, how it's calculated, and how it tested on seasons it wasn't fit on. The football pages have their own longer write-up, [How the Football ARKBOARD Works](/posts/football-arkboard-every-feature/). This one covers the rest of the site and what has changed in football since.
 
-One rule runs through all of it. An input only gets weight if it improves predictions on data the model didn't see: a held-out season, class or birth year, and for anything with a betting line, the closing line. I list inputs that failed that test too.
+An input only gets weight if it improves predictions on data the model didn't see: a held-out season, class or birth year, and for anything with a betting line, the closing line. I list inputs that failed that test too.
 
 This describes the site on November 2, 2026. Tabs get added and moved often, so I'll update it as the pages change. The screenshots are from the live pages that day. Tap one for the full size.
 
@@ -31,9 +31,9 @@ The main board only shows columns every player has. Stats that only some players
 
 Three pages sit across sports:
 
-- **ARKRANKING** has every sport's ARK Ranking and season odds on one page, plus a title-odds table for every competition: the favourite, the second favourite, the ARK Ranking #1, and how open the race is (contenders = 1 / Σp², the inverse Herfindahl of the title odds).
-- **ARKLIST** is my favourites in every sport, marked on the boards.
-- **Predictions** is the only place for picks, lines, futures and props. Sport pages keep projections, ARK Rankings and season odds.
+- ARKRANKING has every sport's ARK Ranking and season odds on one page, plus a title-odds table for every competition: the favourite, the second favourite, the ARK Ranking #1, and how open the race is (contenders = 1 / Σp², the inverse Herfindahl of the title odds).
+- ARKLIST is my favourites in every sport, marked on the boards.
+- Predictions is the only place for picks, lines, futures and props. Sport pages keep projections, ARK Rankings and season odds.
 
 [![ARKRANKING title odds: each competition with its favourite](/img/arkboard/arkranking.webp)](/img/arkboard/arkranking.webp)
 
@@ -57,11 +57,11 @@ FV (Future Value) is the main grade on every prospect board: CFB, CBB, hockey, s
 
 The rules that apply on every board:
 
-- **FV is the mean outcome.** A grade is the average of what past players with the same profile became, busts included. So it sits below the best case. The dropdown shows the odds of each outcome and the 80% range.
-- **FV is absolute.** It comes from each player's predicted talent, not his rank on the board or in his class. A strong class gets more high grades. Each board fits one fixed map from model output to FV on pooled history.
-- **80 is reachable but rare.** The mean of a capped outcome can't reach 80, so above a knot K (the level about three players a season reach) the scale runs linear up to 80 at the level one player reaches in about five seasons. The knots: CFB 67.8, CBB 46.6, hockey 54.0, soccer 64.1, ATP 63.4, WTA 60.2. The exact mean stays in the tooltip.
-- **Grades come in steps of 1.** Chip colours change every 5.
-- **Players without a board grade start at 20** and take every input the model has for them. They're ranked with everyone else and tagged provisional.
+- FV is the mean outcome. A grade is the average of what past players with the same profile became, busts included. So it sits below the best case. The dropdown shows the odds of each outcome and the 80% range.
+- FV is absolute. It comes from each player's predicted talent, not his rank on the board or in his class. A strong class gets more high grades. Each board fits one fixed map from model output to FV on pooled history.
+- 80 is reachable but rare. The mean of a capped outcome can't reach 80, so above a knot K (the level about three players a season reach) the scale runs linear up to 80 at the level one player reaches in about five seasons. The knots: CFB 67.8, CBB 46.6, hockey 54.0, soccer 64.1, ATP 63.4, WTA 60.2. The exact mean stays in the tooltip.
+- Grades come in steps of 1. Chip colours change every 5.
+- Players without a board grade start at 20 and take every input the model has for them. They're ranked with everyone else and tagged provisional.
 
 Each board's **fv model** tab has a scorecard: for each FV band, the mean grade given against the mean outcome reached, with 90% intervals, out of sample. Held out, the slope of reached on given is .99 for CFB, .97 for CBB and 1.00 for soccer, and hockey is calibrated. CFB's 40+ odds run 6-8 points hot in the 40s. The **all-time FV** tab grades every past player the same way, by position.
 
@@ -69,14 +69,14 @@ Each board's **fv model** tab has a scorecard: for each FV band, the mean grade 
 
 The [football post](/posts/football-arkboard-every-feature/) has the full method: FV's composite and scarcity steps, Stat+, college WAR, badges, Draft%, NIL, Transfer%, the team builder, recruits, the game model and NFL WAR. What has changed since October 14:
 
-- **FV.** The top of the scale is stretched as above, so 80 is possible. Six badges and two XV parts (LB coverage, EDGE sack rate) feed FV. QBs aren't deflated: they realize a little below their FV, but a QB term failed held out.
-- **Three mocks.** The **predictive mock** is the projection of the real draft. The **conviction mock** ranks on FV instead of consensus, with the same needs and trades. The **blended mock** puts each slot halfway between (geometric mean of the two expected picks). Each grades the other's picks: a reach or value chip means the other mock has the player 2.5x and 16+ slots away. 200 simulations give each prospect a range of picks.
-- **QB at #1.** A QB-needy team at #1 took a QB 19 of 24 times since 2000, against 1 of 3 without the need. That premium is in the predictive mock in full, the blended at half and the conviction mock not at all. It cut the Brier score on whether a QB goes first from .37 to .15 on fall boards.
-- **Stay or declare.** Declare odds come from expected pick and age on draft day, fit on NIL-era drafts (log loss .529 to .379). Prospects under 50% sit out of the mocks. **UDFA signings** lists where undrafted players land after round 7.
-- **New tabs.** **True freshmen** (FV, WAR and Stat+ against recruiting rank), **special teams** (below), **top performers**, **coach pay** (market value against public pay), **development** (below) and **redshirts**.
-- **CFP odds.** The committee is modelled as a ranking over all FBS teams from rating, record and wins above a bubble team, fit on the 2014-25 committee releases. Held out, the field log loss is .029 against .090 for the old formula.
-- **Game model.** Availability reports (SEC, ACC, MAC, American) set each player's chance of playing. Totals now carry market ratings from earlier lines.
-- **NFL.** WAR blends XV and AV WAR. Two-way players get WAR on each side. **Breakouts** and **special teams** tabs were added. NFL picks and props went live on Predictions.
+- FV: The top of the scale is stretched as above, so 80 is possible. Six badges and two XV parts (LB coverage, EDGE sack rate) feed FV. QBs aren't deflated: they realize a little below their FV, but a QB term failed held out.
+- Three mocks: The **predictive mock** is the projection of the real draft. The **conviction mock** ranks on FV instead of consensus, with the same needs and trades. The **blended mock** puts each slot halfway between (geometric mean of the two expected picks). Each grades the other's picks: a reach or value chip means the other mock has the player 2.5x and 16+ slots away. 200 simulations give each prospect a range of picks.
+- QB at #1: A QB-needy team at #1 took a QB 19 of 24 times since 2000, against 1 of 3 without the need. That premium is in the predictive mock in full, the blended at half and the conviction mock not at all. It cut the Brier score on whether a QB goes first from .37 to .15 on fall boards.
+- Stay or declare: Declare odds come from expected pick and age on draft day, fit on NIL-era drafts (log loss .529 to .379). Prospects under 50% sit out of the mocks. **UDFA signings** lists where undrafted players land after round 7.
+- New tabs: **True freshmen** (FV, WAR and Stat+ against recruiting rank), **special teams** (below), **top performers**, **coach pay** (market value against public pay), **development** (below) and **redshirts**.
+- CFP odds: The committee is modelled as a ranking over all FBS teams from rating, record and wins above a bubble team, fit on the 2014-25 committee releases. Held out, the field log loss is .029 against .090 for the old formula.
+- Game model: Availability reports (SEC, ACC, MAC, American) set each player's chance of playing. Totals now carry market ratings from earlier lines.
+- NFL: WAR blends XV and AV WAR. Two-way players get WAR on each side. **Breakouts** and **special teams** tabs were added. NFL picks and props went live on Predictions.
 
 ### NFL breakouts
 
@@ -246,15 +246,15 @@ The baseball boards are hand graded: the 2026 draft hitters, every U19 prospect 
 
 ## Tabs every sport shares
 
-- **ARK Ranking.** Each sport's game-model rating on a neutral field, broken into its parts. Every row has an 80% rank range and odds of finishing #1 or top 4, from how much ratings still move with the share of the season left (CBB rating sd 3.9 points at the start to 1.6 at the end). NFL and NBA show the rating with today's injuries and at full strength. NFL, NBA and NHL show summed rest-of-season player projections beside it.
-- **Season odds.** 10,000 simulated seasons from the ratings, with rating error that shrinks as the season goes.
-- **Projections.** 20th, 50th and 80th percentile WAR, VORX and stat lines for the NFL, NBA and NHL, season to date plus rest of season. Each is tested for calibration by season stage, position and season.
-- **Rookies / true freshmen / first-year.** Each sport's first-year players against their pre-draft or recruiting rank.
-- **Backup watch.** Second- and third-string players producing above the starter. Rows rank on the gap projected over the next two seasons, with age (a young backup over an old starter ranks higher). Held out, adding age beat the gap alone in every sport tested.
+- ARK Ranking: Each sport's game-model rating on a neutral field, broken into its parts. Every row has an 80% rank range and odds of finishing #1 or top 4, from how much ratings still move with the share of the season left (CBB rating sd 3.9 points at the start to 1.6 at the end). NFL and NBA show the rating with today's injuries and at full strength. NFL, NBA and NHL show summed rest-of-season player projections beside it.
+- Season odds: 10,000 simulated seasons from the ratings, with rating error that shrinks as the season goes.
+- Projections: 20th, 50th and 80th percentile WAR, VORX and stat lines for the NFL, NBA and NHL, season to date plus rest of season. Each is tested for calibration by season stage, position and season.
+- Rookies / true freshmen / first-year. Each sport's first-year players against their pre-draft or recruiting rank.
+- Backup watch: Second- and third-string players producing above the starter. Rows rank on the gap projected over the next two seasons, with age (a young backup over an old starter ranks higher). Held out, adding age beat the gap alone in every sport tested.
 
 [![NBA backup watch](/img/arkboard/backup-watch.webp)](/img/arkboard/backup-watch.webp)
-- **Depth chart.** Every team, one card per slot, coloured by FV in college and by position percentile in the pros.
-- **Badges.** Each badge is one stat regressed toward the position mean by volume, with tiers at the 75th, 90th, 97th and 99th percentiles. A badge is shown only if it predicts the sport's own outcome beyond the main value metric, held out. Usage and volume traits pass (NBA Shot Creator, NFL Target Magnet, NHL Play Driver, soccer Chance Creator). Efficiency rates mostly fail or run the wrong way once value is known. **Team badges** follow the same rule, and 59 of 72 passed. One (NFL return game) also improved the NFL game model.
+- Depth chart: Every team, one card per slot, coloured by FV in college and by position percentile in the pros.
+- Badges: Each badge is one stat regressed toward the position mean by volume, with tiers at the 75th, 90th, 97th and 99th percentiles. A badge is shown only if it predicts the sport's own outcome beyond the main value metric, held out. Usage and volume traits pass (NBA Shot Creator, NFL Target Magnet, NHL Play Driver, soccer Chance Creator). Efficiency rates mostly fail or run the wrong way once value is known. **Team badges** follow the same rule, and 59 of 72 passed. One (NFL return game) also improved the NFL game model.
 
 ## Predictions
 
@@ -296,10 +296,10 @@ at full Kelly on the calibrated chance, compounding. In the walk-forward test, f
 
 ### Record
 
-- **Picks backtest.** Every market's held-out record, by gap and by bet timing, and the close predictor: how much each market's close moves toward the model per point of gap (CFB spread .10, NBA total .42).
-- **Game models.** Each model's live loss against what its backtest expects for that month.
-- **Paper book.** Every pick from the picks tab, at the posted line and stake, compounding from the October 28 reset.
-- **Rule monitor.** Two tests run on every live rule. One stops a rule when its last 300 picks lose to the close (t below −1) or a CUSUM crosses its limit. The other is a sequential test of live edge against the backtest's: it pauses a rule at 19-to-1 odds that the edge is gone.
+- Picks backtest: Every market's held-out record, by gap and by bet timing, and the close predictor: how much each market's close moves toward the model per point of gap (CFB spread .10, NBA total .42).
+- Game models: Each model's live loss against what its backtest expects for that month.
+- Paper book: Every pick from the picks tab, at the posted line and stake, compounding from the October 28 reset.
+- Rule monitor: Two tests run on every live rule. One stops a rule when its last 300 picks lose to the close (t below −1) or a CUSUM crosses its limit. The other is a sequential test of live edge against the backtest's: it pauses a rule at 19-to-1 odds that the edge is gone.
 
 [![Picks backtest: each live rule against its backtest](/img/arkboard/picks-backtest.webp)](/img/arkboard/picks-backtest.webp)
 
@@ -307,6 +307,6 @@ at full Kelly on the calibrated chance, compounding. In the walk-forward test, f
 
 A partial list, from across the site. Most of these are tested again when a new season of data comes in.
 
-- **Game models:** polls (CBB, CFB), byes and short weeks, travel and time zones (NBA), back-to-backs (NBA), team home-court edges, penalty and foul rates, 52 style-matchup terms, ESPN's BPI and FPI predictors, coach career records (CFB), goalie GSAx (NHL), manager changes (soccer).
-- **FV:** a shared cross-sport value scale, college dominator rating (CFB), all-conference honours, McDonald's All-American, self-creation (CBB), age and size at the draft (hockey), youth caps and EA FIFA ratings (soccer), Davis Cup and junior Slams (tennis), program development as an FV driver.
-- **Player value:** RAPM, LEBRON, RAPTOR and LOKI (NBA), offensive line on-field parts (NFL), versatility (CFB), finishing over xG (soccer), break points and tiebreaks (tennis).
+- Game models: polls (CBB, CFB), byes and short weeks, travel and time zones (NBA), back-to-backs (NBA), team home-court edges, penalty and foul rates, 52 style-matchup terms, ESPN's BPI and FPI predictors, coach career records (CFB), goalie GSAx (NHL), manager changes (soccer).
+- FV: a shared cross-sport value scale, college dominator rating (CFB), all-conference honours, McDonald's All-American, self-creation (CBB), age and size at the draft (hockey), youth caps and EA FIFA ratings (soccer), Davis Cup and junior Slams (tennis), program development as an FV driver.
+- Player value: RAPM, LEBRON, RAPTOR and LOKI (NBA), offensive line on-field parts (NFL), versatility (CFB), finishing over xG (soccer), break points and tiebreaks (tennis).
