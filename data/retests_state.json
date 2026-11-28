@@ -1,9 +1,10 @@
 {
 "asof":"2026-11-28",
-"n":98,
+"n":100,
 "count":{
 "watching":1,
 "waiting":94,
+"done":2,
 "shipped":3
 },
 "next":[
@@ -110,6 +111,52 @@
 "due":"2026-12-14",
 "est":0,
 "state":"waiting"
+},
+{
+"key":"cbb_next_vorx_line",
+"t":"CBB Next VORX on the position replacement lines",
+"sp":[
+"CBB"
+],
+"ar":"player",
+"kind":"fix",
+"how":"hand",
+"was":"units sweep Nov 28: Next (next season's VORX, scripts/cbb_next.py) is fit to VORX on the flat -1.4 line while the board's VORX moved to position lines in #1386 (G -1.95, F -1.22, C -.74); a guard at 70% of minutes reads about .15 wins low, a center .18 high",
+"trigger":"refit scripts/cbb_next_research.py on the position-line target",
+"gate":"walk-forward 2016-26 RMSE on the position-line target no worse than the flat-line fit moved by the line (t <= -2 fails)",
+"due":"2026-12-15",
+"est":0,
+"result":{
+"d":"2026-11-28",
+"v":"shipped",
+"e":"RMSE .5190 to .5139 (moved onto the line; refit .5169)",
+"tt":-10.9,
+"pr":null
+},
+"state":"done"
+},
+{
+"key":"cbb_builder_xw_scale",
+"t":"CBB team builder xW: the win chance scale on per-game ratings",
+"sp":[
+"CBB"
+],
+"ar":"team",
+"kind":"fix",
+"how":"hand",
+"was":"units sweep Nov 28: the builder's ratings are points a game (ARK rating) but its win chance multiplies their gap by .68 possessions before the 11.4 sd; against the game model's conference xW the builder runs too flat (sd ratio 1.14) and at x1 too steep (.85), so x1 alone is not the fix",
+"trigger":"a point-in-time test of next-season conference win% from preseason ratings (2016-26 priors)",
+"gate":"the new scale (x1 with a rating-error sd, or a fit factor) beats x.68 on held-out next-season conference win% RMSE, t >= 2, leave one season out",
+"due":"2026-12-15",
+"est":0,
+"result":{
+"d":"2026-11-28",
+"v":"shipped",
+"e":"log loss .62846 to .62760 at k .64 (k 1, the per-game units alone, .65298, t +22.6)",
+"tt":-6.74,
+"pr":null
+},
+"state":"done"
 },
 {
 "key":"soccer_props_novig",
