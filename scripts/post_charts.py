@@ -108,6 +108,35 @@ def process1_charts():
     return out
 
 
+def process0_charts():
+    """p0-spec: the house rules as a spec sheet, read from static/style.css (palette tokens, border-radius rules)"""
+    import re
+    css = open(os.path.join(ROOT, 'static', 'style.css')).read()
+    radii = re.findall(r'border-radius:\s*([^;]+);', css)
+    flat = sum(r.strip() in ('0', '0px') for r in radii)
+    sw = [('background', '#4a3b6b'), ('title bar', '#57068c'), ('well', '#3a2d56'), ('frame', '#241a3a'),
+          ('teal', '#7fffd4'), ('lilac', '#c8c7ff'), ('purple', '#b46cff'), ('platinum', '#b9f2ff')]
+    for name, hx in sw:   # every swatch must still be in the stylesheet
+        assert hx.lower() in css.lower(), hx
+    W, H = 336, 200
+    o = [f'<svg class="libchart" viewBox="0 0 {W} {H}" shape-rendering="crispEdges" role="img" aria-label="spec sheet" style="width:100%;max-width:672px">',
+         f'<rect x="0" y="0" width="{W}" height="{H}" fill="#241a3a"/><rect x="2" y="2" width="{W - 4}" height="{H - 4}" fill="#4a3b6b"/>',
+         f'<rect x="4" y="4" width="{W - 8}" height="16" fill="#57068c"/><text x="10" y="16" fill="#fff" font-size="11">spec.exe_</text>']
+    for i, ch in enumerate('_□×'):
+        x = W - 52 + i * 15
+        o.append(f'<rect x="{x}" y="6" width="12" height="12" fill="#c8c7ff"/><text x="{x + 6}" y="16" fill="#241a3a" font-size="10" text-anchor="middle">{ch}</text>')
+    for i, (name, hx) in enumerate(sw):
+        x, y = 12 + (i % 4) * 79, 30 + (i // 4) * 50
+        o.append(f'<rect x="{x}" y="{y}" width="70" height="26" fill="#241a3a"/><rect x="{x + 2}" y="{y + 2}" width="66" height="22" fill="{hx}"/>')
+        o.append(f'<text x="{x}" y="{y + 37}" fill="#c8c7ff" font-size="10">{name}</text><text x="{x}" y="{y + 47}" fill="#7fffd4" font-size="10">{hx}</text>')
+    o.append(f'<rect x="12" y="134" width="312" height="1" fill="#c8c7ff"/>')
+    o.append('<text x="12" y="152" fill="#7fffd4" font-size="12">font  MS PGothic Pixel, one face everywhere</text>')
+    o.append(f'<text x="12" y="170" fill="#7fffd4" font-size="12">corners  border-radius 0 in {flat} of {len(radii)} rules</text>')
+    o.append('<text x="12" y="188" fill="#7fffd4" font-size="12">emoji  0, every icon is pixel art</text>')
+    o.append('</svg>')
+    return {'p0-spec': {'svg': ''.join(o)}}
+
+
 if __name__ == '__main__':
     fn = os.path.join(ROOT, 'data', 'post_charts.json')
     try: allc = json.load(open(fn))
@@ -115,5 +144,6 @@ if __name__ == '__main__':
     allc.update(xpm_charts())
     allc.update(cbb_xpm_charts())
     allc.update(process1_charts())
+    allc.update(process0_charts())
     json.dump(allc, open(fn, 'w'), indent=1)
     print(sorted(allc))
