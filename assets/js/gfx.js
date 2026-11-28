@@ -4981,6 +4981,77 @@
     });
     return F.canvas;
   }
+  // ---- pro team builder card (teams > team builder, 4:5): the money, five seasons committed, the verdicts on the biggest
+  //      contracts and the deals ending, and the future picks (scripts/pro_builder.py -> static/data/builder/<lg>.json) ----
+  async function buildProBuilder(win, btn) {
+    var lg = btn.getAttribute('data-gfx-lg'), S = (window.__arkPro || {})[lg]; if (!S) return null;
+    var D = S.D, t = S.t, P = S.P, LG = lg.toUpperCase(), cap = D.cap, dash = '—', gap = 20;
+    var F = await frame(2160, 2700, LG + ' :: ' + t.tm + ' team builder', String(D.asof || '').slice(0, 10), SITE + '#team-builder');
+    F.canvas._name = lg + '-' + String(t.tm).toLowerCase();
+    var g = F.g, x = F.x + 40, y = F.y + 70, w = F.w - 80;
+    well(g, F.x, F.y, F.w, F.h);
+    var m = function (v, d) { return v == null ? dash : '$' + (+v).toFixed(d == null ? 1 : d) + 'M'; }, sg = function (v) { return v == null ? dash : (v > 0 ? '+' : v < 0 ? '−' : '') + '$' + Math.abs(v).toFixed(1) + 'M'; };
+    var VDN = { E: 'EXTEND', W: 'LET WALK', K: 'KEEP', T: 'TRADE' }, VDC = { E: C.teal, W: C.down, K: C.lilac, T: '#ffd34d' };
+    var logo = t.logo ? await loadImg(t.logo) : null, LS = 300, ly = y - 60;
+    g.fillStyle = C.face; g.fillRect(x, ly, LS, LS); bevel(g, x, ly, LS, LS, true, 6);
+    g.fillStyle = C.dark; g.fillRect(x + 12, ly + 12, LS - 24, LS - 24);
+    if (logo) { var lr = Math.min(224 / logo.width, 224 / logo.height); drawLogo(g, logo, x + (LS - logo.width * lr) / 2, ly + (LS - logo.height * lr) / 2, logo.width * lr, logo.height * lr); }
+    else { g.font = '84px ' + FONT; g.fillStyle = C.lilac; g.textAlign = 'center'; g.fillText(String(t.tm).slice(0, 4), x + LS / 2, ly + LS / 2); g.textAlign = 'left'; }
+    var pw = 330, tx = x + LS + 40, tw = w - LS - 40 - pw - 36, N = D.teams.length;
+    g.fillStyle = tierCol(Math.round(100 * (N - t.pvRk) / Math.max(N - 1, 1))) || C.teal; g.fillRect(x + w - pw, ly, pw, LS); bevel(g, x + w - pw, ly, pw, LS, true, 6);
+    g.fillStyle = C.dark; g.textAlign = 'center'; g.font = '36px ' + FONT; g.fillText('PICKS', x + w - pw / 2, ly + 44);
+    g.font = '120px ' + FONT; g.fillText('#' + t.pvRk, x + w - pw / 2, ly + 140);
+    g.font = '32px ' + FONT; g.fillText('of ' + N + ' · ' + m(t.pv), x + w - pw / 2, ly + 240); g.textAlign = 'left';
+    var tname = t.name || t.tm, nsz = 96; g.font = nsz + 'px ' + FONT; while (nsz > 64 && g.measureText(tname).width > tw) { nsz -= 4; g.font = nsz + 'px ' + FONT; }
+    g.fillStyle = C.white; g.fillText(fit(g, tname, tw), tx, y);
+    g.font = '48px ' + FONT; g.fillStyle = C.teal;
+    wrap(g, [D.label, m(t.pay) + ' · ' + Math.round(100 * t.pay / cap) + '% of the cap', P.length + ' contracts'].join(' · '), tw).slice(0, 3).forEach(function (l, i) { g.fillText(l, tx, y + 110 + i * 62); });
+    y = ly + LS + 50;
+    var rule = function (label, right) { cardRule(g, x, y, w, label, right); y += 50; };
+    rule('MONEY');
+    var cells = [{ h: 'payroll', t: m(t.pay), sub: 'cap $' + cap + 'M' }];
+    if (lg === 'nhl') cells.push({ h: 'space', t: m(t.space, 2), color: (t.space || 0) < 0 ? C.down : C.teal }, { h: 'dead', t: m(t.dead), color: t.dead ? C.down : C.white });
+    else if (lg === 'nba') cells.push({ h: 'space', t: sg(cap - t.pay), color: cap - t.pay < 0 ? C.down : C.teal }, { h: 'tax room', t: sg(t.tax), color: t.tax < 0 ? C.down : C.teal });
+    else cells.push({ h: 'cap left', t: sg(cap - t.pay), color: C.teal, sub: 'active only' });
+    cells.push({ h: 'coming off', t: m(t.exp), sub: t.nfa + ' deals' });
+    y += cellGrid(g, cells, x, y, w, cells.length, 200, gap) + 60;
+    rule('COMMITTED', 'CAP $' + cap + 'M');
+    var bh = 300, n = D.years.length, cw = (w - (n - 1) * 40) / n, top = Math.max(cap * 1.15, Math.max.apply(null, t.c)), base = y + bh, capY = Math.round(base - bh * cap / top);
+    g.fillStyle = C.white; g.fillRect(x, capY, w, 4);
+    D.years.forEach(function (yr, i) {
+      var bx = Math.round(x + i * (cw + 40)), v = t.c[i] || 0, blocks = Math.max(0, Math.floor(Math.round(bh * v / top) / 14));
+      for (var k = 0; k < blocks; k++) { g.fillStyle = v > cap ? C.down : i === 0 ? C.teal : C.lilac; g.fillRect(bx, base - (k + 1) * 14 + 3, Math.round(cw), 11); }
+      g.font = '40px ' + FONT; g.textAlign = 'center'; var lab = v ? v.toFixed(1) : '0', lw2 = g.measureText(lab).width + 20, ly2 = base - blocks * 14 - 30;
+      g.fillStyle = C.well; g.fillRect(bx + cw / 2 - lw2 / 2, ly2 - 24, lw2, 48); g.fillStyle = C.white; g.fillText(lab, bx + cw / 2, ly2);
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(yr, bx + cw / 2, base + 34); g.textAlign = 'left';
+    });
+    y = base + 90;
+    // the verdicts: the biggest contracts with one, two columns, the deals ending first
+    var vd = t.vd || {};
+    rule('VERDICTS', ['E', 'W', 'K', 'T'].map(function (k) { return (vd[k] || 0) + ' ' + VDN[k].toLowerCase(); }).join(' · '));
+    var withV = P.filter(function (p) { return p.vd; }), half = (w - 60) / 2, bottom = F.y + F.h - 360, y0 = y;
+    var cols = [['ENDING ' + D.years[0], withV.filter(function (p) { return p.left <= 1; }), x], ['UNDER CONTRACT', withV.filter(function (p) { return p.left > 1; }), x + half + 60]];
+    cols.forEach(function (L) {
+      var yy = y0; g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(L[0], L[2], yy); yy += 64;
+      L[1].slice(0, 9).forEach(function (p) {
+        if (yy + 80 > bottom) return;
+        var tag = VDN[p.vd]; g.font = '34px ' + FONT; var tw2 = g.measureText(tag).width + 20;
+        g.fillStyle = VDC[p.vd]; g.fillRect(L[2] + half - tw2, yy - 38, tw2, 50); g.fillStyle = C.dark; g.fillText(tag, L[2] + half - tw2 + 10, yy - 2);
+        g.font = '40px ' + FONT; g.fillStyle = C.white; var nm = fit(g, p.n, half - tw2 - 120), nmw = g.measureText(nm).width; g.fillText(nm, L[2], yy);
+        g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(p.pos, L[2] + nmw + 16, yy + 2);
+        var sub = [p.h[0] != null ? m(p.h[0]) : '', p.left > 1 ? 'thru ' + (p.thru || '') : (p.x != null ? 'xAAV ' + m(p.x) : ''), 'surplus ' + sg(p.s), p.dev ? D.vl + ' ' + p.dev.map(function (d) { return d.toFixed(1); }).join(' > ') : ''].filter(Boolean).join(' · ');
+        g.font = '30px ' + FONT; g.fillStyle = p.s < 0 ? C.down : C.teal; g.fillText(fit(g, sub, half), L[2], yy + 40); yy += 90;
+      });
+    });
+    // the picks
+    y = bottom + 30; rule('PICKS', m(t.pv) + ' · #' + t.pvRk + ' of ' + N);
+    var pk = (t.picks || []).slice().sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; }), line = [], ys = {};
+    pk.forEach(function (k) { (ys[k[0]] = ys[k[0]] || []).push('R' + k[1] + (k[2] !== t.tm ? ' ' + k[2] : '')); });
+    Object.keys(ys).forEach(function (yr) { line.push(yr + ': ' + ys[yr].join(', ')); });
+    g.font = '36px ' + FONT; g.fillStyle = C.white;
+    wrap(g, line.join('   ') || 'none', w).slice(0, 4).forEach(function (l, i) { g.fillText(l, x, y + 20 + i * 52); });
+    return F.canvas;
+  }
   async function buildAgency(win, btn) {
     var D = agData(btn.getAttribute('data-gfx-sport')); if (!D) return null;
     var a = D.agencies[+btn.getAttribute('data-gfx-i')]; if (!a) return null;
@@ -5209,6 +5280,7 @@
       if (mode === 'logboard') { var lb = await buildBoard(win, btn); if (lb) preview(lb, 'arklog-scoreboard'); return; }
       if (mode === 'sheet') { var sc = await buildSheet(win, btn); if (sc) preview(sc, 'arkboard-process-' + String(JSON.parse(btn.getAttribute('data-gfx-sheet') || '{}').sport || 'sport').toLowerCase()); return; }
       if (mode === 'agency' || mode === 'agencyboard') { var ac = mode === 'agency' ? await buildAgency(win, btn) : await buildAgencyBoard(win, btn); if (ac) { var ad = agData(btn.getAttribute('data-gfx-sport')) || {}; preview(ac, 'arkboard-' + (ad.sport || '') + '-' + (mode === 'agency' ? 'agency-' + String(((ad.agencies || [])[+btn.getAttribute('data-gfx-i')] || {}).agency || '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'agencies')); } return; }
+      if (mode === 'probuilder') { var pb = await buildProBuilder(win, btn); if (pb) preview(pb, 'arkboard-team-builder-' + (pb._name || 'team')); return; }
       if (mode === 'payroll') { var pc2 = await buildPayroll(win, btn); if (pc2) preview(pc2, 'arkboard-payroll-' + (pc2._name || 'team')); return; }
       if (mode === 'watch') { var wc = await buildWatch(win, btn); if (wc) preview(wc, 'arkboard-games-to-watch'); return; }
       var canvas = mode === 'term' ? await buildTerm(win, btn) : mode === 'pcard' ? await buildPCard(win, btn.closest('tr[class*="__detail"]').previousElementSibling) : mode === 'card' ? await buildCard(win, btn) : mode === 'team' ? await buildTeamCard(win, btn) : mode === 'class' ? await buildClassCard(win, btn) : mode === 'builder' ? await buildBuilder(win, btn) : mode === 'cbbplan' ? await buildCbbPlan(win, btn) : mode === 'coach' ? await buildCoach(win, btn) : mode === 'games' ? await buildGames(win, btn) : mode === 'game' ? await buildGame(win, btn) : mode === 'method' ? await buildMethod(win, btn) : mode === 'rank' ? await buildRank(win, btn) : mode === 'rq' ? await buildRQ(win, btn) : mode === 'bracket' ? await buildBracket(win, btn) : mode === 'pickem' ? await buildPickem(win, btn) : mode === 'perf' ? await buildPerf(win, btn) : mode === 'depth' ? await buildDepth(win, btn)
