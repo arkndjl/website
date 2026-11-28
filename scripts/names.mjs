@@ -126,7 +126,7 @@ const TEAM_ALIAS = { uconn: 'connecticut', olemiss: 'mississippi', lsu: 'louisia
   miamiflorida: 'miami', stjohns: 'saintjohns', stmarys: 'saintmarys', ncstate: 'northcarolinastate', gatech: 'georgiatech',
   washst: 'washingtonstate', mizzou: 'missouri', cal: 'california', ucberkeley: 'california', texasam: 'texasam', tamu: 'texasam',
   unm: 'newmexico', uh: 'houston', etsu: 'easttennesseestate', fgcu: 'floridagulfcoast', liu: 'longisland', uab: 'alabamabirmingham',
-  ucsb: 'ucsantabarbara' };
+  ucsb: 'ucsantabarbara', samhoustonstate: 'samhouston' };
 export function teamKey(s) {
   let t = fold(s).replace(/&/g, '').replace(/'/g, '');
   t = t.replace(/^st\.?\s/, 'saint ');

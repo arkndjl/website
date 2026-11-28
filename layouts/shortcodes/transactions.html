@@ -36,7 +36,7 @@
     {{- if not $soccer }}<td>{{ .pos }}</td>{{ end }}
     {{- $v := index $V (printf "%s|%s|%s" .d .n .k) | default slice }}
     {{- range $i, $c := $cols }}{{ $x := cond (lt $i (len $v)) (index $v $i) nil }}<td class="cfb__num" data-v="{{ if ne $x nil }}{{ $x }}{{ end }}">{{ if ne $x nil }}{{ if eq (index $c 2) "%d" }}{{ printf "%d" (int $x) }}{{ else }}{{ partial "num.html" (slice (index $c 2) (float $x)) }}{{ end }}{{ end }}</td>{{ end }}
-    <td title="{{ index $kt .k }}"><span class="tx__k tx__k--{{ .k }}">{{ .k }}{{ with .amt }} ${{ lang.FormatNumber 1 (div . 1e6) }}M{{ end }}</span></td>
+    <td title="{{ index $kt .k }}" data-filter="{{ .k }}"><span class="tx__k tx__k--{{ .k }}">{{ .k }}{{ with .amt }} ${{ lang.FormatNumber 1 (div . 1e6) }}M{{ end }}</span></td>
     {{- if $soccer }}<td>{{ .lg }}</td>{{ end }}
     {{- if $college }}
     <td>{{ .fr | default .to }}</td>
