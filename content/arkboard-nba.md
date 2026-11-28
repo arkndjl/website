@@ -11,7 +11,7 @@ cover = "/og/nba.png"
 
 {{< winpane title="nba.exe :: 2026-27" icon="basketball" sprite="px/hero-basketball" status="databallr DPM · Basketball-Reference BPM · LUMA ARC (CC BY 4.0) · ESPN · NBA injury report" class="winpane--art" />}}
 
-{{< wintabs groups="players:leaders,projections,rookies,awards,all-time players,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,units,all-time|market:contract value" side="true" label="NBA views" >}}
+{{< wintabs groups="players:leaders,projections,rookies,awards,all-time players,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,units,all-time|market:payrolls,free agents,contract value" side="true" label="NBA views" >}}
 {{< wintabs tab="leaders" tabs="VORX/XPM leaders,matchups" sub="true" label="leaders views" >}}
 {{< nbaxpm title="NBA XPM" tab="VORX/XPM leaders" >}}
 {{< lazytab tab="matchups" >}}
@@ -19,6 +19,12 @@ cover = "/og/nba.png"
 {{< /lazytab >}}
 {{< /wintabs >}}
 {{< pctl sport="nba" icon="basketball" title="projections" tab="projections" >}}
+{{< wintabs tab="payrolls" tabs="payrolls,cap space,contracts" sub="true" label="payrolls views" >}}
+{{< lazytab tab="payrolls" >}}{{< payrolls lg="nba" view="teams" tab="payrolls" >}}{{< /lazytab >}}
+{{< lazytab tab="cap space" >}}{{< payrolls lg="nba" view="space" tab="cap space" >}}{{< /lazytab >}}
+{{< lazytab tab="contracts" >}}{{< payrolls lg="nba" view="contracts" tab="contracts" >}}{{< /lazytab >}}
+{{< /wintabs >}}
+{{< lazytab tab="free agents" >}}{{< payrolls lg="nba" view="fa" tab="free agents" >}}{{< /lazytab >}}
 {{< nbasurplus title="contract value" tab="contract value" >}}
 {{< wintabs tab="rookies" tabs="rookies,next up,G League" sub="true" label="rookies views" >}}
 {{< rookies sport="nba" icon="basketball" title="rookies" tab="rookies" >}}
