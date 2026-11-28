@@ -5107,9 +5107,13 @@ a.tick__g--nw:hover .tick__me { color: #fff; }
 .tip__btn img { width: 16px; height: 16px; image-rendering: pixelated; border: 0; margin: 0; padding: 0; }
 .tip__note { opacity: .8; }
 @media (max-width: 600px) { .tip__btn { flex: 1 1 100%; justify-content: center; } }
-.tip-top h2 { font-size: 1em; color: #5fd4c4; }
-.tip-top__list { padding-left: 1.6em; }
-.tip-top__list li:nth-child(-n+3) { color: #c8c7ff; }
+.tip-top { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; margin: 1.5em 0; }
+.tip-top[hidden] { display: none; }
+.tip-top__win { margin: 0; min-width: 0; }
+.tip-top__t { width: 100%; }
+.tip-top__t tr.is-top td:nth-child(2) { color: #c8c7ff; }
+.tip-top__t td.tip-top__anon { opacity: .6; }
+.tip-top__t td.tip-top__a { font-weight: bold; color: var(--accent); }
 
 /* Games to watch (layouts/shortcodes/watch.html, Standings) */
 .wt-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
