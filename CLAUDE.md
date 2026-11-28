@@ -69,7 +69,7 @@
 - Content rows (`k: "content"`, `content_rows` in arklog.py, Noah Nov 28): YouTube uploads (ARKNDJL, LAURSEN_111, YTST), LAURSEN_111
   Twitch streams, 1NT ESEA matches, articles, and ST. CLAIRE releases (a track in content/arkndjl-music.md with `date = "YYYY-MM-DD"`).
   Read from the social pulls, data/esea.json and content/; they sit beside the changes but never count as changes or tests.
-- Process updates: one post a month ("PROCESS #N: ... / <month> updates", PROCESS in capitals), front matter `series = "process"` and
+- Process updates: one post a month ("PROCESS #N: ... / <month> updates", PROCESS in capitals), front matter `series = "process"`, tags include "process" and "arklog", and
   `month = "YYYY-MM"`, listed by ARKLOG > updates. It covers every section of the site that month: models and metrics,
   features, bug fixes, 1NT, ST. CLAIRE, videos and articles released, social data, site data, with site screenshots and
   charts. Start from `python3 scripts/arklog.py --month YYYY-MM`.
