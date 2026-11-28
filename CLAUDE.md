@@ -230,11 +230,11 @@
 
 ## Article views and favorites
 
-- Every post shows its views and a platinum pixel star with its favorite count in the post meta line (article page, home and
+- Every post shows its views and a pixel heart with its favorite count in the post meta line (article page, home and
   /posts/): `layouts/partials/poststats.html` + `assets/js/poststats.js`, counted by the site Worker (`/api/posts`, Durable
   Object `PostStats` in `worker/site.js`). A view is one a visitor (hashed IP + user agent, salted per day) per article per day,
   bots and other origins skipped. A favorite is one per browser (random id in local storage) and can be taken back; per IP a day,
-  5 favorites of one article and 40 clicks in all. No setup: a new post gets both by itself.
+  5 favorites of one article and 40 clicks in all. No setup: a new post gets both by itself. Only articles from PROCESS #0 on show them (`postStatsFrom` in hugo.toml; Noah, Nov 28: older ones were not counted).
 - `scripts/post_stats.py` (site-stats.yml, every 6 hours) samples the counts into `data/post_stats.json`; `scripts/milestones.py`
   reads it for the article milestones in ARKLOG. Process > ARKLOG > traffic has articles.exe (`layouts/shortcodes/articlestats.html`,
   in TABS traffic of `scripts/library_build.py`): one row an article, live counts, sorts on every header.
