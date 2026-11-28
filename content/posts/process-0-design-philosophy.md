@@ -34,7 +34,7 @@ This is PROCESS #0. The Process updates are a monthly record of everything that 
 
 What I loved about design growing up in the 2000s came from old operating systems and computers like Gateway and Windows 98, game menus like the ones in the 2000s Madden games and MLB 2K, the Nintendo DS and PictoChat UI, MSN Messenger, old internet websites like MySpace, and broadcast graphics, mainly from 2000s era SNY. In general, it came from the sites and software of the 2000s up until the inception of the iPhone, all of which had texture, borders, and depth, and all of which felt like they had been designed by a person with a specific vision in mind.
 
-{{< image src="/img/process-0/video-exe.png" alt="The video.exe player on the arkndjl.net home page: a bezel screen, an LCD with the track time and title, channel buttons, a scrolling track list and transport buttons, in purple, lilac and teal" position="center" >}}
+{{< image src="/img/process-0/video-exe.png" alt="The video.exe player on the arkndjl.net home page: a bezel screen with a pixel play button, an LCD with the track time, title and tags, channel buttons, a find and tag strip, a scrolling track list, transport buttons, a favorite star and a volume meter, in purple, lilac and teal" position="center" >}}
 
 What I dislike most about the "frictionless" nature of modern design is the homogenization of design into what is effectively minimalist slop, something that I attribute heavily to Apple's design philosophy effectively obliterating the world following the release of the iPhone. I dislike rounded corners, and I dislike stuff like Liquid Glass.
 
@@ -54,7 +54,7 @@ I think friction is inherently good, and the only type of "friction" I dislike i
 
 I believe strongly in cybergothicism and organized maximalism, which means making everything available at once while building a structure underneath it that makes all of it readable once you learn how it works.
 
-{{< image src="/img/process-0/arkboard-cfb.png" alt="The College Football ARKBOARD: a news ticker across the top, pixel social tiles, the menu, a row of buttons for every ARKBOARD page grouped by sport, and the football_prospects.exe window with the draft board below it" position="center" >}}
+{{< image src="/img/process-0/arkboard-cfb.png" alt="The College Football ARKBOARD: a news ticker across the top, pixel social tiles, the menu, a row of buttons for every ARKBOARD page grouped by sport, and the football_prospects.exe window with the board of every graded player below it" position="center" >}}
 
 I love informationally dense tables because they allow for delving deep into information and data immediately, all in one place, which is why the tables on the site are as wide as they are. A player's FV, age, size, production, market price, draft odds, and his school's pay all sit in the same row, and the reader can sort by whichever one they care about, where a minimalist site would split the same information across several pages with a lot of white space in between. What keeps it readable is that every board leads with the stat it ranks by and then the context needed to read it, the column groups are boxed and tinted the same way on every page, and every sport's page has the same groups in the same order, so that once you learn how to read one sport you can read all of them.
 
