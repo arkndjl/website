@@ -11,7 +11,7 @@ data/team_years_fit.json). Included once by cfbbuilder.html and cbbbuilder.html.
   function load(src) { return cache[src] || (cache[src] = fetch(src).then(function (r) { return r.json(); })); }
   var ORDER = { cfb: ['QB', 'RB', 'WR', 'TE', 'OL', 'EDGE', 'DL', 'LB', 'CB', 'S', 'K', 'P'], cbb: ['G', 'F', 'C'] };
   var DEEP = { cfb: { QB: 3, RB: 4, WR: 7, TE: 4, OL: 10, EDGE: 5, DL: 6, LB: 5, CB: 6, S: 5, K: 2, P: 2 }, cbb: { G: 7, F: 6, C: 4 } };
-  var TAG = { back: '', cls: 'FR', 'new': 'NEW', keep: 'KEEP' };
+  var TAG = { back: '', cls: 'FR', 'new': 'NEW', keep: 'KEEP', tgt: 'TGT' };
   var DN = { D: 'Declare', E: 'Even', C: 'College', T: 'Transfer' };
   function fvchip(fv) { return fv == null ? '<span class="cfb__dim">—</span>' : '<span class="fv-chip" data-fv="' + Math.floor(fv / 5) * 5 + '">' + Math.round(fv) + '</span>'; }
   // the season strip: next three seasons from the roster chain, rating or Elo, rank, xW
@@ -24,12 +24,12 @@ data/team_years_fit.json). Included once by cfbbuilder.html and cbbbuilder.html.
   function rows(R, key) { var L = (R.teams || {})[key] || [], c = R.cols; return L.map(function (a) { var o = {}; c.forEach(function (k, i) { o[k] = a[i]; }); return o; }); }
   function seasonLabel(sp, y) { return sp === 'cbb' ? y + '-' + String(y + 1).slice(2) : String(y); }
   function depthHtml(sp, P, j, y) {
-    var by = {}; P.forEach(function (o) { var p = o['p' + j]; if (p >= 0.25) (by[o.pos] = by[o.pos] || []).push(o); });
+    var by = {}; P.forEach(function (o) { var p = o['p' + j]; if (p >= 0.15) (by[o.pos] = by[o.pos] || []).push(o); });
     return '<div class="tbx__room">' + ORDER[sp].filter(function (g) { return by[g]; }).map(function (g) {
-      var L = by[g].sort(function (a, b) { return (b.fv || 0) - (a.fv || 0); }).slice(0, DEEP[sp][g] || 6);
-      return '<div class="tbx__rrow"><b class="tbx__rg">' + esc(g) + '</b><div class="tbx__rl">' + L.map(function (o, i) {
-        var p = o['p' + j];
-        return '<span class="tbx__rc tbx__rc--' + o.kind + (p < 0.5 ? ' is-maybe' : '') + '" title="' + esc(o.name + ' · ' + (o.cls || '') + ' · P(here ' + seasonLabel(sp, y) + ') ' + Math.round(p * 100) + '%') + '"><i>' + (i + 1) + '</i>' + fvchip(o.fv) + '<span>' + esc(o.name) + '</span>' + (TAG[o.kind] ? '<em>' + TAG[o.kind] + '</em>' : '') + '<small>' + pc(p) + '</small></span>';
+      var lk = function (o) { return o['p' + j] >= 0.5 ? 1 : 0; }, L = by[g].sort(function (a, b) { return lk(b) - lk(a) || (b.fv || 0) - (a.fv || 0) || (b['p' + j] || 0) - (a['p' + j] || 0); }), deep = DEEP[sp][g] || 6;
+      return '<div class="tbx__rrow"><b class="tbx__rg">' + esc(g) + '<small>' + L.length + '</small></b><div class="tbx__rl">' + L.map(function (o, i) {
+        var p = o['p' + j], rs = /^RS/.test(o.cls || '') ? 'RS' : '', tag = TAG[o.kind] || rs;
+        return '<span class="tbx__rc tbx__rc--' + o.kind + (p < 0.5 ? ' is-maybe' : '') + (i >= deep ? ' is-deep' : '') + '" title="' + esc(o.name + ' · ' + (o.cls || '') + ' · P(here ' + seasonLabel(sp, y) + ') ' + Math.round(p * 100) + '%') + '"><i>' + (i + 1) + '</i>' + fvchip(o.fv) + '<span>' + esc(o.name) + '</span>' + (tag ? '<em>' + tag + '</em>' : '') + '<small>' + pc(p) + '</small></span>';
       }).join('') + '</div></div>';
     }).join('') + '</div>';
   }
