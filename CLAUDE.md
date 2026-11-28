@@ -1,5 +1,24 @@
 # arkndjl.net
 
+## Standing rules (read first; detail in docs/rules/)
+
+- Keep rules in two places: when a standing rule changes, update this file or `docs/rules/` and project memory in the
+  same thread. A weekly sync and each monthly PROCESS batch check the two against each other. The repo is public:
+  secrets, private client or business work, personal contact details and betting stakes stay in memory only.
+- Design ([docs/rules/design.md](docs/rules/design.md)): pixel art, purple / teal / lilac, one font (MS PGothic), no
+  emoji, team logos full colour, ARK stars platinum with the 5-star+ shimmer, GFX 16:9 with no overlap and boxed
+  column groups, every page works on a phone.
+- Copy ([docs/rules/copy-voice.md](docs/rules/copy-voice.md)): minimal text, no blurbs; everything published in Noah's
+  voice (academic, his own words, Oxford commas, no LLM phrasing or marketing); ARKLOG never logs copy cleanups or
+  mentions AI; one PROCESS #N article a month; every article gets an articleGFX card of verbatim excerpts.
+- Models ([docs/rules/models-tests.md](docs/rules/models-tests.md)): ship only what passes out-of-sample tests, point
+  in time; 2026-27 is a lockbox; cross-sport rule; predictive metric in predictive contexts, descriptive in
+  descriptive; FV is absolute 20-80 true talent, mean headline, never class-relative or a shared cross-sport scale.
+- Boards ([docs/rules/boards.md](docs/rules/boards.md)), metric definitions ([docs/rules/metrics.md](docs/rules/metrics.md)),
+  sections ([docs/rules/sections.md](docs/rules/sections.md)), posting schedule and shipping
+  ([docs/rules/workflow.md](docs/rules/workflow.md)): merge when done, then `python3 scripts/check_live.py`; retrigger
+  the build if not live in about 20 minutes.
+
 ## ARKLIBRARY (content/arklibrary.md)
 
 - Keep music artists and albums in sync: when an album is added to `albums.exe`, add its artist
