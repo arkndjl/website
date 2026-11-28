@@ -15,14 +15,14 @@ draft = false
 Toc = true
 
 [gfx]
-quote = [
-  "I dislike rounded corners, and I dislike stuff like Liquid Glass.",
-  "Friction is also about trust in the age of AI.",
-  "I made this site for myself and people like me",
-  "Models that seek to be both predictive and descriptive often fail at being able to do both",
-  "Every test on the site is published, including the ones that failed",
-  "People just want sports and their favorite teams and players to actually matter to them",
-  "PROCESS #1 comes out on December 1st",
+keys = [
+  "Windows 98, Madden, MLB 2K, PictoChat, MySpace, SNY, Liquid Glass",
+  "friction, expression and personality, trust in the age of AI, bad design",
+  "cybergothicism, organized maximalism, dense tables, one font, one palette, no emoji",
+  "predictive, descriptive, cumulative, rate-based, impact, value",
+  "every test, failed, Future Value, player value, team fit, context",
+  "skin in the game, sports betting, gambling, non-predatory",
+  "December 1st, ARKLOG, eephus.io, playslugger.com, ST. CLAIRE, 1NT, LAURSEN_111, Your Team Should Tank",
 ]
 post = """PROCESS #0: My Design Philosophy, Anti-Minimalism, and the Beauty of Friction
 

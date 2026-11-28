@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""articleGFX check: every post's [gfx] front matter (quote = [sentences], post = "lines") must be Noah's own words, so
-each quote and each line of the post text is checked to be in the article word for word (a post line may also be the
-title), and the post must fit X's 280 characters with the link counted as 23. The card itself is buildArticle in
+"""articleGFX check: every post's [gfx] front matter must come from the article. keys = [one comma list a section, in
+section order] (Noah, Nov 28: the card lists each section's key words, not lines): each key word must be in its own
+section (any case). quote = [excerpts] (older form) and each line of post = "lines" must be in the article word for word
+(a post line may also be the title), and the post must fit X's 280 characters with the link counted as 23. The card itself is buildArticle in
 assets/js/gfx.js (button in layouts/_default/single.html); a post with no [gfx] block uses its first sentence.
 
     python3 scripts/article_gfx.py          # list problems, exit 1 on any
@@ -39,6 +40,15 @@ def problems_of(front, body, name='post'):
     for q in g.get('quote') or []:
         if norm(q) not in txt:
             out.append(f'{name}: gfx.quote is not in the article word for word: {q[:70]!r}')
+    secs = re.split(r'^##\s+.*$', body, flags=re.M)[1:]
+    keys = g.get('keys') or []
+    if len(keys) > len(secs):
+        out.append(f'{name}: gfx.keys has {len(keys)} lists for {len(secs)} sections')
+    for i, ks in enumerate(keys[:len(secs)]):
+        st = plain(secs[i]).lower()
+        for k in [k.strip() for k in ks.split(',') if k.strip()]:
+            if k.lower() not in st:
+                out.append(f'{name}: gfx.keys word {k!r} is not in section {i + 1}')
     post = g.get('post') or ''
     for line in [l for l in re.split(r'\n\s*\n', post) if l.strip()]:
         if norm(line) != title and norm(line) not in txt:
@@ -72,6 +82,9 @@ def test():
     assert problems_of(ok, body) == [], problems_of(ok, body)
     bad = {'title': 'T', 'gfx': {'quote': ['Friction is good.'], 'post': 'Something I never wrote.'}}
     assert len(problems_of(bad, body)) == 2
+    secs = '## A\n\nFriction and trust.\n\n## B\n\nDense tables.'
+    assert problems_of({'title': 'T', 'gfx': {'keys': ['friction, Trust', 'dense tables']}}, secs) == []
+    assert len(problems_of({'title': 'T', 'gfx': {'keys': ['dense tables', 'x', 'y']}}, secs)) == 3
     long = {'title': 'T', 'gfx': {'post': 'Friction ' * 40}}
     assert any('280' in p for p in problems_of(long, body))
     assert x_len('a https://arkndjl.net/posts/very-long-slug-here/') == 25
