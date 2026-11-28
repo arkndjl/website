@@ -122,6 +122,14 @@ def write(sport, out):
     print('wrote', fn, ' '.join(f"{s['l']}:{len(s['rows'])}" for s in out['seasons']))
 
 
+def write_ids(sport, ids):
+    """<sport>-ids.json: {season: [board ids]}, the same rookies by the leaderboard's own player id, read by the R chip
+    on the NBA XPM, NHL WAR and soccer player boards (one small file, so the boards never load the rookie tab)."""
+    fn = os.path.join(OUT, f'{sport}-ids.json')
+    json.dump({str(k): v for k, v in sorted(ids.items())}, open(fn, 'w', encoding='utf-8'), separators=(',', ':'))
+    print('wrote', fn)
+
+
 def season_pts(fn, groups):
     """(name, team) -> this season's SV over replacement (data/nfl_qb.json spts, data/nfl_season_value.json pts,
     data/cfb_season_value.json pts); id -> SV where the file carries ids."""
@@ -238,7 +246,7 @@ def nba():
                 w = (f - a['f']) / (b['f'] - a['f'])
                 return [u + (v - u) * w for u, v in zip(a[ck], b[ck])]
         return pg[-1][ck]
-    seen, seasons = set(), []
+    seen, seasons, ids = set(), [], {}
     for S in files:
         d = json.load(open(os.path.join(SD, 'nba-xpm', f'{S}.json')))
         rows = []
@@ -267,6 +275,7 @@ def nba():
                    'pre': dr[1] if dr else None, 'preL': (f'{dr[0]} #{dr[1]}' if dr[0] != S - 1 else f'#{dr[1]}') if dr else 'UDFA',
                    'pfv': c['fv'] if c else None, 'sub': c['team'] if c else '', **(hw(c.get('ht')) if c else {}),
                    'ph': ESPN_FACE.format('nba', p['ph']) if p.get('ph') else None, 'lo': logo(f"/img/nba/{p['tm'].lower()}.png")}
+            ids.setdefault(S, []).append(p['id'])
             q = pj.get(p['id']) if S == proj['season'] else None
             if S == proj['season']:
                 q = q or {}
@@ -274,6 +283,7 @@ def nba():
             rows.append(row)
         seasons.append({'s': S, 'l': d['label'], 'rows': rows, 'games': d.get('games'), 'qual': round(1000 * gms / 82), 'mdef': 'q'})
     seasons.reverse()
+    write_ids('nba', ids)
     write('nba', {
         'asof': json.load(open(os.path.join(SD, 'nba-xpm', f'{files[-1]}.json'))).get('asof'), 'title': 'rookies', 'key': 'vorx',
         'def': 'rookies: first season on the XPM board. pre-draft FV = the CBB board\'s draft-year FV (college players only); slot = overall pick.',
@@ -305,7 +315,7 @@ def nhl():
     pipe = {p['id']: p for p in h['pipe'] if p.get('id')}
     past = {(p['year'], p['pick']): p for p in h['past']}
     gp = {}             # id -> [gp by prior season]
-    seasons = []
+    seasons, ids = [], {}
     for S in files:
         d = json.load(open(os.path.join(SD, 'nhl-war', f'{S}.json')))
         rows = []
@@ -314,6 +324,7 @@ def nhl():
                 g = gp.get(p['id'], [])
                 if max(g, default=0) >= 25 or sum(1 for x in g if x >= 6) >= 2 or (p.get('age') or 0) >= 26:
                     continue
+                ids.setdefault(S, []).append(p['id'])
                 r = picks.get(p['id'])
                 fv = None
                 if r:
@@ -330,6 +341,7 @@ def nhl():
         for p in d['players']:
             gp.setdefault(p['id'], []).append(p['gp'])
     seasons.reverse()
+    write_ids('nhl', ids)
     write('nhl', {
         'asof': json.load(open(os.path.join(SD, 'nhl-war', f'{files[-1]}.json'))).get('asof'), 'title': 'rookies', 'key': 'war',
         'def': 'rookies: the Calder rule (under 25 NHL games in any prior season, not 6+ in two, under 26 on Sep 15). draft FV = the hockey prospects board\'s grade at the draft.',
@@ -375,7 +387,7 @@ def soccer():
     for p in sp['past']:
         past.setdefault(p['id'], []).append(p)
     cur = max(files)
-    seen, seasons = set(), []
+    seen, seasons, ids = set(), [], {}
     for S in files:
         d = json.load(open(os.path.join(SD, 'soccer-war', f'{S}.json')))
         rows = []
@@ -384,6 +396,7 @@ def soccer():
             seen.add(p['p'])
             if not first or S < files[0] + 2:
                 continue
+            ids.setdefault(S, []).append(p['p'])
             t = tm.get(str(p['p']))
             b = dob.get(str(t)) if t else None
             age = None
@@ -402,6 +415,7 @@ def soccer():
         if rows:
             seasons.append({'s': S, 'l': d['label'], 'rows': rows, 'games': d.get('games')})
     seasons.reverse()
+    write_ids('soccer', ids)
     write('soccer', {
         'asof': json.load(open(os.path.join(SD, 'soccer-war', f'{cur}.json'))).get('asof'), 'title': 'rookies', 'key': 'svar',      # a season board: SVAR, the most descriptive (metric audit Nov 24)
         'def': 'rookies: first big-five league season (Understat, 2015-16 on). prospect FV = the soccer prospects board (U22) where the player was graded.',

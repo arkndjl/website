@@ -12,7 +12,7 @@
        season's WAR, pWAR and HPM (scripts/nhl_badge_backtest.py). */ -}}
 {{- $idx := site.Data.nhl_war -}}
 {{- $pos := slice "C" "L" "R" "D" "G" -}}
-<div class="win cfb nbaxpm nhlwar"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nhlwar data-gfx-logo="/img/nhl/{}.png" data-src="{{ "data/nhl-war/" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="RK,Player,WAR,Pos,TOI,pWAR,3Y,HPM,Off,Def">
+<div class="win cfb nbaxpm nhlwar"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nhlwar data-gfx-logo="/img/nhl/{}.png" data-src="{{ "data/nhl-war/" | relURL }}" data-rook="{{ "data/rookies/nhl-ids.json" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="RK,Player,WAR,Pos,TOI,pWAR,3Y,HPM,Off,Def">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-hockey"/></svg>{{ .Get "title" | default "nhl_war.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -161,7 +161,7 @@
     var gfxRow = function (p) {
       var c = {
         rk: '<td class="cfb__rk">' + p.rk + '</td>',
-        n: '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p, 'n') + ' <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + p.toi + ' min' + medals(p, 't') + '</span></td>',
+        n: '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p, 'n') + (p.rook ? ' <span class="nflwar__rook" data-term="R" title="Calder rule: under 25 games in any earlier season, not 6+ in two, under 26 on Sep 15">R</span>' : '') + ' <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + p.toi + ' min' + medals(p, 't') + '</span></td>',
         wk: p[key] == null && wkf ? __wk.none : __wk.rk(p, wkf, WL[key] || key, null, p[key]),
         war: '<td class="cfb__num c-vorx nbaxpm__v' + k('war') + '">' + p.war.toFixed(1) + '</td>',
         g60: '<td class="cfb__num">' + (p.g60 == null ? '' : sg2(p.g60)) + '</td>',
@@ -198,11 +198,16 @@
     sel.innerHTML = '<option value="">any</option>' + Object.keys(seen).sort().map(function (t) { return '<option>' + esc(t) + '</option>'; }).join('');
     sel.value = seen[want] ? want : '';
   }
+  var rook = null;
   function load() {
     var s = bar.elements.season.value;
     if (cache[s]) { data = cache[s]; teams(); loading.hidden = true; render(); return; }
     loading.hidden = false; loading.textContent = 'loading…';
-    fetch(win.dataset.src + s + '.json').then(function (r) { return r.json(); }).then(function (d) {
+    // R chip: a rookie by the Calder rule (scripts/rookies.py, the rookies tab's own list, by NHL id)
+    rook = rook || fetch(win.dataset.rook).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; });
+    Promise.all([fetch(win.dataset.src + s + '.json').then(function (r) { return r.json(); }), rook]).then(function (a) {
+      var d = a[0], rk = {}; (a[1][s] || []).forEach(function (id) { rk[id] = 1; });
+      d.players.forEach(function (p) { p.rook = !!rk[p.id]; });
       cache[s] = d; if (bar.elements.season.value !== s) return;
       data = d; teams(); loading.hidden = true; bar.hidden = false; render();
     }).catch(function () { loading.textContent = 'load failed.'; });

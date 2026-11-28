@@ -178,7 +178,7 @@
     var gfxRow = function (p) {
       var C = {
         rk: '<td class="cfb__rk">' + p.rk + '</td>',
-        n: '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p) + (p.rook ? ' <span class="nflwar__rook" title="rookie">R</span>' : '') + (p.col ? ' <span class="cfb__dim nflwar__col">' + esc(p.col) + '</span>' : '') + ' <span class="cfb__dim nflwar__tm">' + tl(p.tm) + esc(p.tm) + '</span></td>',
+        n: '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p) + (p.rook ? ' <span class="nflwar__rook" data-term="R" title="first NFL season">R</span>' : '') + (p.col ? ' <span class="cfb__dim nflwar__col">' + esc(p.col) + '</span>' : '') + ' <span class="cfb__dim nflwar__tm">' + tl(p.tm) + esc(p.tm) + '</span></td>',
         wk: !FROM ? '' : p[key] == null ? __wk.none : __wk.rk(p, FROM, RANKED[key], null, p[key]),
         waa: '<td class="cfb__num nflwar__war">' + waa(p.waa) + '</td>',
         war: '<td class="cfb__num nflwar__war">' + f2(p.war) + '</td>',
