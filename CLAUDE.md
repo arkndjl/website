@@ -236,4 +236,5 @@
   bots and other origins skipped. A favorite is one per browser (random id in local storage) and can be taken back; per IP a day,
   5 favorites of one article and 40 clicks in all. No setup: a new post gets both by itself.
 - `scripts/post_stats.py` (site-stats.yml, every 6 hours) samples the counts into `data/post_stats.json`; `scripts/milestones.py`
-  reads it for the article milestones in ARKLOG.
+  reads it for the article milestones in ARKLOG. Process > ARKLOG > traffic has articles.exe (`layouts/shortcodes/articlestats.html`,
+  in TABS traffic of `scripts/library_build.py`): one row an article, live counts, sorts on every header.

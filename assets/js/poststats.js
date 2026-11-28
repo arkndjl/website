@@ -25,8 +25,10 @@
     el.querySelector('.pst__v b').textContent = fmt(d.v);
     el.querySelector('.pst__v span').textContent = d.v === 1 ? 'view' : 'views';
     btn.querySelector('b').textContent = fmt(d.f);
+    btn.querySelector('.pst__l').textContent = on ? 'favorited' : 'favorite';
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     btn.setAttribute('aria-label', (on ? 'favorited' : 'favorite') + ', ' + fmt(d.f));
+    btn.title = on ? 'take back your favorite' : 'favorite this article';
     btn.classList.toggle('is-on', on);
     el.hidden = false;
   }

@@ -169,7 +169,7 @@ ARKLOG = {
     'milestones': '{{< lazytab tab="milestones" >}}{{< arklogmiles tab="milestones" >}}{{< /lazytab >}}',   # scripts/milestones.py
     'scoreboard': '{{< lazytab tab="scoreboard" >}}{{< arklogboard tab="scoreboard" >}}{{< /lazytab >}}',
     'traffic': '{{< desk tab="traffic" >}}\n{{< sitestats part="views" class="desk__wide" >}}\n{{< sitestats part="trend" >}}\n'
-               '{{< sitestats part="traffic" >}}\n{{< /desk >}}',
+               '{{< sitestats part="traffic" >}}\n{{< articlestats >}}\n{{< /desk >}}',
     'build': '{{< desk tab="build" >}}\n{{< sitestats part="build" class="desk__wide" >}}\n{{< /desk >}}',
     'data': '{{< desk tab="data" >}}\n{{< sitestats part="fresh" class="desk__wide" >}}\n{{< /desk >}}',
 }
