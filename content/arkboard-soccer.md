@@ -11,7 +11,7 @@ cover = "/og/soccer.png"
 
 {{< winpane title="soccer.exe :: 2026-27" icon="soccer" sprite="px/hero-soccer" status="ESPN · FotMob · Understat xG · football-data.co.uk" class="winpane--art" />}}
 
-{{< wintabs groups="players:leaders,rookies,awards,all-time players,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,units,all-time,managers|leagues:big five,more leagues,MLS,UEFA cups,national teams" side="true" label="Soccer views" >}}
+{{< wintabs groups="players:leaders,rookies,awards,all-time players,ARKLIST|rosters:depth chart,lineups,transactions|games:games,game table|teams:ARK Ranking,units,all-time,managers|leagues:big five,more leagues,MLS,UEFA cups,national teams|market:wages" side="true" label="Soccer views" >}}
 {{< soccergames title="games" tab="games" >}}
 {{< soccergametable title="game table" tab="game table" >}}
 {{< lazytab tab="ARK Ranking" >}}{{< soccerpower title="ARK Ranking" tab="ARK Ranking" >}}{{< /lazytab >}}
@@ -77,6 +77,12 @@ cover = "/og/soccer.png"
 {{< lazytab tab="MLS bracket" >}}{{< bracket k="soccer" title="projected bracket" tab="MLS bracket" icon="soccer" >}}{{< /lazytab >}}
 {{< lazytab tab="MLS players" >}}{{< soccerextra k="mls" tab="MLS players" >}}{{< /lazytab >}}
 {{< lazytab tab="MLS keepers" >}}{{< soccerextra k="mlsgk" tab="MLS keepers" >}}{{< /lazytab >}}
+{{< /wintabs >}}
+{{< wintabs tab="wages" tabs="club wages,player wages,MLS payrolls,MLS salaries" sub="true" label="wages views" >}}
+{{< lazytab tab="club wages" >}}{{< soccerwages view="clubs" tab="club wages" >}}{{< /lazytab >}}
+{{< lazytab tab="player wages" >}}{{< soccerwages view="players" tab="player wages" >}}{{< /lazytab >}}
+{{< lazytab tab="MLS payrolls" >}}{{< payrolls lg="mls" view="teams" tab="MLS payrolls" >}}{{< /lazytab >}}
+{{< lazytab tab="MLS salaries" >}}{{< payrolls lg="mls" view="contracts" tab="MLS salaries" >}}{{< /lazytab >}}
 {{< /wintabs >}}
 {{< lazytab tab="managers" >}}{{< soccerextra k="managers" tab="managers" >}}{{< /lazytab >}}
 {{< wintabs tab="UEFA cups" tabs="Champions League,Europa League,Conference League,UCL bracket,UEL bracket,UECL bracket" sub="true" label="UEFA cups views" >}}

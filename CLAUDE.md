@@ -269,6 +269,17 @@
   Drafted counts only agencies signed before the draft process (declaring; Dec 1 football, Mar 15 basketball), never the pro agent.
   GFX: `buildAgency` (one agency) and `buildAgencyBoard` (the board), both 16:9.
 
+## Payrolls (market > payrolls, free agents, contract value; soccer market > wages; Nov 28)
+
+- `scripts/payrolls.py [nhl nba nfl mls soccer]` writes `data/payrolls/<lg>.json` from CapWages (NHL), Basketball-Reference
+  contracts (NBA), nflverse's OverTheCap contracts (NFL; never fetch overthecap.com, its robots.txt bars AI agents, so no NFL dead
+  money), ASA's MLSPA salaries (MLS) and Salary Sport's big five estimates (`scripts/soccer_wages.py`, labelled estimates, no
+  efficiency). The board workflows rerun it with `--stale`; `--test` after a change. Tables: `layouts/shortcodes/payrolls.html`,
+  `soccerwages.html`; team card `buildPayroll` in gfx.js (4:5).
+- Surplus / Eff+ (value at the league's $ a win minus pay above the minimum) shows only where it passed held out
+  (`research/payroll_efficiency.json`: NBA, NHL; NFL, MLS and wins over payroll failed, in data/retests.json). Deal and Risk use the
+  age curve in `research/payroll_aging.json` and show only where Surplus passed. Research in `scripts/research/payrolls_nov28/`.
+
 ## Season rollovers (calendar, phases, post days)
 
 - One calendar per sport: `data/seasons/<sport>.json` (league dates `events`, step `keys`: phase, season, draft, class,

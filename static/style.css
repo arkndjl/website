@@ -5758,3 +5758,9 @@ html.ytp-max { overflow: hidden; }
   .fv__chip .px { width: 18px; height: 18px; }
   .fv__cards { margin: 8px 8px 0; }
 }
+
+/* payrolls (layouts/shortcodes/payrolls.html): the expiring-contract tag, option marks, dead-money rows */
+.pay__tag { display: inline-block; padding: 0 3px; margin-left: 2px; font-size: 12px; line-height: 14px; color: var(--background);
+  background: var(--accent); vertical-align: 1px; cursor: help; }
+.pay__opt { font-size: 11px; margin-left: 2px; color: var(--accent); }
+.pay__table tr.pay__dead td { color: color-mix(in srgb, var(--foreground) 55%, transparent); font-style: italic; }

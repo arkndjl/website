@@ -111,6 +111,11 @@ jobs:
         if: env.REFRESH != 'true'
         continue-on-error: true
         run: pip install -q pyarrow && python3 scripts/xaav.py nfl
+      # market > payrolls, cap space, contracts, free agents (scripts/payrolls.py; once a day)
+      - name: Payrolls
+        if: env.REFRESH != 'true'
+        continue-on-error: true
+        run: pip install -q pyarrow && python3 scripts/payrolls.py --stale 20 nfl
       # 20th / 50th / 80th percentile WAR and stats, season and rest of season (scripts/player_pctl.py)
       - name: Percentile projections
         if: env.REFRESH != 'true'
@@ -196,7 +201,7 @@ jobs:
         run: python3 scripts/board_moves.py nfl r-nfl
       - name: Commit if anything changed
         run: |
-          files="data/brackets/nfl.json static/data/next-up/nfl.json static/data/next-up/nfl-tab.json scripts/data/moves static/data/xaav-nfl.json data/units_nfl.json data/nfl_war.json data/nfl_games.json data/nfl_qb.json data/nfl_season_value.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_nfl.json data/futures_board_nfl.json data/nfl_fantasy.json data/backup_nfl.json static/data/depth/nfl.json static/data/personnel/nfl.json data/depth_starters_nfl.json data/model_monitor/nfl.json scripts/data/model_monitor/nfl.json static/data/nfl-war.json static/data/pctl-nfl.json static/data/nfl-fantasy.json static/data/rookies/nfl.json data/nfl_breakouts.json data/st_returners_nfl.json data/st_teams_nfl.json data/st_kickers_nfl.json $(ls scripts/data/odds/nfl-*.jsonl 2>/dev/null) static/data/teams/nfl.json data/team_badges"
+          files="data/brackets/nfl.json data/payrolls/nfl.json static/data/next-up/nfl.json static/data/next-up/nfl-tab.json scripts/data/moves static/data/xaav-nfl.json data/units_nfl.json data/nfl_war.json data/nfl_games.json data/nfl_qb.json data/nfl_season_value.json data/nfl_injuries.json data/nfl_picks.json data/games_picks_nfl.json data/futures_board_nfl.json data/nfl_fantasy.json data/backup_nfl.json static/data/depth/nfl.json static/data/personnel/nfl.json data/depth_starters_nfl.json data/model_monitor/nfl.json scripts/data/model_monitor/nfl.json static/data/nfl-war.json static/data/pctl-nfl.json static/data/nfl-fantasy.json static/data/rookies/nfl.json data/nfl_breakouts.json data/st_returners_nfl.json data/st_teams_nfl.json data/st_kickers_nfl.json $(ls scripts/data/odds/nfl-*.jsonl 2>/dev/null) static/data/teams/nfl.json data/team_badges"
           # main moves while the board builds (merged PRs, the college board, odds snaps): scripts/data_push.py rebuilds
           # the data commit on the new main. This run's files are taken whole, only the ones it changed. The picks log and
           # data/rule_monitor.json are shared with the snaps and every sport's job, so when main has newer copies they are

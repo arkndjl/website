@@ -1,0 +1,183 @@
+{{- /* Team payrolls (scripts/payrolls.py -> data/payrolls/<lg>.json): {{< payrolls lg="nhl|nba|nfl|mls" view="teams|space|contracts|fa" tab="..." >}}
+       teams: one row a team (payroll, space, dead money, what comes off, and Surplus / Eff+ where they passed held out).
+       space: what each team has committed in each of the next five seasons. contracts: every contract (cap hit by season,
+       AAV, length, total, guaranteed, through). fa: contracts that end this season, by xAAV (what he would sign for now). */ -}}
+{{- $lg := .Get "lg" -}}
+{{- $view := .Get "view" | default "teams" -}}
+{{- with index (site.Data.payrolls | default dict) $lg -}}
+{{- $D := . -}}
+{{- $icon := index (dict "nhl" "hockey" "nba" "basketball" "nfl" "football" "mls" "soccer") $lg -}}
+{{- $ship := and $D.eff $D.eff.ship -}}{{- $deal := and $D.eff $D.eff.deal -}}
+{{- $nhl := eq $lg "nhl" }}{{ $nba := eq $lg "nba" }}{{ $nfl := eq $lg "nfl" }}{{ $mls := eq $lg "mls" -}}
+{{- $logo := not $mls -}}
+{{- $date := lower ((time $D.asof).Format "Jan 2, 2006") -}}
+{{- $vl := index (dict "nhl" "WAR" "nba" "VORX" "nfl" "WAR" "mls" "g+") $lg -}}
+{{- $vlast := index (dict "nhl" "2025-26" "nba" "2025-26" "nfl" "2025" "mls" "2026") $lg -}}
+{{- $pay := cond $nfl "Active" (cond $mls "Gtd comp" "Payroll") -}}
+{{- $y := $D.years -}}
+{{- $tm := dict -}}{{ range $D.teams }}{{ $tm = merge $tm (dict .tm .) }}{{ end -}}
+{{- $src := index (dict "nhl" "CapWages" "nba" "Basketball-Reference" "nfl" "OverTheCap via nflverse" "mls" "American Soccer Analysis (MLSPA)") $lg -}}
+
+{{- if eq $view "teams" -}}
+{{- $gc := printf "RK,Team,%s,Cap%%" $pay -}}{{ if $ship }}{{ $gc = printf "RK,Team,Eff+,Surplus,%s" $pay }}{{ end }}{{ if or $nhl $nba }}{{ $gc = printf "%s,Space" $gc }}{{ end }}{{ if not $mls }}{{ $gc = printf "%s,Next,Off" $gc }}{{ end -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "payrolls") "icon" $icon "filter" "find" "tab" ($.Get "tab") "gfxCols" $gc "gfxDate" $date "gfxMax" "32" "class" "pay") -}}
+{{- $gx := slice }}{{ range $i, $t := $D.teams }}{{ $gx = $gx | append (dict "tm" $t.tm "name" $t.name "rk" (add $i 1) "pay" $t.pay "space" $t.space "dead" $t.dead "ltir" $t.ltir "tax" $t.tax "apron1" $t.apron1 "apron2" $t.apron2 "base" $t.base "c" $t.c "exp" $t.exp "nfa" $t.nfa "val" $t.val "surp" $t.surp "eff" $t.eff "dpw" $t.dpw "risk" $t.risk "n" $t.n "top" $t.top "off" $t.off "logo" $t.logo) }}{{ end }}
+<script type="application/json" id="pay-gfx-{{ $lg }}">{{ dict "lg" $lg "label" $D.label "years" $y "cap" $D.cap "tax" $D.tax "apron1" $D.apron1 "apron2" $D.apron2 "ship" $ship "deal" $deal "rate" $D.eff.rate "vl" $vl "vlast" $vlast "pay" $pay "logo" $logo "teams" $gx | jsonify | safeJS }}</script>
+<p class="agency__bar pay__bar"><label class="cfb__field"><span>team</span><select data-pay-team="{{ $lg }}">{{ range $i, $t := sort $D.teams "tm" }}<option value="{{ $t.tm }}">{{ $t.tm }}</option>{{ end }}</select></label>
+  <button type="button" class="cfb__btn" data-gfx data-gfx-mode="payroll" data-gfx-lg="{{ $lg }}" title="team financial card, 4:5">team GFX</button></p>
+<table class="cfb__table pay__table">
+  <thead><tr>
+    <th title="rank by {{ if $ship }}Eff+{{ else }}{{ $pay }}{{ end }}">RK</th><th>Team</th>
+    {{- if $ship }}
+    <th data-term="EFF+" class="pay__k" title="100 + 25 x (Surplus - league mean) / SD">Eff+</th>
+    <th data-term="SURPLUS" title="team Surplus, $M: the roster's {{ $vlast }} {{ $vl }} at the league's ${{ printf "%.2f" $D.eff.rate }}M a win above the minimum, less what the roster costs above minimum players (dead money in)">Surplus</th>
+    {{- end }}
+    <th class="cfb__g" title="{{ if $nfl }}cap numbers of the active contracts, $M (OverTheCap has no dead money){{ else if $mls }}guaranteed compensation of the roster, $M, MLSPA release {{ $D.release }}{{ else }}cap hits this season, $M, dead money in{{ end }}">{{ $pay }}</th>
+    {{- if not $mls }}<th title="{{ $pay }} / the {{ $D.label }} cap (${{ $D.cap }}M)">Cap%</th>{{ end }}
+    {{- if $nhl }}
+    <th title="cap space today, $M (CapWages; LTIR relief in)">Space</th>
+    <th title="LTIR, $M: cap hits of players on long-term injured reserve">LTIR</th>
+    <th title="dead money this season, $M: buyouts and buried cap">Dead</th>
+    {{- end }}
+    {{- if $nba }}
+    <th title="room under the {{ $D.label }} cap (${{ $D.cap }}M), $M; below 0 = over the cap">Space</th>
+    <th title="room under the tax line (${{ $D.tax }}M), $M">Tax</th>
+    <th title="room under the first apron (${{ $D.apron1 }}M), $M">Apron 1</th>
+    <th title="room under the second apron (${{ $D.apron2 }}M), $M">Apron 2</th>
+    {{- end }}
+    {{- if $mls }}<th title="base salary of the roster, $M">Base</th>{{ end }}
+    {{- if not $mls }}
+    <th class="cfb__g" title="committed for {{ index $y 1 }}, $M">Next</th>
+    <th title="cap hits of the contracts that end this season, $M">Off</th>
+    <th title="contracts that end this season">FA</th>
+    {{- end }}
+    <th class="cfb__g" title="the roster's {{ $vl }}, {{ $vlast }}">{{ $vl }}</th>
+    {{- if $deal }}<th data-term="RISK" title="Risk, $M: cap dollars after this season that the age curve expects to buy no value, summed over the roster">Risk</th>{{ end }}
+    {{- if $ship }}<th data-term="$/W" title="pay above minimum players / the roster's {{ $vlast }} {{ $vl }}, $M a win; blank under one win">$/W</th>{{ end }}
+    <th title="{{ if $mls }}players{{ else }}contracts on the sheet{{ end }}">N</th>
+  </tr></thead>
+  <tbody>
+  {{- range $i, $t := $D.teams }}
+  <tr>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__team">{{ if $logo }}<img class="cfb__logo" src="/img/{{ $lg }}/{{ lower $t.tm }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ else }}{{ with $t.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}{{ end }}<span>{{ $t.tm }}</span></td>
+    {{- if $ship }}
+    <td class="cfb__num is-key pay__k" data-v="{{ $t.eff }}">{{ with $t.eff }}{{ . }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $t.surp }}">{{ with $t.surp }}{{ if lt . 0.0 }}<span class="cfb__down">{{ printf "%.1f" . }}</span>{{ else }}+{{ printf "%.1f" . }}{{ end }}{{ else }}—{{ end }}</td>
+    {{- end }}
+    <td class="cfb__num cfb__g" data-v="{{ $t.pay }}">{{ with $t.pay }}{{ printf "%.1f" . }}{{ end }}</td>
+    {{- if not $mls }}<td class="cfb__num" data-v="{{ div $t.pay $D.cap }}">{{ printf "%.0f%%" (mul 100 (div $t.pay $D.cap)) }}</td>{{ end }}
+    {{- if $nhl }}
+    <td class="cfb__num" data-v="{{ $t.space }}">{{ with $t.space }}{{ printf "%.2f" . }}{{ else }}0.00{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $t.ltir }}">{{ with $t.ltir }}{{ printf "%.1f" . }}{{ else }}<span class="cfb__dim">0</span>{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $t.dead }}">{{ with $t.dead }}{{ printf "%.1f" . }}{{ else }}<span class="cfb__dim">0</span>{{ end }}</td>
+    {{- end }}
+    {{- if $nba }}
+    {{- range slice "space" "tax" "apron1" "apron2" }}{{ $v := index $t . }}
+    <td class="cfb__num" data-v="{{ $v }}">{{ if lt $v 0.0 }}<span class="cfb__down">{{ printf "%.1f" $v }}</span>{{ else }}{{ printf "%.1f" $v }}{{ end }}</td>
+    {{- end }}
+    {{- end }}
+    {{- if $mls }}<td class="cfb__num" data-v="{{ $t.base }}">{{ printf "%.1f" $t.base }}</td>{{ end }}
+    {{- if not $mls }}
+    <td class="cfb__num cfb__g" data-v="{{ index $t.c 1 }}">{{ printf "%.1f" (index $t.c 1) }}</td>
+    <td class="cfb__num" data-v="{{ $t.exp }}">{{ printf "%.1f" $t.exp }}</td>
+    <td class="cfb__num">{{ $t.nfa }}</td>
+    {{- end }}
+    <td class="cfb__num cfb__g" data-v="{{ $t.val }}">{{ with $t.val }}{{ printf "%.1f" . }}{{ else }}0.0{{ end }}</td>
+    {{- if $deal }}<td class="cfb__num" data-v="{{ $t.risk }}">{{ with $t.risk }}{{ printf "%.1f" . }}{{ else }}0.0{{ end }}</td>{{ end }}
+    {{- if $ship }}<td class="cfb__num" data-v="{{ $t.dpw }}">{{ with $t.dpw }}{{ printf "%.1f" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
+    <td class="cfb__num">{{ $t.n }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- $about := printf "%s, %s. Value = last full season's %s of the players on the roster now." $src $D.label $vl -}}
+{{- with $D.eff.test }}{{ $about = printf "%s Held out %s (%d team-seasons), next season's win%%: last season's record and next season's payroll miss by %.3f; with Surplus %.3f (t %.2f, %s seasons)%s." $about .years (int .n) .maeBase .surplus.mae .surplus.t .surplus.won (cond $ship "" ", not shipped") }}{{ end -}}
+{{- partial "wintable-close.html" (dict "rows" (len $D.teams) "note" (printf "%s · updated %s" $D.label $date) "about" $about) -}}
+
+{{- else if eq $view "space" -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "cap space") "icon" $icon "filter" "find" "tab" ($.Get "tab") "gfxCols" (printf "RK,Team,%s" (delimit (first 4 $y) ",")) "gfxDate" $date "gfxMax" "32" "class" "pay") -}}
+<table class="cfb__table pay__table">
+  <thead><tr><th title="rank by room under the cap next season">RK</th><th>Team</th>
+  {{- range $j, $s := $y }}<th class="{{ if eq $j 0 }}cfb__g {{ end }}{{ if eq $j 1 }}pay__k{{ end }}" title="committed for {{ $s }}, $M{{ if eq $j 0 }} (this season){{ end }}">{{ $s }}</th>{{ end }}
+  <th class="cfb__g" title="room under the {{ index $y 1 }} cap{{ if $nhl }} ($113.5M, set){{ else }} at this season's cap{{ end }}, $M, before new deals">Room</th>
+  <th title="contracts on the sheet for {{ index $y 1 }}">N</th></tr></thead>
+  <tbody>
+  {{- $cap2 := cond $nhl 113.5 $D.cap -}}
+  {{- $rows := slice }}{{ range $D.teams }}{{ $rows = $rows | append (dict "t" . "r" (sub $cap2 (index .c 1))) }}{{ end -}}
+  {{- range $i, $o := sort $rows "r" "desc" }}{{ $t := $o.t }}
+  {{- $n2 := 0 }}{{ range $D.players }}{{ if and (eq .tm $t.tm) (not .nr) (not .dead) (gt (len .h) 1) }}{{ with index .h 1 }}{{ $n2 = add $n2 1 }}{{ end }}{{ end }}{{ end }}
+  <tr><td class="cfb__rk">{{ add $i 1 }}</td>
+    <td class="cfb__team">{{ if $logo }}<img class="cfb__logo" src="/img/{{ $lg }}/{{ lower $t.tm }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ else }}{{ with $t.logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}{{ end }}<span>{{ $t.tm }}</span></td>
+    {{- range $j, $v := $t.c }}<td class="cfb__num{{ if eq $j 0 }} cfb__g{{ end }}{{ if eq $j 1 }} is-key{{ end }}" data-v="{{ $v }}">{{ printf "%.1f" $v }}</td>{{ end }}
+    <td class="cfb__num cfb__g" data-v="{{ $o.r }}">{{ if lt $o.r 0.0 }}<span class="cfb__down">{{ printf "%.1f" $o.r }}</span>{{ else }}{{ printf "%.1f" $o.r }}{{ end }}</td>
+    <td class="cfb__num">{{ $n2 }}</td></tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $D.teams) "note" (printf "%s · updated %s" $D.label $date) "about" (printf "%s. Cap hits already on the books by season%s; options count as if exercised." $src (cond $nfl ", active contracts only (no dead money in the source)" ""))) -}}
+
+{{- else -}}
+{{- $fa := eq $view "fa" -}}
+{{- $list := $D.players -}}
+{{- if $fa }}{{ $list = where (where $D.players "fa" true) "dead" "!=" 1 }}{{ $list = where $list "nr" "!=" 1 }}{{ end -}}
+{{- $key := "h0" -}}
+{{- $rows := slice }}{{ range $list }}{{ $h0 := 0.0 }}{{ with index .h 0 }}{{ $h0 = . }}{{ end }}{{ $x := -1.0 }}{{ with .x }}{{ $x = . }}{{ end }}{{ $rows = $rows | append (dict "p" . "h0" $h0 "x" $x) }}{{ end -}}
+{{- $rows = sort $rows (cond (and $fa (not $mls)) "x" "h0") "desc" -}}
+{{- $gc := "RK,Player,Cap hit,Pos,Team,Age,AAV,Yrs,Thru" -}}
+{{- if $fa }}{{ $gc = "RK,Player,xAAV,Pos,Team,Age,Status,Cap hit" }}{{ end }}{{ if $mls }}{{ $gc = "RK,Player,Gtd comp,Pos,Team,Base,g+" }}{{ end -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (cond $fa "free agents" "contracts")) "icon" $icon "filter" (cond $mls "Team,Pos" "Team,Pos,Status") "rerank" true "tab" ($.Get "tab") "gfxCols" $gc "gfxDate" $date "gfxMax" "25" "class" "pay") -}}
+<table class="cfb__table pay__table pay__table--pl">
+  <thead><tr>
+    <th>RK</th><th>Player</th>
+    {{- if and $fa (not $mls) }}<th class="pay__k" data-term="XAAV" title="xAAV, $M: the AAV he would sign for as a free agent now, from position, age and last full season's play (the contract value model)">xAAV</th>{{ end }}
+    <th class="{{ if not $fa }}pay__k{{ end }}" title="{{ if $mls }}guaranteed compensation, $M (MLSPA){{ else }}cap hit, {{ index $y 0 }}, $M{{ end }}">{{ if $mls }}Gtd comp{{ else }}Cap hit{{ end }}</th>
+    <th>Pos</th><th>Team</th>{{ if not $mls }}<th>Age</th>{{ end }}
+    {{- if not $mls }}<th title="free-agent status when the deal ends: UFA, RFA, ERFA; PO / TO / ETO = a player, team or early-termination option; FA = status not in the source">Status</th>{{ end }}
+    {{- if and (not $fa) (not $mls) }}{{ range $j, $s := after 1 $y }}<th class="{{ if eq $j 0 }}cfb__g{{ end }}" title="cap hit, {{ $s }}, $M">{{ $s }}</th>{{ end }}{{ end }}
+    {{- if not $mls }}
+    <th class="cfb__g" data-term="AAV" title="{{ if $nba }}mean salary of the years left, $M (Basketball-Reference shows the years left){{ else }}average annual value of the contract, $M{{ end }}">AAV</th>
+    <th data-term="YRS" title="{{ if $nba }}years left, this season in{{ else }}contract length, years{{ end }}">Yrs</th>
+    <th title="{{ if $nba }}salary left, $M{{ else }}total value of the contract, $M{{ end }}">Total</th>
+    <th data-term="GTD" title="{{ if $nba }}guaranteed salary left, $M{{ else if $nhl }}NHL deals are guaranteed (a buyout still pays two thirds, one third under 26), $M{{ else }}guaranteed at signing, $M{{ end }}">Gtd</th>
+    <th title="last season of the deal">Thru</th>
+    {{- end }}
+    {{- if $mls }}<th title="base salary, $M">Base</th>{{ end }}
+    <th class="cfb__g" title="{{ $vl }}, {{ $vlast }}">{{ $vl }}</th>
+    {{- if and $ship (not $fa) }}<th data-term="SURPLUS" title="Surplus, $M: his {{ $vlast }} {{ $vl }} at ${{ printf "%.2f" $D.eff.rate }}M a win, less his cap hit above the minimum">Surplus</th>{{ end }}
+    {{- if and $deal (not $fa) }}<th data-term="DEAL" title="Deal, $M: his expected value over the seasons left in view (age curve on his {{ $vlast }} {{ $vl }}) at ${{ printf "%.2f" $D.eff.rate }}M a win, less his cap hits above the minimum">Deal</th><th data-term="RISK" title="Risk, $M: cap dollars after this season that the age curve expects to buy no value">Risk</th>{{ end }}
+    {{- if and (not $fa) (not $mls) }}<th data-term="XAAV" title="xAAV, $M: what he would sign for as a free agent now">xAAV</th>{{ end }}
+  </tr></thead>
+  <tbody>
+  {{- range $i, $o := $rows }}{{ $p := $o.p }}
+  {{- $st := $p.st | default "" }}{{ if and $p.fa (not $st) }}{{ $st = "FA" }}{{ end }}{{ if and (not $p.fa) $p.opt }}{{ $st = index (split $p.opt " ") 0 }}{{ end -}}
+  {{- $stt := "" }}{{ if $p.fa }}{{ $stt = printf "%s after %s" (cond (eq $st "FA") "free agent" $st) (index $y 0) }}{{ with $p.stx }}{{ $stt = printf "%s after %s" . (index $y 0) }}{{ end }}{{ end }}{{ with $p.opt }}{{ $stt = printf "%s%s%s option" $stt (cond (eq $stt "") "" "; ") (replace (replace (replace . "PO " "player ") "TO " "team ") "ETO " "early termination ") }}{{ end -}}
+  <tr{{ if $p.dead }} class="pay__dead"{{ end }}>
+    <td class="cfb__rk">{{ add $i 1 }}</td>
+    <td><b>{{ $p.n }}</b>{{ if $p.fa }} <span class="pay__tag" title="{{ $stt }}">{{ $st }}</span>{{ end }}{{ with $p.ct }}{{ if not (in (slice "Extension" "UFA" "Drafted" "SFA" "Waiver Claim" "Practice Squad" "RFA" "ERFA" "Franchise Tag" "Trade" "Other" "Rookie" "Undrafted") .) }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ end }}{{ if $p.ltir }} <span class="cfb__dim" title="long-term injured reserve">LTIR</span>{{ end }}{{ if $p.nr }} <span class="cfb__dim" title="in the minors: not on the NHL cap unless buried over the limit">minors</span>{{ end }}</td>
+    {{- if and $fa (not $mls) }}<td class="cfb__num is-key pay__k" data-v="{{ $p.x }}">{{ with $p.x }}{{ printf "%.1f" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
+    <td class="cfb__num{{ if not $fa }} is-key pay__k{{ end }}" data-v="{{ $o.h0 }}">{{ with index $p.h 0 }}{{ printf "%.2f" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    <td>{{ $p.pos }}</td>
+    <td class="cfb__team">{{ if $logo }}<img class="cfb__logo" src="/img/{{ $lg }}/{{ lower $p.tm }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span>{{ $p.tm }}</span></td>
+    {{- if not $mls }}<td class="cfb__num">{{ $p.age }}</td>{{ end }}
+    {{- if not $mls }}<td{{ with $stt }} title="{{ . }}"{{ end }}>{{ $st }}</td>{{ end }}
+    {{- if and (not $fa) (not $mls) }}{{ range $j, $v := after 1 $p.h }}{{ $o2 := "" }}{{ with $p.o }}{{ with index . (add $j 1) }}{{ $o2 = . }}{{ end }}{{ end }}<td class="cfb__num{{ if eq $j 0 }} cfb__g{{ end }}"{{ with $v }} data-v="{{ . }}"{{ end }}{{ with $o2 }} title="{{ . }}"{{ end }}>{{ with $v }}{{ printf "%.1f" . }}{{ with $o2 }}<span class="pay__opt">{{ . }}</span>{{ end }}{{ end }}</td>{{ end }}{{ end }}
+    {{- if not $mls }}
+    <td class="cfb__num cfb__g" data-v="{{ $p.aav }}">{{ with $p.aav }}{{ printf "%.2f" . }}{{ end }}</td>
+    <td class="cfb__num">{{ with $p.len }}{{ . }}{{ else }}{{ $p.left }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $p.tot }}">{{ with $p.tot }}{{ printf "%.1f" . }}{{ end }}</td>
+    <td class="cfb__num" data-v="{{ $p.gtd }}">{{ with $p.gtd }}{{ printf "%.1f" . }}{{ end }}</td>
+    <td>{{ $p.thru }}</td>
+    {{- end }}
+    {{- if $mls }}<td class="cfb__num" data-v="{{ $p.base }}">{{ with $p.base }}{{ printf "%.2f" . }}{{ end }}</td>{{ end }}
+    <td class="cfb__num cfb__g" data-v="{{ $p.v }}">{{ with $p.v }}{{ printf "%.1f" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
+    {{- if and $ship (not $fa) }}<td class="cfb__num" data-v="{{ $p.sv }}">{{ with $p.sv }}{{ if lt . 0.0 }}<span class="cfb__down">{{ printf "%.1f" . }}</span>{{ else }}+{{ printf "%.1f" . }}{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
+    {{- if and $deal (not $fa) }}<td class="cfb__num" data-v="{{ $p.deal }}">{{ with $p.deal }}{{ if lt . 0.0 }}<span class="cfb__down">{{ printf "%.1f" . }}</span>{{ else }}+{{ printf "%.1f" . }}{{ end }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td><td class="cfb__num" data-v="{{ $p.risk }}">{{ if ne $p.risk nil }}{{ printf "%.1f" $p.risk }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
+    {{- if and (not $fa) (not $mls) }}<td class="cfb__num" data-v="{{ $p.x }}">{{ with $p.x }}{{ printf "%.1f" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $rows) "note" (printf "%s · updated %s" $D.label $date) "about" (printf "%s, %s.%s" $src $D.label (cond $fa " Contracts that end this season; status from the source (NFL: by seasons in the league)." ""))) -}}
+{{- end -}}
+{{- end -}}
