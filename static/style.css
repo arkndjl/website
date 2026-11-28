@@ -4061,6 +4061,8 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
   .nflff__table td.nflff__opp { grid-column: 4; text-align: right; }
   .nflff__table td.nflff__line { display: block; grid-column: 2 / span 2; grid-row: 3; font-size: .85em; overflow-wrap: anywhere; }
   .nflff__table td.nflff__av { display: block; grid-column: 4; grid-row: 3; text-align: right; font-size: .75em; color: color-mix(in srgb, var(--foreground) 55%, transparent); white-space: nowrap; }
+  .nflff__table td.nflff__ros { display: block; grid-column: 4; grid-row: 4; text-align: right; font-size: .85em; }
+  .nflff__table td.nflff__ros::after { content: " ROS"; font-size: .85em; color: color-mix(in srgb, var(--foreground) 55%, transparent); }
   .nflff__m { display: inline; }
 }
 

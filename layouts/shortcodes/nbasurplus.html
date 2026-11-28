@@ -4,7 +4,7 @@
        Value = the minimum salary + projected VORX x the season's $ per win (league payroll above the minimum over league projected VORX);
        surplus = value - salary. Contract surplus sums every year left: XPM (proj) aged on the game model's curve, the
        same minutes, $ per win grown with the cap; a player option counts only when it costs the team (he opts in when
-       paid over his value), a team option only when it pays. Views: contract (the default) or this season. Filters ride
+       paid over his value), a team option only when it pays. Every number is a column; a header click on Contract or Surplus ranks the board by it (RK follows; Contract again = most overpaid first), Contract by default (no stat toggles, Nov 28 2026). Filters ride
        in the address with a c prefix, apart from the XPM tab's (#cteam=OKC&cview=s). */ -}}
 <div class="win cfb nbasur"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbasur data-gfx-logo="/img/nba/{}.png" data-src="{{ "data/nba-proj.json" | relURL }}" data-xaav="{{ "data/xaav-nba.json" | relURL }}" data-gfx-cols="RK,Player,Contract,Pos,Surplus,Salary,Value,xAAV,XPM (proj)">
   <div class="win__title">
@@ -19,16 +19,11 @@
     </select></label>
     <button type="reset" class="cfb__btn">reset</button>
     <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: players on screen">GFX</button>
-    <fieldset class="cfb__pos nbaxpm__side"><legend class="visually-hidden">rank by</legend>
-      <button type="button" class="cfb__chip is-on" data-view="" aria-pressed="true" title="surplus over every year left on the contract">contract</button>
-      <button type="button" class="cfb__chip" data-view="s" aria-pressed="false" title="this season: value minus salary">this season</button>
-      <button type="button" class="cfb__chip" data-view="w" aria-pressed="false" title="contract surplus, most overpaid first">overpaid</button>
-    </fieldset>
   </form>
   <div class="wintable__scroll cfb__scroll">
     <table class="cfb__table nbaxpm__table nbasur__table">
       <thead><tr>
-        <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, in the order of the view">RK</th>
+        <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, by the ranked column (Contract unless Surplus is clicked)">RK</th>
         <th data-sort="n">Player</th>
         <th data-sort="csur" data-num class="c-csur" title="contract surplus, $M: every year left, value minus salary (options taken only when they pay their holder)">Contract</th>
         <th data-sort="pos" class="cfb__g" title="position (Basketball-Reference)">Pos</th>
@@ -79,11 +74,10 @@
   function tl(t) { return t ? '<img class="cfb__logo cfb__logo--in" src="/img/nba/' + esc(String(t).toLowerCase()) + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
   function sg(x, d) { if (x == null) return '<span class="cfb__dim">–</span>'; var s = x.toFixed(d == null ? 1 : d), r = +s; return '<span' + (r < 0 ? ' class="cfb__down"' : '') + '>' + (r > 0 ? '+' : '') + (r === 0 ? s.replace('-', '') : s) + '</span>'; }
   function m(x) { return x == null ? '' : x.toFixed(1); }
-  function chips() { [].forEach.call(bar.querySelectorAll('[data-view]'), function (c) { var on = c.dataset.view === view; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
   function readHash() {
     var h = __hp(win);
     view = h.get('cview') || ''; if (['', 's', 'w'].indexOf(view) < 0) view = '';
-    bar.elements.team.value = h.get('cteam') || ''; bar.elements.q.value = h.get('cq') || ''; bar.elements.age.value = h.get('cage') || ''; chips();
+    bar.elements.team.value = h.get('cteam') || ''; bar.elements.q.value = h.get('cq') || ''; bar.elements.age.value = h.get('cage') || '';
   }
   function writeHash() {
     var h = __hp(win), e = bar.elements;
@@ -116,10 +110,9 @@
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
     table.dataset.key = key;
     function k(c) { return c === key ? ' is-key' : ''; }
-    // the surplus the view ranks by sits right after the name, then Pos, Team, Age, MP, then the other surplus, the contract,
-    // salary and value, then XPM (proj) and VORX (the board standard, Nov 23 2026); headers move with it
-    var order = [key, 'pos', 'tm', 'age', 'mp', key === 'sur' ? 'csur' : 'sur', 'ny', 'sal', 'val', 'xa', 'pxpm', 'pvorx'], hr = ths[0].parentNode;
-    ['rk', 'n'].concat(order).forEach(function (c) { var th = ths.filter(function (t) { return t.dataset.sort === c; })[0]; if (th) hr.appendChild(th); });
+    // one fixed column order (no stat toggles, Nov 28 2026): contract surplus right after the name, then Pos, Team, Age, MP,
+    // this season's surplus, the contract, salary and value, then XPM (proj) and VORX (the board standard, Nov 23 2026)
+    var order = ['csur', 'pos', 'tm', 'age', 'mp', 'sur', 'ny', 'sal', 'val', 'xa', 'pxpm', 'pvorx'];
     var CELL = {
       pxpm: function (p) { return '<td class="cfb__num nbaxpm__ph">' + sg(p.pxpm) + '<span class="cfb__dim nbaxpm__od" title="80% range">' + p.lo.toFixed(1) + '–' + p.hi.toFixed(1) + '</span></td>'; },
       pvorx: function (p) { return '<td class="cfb__num nbaxpm__ph">' + p.pvorx.toFixed(1) + '</td>'; },
@@ -149,7 +142,7 @@
     pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
     var t = new Date(data.asof);
     asof.textContent = data.label + ' · $' + data.dpw.toFixed(2) + 'M per win · updated ' + MON[t.getUTCMonth()] + ' ' + t.getUTCDate() + ', ' + t.getUTCFullYear();
-    ths.forEach(function (th) { th.removeAttribute('aria-sort'); if (th.dataset.sort === sortKey) th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending'); });
+    ths.forEach(function (th) { th.removeAttribute('aria-sort'); th.classList.toggle('is-key', th.dataset.sort === key); if (th.dataset.sort === sortKey || sortKey === 'rk' && th.dataset.sort === key) th.setAttribute('aria-sort', (dir * sgn > 0) === (th.dataset.sort === 'rk') ? 'ascending' : 'descending'); });
   }
   function teams() {
     var sel = bar.elements.team, want = sel.value, seen = {};
@@ -159,15 +152,14 @@
   }
   function update() { page = 0; writeHash(); render(); }
   bar.addEventListener('input', update); bar.addEventListener('change', update);
-  bar.addEventListener('reset', function () { view = ''; sortKey = 'rk'; dir = 1; setTimeout(function () { chips(); update(); }); });
-  bar.querySelector('.nbaxpm__side').addEventListener('click', function (e) {
-    var c = e.target.closest('.cfb__chip'); if (!c) return;
-    view = c.dataset.view; sortKey = 'rk'; dir = 1; chips(); update();
-  });
+  bar.addEventListener('reset', function () { view = ''; sortKey = 'rk'; dir = 1; setTimeout(function () { update(); }); });
   ths.forEach(function (th) {
     th.tabIndex = 0;
     function go() {
       var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk';
+      // a ranked column: Contract (again: most overpaid first) or Surplus (again: flips); RK follows
+      if (k === 'csur') { view = sortKey === 'rk' && view === '' ? 'w' : ''; sortKey = 'rk'; dir = 1; update(); return; }
+      if (k === 'sur') { if (view === 's' && sortKey === 'rk') dir = -dir; else { view = 's'; sortKey = 'rk'; dir = 1; } update(); return; }
       best = k === sortKey ? best : asc ? 1 : -1; dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
     }
     th.addEventListener('click', go);

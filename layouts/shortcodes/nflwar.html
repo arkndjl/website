@@ -7,11 +7,11 @@
        pressures (expected sacks, not sacks), stops and plays on the ball (data/nfl_war_def.json). XV = what an average
        regular at the sub-position adds x share + share x quality, quality = the stat-line parts (EPA, CPOE, pressures,
        coverage allowed, ...) weighted by how much they move team margin, 2018-25. ST (scripts/nfl_st_war.py, Nov 2 2026):
-       kicking, punting and returns over an average specialist, shrunk, added to WAR; K and P rows are ST alone. Views: season to date, or per 17 games (100+ snaps).
+       kicking, punting and returns over an average specialist, shrunk, added to WAR; K and P rows are ST alone. One table, every number a column (no stat toggles, Nov 28 2026): a header click on XV, XV/17 or pXP/60 ranks the board by it (RK, ± and the position rank follow), XV by default; the qualified box keeps players with 40%+ of team snaps.
        Every player but QBs (they have their own board, nflqb.html). Filters: position (and OFF / DEF), team, search. RK and the position rank count within the filters and the
        view, in XV order (the season's most descriptive number, metric audit Nov 24 2026: held out it tracks team margin
        better than WAR or SV; WAA and WAR sit next to it); headers sort. ± stays the weekly move in WAA rank (the board's
-       weekly snapshot, scripts/board_moves.py). Filters ride in the address (#pos=QB&team=KC&view=pace).
+       weekly snapshot, scripts/board_moves.py). Filters ride in the address (#pos=QB&team=KC&key=pxp&qual=1).
        Medals in the name cell: bdg, the predictive badges (scripts/nfl_badges.py; data/nfl_badge_backtest.json).
        Two-way players (20+ snaps each side, row's two: {o, d WAR, so, sd snaps, p2 other position}): WAR sums both
        sides, each against its own side's replacement line; the position cell reads CB/WR, either chip finds him, and
@@ -19,8 +19,8 @@
        1Y / 3Y (p1, p3): projected WAR next season and over the next three (scripts/nfl_war_proj.py, fit by
        scripts/nfl_war_proj_research.py -> data/nfl_war_proj_fit.json).
        rXP/60 (xp), pXP/60 (pxp), qualified (q): scripts/nfl_rate.py, fit by scripts/nfl_rate_research.py -> data/nfl_rate_fit.json.
-       Per 17 games view: XV and WAA x 17 / team games (team games from the team's WAR / WAR/17).
-       Per 60 snaps view: qualified players only, ranked by pXP/60 (the predictive rate), Pct next. Pct = pXP/60 percentile at the position among the
+       XV/17: XV x 17 / team games (team games from the team's WAR / WAR/17), 100+ snaps.
+       Pct = pXP/60 percentile at the position among the
        qualified players in the filters. */ -}}
 {{- $d := site.Data.nfl_war -}}
 {{- $fit := site.Data.nfl_war_fit -}}
@@ -33,9 +33,7 @@
   </div>
   <form class="cfb__bar nflwar__bar" data-nw-bar hidden onsubmit="return false" aria-label="filter the leaderboard">
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player, team or college" autocomplete="off"></label>
-    <label class="cfb__field" title="season to date: by XV so far. per 17 games: XV x 17 / team games (100+ snaps). per 60 snaps: qualified players (40%+ of team snaps on their side) by pXP/60"><span>view</span><select name="view">
-      <option value="">season to date</option><option value="pace">per 17 games</option><option value="rate">per 60 snaps</option>
-    </select></label>
+    <label class="cfb__check" title="qualified: 40%+ of team snaps on their side"><input type="checkbox" name="qual"><span>qualified</span></label>
     <label class="cfb__field"><span>team</span><select name="team">
       <option value="">any</option>{{ range $teams }}<option>{{ . }}</option>{{ end }}
     </select></label>
@@ -56,18 +54,19 @@
   <div class="wintable__scroll cfb__scroll">
     <table class="cfb__table nflwar__table">
       <thead><tr>
-        <th data-sort="rk" data-num aria-sort="ascending" title="rank by XV within the filters (pXP/60 in the per 60 snaps view)">RK</th>
+        <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters by the ranked column: XV, or XV/17 or pXP/60 when clicked">RK</th>
         <th data-sort="n" title="medals: predictive badges, bronze to platinum (75th / 90th / 97th / 99th percentile at the position, 300+ snaps a season): Target Magnet (WR / TE, targets a snap), predicted next-season WAR beyond this season's WAR and age, held out (scripts/nfl_badge_backtest.py). Specialists: Kicker, Field Flipper (punter), Kick Returner, on the special teams credit in WAR, which carried to the next season (scripts/nfl_st_war.py)">Player</th>
-        <th data-sort="wk" data-num title="± = rank change in XV since the last Tuesday post, within the filters; hover for the rank and XV then (pXP/60 in the per-60 view)">±</th>
+        <th data-sort="wk" data-num title="± = rank change in XV since the last Tuesday post, within the filters; hover for the rank and the value then (follows the ranked column: XV, XV/17 or pXP/60)">±</th>
         <th data-sort="xv" class="cfb__g" data-num title="XV = WAR from the parts of the stat line that track team margin (EPA, CPOE, sacks taken, first downs, yards after contact, pressures, stops, missed tackles, coverage allowed, penalties), z within the sub-position, weights fit on 2018-25 team margin. 40% of WAR. Held out, the season number that tracks team margin best (vs WAR, SV). season to date, or per 17 games in that view">XV</th>
-        <th data-sort="waa" data-num title="WAA = wins over an average regular at the sub-position (slot WR, nickel CB, OT, IOL, ...), same snaps. season to date, or per 17 games in that view">WAA</th>
-        <th data-sort="pos" class="cfb__g" title="position, rank at position by the view's key within the filters (QB3 = 3rd QB)">Pos</th>
+        <th data-sort="waa" class="cfb__g" data-num title="WAA = wins over an average regular at the sub-position (slot WR, nickel CB, OT, IOL, ...), same snaps. season to date">WAA</th>
+        <th data-sort="pos" class="cfb__g" title="position, rank at position by the ranked column within the filters (QB3 = 3rd QB)">Pos</th>
         <th data-sort="t" class="nflwar__team">Team</th>
         <th data-sort="age" data-num title="age on Sept 1">Age</th>
         <th data-sort="g" data-num title="games played">G</th>
         <th data-sort="sn" data-num title="snaps, own side of the ball">Snaps</th>
-        <th data-sort="war" class="cfb__g" data-num title="WAR = .6 x AV WAR + .4 x XV + ST, season to date. AV WAR = (AV - replacement AV(sub-position) x snap share) x .091 wins/AV; replacement line: blend of points lost when a regular sits, veteran contract cap %, AV. team WAR sums to wins - 3">WAR</th>
+        <th data-sort="war" data-num title="WAR = .6 x AV WAR + .4 x XV + ST, season to date. AV WAR = (AV - replacement AV(sub-position) x snap share) x .091 wins/AV; replacement line: blend of points lost when a regular sits, veteran contract cap %, AV. team WAR sums to wins - 3">WAR</th>
         <th data-sort="pace" data-num title="WAR/17 = WAR x 17 / team games">WAR/17</th>
+        <th data-sort="xvP" data-num title="XV/17 = XV x 17 / team games, 100+ snaps (kickers and punters all)">XV/17</th>
         <th data-sort="p1" data-num title="1Y = projected WAR next season, from WAR this season (pace) and the two before, snaps, age by position group, draft slot on a rookie deal or the cap share of his contract after it (scripts/nfl_war_proj.py). special teams not included">1Y</th>
         <th data-sort="p3" data-num title="3Y = projected WAR over the next three seasons, same inputs. held out 2015-22: RMSE .324 vs .342 for the Marcel WAR rate x snaps (calibrated); the draft slot / contract inputs: .326 to .324, t -3.6, 8/8 seasons">3Y</th>
         <th data-sort="stw" data-num data-sparse title="ST = special teams wins: kicking (FG + XP), punting, kick and punt returns, in points over an average specialist (EPA over the expectation from the kick spot, or the catch spot for returns), shrunk to the part that carries to the next season, over 35.5 points a win. In WAR. kickers and punters: WAR = ST">ST</th>
@@ -105,21 +104,13 @@
   var bar = win.querySelector('[data-nw-bar]'), body = win.querySelector('tbody'), ths = [].slice.call(win.querySelectorAll('thead th')),
       count = win.querySelector('[data-nw-count]'), none = win.querySelector('[data-nw-none]'), loading = win.querySelector('[data-nw-loading]'),
       pager = win.querySelector('[data-nw-pager]'), pageEl = win.querySelector('[data-nw-page]'), pagesEl = win.querySelector('[data-nw-pages]');
-  // column order: the key the view ranks by (XV; pXP/60 in the per 60 snaps view) right after the player, then position,
-  // team, age, sample (G, snaps), the key's companions, the other value metrics, the season line. The th move with it
-  var THS = {}, HEAD = ths[0].parentNode, G = {};
-  ths.forEach(function (th) { THS[th.dataset.sort] = th; });
-  var CTX = ['pos', 't', 'age', 'g', 'sn'], ORDER = {
-    xv: ['rk', 'n', 'wk', 'xv'].concat(CTX, ['waa', 'war', 'pace', 'p1', 'p3', 'stw', 'pxp', 'pct', 'xp', 'av', 'line']),
-    pxp: ['rk', 'n', 'wk', 'pxp'].concat(CTX, ['pct', 'xp', 'xv', 'waa', 'war', 'pace', 'p1', 'p3', 'stw', 'av', 'line']) },
-    GFX = { xv: 'RK,Player,XV,Pos,Team,Age,WAA,WAR,WAR/17,AV', pxp: 'RK,Player,pXP/60,Pos,Team,Age,Pct,XV,WAR,AV' };
-  function layout(rate) {
-    var o = ORDER[rate ? 'pxp' : 'xv']; win.dataset.gfxCols = GFX[rate ? 'pxp' : 'xv']; G = {}; G[o[3]] = G.pos = G[o[4 + CTX.length]] = 1;
-    o.forEach(function (k) { var th = THS[k]; HEAD.appendChild(th); th.classList.toggle('cfb__g', !!G[k]); });
-    return o;
-  }
+  // one fixed column order (no stat toggles, Nov 28 2026): XV right after the player, then position, team, age, sample
+  // (G, snaps), its companions, the other value metrics and rates, the season line
+  var CTX = ['pos', 't', 'age', 'g', 'sn'], COLS = ['rk', 'n', 'wk', 'xv'].concat(CTX, ['waa', 'war', 'pace', 'xvP', 'p1', 'p3', 'stw', 'pxp', 'pct', 'xp', 'av', 'line']),
+    G = { xv: 1, pos: 1, waa: 1 }, RANKED = { xv: 'XV', xvP: 'XV/17', pxp: 'pXP/60' },
+    GFX = { xv: 'RK,Player,XV,Pos,Team,Age,WAA,WAR,WAR/17,AV', xvP: 'RK,Player,XV/17,Pos,Team,Age,XV,WAR/17,WAR,AV', pxp: 'RK,Player,pXP/60,Pos,Team,Age,Pct,XV,WAR,AV' };
   var PER = 50, OFF = { QB: 1, RB: 1, WR: 1, TE: 1, OL: 1 }, ST = { K: 1, P: 1 }, PACE_MIN = 100;
-  var all = [], FROM = null, pos = '', sortKey = 'rk', dir = 1, best = 1, page = 0;
+  var all = [], FROM = null, key = 'xv', pos = '', sortKey = 'rk', dir = 1, best = 1, page = 0;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   // NFL.com headshot (ph = its Cloudinary image id, scripts/nfl_war.py) at 96 px; none, or one that fails, shows the neutral frame (lazy, so only the rows in view load)
   // team logo (static/img/nfl/<abbr>.png), 16 px inline; a code with no file drops it
@@ -133,29 +124,28 @@
   function waa(x) { if (x == null) return ''; var s = x.toFixed(2), r = +s; return '<span' + (r < 0 ? ' class="cfb__down"' : '') + '>' + (r > 0 ? '+' : '') + (r === 0 ? s.replace('-', '') : s) + '</span>'; }
   function readHash() {
     var h = __hp(win);
-    pos = h.get('pos') || ''; bar.elements.team.value = h.get('team') || ''; bar.elements.view.value = h.get('view') === 'pace' || h.get('view') === 'rate' ? h.get('view') : '';
+    pos = h.get('pos') || ''; bar.elements.team.value = h.get('team') || ''; var v = h.get('view');   // old per 17 / per 60 links
+    key = RANKED[h.get('key')] ? h.get('key') : v === 'pace' ? 'xvP' : v === 'rate' ? 'pxp' : 'xv'; bar.elements.qual.checked = h.get('qual') === '1' || v === 'rate';
     bar.elements.q.value = h.get('q') || ''; bar.elements.age.value = h.get('age') || ''; bar.elements.rook.checked = h.get('rook') === '1';
     [].forEach.call(bar.querySelectorAll('.cfb__chip'), function (c) { var on = c.dataset.pos === pos; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); });
   }
   function writeHash() {
     var h = new URLSearchParams();
     if (pos) h.set('pos', pos); if (bar.elements.team.value) h.set('team', bar.elements.team.value);
-    if (bar.elements.view.value) h.set('view', bar.elements.view.value); if (bar.elements.q.value.trim()) h.set('q', bar.elements.q.value.trim());
+    if (key !== 'xv') h.set('key', key); if (bar.elements.qual.checked) h.set('qual', '1'); if (bar.elements.q.value.trim()) h.set('q', bar.elements.q.value.trim());
     if (bar.elements.age.value) h.set('age', bar.elements.age.value); if (bar.elements.rook.checked) h.set('rook', '1');
     var s = h.toString(); __hw(win, s);
   }
   function render() {
-    var q = bar.elements.q.value.trim().toLowerCase(), team = bar.elements.team.value, pace = bar.elements.view.value === 'pace',
-        rate = bar.elements.view.value === 'rate', key = pace ? 'xvP' : rate ? 'pxp' : 'xv', rook = bar.elements.rook.checked, ag = bar.elements.age.value.split('-'),
+    var q = bar.elements.q.value.trim().toLowerCase(), team = bar.elements.team.value, rate = key === 'pxp', qual = bar.elements.qual.checked, rook = bar.elements.rook.checked, ag = bar.elements.age.value.split('-'),
         amin = ag[0] ? +ag[0] : -Infinity, amax = ag.length > 1 ? (ag[1] ? +ag[1] : Infinity) : NaN;
     if (bar.elements.age.value && ag[0] === '') { amin = -Infinity; amax = +ag[1]; }
-    // who's in: position, team, age, rookies, view; ranks count among them in the key's order (WAA, then WAR, then AV, break
+    // who's in: position, team, age, rookies, qualified; ranks count among them in the key's order (WAA, then WAR, then AV, break
     // ties; a row with no key value ranks after those with one)
     var list = all.filter(function (p) {
       if (pos === 'OFF' ? !OFF[p.pos] && !(p.two && OFF[p.two.p2]) : pos === 'DEF' ? (OFF[p.pos] || ST[p.pos]) && !(p.two && !OFF[p.two.p2]) : pos && p.pos !== pos && !(p.two && p.two.p2 === pos)) return false;
       if (team && p.tm.split('/').indexOf(team) < 0) return false;
-      if (pace && p.sn < PACE_MIN && !ST[p.pos]) return false;
-      if (rate && !p.q) return false;
+      if (qual && !p.q) return false;
       if (rook && !p.rook) return false;
       if (bar.elements.age.value && (p.age == null || p.age < amin || p.age > amax)) return false;
       return true;
@@ -169,39 +159,40 @@
       var g = byPos[k], n = g.length;
       g.forEach(function (p) { var lo = 0, eq = 0; g.forEach(function (o) { if (o.pxp < p.pxp) lo++; else if (o.pxp === p.pxp) eq++; }); p.pct = n > 1 ? Math.round(100 * (lo + (eq - 1) / 2) / (n - 1)) : null; });
     });
-    // ±: the weekly snapshots are XV and pXP/60, the keys the season and per-60 views rank by, and XV per 17 games
-    __wk.rank(list, 'rk', rate ? 'pxp' : pace ? 'xvP' : null); __wk.show(win, FROM);
+    // ±: the weekly snapshots are XV, XV per 17 games and pXP/60, the three columns the board can rank by
+    __wk.rank(list, 'rk', key === 'xv' ? null : key); __wk.show(win, FROM);
     // search narrows what's shown, not the ranks
     if (sortKey !== 'rk') {
       var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
       list = list.slice().sort(function (a, b) {
-        var k = sortKey === 'waa' && pace ? 'waaP' : sortKey === 'xv' && pace ? 'xvP' : sortKey === 'age' ? 'ax' : sortKey;
+        var k = sortKey === 'age' ? 'ax' : sortKey;
         var x = sortKey === 'pos' ? a.pos + String(1e4 + a.pr) : a[k], y = sortKey === 'pos' ? b.pos + String(1e4 + b.pr) : b[k];
         if (num) { if (x == null) return 1; if (y == null) return -1; return (x - y) * dir || a.rk - b.rk; }
         return String(x).localeCompare(String(y)) * dir || a.rk - b.rk;
       });
     } else if (dir < 0) list = list.slice().reverse();
-    if (sortKey !== 'rk') __rr(list, 'rk', dir, best, function (p) { return p[sortKey === 'waa' && pace ? 'waaP' : sortKey === 'xv' && pace ? 'xvP' : sortKey === 'age' ? 'ax' : sortKey]; });
+    if (sortKey !== 'rk') __rr(list, 'rk', dir, best, function (p) { return p[sortKey === 'age' ? 'ax' : sortKey]; });
     if (q) list = list.filter(function (p) { return (p.n + ' ' + p.tm + ' ' + p.col + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; });
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
-    var cols = layout(rate);
+    var cols = COLS; win.dataset.gfxCols = GFX[key];
     var gfxRow = function (p) {
       var C = {
         rk: '<td class="cfb__rk">' + p.rk + '</td>',
         n: '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p) + (p.rook ? ' <span class="nflwar__rook" title="rookie">R</span>' : '') + (p.col ? ' <span class="cfb__dim nflwar__col">' + esc(p.col) + '</span>' : '') + ' <span class="cfb__dim nflwar__tm">' + tl(p.tm) + esc(p.tm) + '</span></td>',
-        wk: !FROM ? '' : p[key] == null ? __wk.none : __wk.rk(p, FROM, rate ? 'pXP/60' : pace ? 'XV/17' : 'XV', null, p[key]),
-        waa: '<td class="cfb__num nflwar__war">' + waa(pace ? p.waaP : p.waa) + '</td>',
+        wk: !FROM ? '' : p[key] == null ? __wk.none : __wk.rk(p, FROM, RANKED[key], null, p[key]),
+        waa: '<td class="cfb__num nflwar__war">' + waa(p.waa) + '</td>',
         war: '<td class="cfb__num nflwar__war">' + f2(p.war) + '</td>',
         pxp: '<td class="cfb__num' + (rate ? ' nflwar__war is-key' : '') + '">' + (p.pxp == null ? '' : waa(p.pxp)) + '</td>',
         pct: '<td class="cfb__num">' + (p.pct == null ? '' : p.pct) + '</td>',
         pace: '<td class="cfb__num nflwar__war">' + f2(p.pace) + '</td>',
+        xvP: '<td class="cfb__num' + (key === 'xvP' ? ' nflwar__war is-key' : '') + '">' + f2(p.xvP) + '</td>',
         xp: '<td class="cfb__num">' + (p.xp == null || p.sn < PACE_MIN ? '' : waa(p.xp)) + '</td>',
         p1: '<td class="cfb__num">' + f2(p.p1) + '</td>',
         p3: '<td class="cfb__num">' + f2(p.p3) + '</td>',
         pos: '<td' + (p.two ? ' title="two-way: ' + esc(p.two.so) + ' offense, ' + esc(p.two.sd) + ' defense snaps"' : '') + '>' + esc(p.pos) + (p.two ? '/' + esc(p.two.p2) : '') + '<span class="cfb__dim">' + p.pr + (p.sp ? '·' + esc(p.sp) : '') + '</span></td>',
         t: '<td class="nflwar__team" style="white-space: nowrap">' + tl(p.tm) + esc(p.tm) + '</td>',
         age: '<td class="cfb__num">' + (p.ax != null ? p.ax.toFixed(1) : p.age == null ? '' : p.age) + '</td>',
-        xv: '<td class="cfb__num' + (rate ? '' : ' nflwar__war is-key') + '">' + f2(pace ? p.xvP : p.xv) + '</td>',
+        xv: '<td class="cfb__num' + (key === 'xv' ? ' nflwar__war is-key' : '') + '">' + f2(p.xv) + '</td>',
         stw: '<td class="cfb__num"' + (p.stl ? ' title="' + esc(p.stl) + '"' : '') + '>' + (p.stw == null ? '' : f2(p.stw)) + '</td>',
         av: '<td class="cfb__num">' + p.av.toFixed(1) + '</td>',
         g: '<td class="cfb__num">' + p.g + '</td>',
@@ -217,11 +208,11 @@
     none.hidden = list.length > 0;
     count.textContent = (list.length === all.length ? all.length : list.length + ' of ' + all.length) + ' players';
     pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
-    ths.forEach(function (th) { th.removeAttribute('aria-sort'); if (th.dataset.sort === sortKey) th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending'); });
+    ths.forEach(function (th) { th.removeAttribute('aria-sort'); th.classList.toggle('is-key', th.dataset.sort === key); if (th.dataset.sort === sortKey || sortKey === 'rk' && th.dataset.sort === key) th.setAttribute('aria-sort', (dir > 0) === (th.dataset.sort === 'rk') ? 'ascending' : 'descending'); });
   }
   function update() { page = 0; writeHash(); render(); }
   bar.addEventListener('input', update); bar.addEventListener('change', update);
-  bar.addEventListener('reset', function () { pos = ''; sortKey = 'rk'; dir = 1; setTimeout(function () { readHashFromPos(); update(); }); });
+  bar.addEventListener('reset', function () { pos = ''; key = 'xv'; sortKey = 'rk'; dir = 1; setTimeout(function () { readHashFromPos(); update(); }); });
   function readHashFromPos() { [].forEach.call(bar.querySelectorAll('.cfb__chip'), function (c) { var on = c.dataset.pos === pos; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
   bar.querySelector('.cfb__pos').addEventListener('click', function (e) {
     var c = e.target.closest('.cfb__chip'); if (!c) return;
@@ -231,6 +222,8 @@
     th.tabIndex = 0;
     function go() {
       var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk' || k === 'age';
+      // a ranked column (XV, XV/17, pXP/60): the board ranks by it, RK, ± and the position rank with it; again flips it
+      if (RANKED[k]) { if (key === k && sortKey === 'rk') dir = -dir; else { key = k; sortKey = 'rk'; dir = 1; } update(); return; }
       best = k === sortKey ? best : asc ? 1 : -1; dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
     }
     th.addEventListener('click', go);
@@ -243,7 +236,7 @@
     // per 17 games: XV x 17 / team games, team games read off WAR / WAR/17 (the largest |WAR| on the team, for precision)
     var T17 = {};
     d.players.forEach(function (p) { if (p.war && p.pace != null && Math.abs(p.war) > 0.1) { var t = p.tm.split('/').pop(), a = T17[t]; if (!a || Math.abs(p.war) > a[1]) T17[t] = [p.pace / p.war, Math.abs(p.war)]; } });
-    all.forEach(function (p) { var t = T17[p.tm.split('/').pop()]; p.xvP = p.xv == null || !t ? null : Math.round(p.xv * t[0] * 100) / 100; }); loading.hidden = true; bar.hidden = false; readHash(); render();
+    all.forEach(function (p) { var t = T17[p.tm.split('/').pop()]; p.xvP = p.xv == null || !t || p.sn < PACE_MIN && !ST[p.pos] ? null : Math.round(p.xv * t[0] * 100) / 100; }); loading.hidden = true; bar.hidden = false; readHash(); render();
   }).catch(function () { loading.textContent = 'load failed.'; });
 })();
 </script>
