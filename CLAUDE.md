@@ -31,6 +31,9 @@
   leaders > OVR); process-refresh.yml reruns it. An input ships only through the OVR gate (`scripts/research/ovr_nov28/`):
   better on next-season rate, next-season value r or team R2 at t >= 2, worse on none past 1. Rookie draft-FV prior failed
   (retest `ovr_rookie_fv_prior`); NFL, tennis and CS2 ideas untested (`ovr_nfl_ideas`, `ovr_tennis_cs2_ideas`).
+- Team OVR (`ovrteams.html`, ARK Ranking > team OVR on NBA / NHL / NFL / CS2): player rates weighted by minutes (NFL snaps, CS2 top five
+  by maps) on the same points (replacement roster 60, median team 75, best team 97); minutes beat prior minutes, depth slots and equal
+  weights held out (`scripts/research/ovr_nov28/team.py`, NBA R2 .699, NHL .522).
 
 ## ARKLIBRARY (content/arklibrary.md)
 

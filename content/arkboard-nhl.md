@@ -48,7 +48,8 @@ cover = "/og/nhl.png"
 {{< depthchart sport="nhl" title="depth chart" tab="depth chart" >}}
 {{< backupwatch sport="nhl" title="backup watch" tab="backup watch" >}}
 {{< /wintabs >}}
-{{< wintabs tab="ARK Ranking" tabs="ARK Ranking,season odds,bracket" sub="true" label="ARK Ranking views" >}}
+{{< wintabs tab="ARK Ranking" tabs="ARK Ranking,team OVR,season odds,bracket" sub="true" label="ARK Ranking views" >}}
+{{< lazytab tab="team OVR" >}}{{< ovrteams sport="nhl" title="NHL :: team OVR" tab="team OVR" >}}{{< /lazytab >}}
 {{< nhlpower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< nhlsim title="season odds" tab="season odds" >}}
 {{< lazytab tab="bracket" >}}{{< bracket k="nhl" title="projected bracket" tab="bracket" icon="hockey" >}}{{< /lazytab >}}

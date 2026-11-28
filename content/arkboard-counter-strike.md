@@ -28,7 +28,10 @@ draft = false
 {{< lazytab tab="transactions" >}}
 {{< cs2tx title="transactions" tab="transactions" >}}
 {{< /lazytab >}}
+{{< wintabs tab="ARK Ranking" tabs="ARK Ranking,team OVR" sub="true" label="ARK Ranking views" >}}
 {{< cs2rank title="Counter-Strike :: ARK Ranking" tab="ARK Ranking" >}}
+{{< lazytab tab="team OVR" >}}{{< ovrteams sport="cs2" title="Counter-Strike :: team OVR" tab="team OVR" >}}{{< /lazytab >}}
+{{< /wintabs >}}
 {{< cs2mappool title="map pool :: map win % vs the top 20" tab="map pool" >}}
 {{< cs2matches title="games" tab="games" >}}
 {{< cs2matches view="results" title="game table" tab="game table" >}}

@@ -55,7 +55,8 @@ cover = "/og/nba.png"
 {{< nbalineups title="on/off" tab="on/off" view="onoff" >}}
 {{< lineupleaders sport="nba" title="lineup leaders" tab="lineup leaders" >}}
 {{< /wintabs >}}
-{{< wintabs tab="ARK Ranking" tabs="ARK Ranking,season odds,bracket" sub="true" label="ARK Ranking views" >}}
+{{< wintabs tab="ARK Ranking" tabs="ARK Ranking,team OVR,season odds,bracket" sub="true" label="ARK Ranking views" >}}
+{{< lazytab tab="team OVR" >}}{{< ovrteams sport="nba" title="NBA :: team OVR" tab="team OVR" >}}{{< /lazytab >}}
 {{< nbapower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< nbasim title="season odds" tab="season odds" >}}
 {{< lazytab tab="bracket" >}}{{< bracket k="nba" title="projected bracket" tab="bracket" icon="basketball" >}}{{< /lazytab >}}

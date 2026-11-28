@@ -52,7 +52,8 @@ cover = "/og/nfl.png"
 {{< depthchart sport="nfl" title="depth chart" tab="depth chart" >}}
 {{< backupwatch sport="nfl" title="backup watch" tab="backup watch" >}}
 {{< /wintabs >}}
-{{< wintabs tab="ARK Ranking" tabs="ARK Ranking,season odds,bracket" sub="true" label="ARK Ranking views" >}}
+{{< wintabs tab="ARK Ranking" tabs="ARK Ranking,team OVR,season odds,bracket" sub="true" label="ARK Ranking views" >}}
+{{< lazytab tab="team OVR" >}}{{< ovrteams sport="nfl" title="NFL :: team OVR" tab="team OVR" >}}{{< /lazytab >}}
 {{< nflpower title="ARK Ranking" tab="ARK Ranking" >}}
 {{< nflsim title="season odds" tab="season odds" >}}
 {{< lazytab tab="bracket" >}}{{< bracket k="nfl" title="projected bracket" tab="bracket" icon="football" >}}{{< /lazytab >}}
