@@ -71,9 +71,12 @@ cover = "/og/college-basketball.png"
 {{< lazytab tab="recruit model" >}}
 {{< cbbrecruits view="model" title="recruit model" tab="recruit model" >}}
 {{< /lazytab >}}
+{{< wintabs tab="all-time FV" tabs="all-time FV,draft classes" sub="true" label="all-time FV views" >}}
 {{< lazytab tab="all-time FV" >}}
 {{< fvalltime sport="cbb" tab="all-time FV" >}}
 {{< /lazytab >}}
+{{< fvclasses sport="cbb" tab="draft classes" >}}
+{{< /wintabs >}}
 {{< desk tab="past boards" >}}
 {{< deskcol >}}
 {{< wintable title="ARKBOARD NBA 2026" icon="basketball" filter="FV,Team" >}}
