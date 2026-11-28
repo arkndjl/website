@@ -100,7 +100,14 @@
     }
     // weekly move (scripts/board_moves.py VIEWS): rows carry w0, their values as of the season's wkFrom, one per view in wkV
     var DOW = 'Sunday Monday Tuesday Wednesday Thursday Friday Saturday'.split(' ');
-    function wkIdx() { var S = season(); return S.wkFrom && S.wkV && window.__wk ? S.wkV.indexOf(view) : -1; }
+    // a view the base snapshot has no values for (a column added since that post) gets no ± column, not "new" on every row
+    function wkIdx() {
+      var S = season(), i = S.wkFrom && S.wkV && window.__wk ? S.wkV.indexOf(view) : -1;
+      if (i < 0) return -1;
+      S.wkHas = S.wkHas || {};
+      if (S.wkHas[i] == null) S.wkHas[i] = S.rows.some(function (r) { return r.w0 && r.w0[i] != null; });
+      return S.wkHas[i] ? i : -1;
+    }
     function cols() {
       // one fixed column order on every board (no stat toggles, Nov 28 2026): the file's key leads; the ranked view is teal
       var key = D.flat ? view : D.key, hasPre = !!D.pre && has('pre'), hasPfv = !!D.pfv && has('pfv');
@@ -214,7 +221,8 @@
       var kl = (D.cols.filter(function (c) { return c.k === key; })[0] || {}).l || key;
       var rx = D.cols.filter(function (c) { return c.k === 'xpm'; })[0];   // NBA: XPM, O-XPM and D-XPM stand in for the pick on the GFX
       var lab = function (k) { return (D.cols.filter(function (c) { return c.k === k; })[0] || {}).l; };
-      var gc = rx ? ['RK', 'Player'].concat(key === 'xpm' ? [] : [kl], [rx.l + '=XPM'], [['oxpm', 'O-XPM'], ['dxpm', 'D-XPM']].filter(function (o) { return lab(o[0]) && o[0] !== key; }).map(function (o) { return lab(o[0]) + '=' + o[1]; })) : ['RK', 'Player', kl, 'Pos', 'Age'].concat(D.pre ? [D.pre.l, 'Δ'] : D.pfv ? [D.pfv.l] : []);
+      var kx = key === 'xpm' ? [] : [kl];   // flat boards keep XPM ahead of the ranked number on the card too (Noah, Nov 28 2026: XPM before VORX)
+      var gc = rx ? ['RK', 'Player'].concat(D.flat ? [rx.l + '=XPM'].concat(kx) : kx.concat([rx.l + '=XPM']), [['oxpm', 'O-XPM'], ['dxpm', 'D-XPM']].filter(function (o) { return lab(o[0]) && o[0] !== key; }).map(function (o) { return lab(o[0]) + '=' + o[1]; })) : ['RK', 'Player', kl, 'Pos', 'Age'].concat(D.pre ? [D.pre.l, 'Δ'] : D.pfv ? [D.pfv.l] : []);
       // gfx: the file names the GFX's columns after the view (CFB true freshmen: Stat+, xNIL), a dash where a row has none
       if (D.gfx) gc = ['RK', 'Player', kl].concat(D.gfx.filter(function (k) { return k !== key && has(k); }).map(lab).filter(Boolean));
       if (D.title === 'next up') {   // next up: age, best so far, then the current value and its ceiling (or the workload)

@@ -127,11 +127,14 @@
     return '<span class="cfb__medals" title="' + esc(tip) + '">' + p.bdg.slice(0, 4).map(function (b) { return '<i class="cfb__medal cfb__medal--' + b[1] + '"></i>'; }).join('') + '</span>';
   }
   function lgo(p) { return p.lid ? '<img class="cfb__logo cfb__logo--in" src="/img/soccer/' + p.lid + '.png" alt="" width="16" height="16" loading="lazy"> ' : logo(p.team); }
-  var cache = {}, LG = { 'eng.1': 'EPL', 'esp.1': 'Liga', 'ger.1': 'Bundes.', 'ita.1': 'Serie A', 'fra.1': 'Ligue 1', 'ned.1': 'Erediv.', 'por.1': 'Portugal', 'bel.1': 'Belgium', 'tur.1': 'Turkey', 'cze.1': 'Czechia', 'gre.1': 'Greece', 'pol.1': 'Poland', 'den.1': 'Denmark', 'sui.1': 'Swiss', 'nor.1': 'Norway', 'aut.1': 'Austria', 'sco.1': 'Scotland', 'swe.1': 'Sweden', 'usa.1': 'MLS' }, BIG = { 'eng.1': 1, 'esp.1': 1, 'ger.1': 1, 'ita.1': 1, 'fra.1': 1 }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
+  var ROOK = null, cache = {}, LG = { 'eng.1': 'EPL', 'esp.1': 'Liga', 'ger.1': 'Bundes.', 'ita.1': 'Serie A', 'fra.1': 'Ligue 1', 'ned.1': 'Erediv.', 'por.1': 'Portugal', 'bel.1': 'Belgium', 'tur.1': 'Turkey', 'cze.1': 'Czechia', 'gre.1': 'Greece', 'pol.1': 'Poland', 'den.1': 'Denmark', 'sui.1': 'Swiss', 'nor.1': 'Norway', 'aut.1': 'Austria', 'sco.1': 'Scotland', 'swe.1': 'Sweden', 'usa.1': 'MLS' }, BIG = { 'eng.1': 1, 'esp.1': 1, 'ger.1': 1, 'ita.1': 1, 'fra.1': 1 }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
   // the big five's season file, and the other leagues' (FotMob) when the window asks for them
   function get(src, s, more) {
-    if (!cache[s]) cache[s] = fetch(src + s + '.json').then(function (r) { return r.json(); }).then(function (d) {
-      d.players.forEach(function (p) { var m = Math.max(p.min, 1) / 90; p.nx90 = (p.npxg + p.xa) / m; p.gx = p.g - p.xg; });
+    // R chip: his first big-five season (scripts/rookies.py, the rookies tab's own list, by Understat id; other leagues' rows get none)
+    ROOK = ROOK || fetch({{ "data/rookies/soccer-ids.json" | relURL }}).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; });
+    if (!cache[s]) cache[s] = Promise.all([fetch(src + s + '.json').then(function (r) { return r.json(); }), ROOK]).then(function (a) {
+      var d = a[0], rk = {}; (a[1][s] || []).forEach(function (id) { rk[id] = 1; });
+      d.players.forEach(function (p) { var m = Math.max(p.min, 1) / 90; p.nx90 = (p.npxg + p.xa) / m; p.gx = p.g - p.xg; p.rook = !!rk[p.p]; });
       return d;
     });
     if (!more) return cache[s];
@@ -195,7 +198,7 @@
       var h = __hp(win), s = h.get('season');
       bar.elements.season.value = s && bar.querySelector('option[value="' + s.replace(/\D/g, '') + '"]') ? s : win.dataset.cur;
       pos = h.get('pos') || ''; bar.elements.lg.value = h.get('lg') || ''; bar.elements.team.value = h.get('team') || ''; bar.elements.nat.value = h.get('nat') || '';
-      bar.elements.q.value = h.get('q') || ''; bar.elements.mp.value = h.get('mp') || ''; chips();
+      bar.elements.q.value = h.get('q') || ''; bar.elements.mp.value = h.get('mp') || (h.get('q') ? '0' : ''); chips();   // a link to a named player (the search) shows him at any minutes
     }
     function writeHash() {
       var h = __hp(win), e = bar.elements;
@@ -236,7 +239,7 @@
       if (q) list = list.filter(function (p) { return (p.n + ' ' + p.team).toLowerCase().indexOf(q) >= 0; });
       var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
       var gfxRow = function (p) {
-        var head = '<tr><td class="cfb__rk">' + p['rk' + KEY] + '</td><td class="cfb__name">' + face(p) + flag(p.nat) + '<b>' + esc(p.n) + '</b>' + medals(p) + ' <span class="cfb__dim nbaxpm__tm">' + lgo(p) + esc(p.team) + ' · ' + LG[p.lg] + '</span></td>' + (p.more && wkf && !stats ? __wk.none : (stats ? (p.nx90 == null && wkf ? __wk.none : __wk.rk(p, wkf, 'npxG+xA /90', null, p.nx90)) : __wk.rk(p, wkf, 'SVAR', null, p.svar)));
+        var head = '<tr><td class="cfb__rk">' + p['rk' + KEY] + '</td><td class="cfb__name">' + face(p) + flag(p.nat) + '<b>' + esc(p.n) + '</b>' + medals(p) + (p.rook ? ' <span class="nflwar__rook" data-term="R" title="first big-five league season">R</span>' : '') + ' <span class="cfb__dim nbaxpm__tm">' + lgo(p) + esc(p.team) + ' · ' + LG[p.lg] + '</span></td>' + (p.more && wkf && !stats ? __wk.none : (stats ? (p.nx90 == null && wkf ? __wk.none : __wk.rk(p, wkf, 'npxG+xA /90', null, p.nx90)) : __wk.rk(p, wkf, 'SVAR', null, p.svar)));
         var key = stats ? '<td class="cfb__num nbaxpm__v is-key">' + fx(p.nx90, 2) + '</td>' : '<td class="cfb__num nbaxpm__v is-key">' + sg(p.svar) + '</td>';
         var ctx = '<td class="cfb__g">' + esc(p.role || p.pos || '–') + '<span class="cfb__dim">' + p['pr' + KEY] + '</span></td><td class="nbaxpm__team" style="white-space: nowrap">' + lgo(p) + esc(p.team) + '</td><td class="cfb__num">' + (p.age != null ? p.age.toFixed(1) : '<span class="cfb__dim">–</span>') + '</td>' +
           '<td class="cfb__num nbaxpm__ph">' + p.mp + (p.st !== '' ? ' <span class="cfb__dim">(' + p.st + ')</span>' : '') + '</td><td class="cfb__num nbaxpm__ph">' + p.min + '</td>';

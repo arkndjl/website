@@ -5,7 +5,7 @@
        view="teams": the next class by school, summed FV above the 20 floor. view="model": method and out-of-sample tests.
        {{< cbbrecruits view="class" year="2027" title="..." tab="..." >}} */ -}}
 {{- $d := site.Data.cbb_recruits -}}{{- $view := .Get "view" | default "class" -}}
-{{- with $d -}}{{- $date := lower ((time .asof).Format "Jan 2") -}}
+{{- with $d -}}{{- $date := lower ((time .asof).Format "Jan 2, 2006") -}}
 {{- if not ($.Page.Scratch.Get "cbbrcJs") }}{{ $.Page.Scratch.Set "cbbrcJs" true }}
 <script>
 (function () {
@@ -134,7 +134,7 @@
     <th class="cfb__g" title="the class's FV points: each commit's FV above the 20 floor, summed">Pts</th>
     <th title="every commit; one no service ranks (On3 team lists) counts at 1 ARK star and FV 20">Commits</th>
     <th title="commits at 5-star+ (ARK)">5★+</th><th title="commits at 4.5 or 5 ARK stars">4.5-5★</th><th title="commits at 3, 3.5 or 4 ARK stars">3-4★</th><th title="commits at 2.5 ARK stars or fewer, unranked (1 star) included">0-2.5★</th>
-    <th title="mean FV of the ranked commits">Avg xFV</th>
+    <th title="mean FV of the ranked commits">Avg FV</th>
     <th title="rank by the two best commits' FV points">Top end</th><th title="rank by the rest of the class's FV points">Depth</th>
     <th title="chance at least one commit reaches the NBA">NBA%</th>
     <th title="year 1: expected share of team minutes the commits play, summed (500 = a full lineup)">Y1 Min</th>
@@ -146,9 +146,10 @@
   {{- /* every class with commits (teamsBy, scripts/cbb_recruit_fit.py class_ranks); the year chips (tablefilter.js,
          rows' data-yr) show one class at a time, RK counted within the class and filters */}}
   {{- $by := .teamsBy | default (dict (string (index .classes 0).year) .teams) }}{{ $n := 0 }}
-  {{- range $c := .classes }}{{ range index $by (string $c.year) }}{{ $n = add $n 1 }}
+  {{- range $c := .classes }}{{ $any := 0 }}{{ range index $by (string $c.year) }}{{ $any = add $any .n }}{{ end }}{{ range index $by (string $c.year) }}{{ $n = add $n 1 }}
   <tr data-yr="{{ $c.year }}" data-cr="{{ dict "s" .ets "n" .n "a6" (.a6 | default 0) "ah" (.ah | default 0) "am" (.am | default 0) "al" (.al | default 0) "avg" .avgFv "te" .topRk "dp" .depthRk "top" (.top3 | default .top) | jsonify }}">
-    <td class="cfb__rk">{{ .rk }}</td>
+    {{- /* a class with no commits at all ranks no one (–); a school with none in a ranked class shares the last rank */}}
+    <td class="cfb__rk"{{ if not $any }} data-rk="none"{{ else if not .n }} data-rk="last"{{ end }}>{{ if $any }}{{ .rk }}{{ else }}–{{ end }}</td>
     <td data-v="{{ .team }}"><span class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></span></td>
     <td>{{ .conf }}</td>
     <td class="cfb__num cfb__g" data-v="{{ .ets }}">{{ partial "num.html" (slice "%.1f" .ets) }}</td>

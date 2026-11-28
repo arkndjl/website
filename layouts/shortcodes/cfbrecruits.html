@@ -175,7 +175,7 @@
   <tbody>
   {{- range $set := $sets }}{{ range $set.rows }}
   <tr data-yr="{{ $set.yr }}" data-cr="{{ dict "s" .classXfv "n" .classN "a6" (.a6 | default 0) "ah" (.ah | default 0) "am" (.am | default 0) "al" (.al | default 0) "avg" .avgXfv "te" .topRk "dp" .depthRk "top" .top | jsonify }}">
-    <td class="cfb__rk">{{ .classRk }}</td>
+    <td class="cfb__rk"{{ if not .classN }} data-rk="last"{{ end }}>{{ .classRk }}</td>
     <td class="cfb__team">{{ with .logo }}<img class="cfb__logo" src="{{ . }}" alt="" width="20" height="20" loading="lazy">{{ end }}<span>{{ .team }}</span></td>
     <td>{{ .conf }}</td>
     <td class="cfb__num" data-v="{{ .classXfv }}"><b class="cfbt__big">{{ partial "num.html" (slice "%.1f" .classXfv) }}</b></td>
