@@ -596,7 +596,7 @@
      "term": "VORX",
      "short": "VORX (Value Over Replacement XPM) is NBA wins over replacement: .030 × (XPM + 1.4) × MP / 48.",
      "body": [
-      "Replacement is -1.4 XPM. Both constants are fit to team wins (480 team seasons 2011-26). It is the default sort on the XPM and rookie boards.",
+      "Replacement is -1.4 XPM. Both constants are fit to team wins (480 team seasons 2011-26). Lines by position failed held out on Nov 28 2026 (the CBB form: same-season win% t = .59, next season t = -.2; freely available players by position t = -.26 to -3.4), and so did refitting the level each season, so one line stays and its pool is tracked every week. Qualified boards sort by XPM and the all-player boards by VORX.",
       "Team W% from minutes-weighted value, 2011-26: same-season R² is 0.938 on XPM, compared to 0.926 on the box blend before the team adjustment (t = 2.33, 10/13 seasons). Next season it is 0.679 compared to 0.681 (t = -0.25).",
       "For rookies 2010-23, held out, VORX orders next-three-season VORX best (Spearman .398; pXPM .395, aXPM .379, XPM .330).",
       "For next-three-season XPM, the rookie 3Y orders it best (.481; aXPM .413, XPM .417, VORX .351)."
@@ -793,10 +793,11 @@
      "term": "CBB VORX / WAA",
      "short": "Wins over a replacement or an average D-I player.",
      "body": [
-      "VORX = (sXPM + 1.4) × minutes / 40 × 68 possessions a 40 / 100 × .0187 wins a point. WAA uses sXPM alone.",
+      "VORX = (sXPM - R) × minutes / 40 × 68 possessions a 40 / 100 × .0187 wins a point, where R is the replacement line at his position. WAA uses sXPM alone.",
       "XPM is rXPM (CBB), and sXPM = (XPM × min + 100 × season mean) / (min + 100).",
-      "Replacement is 1.4 below average, the 9th man's sXPM in 2025-26. Wins a point is fit on 3,485 team seasons 2017-26:",
+      "Replacement is set by position (G, F and C on Barttorvik's role). The level is -1.4, the 9th man's sXPM in 2025-26, and each position moves it by how far its 9th to 12th men sit from the rest over the last three finished seasons, so a bench guard is about -1.95, a forward -1.22 and a center -.74 in 2026-27. Wins a point is fit on 3,485 team seasons 2017-26:",
       "wins = .39 × games + team VORX (r .87). It is season only, so no earlier season enters a season's VORX.",
+      "Against one flat line, the position lines won held out, leaving one season out of 2012-26: same-season team win% t = 5.8 (14 of 15 seasons), 3.3 with season fixed effects, and next season's win% on returning VORX t = 4.3 (12 of 13). Refitting the flat level every season failed the same-season test (t = -2.8 to -5.2), so the level stays at -1.4. The lines are refit every week (data/repl_levels.json).",
       "GBPM over season BPM moved held-out team win% R² from .633 to .658, 15 of 15 seasons. The shrink cut half-B GBPM MSE from 16.2 to 11.4",
       "(10 of 10) and held-out team wins RMSE from 3.348 to 3.331 (14 of 14). rXPM then replaced GBPM, with the same team totals and BPM's split inside the team.",
       "The textbook slope (.0347 at a margin sd of 11.5) overstates it, since schedules pair strong teams with strong teams and win odds flatten at the ends.",

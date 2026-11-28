@@ -1311,6 +1311,83 @@
    "trigger": "the 2026-27 season is out of the lockbox (one more origin)",
    "gate": "team chain with the curve against the class-mean chain: t > -1 at every horizon and t >= 2 at one",
    "run_hint": "python3 scripts/research/team_years_nov28/test.py cbb && python3 scripts/research/team_years_nov28/test.py cbb --curve"
+  },
+  {
+   "key": "nba_vorx_pos",
+   "t": "NBA VORX replacement lines by position",
+   "sp": [
+    "NBA"
+   ],
+   "ar": "value",
+   "kind": "retest",
+   "how": "hand",
+   "was": "t .59",
+   "after": "nba:champ:2027",
+   "lag": 14,
+   "trigger": "one more NBA season (2026-27) in the team tests",
+   "gate": "scripts/research/repl_nov28/nba.py qposoff3 against the flat -1.4: same-season team W% t >= 2 with season fixed effects and next-season W% t > -2, ahead in most seasons",
+   "run_hint": "python3 scripts/research/repl_nov28/nba.py (YRS one longer)"
+  },
+  {
+   "key": "nba_vorx_level",
+   "t": "NBA VORX replacement level refit each season",
+   "sp": [
+    "NBA"
+   ],
+   "ar": "value",
+   "kind": "retest",
+   "how": "hand",
+   "was": "t -4.91 pooled, .81 with fixed effects",
+   "after": "nba:champ:2027",
+   "lag": 14,
+   "trigger": "one more NBA season (2026-27)",
+   "gate": "scripts/research/repl_nov28/nba.py flatx (expanding freely available pool) against -1.4: same-season team W% t >= 2 pooled and with fixed effects",
+   "run_hint": "python3 scripts/research/repl_nov28/nba.py"
+  },
+  {
+   "key": "cbb_vorx_level",
+   "t": "CBB VORX replacement level refit each season",
+   "sp": [
+    "CBB"
+   ],
+   "ar": "value",
+   "kind": "retest",
+   "how": "hand",
+   "was": "t -2.82 same season (next season t 3.49)",
+   "after": "cbb:champ:2027",
+   "lag": 14,
+   "trigger": "one more college season (2026-27) in the team tests",
+   "gate": "scripts/research/repl_nov28/cbb.py bench:expanding:pos against prod (level -1.4 + position offsets): same-season W% t >= 2 pooled and next season t > -2",
+   "run_hint": "python3 scripts/research/repl_nov28/cbb.py"
+  },
+  {
+   "key": "cbb_next_pos",
+   "t": "CBB Next (next-season VORX) refit on the position lines",
+   "sp": [
+    "CBB"
+   ],
+   "ar": "players",
+   "kind": "retest",
+   "how": "hand",
+   "after": "cbb:champ:2027",
+   "lag": 30,
+   "trigger": "Next's target is still VORX on the flat -1.4 line (data/cbb_next_fit.json); refit it on the position lines with the 2026-27 season in",
+   "gate": "scripts/cbb_next_research.py with the target on scripts/repl_levels.py cbb_line: walk-forward RMSE no worse (t > -2) than the flat-line fit on the same target",
+   "run_hint": "python3 scripts/cbb_next_research.py"
+  },
+  {
+   "key": "cs2_repl_role",
+   "t": "CS2 replacement level by role (AWP / rifle)",
+   "sp": [
+    "CS2"
+   ],
+   "ar": "value",
+   "kind": "retest",
+   "how": "hand",
+   "due": "2027-01-15",
+   "est": 1,
+   "trigger": "cross-sport port of the CBB position lines (Nov 28 2026); needs role labels for the VRS 51-100 starters",
+   "gate": "scripts/cs2_value.py fee test: replacement by role against one line, leave one fee out, t >= 2"
   }
  ]
 }
