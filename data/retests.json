@@ -1677,6 +1677,57 @@
    "trigger": "a season-by-season player file for each (tennis_ratings history by year, cs2 player ratings by month)",
    "gate": "the OVR gate on next-season (tennis) or next-six-months (CS2) results",
    "run_hint": "add loaders to scripts/research/ovr_nov28/run.py"
+  },
+  {
+   "key": "ovr_team_input",
+   "t": "OVR as a team strength input: the roster's OVR rate (with its held-out extra terms) against the plain projection rate it is read from, minutes-weighted, on next season's team result",
+   "sp": [
+    "NBA",
+    "NHL"
+   ],
+   "ar": "teams",
+   "kind": "retest",
+   "how": "hand",
+   "was": "Nov 28: NBA R2 0.6991 to 0.6992 (t 0.25; OVR is a straight line in pXPM there, so nothing to add), NHL 0.5172 to 0.5216 (t 0.92, 6 of 13 seasons)",
+   "after": "nhl:champ:2027",
+   "lag": 14,
+   "est": 1,
+   "trigger": "2026-27 NHL finished: one more team-season pair",
+   "gate": "paired t >= 2 on per-season R2 over the plain rate",
+   "run_hint": "python3 scripts/research/ovr_nov28/team.py --input"
+  },
+  {
+   "key": "ovr_fv_anchor",
+   "t": "OVR as the FV outcome anchor (NBA): draft-year FV against OVR after three NBA seasons, beside the pre-draft rank",
+   "sp": [
+    "CBB",
+    "NBA"
+   ],
+   "ar": "players",
+   "kind": "retest",
+   "how": "hand",
+   "was": "Nov 28: FV on file for 2011-2024 rookies ranks third-season OVR at Spearman 0.23, the pre-draft rank at 0.42 on the same rows (t -3.94, FV ahead in 2 of 14 classes); not used as an anchor",
+   "after": "nba:champ:2027",
+   "lag": 14,
+   "est": 1,
+   "trigger": "2026-27 finished and point-in-time draft-year FV restated on today's CBB FV model for past classes",
+   "gate": "FV ranks third-season OVR at least as well as the pre-draft rank (t > -1) before OVR outcomes are used to set FV tiers",
+   "run_hint": "python3 scripts/research/ovr_nov28/fv_anchor.py"
+  },
+  {
+   "key": "ovr_nhl_shrink_pwar",
+   "t": "NHL pWAR: OVR's career-TOI term (passed in OVR: forwards value r t 23.5, team R2 t 4.9) as an input to the pWAR projection",
+   "sp": [
+    "NHL"
+   ],
+   "ar": "players",
+   "kind": "retest",
+   "how": "hand",
+   "was": "Nov 28: passed inside OVR, where it reads mostly as next season's playing time (next-season rate error t -.09); not yet run inside pWAR",
+   "due": "2026-12-15",
+   "trigger": "the pWAR fit in scripts/nhl_war.py with the term added",
+   "gate": "next-season WAR error t <= -2 leaving one season out, worse on none past 1",
+   "run_hint": "scripts/research/ovr_nov28/suite.py shrink feature in the pWAR fit"
   }
  ]
 }

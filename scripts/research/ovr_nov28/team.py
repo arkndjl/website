@@ -29,7 +29,7 @@ def nba_seasons():
     for s in sorted(F):
         if s + 1 not in F or s + 1 >= max(F) or s < 2011: continue
         cur = {r['id']: r for r in O.nba_rows(s, F)}
-        for r in cur.values(): r['z'] = O.zof(par, r)
+        for r in cur.values(): r['z'] = r['P'] if RAW else O.zof(par, r)
         nxt = [p for p in json.load(open(F[s + 1]))['players'] if p.get('xpm') is not None and not p.get('pr')]
         teams = {}
         for p in nxt:
@@ -46,7 +46,7 @@ def nhl_seasons():
         if s + 1 not in F or s + 1 >= max(F) or s < 2010: continue
         if json.load(open(F[s + 1])).get('games', 82) < 82: continue
         cur = {r['id']: r for r in O.nhl_rows(s, F)}
-        for r in cur.values(): r['z'] = O.zof(pars[r['grp']], r)          # WAR a 60
+        for r in cur.values(): r['z'] = r['P'] if RAW else O.zof(pars[r['grp']], r)          # WAR a 60
         nxt = [p for p in json.load(open(F[s + 1]))['players'] if p.get('toi') and p.get('grp') in ('F', 'D', 'G')]
         teams = {}
         for p in nxt:
@@ -57,6 +57,8 @@ def nhl_seasons():
     return out
 
 
+RAW = False
+LAST = {}
 SLOTS = {'nba': {'all': 10}, 'nhl': {'F': 12, 'D': 6, 'G': 1}}
 
 
@@ -99,6 +101,7 @@ def run(sport):
             b = wls(X, y, [1.0] * len(y), ridge=1e-3)
             p = [sum(bi * v for bi, v in zip(b, [1.0] + feats(pl, how))) for pl in teams.values()]
             res[how].append(pearson(p, [target(pl) for pl in teams.values()]) ** 2)
+    LAST.clear(); LAST.update(res)
     out = {k: {'r2': round(st.mean(v), 3)} for k, v in res.items()}
     for k in ('prior', 'depth', 'equal'):
         out[k]['vsMins'] = {'t': paired_t(res[k], res['mins']), 'wins': sum(1 for a, b in zip(res[k], res['mins']) if a > b), 'of': len(res[k])}
@@ -106,6 +109,22 @@ def run(sport):
     out['seasons'] = [S[0][0], S[-1][0]]
     return out
 
+
+def input_test(sport):
+    """OVR's rate (with its held-out extra terms) against the plain projection rate, both minutes-weighted with the
+    same newcomer fill, per-season R2 on next season's team result"""
+    global RAW
+    RAW = True; run(sport); raw = list(LAST['mins'])
+    RAW = False; run(sport); ovr = list(LAST['mins'])
+    return {'raw': round(st.mean(raw), 4), 'ovr': round(st.mean(ovr), 4), 't': paired_t(ovr, raw),
+            'wins': sum(1 for a, b in zip(ovr, raw) if a > b), 'of': len(raw)}
+
+
+if __name__ == '__main__' and sys.argv[1:2] == ['--input']:
+    R = json.load(open(RES)); R.setdefault('inputs', {})
+    for sp in ('nba', 'nhl'):
+        R['inputs']['team_' + sp] = input_test(sp); print(sp, R['inputs']['team_' + sp])
+    json.dump(R, open(RES, 'w'), indent=1); sys.exit()
 
 if __name__ == '__main__':
     R = json.load(open(RES)); R.setdefault('team', {})

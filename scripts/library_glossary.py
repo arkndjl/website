@@ -66,6 +66,15 @@ def _ovr():
         out.append('Team OVR is the roster\'s player rates weighted by playing time, put on the same 0-99 points: a replacement roster 60, the median team 75 and the best team in a typical season 97. Four weightings were tested leaving one season out on next season\'s team result (NBA %d to %d, NHL %d to %d): minutes, last season\'s minutes, depth slots fit by position and equal weights on the top of the roster. Minutes won in both leagues, R\u00b2 %.3f in the NBA against %.3f for last season\'s minutes (t = %.2f), %.3f for depth slots and %.3f for equal weights, and %.3f in the NHL against %.3f (t = %.2f), %.3f and %.3f. The board weights by the minutes played so far this season. The NFL weights by snaps and CS2 takes the five players with the most maps.' % (
             a['seasons'][0], a['seasons'][1], b['seasons'][0], b['seasons'][1], a['mins']['r2'], a['prior']['r2'], a['prior']['vsMins']['t'], a['depth']['r2'], a['equal']['r2'],
             b['mins']['r2'], b['prior']['r2'], b['prior']['vsMins']['t'], b['depth']['r2'], b['equal']['r2']))
+    I, A = R.get('inputs') or {}, R.get('fvAnchor')
+    if I.get('team_nba') and I.get('team_nhl'):
+        a, b = I['team_nba'], I['team_nhl']
+        out.append('OVR as an input to the team models did not pass. Weighted by minutes, it predicted next season\'s team result no better than the projection rate it is read from: NBA R\u00b2 %.3f against %.3f (t = %.2f; in the NBA OVR is a straight line in pXPM, so it holds nothing new) and NHL %.3f against %.3f (t = %.2f, %d of %d seasons).' % (
+            a['ovr'], a['raw'], a['t'], b['ovr'], b['raw'], b['t'], b['wins'], b['of']))
+    if A:
+        out.append('OVR is not an FV anchor yet. For %d NBA rookies from the %d to %d drafts, the FV on file ranks OVR after three seasons at a Spearman r of %.2f, and the pre-draft rank does better on the same players (%.2f, t = %.2f, FV ahead in %d of %d classes). FV 45 to 49 rookies were starters (OVR 75 or more) %d%% of the time, and FV 30 to 34 rookies %d%%.' % (
+            A['withPre'], A['classes'][0], A['classes'][1], A['spearFVpre'], A['spearPre'], A['fvVsPre']['t'], A['fvVsPre']['wins'], A['fvVsPre']['of'],
+            round(100 * A['bands']['45']['starter']), round(100 * A['bands']['30']['starter'])))
     return out
 _PE = ld('research/payroll_efficiency.json')                 # payroll efficiency held out (scripts/research/payrolls_nov28/test.py)
 def _paytest():
