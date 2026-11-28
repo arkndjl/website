@@ -40,13 +40,13 @@
      -1.30907,
      24.16138
     ],
-    "C": [
-     -0.80931,
-     24.19978
-    ],
     "F": [
      -1.27656,
      21.58884
+    ],
+    "C": [
+     -0.80931,
+     24.19978
     ]
    },
    "pool": [
@@ -54,156 +54,252 @@
     23.14792
    ],
    "form": "three seasons' value a new deal at the position returned = a + b cost (cap share above the minimum, three seasons)"
+  },
+  "line": "new",
+  "alt": {
+   "line": "moved",
+   "n": 1807,
+   "acc": {
+    "agedp": 0.6685,
+    "carry": 0.6525,
+    "pooled": 0.6685
+   },
+   "agedp_vs": {
+    "carry": {
+     "t": 1.38,
+     "won": "4/6",
+     "gain": 0.016
+    },
+    "pooled": {
+     "t": 0.0,
+     "won": "3/6",
+     "gain": 0.0
+    }
+   },
+   "pass": false,
+   "posPass": false,
+   "core": {
+    "n": 213,
+    "nNeg": 14,
+    "negBeat": 0.5714,
+    "acc": 0.7887,
+    "rule": "top 2 on his team and top 15% in the league in projected three seasons' value, age 31 or under",
+    "override": true
+   }
   }
  },
  "nhl": {
   "n": 3249,
   "years": "2016-2023",
   "acc": {
-   "agedp": 0.6159,
+   "agedp": 0.6223,
    "carry": 0.5986,
-   "pooled": 0.6174
+   "pooled": 0.6036
   },
   "agedp_vs": {
    "carry": {
-    "t": 1.88,
+    "t": 2.69,
     "won": "5/8",
-    "gain": 0.0172
+    "gain": 0.0237
    },
    "pooled": {
-    "t": -0.17,
+    "t": 2.29,
     "won": "5/8",
-    "gain": -0.0015
+    "gain": 0.0188
    }
   },
   "deals": {
-   "F": 721,
    "D": 397,
+   "F": 721,
    "G": 147
   },
-  "pass": false,
-  "posPass": false,
+  "pass": true,
+  "posPass": true,
   "core": {
    "n": 354,
-   "nNeg": 57,
-   "negBeat": 0.4035,
-   "acc": 0.7599,
+   "nNeg": 28,
+   "negBeat": 0.2857,
+   "acc": 0.7684,
    "rule": "top 2 on his team and top 15% in the league in projected three seasons' value, age 31 or under",
    "override": false
   },
   "live": {
    "pos": {
-    "G": [
-     0.475,
-     38.26635
-    ],
     "D": [
-     -0.36947,
-     11.80064
+     -0.30358,
+     10.51461
     ],
     "F": [
-     0.01842,
-     25.88007
+     0.04984,
+     25.49785
+    ],
+    "G": [
+     0.75166,
+     38.98093
     ]
    },
    "pool": [
-    -0.06097,
-    22.96059
+    0.03014,
+    22.36486
    ],
    "form": "three seasons' value a new deal at the position returned = a + b cost (cap share above the minimum, three seasons)"
+  },
+  "line": "moved",
+  "alt": {
+   "line": "new",
+   "n": 3249,
+   "acc": {
+    "agedp": 0.6159,
+    "carry": 0.5986,
+    "pooled": 0.6174
+   },
+   "agedp_vs": {
+    "carry": {
+     "t": 1.88,
+     "won": "5/8",
+     "gain": 0.0172
+    },
+    "pooled": {
+     "t": -0.17,
+     "won": "5/8",
+     "gain": -0.0015
+    }
+   },
+   "pass": false,
+   "posPass": false,
+   "core": {
+    "n": 354,
+    "nNeg": 57,
+    "negBeat": 0.4035,
+    "acc": 0.7599,
+    "rule": "top 2 on his team and top 15% in the league in projected three seasons' value, age 31 or under",
+    "override": false
+   }
   }
  },
  "nfl": {
   "n": 2456,
   "years": "2018-2022",
   "acc": {
-   "agedp": 0.6132,
-   "carry": 0.5513,
-   "pooled": 0.59
+   "agedp": 0.5908,
+   "carry": 0.555,
+   "pooled": 0.5916
   },
   "agedp_vs": {
    "carry": {
-    "t": 5.38,
+    "t": 3.18,
     "won": "5/5",
-    "gain": 0.0619
+    "gain": 0.0358
    },
    "pooled": {
-    "t": 2.37,
-    "won": "5/5",
-    "gain": 0.0232
+    "t": -0.11,
+    "won": "3/5",
+    "gain": -0.0008
    }
   },
   "deals": {
-   "LB": 515,
-   "DB": 1033,
-   "QB": 243,
    "ED": 517,
-   "RB": 354,
-   "WR": 562,
-   "TE": 305,
+   "DB": 1033,
    "OL": 1017,
-   "ST": 180,
-   "DL": 507
+   "DL": 507,
+   "LB": 515,
+   "WR": 562,
+   "QB": 243,
+   "RB": 354,
+   "TE": 305,
+   "ST": 180
   },
   "pass": true,
-  "posPass": true,
+  "posPass": false,
   "core": {
    "n": 218,
-   "nNeg": 75,
-   "negBeat": 0.3467,
-   "acc": 0.5229,
+   "nNeg": 61,
+   "negBeat": 0.3443,
+   "acc": 0.5,
    "rule": "top 2 on his team and top 15% in the league in projected three seasons' value, age 31 or under",
    "override": false
   },
   "live": {
    "pos": {
+    "ED": [
+     0.07399,
+     2.99471
+    ],
     "ST": [
-     -0.01155,
-     0.79362
-    ],
-    "QB": [
-     0.0571,
-     6.39333
-    ],
-    "OL": [
-     0.14788,
-     3.13969
+     0.03314,
+     4.25491
     ],
     "DB": [
-     0.09079,
-     3.18454
+     0.07532,
+     3.60145
     ],
     "RB": [
-     -0.00551,
-     4.12039
+     -0.03712,
+     5.11404
     ],
-    "WR": [
-     -0.04214,
-     5.89666
-    ],
-    "TE": [
-     -0.0848,
-     4.73962
+    "QB": [
+     -0.01791,
+     8.24072
     ],
     "DL": [
-     0.03991,
-     2.90381
+     0.02817,
+     3.16723
+    ],
+    "OL": [
+     0.10931,
+     3.66441
+    ],
+    "WR": [
+     -0.03616,
+     5.48249
     ],
     "LB": [
-     0.05129,
-     3.46529
+     0.0509,
+     3.35474
     ],
-    "ED": [
-     0.10465,
-     2.64075
+    "TE": [
+     -0.07145,
+     4.45791
     ]
    },
    "pool": [
-    0.01821,
-    4.51413
+    0.03314,
+    4.25491
    ],
    "form": "three seasons' value a new deal at the position returned = a + b cost (cap share above the minimum, three seasons)"
+  },
+  "line": "moved",
+  "alt": {
+   "line": "new",
+   "n": 2456,
+   "acc": {
+    "agedp": 0.6132,
+    "carry": 0.5513,
+    "pooled": 0.59
+   },
+   "agedp_vs": {
+    "carry": {
+     "t": 5.38,
+     "won": "5/5",
+     "gain": 0.0619
+    },
+    "pooled": {
+     "t": 2.37,
+     "won": "5/5",
+     "gain": 0.0232
+    }
+   },
+   "pass": true,
+   "posPass": true,
+   "core": {
+    "n": 218,
+    "nNeg": 75,
+    "negBeat": 0.3467,
+    "acc": 0.5229,
+    "rule": "top 2 on his team and top 15% in the league in projected three seasons' value, age 31 or under",
+    "override": false
+   }
   }
  },
- "note": "Pro team builder verdicts against the replacement a team could buy, tested point in time, and the core tag.\n\n    python3 scripts/research/pro_builder_nov28/replace.py [nba nhl nfl]   -> research/pro_builder_replace.json\n\nRows are the verdict rows of verdicts.py (a player paid at least twice the minimum at the end of season s and paid again in\ns + 1; s + 3 <= the last full season). cost = his pay above the minimum as a cap share, summed over s + 1 .. s + 3.\n\n  replacement line   what that money bought on the market at his position: the three seasons' value of new deals\n                     (pay in s + 1 moved more than 10% from s) at the position, on their cost, R(c, pos) = a + b c,\n                     fit on the deals whose three seasons were seen by the end of season s (walk-forward); a position\n                     with fewer than 60 deals uses every position's line\n  truth              sum_k v(s+k) >= R(cost, pos) on the line fit on every season (he beat what his money buys)\n  agedp              the priced projection of verdicts.py (three seasons' value = c0 + c1 v + c2 cost by age group,\n                     walk-forward) >= R(cost, pos)\n  carry              3 v(s) >= R(cost, pos)\n  pooled             agedp against one line for every position (does the position matter)\n\nShips when agedp beats carry with paired t >= 2 on the right-call indicator and wins most seasons. Positions: NBA\nG / F / C (the XPM files), NHL F / D / G, NFL QB, RB, WR, TE, OL, DL, ED, LB, DB, ST (OverTheCap's position, nflverse).\n\nCore: a player whose projected value over the next three seasons is among his team's top two and in the league's top 15%,\nage 31 or under. Test: among rows whose agedp read says trade or let walk, did core players beat their replacement more\noften than not (then the read should not move them: a core player is kept)."
+ "note": "Pro team builder verdicts against the replacement a team could buy, tested point in time, and the core tag.\n\n    python3 scripts/research/pro_builder_nov28/replace.py [nba nhl nfl]   -> research/pro_builder_replace.json\n\nRows are the verdict rows of verdicts.py (a player paid at least twice the minimum at the end of season s and paid again in\ns + 1; s + 3 <= the last full season). cost = his pay above the minimum as a cap share, summed over s + 1 .. s + 3.\n\n  replacement line   what that money bought on the market at his position: the three seasons' value of new deals\n                     (pay in s + 1 moved more than 10% from s) at the position, on their cost, R(c, pos) = a + b c,\n                     fit on the deals whose three seasons were seen by the end of season s (walk-forward); a position\n                     with fewer than 60 deals uses every position's line\n  truth              sum_k v(s+k) >= R(cost, pos) on the line fit on every season (he beat what his money buys)\n  agedp              the priced projection of verdicts.py (three seasons' value = c0 + c1 v + c2 cost by age group,\n                     walk-forward) >= R(cost, pos)\n  carry              3 v(s) >= R(cost, pos)\n  pooled             agedp against one line for every position (does the position matter)\n\nShips when agedp beats carry with paired t >= 2 on the right-call indicator and wins most seasons. Two lines are tried:\n'moved' fits only the new deals that came with a new team (free agents and trades, the market a team can buy; Nov 28, the\nKnicks read made the full set look too rich), 'new' every new deal including extensions with his own team. The live line\nis 'moved' where it passes, else 'new'. Positions: NBA\nG / F / C (the XPM files), NHL F / D / G, NFL QB, RB, WR, TE, OL, DL, ED, LB, DB, ST (OverTheCap's position, nflverse).\n\nCore: a player whose projected value over the next three seasons is among his team's top two and in the league's top 15%,\nage 31 or under. Test: among rows whose agedp read says trade or let walk, did core players beat their replacement more\noften than not (then the read should not move them: a core player is kept)."
 }

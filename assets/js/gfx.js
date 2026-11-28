@@ -5066,7 +5066,7 @@
         if (p.core) pbCore(g, tx + nmw + 28 + g.measureText(p.pos + (p.age ? ' · ' + p.age : '')).width, cy - 32, 24);
         var exp = p.left <= 1 || p.fa;
         var l2 = [p.h[0] != null ? pbM(p.h[0]) : '', exp ? (p.fst || 'FA') : 'thru ' + (p.thru || ''), exp && p.x != null ? 'xAAV ' + pbM(p.x) + (p.xt ? ' x ' + Math.round(p.xt) : '') : ''].filter(Boolean).join(' · ');
-        var l3 = ['vs repl ' + pbS(p.s), p.fit && p.fit.length ? 'fits ' + p.fit.join(' ') : ''].filter(Boolean).join(' · ');
+        var l3 = ['vs repl ' + pbS(p.s), p.lean ? 'leans ' + PB_VDN[p.lean].toLowerCase() : '', p.fit && p.fit.length ? 'fits ' + p.fit.join(' ') : ''].filter(Boolean).join(' · ');
         g.font = '26px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, l2, tw), tx, cy + 8);
         g.fillStyle = p.s < 0 ? C.down : C.teal; g.fillText(fit(g, l3, tw), tx, cy + 44);
         pbBadge(g, p.vd, L[2] + half - BW, cy, BW, BH);

@@ -41,10 +41,10 @@
     return '<span class="pxframe pxframe--row"><img src="' + esc(u || '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>';
   }
   function chip(p) { if (!p.vd) return '<span class="cfb__dim">—</span>'; var v = VD[p.vd];
-    return '<span class="pb__vd pb__vd--' + p.vd + '" title="' + esc(v[0] + ': ' + v[1] + (p.s != null ? ' (' + (p.s >= 0 ? '+' : '−') + '$' + Math.abs(p.s).toFixed(1) + 'M)' : '')) + '">' + v[0] + '</span>'; }
-  function core(p) { return p.core ? ' <span class="pb__core" title="core: top two on the team and the league\'s top 15% in projected value over three seasons, 31 or under, above his replacement">core</span>' : ''; }
+    return '<span class="pb__vd pb__vd--' + p.vd + '" title="' + esc(v[0] + ': ' + v[1] + (p.s != null ? ' (' + (p.s >= 0 ? '+' : '−') + '$' + Math.abs(p.s).toFixed(1) + 'M)' : '') + (p.lean ? '; core, kept; the read leans ' + VD[p.lean][0].toLowerCase() : '')) + '">' + v[0] + '</span>'; }
+  function core(p) { return p.core ? ' <span class="pb__core" title="core: top two on the team and the league\'s top 15% in projected value over three seasons, 31 or under; never traded or let go">core</span>' : ''; }
   function why() {
-    if (D.read === 'repl') return 'three seasons: value read from his ' + VLAST + ' ' + VL + ', age and price, less what the same money bought in free agency at ' + (D.posLines ? 'his position' : 'any position') + ', at $' + D.rate + 'M a win';
+    if (D.read === 'repl') return 'three seasons: value read from his ' + VLAST + ' ' + VL + ', age and price, less what the same money bought ' + (D.line === 'moved' ? 'in deals with a new team' : 'in new deals') + ' at ' + (D.posLines ? 'his position' : 'any position') + ', at $' + D.rate + 'M a win';
     if (D.read === 'last') return 'one season: ' + VLAST + ' ' + VL + ' at $' + D.rate + 'M a win, less his cap hit above the minimum';
     return 'three seasons: value read from his ' + VLAST + ' ' + VL + ', age and the price, at $' + D.rate + 'M a win, less pay above the minimum (xAAV past his deal)';
   }

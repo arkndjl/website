@@ -1484,7 +1484,30 @@
    "lag": 30,
    "trigger": "the 2026-27 season in the NHL payroll panel",
    "gate": "replace.py: agedp beats carry, paired t >= 2 and most seasons",
-   "run_hint": "python3 scripts/research/pro_builder_nov28/replace.py nhl"
+   "run_hint": "python3 scripts/research/pro_builder_nov28/replace.py nhl",
+   "result": {
+    "d": "2026-11-28",
+    "v": "s",
+    "e": "line on deals with a new team: right calls .599 to .622 against carry, by position t 2.29",
+    "tt": 2.69,
+    "pr": 1398
+   }
+  },
+  {
+   "key": "builder_verdict_nba_market",
+   "t": "Pro team builder: NBA replacement line fit only on deals that came with a new team (the market a team can buy) in place of every new deal",
+   "sp": [
+    "NBA"
+   ],
+   "ar": "teams",
+   "kind": "retest",
+   "how": "hand",
+   "was": "Nov 28: right calls .668 against .652 carrying the season forward, t 1.38, 4 of 6 seasons (passed NFL t 3.18, NHL t 2.69)",
+   "after": "nba:champ:2027",
+   "lag": 30,
+   "trigger": "the 2026-27 season in the NBA payroll panel",
+   "gate": "replace.py LINE=moved: agedp beats carry, paired t >= 2 and most seasons",
+   "run_hint": "LINE=moved python3 scripts/research/pro_builder_nov28/replace.py nba"
   },
   {
    "key": "builder_future_score",

@@ -357,7 +357,9 @@ def verdicts(lg, T, rate):
             row['s'] = r2(s)
             row['vd'] = ('E' if s >= 0 else 'W') if last_year else ('K' if s >= 0 else 'T')
         out.append(row)
-    # core: top two on his team and the league's top 15% in projected three seasons' value, 31 or under, at or above the read
+    # core: top two on his team and the league's top 15% in projected three seasons' value, 31 or under. Core is untouchable
+    # (Noah, Nov 28): a core player is never Trade or Let walk; when the read leans that way it is kept in 'lean' for the hover.
+    # The override failed held out (research/pro_builder_replace.json core.negBeat), so the lean is shown, not hidden.
     e = sorted((p['e3'] for p in out if p.get('e3') is not None), reverse=True)
     if e:
         cut = e[max(int(CORE_PCT * len(e)) - 1, 0)]
@@ -369,8 +371,11 @@ def verdicts(lg, T, rate):
             if p.get('e3') is None or p.get('s') is None:
                 continue
             top = sorted(team[p['tm']], reverse=True)[:CORE_TOP]
-            if p['e3'] >= cut and p['e3'] >= min(top) and (p['age'] or 99) <= CORE_AGE and p['s'] >= 0:
+            if p['e3'] >= cut and p['e3'] >= min(top) and (p['age'] or 99) <= CORE_AGE:
                 p['core'] = 1
+                if p['s'] < 0:
+                    p['lean'] = p['vd']
+                    p['vd'] = 'E' if p['vd'] == 'W' else 'K'
     return out, read, V, R
 
 
@@ -487,7 +492,7 @@ def build(lg):
     teams.sort(key=lambda t: t['name'] or t['tm'])
     out = {'lg': lg, 'vl': {'nba': 'VORX', 'nfl': 'WAR', 'nhl': 'WAR'}[lg], 'season': T['season'], 'label': T['label'], 'asof': T['asof'], 'years': T['years'], 'cap': cap,
            'min': T['min'], 'rate': r2(rate, 2), 'read': read, 'tax': T.get('tax'), 'apron1': T.get('apron1'), 'apron2': T.get('apron2'),
-           'groups': GROUPS[lg], 'window': WINDOW, 'lgAge': lgAge, 'posLines': bool(R.get('posPass')),
+           'groups': GROUPS[lg], 'window': WINDOW, 'lgAge': lgAge, 'posLines': bool(R.get('posPass')), 'line': R.get('line'),
            'test': {k: V.get(k) for k in ('n', 'years', 'acc', 'pass', 'realized')} if V else None,
            'testVs': (R.get('agedp_vs') if read == 'repl' else V.get('agedp_vs') if read == 'agedp' else V.get('last_vs')) if V else None,
            'repTest': {k: R.get(k) for k in ('n', 'years', 'acc', 'agedp_vs', 'pass', 'posPass', 'core')} if R else None,

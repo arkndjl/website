@@ -300,12 +300,12 @@
   payrolls free agents view); runs after payrolls in nba-xpm.yml, nfl.yml, nhl.yml; `--test`. Page `probuilder.html`, GFX
   `buildProBuilder` (plan), `buildProWindow`, `buildProDepth` (4:5; badges a fixed right column, centred on the row).
 - Verdict = his next three seasons against the replacement his money buys at his position (`research/pro_builder_replace.json`,
-  `scripts/research/pro_builder_nov28/replace.py`): NBA (pooled line) and NFL (by position) passed; NHL failed (t 1.88) and keeps
-  the priced projection against pay. Core = team top two, league top 15% in projected value, 31 or under, above replacement;
-  never an override (core players read below the line beat it 32-40%).
+  `scripts/research/pro_builder_nov28/replace.py`): the line on deals that came with a new team (the market) where it passes (NFL,
+  NHL by position), else every new deal (NBA; the market line failed, t 1.38). Core = team top two, league top 15% in projected
+  value, 31 or under; untouchable (Noah): never Trade or Let walk, the read's lean shown beside it (the override failed held out).
 - Future score failed against last season's record in all three leagues (`future.py`); the page shows value under contract by
   season, the top-ten window and Now / Window / Rebuild instead. xYrs: `term.py` (NFL OTC, NBA B-Ref signings; NHL xTerm).
-  Retests: builder_verdict_nhl_replacement, builder_future_score, builder_dev_projection.
+  Retests: builder_verdict_nba_market, builder_future_score, builder_dev_projection.
 
 ## Season rollovers (calendar, phases, post days)
 

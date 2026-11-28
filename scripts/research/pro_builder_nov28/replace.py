@@ -17,7 +17,10 @@ s + 1; s + 3 <= the last full season). cost = his pay above the minimum as a cap
   carry              3 v(s) >= R(cost, pos)
   pooled             agedp against one line for every position (does the position matter)
 
-Ships when agedp beats carry with paired t >= 2 on the right-call indicator and wins most seasons. Positions: NBA
+Ships when agedp beats carry with paired t >= 2 on the right-call indicator and wins most seasons. Two lines are tried:
+'moved' fits only the new deals that came with a new team (free agents and trades, the market a team can buy; Nov 28, the
+Knicks read made the full set look too rich), 'new' every new deal including extensions with his own team. The live line
+is 'moved' where it passes, else 'new'. Positions: NBA
 G / F / C (the XPM files), NHL F / D / G, NFL QB, RB, WR, TE, OL, DL, ED, LB, DB, ST (OverTheCap's position, nflverse).
 
 Core: a player whose projected value over the next three seasons is among his team's top two and in the league's top 15%,
@@ -43,6 +46,7 @@ NFL_G = {'QB': 'QB', 'RB': 'RB', 'FB': 'RB', 'WR': 'WR', 'TE': 'TE', 'LT': 'OL',
          'OL': 'OL', 'IDL': 'DL', 'DT': 'DL', 'DL': 'DL', 'ED': 'ED', 'DE': 'ED', 'EDGE': 'ED', 'LB': 'LB', 'ILB': 'LB', 'OLB': 'ED',
          'CB': 'DB', 'S': 'DB', 'FS': 'DB', 'SS': 'DB', 'DB': 'DB', 'K': 'ST', 'P': 'ST', 'LS': 'ST'}
 MIN_POS = 60
+LINE = os.environ.get('LINE', 'new')                       # 'moved': only deals that came with a new team (the market a team can buy)
 CORE_TOP, CORE_PCT, CORE_AGE = 2, 0.15, 31
 
 
@@ -111,13 +115,14 @@ def rows_of(lg):
         vr = [V.get((s + k, pid), 0.0) for k in K]
         rows.append({'s': s, 'id': pid, 'tm': TM[(s, pid)][0], 'age': a, 'b': bin_of(a), 'v': V[(s, pid)], 'c': sum(cost),
                      'sum3': sum(vr), 'pos': group_of(lg, PS, PL, s, pid) or '?',
-                     'new': abs(PAY[(s + 1, pid)] - PAY[(s, pid)]) > 0.1 * PAY[(s, pid)]})
+                     'new': abs(PAY[(s + 1, pid)] - PAY[(s, pid)]) > 0.1 * PAY[(s, pid)],
+                     'moved': (s + 1, pid) in TM and TM[(s + 1, pid)][0] != TM[(s, pid)][0]})
     return rows, last
 
 
 def lines(tr):
     """replacement line by position (new deals only), pooled line for thin positions"""
-    deals = [r for r in tr if r['new']]
+    deals = [r for r in tr if r['new'] and (LINE != 'moved' or r['moved'])]
     pool = ols([[1, r['c']] for r in deals], [r['sum3'] for r in deals])
     by = {}
     for g in {r['pos'] for r in deals}:
@@ -197,8 +202,17 @@ def run(lg):
 def main():
     lgs = sys.argv[1:] or ['nba', 'nhl', 'nfl']
     out = json.load(open(OUT)) if os.path.exists(OUT) else {}
+    global LINE
     for lg in lgs:
-        out[lg] = run(lg)
+        res = {}
+        for LINE in ('moved', 'new'):
+            res[LINE] = run(lg)
+            res[LINE]['line'] = LINE
+        # the market a team can buy (deals that came with a new team) first; every new deal when that fails
+        pick = 'moved' if res['moved']['pass'] else 'new'
+        alt = 'new' if pick == 'moved' else 'moved'
+        out[lg] = res[pick]
+        out[lg]['alt'] = {k: res[alt][k] for k in ('line', 'n', 'acc', 'agedp_vs', 'pass', 'posPass', 'core')}
         print(lg, json.dumps({k: v for k, v in out[lg].items() if k != 'live'}))
     out['note'] = __doc__.strip()
     with open(OUT, 'w') as f:
