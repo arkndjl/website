@@ -3387,7 +3387,7 @@ table.trophycase__hist td.trophycase__post {
 .gfx {
   position: fixed;
   inset: 0;
-  z-index: 100;
+  z-index: 1100;   /* over the header search bar (900) and the phone menu (1000) */
   display: grid;
   place-items: center;
   padding: 16px;
