@@ -1,7 +1,7 @@
 +++
 title = "Standings :: ARKBOARD"
 url = "/arkboard/standings/"
-description = "Standings: what has happened, every sport, no model numbers. NFL, NBA and NHL standings and the playoff picture as it stands; college football and college basketball conference standings with the AP, Coaches and CFP polls; official stat leaders; scores and schedules; 18 soccer league tables, MLS and the UEFA league phases with goals and assists leaders; the ATP and WTA rankings; Valve's CS2 ranking."
+description = "Standings, no model numbers: NFL, NBA and NHL standings and the playoff picture as it stands; college football and college basketball conference standings with the AP, Coaches and CFP polls; official stat leaders; scores and schedules; 18 soccer league tables, MLS and the UEFA league phases with goals and assists leaders; the ATP and WTA rankings; Valve's CS2 ranking."
 keywords = ["arkboard", "standings", "games to watch", "best games this week", "nfl standings", "nba standings", "nhl standings", "college football standings", "college basketball standings", "playoff picture", "stat leaders", "ap poll", "coaches poll", "cfp rankings", "premier league table", "champions league table", "atp rankings", "wta rankings", "valve regional standings", "scores"]
 draft = false
 +++

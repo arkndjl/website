@@ -1,7 +1,7 @@
 +++
 title = "ARKRANKING :: ARKBOARD"
 url = "/arkboard/arkranking/"
-description = "ARKRANKING: every ARKBOARD standings table, ARK Ranking and team odds on one page: title odds across every competition (CFB national title, Super Bowl, CBB national title, NBA title, Stanley Cup, 18 soccer leagues and the UEFA cups) with the favourite, the ARK Ranking #1 and how open each race is; then each sport's ARK Ranking (power rankings) and season odds from 10,000 simulated seasons: expected wins, conference, playoff, CFP and NCAA tournament odds, league tables with title, top-four and relegation odds; and the ATP and WTA ARK Ranking."
+description = "ARKRANKING: ARK Ranking and team odds for every sport: title odds across every competition (CFB national title, Super Bowl, CBB national title, NBA title, Stanley Cup, 18 soccer leagues and the UEFA cups) with the favourite, the ARK Ranking #1 and how open each race is; then each sport's ARK Ranking (power rankings) and season odds from 10,000 simulated seasons: expected wins, conference, playoff, CFP and NCAA tournament odds, league tables with title, top-four and relegation odds; and the ATP and WTA ARK Ranking."
 keywords = ["arkboard", "arkranking", "standings", "ark ranking", "power rankings", "season odds", "playoff odds", "title odds", "college football playoff odds", "ncaa tournament odds", "super bowl odds", "nba title odds", "stanley cup odds", "premier league table", "champions league odds", "expected wins", "tennis rankings", "atp elo", "wta elo"]
 draft = false
 +++
