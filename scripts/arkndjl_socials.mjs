@@ -5,14 +5,20 @@
 // engagement from api.fxtwitter.com (no key). YouTube: subscribers from the channel page, uploads from the channel
 // feed (no key; YOUTUBE_API_KEY adds the full upload list with likes, comments and length). One reading per run,
 // kept when a count moved plus one a day. Writes data/arkndjl_socials.json; a source that fails keeps its last value.
+// `node scripts/arkndjl_socials.mjs ytst` runs the same for another account in ACCTS (YouTube only when x is null).
 import fs from 'fs';
 import path from 'path';
 import { buildGoals } from './social_goals.mjs';
 import { youtube, et, median, r1, r2, DAYS, BLOCKS } from './laursen_social_plan.mjs';
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
-const OUT = path.join(ROOT, 'data', 'arkndjl_socials.json');
-const X_USER = 'ARKNDJL', YT_HANDLE = 'ARKNDJL', YT_CH = 'UCQycF-Vk740tEVkBthOgLdg';
-const OPENED = { x: '2024-08-20', youtube: '2025-02-21' };   // fxtwitter joined, YouTube about "Joined"
+const ACCTS = {   // opened = fxtwitter joined, YouTube about "Joined"
+  arkndjl: { out: 'arkndjl_socials.json', x: 'ARKNDJL', yt: 'ARKNDJL', ch: 'UCQycF-Vk740tEVkBthOgLdg', opened: { x: '2024-08-20', youtube: '2025-02-21' } },
+  ytst: { out: 'ytst_socials.json', x: null, yt: 'YourTeamShouldTankPodcast', ch: 'UC1cQKw7VFWtKMjOORJNER3g', opened: { youtube: '2026-01-16' } },   // Your Team Should Tank (Noah + greg greg)
+};
+const A = ACCTS[process.argv[2] || 'arkndjl'];
+if (!A) { console.error(`unknown account ${process.argv[2]}; one of ${Object.keys(ACCTS).join(', ')}`); process.exit(1); }
+const OUT = path.join(ROOT, 'data', A.out);
+const X_USER = A.x, YT_HANDLE = A.yt, YT_CH = A.ch, OPENED = A.opened;
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36';
 const DAY = 864e5, MIN_AGE = 3, X_AGE = 1, K = 3, X10 = 10;   // X posts get most of their views in a day; YouTube uploads 3
 const prev = (() => { try { return JSON.parse(fs.readFileSync(OUT, 'utf8')); } catch { return { series: [] }; } })();
@@ -23,21 +29,21 @@ const sum = a => a.reduce((x, y) => x + y, 0), fmt = v => v == null ? '—' : Ma
 
 // ---- counts
 const now = Date.now();
-const xu = pj(await get(`https://api.fxtwitter.com/${X_USER}`, 'arkndjl.net'))?.user || null;
+const xu = X_USER && pj(await get(`https://api.fxtwitter.com/${X_USER}`, 'arkndjl.net'))?.user || null;
 const x = xu?.followers ?? null, xn = xu?.tweets ?? null;
 const ytHtml = await get(`https://www.youtube.com/@${YT_HANDLE}`);
 const yts = ytHtml ? num((/([\d.,]+[KkMm]?) subscribers/.exec(ytHtml) || [])[1]) : null;
 const last = prev.series[prev.series.length - 1] || {};
 const cur = { t: now, x: x ?? last.x ?? null, youtube: yts ?? last.youtube ?? null, xn: xn ?? last.xn ?? null };
 const moved = ['x', 'youtube', 'xn'].some(k => cur[k] !== (last[k] ?? null)), stale = !last.t || now - last.t > DAY;
-const status = { x: x != null, youtube: yts != null };
+const status = { ...(X_USER ? { x: x != null } : {}), youtube: yts != null };
 console.log('socials:', JSON.stringify({ x, youtube: yts, xn }));
 const series = moved || stale ? [...prev.series, cur].slice(-3000) : prev.series;
 const { goals, hist } = buildGoals(series, prev.hist, OPENED);
 
 // ---- X posts: his own posts (no reposts), views snapshotted per run; replies to his own posts are thread parts
 const xp = { ...(prev.xp || {}) };
-const st = pj(await get(`https://api.fxtwitter.com/2/profile/${X_USER}/statuses`, 'arkndjl.net'));
+const st = X_USER && pj(await get(`https://api.fxtwitter.com/2/profile/${X_USER}/statuses`, 'arkndjl.net'));
 let xOk = false;
 for (const p of st?.results || []) {
   if (p.reposted_by || (p.author?.screen_name || '').toLowerCase() !== X_USER.toLowerCase() || p.views == null) continue;
@@ -138,6 +144,8 @@ if (msHit.length) { const a = sum(msHit.map(m => m.ahead)) / msHit.length; I.pus
 else pend('Milestones vs pace', 'at the first tracked milestone');
 const rh = prev.plan?.roll_t || [], lr = rh[rh.length - 1], pt = [now, plan.roll.yt?.sum ?? null, plan.roll.xp?.sum ?? null];   // [t, YouTube L10, X L10]
 plan.roll_t = !lr || lr[1] !== pt[1] || lr[2] !== pt[2] || now - lr[0] > DAY ? [...rh, pt].slice(-1500) : rh;
+
+if (!X_USER) { delete plan.x; delete plan.roll.xp; plan.ideas = I.filter(i => !/^X /.test(i.k)); }
 
 const body = { status, goals, hist, series, xp, yt, plan };
 const strip = o => JSON.stringify({ ...o, asof: undefined });

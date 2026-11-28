@@ -79,4 +79,6 @@ draft = false
 {{< lzsocplan src="arkndjl_socials" name="ARKNDJL" part="x" class="desk__wide" >}}
 {{< lzsocplan src="arkndjl_socials" name="ARKNDJL" part="youtube" class="desk__wide" >}}
 {{< lzsocplan src="arkndjl_socials" name="ARKNDJL" part="plan" class="desk__wide" >}}
+{{< lzsocial src="ytst_socials" nets="youtube" name="Your Team Should Tank" icon="icon-youtube" exe="ytst_social_data.exe" class="desk__wide" >}}
+{{< lzsocplan src="ytst_socials" name="Your Team Should Tank" part="youtube" exe="ytst_youtube.exe" class="desk__wide" >}}
 {{< /desk >}}
