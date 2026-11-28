@@ -26,10 +26,12 @@ data/team_years_fit.json). Included once by cfbbuilder.html and cbbbuilder.html.
   function depthHtml(sp, P, j, y) {
     var by = {}; P.forEach(function (o) { var p = o['p' + j]; if (p >= 0.15) (by[o.pos] = by[o.pos] || []).push(o); });
     return '<div class="tbx__room">' + ORDER[sp].filter(function (g) { return by[g]; }).map(function (g) {
-      var lk = function (o) { return o['p' + j] >= 0.5 ? 1 : 0; }, L = by[g].sort(function (a, b) { return lk(b) - lk(a) || (b.fv || 0) - (a.fv || 0) || (b['p' + j] || 0) - (a['p' + j] || 0); }), deep = DEEP[sp][g] || 6;
+      // order: P(starts here) = P(on the roster) x P(wins the job | here) (scripts/start_odds.py); K, P and anyone without it after, by FV
+      var st = function (o) { return o['ps' + j] == null ? -1 : o['p' + j] * o['ps' + j]; },
+        L = by[g].sort(function (a, b) { return st(b) - st(a) || (b.fv || 0) - (a.fv || 0) || (b['p' + j] || 0) - (a['p' + j] || 0); }), deep = DEEP[sp][g] || 6;
       return '<div class="tbx__rrow"><b class="tbx__rg">' + esc(g) + '<small>' + L.length + '</small></b><div class="tbx__rl">' + L.map(function (o, i) {
-        var p = o['p' + j], rs = /^RS/.test(o.cls || '') ? 'RS' : '', tag = TAG[o.kind] || rs;
-        return '<span class="tbx__rc tbx__rc--' + o.kind + (p < 0.5 ? ' is-maybe' : '') + (i >= deep ? ' is-deep' : '') + '" title="' + esc(o.name + ' · ' + (o.cls || '') + ' · P(here ' + seasonLabel(sp, y) + ') ' + Math.round(p * 100) + '%') + '"><i>' + (i + 1) + '</i>' + fvchip(o.fv) + '<span>' + esc(o.name) + '</span>' + (tag ? '<em>' + tag + '</em>' : '') + '<small>' + pc(p) + '</small></span>';
+        var p = o['p' + j], rs = /^RS/.test(o.cls || '') ? 'RS' : '', tag = TAG[o.kind] || rs, s = st(o);
+        return '<span class="tbx__rc tbx__rc--' + o.kind + (p < 0.5 ? ' is-maybe' : '') + (i >= deep ? ' is-deep' : '') + '" title="' + esc(o.name + ' · ' + (o.cls || '') + (s >= 0 ? ' · P(starts ' + seasonLabel(sp, y) + ') ' + pc(s).replace('&lt;', '<') + ' · P(wins the job if here) ' + pc(o['ps' + j]).replace('&lt;', '<') : '') + ' · P(here) ' + Math.round(p * 100) + '%') + '"><i>' + (i + 1) + '</i>' + fvchip(o.fv) + '<span>' + esc(o.name) + '</span>' + (tag ? '<em>' + tag + '</em>' : '') + '<small>' + pc(s >= 0 ? s : p) + '</small></span>';
       }).join('') + '</div></div>';
     }).join('') + '</div>';
   }
