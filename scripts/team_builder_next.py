@@ -301,6 +301,12 @@ def cfb_years(D, T, conf, pw):
         for pl in t.get('plan') or []:
             cl = min(4, TY.CFB_CLS.get(pl.get('cls') or '', 3) + 1)
             ros[str(t['tid'])].append([pl['name'], pl.get('slot') or pl.get('pos'), pl.get('cls'), r1(pl.get('fv')), 1.0, round(stay[cl], 2), round(stay[cl] * stay[min(4, cl + 1)], 2), 'new', None])
+    for t in T:   # targets: P(signs here), then the freshman stay chain
+        for o in (t.get('pot') or {}).get('next', []) + (t.get('pot') or {}).get('later', []):
+            if not o.get('p'): continue
+            k = o['yr'] - nx; ps = [0.0] * k + [o['p']]
+            while len(ps) < 3: ps.append(ps[-1] * stay[min(4, len(ps) - k)])
+            ros[str(t['tid'])].append([o['name'], CFB_G.get(rec_pos('cfb', o['yr'], o['name'], o.get('pos')), o.get('pos')), 'HS ' + str(o['yr']), o.get('fv'), *[round(v, 2) for v in ps[:3]], 'tgt', None])
     out = {tid: sorted(L, key=lambda x: -(x[3] or 0)) for tid, L in ros.items()}
     json.dump({'cols': ['name', 'pos', 'cls', 'fv', 'p1', 'p2', 'p3', 'kind', 'dect'], 'next': nx, 'teams': out},
               open(os.path.join(SD, 'cfb-builder-ros.json'), 'w'), separators=(',', ':'), allow_nan=False)
@@ -371,6 +377,13 @@ def cbb_years(D, T, conf, pw):
             cl = min(4, TY.CLS.get(pl.get('cls') or '', 3) + 1)
             ros[t['t']].append([pl['name'], pl.get('pos'), pl.get('cls'), pl.get('fv'), 1.0, round(stay[cl], 2), round(stay[cl] * stay[min(4, cl + 1)], 2), 'keep' if pl.get('kind') == 'keep' else 'new', None,
                                 *dev_path(pl.get('bpm'), cl, None, 0.5)])
+    for t in T:
+        for o in (t.get('pot') or {}).get('next', []) + (t.get('pot') or {}).get('later', []):
+            if not o.get('p'): continue
+            k = o['yr'] - nx; ps = [0.0] * k + [o['p']]
+            while len(ps) < 3: ps.append(ps[-1] * stay[min(4, len(ps) - k)])
+            ros[t['t']].append([o['name'], CBB_G.get(rec_pos('cbb', o['yr'], o['name'], o.get('pos')), o.get('pos')), 'HS ' + str(o['yr']), o.get('fv'), *[round(v, 2) for v in ps[:3]], 'tgt', None,
+                                *([None] * k + dev_path(o.get('bpm'), 1, None, 0.5))[:3]])
     out = {tm: sorted(L, key=lambda x: -(x[3] or 0)) for tm, L in ros.items()}
     json.dump({'cols': ['name', 'pos', 'cls', 'fv', 'p1', 'p2', 'p3', 'kind', 'dect', 'v1', 'v2', 'v3'], 'next': nx, 'teams': out, 'vLab': 'pXPM'},
               open(os.path.join(SD, 'cbb-builder-ros.json'), 'w'), separators=(',', ':'), allow_nan=False)
