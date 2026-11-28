@@ -1505,6 +1505,22 @@
    "est": 1,
    "trigger": "2026-27 weekly board vintages in scripts/data/snaps (pwar, pw0, toi, war by week)",
    "gate": "rest-of-season WAR a 60 by week: calibrated pWAR beats the raw rate (pw0, from hpm less the file's replacement) on minutes-weighted error, paired t <= -2, calibration slope .8-1.2 by WAR decile; refit the in-season form by season share if it fails"
+  },
+  {
+   "key": "u17wc_event_stats",
+   "t": "U17 World Cup event stats in prospect FV",
+   "sp": [
+    "Soccer"
+   ],
+   "ar": "fv",
+   "kind": "forward",
+   "how": "hand",
+   "was": "not testable (one tournament, no outcomes)",
+   "due": "2030-07-01",
+   "est": 1,
+   "trigger": "the 2026 U17 World Cup cohort reaches the prospect outcome window (after the 2029-30 season)",
+   "gate": "frozen prereg U17E index adds t >= 2 nation-out on the Jan 15 2027 snapshot, top-50 outcome not lower",
+   "run_hint": "scripts/research/u17wc_nov28 (file saved after the final in project storage, soccer-u17wc-2026/)"
   }
  ]
 }
