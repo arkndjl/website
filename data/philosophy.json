@@ -276,7 +276,7 @@
      "q": "Nothing ships unless it beats what was there before on data it never saw."
     },
     {
-     "p": "Every change to a model or metric is tested held out, on seasons or games it was not fit on, and it only ships if it wins. Most of what I try doesn't. Of the 429 tests in ARKLOG, 170 shipped, 173 part shipped and 86 failed outright."
+     "p": "Every change to a model or metric is tested held out, on seasons or games it was not fit on, and it only ships if it wins. Most of what I try doesn't. Of the 430 tests in ARKLOG, 171 shipped, 173 part shipped and 86 failed outright."
     },
     {
      "p": "The failures are published with the same detail as the wins. People should know what has been tested, tried and proven not to work, because it helps them with their own research, and because it shows everything I've thought of trying even when it didn't work."
@@ -295,7 +295,7 @@
     },
     {
      "fig": "verdicts",
-     "svg": "<svg class=\"libchart\" viewBox=\"0 0 336 200\" shape-rendering=\"crispEdges\" role=\"img\" aria-label=\"Verdicts by month\"><rect class=\"lc-grid\" x=\"44\" y=\"166\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"170\" text-anchor=\"end\">0</text><rect class=\"lc-grid\" x=\"44\" y=\"127\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"131\" text-anchor=\"end\">25</text><rect class=\"lc-grid\" x=\"44\" y=\"88\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"92\" text-anchor=\"end\">50</text><rect class=\"lc-grid\" x=\"44\" y=\"49\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"53\" text-anchor=\"end\">75</text><rect class=\"lc-grid\" x=\"44\" y=\"10\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"14\" text-anchor=\"end\">100</text><rect class=\"lc-axis\" x=\"44\" y=\"10\" width=\"2\" height=\"157\"/><rect class=\"lc-axis\" x=\"44\" y=\"166\" width=\"282\" height=\"2\"/><rect class=\"lc-bar lc-s0\" x=\"68\" y=\"55\" width=\"30\" height=\"111\"/><rect class=\"lc-bar lc-s0\" x=\"209\" y=\"12\" width=\"30\" height=\"154\"/><rect class=\"lc-bar lc-s1\" x=\"100\" y=\"13\" width=\"30\" height=\"153\"/><rect class=\"lc-bar lc-s1\" x=\"241\" y=\"49\" width=\"30\" height=\"117\"/><rect class=\"lc-bar lc-s2\" x=\"132\" y=\"104\" width=\"30\" height=\"62\"/><rect class=\"lc-bar lc-s2\" x=\"273\" y=\"94\" width=\"30\" height=\"72\"/><text class=\"lc-tick\" x=\"116\" y=\"180\" text-anchor=\"middle\">11</text><text class=\"lc-tick\" x=\"257\" y=\"180\" text-anchor=\"middle\">10</text><text class=\"lc-label\" x=\"185\" y=\"196\" text-anchor=\"middle\">month</text><text class=\"lc-label\" x=\"10\" y=\"88\" text-anchor=\"middle\" transform=\"rotate(-90 10 88)\">tests</text></svg>",
+     "svg": "<svg class=\"libchart\" viewBox=\"0 0 336 200\" shape-rendering=\"crispEdges\" role=\"img\" aria-label=\"Verdicts by month\"><rect class=\"lc-grid\" x=\"44\" y=\"166\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"170\" text-anchor=\"end\">0</text><rect class=\"lc-grid\" x=\"44\" y=\"127\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"131\" text-anchor=\"end\">25</text><rect class=\"lc-grid\" x=\"44\" y=\"88\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"92\" text-anchor=\"end\">50</text><rect class=\"lc-grid\" x=\"44\" y=\"49\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"53\" text-anchor=\"end\">75</text><rect class=\"lc-grid\" x=\"44\" y=\"10\" width=\"282\" height=\"1\"/><text class=\"lc-tick\" x=\"40\" y=\"14\" text-anchor=\"end\">100</text><rect class=\"lc-axis\" x=\"44\" y=\"10\" width=\"2\" height=\"157\"/><rect class=\"lc-axis\" x=\"44\" y=\"166\" width=\"282\" height=\"2\"/><rect class=\"lc-bar lc-s0\" x=\"68\" y=\"54\" width=\"30\" height=\"112\"/><rect class=\"lc-bar lc-s0\" x=\"209\" y=\"12\" width=\"30\" height=\"154\"/><rect class=\"lc-bar lc-s1\" x=\"100\" y=\"13\" width=\"30\" height=\"153\"/><rect class=\"lc-bar lc-s1\" x=\"241\" y=\"49\" width=\"30\" height=\"117\"/><rect class=\"lc-bar lc-s2\" x=\"132\" y=\"104\" width=\"30\" height=\"62\"/><rect class=\"lc-bar lc-s2\" x=\"273\" y=\"94\" width=\"30\" height=\"72\"/><text class=\"lc-tick\" x=\"116\" y=\"180\" text-anchor=\"middle\">11</text><text class=\"lc-tick\" x=\"257\" y=\"180\" text-anchor=\"middle\">10</text><text class=\"lc-label\" x=\"185\" y=\"196\" text-anchor=\"middle\">month</text><text class=\"lc-label\" x=\"10\" y=\"88\" text-anchor=\"middle\" transform=\"rotate(-90 10 88)\">tests</text></svg>",
      "legend": [
       "shipped",
       "part shipped",
@@ -309,9 +309,8 @@
      "note": "ARKLOG"
     },
     {
-     "link": "../../arklog/",
-     "label": "ARKLOG",
-     "ext": true
+     "link": "log",
+     "label": "ARKLOG"
     }
    ]
   },
@@ -408,12 +407,12 @@
   "stab_xpm": 14,
   "stab_pm": 28,
   "stab_pts": 3,
-  "tests": 429,
-  "shipped": 170,
+  "tests": 430,
+  "shipped": 171,
   "mixed": 173,
   "failed": 86,
   "failed_pct": 20,
-  "changes": "1,266",
+  "changes": "1,267",
   "ship_pct": 40
  }
 }

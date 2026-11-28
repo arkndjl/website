@@ -1,5 +1,5 @@
 # Copyright (c) 2025-2026 Noah Dengler. All rights reserved. See LICENSE.
-"""ARKLOG (/arklog/): the dated record of every change and test on the site, read from the merged pull requests.
+"""ARKLOG (Process > ARKLOG, /process/#log): the dated record of every change and test on the site, read from the merged pull requests.
 
   python3 scripts/arklog.py            rebuild from the cache
   python3 scripts/arklog.py --fetch    first pull the newest merged pull requests (GitHub API; GITHUB_TOKEN if set)

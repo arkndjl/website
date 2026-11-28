@@ -25,7 +25,7 @@
   {{- $card := dict "sport" .sport "lead" .lead "log" .log "groups" $g "n" .nterms "studies" (len .studies) }}
   <p class="rq__bar libstudy__bar">
     <button type="button" class="cfb__btn" data-gfx data-gfx-mode="sheet" data-gfx-sheet="{{ jsonify $card }}" title="sport sheet PNG, 16:9 for X">GFX card</button>
-    <a class="cfb__btn rq__link" href="{{ "arklog/" | relURL }}#log:{{ .sport }}" title="this sport's rows in ARKLOG">ARKLOG</a>
+    <a class="cfb__btn rq__link" href="#log:{{ .sport }}" title="this sport's rows in ARKLOG">ARKLOG</a>
     <a class="cfb__btn rq__link" href="#sheet-{{ .sport | lower }}" title="link to this sheet">link</a>
   </p>
   <div class="win__status"><span>{{ .nterms }} terms · {{ len .studies }} {{ cond (eq (len .studies) 1) "study" "studies" }}</span><span>{{ with .log }}{{ if .all }}{{ .s }} shipped · {{ .m }} part · {{ .f }} failed{{ end }}{{ end }}</span></div>

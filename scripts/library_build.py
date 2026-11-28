@@ -160,6 +160,16 @@ def chart_svg(c):
 GLOSS_TAB = {'fv': 'FV', 'value': 'player value', 'players': 'player odds', 'teams': 'team ratings',
              'games': 'game models', 'drafts': 'drafts and mocks', 'method': 'testing', 'data': 'data and names',
              'abbr': 'abbreviations'}
+# ARKLOG (was /arklog/, its own page until Nov 28 2026): the log, the monthly updates, the scoreboard and the site's own data
+ARKLOG = {
+    'log': '{{< arklog tab="log" >}}',
+    'updates': '{{< arklogupdates tab="updates" >}}',
+    'scoreboard': '{{< lazytab tab="scoreboard" >}}{{< arklogboard tab="scoreboard" >}}{{< /lazytab >}}',
+    'traffic': '{{< desk tab="traffic" >}}\n{{< sitestats part="views" class="desk__wide" >}}\n{{< sitestats part="trend" >}}\n'
+               '{{< sitestats part="traffic" >}}\n{{< /desk >}}',
+    'build': '{{< desk tab="build" >}}\n{{< sitestats part="build" class="desk__wide" >}}\n{{< /desk >}}',
+    'data': '{{< desk tab="data" >}}\n{{< sitestats part="fresh" class="desk__wide" >}}\n{{< /desk >}}',
+}
 GROUP_ORDER = ['football', 'basketball', 'hockey', 'baseball', 'soccer', 'tennis', 'esports']
 # the side strip: section -> the glossary sections under it (Process, Nov 27 2026). Tab names are the URL hash, so a
 # section moves between groups without breaking a link.
@@ -195,8 +205,8 @@ def regroup(sections):
 
 
 def write_page(studies, sections, fv_tables):
-    """content/arkboard-process.md (the Process page, was Reference, before that Library): hero, glossary search, then the
-    side strip: Overview (overview, sports), Philosophy, Metrics, Models, Research, Data. The log is ARKLOG (/arklog/)."""
+    """content/arkboard-process.md (the Process page, /process/; was Reference, before that Library): hero, glossary search,
+    then the side strip: Overview (overview, sports), Philosophy, ARKLOG, Metrics, Models, Research, Data."""
     page = ROOT / 'content/arkboard-process.md'
     head = page.read_text().split('{{< glossfind', 1)[0].split('{{< wintabs', 1)[0]
     groups = [g for g in GROUP_ORDER if any(s['group'] == g for s in studies)]
@@ -209,7 +219,7 @@ def write_page(studies, sections, fv_tables):
     side[0][1].extend(x['id'] for x in sections if x['id'] not in placed)   # a section added later lands under Metrics
     phil = [t['tab'] for t in json.loads((ROOT / 'data/philosophy.json').read_text())['tabs']] \
         if (ROOT / 'data/philosophy.json').exists() else []        # scripts/philosophy_build.py
-    strip = (['Overview:overview,sports'] + (['Philosophy:' + ','.join(phil)] if phil else []) + [f'{lab}:' + ','.join(tab[i] for i in ids) for lab, ids in side[:2]]
+    strip = (['Overview:overview,sports'] + (['Philosophy:' + ','.join(phil)] if phil else []) + ['ARKLOG:' + ','.join(ARKLOG)] + [f'{lab}:' + ','.join(tab[i] for i in ids) for lab, ids in side[:2]]
              + ['Research:' + ','.join(rtabs)] + [f'{lab}:' + ','.join(tab[i] for i in ids) for lab, ids in side[2:]])
     gidx = '|'.join(f'{x["id"]}={tab[x["id"]]}' for x in sections)
     lines = ['{{< glossfind tabs="' + gidx + '" >}}', '',   # glossary search (layouts/shortcodes/glossfind.html)
@@ -218,6 +228,7 @@ def write_page(studies, sections, fv_tables):
     lazy = lambda t, sc: f'{{{{< lazytab tab="{t}" >}}}}{sc}{{{{< /lazytab >}}}}'   # later tabs load on first open
     lines += [lazy('sports', '{{< procsports tab="sports" >}}')]
     lines += [lazy(t, f'{{{{< procphil tab="{t}" >}}}}') for t in phil]
+    lines += [ARKLOG[t] for t in ARKLOG]
 
     def gloss(sid):
         t = tab[sid]
