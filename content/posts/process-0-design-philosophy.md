@@ -5,7 +5,7 @@ author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["design", "process"]
 keywords = ["design philosophy", "anti-minimalism", "friction", "y2k", "windows 98", "organized maximalism", "cybergothic", "flat design", "liquid glass", "ai slop", "data density", "arkndjl"]
-description = "PROCESS #0: the design of arkndjl.net, the 2000s software, game menus, broadcasts and magazines it comes from, frictionless design, friction, organized maximalism, and trust."
+description = "PROCESS #0: the design of arkndjl.net, the 2000s software, game menus and broadcasts it comes from, frictionless design, friction, organized maximalism, and trust."
 series = "process"
 showFullContent = false
 readingTime = false
@@ -14,88 +14,44 @@ draft = false
 Toc = true
 +++
 
-Everything on this site is designed the way it is on purpose: the windows with .exe titles, the pixel font, the purple and teal, the square corners, and the tables that are wider than your screen. It comes from what I loved about design growing up in the 2000s, and from my belief that most of the internet looks worse now than it used to.
+Everything on this site is designed the way it is on purpose, including the windows with .exe titles, the pixel font, the purple and teal palette, the square corners, and the tables that are wider than your screen. All of it comes from everything I loved about design growing up in the 2000s, and from my belief that the homogenization of modern design has made most of the internet worse than it used to be.
 
-This is Process #0. The Process updates are a monthly record of what changed on the site, and this one comes first because it covers how the site is designed.
+This is Process #0. The Process updates are a monthly record of everything that changed on the site, and this one comes first because it explains the design philosophy that the rest of the site, and every update after this one, is built on.
 
-## What I Grew Up On
+## Influences and Frictionless Design
 
-Windows 98 and the Gateway computers that ran it. The menus in the Madden games from the 2000s and MLB 2K. The Nintendo DS and PictoChat. MSN Messenger. MySpace pages, where every profile looked like the person who made it. SNY's broadcast graphics from the 2000s, which are how I watched the Mets. Basically, every website and piece of software from the 2000s up until the iPhone came out.
-
-Print had the same thing going on. Ray Gun, where David Carson was art director from 1992 to 1995, set type in ways that were sometimes hard to read, and the magazine was known as much for its look as for its music coverage. Emigre treated a typeface as something with a point of view. Early Wired was printed in fluorescent inks. The game magazines I read as a kid, Nintendo Power and Electronic Gaming Monthly, packed every page with screenshots, tables, codes and sidebars, and you could spend an hour on one spread.
-
-What all of these have in common is that someone made a decision on every part of them. They had texture and borders and depth, and they assumed the person using them was willing to learn how they worked.
+What I loved about design growing up in the 2000s came from old operating systems and computers like Gateway and Windows 98, game menus like the ones in the 2000s Madden games and MLB 2K, the Nintendo DS and PictoChat UI, MSN Messenger, old internet websites like MySpace, and broadcast graphics, mainly from 2000s era SNY. In general, it came from the sites and software of the 2000s up until the inception of the iPhone, all of which had texture, borders, and depth, and all of which felt like they had been designed by a person with a specific vision in mind.
 
 {{< image src="/img/process-0/video-exe.png" alt="The video.exe player on the arkndjl.net home page: a bezel screen, an LCD with the track time and title, channel buttons, a scrolling track list and transport buttons, in purple, lilac and teal" position="center" >}}
 
-## Frictionless
+What I dislike most about the "frictionless" nature of modern design is the homogenization of design into what is effectively minimalist slop, something that I attribute heavily to Apple's design philosophy effectively obliterating the world following the release of the iPhone. I dislike rounded corners, and I dislike stuff like Liquid Glass.
 
-Most of what replaced that era is minimalist slop. Flat colors, rounded corners, a lot of white space, one sans serif font, and the same card layout on every site. I put most of the blame on Apple. The iPhone was a great product, and its design language was so successful that the rest of the world copied it until everything looked like it, and then kept copying the copies. In June 2025 Apple introduced Liquid Glass, a translucent material that takes its color from whatever is behind it, and called it their broadest software design update ever. I really dislike it, and I dislike rounded corners for the same reason.
+I really dislike how this faux-simplicity is packaged and advertised as "frictionless," when what it is actually doing is effectively forcing consumers, and the world, to choose convenience over customizability and detail. In doing so, the "frictionlessness" is really just dumbing down design, principles, and even features, since features get cut when they don't fit a clean layout, information gets hidden behind extra taps when a dense screen is considered too busy, and settings disappear when the designer has already decided what the user wants.
 
-The word used to sell all of this is "frictionless." The pitch is that removing every rough edge makes things simpler for the user. What actually happens is that the user is forced to choose convenience over customizability and detail, and usually without being asked. Features get cut because they don't fit the clean layout. Information gets hidden behind taps because a dense screen looks busy. Settings disappear because the designer has decided what you want. A frictionless product is usually a dumbed down product, in its design, in its principles and in its features.
+I also strongly dislike AI's tendencies towards certain modernist design styles, which only push design further toward the same homogenized look.
 
-It isn't only my taste. Alex Murrell's essay "The Age of Average" walks through interiors, cars, buildings and brands and shows the same convergence everywhere, toward the version that offends the fewest people. And AI is pushing this further. Doshi and Hauser ran an experiment in 2024 where some writers got story ideas from a large language model. The stories written with AI help were rated as more creative one by one, and as a group they were more similar to each other than the stories written by people alone. I see the same thing in AI generated design, which leans toward the same modernist styles over and over.
+## Friction as Expression
 
-## Friction
+Friction is a big part of life, and my designs are made to have friction because friction is a form of expression and personality. It's about making the numbers easier to read and understand while simultaneously refusing to conform to modernist design philosophies towards things like "simplicity." Borders, title bars, pixel icons, fonts with some weight to them, and tables you have to scroll through all slow the reader down a little, and every one of them is a choice that someone made.
 
-Friction is a big part of life, and I think it is good. My designs have friction on purpose, because friction is a form of expression and personality. A border, a title bar, a pixel icon, a font with some weight to it, a table you have to scroll. All of those slow you down a little, and every one of them is a choice someone made.
+I think friction is inherently good, and the only type of "friction" I dislike isn't really, dialectically, the type of friction I'm talking about, since it's just bad design philosophy, like a button that does nothing, a table that breaks on a phone, or a page that takes ten seconds to load.
 
-Robert Bjork coined the term "desirable difficulties" in 1994 for the finding that some kinds of difficulty during learning, like spacing out practice or testing yourself, lead to better long-term retention even though they make learning feel slower. Hullman, Adar and Shah applied the same idea to charts in 2011. They argued that the push to make every visualization as easy as possible to read trades away comprehension and recall, and that adding some visual difficulty can make people engage more actively with the data. Bateman and coauthors tested embellished charts against minimalist ones in 2010 and found that people read the embellished charts just as accurately, and remembered them better weeks later. Cox and coauthors made the case in 2016 that small, deliberate points of friction in an interface can break automatic, mindless use and get people to think about what they are doing.
+## Organized Maximalism and the Reader
 
-People also value things more when effort went into them. Norton, Mochon and Ariely called this the IKEA effect in 2012, after finding that people valued things they built themselves almost as much as things made by experts. And Kurosu and Kashimura found in 1995 that how usable an interface looks to people is tied more closely to how good it looks than to how usable it actually is.
-
-The only kind of "friction" I dislike isn't really the friction I'm talking about. It's just bad design, like a button that does nothing, a table that breaks on a phone, or a page that takes ten seconds to load. The friction I mean makes the numbers easier to read and understand while refusing to conform to modernist ideas of "simplicity."
-
-## Organized Maximalism
-
-I believe in cybergothicism and organized maximalism. Maximalism because I want everything available at once. Organized because density only works when there is a structure underneath it that you can learn.
+I believe strongly in cybergothicism and organized maximalism, which means making everything available at once while building a structure underneath it that makes all of it readable once you learn how it works.
 
 {{< image src="/img/process-0/arkboard-cfb.png" alt="The College Football ARKBOARD: a news ticker across the top, pixel social tiles, the menu, a row of buttons for every ARKBOARD page grouped by sport, and the football_prospects.exe window with the draft board below it" position="center" >}}
 
-That is why the tables are so wide. I love informationally dense tables because they let you dig into the data right away, all in one place. A player's FV, his age, his size, his production, his market price, his draft odds and his school's pay all sit in one row, and you sort by whichever one you care about. On a minimalist site that would be five pages and a lot of scrolling past white space. The structure is what keeps it readable: every board leads with the stat it ranks by, then the context you need to read it, and the column groups are boxed and tinted the same way on every page. Every sport's page has the same groups in the same order, so once you learn one you know all of them.
+I love informationally dense tables because they allow for delving deep into information and data immediately, all in one place, which is why the tables on the site are as wide as they are. A player's FV, age, size, production, market price, draft odds, and his school's pay all sit in the same row, and the reader can sort by whichever one they care about, where a minimalist site would split the same information across several pages with a lot of white space in between. What keeps it readable is that every board leads with the stat it ranks by and then the context needed to read it, the column groups are boxed and tinted the same way on every page, and every sport's page has the same groups in the same order, so that once you learn how to read one sport you can read all of them.
 
-Edward Tufte made the case for this decades ago. He argued that clutter and confusion are failures of design, not attributes of information, and that a well designed page can hold far more data than people expect.
+I made this site for myself and people like me, and I only care about creating something that I would actually use and love to interact with. That is also why there is almost no explanatory text on the boards, with no intro paragraphs or subtitles telling the reader what a table is about. When a reader needs to know what a label means, they can hover over it to get what it stands for, one line on what it is, and a link to Process, where the method is written out in full.
 
-## Who It's For
+## Trust in the Age of AI
 
-I made this site for myself and for people like me. I only care about making something I would actually use and love to interact with. I'm not trying to make it easy for someone who will look at it once. I'm trying to make it worth coming back to for someone who wants to know everything about a player or a model.
+Friction is also about trust in the age of AI. People should be able to tell that something was designed and artistically constructed and created with a specific vision in mind by a person, and not artificially generated by the whims and homogenized design philosophies associated with AI and techbro culture.
 
-That is also why there is almost no explanatory text on the boards. No intro paragraphs, no subtitles telling you what the table is about. When you need to know what a label means, you hover it and get one line and a link to Process, where the method is written out in full.
+A scouting-report tone is important for the same reason that I dislike AI generation. The scouting reports on the site read like scouting reports, with numbers and percentiles and nothing else, and every article and every log entry is written in my voice, because the world and the internet should not feel dead and buried under tons of artificial intelligence language, and should instead feel alive, real, and human.
 
-## Trust
-
-It's also about trust in the age of AI. People should be able to tell that something was designed and built by a person with a specific vision, and not generated by the whims and homogenized taste of AI and techbro culture.
-
-Bellaiche and coauthors showed people the same AI generated paintings in 2023, some labeled as made by a person and some labeled as made by AI. People liked the ones labeled human more, found them more beautiful, and rated them as more profound and more valuable, and the gap was biggest for meaning and worth.
-
-The same goes for the writing. The scouting reports read like scouting reports, with numbers and percentiles and nothing else, because I don't want the site to sound like a chatbot. Every article and every log entry is written in my voice. The internet should not feel dead and buried under AI language. It should feel alive and real and human.
-
-## How It Shows Up
-
-These are the rules the whole site follows.
-
-- One font everywhere, MS PGothic in a pixel cut, on the pages and on every GFX card.
-- Every corner is square. There are 22 border-radius rules in the site's stylesheet, and every one of them is 0.
-- One palette: deep purple, teal, lilac and a brighter purple, with platinum saved for ARK stars and 5-star+ recruits.
-- Every panel is a window with a title bar and an .exe name, and every page is built out of those windows.
-- No emoji. Every icon is pixel art drawn for the site.
-- No intros, blurbs or subtitles anywhere. Titles, labels, numbers and data only.
-- Every table is as dense as it can be while still lining up on a phone.
+In practice, all of this means that the whole site follows a small set of rules. There is one font everywhere, MS PGothic in a pixel cut, on the pages and on every GFX card, and every corner is square, with all 22 border-radius rules in the site's stylesheet set to 0. There is one palette of deep purple, teal, lilac, and a brighter purple, with platinum saved for ARK stars and 5-star+ recruits. Every panel is a window with a title bar and an .exe name, every page is built out of those windows, there are no emoji, and every icon is pixel art drawn for the site. There are no intros, blurbs, or subtitles anywhere, only titles, labels, numbers, and data, and every table is as dense as it can be while still lining up on a phone.
 
 {{< postchart "p0-spec" >}}
-
-## Works Cited
-
-- Apple. "Apple introduces a delightful and elegant new software design." Apple Newsroom, June 9, 2025. [apple.com](https://www.apple.com/newsroom/2025/06/apple-introduces-a-delightful-and-elegant-new-software-design/)
-- Bateman, S., Mandryk, R. L., Gutwin, C., Genest, A., McDine, D., and Brooks, C. "Useful Junk? The Effects of Visual Embellishment on Comprehension and Memorability of Charts." *CHI 2010*, 2573-2582. [PDF](https://vis.csail.mit.edu/classes/6.859/readings/pdfs/Bateman-UsefulJunk.pdf)
-- Bellaiche, L., Shahi, R., Turpin, M. H., Ragnhildstveit, A., Sprockett, S., Barr, N., Christensen, A., and Seli, P. "Humans versus AI: whether and why we prefer human-created compared to AI-created artwork." *Cognitive Research: Principles and Implications* 8, 42 (2023). [PubMed](https://pubmed.ncbi.nlm.nih.gov/37401999/)
-- Bjork, R. A. "Memory and Metamemory Considerations in the Training of Human Beings." In *Metacognition: Knowing about Knowing*, MIT Press, 1994. Overview: Bjork, E. L., and Bjork, R. A. "Making things hard on yourself, but in a good way." 2011. [PDF](https://bjorklab.psych.ucla.edu/wp-content/uploads/sites/13/2016/04/EBjork_RBjork_2011.pdf)
-- Carson, D. *The End of Print: The Graphic Design of David Carson.* Chronicle Books, 1995. Background: [AIGA medalist profile](https://www.aiga.org/membership-community/aiga-awards/2014-aiga-medalist-david-carson)
-- Consumer Aesthetics Research Institute. Y2K and Frutiger Aero entries. [cari.institute](https://cari.institute/aesthetics/frutiger-aero)
-- Cox, A. L., Gould, S. J. J., Cecchinato, M. E., Iacovides, I., and Renfree, I. "Design Frictions for Mindful Interactions: The Case for Microboundaries." *CHI EA 2016*, 1389-1397. [PDF](https://discovery.ucl.ac.uk/id/eprint/1475258/1/Design%20Frictions_CHI2016LBW_v18.camera.ready.pdf)
-- Doshi, A. R., and Hauser, O. P. "Generative AI enhances individual creativity but reduces the collective diversity of novel content." *Science Advances* 10, eadn5290 (2024). [PubMed](https://pubmed.ncbi.nlm.nih.gov/38996021/)
-- Hullman, J., Adar, E., and Shah, P. "Benefitting InfoVis with Visual Difficulties." *IEEE Transactions on Visualization and Computer Graphics* 17(12), 2213-2222 (2011). [PDF](https://mucollective.northwestern.edu/files/2011-VisualDifficulties-InfoVis.pdf)
-- Kurosu, M., and Kashimura, K. "Apparent Usability vs. Inherent Usability." *CHI 1995* short paper. [CHI 95 proceedings](https://chi1995.chistatic.hosting.acm.org/proceedings/shortppr/mk_bdy.htm)
-- Murrell, A. "The Age of Average." 2023. [alexmurrell.co.uk](https://www.alexmurrell.co.uk/articles/the-age-of-average)
-- Norton, M. I., Mochon, D., and Ariely, D. "The IKEA effect: When labor leads to love." *Journal of Consumer Psychology* 22(3), 453-460 (2012). [PDF](https://dash.harvard.edu/handle/1/12136084)
-- Tufte, E. R. *Envisioning Information.* Graphics Press, 1990. *The Visual Display of Quantitative Information.* Graphics Press, 1983.
