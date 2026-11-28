@@ -656,6 +656,12 @@ def main():
 
     # ---- outputs ---------------------------------------------------------------------------------------------
     nil = sorted(P, key=lambda p: -p['xnil'])[:400]
+    try:          # the draft board's DECT (cbb_tabs.py) needs xNIL / yNIL for every mock prospect, not only the top 400
+        MK = json.load(open(MOCK)); want = {(m['name'], m['school']) for m in MK['mocks']['pred'] + (MK.get('staying') or [])}
+    except (OSError, ValueError, KeyError):
+        want = set()
+    top = {(p['name'], p['team']) for p in nil}
+    nil_draft = [{'name': p['name'], 'team': p['team'], 'x': p['xnil'], 'y': p['ynil']} for p in P if (p['name'], p['team']) in want - top]
     nil_rows = [{'name': p['name'], 'team': p['team'], 'logo': p.get('logo'), 'conf': p.get('conf'), 'pos': p['pos'], 'cls': p.get('cls'), 'fv': p.get('fv'),
                  'x': p['xnil'], 'y': p['ynil'], 'z': p['znil'], 'on3': p['on3'], 'mkt': p['mkt'], 'tp': round(p['pMove'], 3), 'back': round(p['pBack'], 3)} for p in nil]
     teams_nil = sorted([{'team': t, 'logo': power[t].get('logo'), 'conf': power[t].get('conf'), **{k: v for k, v in d.items() if k != 'g'}, 'g': round(d['g'], 3)}
@@ -665,7 +671,7 @@ def main():
                  'bpm': p.get('xbpm'), 'tp': round(p['pMove'], 3), 'back': round(p['pBack'], 3), 'gone': round(p['pGone'], 3), 'x': p['xnil']} for p in tp_rows]
     # ---- transfer + coaching watch (the portal and coaching jobs tabs in season) ---------------------------------
     write_watch(G.get('asof'), season, P, pool, land, power, jl, dest, CO, fit)
-    out = {'asof': G.get('asof'), 'season': season, 'nilFit': nilfit, 'nil': nil_rows, 'teamsNil': teams_nil, 'staff': staff, 'jobs': jl,
+    out = {'asof': G.get('asof'), 'season': season, 'nilFit': nilfit, 'nil': nil_rows, 'nilDraft': nil_draft, 'teamsNil': teams_nil, 'staff': staff, 'jobs': jl,
            'transfer': transfer, 'tests': {k: fit[k]['test'] for k in ('move', 'land', 'vacancy', 'hires')}, 'value': {k: fit['value'][k] for k in ('feats', 'n', 'looR2', 'looRmse')},
            'eOpen': round(sum(x['open'] for x in jl), 1)}
     with open(OUT, 'w') as h:
