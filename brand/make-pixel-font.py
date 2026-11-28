@@ -10,8 +10,9 @@ Input : brand/fonts/msgothic.ttc  (copy from C:\\Windows\\Fonts; not committed)
 Output: static/fonts/mspgothic-pixel.woff2 (MS PGothic face, proportional Latin: the site font)
         FACE=0 python3 brand/make-pixel-font.py -> static/fonts/msgothic-pixel.woff2 (monospaced MS Gothic)
 Run   : python3 brand/make-pixel-font.py   (needs: pip install fonttools brotli)
+        python3 brand/make-pixel-font.py --tighten   (applies TIGHT to the committed woff2, no msgothic.ttc needed)
 """
-import os, pathlib
+import os, pathlib, sys
 from fontTools.ttLib import TTCollection
 from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.ttGlyphPen import TTGlyphPen
@@ -28,6 +29,25 @@ FAMILY = 'MS Gothic Pixel' if FACE == 0 else 'MS PGothic Pixel'
 RANGES = [(0x20, 0x7E), (0xA0, 0xFF), (0x100, 0x17F), (0x2010, 0x2027), (0x2030, 0x203A), (0x2044, 0x2044),
           (0x20AC, 0x20AC), (0x2122, 0x2122), (0x2190, 0x2199), (0x2212, 0x2212), (0x221E, 0x221E),
           (0x2260, 0x2265), (0x25A0, 0x25A1), (0x25B2, 0x25B3), (0x25CB, 0x25CF), (0x2605, 0x2606), (0x266A, 0x266B)]
+
+# Advances in pixels that replace the strike's. MS PGothic's strike gives the curly quotes, primes, the en dash,
+# the ellipsis and a few signs a full or half em of advance with the ink at the left edge, so "It’s" reads
+# "It’ s"; m has 3 blank columns. Each gets its ink plus the 1-2 px gap the letters around it have.
+TIGHT = {0x2018: 3, 0x2019: 3, 0x201A: 3, 0x201C: 7, 0x201D: 7, 0x201E: 7, 0x2032: 3, 0x2033: 7,
+         0x2013: 6, 0x2025: 12, 0x2026: 14, 0x60: 6, 0xB4: 5, 0xB0: 6, 0xA7: 8, 0xD7: 11, 0xF7: 12, 0xB1: 11,
+         0x6D: 11}
+
+def tighten(font):
+    cm, hm = font.getBestCmap(), font['hmtx']
+    for cp, px in TIGHT.items():
+        g = cm.get(cp)
+        if g:
+            hm[g] = (px * PX, hm[g][1])
+
+if '--tighten' in sys.argv:
+    from fontTools.ttLib import TTFont
+    font = TTFont(str(OUT)); tighten(font); font.flavor = 'woff2'; font.save(str(OUT))
+    print(f'{OUT.relative_to(ROOT)}: {len(TIGHT)} advances set'); sys.exit()
 
 src = TTCollection(str(SRC)).fonts[FACE]
 cmap = src.getBestCmap()
@@ -108,6 +128,7 @@ fb.setupOS2(sTypoAscender=asc * PX, sTypoDescender=desc * PX, sTypoLineGap=0,
             xAvgCharWidth=8 * PX, achVendID='ARKN')
 fb.setupPost()
 fb.font['head'].flags |= 0x0008  # integer scaling
+tighten(fb.font)
 fb.font.flavor = 'woff2'
 OUT.parent.mkdir(parents=True, exist_ok=True)
 fb.save(str(OUT))
