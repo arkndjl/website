@@ -503,9 +503,8 @@ def nfl():
         xa = json.load(open(os.path.join(ROOT, 'static', 'data', 'xaav-nfl.json')))['players']
     except OSError:
         xa = []
-    X = defaultdict(list)
-    for p in xa:
-        X[NM.key(p['n'])].append(p)
+    XT = {'LA': 'LAR', 'WAS': 'WSH'}             # the board's team codes where they differ from the ones here
+    X = NM.Matcher([dict(p, tm=XT.get(p['tm'], p['tm'])) for p in xa], name='n', team='tm', pos='pos', team_eq=lambda a, b: a == b)
     y0 = L['season']
     players = []
     for r in by.values():
@@ -530,8 +529,7 @@ def nfl():
         paid = len({x['year'] for x in sh if x['year'].isdigit() and int(x['year']) <= y0 and (x['cap_number'] or 0) > 0})
         fa = thru == y0
         pos = OTC_POS.get(r['position'], r['position'])
-        c = [p for p in X.get(NM.key(r['player']), []) if p['tm'] == tm] or [p for p in X.get(NM.key(r['player']), []) if p.get('pos') == pos]
-        q = c[0] if len(c) == 1 else {}
+        q = X.find(r['player'], tm, pos)[0] or {}      # a nickname (Matt / Matthew Stafford) only on his own team
         age = None
         if r.get('date_of_birth'):
             try:
