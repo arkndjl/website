@@ -1,9 +1,10 @@
 {
 "asof":"2026-11-28",
-"n":92,
+"n":95,
 "count":{
 "watching":1,
-"waiting":91
+"waiting":91,
+"shipped":3
 },
 "next":[
 "understat_return",
@@ -464,7 +465,14 @@
 "gate":"verdicts.py 'market': agedp beats carry and last, paired t >= 2 and most seasons",
 "due":"2027-03-16",
 "est":0,
-"state":"waiting"
+"result":{
+"d":"2026-11-28",
+"v":"s",
+"e":"replacement line by position: NFL right calls .551 to .613 (t 5.38, by position t 2.37), NBA .648 to .679 (t 2.82, pooled line)",
+"tt":5.38,
+"pr":1398
+},
+"state":"shipped"
 },
 {
 "key":"cbb_vorx_level",
@@ -1101,6 +1109,40 @@
 "state":"waiting"
 },
 {
+"key":"builder_verdict_nba_market",
+"t":"Pro team builder: NBA replacement line fit only on deals that came with a new team (the market a team can buy) in place of every new deal",
+"sp":[
+"NBA"
+],
+"ar":"teams",
+"kind":"retest",
+"how":"hand",
+"was":"Nov 28: right calls .668 against .652 carrying the season forward, t 1.38, 4 of 6 seasons (passed NFL t 3.18, NHL t 2.69)",
+"trigger":"the 2026-27 season in the NBA payroll panel",
+"gate":"replace.py LINE=moved: agedp beats carry, paired t >= 2 and most seasons",
+"due":"2027-07-20",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"builder_future_score",
+"t":"Pro team builder: future score (age curve times stay rate on every player, summed) against win share over the next three seasons",
+"sp":[
+"NBA",
+"NHL",
+"NFL"
+],
+"ar":"teams",
+"kind":"retest",
+"how":"hand",
+"was":"Nov 28: failed all three against last season's record (NBA t -1.58, NHL t 3.47, NFL t 3.68); stay rate by pay tier failed too",
+"trigger":"one more full season in each payroll panel, and a pick and cap room history if one is built",
+"gate":"future.py: roster or roster+ beats now and carry on absolute error, paired t <= -2 and most seasons",
+"due":"2027-07-20",
+"est":1,
+"state":"waiting"
+},
+{
 "key":"builder_verdict_nba_projection",
 "t":"Pro team builder: the priced projection (value on the age curve read with the deal's price) as the NBA verdict read in place of the one-season Surplus",
 "sp":[
@@ -1114,7 +1156,14 @@
 "gate":"scripts/research/pro_builder_nov28/verdicts.py: agedp beats carry and last on right calls, paired t >= 2 and most seasons",
 "due":"2027-07-20",
 "est":1,
-"state":"waiting"
+"result":{
+"d":"2026-11-28",
+"v":"s",
+"e":"superseded: verdicts against the replacement line at his position, right calls .648 to .679 against carry",
+"tt":2.82,
+"pr":1398
+},
+"state":"shipped"
 },
 {
 "key":"payroll_wins_over_pay",
@@ -1150,6 +1199,29 @@
 "due":"2027-07-20",
 "est":1,
 "state":"waiting"
+},
+{
+"key":"builder_verdict_nhl_replacement",
+"t":"Pro team builder: NHL verdicts against the replacement line at his position (F / D / G) in place of the priced projection against his pay",
+"sp":[
+"NHL"
+],
+"ar":"teams",
+"kind":"retest",
+"how":"hand",
+"was":"Nov 28: right calls .616 against .599 carrying the season forward, t 1.88, 5 of 8 seasons (passed NFL t 5.38, NBA t 2.82)",
+"trigger":"the 2026-27 season in the NHL payroll panel",
+"gate":"replace.py: agedp beats carry, paired t >= 2 and most seasons",
+"due":"2027-07-23",
+"est":1,
+"result":{
+"d":"2026-11-28",
+"v":"s",
+"e":"line on deals with a new team: right calls .599 to .622 against carry, by position t 2.29",
+"tt":2.69,
+"pr":1398
+},
+"state":"shipped"
 },
 {
 "key":"recruit_pos_fv_cbb",
