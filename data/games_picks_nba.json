@@ -1,9 +1,9 @@
 {
  "sport": "nba",
  "name": "NBA",
- "asof": "2026-11-28T04:25:02Z",
+ "asof": "2026-11-28T04:28:17Z",
  "recenter": {
-  "2026-11-28": 1.43
+  "2026-11-28": 1.44
  },
  "monitor": {
   "clocks": {
@@ -328,7 +328,7 @@
  },
  "model": {
   "asof": "2026-11-28T04:13:03Z",
-  "ageH": 0.2,
+  "ageH": 0.3,
   "stale": false
  },
  "picks": [],
@@ -342,14 +342,14 @@
    "home": "HOU",
    "away": "PHI",
    "mk": "spread",
-   "side": "home",
-   "line": -7.5,
-   "price": -9900.0,
-   "edge": 16.6,
+   "side": "away",
+   "line": 12.5,
+   "price": -142.0,
+   "edge": 3.4,
    "x": 5.0,
-   "why": "gap too big: a bad line",
+   "why": "edge under 5 (role: dog)",
    "m": 9.1,
-   "tm": 225.8
+   "tm": 224.4
   },
   {
    "id": "401910048",
@@ -467,10 +467,10 @@
   },
   "401910050": {
    "mk": "spread",
-   "side": "home",
-   "line": -7.5,
-   "price": -9900.0,
-   "edge": 16.6,
+   "side": "away",
+   "line": 12.5,
+   "price": -142.0,
+   "edge": 3.4,
    "ev": null,
    "units": 0.0,
    "home": "HOU",
@@ -530,7 +530,7 @@
  },
  "timing": {
   "minEdge": 2,
-  "snapshots": 6159,
+  "snapshots": 6160,
   "buckets": [
    {
     "when": "24h+",
@@ -543,11 +543,11 @@
    },
    {
     "when": "6-24h",
-    "clvN": 1362,
-    "clvRet": -0.0135,
-    "clvT": -4.17,
-    "clv": 0.51,
-    "beat": 0.479,
+    "clvN": 1363,
+    "clvRet": -0.0129,
+    "clvT": -3.92,
+    "clv": 0.53,
+    "beat": 0.48,
     "still": 0.371
    },
    {
@@ -7205,7 +7205,7 @@
    "beat": 1
   }
  ],
- "checked": "2026-11-28T04:25:02Z",
+ "checked": "2026-11-28T04:28:17Z",
  "nightCap": {
   "cap": 40.0,
   "nights": {}
