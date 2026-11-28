@@ -222,3 +222,13 @@
 - A new hard-coded season constant goes in its sport's `bumps` (auto 0 when it needs a refit or new ids first). A
   year-named file a workflow commits uses a glob. Weekly post day = calendar `post` (rank_moves.py, fetch_cfb.mjs).
 - Dates a league hasn't published carry `est: 1`; replace them when announced (NBA Finals/draft, NHL playoffs, ESEA S60...).
+
+## Article views and favorites
+
+- Every post shows its views and a platinum pixel star with its favorite count in the post meta line (article page, home and
+  /posts/): `layouts/partials/poststats.html` + `assets/js/poststats.js`, counted by the site Worker (`/api/posts`, Durable
+  Object `PostStats` in `worker/site.js`). A view is one a visitor (hashed IP + user agent, salted per day) per article per day,
+  bots and other origins skipped. A favorite is one per browser (random id in local storage) and can be taken back; per IP a day,
+  5 favorites of one article and 40 clicks in all. No setup: a new post gets both by itself.
+- `scripts/post_stats.py` (site-stats.yml, every 6 hours) samples the counts into `data/post_stats.json`; `scripts/milestones.py`
+  reads it for the article milestones in ARKLOG.
