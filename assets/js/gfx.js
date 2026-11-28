@@ -4426,24 +4426,15 @@
   }
   setTimeout(rqFromHash, 60); window.addEventListener('hashchange', rqFromHash);
 
-  function preview(canvas, name, text) {
+  function preview(canvas, name) {
     var url = canvas.toDataURL('image/png');
     var box = document.createElement('div'); box.className = 'gfx'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', 'graphic preview');
     box.innerHTML = '<div class="win gfx__win"><div class="win__title"><span class="win__title-text">gfx.exe<span class="win__cursor">_</span></span>' +
       '<button type="button" class="gfx__x" aria-label="close">×</button></div><div class="gfx__body"><img alt="graphic preview"></div>' +
       '<div class="gfx__bar"><a class="cfb__btn" download>save PNG</a><button type="button" class="cfb__btn" data-copy hidden>copy</button><button type="button" class="cfb__btn" data-share hidden>share</button>' +
       '<button type="button" class="cfb__btn" data-close>close</button></div>' +
-      (text != null ? '<div class="gfx__post"><textarea readonly rows="6" aria-label="post text"></textarea><div class="gfx__bar"><span class="gfx__n"></span><button type="button" class="cfb__btn" data-copytext>copy text</button></div></div>' : '') + '</div>';
+      '</div>';
     box.querySelector('img').src = url;
-    if (text != null) {   // the post for X, with its length as X counts it (a link is 23)
-      var ta = box.querySelector('.gfx__post textarea'), ct = box.querySelector('[data-copytext]'); ta.value = text;
-      box.querySelector('.gfx__n').textContent = text.replace(/https?:\/\/\S+/g, new Array(24).join('x')).length + ' / 280';
-      ct.addEventListener('click', function () {
-        var done = function () { ct.textContent = 'copied'; setTimeout(function () { ct.textContent = 'copy text'; }, 1600); };
-        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, function () { ta.select(); document.execCommand('copy'); done(); });
-        else { ta.select(); document.execCommand('copy'); done(); }
-      });
-    }
     var a = box.querySelector('a'); a.href = url; a.download = name + '.png';
     // a card with moving parts (5-star+ stars) shows the canvas itself, stepped a few times a second; the saved,
     // copied and shared picture is the still frame
@@ -4875,7 +4866,7 @@
 
   // ---- articleGFX (layouts/_default/single.html): an article as a 16:9 card, the title, Noah's own sentences from the
   // article (front matter gfx.quote, checked verbatim by scripts/article_gfx.py; default the first sentence), and the
-  // article's own figures (its images and postcharts, in order, up to four), with post text for X under the preview ----
+  // article's own figures (its images and postcharts, in order, up to four) ----
   var FONTDATA = null;
   function fontData() {   // the site face as a data URI, so a chart's SVG drawn as an image keeps the one font
     return FONTDATA || (FONTDATA = fetch('{{ "fonts/mspgothic-pixel.woff2" | relURL }}?v=2').then(function (r) { return r.blob(); })
@@ -4920,19 +4911,11 @@
     return best;
   }
   function artData(btn) { try { return JSON.parse(btn.getAttribute('data-gfx-art') || '{}'); } catch (e) { return {}; } }
-  function artSentences(art) {   // the article's own text, for the default quote and post and for the verbatim check
+  function artSentences(art) {   // the article's own text, for the default lines and the verbatim check
     var ps = [].slice.call(art.querySelectorAll('.post-content p')).filter(function (p) { return !p.closest('figure, .table-of-contents'); });
     return ps.map(function (p) { return txt(p); }).filter(Boolean);
   }
   function firstSentence(t) { var m = /^.+?[.!?](?=\s+[A-Z"(]|$)/.exec(t); return m ? m[0] : t; }
-  function artText(btn) {   // the post for X: the front matter's lines, else the title and the first sentence; then the link
-    var d = artData(btn), art = btn.closest('article'), body = artSentences(art), all = body.join(' ');
-    var lines = (d.post || '').split(/\n\s*\n/).map(function (l) { return l.trim(); }).filter(function (l) { return l && (l === d.t || all.indexOf(l) >= 0); });
-    if (!lines.length) lines = [d.t, firstSentence(body[0] || '')].filter(Boolean);
-    var url = d.u || location.href, X = function (ls) { return ls.join('\n\n').length + 2 + 23; };   // X counts any link as 23
-    while (lines.length > 1 && X(lines) > 280) lines.pop();
-    return lines.join('\n\n') + '\n\n' + url;
-  }
   async function buildArticle(btn) {
     var d = artData(btn), art = btn.closest('article'); if (!art || !d.t) return null;
     var body = artSentences(art), all = body.join(' ');
@@ -5013,7 +4996,7 @@
     var btn = e.target.closest('[data-gfx]'); if (!btn) return;
     if (btn.getAttribute('data-gfx-mode') === 'article') {
       btn.disabled = true; var al = btn.textContent; btn.textContent = '…';
-      try { var arc = await buildArticle(btn); if (arc) preview(arc, 'arkndjl-' + (artData(btn).n || 'article'), artText(btn)); }
+      try { var arc = await buildArticle(btn); if (arc) preview(arc, 'arkndjl-' + (artData(btn).n || 'article')); }
       catch (err) { console.error('gfx article', err); } finally { btn.disabled = false; btn.textContent = al; }
       return;
     }

@@ -24,9 +24,6 @@ keys = [
   "skin in the game, sports betting, gambling, non-predatory",
   "December 1st, ARKLOG, eephus.io, playslugger.com, ST. CLAIRE, 1NT, LAURSEN_111, Your Team Should Tank",
 ]
-post = """PROCESS #0: My Design Philosophy, Anti-Minimalism, and the Beauty of Friction
-
-Friction is a big part of life, and my designs are made to have friction because friction is a form of expression and personality."""
 +++
 
 Everything on this site is designed the way it is on purpose, including the windows with .exe titles, the pixel font, the purple and teal palette, the square corners, and the tables that are wider than your screen. All of it comes from everything I loved about design growing up in the 2000s, and from my belief that the homogenization of modern design has made most of the internet worse than it used to be.
