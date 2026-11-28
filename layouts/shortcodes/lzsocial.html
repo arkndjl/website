@@ -1,6 +1,6 @@
 {{- /* social_data.exe: LAURSEN_111's Twitch / YouTube / TikTok / X followers over time (data/laursen_socials.json,
        scripts/laursen_socials.mjs in esea.yml). {{< lzsocial class="desk__wide" >}}
-       Another account: src = data file, nets = which networks in order, name = GFX title, icon = title icon
+       Another account: src = data file, nets = which networks in order, name = GFX title, icon = title icon, exe = window title
        (about/contact: {{< lzsocial src="arkndjl_socials" nets="x,youtube" name="ARKNDJL" icon="icon-twitter" >}}, scripts/arkndjl_socials.mjs). */ -}}
 {{- $src := .Get "src" | default "laursen_socials" }}{{ $s := index site.Data $src -}}
 {{- $want := split (.Get "nets" | default "twitch,youtube,tiktok,x,ig,tth,igl,igv") "," }}{{ $who := .Get "name" | default "LAURSEN_111" -}}
@@ -8,7 +8,7 @@
 {{- $syncd := "" }}{{ with $s }}{{ with .asof }}{{ $syncd = (time.In "America/New_York" (time .)).Format "Jan 2 · 3:04 PM ET" }}{{ end }}{{ end -}}
 <div class="win lzf lzsoc{{ with .Get "class" }} {{ . }}{{ end }}">
   <div class="win__title">
-    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#{{ .Get "icon" | default "icon-twitch" }}"/></svg>social_data.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+    <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#{{ .Get "icon" | default "icon-twitch" }}"/></svg>{{ .Get "exe" | default "social_data.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   {{- with $s.series }}{{ $tr := . }}
@@ -76,6 +76,6 @@
   {{- else }}
   <p class="esea__empty-line">no social data yet.</p>
   {{- end }}
-  <div class="win__status"><span title="{{ if eq $src "laursen_socials" }}Twitch via decapi.me; YouTube and TikTok from the public profile pages; X via api.fxtwitter.com; Instagram via the Instagram API{{ else }}X via api.fxtwitter.com; YouTube from the channel page{{ end }}. Goals: daily gain ~ Gamma (prior = lifetime pace worth 30 days, updated by tracked gains), gain over t days negative binomial; dated goals = median count, % = chance of reaching it">{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
+  <div class="win__status"><span title="{{ if eq $src "laursen_socials" }}Twitch via decapi.me; YouTube and TikTok from the public profile pages; X via api.fxtwitter.com; Instagram via the Instagram API{{ else if in $want "x" }}X via api.fxtwitter.com; YouTube from the channel page{{ else }}YouTube from the channel page{{ end }}. Goals: daily gain ~ Gamma (prior = lifetime pace worth 30 days, updated by tracked gains), gain over t days negative binomial; dated goals = median count, % = chance of reaching it">{{ with $syncd }}synced {{ . }}{{ else }}not synced{{ end }}</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
 </div>
 {{ partial "gfx.html" . }}
