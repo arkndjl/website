@@ -225,9 +225,9 @@
     var cls2 = (T.cls2 || []), c2y = cls2.map(function (c) { return c.yr; }).filter(function (y, i, a) { return a.indexOf(y) === i; });
     cls += c2y.map(function (y) { var L = cls2.filter(function (c) { return c.yr === y; }); return tbl(y + ' class', [['Player'], ['Pos'], ['FV', 'projected FV (the recruit model)'], ['Y1 FV', 'FV if on the field, year 1'], ['ARK', 'ARK stars'], ['xNIL']],
       L.map(function (c) { return '<tr><td>' + esc(c.name) + (c.rk ? ' <span class="cfb__dim">No. ' + c.rk + '</span>' : '') + '</td><td>' + esc(c.pos || '') + '</td><td class="tbx__grp">' + fvc(c.fv) + '</td><td class="cfb__num">' + (c.y1 == null ? '—' : Math.round(c.y1)) + '</td><td>' + stars(c.ark) + '</td><td class="cfb__num tbx__grp tbx__grp--nil">' + (c.x ? money(c.x) : '—') + '</td></tr>'; }), ''); }).join('');
-    var full = '<section class="tb__panel"><h4>full depth</h4><div data-tby-depth></div></section>', ros = '<section class="tb__panel"><h4>roster by season</h4><div data-tby-ros></div></section>';
+    var full = '<section class="tb__panel"><h4>full depth chart</h4><div data-tby-depth></div></section>', ros = '<section class="tb__panel"><h4>roster by season</h4><div data-tby-ros></div></section>';
     body.__tbyKey = String(T.tid);
-    body.innerHTML = head + scoreboard(T, D) + chart + tabs('cfb', [['depth', null, depth + full], ['roster', null, ros], ['portal', nIn, plan + board], ['leaving', nOut, leaving + walk + priced], ['class', (T.cls || []).length + cls2.length || null, cls], ['targets', nPot || null, targets], ['keep', T.keep.length, keep], ['moves', (T.moves || []).length || null, moves]]);
+    body.innerHTML = head + scoreboard(T, D) + chart + tabs('cfb', [['depth', null, full + depth], ['roster', null, ros], ['portal', nIn, plan + board], ['leaving', nOut, leaving + walk + priced], ['class', (T.cls || []).length + cls2.length || null, cls], ['targets', nPot || null, targets], ['keep', T.keep.length, keep], ['moves', (T.moves || []).length || null, moves]]);
     if (window.__tbYears) window.__tbYears.fill(body, 'cfb', body.closest('[data-tb-ros]').getAttribute('data-tb-ros'), String(T.tid), D.next);
   }
 
