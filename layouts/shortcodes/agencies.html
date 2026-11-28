@@ -44,7 +44,7 @@
 <script type="application/json" id="agency-data-{{ $sp }}">{{ dict "sport" $sp "fit" $fit "agencies" $rows "clients" .clients "date" $date | jsonify | safeJS }}</script>
 <table class="cfb__table agency">
   <thead><tr><th>RK</th><th>Agency</th>
-    <th title="Agency+ = 100 + 25 x (c - mean agency c) / SD, c = the mean of the z-scored parts{{ with $pl.agencyP }} ({{ delimit .parts ", " }}){{ end }}. Deal and breakout parts are clients x the shrunk edge, n x sum(v - mu) / (n + k), so an edge counts for more over more players; sent = first-round picks the agency had before the draft process">Agency+</th>
+    <th title="Agency+ = 100 + 25 x (c - mean agency c) / SD, c = the mean of the z-scored parts{{ with $pl.agencyP }} ({{ delimit .parts ", " }}){{ end }}. Deal and breakout parts are the shrunk edge, sum(v - mu) / (n + k), times the clients when it is above zero, so an edge counts for more over more players and a low one is not multiplied; sent = first-round picks the agency had before the draft process">Agency+</th>
     {{- with $pl.dealP }}<th title="Deal+ = 100 + 25 x (s - mean agency s) / SD, s = (sum + k x mean) / (n + k) of each college client's -zNIL / the sport's zNIL SD, k = {{ .k }}. Above 100 the agency gets its clients paid more than they are worth">Deal+</th>{{ end }}
     {{- with $pl.breakoutP }}<th title="Breakout+ = 100 + 25 x (s - mean agency s) / SD, s = (sum + k x mean) / (n + k) of each college client's FV - the mean FV of board players with his ARK stars and class, k = {{ .k }}. Above 100 its clients play above their high school grade">Breakout+</th>{{ end }}
     <th title="represented players and recruits">Clients</th><th title="college players / recruits">Col / Rec</th>
