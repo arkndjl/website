@@ -96,6 +96,13 @@ def check_terms():
         return [f'terms: data/terms.json unreadable ({e})']
 
 
+def check_article_gfx():
+    """articleGFX front matter: quotes and post text must be the article's own words (scripts/article_gfx.py)"""
+    sys.path.insert(0, os.path.join(ROOT, 'scripts'))
+    import article_gfx as ag
+    return ag.problems()
+
+
 def check_fv_scale(tol=0.25, warn_only=('hockey', 'soccer')):   # soccer: stretch held at the earlier fit (8-season tail)
     """stored K/T against a fresh fit from the tables on disk; returns (errors, warnings)"""
     sys.path.insert(0, os.path.join(ROOT, 'scripts'))
@@ -207,7 +214,7 @@ def check_hugo():
 
 if __name__ == '__main__':
     errs, n = check_json()
-    e2, warns = check_sizes(); errs += e2 + check_pairs() + check_cbb_mean() + check_awards()
+    e2, warns = check_sizes(); errs += e2 + check_pairs() + check_cbb_mean() + check_awards() + check_article_gfx()
     e3, w3 = check_fv_scale(); errs += e3; warns += w3
     e4, w4 = check_1nt_sync(); errs += e4; warns += w4
     warns += check_terms() + check_boards()

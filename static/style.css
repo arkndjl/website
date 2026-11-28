@@ -5477,3 +5477,9 @@ td.tbx__p { color: #7fffd4; font-weight: bold; }
 /* Process > ARKLOG > traffic > articles.exe (layouts/shortcodes/articlestats.html) */
 .astat td.astat__t { white-space: normal; min-width: 18ch; max-width: 36ch; }
 .astat td.astat__tags { white-space: normal; max-width: 22ch; color: color-mix(in srgb, var(--foreground) 70%, transparent); }
+/* articleGFX: the button in the post meta, the post text under the preview */
+.post-meta .pst__gfx { margin-left: 10px; vertical-align: middle; }
+.gfx__post { margin: 10px 12px 0; }
+.gfx__post textarea { display: block; box-sizing: border-box; width: 100%; resize: vertical; font: inherit; color: var(--foreground); background: var(--win-well); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); border-radius: 0; padding: 6px 8px; }
+.gfx__post .gfx__bar { padding: 8px 0 0; align-items: center; }
+.gfx__n { margin-right: auto; color: var(--accent); }
