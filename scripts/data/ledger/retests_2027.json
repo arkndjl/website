@@ -118,6 +118,30 @@
      "gate": "passed Nov 26 (t 6.45, 12/13 classes); build when next season's transfers exist (portal window, spring 2027)"
     }
    ]
+  },
+  {
+   "key": "agency_pipeline",
+   "registered": "2026-11-28",
+   "prereg": "scripts/research/agency_pipeline_nov28/landing.py (docstring)",
+   "trigger": "after the January 2027 CFB portal window, once data/cfb_portal.json holds the 2027 cycle (~May 2027)",
+   "harness": "python3 scripts/research/agency_pipeline_nov28/landing.py --score (frozen ledger scripts/data/ledger/agency_pipeline_2027.json)",
+   "tests": [
+    {
+     "key": "cfb_landing_agency_pipe",
+     "form": "log(1 + agency's other clients at the school before the window) on the landing baseline, frozen coefficient .319",
+     "gate": "mean log-likelihood gain > 0 with t >= 2"
+    },
+    {
+     "key": "cbb_landing_agency_pipe",
+     "form": "same, CBB",
+     "gate": "same, only if 20+ client movers"
+    },
+    {
+     "key": "recruit_lean_agency_pipe",
+     "form": "same feature on the ARK lean, recruits whose agency is dated before commitment",
+     "gate": "same, only if 30+ such recruits"
+    }
+   ]
   }
  ]
 }
