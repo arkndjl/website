@@ -1,6 +1,6 @@
 name = "website"
 compatibility_date = "2026-02-14"
-# Worker code runs only for /api/* (the ST. CLAIRE play counter); every other path is plain static assets.
+# Worker code runs only for /api/* (play counter, article views and favorites, Ko-fi, photos); every other path is plain static assets.
 main = "worker/site.js"
 
 [assets]
@@ -27,6 +27,15 @@ class_name = "Supporters"
 [[migrations]]
 tag = "v2-supporters"
 new_sqlite_classes = ["Supporters"]
+
+# Article views and favorites (worker/site.js PostStats, /api/posts).
+[[durable_objects.bindings]]
+name = "POSTS"
+class_name = "PostStats"
+
+[[migrations]]
+tag = "v3-posts"
+new_sqlite_classes = ["PostStats"]
 
 # Every 30 minutes, dispatch the feed workflows (worker/site.js scheduled); GitHub's own cron skips runs under load.
 [triggers]

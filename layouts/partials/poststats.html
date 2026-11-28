@@ -1,0 +1,8 @@
+{{- /* An article's views and favorites (worker/site.js /api/posts; drawn by assets/js/poststats.js), inside .post-meta.
+       Context: dict "p" (the post) "count" (true on the article itself: this visit counts as a view). Hidden until the
+       counts load, so a page with the Worker down shows nothing. */ -}}
+{{- with .p -}}{{- if eq .Type "posts" -}}
+{{- $slug := path.Base (strings.TrimSuffix "/" .RelPermalink) -}}
+<span class="pst" data-post="{{ $slug }}"{{ if $.count }} data-count="1"{{ end }} hidden><span class="pst__v"><b>0</b> <span>views</span></span><button type="button" class="pst__fav" aria-pressed="false" title="favorite"><span class="pst__s" aria-hidden="true"><i></i></span><b>0</b></button></span>
+{{- partial "js.html" "poststats" -}}
+{{- end -}}{{- end -}}
