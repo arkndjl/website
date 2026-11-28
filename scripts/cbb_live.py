@@ -38,6 +38,7 @@ PRIOR = os.path.join(D.HERE, 'cbb_prior.json.gz')   # outside data/: Hugo would 
 LIVE_FIT = os.path.join(D.ROOT, 'data', 'cbb_live_fit.json')
 DOB_FILE = os.path.join(D.ROOT, 'data', 'cbb_dob.json')
 BT_DOB = os.path.join(D.HERE, 'data', 'cbb_bt_dob.json')
+BT_LINES = os.path.join(D.HERE, 'data', 'cbb_bt_lines.json')   # each player's last row read from Barttorvik's season file (line_of)
 
 
 def dob_lookup():
@@ -317,6 +318,44 @@ def merge_ids(by_p, board):
     return n
 
 
+SNAP_COLS = ['team', 'conf', 'role', 'yr', 'gp'] + RECON
+
+
+def usable(o, team, a):
+    """his file's row can anchor the line: at his team, with every rebuilt number, and no more than a game past the logs"""
+    return bool(o and o.get('gp') and o['team'] == team and all(o.get(k) is not None for k in RECON) and o['gp'] <= a['gp'] + 1)
+
+
+def line_of(rs, a, o, team, dates, recon):
+    """his season line to date, from one source every run: the line rebuilt from his games (BPM, PORPAG and ORtg by
+    scripts/cbb_live_backtest.py's regression, the rest summed), with each rebuilt number moved onto Barttorvik's own
+    by what his file says over the games it covers: his file's number plus the change the games since add to the rebuilt
+    line (none when his file covers every game). o is his file's row, or the last one a run read (BT_LINES): runners
+    often get a page instead of the file. The rebuilt line alone while he has no row at his team with these numbers
+    (early on his file leaves BPM blank), or when his file has more than one game over the logs (before the opener it
+    still holds last season's lines).
+    Taking his file when it was within a game and the rebuilt line otherwise flipped grades between runs (Ethan Brown,
+    Illinois: BPM 12.6 in his file, 16.6 rebuilt, FV 40 / 43 / 45). scripts/research/cbb_live_nov28 (source.py: his
+    conference-only file as a part-season file, 2009-10 to 2025-26): grade RMSE against his full-season line .301
+    rebuilt, .242 this way (t -2.06, 14/17 seasons)."""
+    meta = {'team': team, 'conf': o['conf'] if o else None, 'role': o['role'] if o else None}
+    ln = line(a, recon, meta)
+    if not usable(o, team, a):
+        return ln
+    m = int(o['gp'])
+    if m < a['gp']:
+        sub, k = [], 0      # the games his file covers: the first m he played in (it lags the logs, it skips none)
+        for g in rs:
+            if k >= m: break
+            sub.append(g); k += (g[C['min']] or 0) > 0
+        cut = sub[-1][C['date']]
+        ls = line(summed(sub, sum(1 for d, _ in dates if d <= cut) or 1), recon, meta)
+        for k in RECON: ln[k] += o[k] - ls[k]
+    else:
+        for k in RECON: ln[k] = o[k]
+    return ln
+
+
 def season_to_date(prior):
     """Barttorvik's 2026-27 lines and game logs. Returns {pid: line}, {(name key, team): pid}, {team: games played}.
     Only players with a game this season count: before the opener the 2026-27 file still carries last season's lines."""
@@ -347,7 +386,11 @@ def season_to_date(prior):
     merge_ids(by_p, {str(m['pid']) for m in prior.get('careers', []) if m.get('pid')})
     tg = {t: len(v) for t, v in team_dates.items()}
     last = max((g[C['date']] for g in games), default=None)
-    official = {r['pid']: r for r in D.load_bt(SEASON)} if os.path.exists(adv) else {}
+    official = {r['pid']: r for r in D.load_bt(SEASON)} if os.path.exists(adv) and os.path.getsize(adv) > 1000 else {}
+    try:
+        snap = json.load(open(BT_LINES))
+        snap = snap['rows'] if snap.get('season') == SEASON else {}
+    except (OSError, ValueError, KeyError): snap = {}
     recon = json.load(open(LIVE_FIT))['recon']
     lines, keys = {}, {}
     for pid, rs in by_p.items():
@@ -356,13 +399,11 @@ def season_to_date(prior):
         a = summed(rs, tg.get(team, 1))
         if a['mp'] * a['gp'] <= 0: continue
         o = official.get(pid)
-        # Barttorvik's own line when it covers the same games (his two files update at their own times); else the
-        # line rebuilt from the games (scripts/cbb_live_backtest.py's regression for BPM, PORPAG and ORtg); early in the
-        # season his file leaves BPM blank, so the rebuilt line stands in until it fills
-        if o and o['gp'] and abs(o['gp'] - a['gp']) <= 1 and o['team'] == team and o.get('bpm') is not None:
-            ln = {k: o.get(k) for k in KEEP}
-        else:
-            ln = line(a, recon, {'team': team, 'conf': o['conf'] if o else None, 'role': o['role'] if o else None})
+        if usable(o, team, a):
+            snap[pid] = [o[c] for c in SNAP_COLS]
+        elif pid in snap and snap[pid][0] == team:
+            o = dict(zip(SNAP_COLS, snap[pid]))
+        ln = line_of(rs, a, o, team, team_dates.get(team, ()), recon)
         # his class this season: Barttorvik's file, else his game rows (ESPN-filled rows carry none). Never guessed here:
         # a missing class used to read as Fr downstream, which put transfers and seniors on the true freshmen tab
         yr = (o or {}).get('yr') or rs[-1][C['cls']]
@@ -372,6 +413,8 @@ def season_to_date(prior):
         ln['name'] = rs[-1][C['name']]
         lines[pid] = ln
         keys[(D.norm(rs[-1][C['name']]), team)] = pid
+    if official:
+        json.dump({'season': SEASON, 'cols': SNAP_COLS, 'rows': dict(sorted(snap.items()))}, open(BT_LINES, 'w'), separators=(',', ':'))
     return lines, keys, tg, last
 
 
