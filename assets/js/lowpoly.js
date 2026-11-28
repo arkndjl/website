@@ -126,7 +126,7 @@
     box3(-1.0, -0.92, -1.2, 1.2, -0.38, 0.38, 'm', out);
     return out;
   }
-  var MODELS = { favorites: star, teams: trophy, players: sphere, articles: book, songs: record, videos: screen, overview: ico, philosophy: gem, arklog: bars, metrics: sphere, models: torus, research: cone, data: disks };
+  var MODELS = { favs: star, teams: trophy, players: sphere, articles: book, songs: record, videos: screen, overview: ico, philosophy: gem, arklog: bars, metrics: sphere, models: torus, research: cone, data: disks };
   var cache = {};
   function model(k) { k = MODELS[k] ? k : 'overview'; return cache[k] || (cache[k] = MODELS[k]()); }
 
@@ -194,6 +194,7 @@
       last = t; group();
       var a = reduce ? 0.6 : (t - t0) / 1000 * 0.7;
       if (cur === 'arklog') a = 0.45 * Math.sin(a * 0.8);    // the bars sway in front so every verdict row shows
+      else if (/^(favs|players|articles|songs|videos|teams)$/.test(cur) && cur !== 'teams' && cur !== 'players') a = 0.75 * Math.sin(a * 0.9);   // flat models sway, face on
       draw(model(cur), a, cur === 'arklog' ? 0.32 : 0.38 + 0.12 * Math.sin(a * 0.6));
     }
     if (!reduce) requestAnimationFrame(frame); else setTimeout(function () { requestAnimationFrame(frame); }, 400);

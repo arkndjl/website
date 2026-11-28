@@ -79,7 +79,7 @@
   function paintBtn(b, on, name) {
     b.setAttribute('aria-pressed', on ? 'true' : 'false');
     b.classList.toggle('is-on', on);
-    b.title = on ? 'remove from your favorites' : 'add to your favorites';
+    b.title = on ? 'remove from your favs' : 'add to your favs';
     b.setAttribute('aria-label', (on ? 'remove ' : 'favorite ') + (name || ''));
   }
   api.paintBtn = paintBtn;
@@ -121,7 +121,7 @@
   function day(d) { var m = /^(\d{4})-(\d\d)-(\d\d)/.exec(d || ''); return m ? MON[+m[2] - 1] + ' ' + (+m[3]) : (d || ''); }
   function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
   function starBtn(attrs, on, name) {
-    return '<button type="button" class="favb' + (on ? ' is-on' : '') + '" ' + attrs + ' aria-pressed="' + on + '" title="' + (on ? 'remove from your favorites' : 'add to your favorites') + '" aria-label="' + (on ? 'remove ' : 'favorite ') + esc(name) + '"><i></i></button>';
+    return '<button type="button" class="favb' + (on ? ' is-on' : '') + '" ' + attrs + ' aria-pressed="' + on + '" title="' + (on ? 'remove from your favs' : 'add to your favs') + '" aria-label="' + (on ? 'remove ' : 'favorite ') + esc(name) + '"><i></i></button>';
   }
 
   function page(root) {
@@ -256,7 +256,7 @@
       });
       chips.querySelector('[data-g="all"] b').textContent = total;
       root.querySelector('[data-fv-none]').hidden = !!total;
-      var on = only === 'all' ? 'favorites' : only;
+      var on = only === 'all' ? 'favs' : only;
       if (lp) lp.setAttribute('data-lp-model', on);
     }
     // a star taken back stays on the page, unpressed, until the next visit: one more click puts it back

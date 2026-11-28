@@ -212,6 +212,8 @@ def svg(g):
 
 
 def main():
+    if '--symbol' in sys.argv:   # only the #icon-favorites body for layouts/partials/icons.html
+        print(svg(icon(True))); return
     with open(os.path.join(PX, 'hero-favorites.html'), 'w') as f:
         f.write(animated('hero-favorites', hero(), 8))
     for k, fn in GROUPS.items():
@@ -219,8 +221,6 @@ def main():
             f.write(animated(f'fav-{k}', fn(), 4).replace('class="px px--fav-', 'class="px px--fav px--fav-'))
     with open(os.path.join(ROOT, 'static', 'img', 'icons', 'favorites.svg'), 'w') as f:
         f.write('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">' + svg(icon()) + '</svg>')
-    if '--symbol' in sys.argv:   # the #icon-favorites body for layouts/partials/icons.html
-        print(svg(icon(True)))
     print(f'favorites art: hero + {len(GROUPS)} group sprites + icon')
 
 

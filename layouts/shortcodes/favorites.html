@@ -1,4 +1,4 @@
-{{- /* "your favorites" (/favorites/, content/favorites.md): favorites.exe with the hero sprite (scripts/favorites_art.py), a
+{{- /* "your favorites" (/favorites/, content/favorites.md): favs.exe with the hero sprite (scripts/favorites_art.py), a
        low-poly viewport (assets/js/lowpoly.js, data-lp-model follows the open group), the counts, the search that adds a
        team or player, the share code, then one window a group. Everything is kept in this browser (assets/js/favs.js):
        articles from the post star (ark-favs, assets/js/poststats.js), songs, videos, teams and players (ark-favx).
@@ -16,14 +16,14 @@
   <script type="application/json" data-fv-data>{{ dict "posts" $posts "songs" $songs "ver" $ver | jsonify | safeJS }}</script>
   <div class="win fv__head">
     <div class="win__title">
-      <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-favorites"/></svg>favorites.exe<span class="win__cursor" aria-hidden="true">_</span></span>
+      <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-favorites"/></svg>favs.exe<span class="win__cursor" aria-hidden="true">_</span></span>
       <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
     </div>
     <div class="fv__top">
       <div class="fv__px" aria-hidden="true">{{ partial "px/hero-favorites.html" . }}</div>
-      <div class="fv__lp" data-lowpoly data-lp-model="favorites">
+      <div class="fv__lp" data-lowpoly data-lp-model="favs">
         <canvas width="160" height="100" role="img" aria-label="low-poly render of the open group"></canvas>
-        <span class="fv__lplab" data-lp-label>favorites</span>
+        <span class="fv__lplab" data-lp-label>favs</span>
       </div>
       <dl class="fv__n" data-fv-counts>
         <div data-g="teams"><dt>teams</dt><dd>0</dd></div>
@@ -59,7 +59,7 @@
       <div class="win__status"><span data-gn>0</span><span class="win__blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
     </section>
     {{- end }}
-    <p class="fv__none" data-fv-none hidden>0 favorites</p>
+    <p class="fv__none" data-fv-none hidden>0 favs</p>
   </div>
 </div>
 {{- partial "js.html" "lowpoly" -}}

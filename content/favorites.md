@@ -1,5 +1,5 @@
 +++
-title = "your favorites"
+title = "your favs"
 url = "/favorites/"
 aliases = ["/favourites/", "/favs/"]
 draft = false
