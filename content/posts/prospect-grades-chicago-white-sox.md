@@ -5,6 +5,7 @@ date = "2026-01-19T17:54:48-06:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["mlb", "statistics", "arkboard"]
+form = "board"
 keywords = ["prospect", "mlb", "baseball", "2026", "breakout", "chicago"]
 description = "Analysis of the Chicago White Sox farm system and grading prospects based on an analysis of their future value."
 showFullContent = false

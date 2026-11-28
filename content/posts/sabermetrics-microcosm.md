@@ -4,6 +4,7 @@ date = "2026-04-29T13:00:42-06:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["sabermetrics", "statistics", "microcosm"]
+form = "essay"
 keywords = ["sabermetrics", "statistics"]
 description = "A brief summary on sabermetrics as a microcosm for the struggle of the disadvantaged to overcome resource deficits"
 showFullContent = false

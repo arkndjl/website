@@ -4,6 +4,7 @@ date = "2026-02-15T14:00:42-06:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["nba", "statistics", "arkboard"]
+form = "board"
 keywords = ["arkboard", "nba", "basketball", "statistics"]
 description = "The third iteration of my official NBA Big Board (\"ARKBOARD\") for 2026 draft prospects."
 showFullContent = false

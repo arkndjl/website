@@ -5,6 +5,7 @@ date = "2026-01-10T16:50:21-06:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["mlb", "statistics"]
+form = "research"
 keywords = ["prospect", "mlb", "baseball", "2026", "breakout"]
 description = "Theory and analysis of qualitative, quantitative, and mixed-methods indicators for identifying potential prospect breakouts."
 showFullContent = false

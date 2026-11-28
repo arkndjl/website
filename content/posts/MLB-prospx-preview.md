@@ -4,6 +4,7 @@ date = "2026-05-28T14:00:42-06:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["mlb", "prospect", "prospx"]
+form = "tool"
 keywords = ["mlb", "baseball", "statistics", "prospects"]
 description = "Previewing my new tool MLB PROSPX, an all-in-one prospect tracker."
 showFullContent = false

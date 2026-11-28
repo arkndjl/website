@@ -74,6 +74,8 @@
     setTimeout(function () { if (b.parentNode) b.parentNode.removeChild(b); }, 700);
   }
   var cache = {};
+  // the list strip (assets/js/postbar.js) sorts and filters on these counts
+  function shared() { window.__arkPostStats = cache; try { window.dispatchEvent(new Event('arkposts')); } catch (e) {} }
   function bySlug(s) { return els.filter(function (e) { return e.getAttribute('data-post') === s; }); }
   els.forEach(function (el) {
     var s = el.getAttribute('data-post'), btn = el.querySelector('.pst__fav');
@@ -94,6 +96,7 @@
       }).then(function () {
         set('ark-favs', JSON.stringify(favs));
         bySlug(s).forEach(function (e) { paint(e, cache[s]); });
+        shared();
         btn.disabled = false;
       });
     });
@@ -103,7 +106,7 @@
     var load = mine
       ? post(encodeURIComponent(mine.getAttribute('data-post')) + '/view').then(function (r) { cache[mine.getAttribute('data-post')] = r; })
       : fetch(API).then(function (r) { if (!r.ok) throw r.status; return r.json(); }).then(function (all) { cache = all || {}; });
-    load.then(function () { els.forEach(function (e) { paint(e, cache[e.getAttribute('data-post')]); }); }).catch(function () {});
+    load.then(function () { els.forEach(function (e) { paint(e, cache[e.getAttribute('data-post')]); }); shared(); }).catch(function () {});
   }
   // a page the browser renders ahead of a click is not a view until it is shown
   if (document.prerendering) document.addEventListener('prerenderingchange', go, { once: true });
