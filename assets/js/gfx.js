@@ -4833,7 +4833,7 @@
       var tot = hs.reduce(function (s, v) { return s + v; }, 0) + (rows.length - 1) * gap, k = Math.min(1, (h - (rows.length - 1) * gap) / (tot - (rows.length - 1) * gap));
       var area = rows.reduce(function (s, r, j) { return s + r.reduce(function (s2, f) { return s2 + Math.pow(hs[j] * k, 2) * f[2]; }, 0); }, 0);
       var low = Math.min.apply(null, rows.map(function (r, j) { return Math.min.apply(null, r.map(function (f) { return Math.pow(hs[j] * k, 2) * f[2]; })); }));
-      var sc = area + 2 * n * low;   // big, and no figure left tiny
+      var sc = area + low;   // big, and no figure left tiny
       if (!best || sc > best.sc) best = { sc: sc, rows: rows, hs: hs.map(function (v) { return v * k; }) };
     }
     return best;
@@ -4855,34 +4855,56 @@
   async function buildArticle(btn) {
     var d = artData(btn), art = btn.closest('article'); if (!art || !d.t) return null;
     var body = artSentences(art), all = body.join(' ');
-    var quotes = (d.q || []).filter(function (q) { return all.indexOf(q) >= 0; });
-    if (!quotes.length && body[0]) quotes = [firstSentence(body[0])];
+    // the lines: each front matter quote (a verbatim excerpt) under the heading of the section it is in; with none, the
+    // first sentence of each section, cut at a comma when it runs long
+    var P = [].slice.call(art.querySelectorAll('.post-content p')).filter(function (p) { return !p.closest('figure, .table-of-contents'); });
+    function secOf(p) {   // the h2 before a paragraph
+      var hs = [].slice.call(art.querySelectorAll('.post-content h2')), s0 = '';
+      hs.forEach(function (hh) { if (hh.compareDocumentPosition(p) & Node.DOCUMENT_POSITION_FOLLOWING) s0 = txt(hh).replace(/\s*#$/, ''); });
+      return s0;
+    }
+    var quotes = (d.q || []).map(function (q) { var p = P.filter(function (pp) { return txt(pp).indexOf(q) >= 0; })[0]; return p ? [secOf(p), q] : null; }).filter(Boolean);
+    if (!quotes.length) {
+      var seen = {};
+      P.forEach(function (p) {
+        var sec = secOf(p); if (seen[sec] || quotes.length >= 6) return; seen[sec] = 1;
+        var q = firstSentence(txt(p)); if (q.length > 110) { var c = q.indexOf(',', 40); if (c > 0 && c < 110) q = q.slice(0, c); }
+        quotes.push([sec, q]);
+      });
+    }
     var figs = artFigures(art);
     var F = await frame(2400, 1350, 'ARTICLE' + (d.s ? ' :: ' + String(d.s).toUpperCase() : ''), d.d, d.l);
     var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, pad = 40, gap = 24;
     var lw = figs.length ? Math.round(w * 0.5) : w, rx = x + lw + gap, rw = w - lw - gap;
-    // left: the series tag (the part of the title before its colon), the title, then the sentences
+    // left: the series tag (the part of the title before its colon), the title, then each section's heading over its line
     well(g, x, y, lw, h);
     var m = /^(.{2,24}?)\s*:\s+(.+)$/.exec(d.t), kick = m ? m[1] : '', title = m ? m[2] : d.t, cw = lw - 2 * pad, cy = y + pad;
-    if (kick) { tag(g, x + pad, cy, kick.toUpperCase(), C.title, C.white, 40); cy += 64 + 32; }
-    var ts = 88, tl;
-    for (; ts >= 56; ts -= 16) { g.font = ts + 'px ' + FONT; tl = wrap(g, title, cw); if (tl.length <= 3) break; }
-    if (ts < 56) { ts = 56; g.font = ts + 'px ' + FONT; tl = wrap(g, title, cw).slice(0, 3); }
-    g.fillStyle = C.white; tl.forEach(function (t, i) { g.fillText(fit(g, t, cw), x + pad, cy + ts * 0.6 + i * ts * 1.2); });
-    cy += tl.length * ts * 1.2 + 28;
-    g.fillStyle = C.dark; g.fillRect(x + pad, cy, cw, 4); cy += 4 + 40;
-    var room = y + h - pad - cy, fs = 56, lay;
-    for (; fs >= 32; fs -= 4) {
-      g.font = fs + 'px ' + FONT; lay = quotes.map(function (q) { return wrap(g, q, cw - 28); });
-      if (lay.reduce(function (s, l) { return s + l.length * fs * 1.3 + 32; }, -32) <= room) break;
+    var kh = kick ? 64 + 28 : 0, ts, tl, fs, ls, lay, qg = 22, best = null;
+    function quoteH() { return lay.reduce(function (s0, l) { return s0 + (l[0] ? ls * 1.4 : 0) + l[1].length * fs * 1.25 + qg; }, -qg); }
+    outer: for (ts = 88; ts >= 56; ts -= 16) {
+      g.font = ts + 'px ' + FONT; tl = wrap(g, title, cw); if (tl.length > 3) continue;
+      var room = h - 2 * pad - kh - tl.length * ts * 1.2 - 24 - 4 - 32;
+      for (fs = 48; fs >= 28; fs -= 4) {
+        ls = fs >= 40 ? 28 : 24; g.font = fs + 'px ' + FONT;
+        lay = quotes.map(function (q) { return [q[0], wrap(g, q[1], cw - 28)]; });
+        if (quoteH() <= room) { best = [ts, tl, fs, ls, lay]; break outer; }
+      }
     }
+    if (!best) { ts = 56; g.font = ts + 'px ' + FONT; tl = wrap(g, title, cw).slice(0, 3); fs = 28; ls = 24; g.font = fs + 'px ' + FONT; lay = quotes.map(function (q) { return [q[0], wrap(g, q[1], cw - 28)]; }); }
+    else { ts = best[0]; tl = best[1]; fs = best[2]; ls = best[3]; lay = best[4]; }
+    if (kick) { tag(g, x + pad, cy, kick.toUpperCase(), C.title, C.white, 40); cy += kh; }
+    g.font = ts + 'px ' + FONT; g.fillStyle = C.white; tl.forEach(function (t, i) { g.fillText(fit(g, t, cw), x + pad, cy + ts * 0.6 + i * ts * 1.2); });
+    cy += tl.length * ts * 1.2 + 24;
+    g.fillStyle = C.dark; g.fillRect(x + pad, cy, cw, 4); cy += 4 + 32;
     lay.forEach(function (l) {
-      var lh = l.length * fs * 1.3;
+      var lh = (l[0] ? ls * 1.4 : 0) + l[1].length * fs * 1.25;
       if (cy + lh > y + h - pad + 2) return;
-      g.fillStyle = C.teal; g.fillRect(x + pad, Math.round(cy + 4), 8, Math.round(lh - 12));
+      g.fillStyle = C.teal; g.fillRect(x + pad, Math.round(cy + 2), 8, Math.round(lh - 8));
+      var ty = cy;
+      if (l[0]) { g.font = ls + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, l[0].toUpperCase(), cw - 28), x + pad + 28, ty + ls * 0.6); ty += ls * 1.4; }
       g.font = fs + 'px ' + FONT; g.fillStyle = C.white;
-      l.forEach(function (t, i) { g.fillText(t, x + pad + 28, cy + fs * 0.62 + i * fs * 1.3); });
-      cy += lh + 32;
+      l[1].forEach(function (t, i) { g.fillText(t, x + pad + 28, ty + fs * 0.6 + i * fs * 1.25); });
+      cy += lh + qg;
     });
     if (!figs.length) return F.canvas;
     // right: the figures, each in a well

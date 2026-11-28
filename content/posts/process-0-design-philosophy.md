@@ -16,9 +16,12 @@ Toc = true
 
 [gfx]
 quote = [
-  "Friction is a big part of life, and my designs are made to have friction because friction is a form of expression and personality.",
-  "I believe strongly in cybergothicism and organized maximalism, which means making everything available at once while building a structure underneath it that makes all of it readable once you learn how it works.",
-  "Every test on the site is published, including the ones that failed, because people should know what has been tested, tried, and proven not to work.",
+  "I dislike rounded corners, and I dislike stuff like Liquid Glass.",
+  "Friction is also about trust in the age of AI.",
+  "I made this site for myself and people like me",
+  "Models that seek to be both predictive and descriptive often fail at being able to do both",
+  "Every test on the site is published, including the ones that failed",
+  "People just want sports and their favorite teams and players to actually matter to them",
 ]
 post = """PROCESS #0: My Design Philosophy, Anti-Minimalism, and the Beauty of Friction
 
