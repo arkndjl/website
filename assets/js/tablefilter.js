@@ -177,9 +177,9 @@
       });
       // the state in the address, so a link reopens it: #<tab>:s=<column>&d=-1&<filter>=<value>&day=<date>&p=<row key>.
       // p is the row's data-pk (a stable id: NHL, Transfermarkt), and opens its scouting report (partials/prospectjs.html)
-      var id = slug(w.getAttribute('data-tab')), openPk = '';
+      var id = slug(tabOf(w)), openPk = '';
       if (id) {
-        var same = [].slice.call(document.querySelectorAll('[data-tfilter][data-tab]')).filter(function (x) { return slug(x.getAttribute('data-tab')) === id; });
+        var same = [].slice.call(document.querySelectorAll('[data-tfilter]')).filter(function (x) { return slug(tabOf(x)) === id; });
         if (same.indexOf(w) > 0) id += '-' + (same.indexOf(w) + 1);
       }
       function writeHash() {
@@ -213,7 +213,7 @@
         apply();
         // the tab itself opens from the hash (wintabs.html reads the part before the colon); a second table in a tab opens it here
         var group = w.parentElement && w.parentElement.closest('[data-wintabs]');
-        if (group && group.__show && !w.classList.contains('is-active')) group.__show(w.getAttribute('data-tab'));
+        if (group && group.__show && w.hasAttribute('data-tab') && !w.classList.contains('is-active')) group.__show(w.getAttribute('data-tab'));
         var row = want.p && rows.filter(function (r) { return r.dataset.pk === want.p; })[0];
         if (row && WIN && !row.isConnected) { shown = total; paint(); }
         writeHash();
@@ -225,6 +225,8 @@
     });
   }
   function slug(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+  // the tab a table belongs to: its own data-tab, or the lazy tab it was built in (wintabs.html takes data-tab off the windows it fetches)
+  function tabOf(x) { var lz = !x.hasAttribute('data-tab') && x.parentElement && x.parentElement.closest('.lazytab[data-tab]'); return x.getAttribute('data-tab') || (lz ? lz.getAttribute('data-tab') : ''); }
   window.__arkTfInit = init;
   document.addEventListener('ark:lazy', init);   // a tab built on first open (lazytab.html)
   if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
