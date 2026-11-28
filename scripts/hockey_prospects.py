@@ -365,6 +365,29 @@ def gsvc(r, k):
     return 100 * num / (den + GSV_K)
 
 
+def pick_row(p, y, cur, W, L):
+    """one pick's row: draft-time features, post-draft lines, NHL outcome (L = his landing page, or None)"""
+    seasons = (L or {}).get('seasons') or []
+    g = p['pos'] == 'G'
+    r = {'year': y, 'name': p['name'], 'id': p.get('id'), 'pick': p['pick'], 'team': p['team'], 'pos': p['pos'],
+         'G': int(g), 'D': int(p['pos'] == 'D'), 'ht': p.get('ht'), 'wt': p.get('wt'), 'birth': p.get('birth'),
+         'age': age_at(p.get('birth'), y), 'league': p.get('league'), 'club': p.get('club'), 'country': p.get('country'),
+         'css': p.get('css')}
+    if g:
+        r['gsv'] = gsv_lines(seasons)
+    r['d0'] = line_feats(main_line(seasons, (y - 1) * 10000 + y))
+    r['dm1'] = line_feats(main_line(seasons, (y - 2) * 10000 + y - 1))
+    r['post'], r['px'] = {}, {}
+    for k in range(1, 5):
+        S = y + k
+        if S >= cur:
+            break
+        r['post'][k] = line_feats(main_line(seasons, (S - 1) * 10000 + S))
+        r['px'][k] = post_extra(seasons, (S - 1) * 10000 + S)
+    outcome(r, W, cur)
+    return r
+
+
 def load_rows(W):
     """one row per pick, 2008-26: draft-time features, post-draft lines, NHL outcome"""
     rows = []
@@ -375,26 +398,7 @@ def load_rows(W):
             continue
         d = json.load(open(fn))
         for p in d['picks']:
-            L = landing(p.get('id'))
-            seasons = (L or {}).get('seasons') or []
-            g = p['pos'] == 'G'
-            r = {'year': y, 'name': p['name'], 'id': p.get('id'), 'pick': p['pick'], 'team': p['team'], 'pos': p['pos'],
-                 'G': int(g), 'D': int(p['pos'] == 'D'), 'ht': p.get('ht'), 'wt': p.get('wt'), 'birth': p.get('birth'),
-                 'age': age_at(p.get('birth'), y), 'league': p.get('league'), 'club': p.get('club'), 'country': p.get('country'),
-                 'css': p.get('css')}
-            if g:
-                r['gsv'] = gsv_lines(seasons)
-            r['d0'] = line_feats(main_line(seasons, (y - 1) * 10000 + y))
-            r['dm1'] = line_feats(main_line(seasons, (y - 2) * 10000 + y - 1))
-            r['post'], r['px'] = {}, {}
-            for k in range(1, 5):
-                S = y + k
-                if S >= cur:
-                    break
-                r['post'][k] = line_feats(main_line(seasons, (S - 1) * 10000 + S))
-                r['px'][k] = post_extra(seasons, (S - 1) * 10000 + S)
-            outcome(r, W, cur)
-            rows.append(r)
+            rows.append(pick_row(p, y, cur, W, landing(p.get('id'))))
     set_gsv(rows)
     return chl_rows(ahl_shots(rows), fetch=True)
 
@@ -755,6 +759,34 @@ def durability(rows):
             r['dur_k'][k] = min((q['gp'] + (ngp if q['lg'] != 'NHL' else 0)) / n, 1.0)
 
 
+def fill_ids():
+    """the frozen picks with no NHL id (the player search missed them; Nov 28 2026): id and birth date from the NHL
+    records draft table, the landing page for his lines, the row rebuilt the way load_rows builds it; then --fit --frozen"""
+    import hockey_data as HD
+    rows = json.load(gzip.open(ROWS, 'rt'))
+    W, cur, rec, n = war_tables(), D.current_season(), {}, 0
+    for i, r in enumerate(rows):
+        if r.get('id') or r['name'].lower().startswith('forfeit'):
+            continue
+        if r['year'] not in rec:
+            rec[r['year']] = HD.records(r['year'])
+        pid, birth = rec[r['year']].get(r['pick']) or (None, None)
+        pid = str(pid) if pid else None                 # ids are strings in the frozen rows and the WAR tables
+        L = HD.landing(pid) if pid else None
+        dd = (L or {}).get('draftDetails') or {}
+        if not L or dd.get('year') != r['year'] or dd.get('overallPick') != r['pick']:
+            print('no id:', r['year'], r['pick'], r['name'], pid); continue
+        p = {k: r.get(k) for k in ('name', 'pick', 'team', 'pos', 'ht', 'wt', 'league', 'club', 'country', 'css')}
+        p.update(id=pid, birth=L.get('birthDate') or birth, ht=r.get('ht') or L.get('heightInInches'), wt=r.get('wt') or L.get('weightInPounds'))
+        rows[i] = {k: v for k, v in pick_row(p, r['year'], cur, W, L).items() if k not in ('gp_k', 'war_k', 'dur_k')}
+        for k in ('chlp', 'ahls'):
+            if k in r: rows[i][k] = r[k]
+        n += 1
+        print('id', r['year'], r['pick'], r['name'], pid, rows[i]['birth'], 'NHL gp', rows[i]['nhl_gp'])
+    save_rows(rows)
+    print('filled', n)
+
+
 def save_rows(rows):
     keep = [{k: v for k, v in r.items() if k not in ('gp_k', 'war_k', 'dur_k')} for r in rows]
     with gzip.open(ROWS, 'wt') as f:
@@ -1052,12 +1084,19 @@ def build():
     # the floor (22+), the rest are counted
     import hockey_provisional as HP
     prov = HP.live(year or cur, board, rows) if tk else []
-    # exact ages: Tankathon gives the birth month only; the CHL, AHL, USHL and Liiga feeds give the
-    # date (same name, born that month). Display only: the grade keeps the mid-month age (cs moves < .01 FV)
+    # exact ages: Tankathon gives the birth month only; a pin, the CHL, AHL, USHL and Liiga feeds, the HockeyTech player
+    # search or Wikidata give the date (same name, born that month; scripts/hockey_dob.py). dobSrc names the source.
+    # Display only: the grade keeps the mid-month age (cs moves < .01 FV)
+    import hockey_dob as HDOB
+    try:
+        ex = HDOB.lookup([t for t, *_ in live], HP.exact_birth, year or cur)
+    except Exception as e:
+        print('hockey dob:', e, file=sys.stderr); ex = {}
     for (t, *_), b in zip(live, board):
-        eb = HP.exact_birth(t['name'], t['birth'])
-        if eb:
-            b['age'] = round(age_at(eb, year or cur), 2)
+        eb = HDOB.get(ex, t['name'], t['birth']) or ({'dob': HP.exact_birth(t['name'], t['birth']), 'src': 'feed'} if t['birth'] else None)
+        if eb and eb.get('dob'):
+            b['age'] = round(age_at(eb['dob'], year or cur), 2)
+            b['dob'], b['dobSrc'] = eb['dob'], eb['src']
         elif b['age'] is not None:
             b['ageEst'] = 1
     nprov = len(prov)
@@ -1144,7 +1183,9 @@ def build():
 
 
 if __name__ == '__main__':
-    if '--fit' in sys.argv:
+    if '--fill-ids' in sys.argv:
+        fill_ids()
+    elif '--fit' in sys.argv:
         fit(frozen='--frozen' in sys.argv)
     elif '--scorecard' in sys.argv:
         fit(frozen=True, scorecard=True)

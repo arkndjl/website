@@ -9,9 +9,11 @@
 
 Each class: every pick from the NHL's draft API (api-web.nhle.com/v1/draft/picks/<year>/all) and every player in
 Central Scouting's final rankings (/v1/draft/rankings/<year>/<1-4>: North American and international skaters and
-goalies; rank within category, birth date, size, last amateur league). Picks are joined to NHL player ids through the
-NHL's player search, confirmed on the player's landing page by draft year and overall pick (an exact join, no name
-guessing); the landing page carries the birth date and every season line, junior and pro. Central Scouting rows join
+goalies; rank within category, birth date, size, last amateur league). Picks are joined to NHL player ids by the NHL
+records draft table (records.nhl.com/site/api/draft: player id and birth date for each year and overall pick, an exact
+join), then the NHL's player search confirmed on the landing page by draft year and overall pick for any pick the table
+lacks (the search alone missed 63 picks of 2008-26, hyphenated names and Matt/Ben/Zach first names: Nugent-Hopkins,
+Ekman-Larsson, Tom Wilson, Silayev; Nov 28 2026). The landing page carries the birth date and every season line. Central Scouting rows join
 the picks by the shared matcher (scripts/names.py) within the class, checked on birth date where both have one.
 """
 import datetime as dt
@@ -58,6 +60,16 @@ def landing(pid):
     return None
 
 
+RECORDS = 'https://records.nhl.com/site/api/draft?limit=-1&cayenneExp=draftYear=%d'
+
+
+def records(year):
+    """overall pick -> (NHL player id, birth date) from the NHL records draft table; {} when it is down"""
+    j = D.get(RECORDS % year) or {}
+    return {x['overallPickNumber']: (str(x['playerId']), x.get('birthDate')) for x in j.get('data') or []
+            if x.get('overallPickNumber') and x.get('playerId')}
+
+
 def find_id(name, year, overall):
     """the NHL id of the player taken at <overall> in <year>, or None"""
     res = D.get(SEARCH + urllib.parse.quote(name)) or []
@@ -80,13 +92,14 @@ def pull(year, fresh=False):
         picks.append({'name': nm, 'pick': p['overallPick'], 'round': p['round'], 'team': D.team(p.get('teamAbbrev')),
                       'pos': p.get('positionCode'), 'ht': p.get('height'), 'wt': p.get('weight'), 'country': p.get('countryCode'),
                       'league': p.get('amateurLeague'), 'club': p.get('amateurClubName')})
+    rec = records(year)
     with ThreadPoolExecutor(8) as ex:
-        ids = list(ex.map(lambda p: find_id(p['name'], year, p['pick']), picks))
+        ids = list(ex.map(lambda p: (rec.get(p['pick']) or (None,))[0] or find_id(p['name'], year, p['pick']), picks))
     for p, i in zip(picks, ids):
         p['id'] = i
         L = landing(i) if i else None
         if L:
-            p['birth'] = L.get('birthDate'); p['ht'] = p['ht'] or L.get('heightInInches'); p['wt'] = p['wt'] or L.get('weightInPounds')
+            p['birth'] = L.get('birthDate') or (rec.get(p['pick']) or (None, None))[1]; p['ht'] = p['ht'] or L.get('heightInInches'); p['wt'] = p['wt'] or L.get('weightInPounds')
             p['shoots'] = L.get('shootsCatches')
     css = []
     for c, (reg, kind) in CATS.items():
