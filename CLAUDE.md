@@ -191,6 +191,9 @@
 - `scripts/agencies.py` joins the ledger to the boards through the shared name matcher and writes `data/agencies_board.json`
   (the agencies and agency clients subtabs, `layouts/shortcodes/agencies.html`) and `static/data/agencies.json` (the agency
   line on player and recruit cards, `pcAgency` in gfx.js); process-refresh.yml reruns it. `--test` after a change.
+- Drafted clients are tracked forward from the 2027 drafts, never backfilled (Noah, Nov 28): once a year's NFL / NBA draft is complete
+  on ESPN, `record_drafts` in `scripts/agencies.py` writes every ledger college client who was picked to `data/agency_pros.json` with
+  the agency on file that day and marks the year done; the board shows Drafted, 1st rd and Pro% (drafted / (drafted + college clients now)).
 - zNIL = xNIL - yNIL as everywhere: above zero the clients are worth more than they are paid (the agency found them the right
   place), below zero they are paid more than they are worth (the agency got them paid). zNIL* = (sum + k x mean of all
   represented players) / (n + k), k by method of moments. Recruits count for talent only. GFX: `buildAgency` (one agency) and

@@ -49,6 +49,8 @@
     <th title="sum of college clients' xNIL">xNIL</th><th title="sum of college clients' yNIL">yNIL</th><th title="sum of recruits' xNIL">Rec xNIL</th>
     <th title="sum of every client's FV (recruits: expected FV)">FV sum</th><th title="best client FV">Top FV</th>
     <th title="mean high school ARK stars">ARK</th><th title="clients with 5-star+">5★+</th>
+    <th title="ledger clients picked in the NFL draft (football) or NBA draft (basketball), counted from the 2027 drafts on">Drafted</th><th title="drafted clients taken in the first round">1st rd</th>
+    <th title="drafted / (drafted + college clients now)">Pro%</th>
     <th title="share of rows from the agency's own page or a named report">High%</th><th title="top three clients by FV">Top</th><th></th></tr></thead>
   <tbody>
   {{- range $i, $a := $rows }}
@@ -68,6 +70,12 @@
     <td class="cfb__num" data-v="{{ .fvTop }}">{{ with .fvTop }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ math.Round . }}</span>{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-v="{{ .ark }}">{{ with .ark }}{{ partial "num.html" (slice "%.1f" .) }}{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-v="{{ .ark5 }}">{{ .ark5 }}</td>
+    <td class="cfb__num" data-v="{{ .pro | default 0 }}">{{ .pro | default 0 }}</td>
+    <td class="cfb__num" data-v="{{ .pro1 | default 0 }}">{{ .pro1 | default 0 }}</td>
+    <td class="cfb__num" data-v="{{ .proPct }}">{{ with .proPct }}{{ partial "num.html" (slice "%.0f" (mul . 100)) }}%{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .pro | default 0 }}">{{ .pro | default 0 }}</td>
+    <td class="cfb__num" data-v="{{ .pro1 | default 0 }}">{{ .pro1 | default 0 }}</td>
+    <td class="cfb__num" data-v="{{ .proPct }}">{{ with .proPct }}{{ partial "num.html" (slice "%.0f" (mul . 100)) }}%{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-v="{{ .high }}">{{ partial "num.html" (slice "%.0f" (mul .high 100)) }}%</td>
     <td class="agency__top">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ index $p 0 }} <span class="cfb__dim">{{ index $p 1 }}</span>{{ end }}</td>
     <td><button type="button" class="cfb__btn cfb__cardbtn" data-gfx data-gfx-mode="agency" data-gfx-sport="{{ $sp }}" data-gfx-i="{{ $i }}" title="agency card PNG, 16:9">GFX</button></td>

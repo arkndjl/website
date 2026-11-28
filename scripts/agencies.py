@@ -14,10 +14,16 @@ he is paid more than he is worth. An agency's mean zNIL is shrunk toward the mea
 by n / (n + k) with k = within-agency variance / between-agency variance (method of moments), so an agency with two
 clients does not top the board on one outlier.
 
-  python3 scripts/agencies.py            join and write
+Drafted clients are tracked from the 2027 drafts on, never backfilled (Noah, Nov 28 2026): once a year's NFL draft (for
+football) or NBA draft (basketball) is complete on ESPN, every college player in the ledger who was picked is written to
+data/agency_pros.json with the agency the ledger gave him that day, and the year is marked done. The board counts them
+per agency (Drafted, 1st rd, Pro% = drafted / (drafted + college clients now)).
+
+  python3 scripts/agencies.py            record a finished draft, join and write
   python3 scripts/agencies.py --test     the shrinkage and matcher checks
+  python3 scripts/agencies.py --draft nfl 2026 --dry    match a past draft against the ledger without writing it
 """
-import json, math, os, re, sys
+import datetime as dt, json, math, os, re, sys, urllib.request
 from collections import defaultdict
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
@@ -149,7 +155,81 @@ def join(ledger, sport, college, recruits):
     return list(best.values()), miss
 
 
-def board(clients):
+# ---- drafted clients (tracked forward from the 2027 drafts) ------------------------------------------------------------
+
+LEAGUE = {'cfb': ('nfl', 'football/leagues/nfl', (4, 20)), 'cbb': ('nba', 'basketball/leagues/nba', (6, 15))}
+FIRST = 2027              # the first draft tracked; earlier drafts are not backfilled
+ESPN = 'http://sports.core.api.espn.com/v2/sports/%s/seasons/%d/draft'
+
+
+def _get(url, tries=3):
+    for i in range(tries):
+        try:
+            with urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'}), timeout=30) as r:
+                return json.load(r)
+        except Exception as e:
+            err = e
+    print('espn:', url, err); return None
+
+
+def draft_picks(sp, year):
+    """Every pick of a finished draft as {round, pick, name, team (college)}; None while any pick is still to be made."""
+    d = _get(ESPN % (LEAGUE[sp][1], year) + '/rounds?limit=20')
+    if not d or not d.get('items'): return None
+    picks, colleges = [], {}
+    for rd in d['items']:
+        for k in rd.get('picks', []):
+            if (k.get('status') or {}).get('name') != 'SELECTION_MADE' or 'athlete' not in k: return None
+            a = _get(k['athlete']['$ref']) or {}
+            team = None
+            ref = (a.get('college') or {}).get('$ref')
+            if ref:
+                if ref not in colleges: colleges[ref] = (_get(ref) or {}).get('name')
+                team = colleges[ref]
+            picks.append(dict(round=k['round'], pick=k['overall'], name=a.get('fullName') or a.get('displayName'), team=team))
+    return picks
+
+
+def match_drafts(ledger, sp, picks):
+    """Ledger college players (no recruit class) found among the picks, with the agency the ledger gives them now."""
+    m = names.Matcher(picks, pos=None, sport='football' if sp == 'cfb' else 'basketball')
+    rank = {'high': 3, 'medium': 2, 'low': 1}
+    best = {}
+    for e in ledger:
+        if e.get('sport') != sp or not e.get('agency') or e.get('cls'): continue
+        k = names.key(e['player'])
+        o = best.get(k)
+        if o is None or (rank.get(e.get('confidence'), 0), e.get('source_date') or '') > (rank.get(o.get('confidence'), 0), o.get('source_date') or ''):
+            best[k] = e
+    out = []
+    for e in best.values():
+        row, how = m.find(e['player'], team=e.get('school'), cross_team='none')   # same name at another school is not him
+        if row is None: continue
+        out.append(dict(player=e['player'], school=e.get('school'), pos=e.get('pos'), agency=canon(e['agency']),
+                        conf=e.get('confidence') or 'medium', round=row['round'], pick=row['pick'], src=e.get('source')))
+    return sorted(out, key=lambda r: r['pick'])
+
+
+def record_drafts(ledger, today=None):
+    """Write each newly finished draft's ledger clients to data/agency_pros.json (once a year a league)."""
+    today = today or dt.date.today()
+    pros = load('data/agency_pros.json', None) or {'done': {}, 'rows': []}
+    changed = False
+    for sp, (lg, _, (mo, dy)) in LEAGUE.items():
+        y = today.year
+        if y < FIRST or today < dt.date(y, mo, dy) or y in pros['done'].get(lg, []): continue
+        picks = draft_picks(sp, y)
+        if picks is None: continue
+        got = match_drafts(ledger, sp, picks)
+        pros['rows'] += [dict(r, sport=sp, league=lg, year=y) for r in got]
+        pros['done'].setdefault(lg, []).append(y); changed = True
+        print('%s %d draft: %d of %d picks were ledger clients' % (lg, y, len(got), len(picks)))
+    if changed or not os.path.exists(P('data/agency_pros.json')):
+        json.dump(pros, open(P('data/agency_pros.json'), 'w'), indent=1)
+    return pros['rows']
+
+
+def board(clients, pros=()):
     by = defaultdict(list)
     for c in clients: by[c['agency']].append(c)
     zs = {a: [c['z'] for c in l if c['kind'] == 'college' and c['z'] is not None and c['conf'] != 'low'] for a, l in by.items() if a not in SPECIAL}
@@ -176,17 +256,30 @@ def board(clients):
                          high=round(sum(1 for c in l if c['conf'] == 'high') / len(l), 2),
                          top=[[c['name'], c['pos'], c['fv'], c['logo']] for c in top],
                          logos=sorted({c['logo'] for c in l if c['logo']})[:12]))
+    # drafted clients: an agency whose clients have all gone pro still gets a row
+    dr = defaultdict(list)
+    for r in pros: dr[canon(r['agency'])].append(r)
+    have = {r['agency'] for r in rows}
+    for a in dr:
+        if a not in have:
+            rows.append(dict(agency=a, n=0, nCol=0, nRec=0, nZ=0, z=None, zMean=None, zShr=None, zPct=None, x=None, y=None, recX=None,
+                             fv=None, fvTop=None, ark=None, ark5=0, high=0, top=[], logos=[]))
+    for r in rows:
+        d = dr.get(r['agency'], [])
+        r['pro'] = len(d); r['pro1'] = sum(1 for p in d if p['round'] == 1)
+        r['proPct'] = round(len(d) / (len(d) + r['nCol']), 3) if d else None
     rows.sort(key=lambda r: (r['agency'] in SPECIAL, -(r['zShr'] if r['zShr'] is not None else -1e12), -r['n']))
     return rows, dict(k=round(k, 1), mu=round(mu), nZ=len(allz))
 
 
 def main():
     led = load('data/agencies.json', {'rows': []})['rows']
+    pros = record_drafts(led)
     out = {'asof': None, 'sports': {}}
     look = {}
     for sp, col, rec in (('cfb', cfb_rows(), cfb_recruits()), ('cbb', cbb_rows(), cbb_recruits())):
         clients, miss = join(led, sp, col, rec)
-        rows, fit = board(clients)
+        rows, fit = board(clients, [p for p in pros if p['sport'] == sp])
         clients.sort(key=lambda c: (c['agency'] in SPECIAL, c['agency'], -(c['fv'] or 0)))
         out['sports'][sp] = dict(fit=fit, agencies=rows,
                                  clients=[{k: c[k] for k in ('name', 'team', 'logo', 'pos', 'cls', 'kind', 'fv', 'x', 'y', 'z', 'ark', 'agency', 'agent', 'conf', 'src', 'date')} for c in clients],
@@ -207,8 +300,25 @@ def _test():
     k2 = shrink_k([[1, -1, 2, -2], [0.5, -0.5, 1, -1], [2, -2, 0, 0]])
     assert k2 >= 20, k2               # same means, noisy: heavy shrinkage
     assert canon('Athletes First NIL') == 'Athletes First' and canon('family') == 'Family' and canon(' Klutch  Sports ') == 'Klutch Sports Group'
+    picks = [dict(round=1, pick=3, name='Jeremiyah Love', team='Notre Dame'), dict(round=2, pick=40, name='John Smith', team='Ohio State')]
+    led = [dict(player='Jeremiyah Love', school='Notre Dame', sport='cfb', agency='CAA', confidence='high'),
+           dict(player='John Smith', school='Alabama', sport='cfb', agency='WME', confidence='high'),
+           dict(player='Jeremiyah Love', school='Notre Dame', sport='cfb', agency='CAA', confidence='high', cls=2026)]
+    got = match_drafts(led, 'cfb', picks)
+    assert [(g['player'], g['agency'], g['round']) for g in got] == [('Jeremiyah Love', 'CAA Sports', 1)], got   # same name, other school: not him
+    rows, _ = board([], [dict(agency='CAA', round=1)])
+    assert rows[0]['agency'] == 'CAA Sports' and rows[0]['pro'] == 1 and rows[0]['pro1'] == 1 and rows[0]['proPct'] == 1.0
     print('ok')
 
 
+def _dry(lg, y):
+    sp = {'nfl': 'cfb', 'nba': 'cbb'}[lg]
+    picks = draft_picks(sp, y)
+    print(len(picks or []), 'picks;', sum(1 for p in picks or [] if p['team']), 'with a college')
+    for r in match_drafts(load('data/agencies.json', {'rows': []})['rows'], sp, picks or []): print(r)
+
+
 if __name__ == '__main__':
-    _test() if '--test' in sys.argv else main()
+    if '--test' in sys.argv: _test()
+    elif '--draft' in sys.argv: i = sys.argv.index('--draft'); _dry(sys.argv[i + 1], int(sys.argv[i + 2]))
+    else: main()
