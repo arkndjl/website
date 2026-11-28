@@ -1,8 +1,9 @@
 {{- /* An article's views and favorites (worker/site.js /api/posts; drawn by assets/js/poststats.js), inside .post-meta.
-       Context: dict "p" (the post) "count" (true on the article itself: this visit counts as a view). Hidden until the
+       Context: dict "p" (the post) "count" (true on the article itself: this visit counts as a view). Only on articles dated on or after
+       site.Params.poststatsFrom (hugo.toml; PROCESS #0 on). Hidden until the
        counts load, so a page with the Worker down shows nothing. */ -}}
-{{- with .p -}}{{- if eq .Type "posts" -}}
+{{- with .p -}}{{- if and (eq .Type "posts") (ge (.Date.Format "2006-01-02") (site.Params.poststatsFrom | default "2026-11-27")) -}}
 {{- $slug := path.Base (strings.TrimSuffix "/" .RelPermalink) -}}
-<span class="pst" data-post="{{ $slug }}"{{ if $.count }} data-count="1"{{ end }} hidden><span class="pst__v"><b>0</b> <span>views</span></span><button type="button" class="pst__fav" aria-pressed="false" title="favorite"><span class="pst__s" aria-hidden="true"><i></i></span><span class="pst__l">favorite</span><b>0</b></button></span>
+<span class="pst" data-post="{{ $slug }}"{{ if $.count }} data-count="1"{{ end }} hidden><span class="pst__v"><b>0</b> <span>views</span></span><button type="button" class="pst__fav" aria-pressed="false" title="favorite"><span class="pst__h" aria-hidden="true"><i></i></span><span class="pst__l">favorite</span><b>0</b></button></span>
 {{- partial "js.html" "poststats" -}}
 {{- end -}}{{- end -}}

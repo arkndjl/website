@@ -54,6 +54,10 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
 
   # Site-wide links. Used by the footer (layouts/partials/footer.html) and
   # the structured data in layouts/partials/extended_head.html.
+  # Article views and favorites (layouts/partials/poststats.html, shortcodes/articlestats.html) show on articles from this
+  # date on: PROCESS #0, the first published after counting began (Noah, Nov 28 2026).
+  poststatsFrom = "2026-11-27"
+
   # Tip page (/tip/, shortcodes/tip.html)
   [params.tip]
     kofi = "https://ko-fi.com/arkndjl"

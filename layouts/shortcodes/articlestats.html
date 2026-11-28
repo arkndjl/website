@@ -1,13 +1,14 @@
-{{- /* Process > ARKLOG > traffic: one row an article with its live views and favorites (worker/site.js /api/posts, the same
+{{- /* Process > ARKLOG > traffic: one row an article (from site.Params.poststatsFrom on) with its live views and favorites (worker/site.js /api/posts, the same
        counts as the post meta line, layouts/partials/poststats.html). Rows come from the posts; the counts are filled in on
        load and the table sorts by any header. {{< articlestats >}} */ -}}
-{{- $posts := where site.RegularPages "Type" "posts" -}}
+{{- $from := site.Params.poststatsFrom | default "2026-11-27" -}}
+{{- $posts := slice }}{{ range where site.RegularPages "Type" "posts" }}{{ if ge (.Date.Format "2006-01-02") $from }}{{ $posts = $posts | append . }}{{ end }}{{ end -}}
 {{- $start := "2026-11-28" -}}
 {{- partial "wintable-open.html" (dict "title" "articles.exe" "icon" "site" "filter" " " "wait" true "class" "desk__wide") }}
 <table class="cfb__table astat" data-astat data-start="{{ $start }}">
-  <thead><tr><th>article</th><th title="published">date</th><th>tags</th><th title="one a visitor a day, counted since Nov 28 2026">views</th><th title="platinum star clicks, net of the ones taken back">favorites</th><th title="favorites per view">fav%</th><th title="views a day since it was published, or since counting began on Nov 28 2026 for older articles">views/day</th></tr></thead>
+  <thead><tr><th>article</th><th title="published">date</th><th>tags</th><th title="one a visitor a day, counted since Nov 28 2026">views</th><th title="heart clicks, net of the ones taken back">favorites</th><th title="favorites per view">fav%</th><th title="views a day since it was published, or since counting began on Nov 28 2026 for older articles">views/day</th></tr></thead>
   <tbody>
-  {{- range $posts.ByDate.Reverse }}
+  {{- range sort $posts "Date" "desc" }}
   {{- $slug := path.Base (strings.TrimSuffix "/" .RelPermalink) }}
   <tr data-post="{{ $slug }}" data-pub="{{ .Date.Format "2006-01-02" }}"><td class="astat__t"><a href="{{ .RelPermalink }}">{{ .Title }}</a></td><td data-v="{{ .Date.Unix }}">{{ .Date.Format "Jan 2 2006" }}</td><td class="astat__tags">{{ delimit (.Params.tags | default (slice "—")) ", " }}</td><td class="cfb__num" data-k="v">—</td><td class="cfb__num" data-k="f">—</td><td class="cfb__num" data-k="r">—</td><td class="cfb__num" data-k="d">—</td></tr>
   {{- end }}

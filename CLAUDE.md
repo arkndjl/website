@@ -234,7 +234,9 @@
   /posts/): `layouts/partials/poststats.html` + `assets/js/poststats.js`, counted by the site Worker (`/api/posts`, Durable
   Object `PostStats` in `worker/site.js`). A view is one a visitor (hashed IP + user agent, salted per day) per article per day,
   bots and other origins skipped. A favorite is one per browser (random id in local storage) and can be taken back; per IP a day,
-  5 favorites of one article and 40 clicks in all. No setup: a new post gets both by itself.
+  5 favorites of one article and 40 clicks in all. No setup: a new post gets both by itself. The button is a bevelled
+  "favorite" button with the tip pixel heart (Noah, Nov 28). Shown only on articles dated on or after `poststatsFrom` in hugo.toml
+  (2026-11-27, PROCESS #0 on; older articles were never counted), and articles.exe uses the same cutoff.
 - `scripts/post_stats.py` (site-stats.yml, every 6 hours) samples the counts into `data/post_stats.json`; `scripts/milestones.py`
   reads it for the article milestones in ARKLOG. Process > ARKLOG > traffic has articles.exe (`layouts/shortcodes/articlestats.html`,
   in TABS traffic of `scripts/library_build.py`): one row an article, live counts, sorts on every header.
