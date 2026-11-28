@@ -2566,7 +2566,7 @@
     var F = await frame(2160, 2700, (yr ? yr + ' ' : '') + base + cv, win.getAttribute('data-gfx-date'), tabLink(win));
     var g = F.g, D = rows.map(function (r) { return JSON.parse(r.getAttribute('data-cr')); });
     var logos = await Promise.all(rows.map(function (r) { var im = r.querySelector('img.cfb__logo'); return loadImg(im && im.getAttribute('src')); }));
-    var avgH = 'AVG xFV', scH = (txt(win.querySelector('thead th:nth-child(4)')) || 'CLASS').toUpperCase();
+    var clsT = win.querySelector('table[data-cls-src]'), avgH = clsT && /cbb/.test(clsT.getAttribute('data-cls-src')) ? 'AVG FV' : 'AVG xFV', scH = (txt(win.querySelector('thead th:nth-child(4)')) || 'CLASS').toUpperCase();   // CBB recruits are graded on FV, CFB on xFV
     // columns right to left: [header, width, value, colour, star header]
     var cols = [
       [scH, 200, function (d) { return d.s.toFixed(1); }, C.teal, 0, 1],
@@ -2701,7 +2701,9 @@
     nl.forEach(function (t, i) { g.fillText(fit(g, t, nw), nx, ny + i * 52); });
     g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, [d.conf, yr].filter(Boolean).join(' · '), nw), nx, ny + nl.length * 52 - 2);
     var y = Y0 + pad + ls + 16, pw = (cw - 20) / 3, ph = 112;
-    [['RANK', '#' + d.rk, 'of ' + Y.of, 1], [scH, d.s.toFixed(1), '', 1], ['xNIL', d.x ? money(d.x) : '–', '', 0]].forEach(function (p, i) {
+    // a class with no commits anywhere ranks no one: a dash, not #1 of every school
+    var anyC = Object.keys(Y.t).some(function (k) { return Y.t[k].n; });
+    [['RANK', anyC ? '#' + d.rk : '–', 'of ' + Y.of, 1], [scH, d.s.toFixed(1), '', 1], ['xNIL', d.x ? money(d.x) : '–', '', 0]].forEach(function (p, i) {
       var px = lx + i * (pw + 10);
       g.fillStyle = p[3] ? C.dark : TINT.nil; g.fillRect(px, y, pw, ph); if (p[3]) { g.fillStyle = C.teal; g.fillRect(px, y + ph - 6, pw, 6); }
       g.font = '24px ' + FONT; g.fillStyle = C.lilac; g.fillText(p[0], px + 14, y + 22);
@@ -2726,7 +2728,7 @@
     }
     tileRow([[String(d.a6 || 0), '5', PT[1], 2, PT[1]], [String(d.ah || 0), '4.5-5', C.lilac, 1], [String(d.am || 0), '3-4', C.lilac, 1], [String(d.al || 0), '0-2.5', C.lilac, 1]], y);
     y += th + 8;
-    tileRow([[String(d.n), 'COMMITS', C.lilac], [d.avg != null ? d.avg.toFixed(1) : '–', 'AVG xFV', C.lilac], [d.te ? '#' + d.te : '–', 'TOP END', C.lilac], [d.dp ? '#' + d.dp : '–', 'DEPTH', C.lilac]], y);
+    tileRow([[String(d.n), 'COMMITS', C.lilac], [d.avg != null ? d.avg.toFixed(1) : '–', /cbb/.test(src) ? 'AVG FV' : 'AVG xFV', C.lilac], [d.te ? '#' + d.te : '–', 'TOP END', C.lilac], [d.dp ? '#' + d.dp : '–', 'DEPTH', C.lilac]], y);
     y += th + 16;
     // position groups: commits, FV points as a bar against the class's biggest group, mean FV (two columns when leads or visits need the room)
     var G = d.g || [], top = Math.max.apply(null, G.map(function (q) { return q[2]; }).concat([1])), gcols = pipeLeft && G.length > 4 ? 2 : 1;
