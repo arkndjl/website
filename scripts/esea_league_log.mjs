@@ -90,6 +90,31 @@ export function settle(prev, next) {
     const strip = x => JSON.stringify({ ...x, logged: 0 }); return strip(o) === strip(l) ? o : l; });
 }
 
+// ---- the season fetch_esea.mjs follows ----------------------------------------------------------
+// FACEIT names a season's competitions "S59 NA Main A - Regular Season", "Season 60 ..."
+export const inSeason = (name, sn) => new RegExp(`(^|\\b)(S|Season\\s*)${sn}\\b`, 'i').test(name || '');
+const DONE = new Set(['FINISHED', 'CANCELLED', 'ABORTED']);
+// 1NT matches of data/esea.json still to play (one FACEIT never closed counts as played a week after its start)
+export const pendingOf = (p, now = Date.now()) => (p?.matches || []).filter(m => !m.result && !DONE.has(m.status) && (!m.at || m.at > now - 7 * 86400e3));
+// a season is over for 1NT when nothing is left to play and it is out: a loss in the lower bracket or the grand final,
+// the grand final won, missed the playoffs, the whole bracket finished, or two weeks since its last match
+export function seasonFinished(p, now = Date.now()) {
+  const ms = p?.matches || [];
+  if (!p?.season || !ms.length || pendingOf(p, now).length) return false;
+  if (now - Math.max(...ms.map(m => m.at || 0)) > 14 * 86400e3) return true;
+  const po = ms.filter(m => /playoff/i.test(m.stage || '') && m.result).sort((a, b) => (a.at || 0) - (b.at || 0)), last = po.at(-1);
+  if (last && (last.result === 'L' ? last.group === 2 || last.group === 3 : last.group === 3)) return true;
+  if (!po.length && p.stakes && p.stakes.remaining === 0 && p.stakes.inPlayoffs === false) return true;
+  const bm = (p.bracket?.groups || []).flatMap(g => (g.rounds || []).flatMap(r => r.m || []));
+  return bm.length > 0 && bm.every(m => DONE.has(m.st));
+}
+// the season to fetch: base + 1 once base is finished, or once FACEIT lists an S<base+1> championship for 1NT (its
+// leagues, or the player's history) and nothing of base is left to play; else base
+export function pickSeason(base, p, names, now = Date.now()) {
+  const listed = (names || []).some(n => inSeason(n, base + 1) && !/qualifier/i.test(n));
+  return seasonFinished(p, now) || (listed && !pendingOf(p, now).length) ? base + 1 : base;
+}
+
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url) && process.argv.includes('--test')) {
   const W = { a: 0.316, b: 14.2, elo: 0.8, rating: 0.2, star: 0.48, eloScale: 600 };
   const q = () => ({ f1: [['a', 1]], f2: [['b', 1]], in: {}, p: 0.61234, v: 't' });
@@ -118,6 +143,23 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     'ESEA Season 59 North America Advanced: Regular Season', 's59 na advanced regular season'].every(x => isAdvanced(x, K))]);
   checks.push(['other seasons, regions, stages and divisions do not', !['S58 NA Advanced - Regular Season', 'S59 EU Advanced - Regular Season', 'S59 NA Advanced - Playoffs',
     'S59 NA Main B - Regular Season', 'S590 NA Advanced - Regular Season', 'S59 SA Advanced - Regular Season', ''].some(x => isAdvanced(x, K))]);
+  // season advance (fetch_esea.mjs)
+  const D = 86400e3, T0 = 1797000000000;
+  const pm = (o) => ({ result: 'W', status: 'FINISHED', stage: 'Regular Season', at: T0 - 3 * D, ...o });
+  const reg = { season: 59, matches: [pm({}), pm({ at: T0 - 2 * D })], stakes: { remaining: 0, inPlayoffs: true } };
+  const upLoss = { ...reg, matches: [...reg.matches, pm({ stage: 'Playoffs', group: 1, result: 'L', at: T0 - D })] };
+  const lbLoss = { ...reg, matches: [...upLoss.matches, pm({ stage: 'Playoffs', group: 2, result: 'L', at: T0 - D / 2 })] };
+  const next = { ...upLoss, matches: [...upLoss.matches, pm({ stage: 'Playoffs', group: 2, result: null, status: 'SCHEDULED', at: T0 + D })] };
+  checks.push(['season names', inSeason('S59 NA Main A - Regular Season', 59) && inSeason('ESEA Season 60 NA Main', 60) && !inSeason('S590 x', 59) && !inSeason('S59 x', 60)]);
+  checks.push(['an upper-bracket loss is not the end', !seasonFinished(upLoss, T0)]);
+  checks.push(['a lower-bracket loss is', seasonFinished(lbLoss, T0) && pickSeason(59, lbLoss, [], T0) === 60]);
+  checks.push(['a match ahead holds the season', !seasonFinished(next, T0) && pickSeason(59, next, ['S60 NA Main A - Regular Season'], T0) === 59]);
+  checks.push(['missed the playoffs', seasonFinished({ ...reg, stakes: { remaining: 0, inPlayoffs: false } }, T0)]);
+  checks.push(['two weeks quiet', seasonFinished(upLoss, T0 + 15 * D) && !seasonFinished(upLoss, T0 + 5 * D)]);
+  checks.push(['an S60 league moves on once nothing is left', pickSeason(59, upLoss, ['S60 NA Main B - Regular Season'], T0) === 60
+    && pickSeason(59, upLoss, ['S60 NA Open Qualifier'], T0) === 59 && pickSeason(59, upLoss, ['S59 NA Main A - Playoffs'], T0) === 59]);
+  checks.push(['an empty season never moves', pickSeason(59, { season: 59, matches: [] }, [], T0) === 59 && pickSeason(59, {}, [], T0) === 59]);
+  checks.push(['the whole bracket finished', seasonFinished({ ...upLoss, bracket: { groups: [{ rounds: [{ m: [{ st: 'FINISHED' }, { st: 'CANCELLED' }] }] }] } }, T0)]);
   let bad = 0; for (const [n, ok] of checks) if (!ok) { bad++; console.log('FAIL', n); }
   console.log(bad ? `${bad} failed` : `esea_league_log: ${checks.length} checks ok`);
   process.exit(bad ? 1 : 0);

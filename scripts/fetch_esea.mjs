@@ -6,14 +6,14 @@
 // FACEIT_API_KEY (developers.faceit.com, free). .github/workflows/esea.yml runs it every 20 minutes
 // and commits only when something changed.
 //
-//   FACEIT_API_KEY=... node scripts/fetch_esea.mjs            # season from data/esea.json or ESEA_SEASON (59)
+//   FACEIT_API_KEY=... node scripts/fetch_esea.mjs            # season from data/esea.json (moves on by itself) or ESEA_SEASON
 //   FACEIT_API_KEY=... ESEA_SEASON=60 node scripts/fetch_esea.mjs
 import fs from 'node:fs';
 import zlib from 'node:zlib';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PELO, PELO_DIV, FIVE_V, archiveGames, replayElo, teamHistory, fiveWeights, restrict, wmean } from './esea_five.mjs';
-import { price, readLog, writeLog, merge as mergeLog, settle, advKey, isAdvanced } from './esea_league_log.mjs';
+import { price, readLog, writeLog, merge as mergeLog, settle, advKey, isAdvanced, inSeason, pickSeason } from './esea_league_log.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'data', 'esea.json');
@@ -21,9 +21,8 @@ const KEY = process.env.FACEIT_API_KEY;
 const API = 'https://open.faceit.com/data/v4';
 const TEAM_ID = 'a6e9c61b-de50-47d4-9fc8-3f03a13c4d4a';   // 1NT
 const PLAYER = 'LAURSEN_111';
-const REG_SEASON = 14;   // regular-season matches in ESEA Main (S57: 5-9, S58: 8-6); FACEIT only lists the scheduled ones
 const prev = fs.existsSync(OUT) ? JSON.parse(fs.readFileSync(OUT, 'utf8')) : {};
-const SEASON = +(process.env.ESEA_SEASON || prev.season || 59);
+const BASE = +(process.env.ESEA_SEASON || prev.season || 59);
 
 if (!KEY) { console.log('FACEIT_API_KEY not set: nothing fetched'); process.exit(0); }
 
@@ -47,6 +46,19 @@ async function pages(p, max = 400) {
   }
   return out;
 }
+// the season moves on by itself (ESEA_SEASON pins it): to N+1 once 1NT's season N is over, or once FACEIT lists an
+// S<N+1> championship for 1NT (its leagues, the player's latest matches) with nothing of N left to play
+// (pickSeason in esea_league_log.mjs). A season with no championship found yet never replaces the one on file.
+const SEASON = await (async () => {
+  if (process.env.ESEA_SEASON) return BASE;
+  const names = [];
+  for (const t of await pages(`/teams/${TEAM_ID}/tournaments`, 200).catch(() => [])) names.push(t.name);
+  const pl = await api(`/players?nickname=${encodeURIComponent(PLAYER)}`).catch(() => null);
+  if (pl?.player_id) for (const m of (await api(`/players/${pl.player_id}/history?game=cs2&limit=100`).catch(() => null))?.items || []) names.push(m.competition_name);
+  const sn = pickSeason(BASE, prev, names.filter(Boolean));
+  if (sn !== BASE) console.log(`ESEA: S${BASE} is over or S${sn} is listed: following S${sn}`);
+  return sn;
+})();
 // ESEA_DEBUG=1: print what the API returns for 1NT (public data only), to see how a season is named
 if (process.env.ESEA_DEBUG) {
   const sa = p => api(p).catch(e => ({ error: e.message }));
@@ -66,7 +78,7 @@ if (process.env.ESEA_DEBUG) {
   }
   show('team members[0]', t?.members?.[0]);
   const tst = await sa(`/teams/${TEAM_ID}/stats/cs2`); show('team stats lifetime', tst?.lifetime); show('team stats segment[0]', tst?.segments?.[0]);
-  for (const q of ['ESEA', 'Season 59', 'S59']) show(`search championships "${q}"`, (await sa(`/search/championships?name=${encodeURIComponent(q)}&game=cs2&type=ongoing&limit=20`))?.items?.map(x => ({ name: x.name, id: x.competition_id || x.championship_id, region: x.region, status: x.status })));
+  for (const q of ['ESEA', `Season ${BASE}`, `S${BASE}`]) show(`search championships "${q}"`, (await sa(`/search/championships?name=${encodeURIComponent(q)}&game=cs2&type=ongoing&limit=20`))?.items?.map(x => ({ name: x.name, id: x.competition_id || x.championship_id, region: x.region, status: x.status })));
   process.exit(0);
 }
 // ---- FACEIT profile data (independent of the league season) -------------------------------------
@@ -333,7 +345,7 @@ if (process.env.ESEA_DEMO_PROBE) {
   console.log("organizer of our match:", room0?.organizer_id, room0?.competition_id, room0?.competition_name);
   if (room0?.organizer_id) for (const type of ["ongoing", "upcoming", "past"]) {
     const r = await api(`/organizers/${room0.organizer_id}/championships?type=${type}&limit=100`).catch(e => ({ error: e.message }));
-    console.log('organizer champs', type, r?.error || (r?.items || []).filter(x => /S\s*59|Season 59/i.test(x.name || '')).map(x => x.name).join(' | ').slice(0, 1500), 'total', (r?.items || []).length);
+    console.log('organizer champs', type, r?.error || (r?.items || []).filter(x => inSeason(x.name, SEASON)).map(x => x.name).join(' | ').slice(0, 1500), 'total', (r?.items || []).length);
   }
   const any = prev.matches?.find(m => m.result)?.id;
   const room = any && await api(`/matches/${any}`).catch(e => ({ error: e.message }));
@@ -364,7 +376,7 @@ const writeOut = o => {
 };
 
 // FACEIT names a season's competitions "S59 NA Main A - Regular Season", "S59 NA Main A - Playoffs", ...
-const isSeason = name => new RegExp(`(^|\\b)(S|Season\\s*)${SEASON}\\b`, 'i').test(name || '');
+const isSeason = name => inSeason(name, SEASON);
 const stageOf = name => (String(name || '').split(' - ')[1] || null);
 
 // ---- which championship is this season's ------------------------------------------------------
@@ -394,7 +406,13 @@ if (!champId) {
   champId = list.find(t => isSeason(t.name))?.championship_id || list.find(t => isSeason(t.name))?.tournament_id || null;
 }
 if (champId && !champs.has(champId)) champs.set(champId, { id: champId });
-if (!champId) { console.log(`ESEA S${SEASON}: no championship found for 1NT yet`); writeOut({ season: SEASON, asof: new Date().toISOString(), matches: [], profile: prof }); process.exit(0); }
+if (!champId) {
+  console.log(`ESEA S${SEASON}: no championship found for 1NT yet`);
+  // never an empty season over one on file (a finished season stays until the next one has a championship)
+  if (prev.season && prev.matches?.length) writeOut({ ...prev, asof: new Date().toISOString(), profile: prof });
+  else writeOut({ season: SEASON, asof: new Date().toISOString(), matches: [], profile: prof });
+  process.exit(0);
+}
 const champ = await api(`/championships/${champId}`);
 
 // ---- 1NT's matches, across the season's championships ------------------------------------------
@@ -1680,8 +1698,17 @@ if (prev.members) {
 // ECL wildcard invites. Fewer than 4 wins drops a team's group status. Odds: 1NT's remaining regular-
 // season matches as coin flips weighted by its record so far (shrunk toward .500 by 7 games of .500),
 // against a cut line projected from every team in the group finishing at .500 from here.
+// regular-season matches: data/cs.json "eseaRegSeason" ({"60": 16}) when set, else the most any team in the group has
+// listed (FACEIT only lists the scheduled ones), at least 14 (S57: 5-9, S58: 8-6, S59: 14)
+const REG_SEASON = (() => {
+  const set = +((csCfg.eseaRegSeason || {})[SEASON] || 0); if (set) return set;
+  const per = {};
+  for (const m of allM) if (regular.has(m.competition_id)) for (const f of [m.teams?.faction1, m.teams?.faction2]) if (f?.faction_id && f.faction_id !== 'bye') per[f.faction_id] = (per[f.faction_id] || 0) + 1;
+  return Math.max(14, ...Object.values(per));
+})();
 const FORMAT = { playoffSpots: 48 * Math.max(1, regular.size), perGroup: 48, groups: regular.size, safeWins: 4, promote: 4, finals: 2, regSeason: REG_SEASON,
   prizes: [['1st', 15000], ['2nd', 7500], ['3rd–4th', 2000], ['5th–8th', 1000], ['9th–12th', 500], ['13th–16th', 250]],
+  // FACEIT support articles: the ids don't follow the season number, so a new season's links are set here by hand
   sources: ['https://support.faceit.com/hc/en-us/articles/29496103330076-ESEA-League-Season-59-Prize-Breakdown',
     'https://support.faceit.com/hc/en-us/articles/19451574692508-How-does-the-move-up-and-move-down-process-work-in-Season-58'] };
 const safe = f => { try { return f(); } catch (e) { console.log(`${f.name}:`, e.message); return null; } };
@@ -2089,6 +2116,10 @@ function bracket() {
     groups: groups.map(g => ({ g, label: label(g), rounds: [...new Set(all.filter(m => m.g === g).map(m => m.r))].sort((a, b) => a - b).map(r => ({ r, m: all.filter(m => m.g === g && m.r === r) })) })) };
 }
 
+// a past season the 1NT history file (scripts/esea_1nt_history.mjs, run by hand) doesn't hold yet keeps the player lines
+// it had on file, and the season just finished keeps its own
+for (const [sn, v] of Object.entries(prev.seasons || {})) if (+sn < SEASON && !pastSeasons[sn]) pastSeasons[sn] = v;
+if (prev.season && prev.season < SEASON && !pastSeasons[prev.season] && prev.players?.length) pastSeasons[prev.season] = prev.players;
 const out = {
   season: SEASON, asof: new Date().toISOString(),
   championship: { id: champId, name: champ?.name || champs.get(champId)?.name || null,
