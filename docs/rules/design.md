@@ -17,7 +17,8 @@
 
 ## GFX cards
 
-- Share GFX for X/Twitter are 16:9 unless a card type says otherwise (explainer cards also come in 3:4).
+- Table, player and team cards are 4:5 (2160 x 2700; Noah, Nov 28); brackets stay portrait. Log, scoreboard, sport sheet,
+  news, article, agency and wide glossary cards are 16:9; explainer cards also come in 3:4.
 - Clean layout: no overlap, no wrap, no cut text; text as big as fits.
 - Every table GFX keeps name, position, class, team logo and FV; the sorted column and the weekly move column are
   added and never dropped. Full-league GFX show every team (32 / 30).
