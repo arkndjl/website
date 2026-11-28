@@ -992,6 +992,12 @@ th {
   .winlist--thumbs .winlist__year { grid-column: 5; grid-row: 2; }
 }
 
+/* a list of articles: title takes the row, date in the by column (Baseball Articles) */
+.winlist--posts { max-width: none; }
+@media (min-width: 685px) {
+  .winlist--posts .winlist__row { grid-template-columns: 20px 3ch minmax(0, 1fr) 12ch 0; }
+}
+
 /* Tab strip over a group of list windows ({{< wintabs >}}) */
 .wintabs {
   max-width: 760px;
