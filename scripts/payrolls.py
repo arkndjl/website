@@ -259,7 +259,40 @@ def nhl_xaav():
         d = json.load(open(os.path.join(ROOT, 'static', 'data', 'xaav-nhl.json')))
     except OSError:
         return {}
-    return {(NM.key(p['n']), p['grp']): p for p in d['players']}
+    out = defaultdict(list)
+    for p in d['players']:
+        out[(NM.key(p['n']), p['grp'])].append(p)
+    return out
+
+
+def _stripped(w, full):
+    """w is the word full with its accented letters dropped (MoneyPuck: Sttzle / Stützle, Slafkovsk / Slafkovsky)"""
+    if w == full or w == ''.join(c for c in full if c.isascii()):
+        return True
+    k, gone = 0, []
+    for c in full:
+        if k < len(w) and c == w[k]: k += 1
+        else: gone.append(c)
+    return k == len(w) and len(gone) == 1 and gone[0] in 'aeiouy' and len(w) >= 5
+
+
+def nhl_find(idx, n, grp, tm):
+    """the board rows for a CapWages name: the shared key, else one row in his group whose name is his with accented
+    letters missing (the WAR and xAAV files carry MoneyPuck's spellings), on his team or alone in the league"""
+    c = idx.get((NM.key(n), grp))
+    if c:
+        return c
+    a = NM.key(''.join(ch for ch in n if ch.isascii()))
+    c = idx.get((a, grp))
+    if c:
+        return c
+    ws = NM.key(n).split()
+    hit = [p for (k, g), rows in idx.items() if g == grp and len(k.split()) == len(ws)
+           and all(_stripped(x, y) for x, y in zip(k.split(), ws)) for p in rows]
+    if len(hit) == 1:
+        return hit
+    on = [p for p in hit if p.get('tm') == tm]
+    return on if len(on) == 1 else []
 
 
 def nhl_status(s):
@@ -325,9 +358,10 @@ def nhl():
                     r = nhl_player(p, tri, L, 'ltir' if 'injured' in grp else kind)
                     if r and (r['n'], r['pos']) not in seen:
                         seen.add((r['n'], r['pos']))
-                        c = V.get((NM.key(r['n']), r['grp'])) or []
+                        c = nhl_find(V, r['n'], r['grp'], tri)
                         r['v'] = r2(c[0]['war'], 2) if len(c) == 1 else None
-                        xa = X.get((NM.key(r['n']), r['grp']))
+                        xa = nhl_find(X, r['n'], r['grp'], tri)
+                        xa = xa[0] if len(xa) == 1 else None
                         r['x'] = xa['x'] if xa else None
                         r['ph'] = (c[0].get('ph') if len(c) == 1 else None) or (xa or {}).get('ph')
                         players.append(r)
@@ -339,7 +373,9 @@ def nhl():
                 for c in p.get('contracts') or []:
                     for x in c.get('details') or []:
                         b = x.get('buyout') or {}
-                        v = money(b.get('capHit')) if b else (money(x.get('capHit')) if 'buried' in kind else None)
+                        # buried: only the penalty over the allowance counts (CapWages spells it `burriedPenalty`), not his cap hit
+                        bp = x.get('burriedPenalty') or x.get('buriedPenalty')
+                        v = money(b.get('capHit')) if b else (money(bp) if 'buried' in kind and bp else None)
                         if x.get('season') in seasons and v:
                             h[seasons.index(x['season'])] = r2((h[seasons.index(x['season'])] or 0) + v)
                 if any(h):
@@ -382,8 +418,9 @@ def nba_parse(h):
             o.append(next((NBA_OPT[c] for c in cl.split() if c in NBA_OPT), ''))
         age = cells.get('age_today', ('', ''))[1].strip()
         g = cells.get('remain_gtd', ('', ''))[1].strip()
+        dead = 'partial_table' in row[:row.find('>')] or bool(re.search(r"<em><a href='/players/", row))
         out.append({'id': pid.group(1), 'n': __import__('html').unescape(nm.group(1)), 'age': int(age) if age.isdigit() else None,
-                    'h': h, 'o': o, 'gtd': money(g) if g else None})
+                    'h': h, 'o': o, 'gtd': money(g) if g else None, 'dead': dead})   # dead: waived or stretched (italic row)
     return out
 
 
@@ -418,6 +455,11 @@ def nba():
             ys = [v for v in r['h'] if v is not None]
             p = V.get(r['id']) or {}
             c = cur.get(r['id']) or {}
+            if r['dead']:                     # still paid by this team, playing elsewhere: dead money, not a roster contract
+                players.append({'n': r['n'], 'id': r['id'], 'tm': code, 'pos': c.get('pos') or p.get('pos'), 'age': r['age'],
+                                'h': [r2(v) for v in h], 'dead': 1, 'ct': 'waived', 'fa': False, 'thru': ystr(L['season'] + last),
+                                'left': left, 'aav': r2(sum(ys) / len(ys)), 'tot': r2(sum(ys), 2), 'gtd': r2(r['gtd'], 2)})
+                continue
             r['o'][0] = ''                    # this season's option is already decided
             opt = next((f'{o} {ystr(L["season"] + i)}' for i, o in enumerate(r['o']) if o), None)
             players.append({'n': r['n'], 'id': r['id'], 'tm': code, 'pos': c.get('pos') or p.get('pos'), 'age': r['age'],
@@ -426,9 +468,10 @@ def nba():
                             'thru': ystr(L['season'] + last), 'fa': fa, 'st': 'FA' if last == 0 else (r['o'][1] or None) if fa else None,
                             'v': r2(p.get('vorx'), 2), 'x': r2(X.get(r['id']), 2) if isinstance(X, dict) else None})
         pay = sum(p['h'][0] or 0 for p in players if p['tm'] == code)
-        teams.append({'tm': code, 'name': NBA_NAMES.get(code, code), 'pay': r2(pay, 2), 'space': r2(L['cap'] - pay, 2), 'tax': r2(L['tax'] - pay, 2),
+        dead = sum(p['h'][0] or 0 for p in players if p['tm'] == code and p.get('dead'))
+        teams.append({'tm': code, 'name': NBA_NAMES.get(code, code), 'pay': r2(pay, 2), 'dead': r2(dead, 2), 'space': r2(L['cap'] - pay, 2), 'tax': r2(L['tax'] - pay, 2),
                       'apron1': r2(L['apron1'] - pay, 2), 'apron2': r2(L['apron2'] - pay, 2), 'cap': L['cap'],
-                      'n': sum(1 for p in players if p['tm'] == code)})
+                      'n': sum(1 for p in players if p['tm'] == code and not p.get('dead'))})
     finish('nba', L, teams, players, 'Basketball-Reference contract pages; VORX and xAAV from the NBA board')
 
 
@@ -463,9 +506,8 @@ def nfl():
         xa = json.load(open(os.path.join(ROOT, 'static', 'data', 'xaav-nfl.json')))['players']
     except OSError:
         xa = []
-    X = defaultdict(list)
-    for p in xa:
-        X[NM.key(p['n'])].append(p)
+    XT = {'LA': 'LAR', 'WAS': 'WSH'}             # the board's team codes where they differ from the ones here
+    X = NM.Matcher([dict(p, tm=XT.get(p['tm'], p['tm'])) for p in xa], name='n', team='tm', pos='pos', team_eq=lambda a, b: a == b)
     y0 = L['season']
     players = []
     for r in by.values():
@@ -490,8 +532,7 @@ def nfl():
         paid = len({x['year'] for x in sh if x['year'].isdigit() and int(x['year']) <= y0 and (x['cap_number'] or 0) > 0})
         fa = thru == y0
         pos = OTC_POS.get(r['position'], r['position'])
-        c = [p for p in X.get(NM.key(r['player']), []) if p['tm'] == tm] or [p for p in X.get(NM.key(r['player']), []) if p.get('pos') == pos]
-        q = c[0] if len(c) == 1 else {}
+        q = X.find(r['player'], tm, pos)[0] or {}      # a nickname (Matt / Matthew Stafford) only on his own team
         age = None
         if r.get('date_of_birth'):
             try:
@@ -617,9 +658,21 @@ def soccer():
         sv = json.load(open(os.path.join(ROOT, 'static', 'data', 'soccer-war', '2026.json')))['players']
     except OSError:
         sv = []
-    SV = defaultdict(list)
+    one = {}                  # a season split between two clubs is two rows with one id: his SVAR is their sum
     for p in sv:
-        SV[(p['lg'], NM.key(p['n']))].append(p)
+        q = one.setdefault(p['p'], {'n': p['n'], 'lg': p['lg'], 'age': p.get('age'), 'svar': 0.0, 'min': 0})
+        q['svar'] += p.get('svar') or 0
+        if (p.get('min') or 0) >= q['min']:
+            q['lg'], q['min'] = p['lg'], p.get('min') or 0
+    SV = NM.Matcher(one.values(), name='n', team='lg', pos=None, sport='soccer', team_eq=lambda a, b: a == b)
+
+    def svar(r, lg):
+        """his 2025-26 SVAR: the same name (or a spelling the matcher reads as his) in his league, else the same name in
+        another big-five league (he moved) at his age"""
+        q, how = SV.find(r['n'], lg)
+        if q and how == 'name' and q.get('age') and r.get('age') and abs(q["age"] - r["age"]) > 2:
+            return None
+        return q['svar'] if q else None
     end = '2027-06-30'
     teams, players = [], []
     for lg, clubs in W.items():
@@ -634,8 +687,7 @@ def soccer():
             exp = [r for r in rows if r.get('until') and r['until'] <= end]
             val = 0.0
             for r in sorted(rows, key=lambda r: -r['wage_year_gbp']):
-                c = SV.get((lg, NM.key(r['n'])), [])
-                v = c[0].get('svar') if len(c) == 1 else None
+                v = svar(r, lg)
                 val += v or 0
                 if len([q for q in players if q['tm'] == code]) >= SOC_TOP:
                     continue
@@ -665,6 +717,10 @@ def test():
         assert rows and rows[0]['h'][0] > 1, rows[:1]
         assert any('PO' in r['o'] for r in rows)
         print('nba parse ok', len(rows))
+    t = ('<table id="contracts"><tr class="partial_table" ><th data-stat="player" csk="bealbr01" ><em><a href=\'/players/b/bealbr01.html\'>'
+         'Bradley Beal</a></em></th><td class="right " data-stat="y1" csk="1" >$19,383,010</td></tr><tr ><th data-stat="player" '
+         'csk="bookede01" ><a href=\'/players/b/bookede01.html\'>Devin Booker</a></th><td class="right " data-stat="y1" >$53,000,000</td></tr></table>')
+    assert [r['dead'] for r in nba_parse(t)] == [True, False], nba_parse(t)    # waived / stretched rows are dead money
     assert nhl_status('RFA (Arb)') == ('RFA', 'RFA (Arb)')
     assert nfl_status(3) == 'RFA' and nfl_status(5) == 'UFA'
     assert plus([1, 2, 3])[1] == 100

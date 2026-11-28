@@ -326,6 +326,9 @@ def status(stamp):
     weeks = max((v['vintages'] for v in bs.values()), default=0)
     logs['boards'] = {'boards': len(bs), 'weeks': weeks, 'by': bs}
     out = {'asof': stamp, 'logs': logs}
+    old = load(OUT, {}) or {}
+    if old.get('logs') == logs:         # no log moved: keep the file, so process-refresh has nothing to commit and deploy
+        return old
     with open(OUT, 'w') as f:
         json.dump(out, f, indent=1)
         f.write('\n')

@@ -1248,7 +1248,8 @@ def why(M, f, ref_f):
     cur = dict(base)
     for c in sorted(set(M.cp + M.cv), key=lambda c: (c != 'lrk', c)):
         nxt = dict(cur); nxt[c] = f[c]
-        rows.append([LABEL[c], round(fv_of(float(M.ets([nxt])[0])) - fv_of(float(M.ets([cur])[0])), 1)])
+        # signed rows: 'old' reads as his age (a young recruit's row is positive, so "old for the class" would misread)
+        rows.append(['age for the class' if c == 'old' else LABEL[c], round(fv_of(float(M.ets([nxt])[0])) - fv_of(float(M.ets([cur])[0])), 1)])
         cur = nxt
     return {'fv0': round(fv_of(e0), 1), 'rows': rows}
 

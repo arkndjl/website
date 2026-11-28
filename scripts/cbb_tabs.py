@@ -574,7 +574,7 @@ def main():
     # DECT (scripts/dect.py): college players with a year left, a consensus rank and a yNIL
     import dect as DECT
     try:
-        dfit = json.load(open(DECT.OUT)); mk = json.load(open(os.path.join(ROOT, 'data', 'cbb_market.json'))); nilby = {(p['name'], p['team']): p for p in mk['nil']}
+        dfit = json.load(open(DECT.OUT)); mk = json.load(open(os.path.join(ROOT, 'data', 'cbb_market.json'))); nilby = {(p['name'], p['team']): p for p in mk['nil'] + (mk.get('nilDraft') or [])}
         payk = {t['team']: max(0.4, min(2.0, t['y'] / t['x'])) for t in mk['teamsNil'] if t.get('x') and t.get('y')}      # school pay per market dollar
     except (OSError, ValueError, KeyError): dfit, nilby, payk = None, {}, {}
     def dect_of(m, a):

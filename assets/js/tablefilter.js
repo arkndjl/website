@@ -141,7 +141,9 @@
         if (rc < 0) return;
         var on = rows.filter(function (r) { return r.__f !== false; });
         if (rkSort) { window.__rr(on, '__rk', dir, rkSort.best, rkSort.get); }
-        else if (w.hasAttribute('data-tf-rerank')) { var k = 0; on.slice().sort(function (a, b) { return a.dataset.i - b.dataset.i; }).forEach(function (r) { r.__rk = ++k; }); }
+        else if (w.hasAttribute('data-tf-rerank')) {   // rows that share a built rank keep sharing it (schools with no commit)
+          var k = 0, pv = null; on.slice().sort(function (a, b) { return a.dataset.i - b.dataset.i; }).forEach(function (r) { k++; r.__rk = pv && pv.__rk0 === r.__rk0 ? pv.__rk : k; pv = r; });
+        }
         else on.forEach(function (r) { r.__rk = r.__rk0; });
         on.forEach(function (r) { r.cells[rc].textContent = r.__rk; });
       }

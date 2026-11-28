@@ -25,6 +25,9 @@ def plain(md):
     return re.sub(r'\s+', ' ', md)
 
 
+KEYS_FROM = '2026-11-28'
+
+
 def norm(t):
     return re.sub(r'\s+', ' ', t.replace('’', "'").replace('“', '"').replace('”', '"')).strip()
 
@@ -62,6 +65,9 @@ def problems():
             out.append(f'{f}: front matter does not parse ({e})')
             continue
         out += problems_of(front, m.group(2), f)
+        # CLAUDE.md: every new article gets its [gfx] keys (posts from Nov 28 2026 on; a draft waits until it is published)
+        if not front.get('draft') and str(front.get('date', ''))[:10] >= KEYS_FROM and not (front.get('gfx') or {}).get('keys'):
+            out.append(f'{f}: no [gfx] keys (one comma list of key words a section, in order)')
     return out
 
 
