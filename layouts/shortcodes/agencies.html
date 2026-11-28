@@ -41,8 +41,9 @@
 {{- $gc := "RK,Agency,Clients,FV sum,ARK" -}}{{- with $pl.breakoutP }}{{ $gc = "RK,Agency,Breakout+,Clients,FV sum,ARK" }}{{ end }}{{- with $pl.dealP }}{{ $gc = replace $gc "Agency," "Agency,Deal+," }}{{ end }}{{ with $pl.agencyP }}{{ $gc = replace $gc "Agency," "Agency,Agency+," }}{{ end -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "agencies") "icon" $icon "filter" "find" "tab" ($.Get "tab") "gfxCols" $gc "gfxDate" $date "gfxMax" "25") -}}
 <p class="agency__bar"><button type="button" class="cfb__btn" data-gfx data-gfx-mode="agencyboard" data-gfx-sport="{{ $sp }}" title="agency board PNG, 16:9">GFX 16:9</button></p>
+{{ partial "agencydrop.html" . }}
 <script type="application/json" id="agency-data-{{ $sp }}">{{ dict "sport" $sp "fit" $fit "agencies" $rows "clients" .clients "date" $date | jsonify | safeJS }}</script>
-<table class="cfb__table agency">
+<table class="cfb__table agency" data-ag-sport="{{ $sp }}">
   <thead><tr><th>RK</th><th>Agency</th>
     {{ with $pl.agencyP }}<th title="Agency+ = 100 + 25 x (c - mean agency c) / SD, c = the mean of the z-scored parts ({{ delimit $pl.agencyP.parts ", " }}). The deal part is the shrunk edge, sum(v - mu) / (n + k), times the clients when it is above zero, so an edge counts for more over more players and a low one is not multiplied; sent = drafted clients the agency had before the draft process, from the 2027 drafts on">Agency+</th>{{ end }}
     {{- with $pl.dealP }}<th title="Deal+ = 100 + 25 x (s - mean agency s) / SD, s = (sum + k x mean) / (n + k) of each college client's -zNIL / the sport's zNIL SD, k = {{ .k }}. Above 100 the agency gets its clients paid more than they are worth">Deal+</th>{{ end }}
@@ -52,10 +53,10 @@
     <th title="mean high school ARK stars">ARK</th><th title="clients with 5-star+">5★+</th>
     <th title="clients picked in the NFL draft (football) or NBA draft (basketball) with this agency signed before the draft process, counted from the 2027 drafts on">Drafted</th><th title="drafted clients taken in the first round">1st rd</th>
     <th title="drafted / (drafted + college clients now); blank when no college clients are on file">Pro%</th>
-    <th title="share of rows from the agency's own page or a named report">High%</th><th title="top three clients by FV">Top</th><th></th></tr></thead>
+    <th title="share of rows from the agency's own page or a named report">High%</th><th title="top three clients by FV">Top</th></tr></thead>
   <tbody>
   {{- range $i, $a := $rows }}
-  <tr>
+  <tr data-ag="{{ $i }}" class="agency__row">
     <td class="cfb__rk">{{ if or (eq .agency "Family") (eq .agency "None") }}—{{ else }}{{ add $i 1 }}{{ end }}</td>
     <td class="agency__name"><b>{{ .agency }}</b></td>
     {{- with $pl.agencyP }}<td class="cfb__num is-key" data-l="Agency+" data-v="{{ $a.agencyP }}">{{ with $a.agencyP }}<b>{{ . }}</b>{{ else }}—{{ end }}</td>{{ end }}
@@ -72,7 +73,6 @@
     <td class="cfb__num" data-v="{{ .proPct }}">{{ if ne .proPct nil }}{{ partial "num.html" (slice "%.0f" (mul .proPct 100)) }}%{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-v="{{ .high }}">{{ partial "num.html" (slice "%.0f" (mul .high 100)) }}%</td>
     <td class="agency__top">{{ range $j, $p := .top }}{{ if $j }}, {{ end }}{{ index $p 0 }} <span class="cfb__dim">{{ index $p 1 }}</span>{{ end }}</td>
-    <td><button type="button" class="cfb__btn cfb__cardbtn" data-gfx data-gfx-mode="agency" data-gfx-sport="{{ $sp }}" data-gfx-i="{{ $i }}" title="agency card PNG, 16:9">agencyGFX</button></td>
   </tr>
   {{- end }}
   </tbody>
