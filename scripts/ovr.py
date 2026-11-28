@@ -69,6 +69,8 @@ def feats(ship, c, r):
         elif nm == 'shrink': x.append(r['P'] * (r['n'] + r['car']) / (r['n'] + r['car'] + c['K']))
         elif nm == 'age': x += [a, a * a]
         elif nm == 'pos': x += [1.0 if r.get('pos') == p else 0.0 for p in c['pos'][1:]]
+        elif nm == 'role': x.append(math.log((r['n'] / r['gp'] if r.get('gp') else c['mpg']) / c['mpg']))   # minutes a game (round 2)
+        elif nm == 'ageP': x.append(a * r['P'])
     return x
 
 
@@ -104,7 +106,7 @@ def nba_rows(season, F):
     for p in jload(F[season], {}).get('players', []):
         if p.get('xpm') is None or p.get('pr') or p.get('sxpm') is None: continue
         out.append({'p': p, 'id': p['id'], 'P': p['sxpm'], 'D': p.get('txpm', p.get('xpm')), 'n': p['mp'], 'car': car.get(p['id'], 0),
-                    'age': p.get('age'), 'pos': nba_pos(p.get('pos')), 'Po': p.get('soxpm'), 'Pd': p.get('sdxpm')})
+                    'age': p.get('age'), 'pos': nba_pos(p.get('pos')), 'Po': p.get('soxpm'), 'Pd': p.get('sdxpm'), 'gp': p.get('g')})
     return out
 
 
@@ -152,7 +154,7 @@ def nhl_rows(season, F):
         if not p.get('toi') or p.get('pwar') is None or p.get('grp') not in ('F', 'D', 'G'): continue
         g = p['grp']
         out.append({'p': p, 'id': p['id'], 'grp': g, 'P': p['pwar'] / p['toi'] * 60, 'D': p['war'] / p['toi'] * 60 if p.get('war') is not None else None,
-                    'n': p['toi'], 'car': car.get(p['id'], 0), 'age': p.get('age'), 'pos': p.get('pos') if g == 'F' else g})
+                    'n': p['toi'], 'car': car.get(p['id'], 0), 'age': p.get('age'), 'pos': p.get('pos') if g == 'F' else g, 'gp': p.get('gp') or p.get('g')})
     return out
 
 
@@ -363,6 +365,10 @@ def team_rows(sp, rows, K):
 def research_par(R, key):
     x = R.get(key) or {}
     if not x.get('beta'): return None
+    r2_ = (R.get('round2') or {}).get(key) or {}
+    if r2_.get('ship') and r2_.get('beta'):      # round 2 ideas that passed against the live form (scripts/research/ovr_nov28/round2.py)
+        return {'beta': r2_['beta'], 'ship': r2_['feats'], 'consts': r2_['consts'],
+                'bands': {k: x['bands'][k] for k in ('t0', 't1', 'c0')} if x.get('bands') else None}
     return {'beta': x['beta'], 'ship': x.get('ship', []), 'consts': x.get('consts', {}),
             'bands': {k: x['bands'][k] for k in ('t0', 't1', 'c0')} if x.get('bands') else None}
 

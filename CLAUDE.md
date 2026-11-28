@@ -38,6 +38,9 @@
   OVR in the team card's line, with OVR beside each key player (`teamOvr`; ESPN short keys in its AL map).
 - OVR as a team-model input failed (NBA identical to pXPM, NHL t .92; `team.py --input`) and as an FV anchor (draft FV ranks
   third-season OVR below the pre-draft rank, t -3.94; `fv_anchor.py`): retests `ovr_team_input`, `ovr_fv_anchor`, `ovr_nhl_shrink_pwar`.
+- Round 2 (`round2.py`, Nov 28): minutes a game (`role`) shipped NBA + NHL F, age x rate (`ageP`) NBA; `research_par` in ovr.py reads
+  round2's beta when it shipped. NFL stays one scale across positions (`scripts/research/nfl_poscredit_nov28/`, per-group slopes
+  t -.25; RB slope -1.68 vs 2.09 pooled, retest `nfl_rb_credit`).
 
 ## ARKLIBRARY (content/arklibrary.md)
 
