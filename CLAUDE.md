@@ -14,6 +14,8 @@
 - Models ([docs/rules/models-tests.md](docs/rules/models-tests.md)): ship only what passes out-of-sample tests, point
   in time; 2026-27 is a lockbox; every failed or deferred test with a later look goes in data/retests.json; cross-sport rule; predictive metric in predictive contexts, descriptive in
   descriptive; FV is absolute 20-80 true talent, mean headline, never class-relative or a shared cross-sport scale. Replacement levels are refit on a schedule and by position (`scripts/repl_levels.py`, weekly; a split ships only after it passes).
+- Boards: no stat-toggle tables; every stat is a sortable column (header click ranks by it), phones scroll with the
+  name pinned, filters only for row subsets; new boards follow this (Noah, Nov 28).
 - Boards ([docs/rules/boards.md](docs/rules/boards.md)), metric definitions ([docs/rules/metrics.md](docs/rules/metrics.md)),
   sections ([docs/rules/sections.md](docs/rules/sections.md)), posting schedule and shipping
   ([docs/rules/workflow.md](docs/rules/workflow.md)): merge when done, then `python3 scripts/check_live.py`; retrigger

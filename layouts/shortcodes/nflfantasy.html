@@ -4,8 +4,10 @@
        {{< nflfantasy title="..." >}}
        Points shown are expected points: the line if he plays, times the chance he plays (by injury designation,
        roster status and whether he played last week). Rest of season adds every remaining game on his team's schedule.
-       Filters: view, scoring, position (FLEX = RB/WR/TE), team, search. RK and the position rank count within the
-       filters, in projection order; headers sort. Filters ride in the address (#view=ros&fmt=half&pos=RB). */ -}}
+       One table (no stat toggles, Nov 28 2026): this week's points, line and stats, with rest-of-season points (ROS) and
+       games left beside them; a header click on the points or ROS ranks the board by it. Scoring is the league setting.
+       Filters: scoring, position (FLEX = RB/WR/TE), team, search. RK and the position rank count within the
+       filters, in the ranked column's order; headers sort. Filters ride in the address (#key=ros&fmt=half&pos=RB). */ -}}
 {{- $d := site.Data.nfl_fantasy -}}
 {{- $pos := slice "QB" "RB" "WR" "TE" "FLEX" "K" "DST" -}}
 {{- $teams := slice "ARI" "ATL" "BAL" "BUF" "CAR" "CHI" "CIN" "CLE" "DAL" "DEN" "DET" "GB" "HOU" "IND" "JAX" "KC" "LA" "LAC" "LV" "MIA" "MIN" "NE" "NO" "NYG" "NYJ" "PHI" "PIT" "SEA" "SF" "TB" "TEN" "WAS" -}}
@@ -16,9 +18,6 @@
   </div>
   <form class="cfb__bar nflwar__bar" data-ff-bar hidden onsubmit="return false" aria-label="filter the projections">
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or team" autocomplete="off"></label>
-    <label class="cfb__field" title="this week: next game. rest of season: all games left on team schedule"><span>view</span><select name="view">
-      <option value="">this week</option><option value="ros">rest of season</option>
-    </select></label>
     <label class="cfb__field" title="points per reception: PPR 1, half PPR 0.5, standard 0; all other scoring identical"><span>scoring</span><select name="fmt">
       <option value="">PPR</option><option value="half">half PPR</option><option value="std">standard</option>
     </select></label>
@@ -35,16 +34,18 @@
   <div class="wintable__scroll cfb__scroll">
     <table class="cfb__table nflwar__table nflff__table">
       <thead><tr>
-        <th data-sort="rk" data-num aria-sort="ascending" title="rank by projected points within the filters and view">RK</th>
+        <th data-sort="rk" data-num aria-sort="ascending" title="rank by projected points within the filters (this week, or ROS when clicked)">RK</th>
         <th data-sort="n">Player</th>
         <th data-sort="pts" data-num data-ff-pts title="projected points = stat line if playing x P(plays)">PPR</th>
         <th data-sort="pos" class="cfb__g" title="position, rank at position by projected points within the filters (RB3 = 3rd RB)">Pos</th>
         <th data-sort="t" class="nflwar__team">Team</th>
-        <th data-sort="opp" data-ff-opp title="opponent this week (@ = away); rest of season: team games left">Opp</th>
+        <th data-sort="opp" data-ff-opp title="opponent this week (@ = away)">Opp</th>
         <th data-sort="kick" data-num class="nflff__kick" data-ff-kick title="kickoff, local time">Kick</th>
-        <th data-sort="av" data-num title="P(plays) this week by injury designation (Q, D, O), roster status (IR, other reserve lists), played last game; fit 2016-25. rest of season: expected games played">Play</th>
+        <th data-sort="av" data-num title="P(plays) this week by injury designation (Q, D, O), roster status (IR, other reserve lists), played last game; fit 2016-25">Play</th>
+        <th data-sort="ros" data-num class="nflff__rosh" title="rest of season: projected points over every game left on the team schedule (expected games played), selected scoring">ROS</th>
+        <th data-sort="rg" data-num title="team games left; hover a cell for his expected games played">G left</th>
         <th data-sort="ppg" data-num title="points a game, season to date, selected scoring">Pts/G</th>
-        <th data-sort="line" title="projected stat line if playing; rest of season: expected totals">Line</th>
+        <th data-sort="line" title="projected stat line if playing this week; hover for the rest-of-season totals">Line</th>
         <th data-sort="py" data-num class="nflff__x">Pass Yds</th>
         <th data-sort="ptd" data-num class="nflff__x">Pass TD</th>
         <th data-sort="pint" data-num class="nflff__x">INT</th>
@@ -73,7 +74,7 @@
       pager = win.querySelector('[data-ff-pager]'), pageEl = win.querySelector('[data-ff-page]'), pagesEl = win.querySelector('[data-ff-pages]'),
       ptsTh = win.querySelector('[data-ff-pts]'), oppTh = win.querySelector('[data-ff-opp]'), kickTh = win.querySelector('[data-ff-kick]');
   var PER = 50, FLEX = { RB: 1, WR: 1, TE: 1 }, LABEL = { '': 'PPR', half: 'Half', std: 'Std' }, FIX = { '': 'ppr', half: 'half', std: 'std' };
-  var all = [], S = {}, BOCUT = 0.2, pos = '', sortKey = 'rk', dir = 1, best = 1, page = 0;
+  var all = [], S = {}, BOCUT = 0.2, pos = '', key = 'pts', sortKey = 'rk', dir = 1, best = 1, page = 0;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   // nflverse headshot (ph, scripts/nfl_fantasy.py) and team logo; none, or one that fails, shows the neutral frame
   function face(p) { return p.pos === 'DST' ? '' : '<span class="pxframe pxframe--row"><img src="' + esc(p.ph ? 'https://static.www.nfl.com/image/upload/f_auto,q_auto,w_96/league/' + p.ph : '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
@@ -112,25 +113,24 @@
   function readHash() {
     var h = new URLSearchParams(location.hash.slice(1));
     pos = h.get('pos') || ''; bar.elements.team.value = h.get('team') || '';
-    bar.elements.view.value = h.get('view') === 'ros' ? 'ros' : '';
+    key = h.get('key') === 'ros' || h.get('view') === 'ros' ? 'ros' : 'pts';   // view=ros: old rest-of-season links
     bar.elements.fmt.value = ({ half: 'half', std: 'std' })[h.get('fmt')] || '';
     bar.elements.q.value = h.get('q') || '';
     chips();
   }
   function writeHash() {
     var h = new URLSearchParams();
-    if (bar.elements.view.value) h.set('view', 'ros'); if (bar.elements.fmt.value) h.set('fmt', bar.elements.fmt.value);
+    if (key === 'ros') h.set('key', 'ros'); if (bar.elements.fmt.value) h.set('fmt', bar.elements.fmt.value);
     if (pos) h.set('pos', pos); if (bar.elements.team.value) h.set('team', bar.elements.team.value);
     if (bar.elements.q.value.trim()) h.set('q', bar.elements.q.value.trim());
     var s = h.toString(); history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
   }
   function chips() { [].forEach.call(bar.querySelectorAll('.cfb__chip'), function (c) { var on = c.dataset.pos === pos; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
   function render() {
-    var q = bar.elements.q.value.trim().toLowerCase(), team = bar.elements.team.value, ros = bar.elements.view.value === 'ros',
+    var q = bar.elements.q.value.trim().toLowerCase(), team = bar.elements.team.value, ros = false,
         fmt = FIX[bar.elements.fmt.value];
-    ptsTh.textContent = LABEL[bar.elements.fmt.value]; oppTh.textContent = ros ? 'G' : 'Opp'; kickTh.hidden = ros;
-    win.classList.toggle('is-ros', ros);
-    win.dataset.gfxCols = 'RK,Player,' + LABEL[bar.elements.fmt.value] + ',Pos,' + (ros ? 'G' : 'Opp') + ',Line';
+    ptsTh.textContent = LABEL[bar.elements.fmt.value];
+    win.dataset.gfxCols = key === 'ros' ? 'RK,Player,ROS,Pos,G left,' + LABEL[bar.elements.fmt.value] : 'RK,Player,' + LABEL[bar.elements.fmt.value] + ',Pos,Opp,ROS,Line';
     var list = all.filter(function (p) {
       if (pos === 'FLEX' ? !FLEX[p.pos] : pos && p.pos !== pos) return false;
       if (team && p.t !== team) return false;
@@ -143,22 +143,23 @@
       p._ppg = pg; p._v = v;
       p.py = g(v, 'py'); p.ptd = g(v, 'ptd'); p.pint = g(v, 'pint'); p.yds = g(v, 'ry') + g(v, 'wy'); p.rc = g(v, 'rc');
       p.td = g(v, 'rtd') + g(v, 'wtd') + g(v, 'std'); p._av = ros ? p.eg : p.av;
-      p.opp = ros ? p.rg : (p.opp || ''); p.line = line(p, v, ros);
+      p.opp = p.opp || ''; p.line = line(p, v, ros);
+      p.ros = p.r ? score(p, p.r, fmt) : 0; p.rline = line(p, p.r, true);
     });
-    // ranks count within the filters, in projection order; search narrows what's shown, not the ranks
-    list.sort(function (a, b) { return b.pts - a.pts || (b._ppg || 0) - (a._ppg || 0); });
+    // ranks count within the filters, in the ranked column's order (this week or ROS); search narrows what's shown, not the ranks
+    list.sort(function (a, b) { return b[key] - a[key] || (b._ppg || 0) - (a._ppg || 0); });
     var pr = {};
     list.forEach(function (p, i) { p.rk = i + 1; p.pr = (pr[p.pos] = (pr[p.pos] || 0) + 1); });
     if (sortKey !== 'rk') {
       var num = ths.some(function (th) { return th.dataset.sort === sortKey && th.hasAttribute('data-num'); });
-      var key = sortKey === 'av' ? '_av' : sortKey === 'ppg' ? '_ppg' : sortKey;
+      var sk = sortKey === 'av' ? '_av' : sortKey === 'ppg' ? '_ppg' : sortKey;
       list = list.slice().sort(function (a, b) {
-        var x = key === 'pos' ? a.pos + String(1e4 + a.pr) : a[key], y = key === 'pos' ? b.pos + String(1e4 + b.pr) : b[key];
+        var x = sk === 'pos' ? a.pos + String(1e4 + a.pr) : a[sk], y = sk === 'pos' ? b.pos + String(1e4 + b.pr) : b[sk];
         if (num) { if (x == null || x === '') return 1; if (y == null || y === '') return -1; return (x - y) * dir || a.rk - b.rk; }
         return String(x).localeCompare(String(y)) * dir || a.rk - b.rk;
       });
     } else if (dir < 0) list = list.slice().reverse();
-    if (sortKey !== 'rk') __rr(list, 'rk', dir, best, function (p) { return p[key]; });
+    if (sortKey !== 'rk') __rr(list, 'rk', dir, best, function (p) { return p[sortKey === 'av' ? '_av' : sortKey === 'ppg' ? '_ppg' : sortKey]; });
     if (q) list = list.filter(function (p) { return (p.n + ' ' + p.t + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; });
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
     var gfxRow = function (p) {
@@ -170,12 +171,14 @@
       var v = p._v, dst = p.pos === 'DST' || p.pos === 'K';
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
         '<td class="nflff__name">' + face(p) + '<b>' + esc(p.n) + '</b>' + tag + '</td>' +
-        '<td class="cfb__num nflwar__war is-key nflff__pts" data-u="' + LABEL[bar.elements.fmt.value] + '">' + p.pts.toFixed(1) + '</td>' +
+        '<td class="cfb__num nflwar__war' + (key === 'pts' ? ' is-key' : '') + ' nflff__pts" data-u="' + LABEL[bar.elements.fmt.value] + '">' + p.pts.toFixed(1) + '</td>' +
         '<td class="cfb__g nflff__pos">' + esc(p.pos) + '<span class="cfb__dim">' + p.pr + '</span></td>' +
         '<td class="nflwar__team nflff__team" style="white-space: nowrap">' + tl(p.t) + esc(p.t) + '</td>' +
         '<td class="nflff__opp">' + (ros ? '<span class="nflff__m">games </span>' : '') + opp + '</td>' +
         (ros ? '' : '<td class="cfb__num nflff__kick" data-v="' + esc(p.kick || '') + '">' + kick + '</td>') +
         '<td class="cfb__num nflff__av"><span class="nflff__m">' + (ros ? 'exp. games ' : 'plays ') + '</span>' + (ros ? p.eg.toFixed(1) : Math.round(p.av * 100) + '%') + '</td>' +
+        '<td class="cfb__num nflwar__war' + (key === 'ros' ? ' is-key' : '') + ' nflff__ros" title="' + (p.r ? p.rline : 'no games left') + '">' + p.ros.toFixed(1) + '</td>' +
+        '<td class="cfb__num nflff__rg" title="expected games played ' + p.eg.toFixed(1) + '">' + p.rg + '</td>' +
         '<td class="cfb__num nflff__ppg">' + (p._ppg == null ? '<span class="cfb__dim">–</span>' : p._ppg.toFixed(1)) + '</td>' +
         '<td class="cfb__dim nflff__line">' + p.line + '</td>' +
         (dst || !v ? '<td class="nflff__x"></td><td class="nflff__x"></td><td class="nflff__x"></td><td class="nflff__x"></td><td class="nflff__x"></td><td class="nflff__x"></td>' :
@@ -191,11 +194,11 @@
     none.hidden = list.length > 0;
     count.textContent = list.length + (list.length === 1 ? ' player' : ' players');
     pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
-    ths.forEach(function (th) { th.removeAttribute('aria-sort'); if (th.dataset.sort === sortKey) th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending'); });
+    ths.forEach(function (th) { th.removeAttribute('aria-sort'); th.classList.toggle('is-key', th.dataset.sort === key); if (th.dataset.sort === sortKey || sortKey === 'rk' && th.dataset.sort === key) th.setAttribute('aria-sort', (dir > 0) === (th.dataset.sort === 'rk') ? 'ascending' : 'descending'); });
   }
   function update() { page = 0; writeHash(); render(); }
   bar.addEventListener('input', update); bar.addEventListener('change', update);
-  bar.addEventListener('reset', function () { pos = ''; sortKey = 'rk'; dir = 1; setTimeout(function () { chips(); update(); }); });
+  bar.addEventListener('reset', function () { pos = ''; key = 'pts'; sortKey = 'rk'; dir = 1; setTimeout(function () { chips(); update(); }); });
   bar.querySelector('.cfb__pos').addEventListener('click', function (e) {
     var c = e.target.closest('.cfb__chip'); if (!c) return;
     pos = c.dataset.pos === pos ? '' : c.dataset.pos; chips(); update();
@@ -204,6 +207,8 @@
     th.tabIndex = 0;
     function go() {
       var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk' || k === 'kick';
+      // a ranked column (this week's points, ROS): the board ranks by it, RK and the position rank with it; again flips it
+      if (k === 'pts' || k === 'ros') { if (key === k && sortKey === 'rk') dir = -dir; else { key = k; sortKey = 'rk'; dir = 1; } update(); return; }
       best = k === sortKey ? best : asc ? 1 : -1; dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
     }
     th.addEventListener('click', go);
