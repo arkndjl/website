@@ -1041,6 +1041,178 @@
    "trigger": "the 2023 class has three college seasons and its NBA draft read (cbb_recruit_hist rebuilt)",
    "gate": "same test, classes held out one at a time, t >= 2 on MSE of realized FV",
    "run_hint": "python3 scripts/research/recruit_pos_nov28/cbb_fv_test.py"
+  },
+  {
+   "key": "fwd_injury_line_lag",
+   "t": "Injury status changes against line moves",
+   "sp": [
+    "NFL",
+    "NBA",
+    "NHL",
+    "CFB",
+    "CBB"
+   ],
+   "ar": "games",
+   "kind": "forward",
+   "how": "hand",
+   "after": "nba:champ:2027",
+   "lag": 14,
+   "est": 1,
+   "ready": {
+    "file": "data/snapshots.json",
+    "key": "logs.inj.days",
+    "pass": "ge:150"
+   },
+   "trigger": "a season of the injury log (scripts/data/snaps/inj, every 30 minutes from Nov 28 2026) beside the dense odds archive",
+   "gate": "per sport, how long the close takes to absorb a status change, and whether pricing the change into the model margin at the report beats the close on held-out weeks (CLV t >= 2)"
+  },
+  {
+   "key": "fwd_nhl_close",
+   "t": "NHL close model and timing rule on the dense line archive",
+   "sp": [
+    "NHL"
+   ],
+   "ar": "games",
+   "kind": "forward",
+   "how": "hand",
+   "after": "nhl:champ:2027",
+   "lag": 14,
+   "est": 1,
+   "trigger": "NHL rows in scripts/data/odds_dense from Nov 28 2026 (moneyline, puck line, total, model margin), about 1,000 graded games by the Cup final",
+   "gate": "the close model and bet timing fitted on the first half of the season and scored on the second, as the other four sports were; ship on close-growth t >= 2"
+  },
+  {
+   "key": "fwd_depth_promotion",
+   "t": "Depth chart promotions as a next-up and FV input",
+   "sp": [
+    "CFB",
+    "CBB",
+    "NFL",
+    "NBA",
+    "NHL",
+    "Soccer"
+   ],
+   "ar": "fv",
+   "kind": "forward",
+   "how": "hand",
+   "after": "cfb:champ:2027",
+   "lag": 21,
+   "est": 1,
+   "ready": {
+    "file": "data/snapshots.json",
+    "key": "logs.depth.days",
+    "pass": "ge:300"
+   },
+   "trigger": "a full season of the depth chart log (scripts/data/snaps/depth, from Nov 28 2026)",
+   "gate": "a move up the chart in season (weeks moved, slots gained) added to next up and the FV prior, point in time, held out on the next season's production; ship only where t >= 2"
+  },
+  {
+   "key": "fwd_fv_vintage_drift",
+   "t": "Weekly FV moves: signal or noise",
+   "sp": [
+    "CFB",
+    "CBB",
+    "NFL",
+    "NBA",
+    "NHL",
+    "Soccer",
+    "Tennis",
+    "CS2"
+   ],
+   "ar": "fv",
+   "kind": "forward",
+   "how": "hand",
+   "due": "2027-12-01",
+   "est": 1,
+   "ready": {
+    "file": "data/snapshots.json",
+    "key": "logs.boards.weeks",
+    "pass": "ge:50"
+   },
+   "trigger": "a year of weekly board vintages (scripts/data/snaps/boards, from Nov 28 2026)",
+   "gate": "regress next-season outcome on FV now and FV's change over the last 4 and 12 weeks; momentum or reversion ships as a shrink rule only with held-out t >= 2, else FV moves are reported as noise bands"
+  },
+  {
+   "key": "fwd_offer_momentum",
+   "t": "Offer momentum, CFB recruits",
+   "sp": [
+    "CFB"
+   ],
+   "ar": "players",
+   "kind": "forward",
+   "how": "hand",
+   "due": "2027-12-20",
+   "est": 1,
+   "ready": {
+    "file": "data/snapshots.json",
+    "key": "logs.offers.days",
+    "pass": "ge:300"
+   },
+   "trigger": "the 2028 class's offers, commitments and visit counts logged daily through its early signing period (scripts/data/snaps/offers)",
+   "gate": "offers added in the last 30 days (count and P4 share) as an input to commit leans and the recruit index, fit on the 2028 class's first half and scored on its signings; ship on log loss t >= 2"
+  },
+  {
+   "key": "fwd_on3_nil_lead",
+   "t": "yNIL against On3's NIL valuation moves",
+   "sp": [
+    "CFB"
+   ],
+   "ar": "value",
+   "kind": "forward",
+   "how": "hand",
+   "due": "2027-09-01",
+   "est": 1,
+   "ready": {
+    "file": "data/snapshots.json",
+    "key": "logs.on3.days",
+    "pass": "ge:240"
+   },
+   "trigger": "On3 valuations logged each full board run from Nov 28 2026 (scripts/data/snaps/on3) across a portal window and a preseason",
+   "gate": "whether yNIL and xNIL changes lead On3's valuation changes and reported deals (data/nil_deals.json); a lead with t >= 2 moves the deal half-life, never a refit to On3's level (xnil-on3 note)"
+  },
+  {
+   "key": "fwd_agency_sign_date",
+   "t": "Agency first-seen dates for the sent count",
+   "sp": [
+    "CFB",
+    "CBB"
+   ],
+   "ar": "players",
+   "kind": "forward",
+   "how": "hand",
+   "after": "nba:draft:2027",
+   "lag": 14,
+   "est": 1,
+   "ready": {
+    "file": "data/snapshots.json",
+    "key": "logs.agency.days",
+    "pass": "ge:150"
+   },
+   "trigger": "ledger rows stamped the day they first appear (scripts/data/snaps/agency) through the 2027 drafts",
+   "gate": "rows first seen before the declare dates (Dec 1 football, Mar 15 basketball) agree with their source dates on at least 90 percent; then first-seen backs the signed-before-the-process rule in Agency+"
+  },
+  {
+   "key": "fwd_news_weight",
+   "t": "News weights against what moved",
+   "sp": [
+    "CFB",
+    "CBB",
+    "NFL",
+    "NBA",
+    "NHL"
+   ],
+   "ar": "method",
+   "kind": "forward",
+   "how": "hand",
+   "due": "2027-06-01",
+   "est": 1,
+   "ready": {
+    "file": "data/snapshots.json",
+    "key": "logs.news.days",
+    "pass": "ge:180"
+   },
+   "trigger": "six months of news items stamped as first seen (scripts/data/snaps/news)",
+   "gate": "news weight w against the size of the line, FV or board move that followed within 48 hours; reweight only where the rank correlation improves held out"
   }
  ]
 }

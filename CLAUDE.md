@@ -35,6 +35,14 @@
   Tue and Fri) writes `data/retests_state.json` for ARKLOG > retests (`arklogretests.html`) and the Process overview,
   opens a "retest due" issue for hand tests, and only ships a pass. The PR that runs one adds its `result`. `--test` after a change.
 
+## Forward logs (Nov 28; docs/forward-logs.md)
+
+- Data the site reads and then overwrites gets a dated, change-only log in `scripts/snapshots.py` -> `scripts/data/snaps/`
+  (injuries and news every 30 minutes in odds-snap.yml; depth charts, weekly board vintages and agency rows in
+  process-refresh.yml; CFB offers in cfb-recruits.yml; On3 grades and NIL in cfb-board.yml). Batch a new log into an existing
+  workflow, never a new one (Actions minutes). Each log names its future test in `data/retests.json` (`fwd_*`, `ready` on
+  `data/snapshots.json`). Public data only. `python3 scripts/snapshots.py --test` after a change.
+
 ## Player names (every sport)
 
 - Join sources by player name only through the shared matcher: `scripts/names.py` (Python) and `scripts/names.mjs`
