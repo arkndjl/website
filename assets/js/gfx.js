@@ -1325,6 +1325,32 @@
     return isDet(nx) ? { el: nx, opened: true, close: function () { if (row.nextElementSibling === nx) who.click(); } } : { el: null };
   }
   var NBAX = null;
+  // OVR (scripts/ovr.py -> static/data/ovr/<sport>.json): the 0-99 pro grade for cards, by page
+  var OVRD = {};
+  function ovrSports() { var m = location.pathname.match(/\/arkboard\/(nba|nhl|nfl|soccer|tennis|counter-strike)\//); if (!m) return []; return m[1] === 'tennis' ? ['atp', 'wta'] : [m[1] === 'counter-strike' ? 'cs2' : m[1]]; }
+  function ovrData(sp) { return OVRD[sp] || (OVRD[sp] = fetch('/data/ovr/' + sp + '.json').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })); }
+  async function pcOvr(name, team) {
+    var nm = pdNorm(name), tmU = String(team || '').split('/').pop().trim().toUpperCase(), sps = ovrSports();
+    for (var k = 0; k < sps.length; k++) {
+      var D = await ovrData(sps[k]); if (!D) continue;
+      var hits = D.p.filter(function (p) { return pdNorm(p[0]) === nm; }); if (!hits.length) continue;
+      var p = hits.length > 1 && tmU ? hits.find(function (q) { return String(q[1]).toUpperCase() === tmU; }) || hits[0] : hits[0];
+      var below = D.p.filter(function (q) { return q[2] < p[2]; }).length;
+      return { ovr: p[2], pct: Math.round(100 * below / Math.max(1, D.p.length - 1)), label: D.label };
+    }
+    return null;
+  }
+  async function teamOvr(team) {
+    var sps = ovrSports(), tmU = String(team || '').trim().toUpperCase();
+    var AL = { UTAH: 'UTA', WSH: 'WAS', PHX: 'PHO', BKN: 'BRK', CHA: 'CHO', SA: 'SAS', GS: 'GSW', NY: 'NYK', NO: 'NOP' };
+    for (var k = 0; k < sps.length; k++) {
+      var D = await ovrData(sps[k]); if (!D || !D.t) continue;
+      var t = D.t[tmU] || D.t[AL[tmU]] || D.t[String(team || '').trim()];
+      if (!t && tmU.length >= 2) { var ks = Object.keys(D.t).filter(function (q) { return q.toUpperCase().indexOf(tmU) === 0; }); if (ks.length === 1) t = D.t[ks[0]]; }   // ESPN's SA, TB, NJ against SAS, TBL, NJD
+      if (t) return { ovr: t[0], rk: t[1], N: t[2] };
+    }
+    return null;
+  }
   function nbaXpm(w) { return NBAX || (NBAX = fetch(w.getAttribute('data-src') + w.getAttribute('data-cur') + '.json').then(function (r) { return r.json(); }).catch(function () { NBAX = null; return null; })); }
   // ---- a sparse card's spare room: the season line as stat cells, the player's row on the page's other tables, FV outlook
   // a stat in a line of text: "1793 pass yds", "25 mpg" (number, label) or "BPM +2.0 (−0.4 O, +2.3 D)", "3P 33.3% on 3"
@@ -1900,6 +1926,11 @@
         tiles.unshift({ i: -1, h: 'VORX', t: xp.vorx.toFixed(1), pct: vp, good: vp, tip: 'wins over replacement on XPM, ' + xd.label });
       }
     }
+    // every pro card carries OVR; a table without the column borrows it from the sport's OVR board
+    if (!heads.some(function (h) { return /^ovr$/i.test(h); }) && !(rc && rc.c)) {
+      var ov = await pcOvr(name, team);
+      if (ov) tiles.unshift({ i: -1, h: 'OVR', t: String(ov.ovr), pct: ov.pct, good: ov.pct, tip: 'overall 0-99: replacement 60, median starter 75, the best in a typical season 97' });
+    }
     // the headline: the board's FV, else the sorted column (or the first graded number), in a plaque at the top right
     var hasFv = !!(fvT && !pcDash(fvT));   // any dash (soccer's seniors carry "–"): the sorted stat takes the plaque
     var feat = tiles.find(function (t) { return t.i === sortI; }) || (!hasFv ? tiles.find(function (t) { return t.pct != null && t.prob == null; }) : null);
@@ -2268,7 +2299,8 @@
     nl.forEach(function (l, i) { g.fillText(fit(g, l, tw), tx, y + i * 110); });
     y += nl.length * 110;
     // the line under the name, less the record (its own tile below)
-    var head = d.head.map(function (h) { return d.rec && h.indexOf(d.rec) === 0 ? h.slice(d.rec.length).replace(/^[ ,]+/, '').replace(/^\((.*)\)$/, '$1') : h; }).filter(Boolean);
+    var tov = await teamOvr(String(d.key || '').toUpperCase()) || await teamOvr((String(d.logo || '').split('/').pop() || '').replace(/\.\w+$/, '').toUpperCase());
+    var head = (tov ? ['team OVR ' + tov.ovr + ' (#' + tov.rk + ')'] : []).concat(d.head).map(function (h) { return d.rec && h.indexOf(d.rec) === 0 ? h.slice(d.rec.length).replace(/^[ ,]+/, '').replace(/^\((.*)\)$/, '$1') : h; }).filter(Boolean);
     g.font = '48px ' + FONT; g.fillStyle = C.teal;
     wrap(g, head.join(' · '), tw).slice(0, 3).forEach(function (l) { g.fillText(l, tx, y); y += 64; });
     y = ly + LS + 44;
@@ -2354,6 +2386,8 @@
       });
       return py;
     }
+    // OVR beside each key player (static/data/ovr), when the page has an OVR board
+    for (var pi = 0; pi < d.pl.length; pi++) { var po = await pcOvr(d.pl[pi][0], String(d.key || '')); if (po) { d.pl[pi] = d.pl[pi].slice(); d.pl[pi][1] = (d.pl[pi][1] ? d.pl[pi][1] + ' · ' : '') + 'OVR ' + po.ovr; } }
     var two = d.next.length || d.last, up = function (s) { return String(s || '').toUpperCase(); };
     if (d.pl.length) py2 = plist(two ? x + half + 60 : x, py2, two ? half : w, 'KEY PLAYERS', up(d.pm), d.pl, d.pm);
     // elite young talent: under the next games (or beside key players when there is no schedule)

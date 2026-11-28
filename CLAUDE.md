@@ -34,6 +34,8 @@
 - Team OVR (`ovrteams.html`, ARK Ranking > team OVR on NBA / NHL / NFL / CS2): player rates weighted by minutes (NFL snaps, CS2 top five
   by maps) on the same points (replacement roster 60, median team 75, best team 97); minutes beat prior minutes, depth slots and equal
   weights held out (`scripts/research/ovr_nov28/team.py`, NBA R2 .699, NHL .522).
+- Cards: `static/data/ovr/<sport>.json` (written by ovr.py) puts an OVR tile on every pro player card (`pcOvr` in gfx.js) and team
+  OVR in the team card's line, with OVR beside each key player (`teamOvr`; ESPN short keys in its AL map).
 
 ## ARKLIBRARY (content/arklibrary.md)
 

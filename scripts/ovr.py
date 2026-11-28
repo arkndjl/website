@@ -414,6 +414,11 @@ def build(sports):
             summ.setdefault('teams', {})[sp] = meta['teams'][:10]
         meta.update(sport=sp, asof=dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), n=len(rows), anchors=K[sp])
         json.dump(dict(meta, rows=rows), open(os.path.join(OUTD, f'{sp}.json'), 'w'), separators=(',', ':'))
+        # the card lookup (gfx.js pcOvr / team card): name, team, OVR; teams' OVR and rank
+        SD = os.path.join(ROOT, 'static', 'data', 'ovr'); os.makedirs(SD, exist_ok=True)
+        json.dump({'label': meta.get('label'), 'p': [[r['n'], str(r.get('tk') if sp == 'cs2' else r.get('tm') or ''), r['ovr']] for r in rows],
+                   't': {t['tm']: [t['ovr'], t['rk'], len(meta.get('teams') or [])] for t in meta.get('teams') or []}},
+                  open(os.path.join(SD, f'{sp}.json'), 'w'), separators=(',', ':'), ensure_ascii=False)
         summ[sp] = dict(meta, top=[{k: r.get(k) for k in ('n', 'tm', 'pos', 'ovr', 'lo', 'hi', 'age')} for r in rows[:30]])
         print(sp, len(rows), [(r['n'], r['ovr']) for r in rows[:5]])
     json.dump(summ, open(SUM, 'w'), indent=1)
