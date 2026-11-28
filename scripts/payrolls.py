@@ -339,7 +339,9 @@ def nhl():
                 for c in p.get('contracts') or []:
                     for x in c.get('details') or []:
                         b = x.get('buyout') or {}
-                        v = money(b.get('capHit')) if b else (money(x.get('capHit')) if 'buried' in kind else None)
+                        # buried: only the penalty over the allowance counts (CapWages spells it `burriedPenalty`), not his cap hit
+                        bp = x.get('burriedPenalty') or x.get('buriedPenalty')
+                        v = money(b.get('capHit')) if b else (money(bp) if 'buried' in kind and bp else None)
                         if x.get('season') in seasons and v:
                             h[seasons.index(x['season'])] = r2((h[seasons.index(x['season'])] or 0) + v)
                 if any(h):
@@ -379,8 +381,10 @@ def nba_parse(h):
             o.append(next((NBA_OPT[c] for c in cl.split() if c in NBA_OPT), ''))
         age = cells.get('age_today', ('', ''))[1].strip()
         g = cells.get('remain_gtd', ('', ''))[1].strip()
+        # a waived player's guaranteed money left on the books (stretched or not) is a `partial_table` row, his name in <em>
+        dead = 'partial_table' in row[:row.find('>')] or '<em><a ' in row
         out.append({'id': pid.group(1), 'n': __import__('html').unescape(nm.group(1)), 'age': int(age) if age.isdigit() else None,
-                    'h': h, 'o': o, 'gtd': money(g) if g else None})
+                    'h': h, 'o': o, 'gtd': money(g) if g else None, 'dead': dead})
     return out
 
 
@@ -415,6 +419,11 @@ def nba():
             ys = [v for v in r['h'] if v is not None]
             p = V.get(r['id']) or {}
             c = cur.get(r['id']) or {}
+            if r['dead']:                     # dead money: on this team's cap, his value and roster spot are elsewhere
+                players.append({'n': r['n'], 'id': r['id'], 'tm': code, 'pos': c.get('pos') or p.get('pos'), 'age': r['age'],
+                                'h': [r2(v) for v in h], 'gtd': r2(r['gtd'], 2), 'left': left, 'thru': ystr(L['season'] + last),
+                                'dead': 1, 'ct': 'waived', 'fa': False})
+                continue
             r['o'][0] = ''                    # this season's option is already decided
             opt = next((f'{o} {ystr(L["season"] + i)}' for i, o in enumerate(r['o']) if o), None)
             players.append({'n': r['n'], 'id': r['id'], 'tm': code, 'pos': c.get('pos') or p.get('pos'), 'age': r['age'],
@@ -423,9 +432,10 @@ def nba():
                             'thru': ystr(L['season'] + last), 'fa': fa, 'st': 'FA' if last == 0 else (r['o'][1] or None) if fa else None,
                             'v': r2(p.get('vorx'), 2), 'x': r2(X.get(r['id']), 2) if isinstance(X, dict) else None})
         pay = sum(p['h'][0] or 0 for p in players if p['tm'] == code)
+        dead = sum(p['h'][0] or 0 for p in players if p['tm'] == code and p.get('dead'))
         teams.append({'tm': code, 'name': NBA_NAMES.get(code, code), 'pay': r2(pay, 2), 'space': r2(L['cap'] - pay, 2), 'tax': r2(L['tax'] - pay, 2),
-                      'apron1': r2(L['apron1'] - pay, 2), 'apron2': r2(L['apron2'] - pay, 2), 'cap': L['cap'],
-                      'n': sum(1 for p in players if p['tm'] == code)})
+                      'apron1': r2(L['apron1'] - pay, 2), 'apron2': r2(L['apron2'] - pay, 2), 'cap': L['cap'], 'dead': r2(dead, 2),
+                      'n': sum(1 for p in players if p['tm'] == code and not p.get('dead'))})
     finish('nba', L, teams, players, 'Basketball-Reference contract pages; VORX and xAAV from the NBA board')
 
 
@@ -662,6 +672,11 @@ def test():
         assert rows and rows[0]['h'][0] > 1, rows[:1]
         assert any('PO' in r['o'] for r in rows)
         print('nba parse ok', len(rows))
+    row = ('<tr class="partial_table" ><th scope="row" class="left " data-stat="player" csk="bealbr01" ><em><a href=\'/players/b/bealbr01.html\'>'
+           'Bradley Beal</a></em></th><td class="center " data-stat="age_today" >33</td><td class="right " data-stat="y1" csk="1" >$19,383,010</td></tr>')
+    live = row.replace('class="partial_table" ', '').replace('<em>', '').replace('</em>', '')
+    rows = nba_parse(f'<table id="contracts">{row}{live}</table>')
+    assert [r['dead'] for r in rows] == [True, False] and rows[0]['h'][0] > 19, rows   # waived money is dead, not a roster spot
     assert nhl_status('RFA (Arb)') == ('RFA', 'RFA (Arb)')
     assert nfl_status(3) == 'RFA' and nfl_status(5) == 'UFA'
     assert plus([1, 2, 3])[1] == 100
