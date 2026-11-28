@@ -22,6 +22,7 @@ quote = [
   "Models that seek to be both predictive and descriptive often fail at being able to do both",
   "Every test on the site is published, including the ones that failed",
   "People just want sports and their favorite teams and players to actually matter to them",
+  "PROCESS #1 comes out on December 1st",
 ]
 post = """PROCESS #0: My Design Philosophy, Anti-Minimalism, and the Beauty of Friction
 
