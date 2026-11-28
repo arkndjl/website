@@ -43,8 +43,9 @@
 
 ## articleGFX (every article)
 
-- Every article gets the articleGFX button: a 16:9 X card plus post text (`buildArticle` in `assets/js/gfx.js`).
-- The card is a preview, not a summary: one short verbatim excerpt from each section (personal sections too) under
-  its heading, plus the article's own figures. Excerpts may be part of a sentence but stay word for word.
-- Front matter `[gfx]`: `quote = [...]`, `post = """..."""`. `scripts/article_gfx.py` (build gate) fails any line
-  not in the article word for word. No invented lines, no taglines.
+- Every article gets the articleGFX button: a 16:9 card (`buildArticle` in `assets/js/gfx.js`).
+- The card is a preview, not a summary: each section's heading over a comma list of its key words and taglines
+  (Noah, Nov 28 03:03Z: key words, not lines from the article), plus the article's own figures.
+- No tweet or post text (Noah, Nov 28 03:29Z: he writes his own posts).
+- Front matter `[gfx]`: `keys = [one comma list a section, in order]`.
+  `scripts/article_gfx.py` (build gate) fails a key word that is not in its section.

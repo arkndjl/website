@@ -10,7 +10,7 @@
   column groups, every page works on a phone.
 - Copy ([docs/rules/copy-voice.md](docs/rules/copy-voice.md)): minimal text, no blurbs; everything published in Noah's
   voice (academic, his own words, Oxford commas, no LLM phrasing or marketing); ARKLOG never logs copy cleanups or
-  mentions AI; one PROCESS #N article a month; every article gets an articleGFX card of verbatim excerpts.
+  mentions AI; one PROCESS #N article a month; every article gets an articleGFX card (each section's key words, a comma list).
 - Models ([docs/rules/models-tests.md](docs/rules/models-tests.md)): ship only what passes out-of-sample tests, point
   in time; 2026-27 is a lockbox; cross-sport rule; predictive metric in predictive contexts, descriptive in
   descriptive; FV is absolute 20-80 true talent, mean headline, never class-relative or a shared cross-sport scale.
@@ -266,7 +266,7 @@
 ## articleGFX (every article)
 
 - Every post has an articleGFX button (layouts/_default/single.html, `buildArticle` in assets/js/gfx.js): a 16:9 card with the
-  title, each section's heading over a comma list of its key words, and the article's own figures, plus post text for X.
+  title, each section's heading over a comma list of its key words, and the article's own figures. No tweet or post text (Noah, Nov 28: he writes his own).
 - Each new article gets a `[gfx]` block in its front matter: `keys` = one comma list a section, in order (Noah, Nov 28: key words
-  and taglines from the section, not lines from it), `post` = the title and one of his sentences. `python3 scripts/article_gfx.py`
-  (in the build gate) checks every key word is in its section and the post lines are his own words and fit 280.
+  and taglines from the section, not lines from it). `python3 scripts/article_gfx.py`
+  (in the build gate) checks every key word is in its section.
