@@ -648,7 +648,7 @@
       "NHL: 3,241 CapWages deals 2010-26 (standard, 35+ and two-way, no ELCs or extensions), on WAR, pWAR, 3Y, points and TOI a game, games and age, by F/D/G. MAE is .83% of the cap compared to 1.70 (t = -40, 17/17 seasons, forward 11/11). Points and TOI alone tie it (t = -1.4), so the market pays for points.",
       "NFL: 12,192 OverTheCap veteran contracts 2014-26 (3+ years after the draft), on WAR the last two seasons, snaps, games and age, by position. MAE is .86% compared to 1.50 (t = -52, 13/13, forward 9/9). WAR adds over snaps alone (t = -18). The ceiling is the record 24.5% (Burrow 2023).",
       "NBA: 1,334 Basketball-Reference offseason signings 2011-26 (free agent, multi-year or plain contracts, with next season's salary on the signing team), on XPM the last two seasons, VORX, minutes, points and minutes a game, games, age and years in the league. MAE is 2.60% compared to 5.04 (t = -19, 16/16, forward 11/11). XPM and VORX add over points and minutes alone (t = -6, 14/16). The max is 25/30/35% by years in the league, and the 2026-27 cap is $165M (projected).",
-      "Soccer isn't built. There is no public wage data I can reach (Capology blocks it), and xMV is the transfer-market equivalent.",
+      "Soccer isn't built. The only wage source I can reach is Salary Sport's estimates, with no signing dates, and xMV is the transfer-market equivalent.",
       "I also scored the NHL version against AFP Analytics' public projections, on the 109 signings of summer 2026 that both priced (ours from a fit on earlier years only,",
       "AFP's dated May 18 2026). Our mean miss was 1.03% of the cap, compared to .77 for AFP (t = +2.7 against ours).",
       "Restricted free agents were 1.52 compared to .85 (n 30), and unrestricted .81 compared to .70 (n 73). xAAV has no free-agent status input."
@@ -671,6 +671,37 @@
      ],
      "where": "NHL contract value tab (xTerm, Surplus)",
      "sports": [
+      "NHL"
+     ]
+    },
+    {
+     "term": "Payroll",
+     "short": "Every contract on a pro team: its cap hit this season and the next four, with the team's total, space and dead money.",
+     "body": [
+      "NHL: CapWages team pages (cap hits by season, expiry status, clauses, LTIR, buyouts and buried cap). NBA: Basketball-Reference contract pages (salary by season, player, team and early-termination options, guaranteed money left), against the league's cap, tax line and aprons. NFL: OverTheCap through nflverse (cap number by season, contract years, value and guarantees). MLS: American Soccer Analysis (MLSPA guaranteed pay and base salary).",
+      "The NFL source has no dead money, so the NFL table shows the active contracts against the cap and no space. MLS releases carry no contract years. The big five clubs come from Salary Sport's basic-wage estimates (bonuses out, pounds shown in euros at its 1.2 rate), the one free source that allows it: Capology, FBref, Spotrac and PuckPedia refuse scripted requests. Its Inter total came to 3.5% over Calcio e Finanza's published gross figure, and its contract ends match Transfermarkt's month for 71-82% of players. They are estimates and carry no efficiency numbers.",
+      "A tag marks a contract that ends this season, with its status in the hover (UFA, RFA, ERFA, or a player, team or early-termination option). NHL and MLS status comes from the source, NFL status is read from his seasons in the league (two or fewer ERFA, three RFA, more UFA), and the NBA source has no RFA flag."
+     ],
+     "where": "NBA, NFL, NHL payrolls, cap space, contracts and free agents; soccer wages (club wages, player wages, MLS payrolls, MLS salaries)",
+     "sports": [
+      "NBA",
+      "NFL",
+      "NHL",
+      "Soccer"
+     ]
+    },
+    {
+     "term": "Surplus / Eff+",
+     "short": "Surplus is what a roster's play is worth at the league's price of a win, minus what it costs above a roster of minimum players. Eff+ puts it on the plus scale.",
+     "body": [
+      "For each player, value = his WAR (NHL), VORX (NBA), WAR (NFL) or g+ above replacement (MLS) from the last full season, and cost = his cap hit this season minus the league minimum. The price of a win is the league's pay above the minimum divided by its value that season. Surplus is the sum over the roster, dead money counted as cost, and Eff+ = 100 + 25 × (Surplus - the league mean) / SD.",
+      "Tested walk-forward, fitting on earlier seasons only, as a predictor of next season's win% (MLS points a match) beyond last season's record and next season's payroll as a share of the cap. Mean miss: NBA 2018-2026 (270 team-seasons): .0827 with Surplus against .0926 (t = -3.21, 8/9 seasons, passed); NHL 2016-2026 (342 team-seasons): .0662 with Surplus against .0686 (t = -2.68, 10/11 seasons, passed); NFL 2018-2026 (287 team-seasons): .1447 with Surplus against .1454 (t = -.68, 6/9 seasons, failed); MLS 2018-2026 (238 team-seasons): .2536 with Surplus against .2546 (t = -.24, 5/9 seasons, failed). Wins over payroll, the record less what the payroll predicts, failed in every league (NBA t = -.67, NHL t = .51, NFL t = .06, MLS t = 1.70), even though it carries over from one season to the next (r NBA .46, NHL .31, NFL .32, MLS .27).",
+      "Deal and Risk read each season left on the deal with an age curve: his value k seasons on = a + b × his last full season, a and b fit by age group (24 and under, 25-27, 28-30, 31-33, 34 and over), and past three seasons one more year on the curve. Walk-forward against the same line with no age groups, mean miss of value: NBA one season on 1.122 against 1.136 (t = -2.05, 6/8), three seasons on 1.209 against 1.282 (t = -4.14, 6/6); NHL one season on 1.065 against 1.083 (t = -5.47, 9/10), three seasons on .983 against 1.029 (t = -7.73, 8/8); NFL one season on .092 against .093 (t = -2.14, 6/7), three seasons on .073 against .075 (t = -4.60, 5/5). Deal is the expected value over the seasons left in view at the price of a win, minus the cap hits above the minimum. Risk is the cap dollars after this season the curve expects to buy no value. The curve passed in all three, but Deal and Risk show only where Surplus passed too.",
+      "It shows only for the NBA and NHL, the two leagues where it passed. In both, the roster's value alone predicts next season a little better than Surplus does, so what carries the number forward is the talent, and the pay side is the judgement of how cheaply it was bought."
+     ],
+     "where": "NBA, NHL payrolls and contracts",
+     "sports": [
+      "NBA",
       "NHL"
      ]
     },
@@ -1195,7 +1226,9 @@
       "Football strength is Elo from the plan's college WAR, fit on this season's Elo across FBS (R2 = 0.63, n = 138). Basketball strength is the ARK rating of the plan's rotation.",
       "xW is wins over a conference schedule at every team's projected strength: 12 games in football, 31 in basketball. Wins over replacement are xW less a 10th-percentile team on the same schedule, and NIL $ a win is next season's spend over those wins.",
       "DECT as an input failed everywhere it was tested. In Ret% the staying edge made held-out log loss worse in both sports (CFB t = 2.96, CBB t = 0.72 against it). CBB Transfer%: DECT t = 1.47 on 2025-26 (needs 2), school pay per market dollar t = 1.61, market over school pay t = 0.17. CBB landing, money per market dollar at the destination t = 1.15. CFB Transfer% has one fall board to test on and is retested after the 2026-27 cycle. DECT shows on the builder for reading only.",
-      "Targets are uncommitted recruits a school is in on. His chance to sign there is the ARK lean model's for that school when the model has him (its top three schools), else On3's RPM share, else his visits: the rate at which committed recruits signed with a school they took an official visit to was .44 with 2, .32 with 3, .24 with 4 official visits and .18 with five or more. Those rates include visits after the commitment, so they run high. A school under 5% is left off. Next class targets add their chance times what they add to the plan (football: On% times the room AV of his Y1 FV, in Elo; basketball: the team rating of his projected XPM in the rotation), shown as plan + targets."
+      "Targets are uncommitted recruits a school is in on. His chance to sign there is the ARK lean model's for that school when the model has him (its top three schools), else On3's RPM share, else his visits: the rate at which committed recruits signed with a school they took an official visit to was .44 with 2, .32 with 3, .24 with 4 official visits and .18 with five or more. Those rates include visits after the commitment, so they run high. A school under 5% is left off. Next class targets add their chance times what they add to the plan (football: On% times the room AV of his Y1 FV, in Elo; basketball: the team rating of his projected XPM in the rotation), shown as plan + targets.",
+      "The next three seasons come from the roster chain: each player is on the roster a season later at his chance to be back (Ret%, Transfer% and the draft next season, then the stay rate at his class), the committed class joins as freshmen, and the sum of their value above replacement is scaled with the team's strength now. Fit on NIL-era seasons, one season held out at a time, it beat strength now alone at every horizon. Basketball R2 went from .659 to .683 one season out (t = 5.88), .579 to .613 two out and .532 to .587 three out. Football R2 went from .544 to .614, .389 to .535 and .336 to .492 (t = 3.7 three out). Football value in the history is the 247 composite, because there is no season FV before 2025.",
+      "Basketball development is a curve on class, age, level and minutes: a freshman gains +0.33 pXPM on a senior, each year older than his class costs -0.13, each point of pXPM now -0.05 and a full-time role +0.69. Walking forward it beat the class means one season on (t = 6.04) and two on (t = 4.75), so the roster shows pXPM by season on it. Inside the team chain it did not help next season, so the team projection keeps the class means. Football development waits for two season-end FV boards."
      ],
      "where": "CFB team builder, CBB team builder",
      "sports": [

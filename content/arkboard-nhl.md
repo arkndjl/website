@@ -11,10 +11,16 @@ cover = "/og/nhl.png"
 
 {{< winpane title="nhl.exe :: 2026-27" icon="hockey" sprite="px/hero-hockey" status="NHL API · MoneyPuck xG · ESPN · Daily Faceoff" class="winpane--art" />}}
 
-{{< wintabs groups="players:leaders,projections,rookies,awards,all-time players,ARKLIST|rosters:depth chart,lines,transactions|games:games,game table|teams:ARK Ranking,units,all-time|market:contract value" side="true" label="NHL views" >}}
+{{< wintabs groups="players:leaders,projections,rookies,awards,all-time players,ARKLIST|rosters:depth chart,lines,transactions|games:games,game table|teams:ARK Ranking,units,all-time|market:payrolls,free agents,contract value" side="true" label="NHL views" >}}
 {{< nhlgames title="games" tab="games" >}}
 {{< nhlgametable title="game table" tab="game table" >}}
 {{< pctl sport="nhl" icon="hockey" title="projections" tab="projections" >}}
+{{< wintabs tab="payrolls" tabs="payrolls,cap space,contracts" sub="true" label="payrolls views" >}}
+{{< lazytab tab="payrolls" >}}{{< payrolls lg="nhl" view="teams" tab="payrolls" >}}{{< /lazytab >}}
+{{< lazytab tab="cap space" >}}{{< payrolls lg="nhl" view="space" tab="cap space" >}}{{< /lazytab >}}
+{{< lazytab tab="contracts" >}}{{< payrolls lg="nhl" view="contracts" tab="contracts" >}}{{< /lazytab >}}
+{{< /wintabs >}}
+{{< lazytab tab="free agents" >}}{{< payrolls lg="nhl" view="fa" tab="free agents" >}}{{< /lazytab >}}
 {{< xaav sport="nhl" title="contract value" tab="contract value" >}}
 {{< wintabs tab="rookies" tabs="rookies,next up" sub="true" label="rookies views" >}}
 {{< rookies sport="nhl" icon="hockey" title="rookies" tab="rookies" >}}

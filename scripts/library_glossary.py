@@ -43,6 +43,32 @@ _AGT = _agt()
 _AGCR = ld('research/agency_composite.json')
 _AGCOMP = ('A check on the 2022-26 search, which is not used: built from the clients on file and the 2022-24 sends, it ranks the %d agencies by the first-round picks they sent in 2025-26 at Spearman %.2f (p %.3f, %d agencies with such a pick). Sends alone %.2f, Deal %.2f, Breakout %.2f, client count %.2f.'
         % (_AGCR['n'], _AGCR['score']['rho'], _AGCR['score']['p'], _AGCR['agencies with a 2025-26 pick'], _AGCR['sent']['rho'], _AGCR['deal']['rho'], _AGCR['breakout']['rho'], _AGCR['vol']['rho']))               # NIL agencies (scripts/agencies.py)
+_PE = ld('research/payroll_efficiency.json')                 # payroll efficiency held out (scripts/research/payrolls_nov28/test.py)
+def _paytest():
+    nm = {'nba': 'NBA', 'nhl': 'NHL', 'nfl': 'NFL', 'mls': 'MLS'}
+    out = []
+    for k in ('nba', 'nhl', 'nfl', 'mls'):
+        r = _PE.get(k)
+        if not r: continue
+        out.append('%s %s (%d team-seasons): %.4f with Surplus against %.4f (t = %.2f, %s seasons, %s)' % (
+            nm[k], r['years'], r['n'], r['surplus']['mae'], r['maeBase'], r['surplus']['t'], r['surplus']['won'], 'passed' if r['surplus']['pass'] else 'failed'))
+    eff = ', '.join('%s %.2f' % (nm[k], _PE[k]['effYoY']) for k in ('nba', 'nhl', 'nfl', 'mls') if k in _PE)
+    effT = ', '.join('%s t = %.2f' % (nm[k], _PE[k]['eff']['t']) for k in ('nba', 'nhl', 'nfl', 'mls') if k in _PE)
+    return ('Tested walk-forward, fitting on earlier seasons only, as a predictor of next season\'s win% (MLS points a match) beyond last season\'s record and next season\'s payroll as a share of the cap. Mean miss: ' + '; '.join(out) +
+            '. Wins over payroll, the record less what the payroll predicts, failed in every league (' + effT + '), even though it carries over from one season to the next (r ' + eff + ').')
+_PA = ld('research/payroll_aging.json')                      # age curve over the years left (scripts/research/payrolls_nov28/aging.py)
+def _payage():
+    nm = {'nba': 'NBA', 'nhl': 'NHL', 'nfl': 'NFL'}
+    out = []
+    for k in ('nba', 'nhl', 'nfl'):
+        r = _PA.get(k)
+        if not r: continue
+        out.append('%s one season on %.3f against %.3f (t = %.2f, %s), three seasons on %.3f against %.3f (t = %.2f, %s)' % (
+            nm[k], r['k1']['maeAged'], r['k1']['maeFlat'], r['k1']['t'], r['k1']['won'], r['k3']['maeAged'], r['k3']['maeFlat'], r['k3']['t'], r['k3']['won']))
+    return ('Deal and Risk read each season left on the deal with an age curve: his value k seasons on = a + b × his last full season, a and b fit by age group (24 and under, 25-27, 28-30, 31-33, 34 and over), and past three seasons one more year on the curve. Walk-forward against the same line with no age groups, mean miss of value: ' + '; '.join(out) +
+            '. Deal is the expected value over the seasons left in view at the price of a win, minus the cap hits above the minimum. Risk is the cap dollars after this season the curve expects to buy no value. The curve passed in all three, but Deal and Risk show only where Surplus passed too.')
+_PAYAGE = re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _payage())
+_PAYTEST = re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _paytest())
 _DR = ld('data/dect_fit.json')                             # DECT, declare / even / college / transfer in dollars (scripts/dect.py)
 _TBX = {'cfb': ld('static/data/cfb-builder.json').get('nxFit') or {}, 'cbb': ld('static/data/cbb-builder.json').get('nxFit') or {}}   # scripts/team_builder_next.py
 _DX = {k: ld(f'scripts/research/dect_features_nov27/results_{k}.json') for k in ('ret', 'cbb_move', 'cfb_move')}   # DECT as a feature (failed; scripts/research/dect_features_nov27)
@@ -76,6 +102,36 @@ _CW = json.load(_gz.open(ROOT + '/scripts/data/cbb_tabs_2026.json.gz'))   # 2025
 _PX = ld('data/nba_pxpm_research.json')                     # pXPM fit + held-out tests (scripts/nba_pxpm_research.py)
 _NBAEX = (f"Held out 2012-23 ({_NX['n']:,} player seasons, {100 * _NX['exitShare']:.0f}% out of the league), RMSE goes from {_NX['exit_vs_cp']['rmse'][1]:.2f} to "
           f"{_NX['exit_vs_cp']['rmse'][0]:.2f} (t = {_NX['exit_vs_cp']['t']:.1f}, {_NX['exit_vs_cp']['won']}/{_NX['exit_vs_cp']['of']} seasons).")
+
+
+_TYF = ld('data/team_years_fit.json'); _TYD = ld('data/team_years_dev.json')   # scripts/research/team_years_nov28
+
+
+def _f2(x): return f"{x:.3f}".lstrip('0') if x >= 0 else '-' + f"{-x:.3f}".lstrip('0')
+
+
+def _tbx_years():
+    """seasons 2 and 3: the roster chain test, from data/team_years_fit.json"""
+    if not _TYF: return ''
+    b, f = _TYF['cbb']['h'], _TYF['cfb']['h']
+    return ('The next three seasons come from the roster chain: each player is on the roster a season later at his chance to be back '
+            '(Ret%, Transfer% and the draft next season, then the stay rate at his class), the committed class joins as freshmen, and '
+            'the sum of their value above replacement is scaled with the team\'s strength now. Fit on NIL-era seasons, one season held out at a time, '
+            f'it beat strength now alone at every horizon. Basketball R2 went from {_f2(b["1"]["r2_0"])} to {_f2(b["1"]["r2_1"])} one season out (t = {b["1"]["t"]}), '
+            f'{_f2(b["2"]["r2_0"])} to {_f2(b["2"]["r2_1"])} two out and {_f2(b["3"]["r2_0"])} to {_f2(b["3"]["r2_1"])} three out. Football R2 went from {_f2(f["1"]["r2_0"])} to {_f2(f["1"]["r2_1"])}, '
+            f'{_f2(f["2"]["r2_0"])} to {_f2(f["2"]["r2_1"])} and {_f2(f["3"]["r2_0"])} to {_f2(f["3"]["r2_1"])} (t = {f["3"]["t"]} three out). Football value in the history is the 247 composite, '
+            'because there is no season FV before 2025.')
+
+
+def _tbx_dev():
+    """player development: data/team_years_dev.json"""
+    d = (_TYD or {}).get('cbb')
+    if not d: return ''
+    t = d['test']; b = d['b']
+    return (f'Basketball development is a curve on class, age, level and minutes: a freshman gains {b[1]:+.2f} pXPM on a senior, each year older than '
+            f'his class costs {b[4]:+.2f}, each point of pXPM now {b[5]:+.2f} and a full-time role {b[6]:+.2f}. Walking forward it beat the class means '
+            f'one season on (t = {t["1"]["t"]}) and two on (t = {t["2"]["t"]}), so the roster shows pXPM by season on it. Inside the team chain it did not help '
+            'next season, so the team projection keeps the class means. Football development waits for two season-end FV boards.')
 
 
 def _tbx_pot():
@@ -356,8 +412,19 @@ sections.append({'id': 'value', 'title': 'Player value metrics', 'entries': [
        'NHL: 3,241 CapWages deals 2010-26 (standard, 35+ and two-way, no ELCs or extensions), on WAR, pWAR, 3Y, points and TOI a game, games and age, by F/D/G. MAE is .83% of the cap compared to 1.70 (t = -40, 17/17 seasons, forward 11/11). Points and TOI alone tie it (t = -1.4), so the market pays for points.',
        'NFL: 12,192 OverTheCap veteran contracts 2014-26 (3+ years after the draft), on WAR the last two seasons, snaps, games and age, by position. MAE is .86% compared to 1.50 (t = -52, 13/13, forward 9/9). WAR adds over snaps alone (t = -18). The ceiling is the record 24.5% (Burrow 2023).',
        'NBA: 1,334 Basketball-Reference offseason signings 2011-26 (free agent, multi-year or plain contracts, with next season\'s salary on the signing team), on XPM the last two seasons, VORX, minutes, points and minutes a game, games, age and years in the league. MAE is 2.60% compared to 5.04 (t = -19, 16/16, forward 11/11). XPM and VORX add over points and minutes alone (t = -6, 14/16). The max is 25/30/35% by years in the league, and the 2026-27 cap is $165M (projected).',
-       'Soccer isn\'t built. There is no public wage data I can reach (Capology blocks it), and xMV is the transfer-market equivalent.'],
+       'Soccer isn\'t built. The only wage source I can reach is Salary Sport\'s estimates, with no signing dates, and xMV is the transfer-market equivalent.'],
       'NBA, NFL, NHL contract value tabs', ['NBA', 'NFL', 'NHL']),
+    E('Payroll', 'Every contract on a pro team: its cap hit this season and the next four, with the team\'s total, space and dead money.',
+      ['NHL: CapWages team pages (cap hits by season, expiry status, clauses, LTIR, buyouts and buried cap). NBA: Basketball-Reference contract pages (salary by season, player, team and early-termination options, guaranteed money left), against the league\'s cap, tax line and aprons. NFL: OverTheCap through nflverse (cap number by season, contract years, value and guarantees). MLS: American Soccer Analysis (MLSPA guaranteed pay and base salary).',
+       'The NFL source has no dead money, so the NFL table shows the active contracts against the cap and no space. MLS releases carry no contract years. The big five clubs come from Salary Sport\'s basic-wage estimates (bonuses out, pounds shown in euros at its 1.2 rate), the one free source that allows it: Capology, FBref, Spotrac and PuckPedia refuse scripted requests. Its Inter total came to 3.5% over Calcio e Finanza\'s published gross figure, and its contract ends match Transfermarkt\'s month for 71-82% of players. They are estimates and carry no efficiency numbers.',
+       'A tag marks a contract that ends this season, with its status in the hover (UFA, RFA, ERFA, or a player, team or early-termination option). NHL and MLS status comes from the source, NFL status is read from his seasons in the league (two or fewer ERFA, three RFA, more UFA), and the NBA source has no RFA flag.'],
+      'NBA, NFL, NHL payrolls, cap space, contracts and free agents; soccer wages (club wages, player wages, MLS payrolls, MLS salaries)', ['NBA', 'NFL', 'NHL', 'Soccer']),
+    E('Surplus / Eff+', 'Surplus is what a roster\'s play is worth at the league\'s price of a win, minus what it costs above a roster of minimum players. Eff+ puts it on the plus scale.',
+      ['For each player, value = his WAR (NHL), VORX (NBA), WAR (NFL) or g+ above replacement (MLS) from the last full season, and cost = his cap hit this season minus the league minimum. The price of a win is the league\'s pay above the minimum divided by its value that season. Surplus is the sum over the roster, dead money counted as cost, and Eff+ = 100 + 25 × (Surplus - the league mean) / SD.',
+       _PAYTEST,
+       _PAYAGE,
+       'It shows only for the NBA and NHL, the two leagues where it passed. In both, the roster\'s value alone predicts next season a little better than Surplus does, so what carries the number forward is the talent, and the pay side is the judgement of how cheaply it was bought.'],
+      'NBA, NHL payrolls and contracts', ['NBA', 'NHL']),
     E('xXPM', 'Projected XPM this season, the board\'s projection for every player, freshmen and transfers included.',
       [re.sub(r'(?<![\d.])0\.(\d)', r'.\1', _t) for _t in ['A ridge on last season, recruiting, age and size, with rXPM (CBB) as the target. Returners also take pXPM (CBB), board form. In season it blends in XPM to date.',
        'Team context: returning teammates\' VORX, teammates\' recruiting (top 8, -ln rank), WAA and transferring up or down.',
@@ -649,7 +716,7 @@ sections.append({'id': 'players', 'title': 'Player odds and projections', 'entri
        f'Football strength is Elo from the plan\'s college WAR, fit on this season\'s Elo across FBS (R2 = {_TBX["cfb"].get("r2", 0):.2f}, n = {_TBX["cfb"].get("n", 0)}). Basketball strength is the ARK rating of the plan\'s rotation.',
        f'xW is wins over a conference schedule at every team\'s projected strength: {_TBX["cfb"].get("games", 12)} games in football, {_TBX["cbb"].get("games", 31)} in basketball. Wins over replacement are xW less a 10th-percentile team on the same schedule, and NIL $ a win is next season\'s spend over those wins.',
        f'DECT as an input failed everywhere it was tested. In Ret% the staying edge made held-out log loss worse in both sports (CFB t = {_DX["ret"]["cfb"]["terms"]["R1 ce"]["lodo"]["t"]}, CBB t = {_DX["ret"]["cbb"]["terms"]["R1 ce"]["lodo"]["t"]} against it). CBB Transfer%: DECT t = {_DX["cbb_move"]["move"]["terms"]["T4 dect"]["A"]["t"]} on 2025-26 (needs 2), school pay per market dollar t = {_DX["cbb_move"]["move"]["terms"]["T2 k"]["A"]["t"]}, market over school pay t = {_DX["cbb_move"]["move"]["terms"]["T1 zgap"]["A"]["t"]}. CBB landing, money per market dollar at the destination t = {_DX["cbb_move"]["land"]["L1 dest_k"]["A"]["t"]}. CFB Transfer% has one fall board to test on and is retested after the 2026-27 cycle. DECT shows on the builder for reading only.',
-       _tbx_pot()],
+       _tbx_pot(), _tbx_years(), _tbx_dev()],
       'CFB team builder, CBB team builder', ['CFB', 'CBB']),
     E('FBS%', 'The chance an FCS player is on an FBS roster next season.',
       ['A logit on 2023-26 FCS-to-FBS moves: production, team strength, year in school and position. It is capped at 1 - Draft%.'],

@@ -32,7 +32,7 @@
     ]},
     { "name": "NFL", "sources": [
       { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news, injury status and estimated return, roster moves, transactions log (trades and the draft picks in them)" },
-      { "n": "nflverse", "u": "https://github.com/nflverse/nflverse-data", "w": "play-by-play, rosters, snaps, players, draft picks, contracts (OverTheCap); weekly player lines (rookie defenders for DROY, the award backtest by week); weighted career AV from draft picks for all-time careers" },
+      { "n": "nflverse", "u": "https://github.com/nflverse/nflverse-data", "w": "play-by-play, rosters, snaps, players, draft picks, contracts (OverTheCap; cap number by season for the payrolls tabs); weekly player lines (rookie defenders for DROY, the award backtest by week); weighted career AV from draft picks for all-time careers" },
       { "n": "nfldata (Lee Sharpe)", "u": "https://github.com/nflverse/nfldata", "w": "games and closing lines" },
       { "n": "ESPN", "u": "https://www.espn.com/nfl/", "w": "scores, injuries, depth charts, headshots, season stats and leaders (award races)" },
       { "n": "Wikipedia", "u": "https://en.wikipedia.org/", "w": "AP award winners (MVP, OPOY, DPOY, OROY, DROY); Pro Football Hall of Fame coaches (label for the all-time coaches title weights)" },
@@ -69,7 +69,7 @@
     { "name": "NBA", "sources": [
       { "n": "NBA G League Stats", "u": "https://stats.gleague.nba.com/", "w": "G League season totals (1Y / 3Y G League term); player seasons since 2005-06 (box and advanced, regular season and Showcase Cup) for G League call-up odds; team rosters (birth dates) and the two-way contract list" },
       { "n": "RotoWire", "u": "https://www.rotowire.com/", "w": "injury news, injury status and estimated return, roster moves, transactions log (trades and the draft picks in them)" },
-      { "n": "Basketball Reference", "u": "https://www.basketball-reference.com/", "w": "player seasons, box scores, draft history, salaries, transactions, award voting (incl. All-NBA teams), standings, coach registers, Hall of Fame list; team ratings (SRS, ORtg, DRtg) and advanced player seasons since 1947 for all-time rankings" },
+      { "n": "Basketball Reference", "u": "https://www.basketball-reference.com/", "w": "player seasons, box scores, draft history, salaries, transactions, team contract pages (payrolls tabs: salary by season, options, guaranteed money), award voting (incl. All-NBA teams), standings, coach registers, Hall of Fame list; team ratings (SRS, ORtg, DRtg) and advanced player seasons since 1947 for all-time rankings" },
       { "n": "NBA.com", "u": "https://www.nba.com/", "w": "officials, headshots" },
       { "n": "ESPN", "u": "https://www.espn.com/nba/", "w": "scores, injuries, depth, G League team logos" },
       { "n": "databallr", "u": "https://databallr.com/", "w": "DPM" },
@@ -89,7 +89,7 @@
       { "n": "HockeyTech / LeagueStat", "u": "https://lscluster.hockeytech.com/", "w": "CHL, AHL, USHL stats and headshots; player search birth dates for the hockey draft board" },
       { "n": "Liiga", "u": "https://liiga.fi/", "w": "Finnish league stats" },
       { "n": "SHL", "u": "https://www.shl.se/", "w": "Swedish league stats" },
-      { "n": "CapWages", "u": "https://capwages.com/", "w": "NHL cap hits, signings (xAAV); contract length of each signing (xTerm)" },
+      { "n": "CapWages", "u": "https://capwages.com/", "w": "NHL cap hits, signings (xAAV); contract length of each signing (xTerm); team payrolls: every contract by season, expiry status, LTIR, buyouts and cap space (payrolls tabs)" },
       { "n": "College Hockey News", "u": "https://www.collegehockeynews.com/stats/", "w": "NCAA skaters by season: time on ice, shots, xG and CHIP on the prospect pipeline line (display only)" }
     ]},
     { "name": "soccer", "sources": [
@@ -100,7 +100,8 @@
       { "n": "Football-Data.co.uk", "u": "https://www.football-data.co.uk/", "w": "historical results and closing odds" },
       { "n": "International football results (martj42)", "u": "https://github.com/martj42/international_results", "w": "every full international since 1872, shootouts (national-team ratings); tournament winners and goalscorers (Ballon d'Or race)" },
       { "n": "Wikipedia", "u": "https://en.wikipedia.org/", "w": "Ballon d'Or voting by year" },
-      { "n": "American Soccer Analysis", "u": "https://app.americansocceranalysis.com/", "w": "MLS players' goals added (g+) by action, xG and xA, keepers' goals prevented and g+, MLSPA guaranteed pay (MLS players and MLS keepers tabs)" },
+      { "n": "American Soccer Analysis", "u": "https://app.americansocceranalysis.com/", "w": "MLS players' goals added (g+) by action, xG and xA, keepers' goals prevented and g+, MLSPA guaranteed pay and base salary (MLS players, MLS keepers, MLS payrolls and MLS salaries tabs)" },
+      { "n": "Salary Sport", "u": "https://salarysport.com/", "w": "big five basic-wage estimates and contract end dates (soccer market > wages: club wages, player wages)" },
       { "n": "UEFA competition stats", "u": "https://www.uefa.com/uefachampionsleague/statistics/", "w": "Champions League and Europa League top speed, distance and minutes per player (top speed tab)" },
       { "n": "martj42 international results (goalscorers)", "u": "https://github.com/martj42/international_results", "w": "national-team goal scorers with penalties and own goals (national teams scorers tab)" },
       { "n": "Transfermarkt (dump: games)", "u": "https://github.com/dcaribou/transfermarkt-datasets", "w": "managers of each league match (managers tab); Champions League and Europa League minutes for xMV" },
