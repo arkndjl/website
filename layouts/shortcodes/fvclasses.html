@@ -39,7 +39,7 @@
     <td class="fvcl__o cfb__num" data-v="{{ sub 0 .otopR }}" title="{{ partial "num.html" (slice "%.0f" .otop) }} points">#{{ .otopR }}</td>
     <td class="fvcl__o cfb__num" data-v="{{ sub 0 .odepR }}" title="{{ partial "num.html" (slice "%.0f" .odep) }} points">#{{ .odepR }}</td>
     <td class="fvcl__o cfb__num" data-v="{{ .oall }}" title="#{{ .oallR }} of the classes with an outcome"><b>{{ partial "num.html" (slice "%.0f" .oall) }}</b></td>
-    <td class="fvcl__o cfb__name"><span class="fv-chip" data-fv="{{ mul (div (int .obestOut) 5) 5 }}">{{ .obestOut }}</span> {{ .obest }}</td>
+    <td class="fvcl__o cfb__name"><span class="fv-chip" data-fv="{{ mul (div (int .obestOut) 5) 5 }}">{{ .obestOut }}</span> {{ .obest }}{{ if .prov }} <span class="cfb__dim" title="under 8 seasons since the draft: careers still moving">prov</span>{{ end }}</td>
     {{- else }}
     <td class="fvcl__o cfb__dim" data-v="-99">–</td><td class="fvcl__o cfb__dim" data-v="-99">–</td><td class="fvcl__o cfb__dim" data-v="-1">pending</td><td class="fvcl__o cfb__dim">–</td>
     {{- end }}
@@ -49,6 +49,6 @@
 </table>
 {{- $g := .gate.adj -}}
 {{- partial "wintable-close.html" (dict "rows" (len .classes) "note" (printf "%s · %d classes, %d with an outcome" $span (len .classes) (len .mature))
-    "about" (printf "Each class is the all-time FV list at its draft, each player at his draft-day grade. Points: what grades like these became over FV 40, fit by grading era, a class with an outcome held out of its own fit. Top: the class's 10 best grades. Depth: grades 11-50. Overall: the 50 best. Became: the same on the careers (the 10 and 50 best, a re-draft). Era check: rank spread across early, middle and late classes H %.2f against the era-blind line %.2f. %s" (float $g.h) (float $g.line)
+    "about" (printf "Each class is the all-time FV list at its draft, each player at his draft-day grade. Points: what grades like these became over FV 40, fit by grading era, a class with an outcome held out of its own fit. Top: the class's 10 best grades. Depth: grades 11-50. Overall: the 50 best. Became: the same on the careers (the 10 and 50 best, a re-draft); prov = under 8 seasons since the draft. Era check: rank spread across early, middle and late classes H %.2f against the era-blind line %.2f. %s" (float $g.h) (float $g.line)
       (cond (eq $sport "cfb") "QB, RB, WR, TE, EDGE, DT and LB only (OL, CB and S have no PFN lines before 2024). 2021 had no combine." (cond (eq $sport "hockey") "Rounds 1-2 and every later pick graded 35+; Became also counts later picks who reached 45+." "College players and internationals on the boards; careers through the 2020 draft.")))) -}}
 {{- end -}}

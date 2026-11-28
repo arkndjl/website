@@ -9,7 +9,8 @@ Every draft class from the all-time FV lists (data/fv_alltime.json: each player 
 50 is about the number of players on the lists who go in the first two rounds of the NBA or NHL draft, or in the first
 three NFL rounds at the seven CFB positions on the list; a fixed 50 keeps the lists' pool size (FBS seasons graded,
 the box-score years thinner) out of the ranks. Became = the same sums on what the careers became (Out - 40)+, the
-class's 10 and 50 best careers (a re-draft), shown once the class has an outcome.
+class's 10 and 50 best careers (a re-draft), shown once the class has an outcome; provisional (prov) while the class
+is under 8 seasons from its draft. The check also gives r on the complete classes and r with the draft year partialled out.
 
 Era: xP is fit by grading era (CFB box-score stand-ins, drafts 2015-19, then PFN; CBB out of sample by class through
 2016, forward after; hockey one era), Out on (mu = c + b (FV - 40), sd) with E[(Y - 40)+] read from the normal, and a
@@ -35,6 +36,9 @@ P = lambda *a: os.path.join(ROOT, *a)
 OUT = P('data', 'fv_classes.json')
 REPL = 40.0         # replacement: FV 40
 TOPN, DEPN = 10, 50
+DONE = 8            # seasons since the draft before a class's careers count as complete; fewer = Became is provisional
+import datetime
+NOW = datetime.date.today().year if datetime.date.today().month >= 7 else datetime.date.today().year - 1   # last completed draft year
 # grading eras: class year -> era (each sport's own board history; see the docstring)
 ERA = {'cfb': lambda y: 'box' if y <= 2019 else 'pfn', 'cbb': lambda y: 'oof' if y <= 2016 else 'fwd', 'hockey': lambda y: 'one'}
 ERA_LAB = {'box': 'box-score line (drafts 2015-19)', 'pfn': 'PFN line (drafts 2020 on)', 'oof': 'held out by class (2009-16)',
@@ -146,12 +150,18 @@ def sport(sp, d, rng):
             bo = max((r for r in rp[y] if r.get('out') is not None), key=lambda r: (r['out'], r['fvx']))
             c.update(otop=round(float(o[:TOPN].sum()), 1), odep=round(float(o[TOPN:DEPN].sum()), 1), oall=round(float(o[:DEPN].sum()), 1),
                      obest=bo['name'], obestOut=round(bo['out']))
+            if NOW - y < DONE: c['prov'] = 1
         C.append(c)
     for k in ('top', 'dep', 'all', 'raw', 'otop', 'odep', 'oall'):
         S = sorted([c for c in C if k in c], key=lambda c: -c[k])
         for i, c in enumerate(S): c[k + 'R'] = i + 1
     M = [c for c in C if 'oall' in c]
     corr = lambda a, b: round(float(np.corrcoef([c[a] for c in M], [c[b] for c in M])[0, 1]), 2) if len(M) > 3 else None
+    Mc = [c for c in M if not c.get('prov')]
+    yy = np.array([c['y'] for c in M], float); aa = np.array([c['all'] for c in M]); bb = np.array([c['oall'] for c in M])
+    ra, rb, rab = np.corrcoef(aa, yy)[0, 1], np.corrcoef(bb, yy)[0, 1], np.corrcoef(aa, bb)[0, 1]
+    corr_done = {'n': len(Mc), 'r': round(float(np.corrcoef([c['all'] for c in Mc], [c['oall'] for c in Mc])[0, 1]), 2) if len(Mc) > 3 else None,
+                 'partialYear': round(float((rab - ra * rb) / math.sqrt((1 - ra ** 2) * (1 - rb ** 2))), 2)}
     gate = {'adj': era_gate([c['y'] for c in C], [c['all'] for c in C], rng), 'raw': era_gate([c['y'] for c in C], [c['raw'] for c in C], rng)}
     gate['became'] = era_gate([c['y'] for c in M], [c['oall'] for c in M], rng) if len(M) >= 6 else None
     for k in ('adj', 'raw', 'became'):
@@ -162,7 +172,7 @@ def sport(sp, d, rng):
                                                                             [r['out'] for z in mature if era(z) == e for r in by[z] if r.get('out') is not None])]}
                      for e in eras if any(era(z) == e for z in mature)},
             'pts': {str(v): round(float(ex_over([v], F_era[years[-1]])[0]), 1) for v in (45, 50, 60, 70)},
-            'calib': calib, 'gate': gate, 'corr': {'all': corr('all', 'oall'), 'top': corr('top', 'otop'), 'dep': corr('dep', 'odep')}}
+            'calib': calib, 'gate': gate, 'corr': {'all': corr('all', 'oall'), 'top': corr('top', 'otop'), 'dep': corr('dep', 'odep'), 'done': corr_done}}
 
 
 def main():
@@ -175,6 +185,7 @@ def main():
         print(sp, 'classes', len(s['classes']), 'with an outcome', len(s['mature']), 'eras', {k: v['fit'] for k, v in s['eras'].items()})
         print('   calib pooled', s['calib']['pooled'], 'by era', s['calib']['era'])
         print('   era gate', s['gate'], 'corr draft-day vs became', s['corr'])
+        print('   provisional', [c['y'] for c in s['classes'] if c.get('prov')])
         for c in s['classes'][:5]: print('   ', c['allR'], c['y'], 'top', c['top'], c['topR'], 'dep', c['dep'], c['depR'], 'all', c['all'], 'raw', c['raw'], 'became', c.get('oall'), c.get('oallR'), c['best'])
     s = json.dumps(out, separators=(',', ':'), allow_nan=False)
     open(OUT, 'w').write(s)
