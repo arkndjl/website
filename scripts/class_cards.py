@@ -22,7 +22,8 @@ Reads static/data/cfb-recruits.json (every graded recruit, scripts/cfb_recruit.m
 Every board program is listed (scripts/cfb_recruit.mjs everyClass, scripts/cbb_recruit_fit.py class_ranks), the ones
 with no commit yet too, and r holds the commits only On3's team lists name (data/class_offboard.json, scripts/class_offboard.py)
 at their HS ARK stars and FV 20 (ob: 1). Offers: each program's On3 offer list (scripts/data/class_offers.json.gz) and
-the schools in each pulled recruit's On3 recruitment with any status past interest (recruit_on3_live / _committed `of`).
+the schools in each pulled recruit's On3 recruitment with any status past interest (recruit_on3_live / _committed `of`),
+and for CFB each recruit's offers on ESPN's class lists (scripts/cfb_recruit.mjs cache, else scripts/data/snaps/offers).
 School slugs: data/school_slugs.json (every FBS, FCS and D-I program).
 
 a6 = 5-star+, ah = 4.5-5, am = 3-4, al = unranked to 2.5 ARK stars (copied from the class rankings rows).
@@ -148,11 +149,42 @@ def offers(sp, yr, lst):
         for name, pos, state, st, org in rows:
             if st and NO_OFFER.search(st): continue
             add(sch, board(name, state), name, pos, org)
+    if sp == 'cfb':   # ESPN's class lists name each recruit's offers (ESPN team ids)
+        tid = board_tids('cfb')
+        for name, offs in espn_offers(yr):
+            r = board(name, None)
+            for t in offs: add(tid.get(str(t)), r, name)
     out = {}
     for sch, by in got.items():
         rows = sorted(by.values(), key=lambda x: (x.get('u', 0), -(x['a'] or 0), -x['f'], x['n']))
         out[sch] = ([{k: v for k, v in x.items() if v is not None and k != 'u'} for x in rows[:OFFERS]], len(rows), sum(1 for x in rows if x.get('c')))
     return out
+
+
+def board_tids(sp):
+    """ESPN team id -> board team (the board's logos carry the id)"""
+    b = load('static', 'data', sp + '-all.json'); c = {k: i for i, k in enumerate(b['cols'])}; out = {}
+    for x in b['rows']:
+        mm = re.search(r'/(\d+)\.png', x[c['logo']] or '')
+        if mm: out.setdefault(mm.group(1), x[c['team']])
+    return out
+
+
+def espn_offers(yr):
+    """[(name, [ESPN team id, ...]), ...]: each recruit's offers on ESPN's class list, from scripts/cfb_recruit.mjs's
+    cache when this run has it, else rebuilt from the dated log (scripts/data/snaps/offers/cfb-<class>.jsonl, scripts/snapshots.py)"""
+    f = os.path.join(ROOT, 'scripts', '.cache', 'cfb', 'espnclass2-%s.json' % yr)
+    if os.path.exists(f):
+        try: return [(a.get('name'), [str(t) for t in a.get('offers') or [] if t]) for a in json.load(open(f)) if a.get('name')]
+        except (OSError, ValueError): pass
+    f = os.path.join(ROOT, 'scripts', 'data', 'snaps', 'offers', 'cfb-%s.jsonl' % yr)
+    if not os.path.exists(f): return []
+    by = {}
+    for line in open(f, encoding='utf-8'):
+        if not line.strip(): continue
+        r = json.loads(line); p = by.setdefault(r['rid'], [r.get('n'), set()])
+        p[0] = r.get('n') or p[0]; p[1] |= set(r.get('add') or []); p[1] -= set(r.get('drop') or [])
+    return [(n, sorted(o)) for n, o in by.values() if n and o]
 
 
 def offboard(sp, yr, lst):
