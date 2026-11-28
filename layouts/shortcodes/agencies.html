@@ -63,7 +63,7 @@
     {{- with $pl.breakoutP }}<td class="cfb__num" data-l="Breakout+" data-v="{{ $a.breakoutP }}">{{ with $a.breakoutP }}{{ . }}{{ else }}—{{ end }}</td>{{ end }}
     <td class="cfb__num" data-v="{{ .n }}">{{ .n }}</td>
     <td class="cfb__num">{{ .nCol }} / {{ .nRec }}</td>
-    <td class="cfb__num" data-v="{{ .fv }}">{{ with .fv }}{{ partial "num.html" (slice "%.0f" .) }}{{ else }}—{{ end }}</td>
+    <td class="cfb__num" data-v="{{ .fv }}">{{ with .fv }}{{ math.Round . }}{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-v="{{ .fvTop }}">{{ with .fvTop }}<span class="fv-chip" data-fv="{{ mul (div (int .) 5) 5 }}">{{ math.Round . }}</span>{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-v="{{ .ark }}">{{ with .ark }}{{ partial "num.html" (slice "%.1f" .) }}{{ else }}—{{ end }}</td>
     <td class="cfb__num" data-v="{{ .ark5 }}">{{ .ark5 }}</td>
