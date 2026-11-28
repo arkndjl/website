@@ -1,0 +1,993 @@
+{
+"asof":"2026-11-27",
+"n":61,
+"count":{
+"watching":1,
+"waiting":60
+},
+"next":[
+"understat_return",
+"cfbd_portal_pull",
+"thunderpick_recheck",
+"dect_transfer_cost",
+"tennis_year_end",
+"soccer_props_novig"
+],
+"rows":[
+{
+"key":"understat_return",
+"t":"Understat back for big-five soccer stats",
+"sp":[
+"Soccer"
+],
+"ar":"value",
+"kind":"data",
+"how":"watch",
+"pr":1254,
+"trigger":"checked on every soccer run; GAR and SVAR move back from the FotMob stand-in by themselves",
+"gate":"no league trails the results",
+"due":"2026-11-01",
+"est":0,
+"state":"watching"
+},
+{
+"key":"cfbd_portal_pull",
+"t":"CFB portal history pull (2021-25)",
+"sp":[
+"CFB"
+],
+"ar":"players",
+"kind":"data",
+"how":"hand",
+"trigger":"CFBD quota resets Dec 1 2026 (keep 500 calls for the boards)",
+"gate":"rows land in the portal history file",
+"due":"2026-12-01",
+"est":0,
+"state":"waiting"
+},
+{
+"key":"thunderpick_recheck",
+"t":"Thunderpick CS2 odds recheck",
+"sp":[
+"CS2"
+],
+"ar":"games",
+"kind":"data",
+"how":"hand",
+"trigger":"Dec 1 2026",
+"gate":"feed serves prices again; then the blend refits on the archive (cs2.json tpw)",
+"due":"2026-12-01",
+"est":0,
+"state":"waiting"
+},
+{
+"key":"dect_transfer_cost",
+"t":"Transfer draft cost and bigger role in DECT",
+"sp":[
+"CFB"
+],
+"ar":"drafts",
+"kind":"retest",
+"how":"hand",
+"was":"untestable before the portal history",
+"pr":1292,
+"trigger":"after the portal history pull, Dec 1 2026",
+"gate":"point in time, held out t >= 2; price only what passes",
+"due":"2026-12-01",
+"est":0,
+"state":"waiting"
+},
+{
+"key":"tennis_year_end",
+"t":"Tennis prospect terms at the 2026 year-end rankings",
+"sp":[
+"Tennis"
+],
+"ar":"fv",
+"kind":"retest",
+"how":"hand",
+"was":"near misses Nov 1-7",
+"trigger":"ATP and WTA year-end rankings final (the 1998 births complete their window)",
+"gate":"birth-year-out t >= 2, 12/19, forward top-50 not worse; Holm at .05 inside the family; ATP tree blend on forward MSE t >= 2",
+"ledger":"tennis_year_end",
+"due":"2026-12-07",
+"est":0,
+"state":"waiting"
+},
+{
+"key":"soccer_props_novig",
+"t":"Soccer player props at Novig asks",
+"sp":[
+"Soccer"
+],
+"ar":"players",
+"kind":"retest",
+"how":"hand",
+"was":"lost at DK prices on every market",
+"pr":596,
+"trigger":"about 300 graded markets each in the Novig ask archive (from Oct 31 2026)",
+"gate":"walk-forward, held at real asks; no pick unless profit holds at the ask",
+"due":"2026-12-15",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"nil_reported_deals",
+"t":"xNIL against reported deals",
+"sp":[
+"CFB",
+"CBB"
+],
+"ar":"value",
+"kind":"retest",
+"how":"hand",
+"trigger":"20 reported deals in the ledger",
+"gate":"log error of xNIL against the report, t by player",
+"due":"2026-12-15",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"esea_only_fv",
+"t":"ESEA-only CS2 prospects",
+"sp":[
+"CS2"
+],
+"ar":"fv",
+"kind":"retest",
+"how":"watch",
+"was":"too little history",
+"pr":1183,
+"trigger":"weekly in esea-research.yml; each season 53+ joins the held set once it has a full year (S55 about Dec 16 2026)",
+"gate":"120 tune rows, 60 held players, held t <= -2, |bias t| < 2, slope > .5; on a pass cs2_players adds the ESEA grades",
+"due":"2026-12-16",
+"est":0,
+"state":"waiting"
+},
+{
+"key":"cs2_prov_drivers",
+"t":"Provisional CS2 FV drivers (division, team results, promotion, FACEIT)",
+"sp":[
+"CS2"
+],
+"ar":"fv",
+"kind":"retest",
+"how":"watch",
+"was":"t -2.03, bias t -3.15",
+"pr":1186,
+"trigger":"weekly in esea-research.yml as new ESEA seasons reach a full year",
+"gate":"held S53+, clustered t, Holm of 5, bias |t| < 2; a kept spec feeds cs2_players",
+"due":"2026-12-16",
+"est":0,
+"state":"waiting"
+},
+{
+"key":"cfb_recruit_tail",
+"t":"Tail-only fix for recruit visits and picks",
+"sp":[
+"CFB"
+],
+"ar":"players",
+"kind":"retest",
+"how":"hand",
+"was":"failed walk-forward",
+"trigger":"the 2027 class signs",
+"gate":"walk-forward",
+"due":"2027-02-05",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cfb_qb_btt",
+"t":"Air-yard big-time throws, CFB QBs",
+"sp":[
+"CFB"
+],
+"ar":"value",
+"kind":"retest",
+"how":"hand",
+"trigger":"2026 ESPN spots give outcomes",
+"gate":"pre-registered like the aDOT test",
+"due":"2027-02-08",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cfb_dc_prior",
+"t":"Coordinator career prior, CFB",
+"sp":[
+"CFB"
+],
+"ar":"teams",
+"kind":"retest",
+"how":"hand",
+"was":"held t -2.00",
+"trigger":"after the 2026 season",
+"gate":"tune and held log loss",
+"due":"2027-02-08",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"lockbox_cfb",
+"t":"Lockbox score, CFB",
+"sp":[
+"CFB"
+],
+"ar":"method",
+"kind":"lockbox",
+"how":"hand",
+"trigger":"the 2026 CFB season from week 11 is over",
+"gate":"every shipped model scored once, hash recorded first; batch b at .05 / (1 + earlier batches)",
+"due":"2027-02-08",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cfb_game_absences",
+"t":"Report absences against the close, CFB games",
+"sp":[
+"CFB"
+],
+"ar":"games",
+"kind":"retest",
+"how":"hand",
+"was":"t 2.7 / 2.3, too few games",
+"trigger":"after the 2026 season",
+"gate":"walk-forward margin MAE and a rule test",
+"due":"2027-02-08",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cfb_rush_epa",
+"t":"Rush EPA weight in the CFB game model",
+"sp":[
+"CFB"
+],
+"ar":"games",
+"kind":"retest",
+"how":"hand",
+"was":"held-only",
+"trigger":"after the 2026 season",
+"gate":"tune and held both",
+"due":"2027-02-08",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"coach_watch_cfb",
+"t":"Coaching watch, CFB (Leave% and likeliest jobs)",
+"sp":[
+"CFB"
+],
+"ar":"teams",
+"kind":"forward",
+"how":"hand",
+"trigger":"cut date Feb 15 2027 (scripts/data/ledger/coach_watch_2027.json)",
+"gate":"Leave% log loss against the constant, t <= -2; jobs top-3 above the null, one-sided p < .05",
+"due":"2027-02-15",
+"est":0,
+"state":"waiting"
+},
+{
+"key":"nfl_fpi_stack",
+"t":"ESPN FPI stacked on the NFL game model",
+"sp":[
+"NFL"
+],
+"ar":"games",
+"kind":"retest",
+"how":"hand",
+"was":"held t -.18",
+"trigger":"after the 2026 season",
+"gate":"held log loss t <= -2",
+"due":"2027-02-28",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"lockbox_nfl",
+"t":"Lockbox score, NFL",
+"sp":[
+"NFL"
+],
+"ar":"method",
+"kind":"lockbox",
+"how":"hand",
+"trigger":"the 2026 NFL season from week 11 is over",
+"gate":"every shipped model scored once, hash recorded first; batch b at .05 / (1 + earlier batches)",
+"due":"2027-02-28",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"nfl_qb_age",
+"t":"QB age line, NFL",
+"sp":[
+"NFL"
+],
+"ar":"value",
+"kind":"retest",
+"how":"hand",
+"was":"2021-25 t -.8 to -2.3",
+"trigger":"after the 2026 season",
+"gate":"tune and held both",
+"due":"2027-02-28",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"nfl_personnel",
+"t":"Lines and personnel in the NFL game model",
+"sp":[
+"NFL"
+],
+"ar":"games",
+"kind":"retest",
+"how":"hand",
+"trigger":"2026 participation data published",
+"gate":"walk-forward",
+"due":"2027-03-15",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cbb_lowdiv_movers",
+"t":"D-II and D-III movers into D-I",
+"sp":[
+"CBB"
+],
+"ar":"fv",
+"kind":"retest",
+"how":"hand",
+"was":"t .98 / .54",
+"trigger":"2026-27 adds a third mover cycle",
+"gate":"end-to-end t >= 2",
+"due":"2027-04-19",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cbb_futures_prior",
+"t":"Futures prior, CBB",
+"sp":[
+"CBB"
+],
+"ar":"teams",
+"kind":"retest",
+"how":"hand",
+"trigger":"a season of DK futures snapshots",
+"gate":"walk-forward game log loss",
+"due":"2027-04-19",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"lockbox_cbb",
+"t":"Lockbox score, CBB",
+"sp":[
+"CBB"
+],
+"ar":"method",
+"kind":"lockbox",
+"how":"hand",
+"trigger":"the 2026-27 CBB season is over",
+"gate":"every shipped model scored once, hash recorded first; batch b at .05 / (1 + earlier batches)",
+"due":"2027-04-19",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cbb_pro_newcomers",
+"t":"Pro-line newcomers' own shrink, CBB",
+"sp":[
+"CBB"
+],
+"ar":"fv",
+"kind":"retest",
+"how":"hand",
+"was":"t -.3",
+"trigger":"after 2026-27",
+"gate":"held out t >= 2",
+"due":"2027-04-19",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cbb_tempo",
+"t":"Tempo term, CBB totals",
+"sp":[
+"CBB"
+],
+"ar":"games",
+"kind":"retest",
+"how":"hand",
+"trigger":"after 2026-27",
+"gate":"tune and held both",
+"due":"2027-04-19",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cfb_g5_drift",
+"t":"Index-era drift for G5 signees in HS ARK stars",
+"sp":[
+"CFB"
+],
+"ar":"players",
+"kind":"retest",
+"how":"hand",
+"was":"1.7% drafted vs 2.8% expected",
+"trigger":"the 2022-23 classes' drafts are complete",
+"gate":"forward test (fit 2011-19, test 2020-23)",
+"due":"2027-05-08",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"agency_pipeline",
+"t":"Agency pipelines in transfer landing and recruit leans",
+"sp":[
+"CFB",
+"CBB"
+],
+"ar":"players",
+"kind":"forward",
+"how":"hand",
+"was":"t -.25",
+"pr":1353,
+"trigger":"the January 2027 portal window is in data/cfb_portal.json (about May 2027)",
+"gate":"frozen fit (scripts/data/ledger/agency_pipeline_2027.json, coef .319) scored once; pass t >= 2 on landing log loss",
+"ledger":"agency_pipeline",
+"due":"2027-05-15",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"coach_watch_cbb",
+"t":"Coaching watch, CBB (Leave% and likeliest jobs)",
+"sp":[
+"CBB"
+],
+"ar":"teams",
+"kind":"forward",
+"how":"hand",
+"trigger":"cut date May 15 2027",
+"gate":"same as CFB",
+"due":"2027-05-15",
+"est":0,
+"state":"waiting"
+},
+{
+"key":"xfer_watch_cfb",
+"t":"Transfer watch, CFB (Xfer% and the lean schools)",
+"sp":[
+"CFB"
+],
+"ar":"players",
+"kind":"forward",
+"how":"hand",
+"trigger":"ESPN 2027 rosters out (about May 2027)",
+"gate":"Xfer% skill > 0 with paired t <= -2; top-3 schools above 3 / N, binomial p < .05",
+"due":"2027-05-20",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cbb_combine_guard",
+"t":"Combine guard composite in the CBB mock",
+"sp":[
+"CBB"
+],
+"ar":"drafts",
+"kind":"retest",
+"how":"hand",
+"was":"closest of 52, failed Holm",
+"trigger":"the 2027 draft combine",
+"gate":"Holm across the family",
+"due":"2027-05-25",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cbb_net_class",
+"t":"Net class (recruits plus incoming transfers) in CBB",
+"sp":[
+"CBB"
+],
+"ar":"teams",
+"kind":"retest",
+"how":"hand",
+"was":"passed t 6.45, not built (no transfers before the portal)",
+"trigger":"the spring 2027 portal window closes",
+"gate":"forward first season, same form as Nov 26",
+"ledger":"class_score_top_end",
+"due":"2027-06-04",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"came_with_coach",
+"t":"Came-with-coach term in Transfer% and leans",
+"sp":[
+"CBB",
+"CFB"
+],
+"ar":"players",
+"kind":"retest",
+"how":"hand",
+"was":"t -.91 CBB, .98 CFB",
+"pr":1279,
+"trigger":"the 2026-27 transfer cycle is complete in both sports (the sample doubles)",
+"gate":"same prereg as scripts/research/coach_loyalty_nov27/prereg.md, held out t >= 2",
+"due":"2027-06-19",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"team_builder_k",
+"t":"Team builder strength k and DECT inputs",
+"sp":[
+"CBB",
+"CFB"
+],
+"ar":"teams",
+"kind":"retest",
+"how":"hand",
+"was":"DECT-as-input failed",
+"pr":1299,
+"trigger":"after the 2026-27 cycle",
+"gate":"next-season strength held out",
+"due":"2027-06-19",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"lockbox_soccer",
+"t":"Lockbox score, Soccer",
+"sp":[
+"Soccer"
+],
+"ar":"method",
+"kind":"lockbox",
+"how":"hand",
+"trigger":"the 2026-27 soccer season (with the international altitude term) is over",
+"gate":"every shipped model scored once, hash recorded first; batch b at .05 / (1 + earlier batches)",
+"due":"2027-06-20",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cbb_recruit_ladder",
+"t":"Ordinal ladder for CBB recruit FV",
+"sp":[
+"CBB"
+],
+"ar":"fv",
+"kind":"retest",
+"how":"hand",
+"was":"RPS t 2.31 vs 2.33 needed",
+"trigger":"the 2026-27 NBA season is final (2017 and 2018 classes reach nine and eight seasons)",
+"gate":"as registered, no look before the trigger",
+"ledger":"cbb_recruit_ladder",
+"due":"2027-06-27",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"soccer_youth_index",
+"t":"Youth international index in prospect FV",
+"sp":[
+"Soccer"
+],
+"ar":"fv",
+"kind":"retest",
+"how":"hand",
+"was":"failed held out",
+"pr":1169,
+"trigger":"the 2021-22 prospect classes reach their outcome window (after the 2026-27 season)",
+"gate":"class-out t >= 2, forward top-50 not worse",
+"due":"2027-07-01",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"loki_realtime",
+"t":"LOKI real-time releases as an NBA game prior",
+"sp":[
+"NBA"
+],
+"ar":"games",
+"kind":"retest",
+"how":"hand",
+"was":"failed (gain only in LUMA tuning seasons)",
+"pr":529,
+"trigger":"a season of frozen 2026-27 releases",
+"gate":"walk-forward, held log loss t <= -2",
+"due":"2027-07-04",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"nba_onoff_lineups",
+"t":"Lineup on/off terms, NBA games",
+"sp":[
+"NBA"
+],
+"ar":"games",
+"kind":"retest",
+"how":"hand",
+"was":"later seasons only",
+"trigger":"after 2026-27",
+"gate":"tune and held both",
+"due":"2027-07-04",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"lockbox_nba",
+"t":"Lockbox score, NBA",
+"sp":[
+"NBA"
+],
+"ar":"method",
+"kind":"lockbox",
+"how":"hand",
+"trigger":"the 2026-27 NBA season is over",
+"gate":"every shipped model scored once, hash recorded first; batch b at .05 / (1 + earlier batches)",
+"due":"2027-07-04",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"hockey_trees",
+"t":"Tree stacks on hockey draft and stage FV",
+"sp":[
+"NHL"
+],
+"ar":"fv",
+"kind":"retest",
+"how":"hand",
+"was":"family t 4.34 but every stage failed a forward gate",
+"trigger":"the hockey 2020 class matures after 2026-27",
+"gate":"class-out t >= 2, top-64 and forward better",
+"ledger":"tree_stacks",
+"due":"2027-07-06",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"nhl_first_war",
+"t":"First-season WAR sign, hockey prospects",
+"sp":[
+"NHL"
+],
+"ar":"fv",
+"kind":"retest",
+"how":"hand",
+"trigger":"the 2020-21 classes mature",
+"gate":"class-out t >= 2",
+"due":"2027-07-07",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"nhl_lineup_value",
+"t":"Lineup value in the NHL game model",
+"sp":[
+"NHL"
+],
+"ar":"games",
+"kind":"retest",
+"how":"hand",
+"was":"held-only",
+"trigger":"after 2026-27",
+"gate":"tune and held both",
+"due":"2027-07-07",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"lockbox_nhl",
+"t":"Lockbox score, NHL",
+"sp":[
+"NHL"
+],
+"ar":"method",
+"kind":"lockbox",
+"how":"hand",
+"trigger":"the 2026-27 NHL season (with the exit hurdle) is over",
+"gate":"every shipped model scored once, hash recorded first; batch b at .05 / (1 + earlier batches)",
+"due":"2027-07-07",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"nhl_long_xg",
+"t":"Long-memory xG in the NHL rating",
+"sp":[
+"NHL"
+],
+"ar":"teams",
+"kind":"retest",
+"how":"hand",
+"was":"tune t -.7 to -1.2, held +2.4",
+"trigger":"after 2026-27",
+"gate":"tune and held both",
+"due":"2027-07-07",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"ret_pay_dollars",
+"t":"Draft pay in dollars in Ret%",
+"sp":[
+"CFB",
+"CBB"
+],
+"ar":"drafts",
+"kind":"retest",
+"how":"hand",
+"was":"failed point in time",
+"pr":1276,
+"trigger":"the 2027 drafts add a sixth board year",
+"gate":"point in time, held out t >= 2",
+"due":"2027-07-08",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cbb_intl_young",
+"t":"ANGT and FIBA youth at a young age (CBB international)",
+"sp":[
+"CBB"
+],
+"ar":"fv",
+"kind":"retest",
+"how":"hand",
+"was":"t 2.24 but top-30 corr .718 to .465",
+"trigger":"the 2023-24 international classes mature (summer 2027)",
+"gate":"class folds t >= 2 and top-30 not worse",
+"due":"2027-07-15",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cbb_next_prior",
+"t":"Next-season projection as the CBB team prior",
+"sp":[
+"CBB"
+],
+"ar":"teams",
+"kind":"retest",
+"how":"hand",
+"trigger":"the October 2027 preseason prior build",
+"gate":"lined-game margin MAE, tune t <= -1.5 and held one-sided p < .05",
+"ledger":"cbb_next_prior",
+"due":"2027-10-15",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"xfer_watch_cbb",
+"t":"Transfer watch, CBB (Xfer% and the lean schools)",
+"sp":[
+"CBB"
+],
+"ar":"players",
+"kind":"forward",
+"how":"hand",
+"trigger":"2027-28 rosters out (about October 2027)",
+"gate":"same as CFB",
+"due":"2027-10-20",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"lockbox_cs2",
+"t":"Lockbox score, CS2",
+"sp":[
+"CS2"
+],
+"ar":"method",
+"kind":"lockbox",
+"how":"hand",
+"trigger":"CS2 from Nov 11 2026 is over",
+"gate":"every shipped model scored once, hash recorded first; batch b at .05 / (1 + earlier batches)",
+"due":"2027-11-11",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cs2_series_gbm",
+"t":"Tree stack on CS2 series",
+"sp":[
+"CS2"
+],
+"ar":"games",
+"kind":"retest",
+"how":"hand",
+"trigger":"CS2 series after the lockbox year",
+"gate":"t by month <= -2 and top-50 gate",
+"ledger":"tree_stacks",
+"due":"2027-11-11",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"lockbox_tennis",
+"t":"Lockbox score, Tennis",
+"sp":[
+"Tennis"
+],
+"ar":"method",
+"kind":"lockbox",
+"how":"hand",
+"trigger":"tennis from Nov 11 2026 is over",
+"gate":"every shipped model scored once, hash recorded first; batch b at .05 / (1 + earlier batches)",
+"due":"2027-12-12",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cfb_expert_weights",
+"t":"Recruiting expert weights",
+"sp":[
+"CFB"
+],
+"ar":"players",
+"kind":"retest",
+"how":"hand",
+"trigger":"the 2027 and 2028 classes sign",
+"gate":"walk-forward",
+"due":"2028-02-05",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cfb_skill_transfers",
+"t":"FBS-to-FBS skill transfers",
+"sp":[
+"CFB"
+],
+"ar":"players",
+"kind":"retest",
+"how":"hand",
+"trigger":"2027 adds a season",
+"gate":"held out t >= 2",
+"due":"2028-02-07",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cfb_team_adj_war",
+"t":"Team-adjusted WAR, CFB",
+"sp":[
+"CFB"
+],
+"ar":"value",
+"kind":"retest",
+"how":"hand",
+"trigger":"the board's own WAR is complete for 2026 and 2027",
+"gate":"next-season team R² held out",
+"due":"2028-02-07",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cfb_class_top_end",
+"t":"Top end against depth in the CFB class score (NIL era)",
+"sp":[
+"CFB"
+],
+"ar":"teams",
+"kind":"retest",
+"how":"hand",
+"was":"t 1.49",
+"trigger":"after the 2027 CFB season (NIL-era seasons 2022-27)",
+"gate":"held out t >= 2",
+"ledger":"class_score_top_end",
+"due":"2028-02-07",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cfb_pff_board",
+"t":"PFF final pre-draft board in CFB FV",
+"sp":[
+"CFB"
+],
+"ar":"fv",
+"kind":"retest",
+"how":"hand",
+"was":"t -.53, 2/4",
+"trigger":"the 2024-25 drafts mature",
+"gate":"held out t >= 2",
+"due":"2028-02-27",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cfb_qb_top_end",
+"t":"QB top-end FV stretch",
+"sp":[
+"CFB"
+],
+"ar":"fv",
+"kind":"retest",
+"how":"hand",
+"was":"failed on 8 QBs",
+"trigger":"the 2024-25 QB drafts have three NFL seasons",
+"gate":"same script, same bar",
+"due":"2028-02-27",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cbb_eybl_prior",
+"t":"EYBL box score in the CBB freshman prior",
+"sp":[
+"CBB"
+],
+"ar":"fv",
+"kind":"retest",
+"how":"hand",
+"trigger":"the 2027-28 regular season is final (class of 2027 freshman year)",
+"gate":"as registered; confirm on the 2028 class after 2028-29",
+"ledger":"cbb_eybl_prior",
+"due":"2028-03-10",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cbb_znil_fv",
+"t":"zNIL as a CBB FV driver",
+"sp":[
+"CBB"
+],
+"ar":"fv",
+"kind":"retest",
+"how":"hand",
+"was":"untestable",
+"trigger":"2027 outcomes mature",
+"gate":"driver gate",
+"due":"2028-04-20",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cbb_recruit_age",
+"t":"Age for the class in CBB recruit FV",
+"sp":[
+"CBB"
+],
+"ar":"fv",
+"kind":"retest",
+"how":"hand",
+"was":"t 1.19 against the old flag",
+"pr":1222,
+"trigger":"the 2017-20 classes close their NBA windows",
+"gate":"held out against the shipped old flag, t >= 2",
+"due":"2028-07-01",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cbb_onoff_fv",
+"t":"On/off in CBB FV",
+"sp":[
+"CBB"
+],
+"ar":"fv",
+"kind":"retest",
+"how":"hand",
+"trigger":"the 2025 and 2026 classes have three NBA seasons",
+"gate":"driver gate",
+"due":"2028-07-01",
+"est":1,
+"state":"waiting"
+}
+],
+"runs":{}
+}

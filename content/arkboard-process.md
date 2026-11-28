@@ -10,7 +10,7 @@ draft = false
 
 {{< glossfind tabs="fv=FV|value=player value|players=player odds|teams=team ratings|games=game models|drafts=drafts and mocks|method=testing|data=data and names|abbr=abbreviations" >}}
 
-{{< wintabs groups="Overview:overview,sports|Philosophy:predict and describe,count and rate,projection,one framework,shipping,friction,human,skin in the game|ARKLOG:log,updates,calendar,milestones,scoreboard,traffic,build,data|Metrics:FV,FV scales,player value,player odds|Models:team ratings,game models,drafts and mocks,testing|Research:all studies,football,basketball,hockey,baseball,soccer,tennis,esports|Data:data sources,data and names,abbreviations" side="true" class="libtabs" label="Process views" >}}
+{{< wintabs groups="Overview:overview,sports|Philosophy:predict and describe,count and rate,projection,one framework,shipping,friction,human,skin in the game|ARKLOG:log,updates,calendar,retests,milestones,scoreboard,traffic,build,data|Metrics:FV,FV scales,player value,player odds|Models:team ratings,game models,drafts and mocks,testing|Research:all studies,football,basketball,hockey,baseball,soccer,tennis,esports|Data:data sources,data and names,abbreviations" side="true" class="libtabs" label="Process views" >}}
 {{< procover tab="overview" >}}
 {{< lazytab tab="sports" >}}{{< procsports tab="sports" >}}{{< /lazytab >}}
 {{< lazytab tab="predict and describe" >}}{{< procphil tab="predict and describe" >}}{{< /lazytab >}}
@@ -24,6 +24,7 @@ draft = false
 {{< arklog tab="log" >}}
 {{< arklogupdates tab="updates" >}}
 {{< arklogcal tab="calendar" >}}
+{{< lazytab tab="retests" >}}{{< arklogretests tab="retests" >}}{{< /lazytab >}}
 {{< lazytab tab="milestones" >}}{{< arklogmiles tab="milestones" >}}{{< /lazytab >}}
 {{< lazytab tab="scoreboard" >}}{{< arklogboard tab="scoreboard" >}}{{< /lazytab >}}
 {{< desk tab="traffic" >}}

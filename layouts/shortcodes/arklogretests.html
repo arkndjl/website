@@ -1,0 +1,41 @@
+{{- /* ARKLOG > retests: every failed or deferred test with its retest date, and the results. Read from
+       data/retests_state.json (scripts/retests.py, retests workflow; registry data/retests.json). Nothing typed here.
+       {{< arklogretests tab="retests" >}} */ -}}
+{{- $s := site.Data.retests_state -}}
+{{- $how := dict "hand" "run by hand" "watch" "rerun by its workflow" "auto" "run by the retest workflow" -}}
+{{- $kind := dict "retest" "retest" "forward" "forward test" "lockbox" "lockbox" "data" "data" -}}
+{{- $open := slice -}}{{- $done := slice -}}
+{{- range $s.rows }}{{ if .result }}{{ $done = $done | append . }}{{ else }}{{ $open = $open | append . }}{{ end }}{{ end -}}
+<div class="desk libgrid libgrid--one" data-tab="{{ .Get "tab" }}">
+<div class="win">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>retests.exe<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="libfv__wrap"><table class="libfv arklog__cal arklog__rt">
+    <thead><tr><th>date</th><th>sport</th><th>test</th><th title="the result that sent it here">last</th><th title="waiting: before its date; data: its date has come and the data it needs has not; due: open, a GitHub issue tracks it; watching: its workflow reruns it until it passes; est: the date is an estimate">state</th></tr></thead>
+    <tbody>
+    {{- range $open }}
+    <tr class="arklog__rt--{{ .state }}"><th>{{ dateFormat "Jan 2 2006" .due }}</th><td>{{ delimit .sp ", " }}</td>
+      <td title="{{ index $kind .kind }}{{ with .trigger }} · when: {{ . }}{{ end }}{{ with .gate }} · gate: {{ . }}{{ end }} · {{ index $how .how }}">{{ .t }}</td>
+      <td title="{{ .was }}">{{ with .was }}{{ . }}{{ end }}{{ with .pr }} <a href="https://github.com/arkndjl/website/pull/{{ . }}" rel="noopener" target="_blank">#{{ . }}</a>{{ end }}</td>
+      <td>{{ with .issue }}<a href="https://github.com/arkndjl/website/issues/{{ . }}" rel="noopener" target="_blank">due</a>{{ else }}{{ .state }}{{ end }}{{ if and .est (eq .state "waiting") }} est{{ end }}</td></tr>
+    {{- end }}
+    </tbody>
+  </table></div>
+  <div class="win__status"><span>{{ len $open }} scheduled</span>{{ with $s.asof }}<span>updated {{ dateFormat "Jan 2 2006" . }}</span>{{ end }}</div>
+</div>
+{{- if $done }}
+<div class="win">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>results<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="libfv__wrap"><table class="libfv arklog__cal arklog__rt">
+    <thead><tr><th>date</th><th>sport</th><th>test</th><th>result</th><th>verdict</th></tr></thead>
+    <tbody>
+    {{- range sort $done "result.d" "desc" }}{{ $r := .result }}
+    <tr class="arklog__rt--{{ .state }}"><th>{{ dateFormat "Jan 2 2006" $r.d }}</th><td>{{ delimit .sp ", " }}</td><td title="{{ with .gate }}gate: {{ . }}{{ end }}">{{ .t }}</td>
+      <td>{{ with $r.e }}{{ index . 0 }} {{ index . 1 }} to {{ index . 2 }}{{ end }}{{ with $r.tt }}, t = {{ . }}{{ end }}{{ with $r.pr }} <a href="https://github.com/arkndjl/website/pull/{{ . }}" rel="noopener" target="_blank">#{{ . }}</a>{{ end }}</td>
+      <td>{{ .state }}</td></tr>
+    {{- end }}
+    </tbody>
+  </table></div>
+  <div class="win__status"><span>{{ len $done }} run</span></div>
+</div>
+{{- end }}
+</div>

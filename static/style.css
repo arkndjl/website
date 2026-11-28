@@ -4730,6 +4730,10 @@ a.tick__g:hover .tick__when, a.tick__g:hover .tick__note { color: #fff; }
 .libfv { width: 100%; border-collapse: collapse; font-size: .9em; }
 .libfv th, .libfv td { padding: 3px 8px; border-bottom: 1px solid var(--win-well); text-align: left; vertical-align: top; }
 .libfv thead th { background: var(--win-title); color: #fff; }
+/* ARKLOG > retests (layouts/shortcodes/arklogretests.html): the last result is cut to one line, its full text in the hover */
+.arklog__rt td:nth-child(4) { max-width: 18em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 600px) { .arklog__rt th:nth-child(2), .arklog__rt td:nth-child(2), .arklog__rt th:nth-child(4), .arklog__rt td:nth-child(4) { display: none; }
+  .arklog__rt td:nth-child(3) { white-space: normal; } .arklog__rt th:first-child { white-space: nowrap; } }
 .libfv tbody th { color: var(--foreground); white-space: nowrap; }
 @media (max-width: 684px) {
   .libstudy__body, .libterm__body { margin: 8px; }

@@ -542,6 +542,29 @@ def content_rows():
     return [r for r in rows if not NOAI.search(r['t'])]
 
 
+def retest_rows():
+    """Retests the runner settled by itself (scripts/retests.py: a watched test that passed, or an auto run), as rows
+    (k = 'retest'). A retest run by hand is logged by its own pull request, so it is not added here."""
+    f = ROOT / 'data/retests_state.json'
+    s = json.loads(f.read_text()) if f.exists() else {}
+    rows = []
+    for r in s.get('rows') or []:
+        res = r.get('result') or {}
+        if r.get('kind') == 'data' or res.get('by') not in ('watch', 'auto') or res.get('v') not in ('s', 'f', 'm'):
+            continue
+        row = {'k': 'retest', 'id': f'rt-{r["key"]}', 'd': res['d'] + 'T12:00:00Z', 't': f'Retest: {r["t"]}', 'sec': 'ARKBOARD',
+               'sp': r.get('sp') or [], 'ar': r.get('ar') or 'method', 'v': res['v']}
+        if res.get('e'):
+            row['e'] = res['e']
+        if res.get('tt') is not None:
+            row['tt'] = res['tt']
+        x = headline(row)
+        if x:
+            row['x'] = x
+        rows.append(row)
+    return rows
+
+
 def build():
     prs = load_cache()
     fix = json.loads(FIX.read_text()) if FIX.exists() else {}
@@ -563,6 +586,7 @@ def build():
         rows.append(r)
     rows += study_rows(prs)
     rows += content_rows()
+    rows += retest_rows()
     rows.sort(key=lambda r: r['d'], reverse=True)
     asof = rows[0]['d'] if rows else ''
     (ROOT / 'static/data').mkdir(parents=True, exist_ok=True)
