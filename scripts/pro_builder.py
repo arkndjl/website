@@ -276,8 +276,8 @@ def verdicts(lg, T, rate):
             s = rate * e3 - sum(costs)
             row['e3'] = r2(e3, 2)
         if s is not None:
-            row['s'] = r2(s)
-            row['vd'] = ('E' if s >= 0 else 'W') if last_year else ('K' if s >= 0 else 'T')
+            row['s'] = r2(s)   # the verdict reads the shown surplus, so a -$0.04M never shows $0.0M beside Trade
+            row['vd'] = ('E' if row['s'] >= 0 else 'W') if last_year else ('K' if row['s'] >= 0 else 'T')
         out.append(row)
     return out, read, V
 

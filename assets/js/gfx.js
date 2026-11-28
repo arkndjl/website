@@ -5041,7 +5041,7 @@
       L[1].slice(0, 9).forEach(function (p) {
         if (yy + 80 > bottom) return;
         var tag = VDN[p.vd]; g.font = '34px ' + FONT; var tw2 = g.measureText(tag).width + 20;
-        g.fillStyle = VDC[p.vd]; g.fillRect(L[2] + half - tw2, yy - 38, tw2, 50); g.fillStyle = C.dark; g.fillText(tag, L[2] + half - tw2 + 10, yy - 2);
+        g.fillStyle = VDC[p.vd]; g.fillRect(L[2] + half - tw2, yy - 38, tw2, 50); g.fillStyle = C.dark; g.fillText(tag, L[2] + half - tw2 + 10, yy - 12);   // the middle of the 50 px tag (text is drawn on its middle)
         g.font = '40px ' + FONT; g.fillStyle = C.white; var nm = fit(g, p.n, half - tw2 - 120), nmw = g.measureText(nm).width; g.fillText(nm, L[2], yy);
         g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.fillText(p.pos, L[2] + nmw + 16, yy + 2);
         var sub = [p.h[0] != null ? m(p.h[0]) : '', p.left > 1 ? 'thru ' + (p.thru || '') : (p.x != null ? 'xAAV ' + m(p.x) : ''), 'surplus ' + sg(p.s), p.dev ? D.vl + ' ' + p.dev.map(function (d) { return d.toFixed(1); }).join(' > ') : ''].filter(Boolean).join(' · ');
@@ -5052,7 +5052,7 @@
     y = bottom + 30; rule('PICKS', m(t.pv) + ' · #' + t.pvRk + ' of ' + N);
     var pk = (t.picks || []).slice().sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; }), line = [], ys = {};
     pk.forEach(function (k) { (ys[k[0]] = ys[k[0]] || []).push('R' + k[1] + (k[2] !== t.tm ? ' ' + k[2] : '')); });
-    Object.keys(ys).forEach(function (yr) { line.push(yr + ': ' + ys[yr].join(', ')); });
+    Object.keys(ys).forEach(function (yr) { line.push((yr + ': ' + ys[yr].join(', ')).replace(/ /g, '\u00a0')); });   // a year's picks stay on one line
     g.font = '36px ' + FONT; g.fillStyle = C.white;
     wrap(g, line.join('   ') || 'none', w).slice(0, 4).forEach(function (l, i) { g.fillText(l, x, y + 20 + i * 52); });
     return F.canvas;
