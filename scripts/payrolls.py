@@ -115,12 +115,21 @@ def plus(vals):
     return [None if x is None else round(100 + 25 * (x - m) / sd) for x in vals]
 
 
-def team_value(lg, teams, players, mn, cap):
+def value_rate(lg, season):
+    """the league's $ a win in the season the value column comes from (MLS: this season; the others: the last full season,
+    season - 1). Never a season in progress: its rate is a full season's pay over part of a season's wins (NFL 2026
+    read $53.9M a win against $31.7M for 2025)"""
+    rates = (efficiency().get(lg) or {}).get('ratePerWin') or {}
+    last = season if lg == 'mls' else season - 1
+    ys = [int(y) for y in rates if int(y) <= last]
+    return rates[str(max(ys))] if ys else None
+
+
+def team_value(lg, teams, players, mn, cap, season):
     """Surplus ($M) and Eff+ per team: last full season's value of today's roster at the league's rate a win, less pay above
     the minimum; ships only when the held-out test passed for the league (research/payroll_efficiency.json)"""
     R = efficiency().get(lg) or {}
-    rates = R.get('ratePerWin') or {}
-    rate = rates[max(rates, key=int)] if rates else None
+    rate = value_rate(lg, season)
     ship = bool((R.get('surplus') or {}).get('pass'))
     by = defaultdict(list)
     for p in players:
@@ -191,8 +200,8 @@ def finish(lg, L, teams, players, src, extra=None):
         t['c'] = [r2(sum((p['h'][i] or 0) for p in players if p['tm'] == t['tm'] and not p.get('nr') and p['h'] and i < len(p['h'])), 2) for i in range(YEARS)]
         t['exp'] = r2(sum((p['h'][0] or 0) for p in players if p['tm'] == t['tm'] and p.get('fa') and not p.get('nr') and p['h']), 2)
         t['nfa'] = sum(1 for p in players if p['tm'] == t['tm'] and p.get('fa') and not p.get('nr') and not p.get('dead'))
-    eff = team_value(lg, teams, players, L['min'], L['cap'])
-    eff['deal'] = deal_risk(lg, players, L['min'], (efficiency().get(lg) or {}).get('ratePerWin', {}).get(str(max(map(int, (efficiency().get(lg) or {}).get('ratePerWin', {'0': 0}))))))
+    eff = team_value(lg, teams, players, L['min'], L['cap'], L['season'])
+    eff['deal'] = deal_risk(lg, players, L['min'], value_rate(lg, L['season']))
     if eff['deal']:
         A = json.load(open(AGE))[lg]
         eff['aging'] = {k: A[k] for k in ('k1', 'k2', 'k3')}
