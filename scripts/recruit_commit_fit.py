@@ -32,6 +32,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, 'scripts', '.cache', 'recruit_commit')
 OUT = os.path.join(ROOT, 'data', 'recruit_commit_fit.json')
 LEANS = os.path.join(ROOT, 'data', 'recruit_commit_leans.json')
+TOP = os.path.join(ROOT, 'data', 'recruit_commit_top.json')   # the model's top three schools a recruit (team builder targets)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cfb_transfer_fit import geocode, miles  # noqa: E402
 import recruit_on3_join as ON3  # noqa: E402
@@ -300,7 +301,7 @@ def site_keys(sp, leans):
     by = defaultdict(list)
     leans = [x for x in leans if x['set'] == 'list']   # shown: the list model only (calibrated held out; the open field reads overconfident)
     for x in leans: by[(x['year'], names.key(x['name']))].append(x)
-    out = defaultdict(dict)
+    out = defaultdict(dict); top = defaultdict(dict)
     for g in groups:
         for r in g.get('list', []):
             if r.get('team') or r.get('school') or r.get('status') not in (None, 'uncommitted'): continue
@@ -311,7 +312,12 @@ def site_keys(sp, leans):
             if len(cand) == 1:
                 t, nm, pr = cand[0]['lean'][0]
                 out[str(g['year'])][r['name']] = [nm, round(pr * 100), t]
+                top[str(g['year'])][r['name']] = [[nm, round(pr * 100), t] for t, nm, pr in cand[0]['lean']]
+    TOPS[sp] = top
     return out
+
+
+TOPS = {}
 
 
 def main():
@@ -341,6 +347,7 @@ def main():
         leans[sp] = site_keys(sp, lv)
         if refit or not only_live: json.dump(res, open(OUT, 'w'), indent=1)
     json.dump(leans, open(LEANS, 'w'), separators=(',', ':'))
+    json.dump(TOPS, open(TOP, 'w'), separators=(',', ':'))
     print('wrote', LEANS, {sp: {y: len(v) for y, v in d.items()} for sp, d in leans.items()})
 
 

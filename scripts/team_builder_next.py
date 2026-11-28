@@ -18,8 +18,21 @@ Per team:
   bud   the reported budget for next season (data/nil_budgets.json, low and high, x the market's yearly growth)
   cls   the incoming class: FV, Y1 FV, ARK stars, On% (CFB), $ (xNIL)
   dect  DECT on returners and departures (Declare / Even / College / Transfer), where the draft boards carry it
+  pot   potential recruits: uncommitted recruits this school is in on, next class ("next", counted in the projection)
+        and the one after ("later", listed), each with P(he signs here):
+          1. the ARK lean model's chance for this school when the model has him (its top three schools; the held-out
+             calibrated LIST model, data/recruit_commit_top.json; CFB already reads visits and expert picks),
+          2. else On3's RPM share for the school at its latest reading,
+          3. else his visits: the rate at which recruits who took k official visits signed with one of those schools,
+             and for an unofficial-only school the same by unofficial count, read from the committed recruits' On3
+             visit lists (scripts/data/recruit_on3_committed.json.gz; visits after the commitment are in there, so
+             the rates run high). Per recruit the schools' chances are scaled to sum to 1 at most.
+        Expert picks are shown beside it (k experts on the school of n). gain = P x his value added to the plan:
+        CFB P x On% x the AV his Y1 FV adds to the room (the room's depth weights), in Elo; CBB P x the ARK rating
+        his projected BPM adds to the rotation. nx.pot = the plan with every next-class target's expected gain.
 """
-import json, math, os, sys
+import gzip, json, math, os, re, sys
+from collections import defaultdict
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 SD = os.path.join(ROOT, 'static', 'data')
@@ -72,6 +85,128 @@ def rank(teams, key):
 def r1(x): return None if x is None else round(x, 1)
 
 
+def J(*a, gz=False):
+    f = os.path.join(ROOT, *a)
+    if not os.path.exists(f): return {}
+    return json.load(gzip.open(f) if gz else open(f))
+
+
+# ---------------------------------------------------------------------------------------------- potential recruits
+POT_MIN = 0.05   # a school under a 5% chance is not a target
+POT_N = 15
+
+
+def visit_rates():
+    """(official?, k) -> share of committed recruits' visited schools that he signed with, both sports pooled; k = his
+    count of official visits (unofficial-only schools: his unofficial count), 5 = five or more. k = 1 official reads
+    the k = 2 rate (a lone official is usually the school he already picked)"""
+    sys.path.insert(0, HERE)
+    import names, player_moves as PM
+    from recruit_on3_join import slug_map
+    d = J('scripts', 'data', 'recruit_on3_committed.json.gz', gz=True); agg = defaultdict(lambda: [0, 0])
+    for sp, cl in d.items():
+        sm = slug_map(sp); rec = PM.site_recruits(sp)
+        for y, rows in cl.items():
+            m = names.Matcher(rec.get(int(y)) or [], team=None)
+            for o in rows:
+                r, _ = m.find(o.get('name'))
+                ch = r and (str(r['tid']) if r.get('tid') else CBB_ID.get(names.team_key(r.get('team') or '')))
+                if not ch: continue
+                ov = {sm[v[0]] for v in o.get('visits') or [] if v[1] == 'Official' and v[0] in sm}
+                uv = {sm[v[0]] for v in o.get('visits') or [] if v[1] != 'Official' and v[0] in sm} - ov
+                for x in ov: a = agg[(1, min(len(ov), 5))]; a[0] += x == ch; a[1] += 1
+                if not ov:
+                    for x in uv: a = agg[(0, min(len(uv), 5))]; a[0] += x == ch; a[1] += 1
+    R = {}
+    for o in (1, 0):
+        for k in range(1, 6):
+            a = agg[(o, k)]; R[(o, k)] = (a[0] + 1) / (a[1] + 4) if a[1] else None   # +1 / +4: a small prior on thin cells
+        R[(1, 1)] = R[(1, 2)]
+    return R, {f"{'ov' if o else 'uv'}{k}": [round(v, 3), agg[(o, k)][1]] for (o, k), v in R.items() if v is not None}
+
+
+def pot_sources(sp, classes):
+    """{year: [recruit row + {'sch': {espn id: {p, src, lean, rpm, ex, ov, uv}}}]} for the uncommitted recruits of the
+    given classes ({year: rows})"""
+    sys.path.insert(0, HERE)
+    import names
+    from recruit_on3_join import slug_map
+    sm = slug_map(sp)
+    top = J('data', 'recruit_commit_top.json').get(sp, {}); lean1 = J('data', 'recruit_commit_leans.json').get(sp, {})
+    rpm1 = J('data', 'recruit_rpm.json').get(sp, {}); ex = J('data', 'recruit_expert_picks.json').get(sp, {})
+    live = J('scripts', 'data', 'recruit_on3_live.json.gz', gz=True).get(sp, {})
+    R, _ = RATES
+    out = {}
+    for y, rows in classes.items():
+        ys = str(y); m = names.Matcher(rows, team=None); on3 = {}
+        for o in live.get(ys) or []:
+            r, _ = m.find(o.get('name'))
+            if r and not (o.get('state') and r.get('home') and not r['home'].endswith(o['state'])): on3[r['name']] = o
+        res = []
+        for r in rows:
+            if r.get('team') or r.get('tid') or r.get('status') not in (None, 'uncommitted'): continue
+            S = defaultdict(dict)
+            L = top.get(ys, {}).get(r['name']) or ([lean1[ys][r['name']]] if r['name'] in lean1.get(ys, {}) else [])
+            for nm, pc, tid in L: S[str(tid)]['lean'] = pc
+            o = on3.get(r['name']) or {}
+            lead = max(o.get('lead') or [], key=lambda x: x[0], default=None)
+            for row in (lead[1] if lead else []) or []:
+                if row and row[0] in sm and row[1]: S[sm[row[0]]]['rpm'] = round(row[1])
+            if not lead and r['name'] in rpm1.get(ys, {}):
+                nm, pc, tid = rpm1[ys][r['name']]; S[str(tid)]['rpm'] = round(pc)
+            if r['name'] in ex.get(ys, {}):
+                nm, k, n, tid = ex[ys][r['name']]; S[str(tid)]['ex'] = [k, n]
+            ov = {sm[v[0]] for v in o.get('visits') or [] if v[1] == 'Official' and v[0] in sm}
+            uv = {sm[v[0]] for v in o.get('visits') or [] if v[1] != 'Official' and v[0] in sm} - ov
+            for x in ov: S[x]['ov'] = 1
+            for x in uv: S[x]['uv'] = 1
+            for t, v in S.items():
+                if L: v['p'], v['src'] = (v['lean'] / 100, 'lean') if 'lean' in v else (None, None)
+                elif 'rpm' in v: v['p'], v['src'] = v['rpm'] / 100, 'rpm'
+                elif v.get('ov') and R[(1, min(len(ov), 5))]: v['p'], v['src'] = R[(1, min(len(ov), 5))], 'visit'
+                elif v.get('uv') and not ov and R[(0, min(len(uv), 5))]: v['p'], v['src'] = R[(0, min(len(uv), 5))], 'visit'
+                else: v['p'], v['src'] = None, None
+            tot = sum(v['p'] or 0 for v in S.values())
+            if tot > 1:
+                for v in S.values():
+                    if v['p']: v['p'] /= tot
+            S = {t: v for t, v in S.items() if (v['p'] or 0) >= POT_MIN or v.get('ex')}
+            if S: res.append(dict(r, sch=S))
+        out[y] = res
+    return out
+
+
+def pot_row(r, v, yr, cfb):
+    o = {'name': r['name'], 'pos': r.get('pos'), 'yr': yr, 'fv': r1(r.get('xfv') if cfb else r.get('fv')), 'y1': r1(r.get('fvOn') if cfb else r.get('y1fv')),
+         'ark': r.get('ark'), 'stars': r.get('stars'), 'rk': r.get('rank') if cfb else r.get('rk'), 'x': r.get('xnil'),
+         'p': None if v['p'] is None else round(v['p'], 3), 'src': v['src']}
+    if cfb: o['on'] = r.get('pOn')
+    for k in ('lean', 'rpm', 'ex', 'ov', 'uv'):
+        if v.get(k) is not None: o[k] = v[k]
+    return o
+
+
+def cfb_room(src):
+    """roomAv's constants from scripts/cfb_transfer.mjs and scripts/cfb_teams.mjs (read, not copied)"""
+    a = open(os.path.join(HERE, 'cfb_teams.mjs')).read(); b = open(os.path.join(HERE, 'cfb_transfer.mjs')).read()
+    avt = json.loads(re.search(r'const AV_BY_FV = (\[\[.*?\]\]);', a).group(1))
+    st = json.loads(re.sub(r'(\w+):', r'"\1":', re.search(r'export const STARTERS = (\{.*?\});', a).group(1)))
+    dw = json.loads(re.sub(r'(\w+):', r'"\1":', re.search(r'const DEPTH_W = (\{.*?\});', b, re.S).group(1).replace('\n', ' ')))
+    fill = float(re.search(r'const FILL = (\d+)', b).group(1))
+    def avOf(f):
+        for (f0, a0), (f1, a1) in zip(avt, avt[1:]):
+            if f <= f1: return a0 + (a1 - a0) * max(0, f - f0) / (f1 - f0)
+        return avt[-1][1]
+    def room(fvs, g, repl):
+        fvs = sorted(fvs, reverse=True); W = dw[g]; n = st.get(g, 1)
+        return sum(W[k] * avOf(max(fvs[k] if k < len(fvs) else repl, repl) if k < n else (fvs[k] if k < len(fvs) else fill)) for k in range(len(W)))
+    return room, set(dw)
+
+
+RATES = None
+CBB_ID = {}   # team key -> ESPN id (the CBB class rows name the school only)
+
+
 # ---------------------------------------------------------------------------------------------------------- CFB
 def cfb():
     p = os.path.join(SD, 'cfb-builder.json')
@@ -105,7 +240,6 @@ def cfb():
         t['eff'] = int(round(spend / max(war, 0.5), -3))
         t['warSea'] = r1(t['avPlan'] * WK)
         t['bud'] = budget_next('cfb', t['team'], D['next'])
-    for t in T: del t['_e']
     er = rank(T, lambda o: -o['eff'])
     for t in T: t['effRk'] = er[id(t)]
     # the class (static/data/cfb-recruits.json) and the redshirts and young players' next FV are already in the chart;
@@ -119,6 +253,41 @@ def cfb():
                                                      'ark': x.get('ark'), 'stars': x.get('stars'), 'rk': x.get('rank'), 'x': x.get('xnil')})
         for t in T: t['cls'] = sorted(cls.get(t['tid'], []), key=lambda c: -(c['fv'] or 0))
     except (OSError, ValueError): pass
+    # potential recruits
+    try:
+        R = json.load(open(os.path.join(SD, 'cfb-recruits.json')))
+        room, G = cfb_room(None)
+        cls_by = {int(R['next']): R.get('class') or []}
+        for f in R.get('future') or []: cls_by[int(f['year'])] = f.get('list') or []
+        nxt_y = int(R['next']); later = [y for y in sorted(cls_by) if y > nxt_y][:1]
+        src = pot_sources('cfb', {y: cls_by[y] for y in [nxt_y] + later})
+        byT = defaultdict(lambda: {'next': [], 'later': []})
+        for y, rows in src.items():
+            for r in rows:
+                for tid, v in r['sch'].items(): byT[tid]['next' if y == nxt_y else 'later'].append((r, v, y))
+        gs = lambda g: ['WR', 'RB', 'CB', 'S'] if g == 'ATH' else ['DL'] if g == 'DT' else [g]
+        for t in T:
+            P = {pz['g']: pz for pz in t['positions']}; gain = 0.0; pot = {}
+            for k in ('next', 'later'):
+                rows = []
+                for r, v, y in byT.get(str(t['tid']), {}).get(k, []):
+                    o = pot_row(r, v, y, True)
+                    if k == 'next' and o['p'] and o['y1'] is not None:
+                        best = 0.0
+                        for g in gs(r.get('g') or r.get('pos')):
+                            pz = P.get(g)
+                            if not pz or g not in G: continue
+                            base = [c['fv'] for c in pz.get('chart') or [] if c.get('kind') != 'open' and c.get('fv') is not None]
+                            best = max(best, room(base + [o['y1']], g, pz['repl']) - room(base, g, pz['repl']))
+                        o['av'] = round(o['p'] * (o['on'] or 0) * best, 2); o['g'] = round(o['av'] * b[1]); gain += o['av']
+                    rows.append(o)
+                rows.sort(key=lambda o: -((o['p'] or 0) * (o['fv'] or 0) + (o['fv'] or 0) / 1e3))
+                pot[k] = rows[:POT_N]
+            t['pot'] = pot; t['_e']['pot'] = t['_e']['plan'] + b[1] * gain
+            t['potX'] = int(round(sum((o['p'] or 0) * (o['x'] or 0) for o in pot['next']), -3))
+        xw = sched(T, lambda o: o['_e']['pot'], conf, pw, CFB_GAMES); rk = rank(T, lambda o: o['_e']['pot'])
+        for t in T: t['nx']['pot'] = {'e': round(t['_e']['pot']), 'rk': rk[id(t)], 'xw': round(xw(t, t['_e']['pot']), 1)}
+    except (OSError, ValueError, KeyError) as e: print('cfb pot', repr(e))
     # DECT from the draft board (cfb-all.json rows carry dectL once the board run writes it)
     try:
         A = json.load(open(os.path.join(SD, 'cfb-all.json'))); c = {k: i for i, k in enumerate(A['cols'])}
@@ -136,7 +305,9 @@ def cfb():
                     v = dk.get((x.get('name'), t['team']))
                     if v and x.get('kind') == 'back': x['dect'] = v
     except (OSError, ValueError, KeyError): pass
-    D['nxFit'] = {'b': [round(v, 3) for v in b], 'r2': round(r2, 3), 'n': len(fit), 'games': CFB_GAMES, 'replQ': REPL_Q, 'warPerAv': WK}
+    for t in T: t.pop('_e', None)
+    D['nxFit'] = {'b': [round(v, 3) for v in b], 'r2': round(r2, 3), 'n': len(fit), 'games': CFB_GAMES, 'replQ': REPL_Q, 'warPerAv': WK,
+                  'pot': pot_fit(T, 'cfb')}
     json.dump(D, open(p, 'w'), separators=(',', ':'), allow_nan=False)
     return D['nxFit']
 
@@ -174,6 +345,41 @@ def cbb():
             for cm in t.get('commits') or []:
                 cm.update({k: v for k, v in (cls.get(t['t'], {}).get(cm['name']) or {}).items() if v is not None})
     except (OSError, ValueError): pass
+    # potential recruits: the rotation sum (cbb_market.py rate) on the ARK scale, fit back from the plan's own numbers
+    try:
+        F = J('data', 'cbb_market_fit.json'); sch = F.get('minsched') or [0.78, 0.74, 0.68, 0.6, 0.52, 0.42, 0.32, 0.22, 0.14, 0.08, 0.05, 0.03, 0.02]
+        sch = [v / sum(sch) * 5 for v in sch]; fb = F['fresh']['bpm']; REP = float(re.search(r'REP_BPM = (-?[\d.]+)', open(os.path.join(HERE, 'cbb_recruit_fit.py')).read()).group(1))
+        def rate(bs):
+            b = sorted(bs, reverse=True)[:len(sch)]; b += [REP] * (len(sch) - len(b)); return sum(a * c for a, c in zip(sch, b))
+        cur = lambda t: [x['bpm'] for x in t.get('back') or []] + [x['bpm'] for x in t.get('commits') or []] + [x['bpm'] for x in t.get('plan') or []]
+        ra, rk_ = lsq([[1.0, rate(cur(t))] for t in T], [t['after'] for t in T])
+        R = json.load(open(os.path.join(ROOT, 'data', 'cbb_recruits.json')))
+        cls_by = {int(c['year']): c.get('list') or [] for c in R.get('classes') or []}
+        nxt_y = int(D['season']); later = [y for y in sorted(cls_by) if y > nxt_y][:1]
+        src = pot_sources('cbb', {y: cls_by[y] for y in [nxt_y] + later if y in cls_by})
+        byT = defaultdict(lambda: {'next': [], 'later': []})
+        for y, rows in src.items():
+            for r in rows:
+                for tid, v in r['sch'].items(): byT[tid]['next' if y == nxt_y else 'later'].append((r, v, y))
+        for t in T:
+            c0 = cur(t); r0 = rate(c0); gain = 0.0; pot = {}
+            for k in ('next', 'later'):
+                rows = []
+                for r, v, y in byT.get(str(t['id']), {}).get(k, []):
+                    o = pot_row(r, v, y, False)
+                    if k == 'next' and o['p'] and r.get('rk'):
+                        o['bpm'] = round(fb[0] + fb[1] * -math.log(r['rk']), 1)
+                        o['g'] = round(o['p'] * rk_ * (rate(c0 + [o['bpm']]) - r0), 2); gain += o['g']
+                    rows.append(o)
+                rows.sort(key=lambda o: -((o['p'] or 0) * (o['fv'] or 0) + (o['fv'] or 0) / 1e3))
+                pot[k] = rows[:POT_N]
+            t['pot'] = pot; t['_pot'] = t['after'] + gain
+            t['potX'] = int(round(sum((o['p'] or 0) * (o['x'] or 0) for o in pot['next']), -3))
+        xw = sched(T, lambda o: o['_pot'], conf, pw, CBB_GAMES); rk = rank(T, lambda o: o['_pot'])
+        for t in T: t['nx']['pot'] = {'r': round(t['_pot'], 1), 'rk': rk[id(t)], 'xw': round(xw(t, t['_pot']), 1)}
+        for t in T: del t['_pot']
+        potfit = dict(pot_fit(T, 'cbb'), rot=[round(ra, 2), round(rk_, 3)])
+    except (OSError, ValueError, KeyError) as e: print('cbb pot', repr(e)); potfit = None
     # DECT: the draft board tab rows (scripts/cbb_tabs.py) carry dectL by name and school
     dk = {}
     def walk(o):
@@ -189,9 +395,16 @@ def cbb():
             for x in L:
                 v = dk.get((x['name'], t['t']))
                 if v: x['dect'] = v
-    D['nxFit'] = {'games': CBB_GAMES, 'poss': CBB_POSS, 'sd': CBB_SD, 'replQ': REPL_Q}
+    D['nxFit'] = {'games': CBB_GAMES, 'poss': CBB_POSS, 'sd': CBB_SD, 'replQ': REPL_Q, 'pot': potfit}
     json.dump(D, open(p, 'w'), separators=(',', ':'), allow_nan=False)
     return D['nxFit']
+
+
+def pot_fit(T, sp):
+    n = [o for t in T for o in (t.get('pot') or {}).get('next', [])]
+    by = defaultdict(int)
+    for o in n: by[o['src']] += 1
+    return {'rates': RATES[1], 'min': POT_MIN, 'rows': len(n), 'recruits': len({o['name'] for o in n}), 'src': dict(by)}
 
 
 def test():
@@ -205,4 +418,11 @@ def test():
 
 if __name__ == '__main__':
     if '--test' in sys.argv: test(); sys.exit()
+    sys.path.insert(0, HERE)
+    import names as _n
+    CBB_ID.update({_n.team_key(t['t']): str(t['id']) for t in J('static', 'data', 'cbb-builder.json').get('teams') or []})
+    try: RATES = visit_rates()
+    except Exception as e:   # no On3 pack or no ESPN team list: visits read nothing, the lean model and RPM still do
+        print('visit rates', repr(e)); RATES = ({(o, k): None for o in (0, 1) for k in range(1, 6)}, {})
+    print('visit rates', RATES[1])
     print('cfb', cfb()); print('cbb', cbb())

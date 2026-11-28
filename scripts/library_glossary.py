@@ -63,6 +63,19 @@ _PX = ld('data/nba_pxpm_research.json')                     # pXPM fit + held-ou
 _NBAEX = (f"Held out 2012-23 ({_NX['n']:,} player seasons, {100 * _NX['exitShare']:.0f}% out of the league), RMSE goes from {_NX['exit_vs_cp']['rmse'][1]:.2f} to "
           f"{_NX['exit_vs_cp']['rmse'][0]:.2f} (t = {_NX['exit_vs_cp']['t']:.1f}, {_NX['exit_vs_cp']['won']}/{_NX['exit_vs_cp']['of']} seasons).")
 
+
+def _tbx_pot():
+    """the targets paragraph, from the builder files' nxFit.pot"""
+    P = (_TBX.get('cfb') or {}).get('pot') or {}; R = P.get('rates') or {}
+    if not R: return 'Targets are uncommitted recruits a school is in on, each at his chance to sign there.'
+    ov = ', '.join(f"{R[k][0]:.2f}".lstrip('0') + f" with {k[2]}" for k in ('ov2', 'ov3', 'ov4') if k in R)
+    return ('Targets are uncommitted recruits a school is in on. His chance to sign there is the ARK lean model\'s for that school when '
+            'the model has him (its top three schools), else On3\'s RPM share, else his visits: the rate at which committed recruits '
+            f'signed with a school they took an official visit to was {ov} official visits and {f"{R.get('ov5', [0])[0]:.2f}".lstrip('0')} with five or more. '
+            'Those rates include visits after the commitment, so they run high. A school under 5% is left off. Next class targets add '
+            'their chance times what they add to the plan (football: On% times the room AV of his Y1 FV, in Elo; basketball: the team '
+            'rating of his projected XPM in the rotation), shown as plan + targets.')
+
 ALLP = ['CFB', 'NFL', 'CBB', 'NBA', 'NHL', 'Hockey', 'Soccer', 'Tennis']
 
 
@@ -618,7 +631,8 @@ sections.append({'id': 'players', 'title': 'Player odds and projections', 'entri
       ['Returners count at their chance to be back (Ret%, Transfer%, the draft), the class at its chance to be on the field, signings at Transfer% x landing odds. Money is the school\'s NIL budget (its roster yNIL, which shares the reported budget) as a soft limit.',
        f'Football strength is Elo from the plan\'s college WAR, fit on this season\'s Elo across FBS (R2 = {_TBX["cfb"].get("r2", 0):.2f}, n = {_TBX["cfb"].get("n", 0)}). Basketball strength is the ARK rating of the plan\'s rotation.',
        f'xW is wins over a conference schedule at every team\'s projected strength: {_TBX["cfb"].get("games", 12)} games in football, {_TBX["cbb"].get("games", 31)} in basketball. Wins over replacement are xW less a 10th-percentile team on the same schedule, and NIL $ a win is next season\'s spend over those wins.',
-       f'DECT as an input failed everywhere it was tested. In Ret% the staying edge made held-out log loss worse in both sports (CFB t = {_DX["ret"]["cfb"]["terms"]["R1 ce"]["lodo"]["t"]}, CBB t = {_DX["ret"]["cbb"]["terms"]["R1 ce"]["lodo"]["t"]} against it). CBB Transfer%: DECT t = {_DX["cbb_move"]["move"]["terms"]["T4 dect"]["A"]["t"]} on 2025-26 (needs 2), school pay per market dollar t = {_DX["cbb_move"]["move"]["terms"]["T2 k"]["A"]["t"]}, market over school pay t = {_DX["cbb_move"]["move"]["terms"]["T1 zgap"]["A"]["t"]}. CBB landing, money per market dollar at the destination t = {_DX["cbb_move"]["land"]["L1 dest_k"]["A"]["t"]}. CFB Transfer% has one fall board to test on and is retested after the 2026-27 cycle. DECT shows on the builder for reading only.'],
+       f'DECT as an input failed everywhere it was tested. In Ret% the staying edge made held-out log loss worse in both sports (CFB t = {_DX["ret"]["cfb"]["terms"]["R1 ce"]["lodo"]["t"]}, CBB t = {_DX["ret"]["cbb"]["terms"]["R1 ce"]["lodo"]["t"]} against it). CBB Transfer%: DECT t = {_DX["cbb_move"]["move"]["terms"]["T4 dect"]["A"]["t"]} on 2025-26 (needs 2), school pay per market dollar t = {_DX["cbb_move"]["move"]["terms"]["T2 k"]["A"]["t"]}, market over school pay t = {_DX["cbb_move"]["move"]["terms"]["T1 zgap"]["A"]["t"]}. CBB landing, money per market dollar at the destination t = {_DX["cbb_move"]["land"]["L1 dest_k"]["A"]["t"]}. CFB Transfer% has one fall board to test on and is retested after the 2026-27 cycle. DECT shows on the builder for reading only.',
+       _tbx_pot()],
       'CFB team builder, CBB team builder', ['CFB', 'CBB']),
     E('FBS%', 'The chance an FCS player is on an FBS roster next season.',
       ['A logit on 2023-26 FCS-to-FBS moves: production, team strength, year in school and position. It is capped at 1 - Draft%.'],
