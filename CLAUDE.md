@@ -173,6 +173,18 @@
   `assets/js/gfx.js` (`/news/#gfx` opens the newest). Category icons: 11x11 bitmaps in `data/news_icons.json`.
 - Never surface hidden pages (Franchise Fantasy) or betting lines in the feed.
 
+## College team builders (CFB and CBB; Nov 27-28)
+
+- `scripts/team_builder_next.py` runs after the board builders (cfb-board.yml, cbb-board.yml) and adds next season's strength,
+  xW, wins over replacement, NIL $ a win, DECT chips, targets (uncommitted recruits with P(signs here): lean model top three in
+  `data/recruit_commit_top.json`, else On3 RPM, else visit rates), later classes' commits, and seasons 2-3.
+- Seasons ahead = the roster chain (`scripts/team_years.py`; fit and test `scripts/research/team_years_nov28/test.py` ->
+  `data/team_years_fit.json`, NIL-era origins, passed 1-3 seasons out both sports): P(back) next season, then stay rates by class,
+  scaled with strength now. Rerun the test after each season ends. Roster by season files: `static/data/<sport>-builder-ros.json`
+  (full depth and roster tabs, `layouts/partials/tbyears.html`).
+- CBB development curve (`dev.py` -> `data/team_years_dev.json`, class, age, level, minutes) shows pXPM by season; it is not in the
+  team chain (failed there next season) and CFB has none yet: both in data/retests.json.
+
 ## Recruit GFX card and MOVES strip
 
 - Rows with a class year in `data-rc` (`layouts/partials/rcgfx.html`: CFB class/future tabs, CBB class tabs) draw the recruit

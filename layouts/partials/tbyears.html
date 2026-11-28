@@ -1,0 +1,64 @@
+{{- /* Team builder, seasons ahead (CFB and CBB): the roster by season (static/data/<sport>-builder-ros.json, written by
+scripts/team_builder_next.py: every player and commit with P(on this roster) in each of the next three seasons) drawn as the
+full depth chart for a chosen season and the roster table; and the season strip (nx.y1-y3, the roster chain fit,
+data/team_years_fit.json). Included once by cfbbuilder.html and cbbbuilder.html. */ -}}
+<script>
+(function () {
+  if (window.__tbYears) return;
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function pc(x) { return x == null ? '—' : x < 0.005 ? '&lt;1%' : Math.min(99, Math.round(x * 100)) + '%'; }
+  var cache = {};
+  function load(src) { return cache[src] || (cache[src] = fetch(src).then(function (r) { return r.json(); })); }
+  var ORDER = { cfb: ['QB', 'RB', 'WR', 'TE', 'OL', 'EDGE', 'DL', 'LB', 'CB', 'S', 'K', 'P'], cbb: ['G', 'F', 'C'] };
+  var DEEP = { cfb: { QB: 3, RB: 4, WR: 7, TE: 4, OL: 10, EDGE: 5, DL: 6, LB: 5, CB: 6, S: 5, K: 2, P: 2 }, cbb: { G: 7, F: 6, C: 4 } };
+  var TAG = { back: '', cls: 'FR', 'new': 'NEW', keep: 'KEEP' };
+  var DN = { D: 'Declare', E: 'Even', C: 'College', T: 'Transfer' };
+  function fvchip(fv) { return fv == null ? '<span class="cfb__dim">—</span>' : '<span class="fv-chip" data-fv="' + Math.floor(fv / 5) * 5 + '">' + Math.round(fv) + '</span>'; }
+  // the season strip: next three seasons from the roster chain, rating or Elo, rank, xW
+  function strip(N, years, unit, fmt, n) {
+    if (!N || !N.y1) return '';
+    return '<div class="tbx__yrs" title="roster chain: strength now and the players on this roster in each season, fit on 2021-26 NIL-era seasons">' +
+      ['y1', 'y2', 'y3'].map(function (k, i) { var r = N[k]; return '<div class="tbx__yr"><span>' + years[i] + '</span><b>' + fmt(r[unit]) + '</b><i>#' + r.rk + ' · ' + r.xw.toFixed(1) + ' xW</i></div>'; }).join('') + '</div>';
+  }
+  function pcell(p) { var a = Math.max(0, Math.min(1, p || 0)); return '<td class="cfb__num tbx__pc" style="--a:' + a.toFixed(2) + '">' + (p ? pc(p) : '—') + '</td>'; }
+  function rows(R, key) { var L = (R.teams || {})[key] || [], c = R.cols; return L.map(function (a) { var o = {}; c.forEach(function (k, i) { o[k] = a[i]; }); return o; }); }
+  function seasonLabel(sp, y) { return sp === 'cbb' ? y + '-' + String(y + 1).slice(2) : String(y); }
+  function depthHtml(sp, P, j, y) {
+    var by = {}; P.forEach(function (o) { var p = o['p' + j]; if (p >= 0.25) (by[o.pos] = by[o.pos] || []).push(o); });
+    return '<div class="tbx__room">' + ORDER[sp].filter(function (g) { return by[g]; }).map(function (g) {
+      var L = by[g].sort(function (a, b) { return (b.fv || 0) - (a.fv || 0); }).slice(0, DEEP[sp][g] || 6);
+      return '<div class="tbx__rrow"><b class="tbx__rg">' + esc(g) + '</b><div class="tbx__rl">' + L.map(function (o, i) {
+        var p = o['p' + j];
+        return '<span class="tbx__rc tbx__rc--' + o.kind + (p < 0.5 ? ' is-maybe' : '') + '" title="' + esc(o.name + ' · ' + (o.cls || '') + ' · P(here ' + seasonLabel(sp, y) + ') ' + Math.round(p * 100) + '%') + '"><i>' + (i + 1) + '</i>' + fvchip(o.fv) + '<span>' + esc(o.name) + '</span>' + (TAG[o.kind] ? '<em>' + TAG[o.kind] + '</em>' : '') + '<small>' + pc(p) + '</small></span>';
+      }).join('') + '</div></div>';
+    }).join('') + '</div>';
+  }
+  function vcell(v) { return '<td class="cfb__num">' + (v == null ? '—' : (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1)) + '</td>'; }
+  function rosterHtml(sp, P, y0, vLab) {
+    var L = P.filter(function (o) { return Math.max(o.p1 || 0, o.p2 || 0, o.p3 || 0) >= 0.1; });
+    if (!L.length) return '<p class="cfb__dim">no roster on file.</p>';
+    return '<div class="wintable__scroll"><table class="cfb__table tb__t"><thead><tr><th>Player</th><th>Pos</th><th>Cls</th><th>FV</th><th title="worth most to him: Declare, Even, College, Transfer">DECT</th>' +
+      [0, 1, 2].map(function (i) { return '<th class="' + (i ? '' : 'tbx__grp') + '" title="P(on this roster): next season from Ret%, Transfer% and the draft, then the stay rate at each class">' + seasonLabel(sp, y0 + i) + '</th>'; }).join('') +
+      (vLab ? [0, 1, 2].map(function (i) { return '<th class="' + (i ? '' : 'tbx__grp tbx__grp--val') + '" title="' + vLab + ' in ' + seasonLabel(sp, y0 + i) + ': next season\'s projection, then the development curve (class, age, level, minutes)">' + vLab + ' ' + String(y0 + i).slice(2) + '</th>'; }).join('') : '') + '</tr></thead><tbody>' +
+      L.map(function (o) { return '<tr><td>' + esc(o.name) + (TAG[o.kind] ? ' <span class="tb__dtag' + (o.kind === 'cls' ? ' tb__dtag--recruit' : o.kind === 'new' ? ' tb__dtag--new' : '') + '">' + TAG[o.kind] + '</span>' : '') + '</td><td>' + esc(o.pos || '') + '</td><td>' + esc(o.cls || '') + '</td><td>' + fvchip(o.fv) + '</td><td>' + (o.dect && DN[o.dect] ? '<span class="tbx__dect tbx__dect--' + o.dect + '" data-term="DECT">' + DN[o.dect] + '</span>' : '') + '</td>' + pcell(o.p1).replace('<td class="', '<td class="tbx__grp ') + pcell(o.p2) + pcell(o.p3) + (vLab ? vcell(o.v1).replace('<td class="', '<td class="tbx__grp tbx__grp--val ') + vcell(o.v2) + vcell(o.v3) : '') + '</tr>'; }).join('') + '</tbody></table></div>';
+  }
+  // fill the [data-tby-depth] and [data-tby-ros] slots of the drawn team; key = the team's key in the ros file
+  function fill(body, sp, src, key, y0) {
+    var d = body.querySelector('[data-tby-depth]'), r = body.querySelector('[data-tby-ros]');
+    if (!d && !r) return;
+    load(src).then(function (R) {
+      if (body.__tbyKey !== key) return;
+      var P = rows(R, key);
+      if (r) r.innerHTML = rosterHtml(sp, P, y0, R.vLab);
+      if (d) {
+        var draw = function (j) { d.querySelector('[data-tby-pane]').innerHTML = depthHtml(sp, P, j, y0 + j - 1);
+          d.querySelectorAll('[data-tby-y]').forEach(function (b) { b.setAttribute('aria-pressed', String(+b.getAttribute('data-tby-y') === j)); }); };
+        d.innerHTML = '<div class="tbx__ybtn">' + [1, 2, 3].map(function (j) { return '<button type="button" data-tby-y="' + j + '">' + seasonLabel(sp, y0 + j - 1) + '</button>'; }).join('') + '</div><div data-tby-pane></div>';
+        d.querySelectorAll('[data-tby-y]').forEach(function (b) { b.addEventListener('click', function () { draw(+b.getAttribute('data-tby-y')); }); });
+        draw(1);
+      }
+    }).catch(function () { if (r) r.innerHTML = '<p class="cfb__dim">roster failed to load.</p>'; });
+  }
+  window.__tbYears = { strip: strip, fill: fill, label: seasonLabel };
+})();
+</script>
