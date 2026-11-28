@@ -23,7 +23,8 @@
     <div class="pickem__stage">
       <b>{{ upper .stage }}</b>
       {{- if .picks }}<span title="chance of 5+ of the 10 picks correct">5+ / 10 · <b>{{ partial "num.html" (slice "%.0f" (mul .pPass 100)) }}%</b></span><span class="cfb__dim" title="expected correct picks">{{ partial "num.html" (slice "%.1f" .ev) }} xC</span>{{ end }}
-      {{- if .locked }}<span class="pickem__tag">LOCKED</span>{{ else if .start }}<span class="cfb__dim">lock {{ (time.In "America/New_York" (time .start)).Format "Jan 2 · 3:04 PM" }} ET</span>{{ end }}
+      {{- $past := false }}{{ with .start }}{{ $past = (time .).Before now }}{{ end }}
+      {{- if or .locked $past }}<span class="pickem__tag">LOCKED</span>{{ else if .start }}<span class="cfb__dim">lock {{ (time.In "America/New_York" (time .start)).Format "Jan 2 · 3:04 PM" }} ET</span>{{ end }}
       {{- if .projected }}<span class="pickem__tag pickem__tag--dim" title="field from Valve's invitation standings, not yet confirmed">PROJ</span>{{ end }}
       {{- if or .picks .bracket }}
       {{- /* GFX card (assets/js/gfx.js buildPickem): picks per slot with chances, or the playoff bracket picks */ -}}

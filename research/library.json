@@ -212,7 +212,7 @@
      "short": "An OLS on outcome FV for the draft class and for drafted players short of 100 NHL games.",
      "body": [
       "The draft model keeps log slot (board rank as slot), defense, goalie, draft-year NHLe, class strength.",
-      "Leave-one-class-out error is 87.92, compared to 92.44 for draft slot alone (2008-19 classes, 2,541 picks).",
+      "Leave-one-class-out error is 87.25, compared to 90.52 for draft slot alone (2008-19 classes, 2,541 picks).",
       "After the draft, stage models add the latest NHLe, pro games, a World Juniors spot, NHL games and WAR so far."
      ],
      "where": "Hockey prospects board, drafted prospects, fv model tab",
@@ -2898,6 +2898,7 @@
       "GA/60: Goals Against per 60. Goals allowed per 60 minutes.",
       "GA/G: Goals Against per game. Goals allowed a game.",
       "GAA: Goals Against Average. Goals a goalie allows per 60 minutes.",
+      "GF%: Goals For percentage. The share of the goals scored while he or the unit was on the ice.",
       "GF/60: Goals For per 60. Goals scored per 60 minutes.",
       "GF/G: Goals For per game. Goals scored a game.",
       "HDXGA: High-Danger Expected Goals Against. Expected goals allowed from the best scoring areas, per 60 minutes.",
@@ -2913,6 +2914,7 @@
       "PP%: Power Play percentage. The share of power plays that end in a goal.",
       "PPG: Power Play Goals. Goals scored on the power play.",
       "PTS%: Points percentage. The share of available standings points won.",
+      "RW: Regulation Wins. Wins in regulation time, the first tiebreaker.",
       "SHG: Shorthanded Goals. Goals scored while a man down.",
       "SHGA: Shorthanded Goals Against. Goals allowed while on the power play.",
       "SV%: Save percentage. The share of shots a goalie stops.",
@@ -2922,6 +2924,7 @@
       "xG: Expected Goals. The goals an average finisher scores from the same shots.",
       "XGA/60: Expected Goals Against per 60. Expected goals against per 60 minutes.",
       "xGA: Expected Goals Against. The goals the shots his team allows should produce.",
+      "xGF%: Expected Goals For percentage. The share of the expected goals while he or the unit was on the ice.",
       "XGF/60: Expected Goals For per 60. Expected goals for per 60 minutes.",
       "xGF: Expected Goals For. The goals his team's shots should produce."
      ],
@@ -2991,22 +2994,43 @@
      "term": "Counter-Strike abbreviations",
      "short": "The short labels on the CS2, 1NT and LAURSEN_111 tables.",
      "body": [
+      "4v5%: 4v5 win percentage. The share of rounds won after giving up the first kill.",
+      "5v4%: 5v4 win percentage. The share of rounds won after getting the first kill.",
       "ADR: Average Damage per Round. The damage he deals in an average round.",
+      "Adv%: Buy advantage win percentage. The share of rounds won with the better buy.",
+      "AWP+: AWP plus. Sniper kills a round and his share of the team's sniper kills. 100 is average.",
       "Bo3: Best of three. A series of up to three maps.",
+      "Clutch%: Clutch win percentage. The share of clutch setups he won.",
+      "Clutch+: Clutch plus. How often he wins 1v1 and 1v2 rounds and what they are worth. 100 is average.",
       "CT%: CT-side win rate. The share of defending rounds won.",
       "CT: Counter-Terrorist side. The defending side.",
+      "Dis%: Buy disadvantage win percentage. The share of rounds won with the worse buy.",
       "DPR: Deaths Per Round. Deaths in an average round.",
+      "Duel+: Duel plus. Fights after the opening one: the share he wins and his kills a round. 100 is average.",
+      "Entry%: Entry win percentage. The share of his opening duels he won.",
+      "Entry+: Entry plus. Opening duels won and the rounds they swing. 100 is average, 10 is one standard deviation.",
       "ESEA: ESEA League. The open league ladder that leads up toward the pro tier.",
+      "Gun%: Gun round win percentage. The share of rounds won when both teams are on a full buy.",
       "HLTV: HLTV. The main Counter-Strike stats site, and its player rating.",
       "HS%: Headshot percentage. The share of his kills that were headshots.",
       "K/D: Kills per Death. Kills divided by deaths. Above 1 means he wins more fights than he loses.",
       "KAST: Kill, Assist, Survive or Trade. The share of rounds where he got a kill, an assist, survived or was traded.",
       "KPR: Kills Per Round. Kills in an average round.",
+      "Multi+: Multi-kill plus. Rounds with two or more kills, weighted by how many. 100 is average.",
+      "MVP/R: Round MVPs per round. The share of his rounds where FACEIT named him the round MVP.",
+      "Open%: Opening kill percentage. The share of rounds where the team got the first kill.",
       "PUG: Pick-up game. A matchmaking game with random teammates, not a team match.",
+      "RAA: Rounds Above Average. Rounds won over an average player at his level across the season: RWA times rounds over 100.",
+      "RAR: Rounds Above Replacement. Rounds won over a replacement player: RWA over replacement times rounds over 100.",
+      "Rd MVP: Round MVPs. Rounds where FACEIT named him the MVP.",
+      "Rd%: Round win percentage. The share of rounds won.",
+      "RD/m: Round difference per map. Rounds won minus rounds lost, a map.",
       "RTG: ARK Rating. A player rating where 1.00 is a league-average player.",
       "RTG: VRS points. Valve's ranking points.",
+      "Surv+: Survival plus. Deaths a round, turned over so that fewer deaths score higher. 100 is average.",
       "T%: T-side win rate. The share of attacking rounds won.",
       "UDR: Utility Damage per Round. Grenade damage in an average round.",
+      "Util+: Utility plus. Grenade damage, enemies blinded a flash and flashes a round. 100 is average.",
       "VRS: Valve Regional Standings. Valve's own team ranking, which decides Major invites."
      ],
      "where": "every table",
@@ -3054,7 +3078,7 @@
      "plus",
      "Pro Bowler",
      "2+ All-Star, 1.7+ peak XPM",
-     "top 5 / class, 2.26+ peak WAR",
+     "top 5 / class, 2.27+ peak WAR",
      "top 20 / birth year",
      "All-Star / #3 SP"
     ],
@@ -3063,7 +3087,7 @@
      "above average",
      "6+ seasons starting",
      "above-avg starter, 0.6+ peak XPM",
-     "top 10 / class, 1.68+ peak WAR",
+     "top 10 / class, 1.71+ peak WAR",
      "top 45 / birth year",
      "above-average regular"
     ],
@@ -3072,7 +3096,7 @@
      "average",
      "4+ seasons starting",
      "average starter, 0.0+ peak XPM",
-     "top 20 / class, 1.03+ peak WAR",
+     "top 20 / class, 1.05+ peak WAR",
      "top 90 / birth year (big-five regular)",
      "average regular"
     ],
@@ -3081,7 +3105,7 @@
      "below average",
      "2+ seasons starting",
      "low-end starter, -0.6+ peak XPM",
-     "top 30 / class, 0.65+ peak WAR",
+     "top 30 / class, 0.66+ peak WAR",
      "top 150 / birth year",
      "low-end regular / platoon"
     ],
@@ -3090,7 +3114,7 @@
      "bench",
      "rotational",
      "end of rotation, -1.4+ peak XPM",
-     "top 45 / class, 0.26+ peak WAR",
+     "top 45 / class, 0.28+ peak WAR",
      "top 250 / birth year (top-flight regular)",
      "bench"
     ],
@@ -3414,48 +3438,48 @@
      "2.98+ peak WAR a season",
      "top 2 of a class",
      "top 0.9% of picks",
-     "0 / 3",
-     "65-69: 67.3 -> 64.2 (n 6, NHL 100%)"
+     "1 / 3",
+     "65-69: 66.9 -> 64.6 (n 9, NHL 100%)"
     ],
     [
      "60",
-     "2.26+ peak WAR a season",
+     "2.27+ peak WAR a season",
      "top 5 of a class",
      "top 2.4% of picks",
      "1 / 6",
-     "60-64: 62.3 -> 59.0 (n 12, NHL 100%)"
+     "60-64: 62.5 -> 58.1 (n 11, NHL 100%)"
     ],
     [
      "55",
-     "1.68+ peak WAR a season",
+     "1.71+ peak WAR a season",
      "top 10",
      "top 4.7% of picks",
      "1 / 13",
-     "55-59: 57.7 -> 60.4 (n 14, NHL 100%)"
+     "55-59: 57.3 -> 59.2 (n 16, NHL 100%)"
     ],
     [
      "50",
-     "1.03+ peak WAR a season",
+     "1.05+ peak WAR a season",
      "top 20 (NHL regular)",
      "top 9.4% of picks",
      "5 / 26",
-     "50-54: 52.1 -> 52.2 (n 39, NHL 97%)"
+     "50-54: 52.3 -> 51.7 (n 35, NHL 100%)"
     ],
     [
      "45",
-     "0.65+ peak WAR a season",
+     "0.66+ peak WAR a season",
      "top 30",
      "top 14.2% of picks",
-     "10 / 66",
-     "45-49: 47.4 -> 48.4 (n 63, NHL 98%)"
+     "9 / 66",
+     "45-49: 47.4 -> 49.1 (n 68, NHL 98%)"
     ],
     [
      "40",
-     "0.26+ peak WAR a season",
+     "0.28+ peak WAR a season",
      "top 45 (NHL career)",
      "top 21.3% of picks",
-     "23 / 115",
-     "40-44: 42.3 -> 44.6 (n 125, NHL 98%)"
+     "23 / 119",
+     "40-44: 42.2 -> 43.8 (n 119, NHL 98%)"
     ],
     [
      "30",
@@ -3463,7 +3487,7 @@
      "-",
      "-",
      "88 / 300",
-     "30-34: 32.1 -> 31.0 (n 453, NHL 63%)"
+     "30-34: 32.1 -> 31.3 (n 440, NHL 64%)"
     ],
     [
      "20",
@@ -3471,7 +3495,7 @@
      "-",
      "-",
      "189 / 300",
-     "20-24: 22.9 -> 23.5 (n 830, NHL 24%)"
+     "20-24: 23.0 -> 23.7 (n 804, NHL 24%)"
     ]
    ]
   },

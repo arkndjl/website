@@ -80,7 +80,11 @@
   "EPA/db": "EPA/DB",
   "RECTD": "RecTD",
   "Sack%": "SACK%",
-  "Snap%": "SNAP%"
+  "Snap%": "SNAP%",
+  "HS %": "HS%",
+  "Entry %": "Entry%",
+  "Clutch %": "Clutch%",
+  "UD/R": "UDR"
  },
  "terms": {
   "FV": {
@@ -3110,6 +3114,281 @@
    "n": "Pro share",
    "d": "An agency's drafted clients over drafted plus its college clients now, counted from the 2027 drafts on.",
    "g": "NIL agencies"
+  },
+  "Entry+": {
+   "n": "Entry plus",
+   "d": "Opening duels won and the rounds they swing. 100 is average, 10 is one standard deviation.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "Duel+": {
+   "n": "Duel plus",
+   "d": "Fights after the opening one: the share he wins and his kills a round. 100 is average.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "Multi+": {
+   "n": "Multi-kill plus",
+   "d": "Rounds with two or more kills, weighted by how many. 100 is average.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "Clutch+": {
+   "n": "Clutch plus",
+   "d": "How often he wins 1v1 and 1v2 rounds and what they are worth. 100 is average.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "Util+": {
+   "n": "Utility plus",
+   "d": "Grenade damage, enemies blinded a flash and flashes a round. 100 is average.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "AWP+": {
+   "n": "AWP plus",
+   "d": "Sniper kills a round and his share of the team's sniper kills. 100 is average.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "Surv+": {
+   "n": "Survival plus",
+   "d": "Deaths a round, turned over so that fewer deaths score higher. 100 is average.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "Entry%": {
+   "n": "Entry win percentage",
+   "d": "The share of his opening duels he won.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "Clutch%": {
+   "n": "Clutch win percentage",
+   "d": "The share of clutch setups he won.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "RAA": {
+   "n": "Rounds Above Average",
+   "d": "Rounds won over an average player at his level across the season: RWA times rounds over 100.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "RAR": {
+   "n": "Rounds Above Replacement",
+   "d": "Rounds won over a replacement player: RWA over replacement times rounds over 100.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "RD/m": {
+   "n": "Round difference per map",
+   "d": "Rounds won minus rounds lost, a map.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "MVP/R": {
+   "n": "Round MVPs per round",
+   "d": "The share of his rounds where FACEIT named him the round MVP.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "Rd MVP": {
+   "n": "Round MVPs",
+   "d": "Rounds where FACEIT named him the MVP.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "Rd%": {
+   "n": "Round win percentage",
+   "d": "The share of rounds won.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "Gun%": {
+   "n": "Gun round win percentage",
+   "d": "The share of rounds won when both teams are on a full buy.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "Adv%": {
+   "n": "Buy advantage win percentage",
+   "d": "The share of rounds won with the better buy.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "Dis%": {
+   "n": "Buy disadvantage win percentage",
+   "d": "The share of rounds won with the worse buy.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "Open%": {
+   "n": "Opening kill percentage",
+   "d": "The share of rounds where the team got the first kill.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "5v4%": {
+   "n": "5v4 win percentage",
+   "d": "The share of rounds won after getting the first kill.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "4v5%": {
+   "n": "4v5 win percentage",
+   "d": "The share of rounds won after giving up the first kill.",
+   "a": "cs",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "RWA0": {
+   "n": "RWA at the move",
+   "d": "His RWA on the day he joined. Zero is an average tier-1 starter.",
+   "g": "RWA (CS2)",
+   "only": [
+    "counter-strike",
+    "1nt",
+    "laursen_111",
+    "home"
+   ]
+  },
+  "GF%": {
+   "n": "Goals For percentage",
+   "d": "The share of the goals scored while he or the unit was on the ice.",
+   "a": "hk",
+   "only": [
+    "nhl",
+    "hockey-prospects",
+    "standings",
+    "home"
+   ]
+  },
+  "xGF%": {
+   "n": "Expected Goals For percentage",
+   "d": "The share of the expected goals while he or the unit was on the ice.",
+   "a": "hk",
+   "only": [
+    "nhl",
+    "hockey-prospects",
+    "standings",
+    "home"
+   ]
+  },
+  "RW": {
+   "n": "Regulation Wins",
+   "d": "Wins in regulation time, the first tiebreaker.",
+   "a": "hk",
+   "only": [
+    "nhl",
+    "hockey-prospects",
+    "standings",
+    "home"
+   ]
   }
  }
 }
