@@ -1005,6 +1005,42 @@
    "est": 1,
    "trigger": "after 2026-27",
    "gate": "tune and held both"
+  },
+  {
+   "key": "recruit_pos_fv_cfb",
+   "t": "Projected college position as a CFB recruit FV input",
+   "sp": [
+    "CFB"
+   ],
+   "ar": "recruits",
+   "kind": "retest",
+   "how": "hand",
+   "pr": null,
+   "was": "t -.09 (ATH swap), 1.12 on top of the listed group, 5/6",
+   "after": "nfl:draft:2027",
+   "lag": 30,
+   "est": 1,
+   "trigger": "the 2027 NFL draft adds the 2020 class to the outcome window (seven classes)",
+   "gate": "same test, classes 2014-20 held out one at a time, t >= 2 on MSE of the NFL outcome",
+   "run_hint": "python3 scripts/research/recruit_pos_nov28/cfb_fv_test.py (extend the class range to 2020)"
+  },
+  {
+   "key": "recruit_pos_fv_cbb",
+   "t": "Projected college position as a CBB recruit FV input",
+   "sp": [
+    "CBB"
+   ],
+   "ar": "recruits",
+   "kind": "retest",
+   "how": "hand",
+   "pr": null,
+   "was": "t .75, 9/14",
+   "after": "nba:draft:2027",
+   "lag": 30,
+   "est": 1,
+   "trigger": "the 2023 class has three college seasons and its NBA draft read (cbb_recruit_hist rebuilt)",
+   "gate": "same test, classes held out one at a time, t >= 2 on MSE of realized FV",
+   "run_hint": "python3 scripts/research/recruit_pos_nov28/cbb_fv_test.py"
   }
  ]
 }

@@ -66,7 +66,13 @@ jobs:
         run: |
           node scripts/cfb_recruit.mjs
           python3 scripts/class_cards.py   # each school's class for the class rankings dropdown + classGFX
+      # projected college position on the recruit tables (scripts/recruit_pos.py: the fit on file, no pulls)
+      - name: Recruit positions
+        continue-on-error: true
+        run: |
+          pip install -q numpy
+          python3 scripts/recruit_pos.py
       - name: Commit if anything changed
         run: |
           python3 scripts/data_push.py -m "Update the CFB recruit classes ($(date -u +%Y-%m-%d))" \
-            -- data/cfb_recruits.json static/data/cfb-recruits.json static/data/classes/cfb.json static/data/cfb-builder.json scripts/data/cfb_on3_live.json scripts/data/recruit_age_cfb.json scripts/data/recruit_wikidata_dob.json
+            -- data/cfb_recruits.json data/recruit_pos.json static/data/cfb-recruits.json static/data/classes/cfb.json static/data/cfb-builder.json scripts/data/cfb_on3_live.json scripts/data/recruit_age_cfb.json scripts/data/recruit_wikidata_dob.json
