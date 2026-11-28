@@ -1,0 +1,40 @@
+{{- /* Team OVR: {{< ovrteams sport="nba|nhl|nfl|cs2" tab="..." >}}. data/ovr/<sport>.json "teams" (scripts/ovr.py): the
+       players' OVR rates weighted by the minutes they play, on 0-99 (replacement roster 60, median team 75, the best team
+       in a typical season 97). */ -}}
+{{- $sp := .Get "sport" -}}
+{{- with index (site.Data.ovr | default dict) $sp -}}
+{{- $D := . -}}
+{{- if $D.teams -}}
+{{- $icon := index (dict "nba" "basketball" "nhl" "hockey" "nfl" "football" "cs2" "cs") $sp -}}
+{{- $cs := eq $sp "cs2" -}}
+{{- $K := $D.teamAnchors -}}
+{{- $date := lower ((time $D.asof).Format "Jan 2") -}}
+{{- $vl := index (dict "nba" "Rating" "nhl" "pWAR" "nfl" "pXP/G" "cs2" "RWA") $sp -}}
+{{- $vt := index (dict "nba" "the players' pXPM weighted by minutes, x 5: points a 100 possessions over an average team" "nhl" "the players' pWAR a 60 x their TOI, put on 82 games" "nfl" "the players' pXP/60 x their snaps / 60, a game: points of margin over a roster of average regulars" "cs2" "mean RWA rating of the five with the most maps") $sp -}}
+{{- partial "wintable-open.html" (dict "title" ($.Get "title" | default "team OVR") "icon" $icon "filter" (cond $cs "Tier" "Team") "tab" ($.Get "tab") "gfxCols" (printf "RK,Team,OVR,%s,Top" $vl) "gfxDate" $date "gfxMax" "32" "class" "ovrt") -}}
+<table class="cfb__table tstick2 ovr__table">
+  <thead><tr>
+    <th>RK</th><th>Team</th>
+    <th class="cfb__g ovr__k" data-term="OVR" title="team OVR 0-99: replacement roster 60, the median team 75, the best team in a typical season 97">OVR</th>
+    {{- if $cs }}<th title="event-access tier">Tier</th>{{ end }}
+    <th class="cfb__g" title="{{ $vt }}">{{ $vl }}</th>
+    <th title="the three highest OVR on the roster">Top</th>
+    <th title="players with {{ if $cs }}maps{{ else }}minutes{{ end }} this season">N</th>
+  </tr></thead>
+  <tbody>
+  {{- range $D.teams }}
+  <tr>
+    <td class="cfb__rk">{{ .rk }}</td>
+    <td class="cfb__team">{{ if $cs }}{{ if .logo }}<img class="cfb__logo" src="/img/cs2/{{ .tm }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}{{ else }}<img class="cfb__logo" src="/img/{{ $sp }}/{{ lower .tm }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span>{{ .n }}</span></td>
+    <td class="cfb__num is-key ovr__k cfb__g" data-v="{{ .v }}"><b>{{ .ovr }}</b></td>
+    {{- if $cs }}<td class="cs__tier" data-v="{{ .tier }}" data-filter="Tier {{ .tier }}"><span class="cs__t cs__t--{{ .tier }}">T{{ .tier }}</span></td>{{ end }}
+    <td class="cfb__num cfb__g" data-v="{{ .v }}">{{ printf "%.2f" (float .v) }}</td>
+    <td style="white-space: nowrap">{{ range $i, $p := .top }}{{ if $i }}, {{ end }}{{ index $p 0 }} <span class="cfb__dim">{{ index $p 1 }}</span>{{ end }}</td>
+    <td class="cfb__num">{{ .np }}</td>
+  </tr>
+  {{- end }}
+  </tbody>
+</table>
+{{- partial "wintable-close.html" (dict "rows" (len $D.teams) "note" (printf "%s · updated %s" $D.label $date) "about" (printf "Team OVR on %s: replacement roster %.2f = 60, median team %.2f = 75, best team in a typical season %.2f = 97. Minutes weighting picked held out (research/ovr_research.json team)." $K.unit (float $K.r) (float $K.s) (float $K.t))) -}}
+{{- end -}}
+{{- end -}}

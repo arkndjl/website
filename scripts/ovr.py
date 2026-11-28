@@ -204,7 +204,7 @@ def nhl_build(pars, K):
         z = zof(pars[g], r); t = tau(pars[g], r)
         out.append({'n': p['n'], 'id': p['id'], 'tm': p.get('tm'), 'pos': p.get('pos'), 'pg': g, 'age': p.get('age'),
                     'ovr': gi(z * f, KK), 'lo': gi((z - Z80 * t) * f, KK) if t else None, 'hi': gi((z + Z80 * t) * f, KK) if t else None,
-                    'm': r2(z * f, 2), 'x': r2(p.get('war'), 2), 'smp': p['toi'], 'g': p.get('gp'), 'ph': p.get('ph'), 'z': r2(z * f, 3)})
+                    'm': r2(z * f, 2), 'x': r2(p.get('war'), 2), 'smp': p['toi'], 'g': p.get('gp'), 'ph': p.get('ph'), 'z': r2(z * f, 3), 'zr': r2(z, 5)})
     return out, {'season': cur, 'label': f'{cur - 1}-{str(cur)[2:]}', 'metric': 'pWAR/82', 'desc': 'WAR', 'sample': 'TOI'}
 
 
@@ -295,6 +295,70 @@ def cs2_build(K=None):
     return out, {'label': '', 'metric': 'RWA', 'desc': 'Δ90', 'sample': 'Maps'}, K
 
 
+
+# ---------------------------------------------------------------- team OVR
+# A team's value is its players' z weighted by the minutes they play (scripts/research/ovr_nov28/team.py: held out, next
+# season's team rating from the minutes they went on to play R2 .699 NBA / .522 NHL, against .579 / .451 on last season's
+# minutes, .585 / .364 on depth slots fit by rank and .584 / .383 on the top players equally). In season the minutes so far.
+#   NBA  sum(z x MP) / sum(MP) x 5 (team rating, points a 100 over average)    NHL  sum(WAR a 60 x TOI / 60) x 82 / games
+#   NFL  sum(pXP/60 x snaps / 60) / games                                     CS2  mean RWA of the five with the most maps
+def team_value(sp, rows):
+    T = {}
+    for r in rows:
+        t = (r.get('tk') if sp == 'cs2' else str(r.get('tm') or '').split('/')[-1]) or ''
+        if t and t != 'None': T.setdefault(t, []).append(r)
+    out = {}
+    for t, pl in T.items():
+        if sp == 'nba':
+            w = sum(r['smp'] for r in pl)
+            if w: out[t] = sum(r['z'] * r['smp'] for r in pl) / w * 5
+        elif sp == 'nhl':
+            g = max(r.get('g') or 0 for r in pl)
+            if g: out[t] = sum(r['zr'] * r['smp'] / 60 for r in pl) * 82 / g
+        elif sp == 'nfl':
+            g = max(r.get('g') or 0 for r in pl)
+            if g: out[t] = sum(r['z'] * r['smp'] / 60 for r in pl) / g
+        elif sp == 'cs2':
+            five = sorted(pl, key=lambda r: -(r.get('smp') or 0))[:5]
+            if len(five) == 5: out[t] = sum(r['z'] for r in five) / 5
+    return out, T
+
+
+def team_fit(P, K):
+    """anchors for team OVR: replacement roster 60, the median team 75, the mean of each season's best team 97"""
+    TK = {}
+    F = nba_files(); med, top = [], []
+    for s_ in sorted(F):
+        if s_ < 2016 or s_ >= max(F): continue
+        rows = [{'tm': r['p'].get('tm'), 'z': zof(P['nba'], r), 'smp': r['n']} for r in nba_rows(s_, F)]
+        v, _ = team_value('nba', rows); med.append(st.median(v.values())); top.append(max(v.values()))
+    TK['nba'] = {'r': K['nba']['r'] * 5, 's': round(st.mean(med), 3), 't': round(st.mean(top), 3), 'unit': 'team rating'}
+    F = nhl_files(); med, top = [], []
+    for s_ in sorted(F):
+        if s_ < 2014 or s_ >= max(F) or jload(F[s_], {}).get('games', 82) < 82: continue
+        rows = [{'tm': r['p'].get('tm'), 'zr': zof(P['nhl'][r['grp']], r), 'smp': r['n'], 'g': r['p'].get('gp')} for r in nhl_rows(s_, F)]
+        v, _ = team_value('nhl', rows); med.append(st.median(v.values())); top.append(max(v.values()))
+    TK['nhl'] = {'r': 0.0, 's': round(st.mean(med), 3), 't': round(st.mean(top), 3), 'unit': 'team pWAR, 82 games'}
+    rows, _, _ = nfl_build(K['nfl']); v, T = team_value('nfl', rows)
+    rep = st.mean(K['nfl']['r'] * sum(r['smp'] for r in T[t]) / 60 / max(r.get('g') or 1 for r in T[t]) for t in v)
+    TK['nfl'] = {'r': round(rep, 3), 's': round(st.median(v.values()), 3), 't': round(max(v.values()), 3), 'unit': 'pXP a game over average regulars'}
+    rows, _, _ = cs2_build(K['cs2']); v, T = team_value('cs2', rows)
+    t1 = [x for t, x in v.items() if any(r.get('tier') == 1 for r in T[t])]
+    TK['cs2'] = {'r': K['cs2']['r'], 's': round(st.median(t1), 3), 't': round(max(v.values()), 3), 'unit': 'mean RWA of the five'}
+    return TK
+
+
+def team_rows(sp, rows, K):
+    v, T = team_value(sp, rows); out = []
+    for t, x in v.items():
+        pl = sorted(T[t], key=lambda r: -(r.get('ovr') or 0))
+        out.append({'tm': t, 'n': pl[0].get('tm') if sp == 'cs2' else t, 'ovr': gi(x, K), 'v': r2(x, 3), 'np': len(pl),
+                    'logo': pl[0].get('logo'), 'tier': min((r.get('tier') or 9) for r in pl) if sp == 'cs2' else None,
+                    'top': [[r['n'], r['ovr'], r.get('pos')] for r in pl[:3]]})
+    out.sort(key=lambda r: -r['v'])
+    for i, r in enumerate(out): r['rk'] = i + 1
+    return out
+
 # ---------------------------------------------------------------- fit / run
 def research_par(R, key):
     x = R.get(key) or {}
@@ -311,6 +375,7 @@ def fit():
     _, _, K['nfl'] = nfl_build()
     for t in ('atp', 'wta'): _, _, K[t] = tennis_build(t)
     _, _, K['cs2'] = cs2_build()
+    K['team'] = team_fit(par, K)
     import datetime as dt
     out = {'asof': dt.date.today().isoformat(), 'scale': {'repl': LO, 'starter': MID, 'top': HI, 'cap': CAP, 'floor': FLOOR},
            'par': par, 'anchors': K}
@@ -344,8 +409,16 @@ def build(sports):
         rows.sort(key=lambda r: (-r['ovr'], -(r.get('z') or 0)))
         for i, r in enumerate(rows): r['rk'] = i + 1
         posrank(rows)
+        if sp in K.get('team', {}):
+            meta['teams'] = team_rows(sp, rows, K['team'][sp]); meta['teamAnchors'] = K['team'][sp]
+            summ.setdefault('teams', {})[sp] = meta['teams'][:10]
         meta.update(sport=sp, asof=dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), n=len(rows), anchors=K[sp])
         json.dump(dict(meta, rows=rows), open(os.path.join(OUTD, f'{sp}.json'), 'w'), separators=(',', ':'))
+        # the card lookup (gfx.js pcOvr / team card): name, team, OVR; teams' OVR and rank
+        SD = os.path.join(ROOT, 'static', 'data', 'ovr'); os.makedirs(SD, exist_ok=True)
+        json.dump({'label': meta.get('label'), 'p': [[r['n'], str(r.get('tk') if sp == 'cs2' else r.get('tm') or ''), r['ovr']] for r in rows],
+                   't': {t['tm']: [t['ovr'], t['rk'], len(meta.get('teams') or [])] for t in meta.get('teams') or []}},
+                  open(os.path.join(SD, f'{sp}.json'), 'w'), separators=(',', ':'), ensure_ascii=False)
         summ[sp] = dict(meta, top=[{k: r.get(k) for k in ('n', 'tm', 'pos', 'ovr', 'lo', 'hi', 'age')} for r in rows[:30]])
         print(sp, len(rows), [(r['n'], r['ovr']) for r in rows[:5]])
     json.dump(summ, open(SUM, 'w'), indent=1)
