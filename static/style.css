@@ -5396,3 +5396,31 @@ td.tbx__p { color: #7fffd4; font-weight: bold; }
 .phil__tbl .phil__g0 { border-left: 2px solid var(--win-light); }
 .phil__fig .libchart { max-height: 360px; }
 .phil__img { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+/* Process head (layouts/shortcodes/procview.html): pixel monitor, low-poly viewport (assets/js/lowpoly.js), tallies */
+.procview__body { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; margin: 10px 12px; }
+.procview__px .px { width: 192px; height: 120px; display: block; }
+.px--hero-process { --px-dur: 2.4s; }
+.procview__lp { position: relative; background: var(--win-dark); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); }
+.procview__lp canvas { display: block; width: 100%; aspect-ratio: 3 / 1; height: auto; image-rendering: pixelated; }
+.procview__lab { position: absolute; left: 6px; top: 4px; font-size: .8em; letter-spacing: .08em; text-transform: uppercase; color: var(--foreground); }
+.procview__n { display: grid; grid-template-columns: repeat(2, auto); gap: 2px 14px; margin: 0; }
+.procview__n div { display: contents; }
+.procview__n dt { color: var(--accent); font-size: .85em; }
+.procview__n dd { margin: 0; color: #fff; text-align: right; }
+.procview__n .is-s dd { color: var(--foreground); } .procview__n .is-m dd { color: #cf9bff; } .procview__n .is-f dd { color: #ff9ec7; }
+@media (max-width: 760px) {
+  .procview__body { grid-template-columns: auto minmax(0, 1fr); }
+  .procview__px .px { width: 128px; height: 80px; }
+  .procview__lp { grid-column: 1 / -1; grid-row: 2; }
+  .procview__n { grid-column: 2; grid-row: 1; font-size: .9em; }
+}
+/* Philosophy tab sprites (layouts/partials/px/phil-*.html, scripts/process_art.py) */
+.phil__px { float: right; margin: 0 0 8px 12px; padding: 4px; background: var(--win-dark); border: 2px solid; border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark); }
+.px--phil { display: block; width: 96px; height: 96px; --px-dur: 1.6s; }
+@media (max-width: 600px) { .px--phil { width: 64px; height: 64px; } }
+/* the overview chain: the arrows light in order, like a signal moving down the line */
+.proc__node:not(:last-child)::after { animation: proc-flow 2.1s steps(1, end) infinite; }
+.proc__node:nth-child(2)::after { animation-delay: .3s; } .proc__node:nth-child(3)::after { animation-delay: .6s; }
+.proc__node:nth-child(4)::after { animation-delay: .9s; } .proc__node:nth-child(5)::after { animation-delay: 1.2s; }
+.proc__node:nth-child(6)::after { animation-delay: 1.5s; }
+@keyframes proc-flow { 0% { background: var(--foreground); } 15% { background: var(--accent); } }

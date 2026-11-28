@@ -19,13 +19,13 @@ This is the first monthly Process update. Every month I'll write one of these co
 
 ## ARKLOG
 
-ARKLOG is the dated record of every change on the site. It replaces the old site data page in the menu, and it keeps that page's traffic, build and data tabs.
+ARKLOG is the dated record of every change on the site. It lives inside Process, along with the traffic, build and data tabs from the old site data page.
 
 Every row is one merged change, with its date, its section of the site and its sport. A model or metric test also shows whether it shipped, part shipped or failed, and the held-out number that decided it, before and after, with its t. The failures are in there with everything else. People should know what has been tested and shown not to work, because it helps them with their own research, and because it shows everything I've thought of trying even when it didn't pan out.
 
 {{< image src="/img/process-1/arklog.png" alt="The ARKLOG log tab: filters by verdict, month, section, sport and area, a find box, and dated rows with shipped, part shipped and failed tags and their held-out numbers" position="center" >}}
 
-ARKLOG is built from the pull requests that make every change, so nothing in it is typed in by hand. The catch is that reading a verdict out of a write-up by pattern got it wrong often, so I read every test through #1304 against its write-up and held the reviewed verdict, number and t in a fix file. From now on every test ends its write-up with one line that says what happened, and that line is taken as written.
+ARKLOG is built from the pull requests that make every change, so nothing in it is typed in by hand. Reading a verdict out of a write-up by pattern got it wrong often, so I read every test through #1304 against its write-up and held the reviewed verdict, number and t in a fix file. From now on every test ends its write-up with one line that says what happened, and that line is taken as written.
 
 The scoreboard tab has the tallies and charts by week, sport, area and section, and each row, the scoreboard and each sport's sheet can be pulled as a GFX card. The updates tab lists these monthly posts beside each month's tallies.
 
@@ -39,7 +39,7 @@ In November there were 642 merged changes and 209 tests. 71 shipped, 98 part shi
 
 ## Process
 
-Process is where the method lives. It was rebuilt this month into five sections. Overview has the chain from data sources to mocks, each sport's most descriptive and most predictive metric with its held-out R², the tests by week, the gates and the latest tests. Metrics has FV, the FV scales, player value and player odds. Models has team ratings, game models, drafts and mocks, and testing. Then Research and Data.
+Process is where the method lives. This month it moved out of ARKBOARD to its own page at /process/, right under donate in the menu, and it was rebuilt into seven sections. Overview has the chain from data sources to mocks, each sport's most descriptive and most predictive metric with its held-out R², the tests by week, the gates and the latest tests. Philosophy is how I think about metrics and design, in eight tabs. ARKLOG is the log. Metrics has FV, the FV scales, player value and player odds. Models has team ratings, game models, drafts and mocks, and testing. Then Research and Data.
 
 {{< image src="/img/process-1/process-overview.png" alt="The Process overview tab: the chain of sections with counts, the describe and predict metric for each sport with held-out R², tests by week, the gates and the latest tests" position="center" >}}
 

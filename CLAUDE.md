@@ -30,7 +30,10 @@
 - Philosophy (Noah, Nov 28): Overview | Philosophy | Metrics ... Text in Noah's words is `research/philosophy.json` (numbers as
   `{key}` placeholders), filled with figures from the fit files by `scripts/philosophy_build.py` into `data/philosophy.json`,
   drawn by `layouts/shortcodes/procphil.html`; process-refresh.yml reruns it. The 16:9 ARKPHILOSOPHY card
-  (`static/img/process/arkphilosophy.png`) is `python3 scripts/philosophy_gfx.py` (Playwright; rerun by hand).
+  (`static/img/process/arkphilosophy.png`) is `python3 scripts/philosophy_gfx.py` (Playwright; rerun by hand); its lines are Noah's own
+  words from the interview (`card` in research/philosophy.json), no taglines. The head window is `procview.html`: the animated pixel
+  monitor and the Philosophy tab sprites are drawn by `scripts/process_art.py`, and `assets/js/lowpoly.js` renders a low-poly model
+  for the open group (ARKLOG = 3D bars of every test by sport and verdict).
 - Side strip (Nov 28): Overview | Philosophy | ARKLOG (`ARKLOG` in library_build.py) | Metrics (FV, FV scales, player value, player odds) | Models (team ratings,
   game models, drafts and mocks, testing) | Research | Data (data sources, data and names, abbreviations). The page is written by
   `scripts/library_build.py` from `data/library.json`; rerun it rather than hand-editing. A new glossary section goes in SIDE

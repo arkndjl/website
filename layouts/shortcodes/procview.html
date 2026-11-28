@@ -1,0 +1,29 @@
+{{- /* Process head (content/arkboard-process.md): the process.exe window. The animated pixel monitor
+       (layouts/partials/px/hero-process.html, scripts/process_art.py), a low-poly viewport whose model follows the open
+       group (assets/js/lowpoly.js; ARKLOG draws every test by sport and verdict from data/arklog.json) and the log's tallies.
+       {{< procview >}} */ -}}
+{{- $l := site.Data.arklog -}}
+{{- $o := site.Data.library.overview -}}
+{{- $bars := slice -}}
+{{- range $l.by_sport }}{{ $c := index . 1 }}{{ $bars = $bars | append (dict "n" (index . 0) "v" (slice $c.shipped $c.mixed $c.failed)) }}{{ end -}}
+<div class="win procview">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>process.exe<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="procview__body">
+    <div class="procview__px" aria-hidden="true">{{ partial "px/hero-process.html" . }}</div>
+    <div class="procview__lp" data-lowpoly data-bars="{{ $bars | jsonify }}">
+      <canvas width="240" height="80" aria-label="low-poly render of the open Process group" role="img"></canvas>
+      <span class="procview__lab" data-lp-label>overview</span>
+    </div>
+    <dl class="procview__n">
+      <div><dt>changes</dt><dd>{{ lang.FormatNumber 0 $l.changes }}</dd></div>
+      <div><dt>tests</dt><dd>{{ $l.tests }}</dd></div>
+      <div class="is-s"><dt>shipped</dt><dd>{{ $l.shipped }}</dd></div>
+      <div class="is-m"><dt>part shipped</dt><dd>{{ $l.mixed }}</dd></div>
+      <div class="is-f"><dt>failed</dt><dd>{{ $l.failed }}</dd></div>
+      <div><dt>terms</dt><dd>{{ $o.terms }}</dd></div>
+      <div><dt>studies</dt><dd>{{ $o.studies }}</dd></div>
+    </dl>
+  </div>
+  <div class="win__status"><span>since {{ dateFormat "Jan 2 2006" $l.first }}</span><span>updated {{ dateFormat "Jan 2 2006" $l.asof }}</span></div>
+</div>
+{{- partial "js.html" "lowpoly" -}}
