@@ -1,9 +1,9 @@
 {
 "asof":"2026-11-28",
-"n":89,
+"n":90,
 "count":{
 "watching":1,
-"waiting":88
+"waiting":89
 },
 "next":[
 "understat_return",
@@ -1455,6 +1455,22 @@
 "gate":"verdicts.py: agedpw beats agedp on right calls, paired t >= 2 and most seasons",
 "due":"2028-07-01",
 "est":0,
+"state":"waiting"
+},
+{
+"key":"u17wc_event_stats",
+"t":"U17 World Cup event stats in prospect FV",
+"sp":[
+"Soccer"
+],
+"ar":"fv",
+"kind":"forward",
+"how":"hand",
+"was":"not testable (one tournament, no outcomes)",
+"trigger":"the 2026 U17 World Cup cohort reaches the prospect outcome window (after the 2029-30 season)",
+"gate":"frozen prereg U17E index adds t >= 2 nation-out on the Jan 15 2027 snapshot, top-50 outcome not lower",
+"due":"2030-07-01",
+"est":1,
 "state":"waiting"
 }
 ],
