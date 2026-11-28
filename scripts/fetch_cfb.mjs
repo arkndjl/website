@@ -628,6 +628,7 @@ async function fetchOn3() {
 }
 
 // ---- ESPN ------------------------------------------------------------------------------------
+const ESPN_EXTRA = ['292'];   // UT Rio Grande Valley
 async function fetchEspn(teamNames) {
   const all = (await get('https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams?limit=1000', 'json'))
     .sports[0].leagues[0].teams.map(t => t.team);
@@ -635,6 +636,15 @@ async function fetchEspn(teamNames) {
   for (const t of all) {
     teams[t.id] = { id: t.id, name: t.location, full: t.displayName, abbr: t.abbreviation, color: t.color,
                     logo: t.logos?.[0]?.href || `https://a.espncdn.com/i/teamlogos/ncaa/500/${t.id}.png` };
+  }
+  // programs ESPN marks inactive drop out of the list above but keep their team page, roster and logo (UTRGV, first season 2025)
+  for (const id of ESPN_EXTRA) {
+    if (teams[id]) continue;
+    try {
+      const t = (await get(`https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams/${id}`, 'json')).team;
+      teams[id] = { id: t.id, name: t.location, full: t.displayName, abbr: t.abbreviation, color: t.color,
+                    logo: t.logos?.[0]?.href || `https://a.espncdn.com/i/teamlogos/ncaa/500/${t.id}.png` };
+    } catch (e) { console.log(`ESPN team ${id}: ${e.message}`); }
   }
   const want = new Set(teamNames.map(n => teamIndex(teams).resolve(n)).filter(Boolean));
   const rosters = await fetchRosters(want, teams);
