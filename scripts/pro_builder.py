@@ -354,8 +354,8 @@ def verdicts(lg, T, rate):
         if s is None and v is not None and read == 'last' and h[0] is not None:
             s = rate * v - max(h[0] - mn, 0)
         if s is not None:
-            row['s'] = r2(s)
-            row['vd'] = ('E' if s >= 0 else 'W') if last_year else ('K' if s >= 0 else 'T')
+            row['s'] = r2(s)   # the verdict reads the shown surplus, so a -$0.04M never shows $0.0M beside Trade
+            row['vd'] = ('E' if row['s'] >= 0 else 'W') if last_year else ('K' if row['s'] >= 0 else 'T')
         out.append(row)
     # core: top two on his team and the league's top 15% in projected three seasons' value, 31 or under. Core is untouchable
     # (Noah, Nov 28): a core player is never Trade or Let walk; when the read leans that way it is kept in 'lean' for the hover.

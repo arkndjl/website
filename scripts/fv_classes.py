@@ -154,7 +154,7 @@ def sport(sp, d, rng):
         C.append(c)
     for k in ('top', 'dep', 'all', 'raw', 'otop', 'odep', 'oall'):
         S = sorted([c for c in C if k in c], key=lambda c: -c[k])
-        for i, c in enumerate(S): c[k + 'R'] = i + 1
+        for i, c in enumerate(S): c[k + 'R'] = S[i - 1][k + 'R'] if i and c[k] == S[i - 1][k] else i + 1   # ties share a rank
     M = [c for c in C if 'oall' in c]
     corr = lambda a, b: round(float(np.corrcoef([c[a] for c in M], [c[b] for c in M])[0, 1]), 2) if len(M) > 3 else None
     Mc = [c for c in M if not c.get('prov')]

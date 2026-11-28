@@ -13,7 +13,7 @@
        Medals in the name cell: bdg, the predictive badges (scripts/nba_badges.py; data/nba_badge_backtest.json). */ -}}
 {{- $idx := site.Data.nba_xpm -}}
 {{- $pos := slice "PG" "SG" "SF" "PF" "C" -}}
-<div class="win cfb nbaxpm"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbaxpm data-gfx-logo="/img/nba/{}.png" data-src="{{ "data/nba-xpm/" | relURL }}" data-proj="{{ "data/nba-proj.json" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="RK,Player,VORX,XPM,O-XPM,D-XPM,Pos,MP">
+<div class="win cfb nbaxpm"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbaxpm data-gfx-logo="/img/nba/{}.png" data-src="{{ "data/nba-xpm/" | relURL }}" data-proj="{{ "data/nba-proj.json" | relURL }}" data-rook="{{ "data/rookies/nba-ids.json" | relURL }}" data-cur="{{ with $idx }}{{ .current }}{{ end }}" data-gfx-cols="RK,Player,VORX,XPM,O-XPM,D-XPM,Pos,MP">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ .Get "title" | default "nba_xpm.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -113,7 +113,7 @@
     bar.elements.season.value = s && bar.querySelector('option[value="' + s.replace(/\D/g, '') + '"]') ? s : win.dataset.cur;
     pos = h.get('pos') || ''; side = KEY[h.get('side') || ''] || '';   // side = the column the board ranks by (old links: x, v, s, o, d, p, 3)
     bar.elements.team.value = h.get('team') || ''; bar.elements.q.value = h.get('q') || ''; bar.elements.age.value = h.get('age') || '';
-    bar.elements.mp.value = h.get('mp') || ''; chips();
+    bar.elements.mp.value = h.get('mp') || (h.get('q') ? '0' : ''); chips();   // a link to a named player (the search) shows him at any minutes
   }
   function writeHash() {
     var h = new URLSearchParams(), e = bar.elements;
@@ -194,7 +194,7 @@
     };
     var gfxRow = function (p) {
       return '<tr><td class="cfb__rk">' + p.rk + '</td>' +
-        '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p) + ' <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + p.mp + ' MP</span></td>' +
+        '<td>' + face(p) + '<b>' + esc(p.n) + '</b>' + medals(p) + (p.rook ? ' <span class="nflwar__rook" data-term="R" title="first season on the XPM board">R</span>' : '') + ' <span class="cfb__dim nbaxpm__tm">' + tl(p.tm) + esc(p.tm) + ' · ' + p.mp + ' MP</span></td>' +
         __wk.rk(p, wkf, WL[key] || key, null, p[key]) +
         order.map(function (c) { return CELL[c](p); }).join('') + '</tr>';
     };
@@ -216,13 +216,17 @@
     sel.innerHTML = '<option value="">any</option>' + Object.keys(seen).sort().map(function (t) { return '<option>' + esc(t) + '</option>'; }).join('');
     sel.value = seen[want] ? want : '';
   }
+  var rook = null;
   function load() {
     var s = bar.elements.season.value;
     if (cache[s]) { data = cache[s]; teams(); loading.hidden = true; render(); return; }
     loading.hidden = false; loading.textContent = 'loading…';
     var pj = s === win.dataset.cur ? fetch(win.dataset.proj).then(function (r) { return r.json(); }).catch(function () { return null; }) : Promise.resolve(null);
-    Promise.all([fetch(win.dataset.src + s + '.json').then(function (r) { return r.json(); }), pj]).then(function (a) {
-      var d = a[0], pr = a[1];
+    // R chip: his first season on the XPM board (scripts/rookies.py, the rookies tab's own list, by bbref id)
+    rook = rook || fetch(win.dataset.rook).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; });
+    Promise.all([fetch(win.dataset.src + s + '.json').then(function (r) { return r.json(); }), pj, rook]).then(function (a) {
+      var d = a[0], pr = a[1], rk = {}; (a[2][s] || []).forEach(function (id) { rk[id] = 1; });
+      d.players.forEach(function (p) { p.rook = !!rk[p.id]; });
       // rXPM on this board = the team-adjusted blend (txpm / toxpm / tdxpm, scripts/nba_xpm.py team_adj); bxpm keeps the box blend
       d.players.forEach(function (p) { if (p.txpm != null) { p.bxpm = p.xpm; p.xpm = p.txpm; p.oxpm = p.toxpm; p.dxpm = p.tdxpm; } var w = p.wx; if (w) { w.xpm = w.txpm; w.oxpm = w.toxpm; w.dxpm = w.tdxpm; } });   // wx: the same columns a week back
       // XPM (proj) for the season in progress (scripts/nba_proj.py), joined on the bbref id

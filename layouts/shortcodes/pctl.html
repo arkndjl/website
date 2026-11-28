@@ -136,7 +136,7 @@
         return '<tr>' + CC.map(function (c) {
           if (c.x) return '<td class="cfb__num ' + c.cls + '">' + sx(r[c.k]) + '</td>';
           if (c.k === 'rk') return '<td class="cfb__rk">' + r.rk + '</td>';
-          if (c.k === 'n') return '<td>' + face(r) + '<b>' + esc(r.n) + '</b>' + (r.r ? ' <span class="cfb__dim" title="rookie">R</span>' : '') + ' <span class="cfb__dim nbaxpm__tm">' + tl(r.tm) + esc(r.tm) + '</span></td>';
+          if (c.k === 'n') return '<td>' + face(r) + '<b>' + esc(r.n) + '</b>' + (r.r ? ' <span class="nflwar__rook" data-term="R" title="rookie">R</span>' : '') + ' <span class="cfb__dim nbaxpm__tm">' + tl(r.tm) + esc(r.tm) + '</span></td>';
           if (c.k === 'pos') return '<td class="' + c.cls + '">' + esc(r.pos) + '</td>';
           if (c.k === 'g' || c.k === 'age') return '<td class="cfb__num ' + c.cls + '">' + (r[c.k] == null ? '<span class="cfb__dim">–</span>' : r[c.k]) + '</td>';
           var t = c.st, d = t.d, lo = q(r, c.k, 0, 'ssn'), hi = q(r, c.k, 2, 'ssn'), rr = [0, 1, 2].map(function (i) { return q(r, c.k, i, 'ros'); }), now = td(r, c.k);

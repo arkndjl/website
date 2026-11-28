@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ .Permalink }}</title>
+    <link rel="canonical" href="{{ .Permalink }}">
+    <meta name="robots" content="noindex">
+    <meta charset="utf-8">
+    {{- /* an old path keeps its tab: /arkgallery/#books opens /arklibrary/#books (a meta refresh drops the hash) */}}
+    <script>location.replace({{ .Permalink }} + location.hash);</script>
+    <meta http-equiv="refresh" content="0; url={{ .Permalink }}">
+  </head>
+</html>

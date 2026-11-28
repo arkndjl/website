@@ -17,6 +17,7 @@
   be left out by scripts/awards.py blend, never written as a bare row (no photo, team or position; Nov 19)
 - with --hugo: data/team_alias.json (the browser's team short forms, layouts/partials/namekey.html) matches
   scripts/names.py TEAM_ALIAS; `python3 scripts/names.py --teams` rewrites it
+- every team dropdown is one assets/js/teamsort.js sorts A to Z, and the footer loads it (Nov 28)
 Local hook: git config core.hooksPath .githooks (runs the fast checks on each commit). Stdlib only."""
 import json, os, shutil, subprocess, sys, tempfile
 
@@ -217,6 +218,34 @@ def check_boards():
     return out
 
 
+def check_team_selects():
+    """every team dropdown lists its teams A to Z (Noah, Nov 28): assets/js/teamsort.js, loaded in the footer, sorts any
+    <select> it reads as a team dropdown (name or aria-label team, a data-*-team attribute, or a label captioned team,
+    teams or school). Fails when the footer stops loading it, or when a dropdown in layouts/ looks like a team picker
+    (club, program, franchise, school, team in its caption or attributes) but the sorter's rule would miss it."""
+    import re
+    errs = []
+    foot = open(os.path.join(ROOT, 'layouts', 'partials', 'footer.html'), encoding='utf-8').read()
+    if '"teamsort"' not in foot: errs.append('layouts/partials/footer.html no longer loads assets/js/teamsort.js (team dropdowns A to Z)')
+    word = re.compile(r'\b(teams?|club|clubs|program|programs|franchise|school)\b', re.I)
+    for d, _, fs in os.walk(os.path.join(ROOT, 'layouts')):
+        for f in fs:
+            if not f.endswith('.html'): continue
+            src = open(os.path.join(d, f), encoding='utf-8').read()
+            for m in re.finditer(r'<select\b([^>]*)>', src):
+                at = m.group(1)
+                lab = src.rfind('<label', 0, m.start()); end = src.rfind('</label>', 0, m.start())
+                cap = re.findall(r'<span[^>]*>([^<]*)</span>', src[lab:m.start()]) if lab > end else []
+                cap = cap[-1].strip() if cap else ''
+                nm = re.search(r'\bname="([^"]*)"', at); al = re.search(r'aria-label="([^"]*)"', at)
+                caught = (nm and re.fullmatch(r'teams?', nm.group(1), re.I)) or (al and re.fullmatch(r'teams?', al.group(1), re.I)) \
+                    or re.search(r'\bdata-[a-z0-9]+-team\b(?!-)', at) or re.fullmatch(r'teams?|school', cap, re.I)
+                looks = word.search(cap) or word.search(' '.join(re.findall(r'(?:name|aria-label)="([^"]*)"', at))) or re.search(r'data-[a-z0-9-]*team', at)
+                if looks and not caught and not re.search(r'conf|league|scope|mode|view|sort', (nm.group(1) if nm else '') + ' ' + cap, re.I):
+                    errs.append(f'{os.path.relpath(os.path.join(d, f), ROOT)}: team dropdown "{cap or at.strip()[:40]}" is not one assets/js/teamsort.js sorts (caption it "team" or give it name="team")')
+    return errs
+
+
 def check_hugo():
     hugo = shutil.which('hugo') or os.environ.get('HUGO')
     if not hugo: return ['hugo not found (set HUGO or put it on PATH)']
@@ -231,7 +260,7 @@ def check_hugo():
 
 if __name__ == '__main__':
     errs, n = check_json()
-    e2, warns = check_sizes(); errs += e2 + check_pairs() + check_cbb_mean() + check_awards() + check_article_gfx()
+    e2, warns = check_sizes(); errs += e2 + check_pairs() + check_cbb_mean() + check_awards() + check_article_gfx() + check_team_selects()
     e3, w3 = check_fv_scale(); errs += e3; warns += w3
     e4, w4 = check_1nt_sync(); errs += e4; warns += w4
     warns += check_terms() + check_boards()

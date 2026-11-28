@@ -1,7 +1,7 @@
 {{- /* /news/: the site's news (data/news.json, scripts/news.py; rules for the weight w in that script). front_page.exe is
        the newest day's roundup (the day's `top` ids: heaviest first, capped per category); wire.log is every item by
        day with section chips and a major-only switch. Each day's GFX button draws that day's roundup card
-       (assets/js/gfx.js buildNews, 4:5); /news/#gfx opens the newest one. Icons: layouts/partials/newsicons.html. */ -}}
+       (assets/js/gfx.js buildNews, 16:9); /news/#gfx opens the newest one. Icons: layouts/partials/newsicons.html. */ -}}
 {{- $d := site.Data.news | default dict -}}
 {{- $major := $d.major | default 60 -}}
 {{- $items := $d.items | default slice -}}
@@ -19,7 +19,7 @@
   </div>
   <div class="nws__mast">
     <span class="nws__mdate">{{ lower ((time (index $d.days 0).d).Format "Mon Jan 2 2006") }}</span>
-    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="news" data-gfx-day="{{ (index $d.days 0).d }}" title="the day's roundup card (4:5)">daily GFX</button>
+    <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="news" data-gfx-day="{{ (index $d.days 0).d }}" title="the day's roundup card (16:9)">daily GFX</button>
   </div>
   <div class="nws__grid">
     {{- range $i, $it := first 5 . }}
@@ -55,7 +55,7 @@
     <header class="nws__dh">
       <span class="nws__date">{{ lower ((time .d).Format "Mon Jan 2") }}</span>
       <span class="nws__cnt" data-nws-cnt>{{ .n }}</span>
-      {{- if .top }}<button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="news" data-gfx-day="{{ .d }}" title="the day's roundup card (4:5)">GFX</button>{{ end }}
+      {{- if .top }}<button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-mode="news" data-gfx-day="{{ .d }}" title="the day's roundup card (16:9)">GFX</button>{{ end }}
     </header>
     <ol class="nws__list">
       {{- range where $items "d" $day }}

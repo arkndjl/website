@@ -2566,7 +2566,7 @@
     var F = await frame(2160, 2700, (yr ? yr + ' ' : '') + base + cv, win.getAttribute('data-gfx-date'), tabLink(win));
     var g = F.g, D = rows.map(function (r) { return JSON.parse(r.getAttribute('data-cr')); });
     var logos = await Promise.all(rows.map(function (r) { var im = r.querySelector('img.cfb__logo'); return loadImg(im && im.getAttribute('src')); }));
-    var avgH = 'AVG xFV', scH = (txt(win.querySelector('thead th:nth-child(4)')) || 'CLASS').toUpperCase();
+    var clsT = win.querySelector('table[data-cls-src]'), avgH = clsT && /cbb/.test(clsT.getAttribute('data-cls-src')) ? 'AVG FV' : 'AVG xFV', scH = (txt(win.querySelector('thead th:nth-child(4)')) || 'CLASS').toUpperCase();   // CBB recruits are graded on FV, CFB on xFV
     // columns right to left: [header, width, value, colour, star header]
     var cols = [
       [scH, 200, function (d) { return d.s.toFixed(1); }, C.teal, 0, 1],
@@ -2701,7 +2701,9 @@
     nl.forEach(function (t, i) { g.fillText(fit(g, t, nw), nx, ny + i * 52); });
     g.font = '28px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, [d.conf, yr].filter(Boolean).join(' · '), nw), nx, ny + nl.length * 52 - 2);
     var y = Y0 + pad + ls + 16, pw = (cw - 20) / 3, ph = 112;
-    [['RANK', '#' + d.rk, 'of ' + Y.of, 1], [scH, d.s.toFixed(1), '', 1], ['xNIL', d.x ? money(d.x) : '–', '', 0]].forEach(function (p, i) {
+    // a class with no commits anywhere ranks no one: a dash, not #1 of every school
+    var anyC = Object.keys(Y.t).some(function (k) { return Y.t[k].n; });
+    [['RANK', anyC ? '#' + d.rk : '–', 'of ' + Y.of, 1], [scH, d.s.toFixed(1), '', 1], ['xNIL', d.x ? money(d.x) : '–', '', 0]].forEach(function (p, i) {
       var px = lx + i * (pw + 10);
       g.fillStyle = p[3] ? C.dark : TINT.nil; g.fillRect(px, y, pw, ph); if (p[3]) { g.fillStyle = C.teal; g.fillRect(px, y + ph - 6, pw, 6); }
       g.font = '24px ' + FONT; g.fillStyle = C.lilac; g.fillText(p[0], px + 14, y + 22);
@@ -2726,7 +2728,7 @@
     }
     tileRow([[String(d.a6 || 0), '5', PT[1], 2, PT[1]], [String(d.ah || 0), '4.5-5', C.lilac, 1], [String(d.am || 0), '3-4', C.lilac, 1], [String(d.al || 0), '0-2.5', C.lilac, 1]], y);
     y += th + 8;
-    tileRow([[String(d.n), 'COMMITS', C.lilac], [d.avg != null ? d.avg.toFixed(1) : '–', 'AVG xFV', C.lilac], [d.te ? '#' + d.te : '–', 'TOP END', C.lilac], [d.dp ? '#' + d.dp : '–', 'DEPTH', C.lilac]], y);
+    tileRow([[String(d.n), 'COMMITS', C.lilac], [d.avg != null ? d.avg.toFixed(1) : '–', /cbb/.test(src) ? 'AVG FV' : 'AVG xFV', C.lilac], [d.te ? '#' + d.te : '–', 'TOP END', C.lilac], [d.dp ? '#' + d.dp : '–', 'DEPTH', C.lilac]], y);
     y += th + 16;
     // position groups: commits, FV points as a bar against the class's biggest group, mean FV (two columns when leads or visits need the room)
     var G = d.g || [], top = Math.max.apply(null, G.map(function (q) { return q[2]; }).concat([1])), gcols = pipeLeft && G.length > 4 ? 2 : 1;
@@ -4787,59 +4789,60 @@
     var by = {}; D.items.forEach(function (i) { by[i.id] = i; });
     var top = (dy.top || []).map(function (id) { return by[id]; }).filter(Boolean); if (!top.length) return null;
     var dTxt = new Date(day + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-    var F = await frame(2160, 2700, 'NEWS :: ' + dTxt, '', 'arkndjl.net/news');
-    var g = F.g, IC = D.icons || {};
+    // 16:9 (a news card, not a table card): the lead as a hero tile on the left over the day's counts, the rest in rows on the right
+    var F = await frame(2400, 1350, 'NEWS :: ' + dTxt, '', 'arkndjl.net/news');
+    var g = F.g, IC = D.icons || {}, gap = 24;
     var imgs = await Promise.all(top.map(function (it) { return Promise.all([it.logo ? loadImg(it.logo) : null, it.logo2 ? loadImg(it.logo2) : null]); }));
-    // counts strip: the day by section
+    var L = top[0], rest = top.slice(1), lw = rest.length ? Math.round(F.w * 0.44) : F.w;
+    // counts: the day by section, two by two under the lead
     var SEC = [['stclaire', 'ST. CLAIRE'], ['arkboard', 'ARKBOARD'], ['1nt', '1NT'], ['laursen', 'LAURSEN_111']], dayItems = D.items.filter(function (i) { return i.d === day; });
-    var sh = 112, sy = F.y + F.h - sh, sw = (F.w - 3 * 16) / 4;
+    var ch = 88, cg = 16, cw = (lw - cg) / 2, stripH = 2 * ch + cg, sy = F.y + F.h - stripH;
     SEC.forEach(function (s, k) {
-      var n = dayItems.filter(function (i) { return i.sec === s[0]; }).length, x = F.x + k * (sw + 16);
-      well(g, x, sy, sw, sh);
-      g.font = '64px ' + FONT; g.fillStyle = n ? C.teal : C.lilac; g.globalAlpha = n ? 1 : 0.45; g.fillText(String(n), x + 24, sy + sh / 2 + 2);
+      var n = dayItems.filter(function (i) { return i.sec === s[0]; }).length, x = Math.round(F.x + (k % 2) * (cw + cg)), y = sy + Math.floor(k / 2) * (ch + cg);
+      well(g, x, y, Math.round(cw), ch);
+      g.font = '56px ' + FONT; g.fillStyle = n ? C.teal : C.lilac; g.globalAlpha = n ? 1 : 0.45; g.fillText(String(n), x + 24, y + ch / 2 + 2);
       var nw = g.measureText(String(n)).width;
-      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(s[1], x + 24 + nw + 20, sy + sh / 2 + 2); g.globalAlpha = 1;
+      g.font = '32px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, s[1], cw - 72 - nw), x + 24 + nw + 20, y + ch / 2 + 2); g.globalAlpha = 1;
     });
-    var bodyH = F.h - sh - 20;
     // the lead: a hero tile
-    var L = top[0], rest = top.slice(1), gap = 12, HMIN = 560;
-    var rh = rest.length ? Math.min(236, Math.floor((bodyH - HMIN - 20 - gap * (rest.length - 1)) / rest.length)) : 0;
-    var hh = rest.length ? Math.min(960, bodyH - 20 - rest.length * rh - gap * (rest.length - 1)) : Math.min(bodyH, 1200);
-    well(g, F.x, F.y, F.w, hh);
-    g.fillStyle = 'rgba(200,199,255,0.05)'; for (var ly = F.y + 8; ly < F.y + hh - 4; ly += 8) g.fillRect(F.x + 4, ly, F.w - 8, 2);
-    var iu = 12, ix = F.x + 40, iy = F.y + 40;
+    var hh = F.h - stripH - 20;
+    well(g, F.x, F.y, lw, hh);
+    g.fillStyle = 'rgba(200,199,255,0.05)'; for (var ly = F.y + 8; ly < F.y + hh - 4; ly += 8) g.fillRect(F.x + 4, ly, lw - 8, 2);
+    var iu = 10, ix = F.x + 40, iy = F.y + 40;
     g.fillStyle = C.dark; g.fillRect(ix - 16, iy - 16, 11 * iu + 32, 11 * iu + 32); bevel(g, ix - 16, iy - 16, 11 * iu + 32, 11 * iu + 32, true, 3);
     nwIcon(g, IC[L.cat], ix, iy, iu, C.teal);
-    var hx = ix + 11 * iu + 48, tagW = nwTag(g, L.tag, hx, F.y + 76, 48);
-    g.font = '40px ' + FONT; g.fillStyle = C.lilac; g.fillText(String(L.cat).toUpperCase(), hx + tagW + 28, F.y + 78);
-    nwPips(g, L.w, F.x + F.w - 40, F.y + 76, 12);
-    var lg = imgs[0].filter(Boolean), lgS = 176, lgW = lg.length ? lg.length * (lgS + 20) + 20 : 0;
-    lg.forEach(function (im, k) { drawLogo(g, im, F.x + F.w - 40 - lgW + 20 + k * (lgS + 20), F.y + hh - 40 - lgS - (L.s ? 0 : 0), lgS, lgS); });
-    var tx = F.x + 40, tw = F.w - 80 - lgW, lines, sz = 112;
-    for (;;) { g.font = sz + 'px ' + FONT; lines = wrap(g, L.t, tw); if (lines.length <= 2 || sz <= 64) break; sz -= 16; }
-    lines = lines.slice(0, 2); if (lines.length === 2) lines[1] = fit(g, lines[1], tw);
-    var subH = L.s ? 72 : 0, blockH = lines.length * sz * 1.12 + subH, by0 = F.y + 40 + 11 * iu + 32, ty = by0 + Math.max(0, (F.y + hh - 28 - by0 - blockH) / 2) + sz * 0.56;
+    var hx = ix + 11 * iu + 48, pipW = nwPips(g, L.w, F.x + lw - 40, F.y + 70, 10), tagW = nwTag(g, L.tag, hx, F.y + 70, 44);
+    g.font = '36px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, String(L.cat).toUpperCase(), F.x + lw - 40 - pipW - 28 - (hx + tagW + 24)), hx + tagW + 24, F.y + 72);
+    var lg = imgs[0].filter(Boolean), lgS = 144, tx = F.x + 40, tw = lw - 80;
+    var bTop = F.y + 40 + 11 * iu + 40, bBot = F.y + hh - 40 - (lg.length ? lgS + 24 : (L.s ? 64 : 0));
+    var lines, sz = 104;
+    for (;;) { g.font = sz + 'px ' + FONT; lines = wrap(g, L.t, tw); if ((lines.length <= 3 && lines.length * sz * 1.12 <= bBot - bTop) || sz <= 56) break; sz -= 8; }
+    lines = lines.slice(0, 3); if (lines.length) lines[lines.length - 1] = fit(g, lines[lines.length - 1], tw);
+    var blockH = lines.length * sz * 1.12, ty = bTop + Math.max(0, (bBot - bTop - blockH) / 2) + sz * 0.56;
     g.fillStyle = C.white; lines.forEach(function (ln, k) { g.fillText(ln, tx, ty + k * sz * 1.12); });
-    if (L.s) { g.font = '48px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, L.s, tw), tx, ty + (lines.length - 1) * sz * 1.12 + sz * 0.56 + 44); }
+    var lgW = lg.length ? lg.length * (lgS + 20) - 20 : 0, rowY = F.y + hh - 40 - (lg.length ? lgS / 2 : 24);
+    lg.forEach(function (im, k) { drawLogo(g, im, F.x + lw - 40 - lgW + k * (lgS + 20), rowY - lgS / 2, lgS, lgS); });
+    if (L.s) { g.font = '44px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, L.s, tw - (lgW ? lgW + 32 : 0)), tx, rowY); }
     // the rest: one row each
     if (rest.length) {
-      var ry0 = F.y + hh + 20;
-      var big = rh >= 170, ts = big ? 56 : 48, ss = big ? 40 : 32, u = big ? 8 : 6;
+      var rx = F.x + lw + gap, rw = F.w - lw - gap, rg = 12, n = rest.length;
+      var rh = Math.min(200, Math.floor((F.h - rg * (n - 1)) / n)), big = rh >= 150;
+      var ts = big ? 52 : rh >= 110 ? 44 : 40, ss = big ? 36 : 30, u = big ? 7 : rh >= 110 ? 6 : 5, two = rh >= 96;
       rest.forEach(function (it, k) {
-        var y = ry0 + k * (rh + gap), cy = y + rh / 2;
-        g.fillStyle = C.face; g.fillRect(F.x, y, F.w, rh); bevel(g, F.x, y, F.w, rh, true, 3);
-        var bx = F.x + 20, bs = 11 * u + 2 * u * 2;
+        var y = F.y + k * (rh + rg), cy = y + rh / 2;
+        g.fillStyle = C.face; g.fillRect(rx, y, rw, rh); bevel(g, rx, y, rw, rh, true, 3);
+        var bx = rx + 16, bs = 15 * u;
         g.fillStyle = C.well; g.fillRect(bx, cy - bs / 2, bs, bs); bevel(g, bx, cy - bs / 2, bs, bs, false, 3);
         nwIcon(g, IC[it.cat], bx + 2 * u, cy - 5.5 * u, u, it.w >= 60 ? C.teal : C.lilac);
-        var x = bx + bs + 28, right = F.x + F.w - 28;
-        right -= nwPips(g, it.w, right, cy, big ? 9 : 8) + 28;
-        var ls = imgs[k + 1].filter(Boolean), S = Math.min(rh - 48, 128);
+        var x = bx + bs + 24, right = rx + rw - 24;
+        right -= nwPips(g, it.w, right, cy, big ? 8 : 6) + 24;
+        var ls = imgs[k + 1].filter(Boolean), S = Math.min(rh - 32, 104);
         ls.slice().reverse().forEach(function (im) { right -= S; drawLogo(g, im, right, cy - S / 2, S, S); right -= 16; });
-        var l1 = cy - (it.s ? ss * 0.7 : 0), l2 = cy + ts * 0.62;
-        var tgw = nwTag(g, it.tag, x, l1, big ? 36 : 32);
-        var tmax = right - x - tgw - 28 - 12; g.font = ts + 'px ' + FONT; if (g.measureText(it.t).width > tmax) g.font = (ts - 8) + 'px ' + FONT;
-        g.fillStyle = C.white; g.fillText(fit(g, it.t, tmax), x + tgw + 28, l1 + 2);
-        if (it.s) { g.font = ss + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, it.s, right - x - 12), x, l2); }
+        var sub = two && it.s, l1 = sub ? cy - ss * 0.75 : cy, l2 = cy + ts * 0.6;
+        var tgw = nwTag(g, it.tag, x, l1, big ? 32 : 28);
+        var tmax = right - x - tgw - 20 - 12; g.font = ts + 'px ' + FONT; if (g.measureText(it.t).width > tmax) g.font = (ts - 8) + 'px ' + FONT;
+        g.fillStyle = C.white; g.fillText(fit(g, it.t, tmax), x + tgw + 20, l1 + 2);
+        if (sub) { g.font = ss + 'px ' + FONT; g.fillStyle = C.lilac; g.fillText(fit(g, it.s, right - x - 12), x, l2); }
       });
     }
     return F.canvas;

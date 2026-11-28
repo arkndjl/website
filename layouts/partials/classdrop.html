@@ -13,10 +13,10 @@
     return a > 5 ? '<span class="cfbrc__glow">' + s + '<span class="cfbrc__plus" aria-hidden="true">+</span></span>' : s;
   }
   function shut(table) { table.querySelectorAll('tr.cfb__detail').forEach(function (d) { d.remove(); }); }
-  function render(team, yr, Y, t, today) {
+  function render(team, yr, Y, t, today, fvL) {
     var hs = t.r.some(function (r) { return r.hs; }), fl = t.r.some(function (r) { return r.fl; }), wt = t.r.every(function (r) { return r.w; });
     var head = '<tr><th>Recruit</th><th>ARK</th><th>Pos</th><th>Ht</th>' + (wt ? '<th>Wt</th>' : '') + (hs ? '<th>High school</th>' : '') + '<th>Hometown</th>' +
-      '<th>xFV</th><th>Y1 FV</th><th title="industry stars">Stars</th><th>xNIL</th>' + (fl ? '<th title="the school he was committed to before this one">Flipped from</th>' : '') + '</tr>';
+      '<th>' + fvL + '</th><th>Y1 FV</th><th title="industry stars">Stars</th><th>xNIL</th>' + (fl ? '<th title="the school he was committed to before this one">Flipped from</th>' : '') + '</tr>';
     var body = t.r.map(function (r) {
       return '<tr><td>' + esc(r.n) + '</td><td>' + stars(r.a) + '</td><td>' + esc(r.p) + '</td><td class="cfb__num">' + esc(r.h || '—') + '</td>' + (wt ? '<td class="cfb__num">' + r.w + '</td>' : '') +
         (hs ? '<td>' + esc(r.hs || '—') + '</td>' : '') + '<td>' + esc(r.o || '—') + '</td><td class="cfb__num"><b>' + r.f + '</b></td><td class="cfb__num">' + r.y + '</td>' +
@@ -34,8 +34,9 @@
       return '<tr>' + who(r) + '<td>' + (r.c ? (r.cl ? '<img class="cfb__logo cfb__logo--in" src="' + esc(r.cl) + '" alt="" loading="lazy"> ' : '') + esc(r.c) : '<span class="cfb__dim">—</span>') + '</td></tr>';
     }).join('');
     var tbl = function (h, b) { return '<div class="clsd"><table class="clsd__t"><thead><tr>' + h + '</tr></thead><tbody>' + b + '</tbody></table></div>'; };
-    var pr = '<th>Recruit</th><th>ARK</th><th>Pos</th><th>xFV</th>';
-    return '<p class="cfb__dhead"><b>' + esc(team) + '</b> · ' + esc(yr) + ' · #' + t.rk + ' of ' + Y.of +
+    var pr = '<th>Recruit</th><th>ARK</th><th>Pos</th><th>' + fvL + '</th>';
+    var anyC = Object.keys(Y.t).some(function (k) { return Y.t[k].n; });   // a class with no commits anywhere ranks no one
+    return '<p class="cfb__dhead"><b>' + esc(team) + '</b> · ' + esc(yr) + ' · ' + (anyC ? '#' + t.rk : '–') + ' of ' + Y.of +
       ' <button type="button" class="cfb__btn cfb__cardbtn" data-gfx data-gfx-mode="class" title="class card graphic (16:9)">classGFX</button></p>' +
       (body ? '<div class="clsd"><table class="clsd__t"><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>' : '') +
       (ld ? '<p class="cfb__dhead">leads</p>' + tbl(pr + '<th title="On3 and Rivals experts picking the school, of those with a pick">Experts</th><th title="On3 RPM">RPM</th><th title="ARK lean">Lean</th>', ld) : '') +
@@ -58,7 +59,7 @@
       var Y = (d.y || {})[yr], c = Y && Y.t[team];
       if (!box.isConnected) return;
       if (!c) { shut(table); return; }
-      box.innerHTML = render(team, yr, Y, c, d.asof || '');
+      box.innerHTML = render(team, yr, Y, c, d.asof || '', /cbb/.test(table.getAttribute('data-cls-src')) ? 'FV' : 'xFV');   // CBB recruits are graded on FV, CFB on xFV
     }).catch(function () { if (box.isConnected) shut(table); });
   });
   // a filter, a class year or a search reorders the rows: the open class closes
