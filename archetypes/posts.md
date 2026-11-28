@@ -5,6 +5,7 @@ date = "{{ .Date }}"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["", ""]
+form = "" # board, method, research, analysis, essay, process, list, video, tool (the type filter on article lists)
 keywords = ["", ""]
 description = ""
 showFullContent = false

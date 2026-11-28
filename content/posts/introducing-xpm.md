@@ -4,6 +4,7 @@ date = "2026-11-24T14:00:42-05:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["nba", "statistics"]
+form = "method"
 keywords = ["xpm", "rxpm", "pxpm", "stabilization", "plus-minus", "nba", "basketball", "statistics"]
 description = "How XPM is built from BPM and DPM, how fast it stabilizes, and how rXPM (descriptive) and pXPM (predictive) compare with BPM, DPM, xRAPM, LEBRON, RAPM, HAPM and on/off."
 showFullContent = false

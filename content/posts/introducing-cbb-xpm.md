@@ -4,6 +4,7 @@ date = "2026-11-26T15:00:00-05:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["college basketball", "statistics"]
+form = "method"
 keywords = ["xpm", "rxpm", "pxpm", "college basketball", "bpm", "gbpm", "barttorvik", "plus-minus", "projection", "statistics"]
 description = "How XPM for college basketball is built from Barttorvik's BPM and game BPM, how rXPM (descriptive) and pXPM (predictive) compare with BPM at describing a season and predicting the next one, and where both are used on the College Basketball ARKBOARD."
 showFullContent = false

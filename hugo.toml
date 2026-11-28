@@ -28,6 +28,10 @@ copyright = '© 2025-2026 Noah Dengler. All rights reserved.'
 [outputs]
   home = ['HTML', 'RSS', 'BuildInfo']
 
+# Article lists show every post on one page, so the search and filter strip (layouts/partials/postbar.html) sees them all.
+[pagination]
+  pagerSize = 100
+
 # Required for Chroma and the custom syntax highlighting.
 [markup.highlight]
   noClasses = false

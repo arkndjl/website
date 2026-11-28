@@ -4,6 +4,7 @@ date = "2026-11-28T09:00:00-05:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["process", "arklog"]
+form = "process"
 keywords = ["arklog", "process", "november 2026", "xpm", "dect", "nil", "ark stars", "1nt", "laursen_111", "st. claire", "site data"]
 description = "November 2026 on arkndjl.net: ARKLOG, models and metrics that shipped and failed, new features, bug fixes, 1NT, LAURSEN_111, ST. CLAIRE, videos and articles, social data and site data."
 series = "process"

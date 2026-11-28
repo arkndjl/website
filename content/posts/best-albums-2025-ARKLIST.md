@@ -4,6 +4,7 @@ date = "2026-02-20T14:00:42-06:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["music", "rankings", "arklist"]
+form = "list"
 keywords = ["arklist", "music", "rankings", "albums"]
 description = "Looking at the best albums I listened to in 2025."
 showFullContent = false

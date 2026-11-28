@@ -4,6 +4,7 @@ date = "2026-11-27T19:45:00-05:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
 tags = ["design", "process", "arklog"]
+form = "process"
 keywords = ["design philosophy", "predictive", "descriptive", "future value", "sports betting", "anti-minimalism", "friction", "y2k", "windows 98", "organized maximalism", "cybergothic", "flat design", "liquid glass", "ai slop", "data density", "arkndjl"]
 description = "PROCESS #0: the design of arkndjl.net, the 2000s software, game menus and broadcasts it comes from, frictionless design, friction, organized maximalism, prediction and description, Future Value, skin in the game, and trust."
 series = "process"

@@ -239,3 +239,6 @@
 - `scripts/post_stats.py` (site-stats.yml, every 6 hours) samples the counts into `data/post_stats.json`; `scripts/milestones.py`
   reads it for the article milestones in ARKLOG. Process > ARKLOG > traffic has articles.exe (`layouts/shortcodes/articlestats.html`,
   in TABS traffic of `scripts/library_build.py`): one row an article, live counts, sorts on every header.
+- Article lists (home and /posts/) have a strip on top (`layouts/partials/postbar.html`, `assets/js/postbar.js`): search, type, tag,
+  sort (newest, views, favorites) and a favorited toggle (this browser's stars). Type is the post's front matter `form` (board, method,
+  research, analysis, essay, process, list, video, tool; `kind` is reserved by Hugo). Every post is on one page (`pagerSize = 100`).
