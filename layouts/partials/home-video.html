@@ -1,14 +1,14 @@
 {{- /* Home page video.exe as a small desktop media player skin: screen, LCD, seek bar, transport, channel modes and a
-       track list. Newest long-form YouTube uploads (no Shorts) from LAURSEN_111 and ARKNDJL, newest loaded first.
-       Data: data/laursen_socials.json + data/arkndjl_socials.json `yt` (channel RSS every 20 min in esea.yml; short =
+       track list. Newest long-form YouTube uploads (no Shorts) from LAURSEN_111, ARKNDJL and Your Team Should Tank,
+       newest loaded first. Data: data/laursen_socials.json + data/arkndjl_socials.json + data/ytst_socials.json `yt` (channel RSS every 20 min in esea.yml; short =
        the feed's /shorts/ link, or the API check in scripts/laursen_social_plan.mjs). The transport drives the embed
        through the YouTube iframe postMessage API (enablejsapi=1), no API script; a finished video plays the next. */ -}}
-{{- $chs := slice (dict "k" "laursen" "n" "LAURSEN_111" "h" "LAURSEN_111" "yt" site.Data.laursen_socials.yt) (dict "k" "arkndjl" "n" "ARKNDJL" "h" "ARKNDJL" "yt" site.Data.arkndjl_socials.yt) -}}
+{{- $chs := slice (dict "k" "laursen" "n" "LAURSEN_111" "b" "LAURSEN_111" "s" "L111" "h" "LAURSEN_111" "yt" site.Data.laursen_socials.yt) (dict "k" "arkndjl" "n" "ARKNDJL" "b" "ARKNDJL" "s" "ARK" "h" "ARKNDJL" "yt" site.Data.arkndjl_socials.yt) (dict "k" "ytst" "n" "Your Team Should Tank" "b" "YTST" "s" "YTST" "h" "YourTeamShouldTankPodcast" "yt" site.Data.ytst_socials.yt) -}}
 {{- $v := slice -}}
 {{- range $chs }}{{ $c := . }}
   {{- range $id, $x := .yt }}
     {{- if and (not $x.short) (not (findRE `(?i)#shorts?\b` $x.title)) $x.pub }}
-      {{- $v = $v | append (dict "id" $id "t" $x.title "pub" $x.pub "k" $c.k "n" $c.n) }}
+      {{- $v = $v | append (dict "id" $id "t" $x.title "pub" $x.pub "k" $c.k "n" $c.n "s" $c.s) }}
     {{- end }}
   {{- end }}
 {{- end -}}
@@ -44,12 +44,12 @@
       </div>
       <div class="hvid__modes" role="group" aria-label="channel">
         <button type="button" data-ch="" aria-pressed="true">all</button>
-        {{- range $chs }}<button type="button" data-ch="{{ .k }}" aria-pressed="false">{{ .n }}</button>{{ end }}
+        {{- range $chs }}{{ if .yt }}<button type="button" data-ch="{{ .k }}" aria-pressed="false"{{ if ne .b .n }} title="{{ .n }}"{{ end }}>{{ .b }}</button>{{ end }}{{ end }}
         {{- with site.Data.arkmixes_upcoming }}<button type="button" data-ch="upcoming" aria-pressed="false">upcoming</button>{{ end }}
       </div>
       <ol class="hvid__list">
         {{- range $i, $x := . }}
-        <li data-ch="{{ .k }}"><a href="https://www.youtube.com/watch?v={{ .id }}" data-vid="{{ .id }}" data-n="{{ .n }}" data-k="{{ .k }}" data-d="{{ (time.AsTime (int (div .pub 1000))).Format "Jan 2 2006" }}"{{ if eq $i 0 }} class="is-on"{{ end }} rel="noopener"><span class="hvid__no"></span><span class="hvid__t">{{ .t }}</span><b class="hvid__ch hvid__ch--{{ .k }}">{{ if eq .k "laursen" }}L111{{ else }}ARK{{ end }}</b></a></li>
+        <li data-ch="{{ .k }}"><a href="https://www.youtube.com/watch?v={{ .id }}" data-vid="{{ .id }}" data-n="{{ .n }}" data-k="{{ .k }}" data-d="{{ (time.AsTime (int (div .pub 1000))).Format "Jan 2 2006" }}"{{ if eq $i 0 }} class="is-on"{{ end }} rel="noopener"><span class="hvid__no"></span><span class="hvid__t">{{ .t }}</span><b class="hvid__ch hvid__ch--{{ .k }}">{{ .s }}</b></a></li>
         {{- end }}
       </ol>
       {{- with site.Data.arkmixes_upcoming }}
@@ -108,6 +108,7 @@
 .hvid__ch{font-weight:normal;padding:0 3px;color:#000;white-space:nowrap}
 .hvid__ch--laursen{background:#7fffd4}
 .hvid__ch--arkndjl{background:#c8c7ff}
+.hvid__ch--ytst{background:#e6c3ff}
 .hvid__modes{display:flex;gap:4px}
 .hvid__modes button{flex:1 1 auto;font:inherit;font-size:.7em;letter-spacing:.04em;padding:2px 4px;cursor:pointer;color:var(--hv-ink);background:#ada9ec;border:0;
   box-shadow:inset 2px 2px 0 var(--hv-hi),inset -2px -2px 0 var(--hv-lo),0 0 0 2px var(--hv-ink)}

@@ -57,6 +57,12 @@ jobs:
         run: node scripts/arkndjl_socials.mjs
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+      # Your Team Should Tank YouTube (home video.exe + about/contact social section): data/ytst_socials.json
+      - name: Your Team Should Tank socials
+        continue-on-error: true
+        run: node scripts/arkndjl_socials.mjs ytst
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
       - name: 1NT live
         continue-on-error: true
         env:
@@ -92,4 +98,4 @@ jobs:
         # the build gate, then the push; on a rejection this run's files are taken whole onto the new main (scripts/data_push.py)
         run: |
           python3 scripts/data_push.py -m "Update 1NT's ESEA season ($(date -u +%Y-%m-%dT%H:%MZ))" \
-            -- data/esea.json data/laursen_socials.json data/arkndjl_socials.json data/esea_lab.json data/esea_rwa.json data/esea_seasons.json data/esea_milestones.json data/esea_league_log.json scripts/data/esea_league_log.jsonl static/img/1nt/opp
+            -- data/esea.json data/laursen_socials.json data/arkndjl_socials.json data/ytst_socials.json data/esea_lab.json data/esea_rwa.json data/esea_seasons.json data/esea_milestones.json data/esea_league_log.json scripts/data/esea_league_log.jsonl static/img/1nt/opp

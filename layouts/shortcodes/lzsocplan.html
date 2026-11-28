@@ -8,7 +8,7 @@
 {{- $fmt := "Jan 2" -}}
 {{- $ytl := "Shorts" }}{{ with $p.roll }}{{ with .ytl }}{{ $ytl = . }}{{ end }}{{ end -}}
 {{- $names := dict "x" (slice "x.exe" "icon-twitter") "plan" (slice "insights.exe" (cond (eq $src "laursen_socials") "icon-twitch" "icon-twitter")) "youtube" (slice "youtube.exe" "icon-youtube") "twitch" (slice "twitch.exe" "icon-twitch") "tiktok" (slice "tiktok_stats.exe" "icon-tiktok") "instagram" (slice "instagram.exe" "icon-instagram") -}}
-{{- $nm := index $names $part -}}
+{{- $nm := index $names $part -}}{{ with .Get "exe" }}{{ $nm = slice . (index $nm 1) }}{{ end -}}
 {{- if or (ne $part "instagram") $p.ig }}
 <div class="win lzf lzp{{ with .Get "class" }} {{ . }}{{ end }}">
   <div class="win__title">
