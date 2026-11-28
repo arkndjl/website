@@ -1,9 +1,9 @@
 {
-"asof":"2026-11-27",
-"n":61,
+"asof":"2026-11-28",
+"n":77,
 "count":{
 "watching":1,
-"waiting":60
+"waiting":76
 },
 "next":[
 "understat_return",
@@ -162,6 +162,22 @@
 "state":"waiting"
 },
 {
+"key":"payroll_surplus_mls",
+"t":"Payroll Surplus and Eff+ against next-season points, MLS",
+"sp":[
+"Soccer"
+],
+"ar":"teams",
+"kind":"retest",
+"how":"hand",
+"was":"t -.24",
+"trigger":"MLS Cup 2026 is played (2026 table complete, one more held-out season)",
+"gate":"scripts/research/payrolls_nov28/test.py: Surplus on g+ beats record + payroll on held-out next-season points a game, t <= -2 and better in most seasons",
+"due":"2026-12-20",
+"est":0,
+"state":"waiting"
+},
+{
 "key":"cfb_recruit_tail",
 "t":"Tail-only fix for recruit visits and picks",
 "sp":[
@@ -271,6 +287,26 @@
 "state":"waiting"
 },
 {
+"key":"fwd_depth_promotion",
+"t":"Depth chart promotions as a next-up and FV input",
+"sp":[
+"CFB",
+"CBB",
+"NFL",
+"NBA",
+"NHL",
+"Soccer"
+],
+"ar":"fv",
+"kind":"forward",
+"how":"hand",
+"trigger":"a full season of the depth chart log (scripts/data/snaps/depth, from Nov 28 2026)",
+"gate":"a move up the chart in season (weeks moved, slots gained) added to next up and the FV prior, point in time, held out on the next season's production; ship only where t >= 2",
+"due":"2027-02-15",
+"est":1,
+"state":"waiting"
+},
+{
 "key":"nfl_fpi_stack",
 "t":"ESPN FPI stacked on the NFL game model",
 "sp":[
@@ -299,6 +335,22 @@
 "gate":"every shipped model scored once, hash recorded first; batch b at .05 / (1 + earlier batches)",
 "due":"2027-02-28",
 "est":1,
+"state":"waiting"
+},
+{
+"key":"payroll_surplus_nfl",
+"t":"Payroll Surplus and Eff+ against next-season wins, NFL",
+"sp":[
+"NFL"
+],
+"ar":"teams",
+"kind":"retest",
+"how":"hand",
+"was":"t -.68",
+"trigger":"the 2026 season is complete (one more held-out season in panel_nfl)",
+"gate":"scripts/research/payrolls_nov28/test.py: Surplus beats record + payroll on held-out next-season win%, t <= -2 and better in most seasons; Deal and Risk ship with it (the aging curve already passed)",
+"due":"2027-02-28",
+"est":0,
 "state":"waiting"
 },
 {
@@ -410,6 +462,22 @@
 "state":"waiting"
 },
 {
+"key":"cbb_dev_curve_chain",
+"t":"CBB development curve inside the team builder's roster chain",
+"sp":[
+"CBB"
+],
+"ar":"teams",
+"kind":"retest",
+"how":"hand",
+"was":"player level passed (k=1 t 6.04, k=2 t 4.75); in the team chain t -1.76 next season, 2.44 and 1.48 at 2 and 3 seasons",
+"trigger":"the 2026-27 season is out of the lockbox (one more origin)",
+"gate":"team chain with the curve against the class-mean chain: t > -1 at every horizon and t >= 2 at one",
+"due":"2027-05-05",
+"est":0,
+"state":"waiting"
+},
+{
 "key":"cfb_g5_drift",
 "t":"Index-era drift for G5 signees in HS ARK stars",
 "sp":[
@@ -487,6 +555,42 @@
 "trigger":"the 2027 draft combine",
 "gate":"Holm across the family",
 "due":"2027-05-25",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"recruit_pos_fv_cfb",
+"t":"Projected college position as a CFB recruit FV input",
+"sp":[
+"CFB"
+],
+"ar":"recruits",
+"kind":"retest",
+"how":"hand",
+"was":"t -.09 (ATH swap), 1.12 on top of the listed group, 5/6",
+"pr":1364,
+"trigger":"the 2027 NFL draft adds the 2020 class to the outcome window (seven classes)",
+"gate":"same test, classes 2014-20 held out one at a time, t >= 2 on MSE of the NFL outcome",
+"due":"2027-05-31",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"fwd_news_weight",
+"t":"News weights against what moved",
+"sp":[
+"CFB",
+"CBB",
+"NFL",
+"NBA",
+"NHL"
+],
+"ar":"method",
+"kind":"forward",
+"how":"hand",
+"trigger":"six months of news items stamped as first seen (scripts/data/snaps/news)",
+"gate":"news weight w against the size of the line, FV or board move that followed within 48 hours; reweight only where the rank correlation improves held out",
+"due":"2027-06-01",
 "est":1,
 "state":"waiting"
 },
@@ -589,6 +693,25 @@
 "trigger":"the 2021-22 prospect classes reach their outcome window (after the 2026-27 season)",
 "gate":"class-out t >= 2, forward top-50 not worse",
 "due":"2027-07-01",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"fwd_injury_line_lag",
+"t":"Injury status changes against line moves",
+"sp":[
+"NFL",
+"NBA",
+"NHL",
+"CFB",
+"CBB"
+],
+"ar":"games",
+"kind":"forward",
+"how":"hand",
+"trigger":"a season of the injury log (scripts/data/snaps/inj, every 30 minutes from Nov 28 2026) beside the dense odds archive",
+"gate":"per sport, how long the close takes to absorb a status change, and whether pricing the change into the model margin at the report beats the close on held-out weeks (CLV t >= 2)",
+"due":"2027-07-04",
 "est":1,
 "state":"waiting"
 },
@@ -720,6 +843,37 @@
 "state":"waiting"
 },
 {
+"key":"fwd_nhl_close",
+"t":"NHL close model and timing rule on the dense line archive",
+"sp":[
+"NHL"
+],
+"ar":"games",
+"kind":"forward",
+"how":"hand",
+"trigger":"NHL rows in scripts/data/odds_dense from Nov 28 2026 (moneyline, puck line, total, model margin), about 1,000 graded games by the Cup final",
+"gate":"the close model and bet timing fitted on the first half of the season and scored on the second, as the other four sports were; ship on close-growth t >= 2",
+"due":"2027-07-07",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"fwd_agency_sign_date",
+"t":"Agency first-seen dates for the sent count",
+"sp":[
+"CFB",
+"CBB"
+],
+"ar":"players",
+"kind":"forward",
+"how":"hand",
+"trigger":"ledger rows stamped the day they first appear (scripts/data/snaps/agency) through the 2027 drafts",
+"gate":"rows first seen before the declare dates (Dec 1 football, Mar 15 basketball) agree with their source dates on at least 90 percent; then first-seen backs the signed-before-the-process rule in Agency+",
+"due":"2027-07-08",
+"est":1,
+"state":"waiting"
+},
+{
 "key":"ret_pay_dollars",
 "t":"Draft pay in dollars in Ret%",
 "sp":[
@@ -750,6 +904,73 @@
 "trigger":"the 2023-24 international classes mature (summer 2027)",
 "gate":"class folds t >= 2 and top-30 not worse",
 "due":"2027-07-15",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"payroll_wins_over_pay",
+"t":"Wins over payroll (the plain efficiency form) against next-season wins",
+"sp":[
+"NFL",
+"NBA",
+"NHL",
+"Soccer"
+],
+"ar":"teams",
+"kind":"retest",
+"how":"hand",
+"was":"NBA t -.67, failed in every league",
+"trigger":"one more full season in each panel (NFL 2026, NBA and NHL 2026-27, MLS 2026)",
+"gate":"scripts/research/payrolls_nov28/test.py 'eff' form: beats record + payroll held out, t <= -2 and better in most seasons, in any league",
+"due":"2027-07-20",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cbb_live_xpm",
+"t":"rXPM in place of BPM in the CBB in-season line (FV now grade)",
+"sp":[
+"CBB"
+],
+"ar":"players",
+"kind":"retest",
+"how":"hand",
+"was":"t -.33",
+"trigger":"one more college season has three NBA seasons to show (realized FV through 2019-20)",
+"gate":"scripts/research/cbb_live_nov28/prereg.md test 2: held-out realized rung deviance, t <= -2 and better in 6+ of the seasons",
+"due":"2027-07-20",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"recruit_pos_fv_cbb",
+"t":"Projected college position as a CBB recruit FV input",
+"sp":[
+"CBB"
+],
+"ar":"recruits",
+"kind":"retest",
+"how":"hand",
+"was":"t .75, 9/14",
+"pr":1364,
+"trigger":"the 2023 class has three college seasons and its NBA draft read (cbb_recruit_hist rebuilt)",
+"gate":"same test, classes held out one at a time, t >= 2 on MSE of realized FV",
+"due":"2027-07-24",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"fwd_on3_nil_lead",
+"t":"yNIL against On3's NIL valuation moves",
+"sp":[
+"CFB"
+],
+"ar":"value",
+"kind":"forward",
+"how":"hand",
+"trigger":"On3 valuations logged each full board run from Nov 28 2026 (scripts/data/snaps/on3) across a portal window and a preseason",
+"gate":"whether yNIL and xNIL changes lead On3's valuation changes and reported deals (data/nil_deals.json); a lead with t >= 2 moves the deal half-life, never a refit to On3's level (xnil-on3 note)",
+"due":"2027-09-01",
 "est":1,
 "state":"waiting"
 },
@@ -816,6 +1037,28 @@
 "state":"waiting"
 },
 {
+"key":"fwd_fv_vintage_drift",
+"t":"Weekly FV moves: signal or noise",
+"sp":[
+"CFB",
+"CBB",
+"NFL",
+"NBA",
+"NHL",
+"Soccer",
+"Tennis",
+"CS2"
+],
+"ar":"fv",
+"kind":"forward",
+"how":"hand",
+"trigger":"a year of weekly board vintages (scripts/data/snaps/boards, from Nov 28 2026)",
+"gate":"regress next-season outcome on FV now and FV's change over the last 4 and 12 weeks; momentum or reversion ships as a shrink rule only with held-out t >= 2, else FV moves are reported as noise bands",
+"due":"2027-12-01",
+"est":1,
+"state":"waiting"
+},
+{
 "key":"lockbox_tennis",
 "t":"Lockbox score, Tennis",
 "sp":[
@@ -827,6 +1070,21 @@
 "trigger":"tennis from Nov 11 2026 is over",
 "gate":"every shipped model scored once, hash recorded first; batch b at .05 / (1 + earlier batches)",
 "due":"2027-12-12",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"fwd_offer_momentum",
+"t":"Offer momentum, CFB recruits",
+"sp":[
+"CFB"
+],
+"ar":"players",
+"kind":"forward",
+"how":"hand",
+"trigger":"the 2028 class's offers, commitments and visit counts logged daily through its early signing period (scripts/data/snaps/offers)",
+"gate":"offers added in the last 30 days (count and P4 share) as an input to commit leans and the recruit index, fit on the 2028 class's first half and scored on its signings; ship on log loss t >= 2",
+"due":"2027-12-20",
 "est":1,
 "state":"waiting"
 },
@@ -889,6 +1147,22 @@
 "gate":"held out t >= 2",
 "ledger":"class_score_top_end",
 "due":"2028-02-07",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"cfb_dev_curve",
+"t":"CFB player development curve in the team builder (FV by season from class, age and level)",
+"sp":[
+"CFB"
+],
+"ar":"teams",
+"kind":"deferred",
+"how":"hand",
+"was":"untestable: no season-by-season FV before the 2025 board",
+"trigger":"two season-end FV vintages on file (2026 and 2027 boards, scripts/data/snaps board vintages)",
+"gate":"scripts/research/team_years_nov28/prereg.md D1 form on FV: squared error lower than the class means, t >= 2 clustered by team, every season but one; then the team chain no worse (t > -1)",
+"due":"2028-02-23",
 "est":1,
 "state":"waiting"
 },

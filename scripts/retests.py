@@ -4,6 +4,8 @@
     python3 scripts/retests.py            check every test, run what is due, write data/retests_state.json
     python3 scripts/retests.py --dry      print what is due, change nothing
     python3 scripts/retests.py --due      the hand retests that are due now (the monthly retest task reads this)
+    python3 scripts/retests.py --state    rewrite data/retests_state.json only: no auto runs, no issues (process-refresh.yml,
+                                          so a test added to the registry shows on ARKLOG > retests the same day)
     python3 scripts/retests.py --test     self-check
 
 The registry is data/retests.json "tests" (added to by hand the day a test fails or is deferred). Each test has a date:
@@ -289,6 +291,11 @@ def main():
         for r in due:
             print(f'{r["due"]}  {r["key"]:<22} {r["state"]:<5} {r["t"]}')
         print(f'{len(due)} hand retests due')
+        return
+    if '--state' in sys.argv:
+        s = check(reg, load(OUT, {}), on)
+        print('retests state:', ', '.join(f'{v} {k}' for k, v in sorted(s['count'].items())))
+        write(s)
         return
     issues = None if DRY else Issues()
     s = check(reg, load(OUT, {}), on, issues)
