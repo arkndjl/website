@@ -289,6 +289,39 @@ def plus_scores(rows, by, sp, pool):
     return fit
 
 
+def components(clients, pros, sp, pool):
+    """per agency: the shipped tendency scores as a total, clients x the shrunk edge (n x sum(v - mu) / ((n + k) x sd)), so the
+    same edge counts for more the more players it covers;
+    sent = picks the agency had before the draft process; vol = log(1 + clients). score = the mean of the z-scored parts the
+    sport uses (shipped tendencies + sent; COMPOSITE)."""
+    fs = tendencies(pool); by = defaultdict(list)
+    for c in clients: by[c['agency']].append(c)
+    out = defaultdict(dict)
+    for name in ('Deal', 'Breakout'):
+        f = fs.get(name)
+        if not f: continue
+        vals = {a: [v for v in (f(c) for c in l) if v is not None] for a, l in by.items()}
+        allv = [v for a, l in vals.items() if a not in SPECIAL for v in l]
+        if len(allv) < 3: continue
+        mu = sum(allv) / len(allv); sd = (sum((v - mu) ** 2 for v in allv) / len(allv)) ** .5 or 1.0
+        k = shrink_k([l for a, l in vals.items() if a not in SPECIAL])
+        for a, l in vals.items():
+            # clients x the shrunk edge = n x sum(v - mu) / (n + k), in SDs: one client counts for 1 / (1 + k) of himself,
+            # a big roster for close to all of its total
+            out[a][name.lower()] = len(l) * sum(v - mu for v in l) / ((len(l) + k) * sd) if l else 0.0
+    for p in pros: out[canon(p['agency'])]['sent'] = out[canon(p['agency'])].get('sent', 0) + 1
+    for a, l in by.items(): out[a]['vol'] = math.log1p(len(l))
+    use = [k.lower() for k in shipped(sp)] + ['sent']
+    ag = [a for a in out if a not in SPECIAL]
+    z = {}
+    for k in use:
+        v = [out[a].get(k, 0.0) for a in ag]; m = sum(v) / len(v) if v else 0; s = (sum((x - m) ** 2 for x in v) / len(v)) ** .5 if v else 0
+        z[k] = (m, s or 1.0)
+    for a in out:
+        out[a]['score'] = sum((out[a].get(k, 0.0) - z[k][0]) / z[k][1] for k in use) / len(use) if use else 0.0
+    return out
+
+
 def board(clients, pros=(), sp='cfb', pool=()):
     by = defaultdict(list)
     for c in clients: by[c['agency']].append(c)
@@ -330,7 +363,15 @@ def board(clients, pros=(), sp='cfb', pool=()):
         r['pro'] = len(d); r['pro1'] = sum(1 for p in d if p['round'] == 1)
         r['proPct'] = round(len(d) / (len(d) + r['nCol']), 3) if d and r['nCol'] else None   # no college clients on file: no share
     pf = plus_scores(rows, by, sp, pool)
-    lead = 'dealP' if 'dealP' in pf else 'breakoutP' if 'breakoutP' in pf else None
+    # Agency+: the composite (components), 100 + 25 x score / SD over the agencies
+    cp = components(clients, [p for p in pros if p.get('conf') != 'low'], sp, pool)
+    ag = [cp[r['agency']]['score'] for r in rows if r['agency'] not in SPECIAL and r['agency'] in cp]
+    m = sum(ag) / len(ag) if ag else 0.0; sd = (sum((v - m) ** 2 for v in ag) / len(ag)) ** .5 if ag else 1.0
+    for r in rows:
+        c = cp.get(r['agency'])
+        r['agencyP'] = round(100 + 25 * (c['score'] - m) / (sd or 1.0)) if c else None
+    pf['agencyP'] = dict(parts=[k.lower() for k in shipped(sp)] + ['sent'])
+    lead = 'agencyP'
     rows.sort(key=lambda r: (r['agency'] in SPECIAL, -(r[lead] if lead and r.get(lead) is not None else -1e12), -(r['fv'] or 0), -r['n']))
     return rows, dict(k=round(k, 1), mu=round(mu), nZ=len(allz), plus=pf, lead=lead)
 
