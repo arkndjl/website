@@ -1,0 +1,66 @@
+# Season rollovers (Nov 28 2026): scripts/season_roll.py carries out the site transitions in data/seasons/<sport>.json
+# on their dates (archive the finished season, move hard-coded season constants, history rebuilds, hand-job alerts) and
+# writes data/season_state.json + static/data/seasons.json (the ARKLOG calendar and the boards' phase / post day).
+# Every step is keyed on its date and done once, so a run that GitHub starts hours late just does the due steps then.
+# A step that can't finish leaves the site where it was and opens "season rollover: <step>" (label data-alert); the
+# data-health check reopens it from the other side if this workflow itself goes red.
+name: season roll
+
+on:
+  schedule:
+    - cron: "20 4,16 * * *"
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: "dry run (print what is due, change nothing)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+  actions: write
+
+concurrency:
+  group: season-roll
+  cancel-in-progress: false
+
+jobs:
+  roll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Calendar checks
+        run: |
+          python3 scripts/season.py --test
+          node scripts/season.mjs --test
+          python3 scripts/season_roll.py --test
+      - name: Due steps
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ inputs.dry }}" = "true" ]; then python3 scripts/season_roll.py --dry; exit 0; fi
+          python3 scripts/season_roll.py
+      - name: Commit if anything changed
+        if: ${{ inputs.dry != true }}
+        run: |
+          git add -A data/season_state.json static/data/seasons.json scripts content data
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes
+          git commit -m "Season roll ($(date -u +%Y-%m-%d))"
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            sleep $((i * 5))
+            git pull --rebase -X theirs origin main || exit 1
+          done
+          exit 1

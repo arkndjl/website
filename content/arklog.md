@@ -6,9 +6,10 @@ keywords = ["arklog", "update log", "changelog", "model updates", "backtests", "
 draft = false
 +++
 
-{{< wintabs groups="Log:log,updates,scoreboard|Site data:traffic,build,data" side="true" class="libtabs" label="ARKLOG views" >}}
+{{< wintabs groups="Log:log,updates,calendar,scoreboard|Site data:traffic,build,data" side="true" class="libtabs" label="ARKLOG views" >}}
 {{< arklog tab="log" >}}
 {{< arklogupdates tab="updates" >}}
+{{< arklogcal tab="calendar" >}}
 {{< lazytab tab="scoreboard" >}}{{< arklogboard tab="scoreboard" >}}{{< /lazytab >}}
 {{< desk tab="traffic" >}}
 {{< sitestats part="views" class="desk__wide" >}}
