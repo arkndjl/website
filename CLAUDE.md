@@ -64,7 +64,7 @@
   and correct it in `research/arklog_fix.json`. Every test through #1304 was read against its write-up on Nov 27 and is
   held there (`v`, `e`, `tt`); do not regenerate those entries.
 - Hidden pages (Franchise Fantasy, the ST. CLAIRE style guide) never appear in the log (`OUT` in arklog.py).
-- Process updates: one post a month ("Process #N: ... / <month> updates"), front matter `series = "process"` and
+- Process updates: one post a month ("PROCESS #N: ... / <month> updates", PROCESS in capitals), front matter `series = "process"` and
   `month = "YYYY-MM"`, listed by ARKLOG > updates. It covers every section of the site that month: models and metrics,
   features, bug fixes, 1NT, ST. CLAIRE, videos and articles released, social data, site data, with site screenshots and
   charts. Start from `python3 scripts/arklog.py --month YYYY-MM`.
