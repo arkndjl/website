@@ -5,7 +5,8 @@ in the repo and written to data/milestones.json (layouts/shortcodes/arklogmiles.
   followers   every account's follower milestones from data/arkndjl_socials.json and data/laursen_socials.json (hist.ms,
               kept by scripts/arkndjl_socials.mjs and the LAURSEN_111 social pull; dates from before tracking are estimates)
   videos      the first video on a channel to pass 1k, 2.5k, 5k, 10k, 25k, 50k and 100k views (yt.v, sampled each pull)
-  posts       the first X post to pass 1k, 5k, 10k, 25k, 50k and 100k views (xp.v)
+  posts       the first X post to pass round numbers of likes and reposts (xp.l, xp.r, read each pull; before those readings
+              began the post's own time is the start and the date is an estimate). Post views are not tracked (Noah, Nov 28)
   site        the first day over 250, 500, 1,000, 1,500 and 2,000 page views or visitors, and total page views and
               visitors passing round numbers (data/site_stats.json days)
   ARKLOG      total changes and tests passing round numbers (static/data/arklog.json rows)
@@ -31,7 +32,8 @@ ACCOUNTS = {
 }
 UNIT = {'twitch': 'followers', 'youtube': 'subscribers', 'tiktok': 'followers', 'x': 'followers', 'ig': 'followers'}
 VIEWS = [1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000, 1000000]
-POSTS = [1000, 5000, 10000, 25000, 50000, 100000, 250000, 1000000]
+LIKES = [25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]
+REPOSTS = [5, 10, 25, 50, 100, 250, 500, 1000]
 DAY = [250, 500, 1000, 1500, 2000, 2500, 5000, 10000]
 TOTAL = [1000, 5000, 10000, 25000, 50000, 75000, 100000, 150000, 200000, 250000, 500000, 1000000]
 LOG_CH = [100, 250, 500, 1000, 1500, 2000, 2500, 5000]
@@ -98,11 +100,22 @@ def social(rows, nxt):
                     nxt.append({'sec': sec, 't': f'{sec} YouTube {kind}: {n(up)} views', 'now': top[1][-1][1], 'goal': up,
                                 'eta': None, 'p': None, 'of': top[0]})
         xp = d.get('xp') or {}
-        items = [(p['text'], p['v']) for p in xp.values() if p.get('v')]
-        for th, (name, t, by) in first_cross(items, POSTS):
-            short = name if len(name) <= 70 else name[:67].rsplit(' ', 1)[0] + '...'
-            rows.append({'d': day(t), 'sec': sec, 'k': 'views', 'est': by, 't': f'First {sec} X post over {n(th)} views: "{short}"'})
-
+        for key, ths, lab in (('likes', LIKES, 'likes'), ('reposts', REPOSTS, 'reposts')):
+            items = []
+            for p in xp.values():
+                h = p.get(key[0]) or ([[(p.get('v') or [[p['pub'] + 1]])[-1][0], p[key]]] if p.get(key) else [])   # no readings yet: the count at the last view pull
+                if h:   # starts at zero when posted, so a crossing before the first reading is interpolated from the post time
+                    items.append((p['text'], [[p['pub'], 0]] + [list(x) for x in h]))
+            for th, (name, t, by) in first_cross(items, ths):
+                by = by or not (next(p for p in xp.values() if p['text'] == name).get(key[0]))   # no like/repost readings of its own
+                short = name if len(name) <= 70 else name[:67].rsplit(' ', 1)[0] + '...'
+                rows.append({'d': day(t), 'sec': sec, 'k': lab, 'est': by, 't': f'First {sec} X post over {n(th)} {lab}: "{short}"'})
+            if items:
+                top = max(items, key=lambda it: it[1][-1][1])
+                up = next((th for th in ths if th > top[1][-1][1]), None)
+                if up:
+                    nxt.append({'sec': sec, 't': f'{sec} X post: {n(up)} {lab}', 'now': top[1][-1][1], 'goal': up,
+                                'eta': None, 'p': None, 'of': top[0]})
 
 def site(rows, nxt):
     f = ROOT / 'data/site_stats.json'

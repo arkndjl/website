@@ -43,6 +43,8 @@ const { goals, hist } = buildGoals(series, prev.hist, OPENED);
 
 // ---- X posts: his own posts (no reposts), views snapshotted per run; replies to his own posts are thread parts
 const xp = { ...(prev.xp || {}) };
+// likes and reposts kept as [time, count] readings when they change (ARKLOG milestones date crossings from them)
+const xhist = (h, x) => { h = h || []; const a = h.length && h[h.length - 1][1] === x ? h : [...h, [now, x]]; return a.length > 40 ? [a[0], ...a.slice(-39)] : a; };
 const st = X_USER && pj(await get(`https://api.fxtwitter.com/2/profile/${X_USER}/statuses`, 'arkndjl.net'));
 let xOk = false;
 for (const p of st?.results || []) {
@@ -51,7 +53,7 @@ for (const p of st?.results || []) {
   const media = ((p.media || {}).all || []).map(m => m.type), kind = p.replying_to ? 'reply' : p.quote ? 'quote' : media.length ? (media.includes('video') || media.includes('gif') ? 'video' : 'photo') : 'text';
   const o = xp[p.id] || { v: [] }, lastV = o.v.length ? o.v[o.v.length - 1][1] : null, snaps = lastV === p.views ? o.v : [...o.v, [now, p.views]];
   xp[p.id] = { text: (p.text || '').replace(/\s+/g, ' ').slice(0, 140), pub: p.created_timestamp * 1e3, kind, likes: p.likes || 0, reposts: p.reposts || 0, replies: p.replies || 0, quotes: p.quotes || 0, bookmarks: p.bookmarks || 0,
-    v: snaps.length > 40 ? [snaps[0], ...snaps.slice(-39)] : snaps };
+    v: snaps.length > 40 ? [snaps[0], ...snaps.slice(-39)] : snaps, l: xhist(o.l, p.likes || 0), r: xhist(o.r, p.reposts || 0) };
 }
 // keep the newest 600
 const xKeep = Object.entries(xp).sort((a, b) => b[1].pub - a[1].pub).slice(0, 600); for (const k of Object.keys(xp)) delete xp[k]; for (const [k, v] of xKeep) xp[k] = v;
