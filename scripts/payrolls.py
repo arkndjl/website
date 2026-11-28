@@ -259,7 +259,40 @@ def nhl_xaav():
         d = json.load(open(os.path.join(ROOT, 'static', 'data', 'xaav-nhl.json')))
     except OSError:
         return {}
-    return {(NM.key(p['n']), p['grp']): p for p in d['players']}
+    out = defaultdict(list)
+    for p in d['players']:
+        out[(NM.key(p['n']), p['grp'])].append(p)
+    return out
+
+
+def _stripped(w, full):
+    """w is the word full with its accented letters dropped (MoneyPuck: Sttzle / Stützle, Slafkovsk / Slafkovsky)"""
+    if w == full or w == ''.join(c for c in full if c.isascii()):
+        return True
+    k, gone = 0, []
+    for c in full:
+        if k < len(w) and c == w[k]: k += 1
+        else: gone.append(c)
+    return k == len(w) and len(gone) == 1 and gone[0] in 'aeiouy' and len(w) >= 5
+
+
+def nhl_find(idx, n, grp, tm):
+    """the board rows for a CapWages name: the shared key, else one row in his group whose name is his with accented
+    letters missing (the WAR and xAAV files carry MoneyPuck's spellings), on his team or alone in the league"""
+    c = idx.get((NM.key(n), grp))
+    if c:
+        return c
+    a = NM.key(''.join(ch for ch in n if ch.isascii()))
+    c = idx.get((a, grp))
+    if c:
+        return c
+    ws = NM.key(n).split()
+    hit = [p for (k, g), rows in idx.items() if g == grp and len(k.split()) == len(ws)
+           and all(_stripped(x, y) for x, y in zip(k.split(), ws)) for p in rows]
+    if len(hit) == 1:
+        return hit
+    on = [p for p in hit if p.get('tm') == tm]
+    return on if len(on) == 1 else []
 
 
 def nhl_status(s):
@@ -325,9 +358,10 @@ def nhl():
                     r = nhl_player(p, tri, L, 'ltir' if 'injured' in grp else kind)
                     if r and (r['n'], r['pos']) not in seen:
                         seen.add((r['n'], r['pos']))
-                        c = V.get((NM.key(r['n']), r['grp'])) or []
+                        c = nhl_find(V, r['n'], r['grp'], tri)
                         r['v'] = r2(c[0]['war'], 2) if len(c) == 1 else None
-                        xa = X.get((NM.key(r['n']), r['grp']))
+                        xa = nhl_find(X, r['n'], r['grp'], tri)
+                        xa = xa[0] if len(xa) == 1 else None
                         r['x'] = xa['x'] if xa else None
                         r['ph'] = (c[0].get('ph') if len(c) == 1 else None) or (xa or {}).get('ph')
                         players.append(r)
