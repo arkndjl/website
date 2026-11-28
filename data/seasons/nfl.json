@@ -1,0 +1,178 @@
+{
+ "sport": "nfl",
+ "name": "NFL",
+ "page": "/arkboard/nfl/",
+ "events": [
+  {
+   "d": "2026-09-10",
+   "k": "reg",
+   "t": "regular season starts"
+  },
+  {
+   "d": "2027-01-10",
+   "k": "reg_end",
+   "t": "regular season ends (week 18)"
+  },
+  {
+   "d": "2027-01-16",
+   "k": "post",
+   "t": "wild card round",
+   "to": "2027-01-18",
+   "src": "https://www.cbssports.com/nfl/news/2026-nfl-playoff-schedule-dates-times-tv-wild-card-to-super-bowl/"
+  },
+  {
+   "d": "2027-01-23",
+   "k": "post",
+   "t": "divisional round",
+   "to": "2027-01-24"
+  },
+  {
+   "d": "2027-01-31",
+   "k": "post",
+   "t": "conference championships"
+  },
+  {
+   "d": "2027-02-14",
+   "k": "champ",
+   "t": "Super Bowl LXI"
+  },
+  {
+   "d": "2027-03-10",
+   "k": "other",
+   "t": "new league year, free agency",
+   "est": 1
+  },
+  {
+   "d": "2027-04-29",
+   "k": "draft",
+   "t": "NFL draft",
+   "to": "2027-05-01",
+   "src": "https://www.nfl.com/news/nfl-announces-dates-for-2027-draft-in-washington-d-c"
+  },
+  {
+   "d": "2027-08-05",
+   "k": "pre",
+   "t": "preseason",
+   "est": 1
+  },
+  {
+   "d": "2027-09-09",
+   "k": "reg",
+   "t": "2027 regular season starts",
+   "est": 1
+  }
+ ],
+ "keys": {
+  "phase": [
+   [
+    "2026-08-01",
+    "preseason"
+   ],
+   [
+    "2026-09-10",
+    "regular"
+   ],
+   [
+    "2027-01-16",
+    "postseason"
+   ],
+   [
+    "2027-02-15",
+    "offseason"
+   ],
+   [
+    "2027-08-05",
+    "preseason"
+   ],
+   [
+    "2027-09-09",
+    "regular"
+   ]
+  ],
+  "season": [
+   [
+    "2026-03-01",
+    2026
+   ],
+   [
+    "2027-03-01",
+    2027
+   ]
+  ],
+  "draft": [
+   [
+    "2026-04-26",
+    2027
+   ],
+   [
+    "2027-05-02",
+    2028
+   ]
+  ],
+  "post": [
+   [
+    "2026-01-01",
+    "tue"
+   ]
+  ]
+ },
+ "steps": [
+  {
+   "id": "nfl-bracket-real",
+   "on": "2027-01-11",
+   "do": "key",
+   "t": "NFL playoff bracket from the final standings"
+  },
+  {
+   "id": "nfl-archive-2026",
+   "on": "2027-02-15",
+   "do": "archive",
+   "t": "archive the 2026 season",
+   "season": 2026,
+   "files": [
+    "data/nfl_games.json",
+    "data/brackets/nfl.json",
+    "static/data/nfl-war.json",
+    "data/futures_board_nfl.json"
+   ]
+  },
+  {
+   "id": "nfl-refit-2026",
+   "on": "2027-03-02",
+   "do": "bump",
+   "t": "NFL fits take in 2026 (walk-forward last season)",
+   "key": "season",
+   "lead": 14,
+   "test": [
+    "python3 -m py_compile scripts/nfl_games.py scripts/nfl_picks.py scripts/nfl_q.py"
+   ]
+  }
+ ],
+ "bumps": [
+  {
+   "key": "season",
+   "file": "scripts/nfl_games.py",
+   "rx": "^    last = (\\d{4})",
+   "off": -1,
+   "auto": 0,
+   "mode": "int",
+   "why": "--fit walk-forward last season"
+  },
+  {
+   "key": "season",
+   "file": "scripts/nfl_picks.py",
+   "rx": "^    last = (\\d{4})",
+   "off": -1,
+   "auto": 0,
+   "mode": "int"
+  },
+  {
+   "key": "season",
+   "file": "scripts/nfl_q.py",
+   "rx": "fit\\(last=(\\d{4})\\)",
+   "off": -1,
+   "auto": 0,
+   "mode": "int"
+  }
+ ]
+}

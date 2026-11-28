@@ -45,9 +45,12 @@ jobs:
         run: |
           npm i --no-save --no-package-lock playwright@1.56.1
           npx playwright install --with-deps chromium
-          node scripts/recruit_on3_visits.mjs cfb 2028 2029 --open --top 400
-          node scripts/recruit_on3_visits.mjs cbb 2027 2028 2029 --open --top 120
-          python3 scripts/recruit_on3_join.py --live 2027 2028 2029
+          # class years from the season calendar (data/seasons, scripts/season.py): they roll with the classes
+          CO=$(python3 scripts/season.py --get cfb open_class); CY=$(python3 scripts/season.py --get cfb class); BY=$(python3 scripts/season.py --get cbb class)
+          LO=$(( CY < BY ? CY : BY )); HI=$(( CY > BY ? CY + 2 : BY + 2 ))
+          node scripts/recruit_on3_visits.mjs cfb $(seq $CO $((CY + 2))) --open --top 400
+          node scripts/recruit_on3_visits.mjs cbb $(seq $BY $((BY + 2))) --open --top 120
+          python3 scripts/recruit_on3_join.py --live $(seq $LO $HI)
       # the committed recruits' visits for the GFX cards (scripts/player_moves.py): Mondays and hand runs; a recruit who
       # commits between pulls keeps the visits the daily pull saw (scripts/data/player_moves_hist.json.gz)
       - name: On3 visits of the committed recruits (weekly)
@@ -56,9 +59,11 @@ jobs:
         timeout-minutes: 40
         run: |
           if [ "${{ github.event_name }}" != "workflow_dispatch" ] && [ "$(date -u +%u)" != "1" ]; then echo "not Monday"; exit 0; fi
-          node scripts/recruit_on3_visits.mjs cfb 2027 2028 2029 --committed --top 400
-          node scripts/recruit_on3_visits.mjs cbb 2027 2028 2029 --committed --top 120
-          python3 scripts/recruit_on3_join.py --committed 2027 2028 2029
+          CY=$(python3 scripts/season.py --get cfb class); BY=$(python3 scripts/season.py --get cbb class)
+          LO=$(( CY < BY ? CY : BY )); HI=$(( CY > BY ? CY + 2 : BY + 2 ))
+          node scripts/recruit_on3_visits.mjs cfb $(seq $CY $((CY + 2))) --committed --top 400
+          node scripts/recruit_on3_visits.mjs cbb $(seq $BY $((BY + 2))) --committed --top 120
+          python3 scripts/recruit_on3_join.py --committed $(seq $LO $HI)
       - name: Score the live classes
         run: python3 scripts/recruit_commit_fit.py --live
       - name: Expert picks for the recruit GFX card

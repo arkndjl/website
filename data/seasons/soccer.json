@@ -1,0 +1,219 @@
+{
+ "sport": "soccer",
+ "name": "Soccer",
+ "page": "/arkboard/soccer/",
+ "events": [
+  {
+   "d": "2026-08-14",
+   "k": "reg",
+   "t": "European leagues start",
+   "to": "2026-08-30"
+  },
+  {
+   "d": "2026-12-05",
+   "k": "champ",
+   "t": "MLS Cup 2026",
+   "est": 1
+  },
+  {
+   "d": "2027-01-27",
+   "k": "other",
+   "t": "Champions League league phase ends",
+   "est": 1,
+   "src": "https://uefa.com/uefachampionsleague/news/02a6-20d57cfcd03e-407c22a7f465-1000--2026-27-champions-league-teams-dates-draws-format-final/"
+  },
+  {
+   "d": "2027-02-16",
+   "k": "post",
+   "t": "UEFA knockout playoffs",
+   "to": "2027-02-25",
+   "est": 1,
+   "src": "https://uefa.com/uefachampionsleague/news/02a6-20d57cfcd03e-407c22a7f465-1000--2026-27-champions-league-teams-dates-draws-format-final/"
+  },
+  {
+   "d": "2027-02-20",
+   "k": "reg",
+   "t": "MLS 2027 sprint season starts",
+   "est": 1,
+   "src": "https://www.mlssoccer.com/news/mls-to-align-calendar-with-top-leagues-around-world"
+  },
+  {
+   "d": "2027-03-09",
+   "k": "post",
+   "t": "Champions League round of 16",
+   "to": "2027-03-17",
+   "est": 1
+  },
+  {
+   "d": "2027-04-06",
+   "k": "post",
+   "t": "Champions League quarterfinals",
+   "to": "2027-04-14",
+   "est": 1
+  },
+  {
+   "d": "2027-04-27",
+   "k": "post",
+   "t": "Champions League semifinals",
+   "to": "2027-05-05",
+   "est": 1
+  },
+  {
+   "d": "2027-05-22",
+   "k": "reg_end",
+   "t": "Bundesliga final matchday",
+   "src": "https://www.bundesliga.com/en/bundesliga/news/2026-27-season-fixture-schedules-37671"
+  },
+  {
+   "d": "2027-05-29",
+   "k": "reg_end",
+   "t": "Ligue 1 final round",
+   "est": 1
+  },
+  {
+   "d": "2027-05-30",
+   "k": "reg_end",
+   "t": "Premier League and La Liga final day",
+   "src": "https://www.premierleague.com/en/news/4468487/dates-for-202627-premier-league-season-confirmed"
+  },
+  {
+   "d": "2027-05-30",
+   "k": "champ",
+   "t": "MLS Cup 2027 (sprint season)",
+   "est": 1,
+   "src": "https://www.mlssoccer.com/news/mls-to-align-calendar-with-top-leagues-around-world"
+  },
+  {
+   "d": "2027-06-05",
+   "k": "champ",
+   "t": "Champions League final (Madrid)",
+   "src": "https://uefa.com/uefachampionsleague/news/02a6-20d57cfcd03e-407c22a7f465-1000--2026-27-champions-league-teams-dates-draws-format-final/"
+  },
+  {
+   "d": "2027-07-01",
+   "k": "pre",
+   "t": "2027-28 season (Europe and MLS from July)",
+   "src": "https://www.mlssoccer.com/news/mls-to-align-calendar-with-top-leagues-around-world"
+  }
+ ],
+ "keys": {
+  "phase": [
+   [
+    "2026-07-01",
+    "preseason"
+   ],
+   [
+    "2026-08-14",
+    "regular"
+   ],
+   [
+    "2027-05-31",
+    "postseason"
+   ],
+   [
+    "2027-06-06",
+    "offseason"
+   ],
+   [
+    "2027-07-01",
+    "preseason"
+   ],
+   [
+    "2027-08-13",
+    "regular"
+   ]
+  ],
+  "season": [
+   [
+    "2026-07-01",
+    2027
+   ],
+   [
+    "2027-07-01",
+    2028
+   ]
+  ],
+  "mls": [
+   [
+    "2026-01-01",
+    2026
+   ],
+   [
+    "2027-01-01",
+    2027
+   ]
+  ],
+  "last": [
+   [
+    "2026-07-01",
+    2026
+   ],
+   [
+    "2027-07-01",
+    2027
+   ]
+  ],
+  "post": [
+   [
+    "2026-01-01",
+    "mon"
+   ]
+  ]
+ },
+ "steps": [
+  {
+   "id": "soccer-uefa-ko",
+   "on": "2027-01-28",
+   "do": "key",
+   "t": "UEFA knockout brackets from the real draw"
+  },
+  {
+   "id": "soccer-mls-calendar",
+   "on": "2027-06-01",
+   "do": "alert",
+   "t": "MLS moves to a July-May season in 2027-28",
+   "lead": 30,
+   "body": "soccer_data.py CAL lists usa.1 as a calendar-year league; from July 2027 MLS runs July-May like Europe. Drop usa.1 from CAL (and the MLS season label) before the 2027-28 opener."
+  },
+  {
+   "id": "soccer-archive-2027",
+   "on": "2027-06-06",
+   "do": "archive",
+   "t": "archive the 2026-27 season",
+   "season": 2027,
+   "files": [
+    "data/soccer_games.json",
+    "data/brackets/ucl.json",
+    "data/brackets/uel.json",
+    "data/brackets/uecl.json",
+    "data/brackets/soccer.json"
+   ]
+  },
+  {
+   "id": "soccer-last-2027",
+   "on": "2027-07-01",
+   "do": "alert",
+   "t": "soccer frozen bases take in 2026-27 (players --fit, prospects LAST + --freeze, xMV LAST)",
+   "lead": 0,
+   "body": "soccer_players.py --fit; soccer_prospects.py LAST 2027 then --freeze and --freeze-yi; soccer_prospect_data.py lo/hi; soccer_mv.py LAST."
+  }
+ ],
+ "bumps": [
+  {
+   "key": "last",
+   "file": "scripts/soccer_mv.py",
+   "rx": "^FIRST, LAST = 2015, (\\d{4})",
+   "off": 0,
+   "auto": 0,
+   "mode": "shift-line"
+  },
+  {
+   "key": "last",
+   "file": "scripts/soccer_prospects.py",
+   "rx": "^FIRST, LAST = 2012, (\\d{4})",
+   "off": 0,
+   "auto": 0,
+   "mode": "shift-line"
+  }
+ ]
+}

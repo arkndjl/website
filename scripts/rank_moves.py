@@ -24,6 +24,14 @@ POST = {'soccer': 0, 'soccerm': 0, 'soccerb': 0, 'soccerp': 0, 'cs2': 0, 'tennis
 # the posts go out in the morning, New York time: from this hour on a post day the board belongs to the next week, so the
 # post's base is the board as posted (the last snapshot before this hour) and the moves restart from it
 POST_HOUR = 10
+# the post day can change with the season (data/seasons/<sport>.json "post", scripts/season.py): CFB posts on Monday
+# from Dec 7 2026 through the bowls and back on Wednesday when the 2027 season starts (Noah, Nov 28 2026). POST is the
+# fallback for a board the calendar doesn't name.
+try:
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import season as _season
+except Exception:  # pragma: no cover
+    _season = None
 ET = None
 try:
     from zoneinfo import ZoneInfo
@@ -32,12 +40,22 @@ except Exception:
     pass
 
 
+def post_wd(sport, day):
+    """the post weekday in force on `day` (Monday = 0), None for a rolling 7 days"""
+    if _season is not None:
+        try:
+            return _season.post_wd(sport, day, POST.get(sport))
+        except Exception:  # a broken calendar never stops a board
+            pass
+    return POST.get(sport)
+
+
 def board_day(when, sport=None):
     """the snapshot day for a run at `when` (aware datetime): the New York date, moved to the next day once a post day's
     post has gone out (POST_HOUR), so later runs on a post day never overwrite the posted snapshot"""
     t = when.astimezone(ET or dt.timezone.utc)
     d = t.date()
-    if POST.get(sport) == d.weekday() and t.hour >= POST_HOUR:
+    if post_wd(sport, d) == d.weekday() and t.hour >= POST_HOUR:
         d += dt.timedelta(days=1)
     return d
 
@@ -48,11 +66,15 @@ def today(sport=None):
 
 
 def cutoff(day, sport=None, days=DAYS):
-    """the date the moves count from: the last post day before `day`, else `days` back"""
-    wd = POST.get(sport)
-    if wd is None:
+    """the date the moves count from: the last post day before `day` (under the post day in force on each day, so the
+    first post after a schedule change counts from the last post under the old one), else `days` back"""
+    if post_wd(sport, day) is None:
         return day - dt.timedelta(days=days)
-    return day - dt.timedelta(days=(day.weekday() - wd) % 7 or 7)
+    for back in range(1, 15):
+        d = day - dt.timedelta(days=back)
+        if post_wd(sport, d) == d.weekday():
+            return d
+    return day - dt.timedelta(days=days)
 
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
