@@ -44,10 +44,12 @@ jobs:
         run: |
           npm i --no-save --no-package-lock playwright@1.56.1
           npx playwright install --with-deps chromium
-          Y=$(python3 -c "import json; print(json.load(open('static/data/cfb-all.json'))['asof'][:4])")
+          # this season's freshmen from the season calendar (scripts/season.py), not the board's calendar year: a January
+          # board run still has the CFB 2026 season's freshmen (class 2026); CBB 2027 freshmen are class 2026 too
+          Y=$(python3 scripts/season.py --get cfb season); BY=$(( $(python3 scripts/season.py --get cbb season) - 1 ))
           ON3_TEAMS=scripts/data/arkstars_on3_teams.json ON3_EXTRA=scripts/data/arkstars_on3_extra.json \
             node scripts/on3_commits.mjs football $Y $((Y + 3)) --fcs
-          node scripts/on3_commits.mjs basketball $Y $((Y + 2))
+          node scripts/on3_commits.mjs basketball $BY $((BY + 2))
       - name: Packs
         if: github.event_name != 'workflow_run'
         run: python3 scripts/arkstars_hist.py --update

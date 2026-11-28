@@ -72,7 +72,10 @@ LOGGED = lambda r: r.get('k') not in ('study', 'content')   # a change to the si
 
 
 def section_of(title, sports):
-    board = bool(sports) or bool(re.search(r'ARKBOARD|ARKLIST|ARKRANKING|ARK Ranking|Predictions|Process|\bFV\b|\bpicks?\b|standings|'
+    # the articles, their cards and stats, and ARKLOG are site work even when the title names Process or ARKBOARD
+    if re.search(r'PROCESS #\d|articleGFX|\bARKLOG\b|favorite star|article views', title, re.I) and not sports:
+        return 'site'
+    board =bool(sports) or bool(re.search(r'ARKBOARD|ARKLIST|ARKRANKING|ARK Ranking|Predictions|Process|\bFV\b|\bpicks?\b|standings|'
                                              r'prospects?|recruit|mock|\bGFX\b', title, re.I))
     for k, p in SECTIONS:
         if re.search(p, title, re.I) and not (k == 'site' and board) and not (k == '1NT' and re.search(r'\bCS2\b.*(ARK|RWA|prospect)', title)):
@@ -150,7 +153,7 @@ def body_lines(b):
     out, head = [], ''
     for raw in b.split('\n'):
         ln = raw.strip()
-        if not ln or AI_LINE.search(ln):
+        if not ln or AI_LINE.search(ln) or LOGLINE.match(ln.strip('*_ ')):   # the ARKLOG: line is the verdict, not a line of the entry
             continue
         m = re.match(r'^(?:#{1,6}\s*(.+?)\s*#*|\*\*([^*]+?)\*\*:?)$', ln)
         if m:
@@ -678,6 +681,9 @@ def selftest():
     assert parse({'n': 5, 't': 'Franchise Fantasy: draft room', 'at': '2026-11-27T00:00:00Z', 'b': ''}) is None
     r = parse({'n': 4, 't': 'CFB depth chart tab on phones', 'at': '2026-11-27T00:00:00Z', 'b': 'Rows wrap at 390px.'})
     assert r['v'] == '' and r['ar'] == 'site', r
+    assert section_of('articleGFX: card only, no post text', []) == 'site' and section_of('ARKLOG milestones, and Process off the ARKBOARD menu', []) == 'site'
+    assert section_of('Process: glossary search', []) == 'ARKBOARD'
+    assert body_lines('Fit the class weight.\n\nARKLOG: failed · t = 0.75') == [('', 'Fit the class weight.')]
     assert clean('split `XNIL.k` 1.1 -> 1.375 (`scripts/x.py`)') == 'split XNIL.k 1.1 to 1.375'
     assert effect('seasons 2012 to 2018, r .41') is None
     print('arklog: tests pass')

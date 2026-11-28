@@ -273,9 +273,15 @@ def roll(on, only=None, dry=DRY, root=ROOT):
 
 
 def write_state(state, on):
-    state['asof'] = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     state['on'] = on.isoformat()
     state['sports'] = S.state(on)
+    try:   # a run with nothing new keeps the old stamp, so the workflow has nothing to commit (and no deploy)
+        old = json.load(open(STATE))
+    except (OSError, ValueError):
+        old = {}
+    bare = lambda d: json.loads(json.dumps({k: v for k, v in d.items() if k != 'asof'}, sort_keys=True))
+    same = bool(old.get('asof')) and bare(old) == bare(state)
+    state['asof'] = old['asof'] if same else dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     json.dump(state, open(STATE, 'w'), indent=1, sort_keys=True)
     open(STATE, 'a').write('\n')
     # the browser copy (gfx.js season week, ARKLOG calendar filters): phases, post days and the next 400 days

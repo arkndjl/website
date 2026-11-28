@@ -33,6 +33,9 @@ SOCCER = [('eng.1', 'Premier League'), ('esp.1', 'La Liga'), ('ger.1', 'Bundesli
           ('swe.1', 'Allsvenskan'), ('usa.1', 'MLS'), ('uefa.champions', 'Champions League'),
           ('uefa.europa', 'Europa League'), ('uefa.europa.conf', 'Conference League')]
 
+# leagues ESPN serves no statistics page for (400 Bad Request every run): table only, no leaders
+NO_LEADERS = {'cze.1', 'pol.1'}
+
 # leaders: (key, ESPN path, query, [(category, label)])
 LEADERS = [
     ('nfl', 'football/nfl', '', [('passingYards', 'Passing yards'), ('passingTouchdowns', 'Passing TD'),
@@ -437,7 +440,7 @@ def main():
     keep('tables', 'cbb', lambda: college_tables('basketball/mens-college-basketball', '', 'cbb', 'CBB standings (D-I)'))
     for lg, name in SOCCER:
         keep('tables', lg, lambda lg=lg, name=name: soccer_table(lg, name))
-        if not lg.startswith('uefa'):
+        if not lg.startswith('uefa') and lg not in NO_LEADERS:
             keep('leaders', lg, lambda lg=lg: soccer_leaders(lg))
     for key, path, q, cats in LEADERS:
         keep('leaders', key, lambda key=key, path=path, q=q, cats=cats: leaders(key, path, q, cats))

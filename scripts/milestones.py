@@ -201,6 +201,13 @@ def main():
     arklog(rows, nxt)
     rows.sort(key=lambda r: (r['d'], r['t']), reverse=True)
     nxt.sort(key=lambda x: (x['eta'] or '9999', -x['now'] / x['goal']))
+    try:   # unchanged numbers keep the old stamp, so process-refresh commits (and deploys) only when a milestone moved
+        old = json.loads(OUT.read_text())
+    except (OSError, ValueError):
+        old = {}
+    if old.get('rows') == rows and old.get('next') == nxt:
+        print(f'milestones: {len(rows)} reached, {len(nxt)} next (unchanged)')
+        return
     OUT.write_text(json.dumps({'asof': dt.datetime.now(dt.UTC).strftime('%Y-%m-%dT%H:%M:%SZ'), 'rows': rows, 'next': nxt},
                               ensure_ascii=False, indent=1, allow_nan=False) + '\n')
     print(f'milestones: {len(rows)} reached, {len(nxt)} next')
