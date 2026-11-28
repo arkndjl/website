@@ -375,16 +375,18 @@ def board(clients, pros=(), sp='cfb', pool=()):
     m = sum(ag) / len(ag) if ag else 0.0; sd = (sum((v - m) ** 2 for v in ag) / len(ag)) ** .5 if ag else 1.0
     for r in rows:
         c = cp.get(r['agency'])
-        r['agencyP'] = round(100 + 25 * (c['score'] - m) / (sd or 1.0)) if c else None
-    pf['agencyP'] = dict(parts=[k.lower() for k in shipped(sp) if k in COMPOSITE] + ['sent'])
-    lead = 'agencyP'
+        r['agencyP'] = round(100 + 25 * (c['score'] - m) / sd) if c and sd > 1e-9 else None   # no part varies yet: blank
+    if sd > 1e-9: pf['agencyP'] = dict(parts=[k.lower() for k in shipped(sp) if k in COMPOSITE] + ['sent'])
+    lead = 'agencyP' if 'agencyP' in pf else 'dealP' if 'dealP' in pf else 'breakoutP' if 'breakoutP' in pf else None
     rows.sort(key=lambda r: (r['agency'] in SPECIAL, -(r[lead] if lead and r.get(lead) is not None else -1e12), -(r['fv'] or 0), -r['n']))
     return rows, dict(k=round(k, 1), mu=round(mu), nZ=len(allz), plus=pf, lead=lead)
 
 
 def main():
     led = load('data/agencies.json', {'rows': []})['rows']
-    pros = record_drafts(led)
+    # the 2022-26 backfill stays in data/agency_pros.json for research but counts nowhere: sources on who had a player before
+    # the draft process are too thin to judge agencies on (Noah, Nov 28). Drafted and Agency+ start with the 2027 drafts.
+    pros = [p for p in record_drafts(led) if not p.get('backfill')]
     out = {'asof': None, 'sports': {}}
     look = {}
     for sp, col, rec in (('cfb', cfb_rows(), cfb_recruits()), ('cbb', cbb_rows(), cbb_recruits())):

@@ -241,6 +241,7 @@
   Agency+ (lead column, Nov 28) = mean of z-scored parts: Deal (COMPOSITE; Breakout+ left out, it measures the clients, Noah) as the shrunk edge sum(v - mu) / ((n + k) sd), times n
   only when above zero (Noah: big rosters not charged per player for a low score) + sent (pre-draft-process first-round picks); `components` in agencies.py; forward test 2022-24 -> 2025-26 sends in
   `scripts/research/agencies_nov28/compose.py` (research/agency_composite.json).
+  The 2022-26 R1 backfill in agency_pros.json (`backfill: 1`) counts nowhere (Noah, Nov 28: sources too thin); sent starts 2027.
   Drafted counts only agencies signed before the draft process (declaring; Dec 1 football, Mar 15 basketball), never the pro agent.
   GFX: `buildAgency` (one agency) and `buildAgencyBoard` (the board), both 16:9.
 
