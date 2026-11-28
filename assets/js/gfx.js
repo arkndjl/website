@@ -354,7 +354,7 @@
     // window with title bar
     var wx = PAD, wy = PAD, ww = W - 2 * PAD, wh = H - 2 * PAD - FOOT;
     g.fillStyle = C.face; g.fillRect(wx, wy, ww, wh); bevel(g, wx, wy, ww, wh, true);
-    titleBar(g, wx, wy, ww, title, seas && seas.value && seas.selectedIndex > 0 ? '' : seasonWeek(), logo);
+    titleBar(g, wx, wy, ww, title, tabLabel(win, title, heads, rows, seas), logo);
     // subtitle strip: what is shown
     var hasReal = data.some(function (r) { return r.some(function (c) { return (c.tags || []).some(function (t) { return t.real; }); }); }),
         hasProj = data.some(function (r) { return r.some(function (c) { return (c.tags || []).some(function (t) { return !t.real && !t.kind; }); }); });
@@ -658,8 +658,29 @@
       if (week) { g.fillStyle = C.teal; g.fillText(week, tx + (k ? 8 + 64 + 16 : 20), cy + 1); }
       tw += 28;
     }
-    g.font = '64px ' + FONT; g.fillStyle = C.white;
-    g.fillText(fit(g, title, tabR - tw - (wx + 108) - 40) + '_', wx + 108, cy + 1);
+    // a long title steps down (64, 56, 48 px, the pixel face's whole steps) before anything is cut
+    var room = tabR - tw - (wx + 108) - 40, ts = 64;
+    g.font = ts + 'px ' + FONT; while (ts > 48 && g.measureText(title + '_').width > room) { ts -= 8; g.font = ts + 'px ' + FONT; }
+    g.fillStyle = C.white; g.fillText(fit(g, title, room - g.measureText('_').width) + '_', wx + 108, cy + 1);
+  }
+  // what the tab beside the ball says on a table graphic: the season week on a live board; on a board of past
+  // seasons (all-time, past boards, history, a past season picked in its season select) the season or year it shows:
+  // the year filter in force, else the one year every drawn row shares, else the span of the rows' years, else the
+  // year span in its title, else nothing (the ball alone)
+  var HIST = /all-?time|past|history|historic|archive|career|draft-day|record book|hall of/i, YEAR = /^(19|20)\d{2}(-\d{2}(\d{2})?)?$/;
+  function endYear(y) { var p = y.split('-'); return p[1] ? (p[1].length === 2 ? p[0].slice(0, 2) + p[1] : p[1]) : p[0]; }   // 2026-27 -> 2027
+  function tabLabel(win, title, heads, rows, seas) {
+    if (seas && seas.value && seas.selectedIndex > 0) return seas.options[seas.selectedIndex].text;
+    var tabs = [], n = win; while (n && n !== document.body) { if (n.getAttribute && n.getAttribute('data-tab')) tabs.push(n.getAttribute('data-tab')); n = n.parentElement; }
+    if (!HIST.test(title + ' ' + tabs.join(' '))) return seasonWeek();
+    var form = win.querySelector('form'), pick = form && [].slice.call(form.querySelectorAll('select')).filter(function (el) {
+      var o = el.options[el.selectedIndex]; return el.value && o && YEAR.test(o.text.trim());
+    })[0];
+    if (pick) return pick.options[pick.selectedIndex].text.trim();
+    var yc = heads.findIndex(function (h) { return /^(season|year|draft|class)$/i.test(h); });
+    var ys = yc < 0 ? [] : rows.map(function (r) { return r.cells[yc] ? txt(r.cells[yc]) : ''; }).filter(function (v) { return YEAR.test(v); });
+    if (ys.length) { ys.sort(); return ys[0] === ys[ys.length - 1] ? ys[0] : ys[0].slice(0, 4) + '-' + endYear(ys[ys.length - 1]); }
+    var m = title.match(/\b(19|20)\d{2}(-(19|20)?\d{2})?\b/); return m ? m[0] : '';
   }
   async function frame(w, h, title, stamp, link) {
     W = w; H = h;
