@@ -11,7 +11,7 @@
   function day(d) { try { return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'America/New_York' }); } catch (e) { return d.slice(5, 10); } }
   function stamp(d) { try { return new Date(d).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' }) + ' ET'; } catch (e) { return d; } }
   function eff(r) { return r.k === 'study' ? (r.a || '') : (r.x || ''); }
-  function key(r) { return r.k === 'study' || r.k === 'content' ? r.id : String(r.n); }
+  function key(r) { return r.k === 'study' || r.k === 'content' || r.k === 'retest' ? r.id : String(r.n); }
   function load(src) {
     if (!loading) loading = fetch(src).then(function (x) { if (!x.ok) throw x.status; return x.json(); }).then(function (j) {
       data = j.rows || [];

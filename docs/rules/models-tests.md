@@ -11,6 +11,19 @@
 - Shared scoring harness: `scripts/harness.py` / `scripts/harness.mjs` (cluster-robust paired tests, BH across
   models). Ledger in `data/model_ledger.json`.
 
+## Scheduled retests
+
+- Every test that fails or is deferred with a reason to look again later (more seasons, a class maturing, a data pull,
+  a forward window) goes into `data/retests.json` in the same pull request: what, the last result, the trigger, the
+  gate, and a date (`after` = a calendar event in `data/seasons` plus a lag, else `due`). Never leave a retest only in
+  a note or in memory (Noah, Nov 28 2026: he will forget them).
+- `scripts/retests.py` (retests workflow, twice a week) runs what is due: watched tests are read from the workflow
+  that already reruns them, auto tests run there and ship only on a pass, hand tests open a "retest due" GitHub issue
+  (label retest) and the monthly retest task runs them. A retest runs once on its trigger with the gate it was
+  registered with; only a pass ships, a fail is recorded with its numbers.
+- The pull request that runs a hand retest adds `result` {d, v, e, tt, pr} to its entry and ends with its ARKLOG line.
+  ARKLOG > retests and the Process overview show what is scheduled and what has run.
+
 ## Lockbox
 
 - The 2026-27 seasons are a lockbox: no threshold, term choice, refit selection or "held" check may read their

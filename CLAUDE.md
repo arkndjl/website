@@ -12,7 +12,7 @@
   voice (academic, his own words, Oxford commas, no LLM phrasing or marketing); ARKLOG never logs copy cleanups or
   mentions AI; one PROCESS #N article a month; every article gets an articleGFX card (each section's key words, a comma list).
 - Models ([docs/rules/models-tests.md](docs/rules/models-tests.md)): ship only what passes out-of-sample tests, point
-  in time; 2026-27 is a lockbox; cross-sport rule; predictive metric in predictive contexts, descriptive in
+  in time; 2026-27 is a lockbox; every failed or deferred test with a later look goes in data/retests.json; cross-sport rule; predictive metric in predictive contexts, descriptive in
   descriptive; FV is absolute 20-80 true talent, mean headline, never class-relative or a shared cross-sport scale.
 - Boards ([docs/rules/boards.md](docs/rules/boards.md)), metric definitions ([docs/rules/metrics.md](docs/rules/metrics.md)),
   sections ([docs/rules/sections.md](docs/rules/sections.md)), posting schedule and shipping
@@ -27,6 +27,13 @@
 - Artist photos come from Deezer. Check that the photo is the same Deezer artist as the album's
   (several artists share names); pin the artist id (`("deezer", "<id>")`) when the name search
   picks someone else.
+
+## Scheduled retests (data/retests.json; Noah, Nov 28)
+
+- A failed or deferred test with a later retest goes into `data/retests.json` in the same PR (trigger, gate, `after` =
+  `sport:kind:year` in data/seasons + `lag`, or `due`; `how` = watch / auto / hand). `scripts/retests.py` (retests.yml,
+  Tue and Fri) writes `data/retests_state.json` for ARKLOG > retests (`arklogretests.html`) and the Process overview,
+  opens a "retest due" issue for hand tests, and only ships a pass. The PR that runs one adds its `result`. `--test` after a change.
 
 ## Player names (every sport)
 

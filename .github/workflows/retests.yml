@@ -1,0 +1,56 @@
+# Scheduled retests (Nov 28 2026): scripts/retests.py reads data/retests.json, works out which failed or deferred
+# tests are due (dates follow data/seasons), reads the watched ones from the files their own workflows write, runs the
+# auto ones (shipping only on a pass), and opens a "retest due: <test>" issue (label retest) for each hand one; the
+# monthly retest task runs those. Writes data/retests_state.json (ARKLOG > retests, Process overview).
+# Kept small for Actions minutes: twice a week, Python only, shallow checkout, one short job; nothing installs unless
+# an auto retest is due.
+name: retests
+
+on:
+  schedule:
+    - cron: "40 14 * * 2,5"
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: "dry run (print what is due, change nothing)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: retests
+  cancel-in-progress: false
+
+jobs:
+  retests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Check and run due retests
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 scripts/retests.py --test
+          if [ "${{ inputs.dry }}" = "true" ]; then python3 scripts/retests.py --dry; exit 0; fi
+          python3 scripts/retests.py
+      - name: Commit if anything changed
+        if: ${{ inputs.dry != true }}
+        run: |
+          git add data/retests_state.json data/retests.json
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          # a result the runner recorded itself goes into ARKLOG now (no fetch: rows come from the cache)
+          python3 scripts/arklog.py && git add data/arklog.json static/data/arklog.json
+          git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
+          git commit -m "Retests ($(date -u +%Y-%m-%d))"
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            sleep $((i * 5))
+            git pull --rebase -X theirs origin main || exit 1
+          done
+          exit 1
