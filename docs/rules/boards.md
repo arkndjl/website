@@ -8,6 +8,13 @@
   Boards: FV + Δ is the key. Team tables: `RK | ± | Team | Conf | KEY | G | rest`.
   Mock drafts lead with PICK, transactions with DATE.
 - No name suffixes that duplicate a column.
+- No stat-toggle tables (Noah, Nov 28 2026): never buttons, chips or selects that swap which stats a table shows or
+  ranks by (VORX / XPM / offense, this week / rest of season, per 17 / per 60, a percentile span). Every stat is a
+  sortable column in one fixed order; a header click ranks the board by that column (RK, ± and the position rank
+  follow, a second click flips it). Phones scroll sideways with the name column pinned. Filters are only for row
+  subsets (position, team, age, minutes, qualified, season). A stat some rows lack shows only when a filter leaves
+  rows that all have it (a position chip). New boards follow this. Kept as choices: league scoring (PPR / half /
+  standard) and switches between different sets of rows (5-man units / pairs, returners / kickers, awards).
 - Injured starters stay atop the depth chart with a fill-in tag.
 
 ## Recruits

@@ -1,6 +1,6 @@
 {{- /* G League call-up odds: every G League player this season (static/data/gleague.json, scripts/gleague_callup.py),
        50 to a page. The season select swaps in a past season's end-of-season board (static/data/gleague-past.json,
-       gleague_callup.py --past: fit walk forward) with what happened next (MP next, VORX 3Y). {{< gleague title="..." tab="..." >}}. Filters ride in the address with a g prefix. */ -}}
+       gleague_callup.py --past: fit walk forward) with what happened next (MP next, VORX 3Y). {{< gleague title="..." tab="..." >}}. Every number is a column; a header click on NBA%, REG%, xVORX or xXPM ranks the board by it (RK follows), NBA% by default (no stat toggles, Nov 28 2026). Filters ride in the address with a g prefix. */ -}}
 <div class="win cfb nbagl"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-nbagl data-src="{{ "data/gleague.json" | relURL }}" data-past="{{ "data/gleague-past.json" | relURL }}" data-gfx-cols="RK,Player,Age,GP,MIN,GmSc/36,TS%,NBA MP,NBA%,REG%,xVORX,xXPM">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-basketball"/></svg>{{ .Get "title" | default "gleague.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
@@ -18,17 +18,11 @@
     </select></label>
     <button type="reset" class="cfb__btn">reset</button>
     <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: players on screen">GFX</button>
-    <fieldset class="cfb__pos nbaxpm__side"><legend class="visually-hidden">rank by</legend>
-      <button type="button" class="cfb__chip is-on" data-view="p1" aria-pressed="true" title="chance of NBA minutes next season">NBA%</button>
-      <button type="button" class="cfb__chip" data-view="p5" aria-pressed="false" title="chance of being an NBA regular next season: 1,000+ NBA minutes">REG%</button>
-      <button type="button" class="cfb__chip" data-view="xv" aria-pressed="false" title="expected NBA VORX per season, next 3 seasons">xVORX</button>
-      <button type="button" class="cfb__chip" data-view="xx" aria-pressed="false" title="expected NBA XPM if he plays, next 3 seasons">xXPM</button>
-    </fieldset>
   </form>
   <div class="wintable__scroll cfb__scroll">
     <table class="cfb__table nbaxpm__table nbagl__table">
       <thead><tr>
-        <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, in the order of the view">RK</th>
+        <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, by the ranked column (NBA% unless another is clicked)">RK</th>
         <th data-sort="n" title="tags: TW two-way contract, NBA standard NBA contract on assignment; no tag G League contract">Player</th>
         <th data-sort="ax" data-num title="age on Feb 1 of the season">Age</th>
         <th data-sort="gp" data-num class="nbaxpm__ph" title="G League games this season (Showcase Cup + regular season)">GP</th>
@@ -81,12 +75,11 @@
   function logo(src) { return '<img class="cfb__logo cfb__logo--in" src="' + src + '" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> '; }
   function pct(x) { return x == null ? '<span class="cfb__dim">–</span>' : (100 * x < 1 ? '<1' : 100 * x > 99 ? '>99' : Math.round(100 * x)); }
   function sg(x) { if (x == null) return '<span class="cfb__dim">–</span>'; var r = +x.toFixed(1); return '<span' + (r < 0 ? ' class="cfb__down"' : '') + '>' + (r > 0 ? '+' : '') + (r || 0).toFixed(1) + '</span>'; }
-  function chips() { [].forEach.call(bar.querySelectorAll('[data-view]'), function (c) { var on = c.dataset.view === view; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
   function readHash() {
     var h = __hp(win), e = bar.elements;
     var gs = h.get('gs'); if (gs && past) { var S = past.seasons.filter(function (x) { return String(x.season) === gs; })[0]; if (S) { e.season.value = gs; data = S; } }
     view = h.get('gview') || 'p1'; if (VIEWS.indexOf(view) < 0) view = 'p1';
-    e.team.value = h.get('gteam') || ''; e.q.value = h.get('gq') || ''; e.nb.value = h.get('gnb') || ''; e.age.value = h.get('gage') || ''; chips();
+    e.team.value = h.get('gteam') || ''; e.q.value = h.get('gq') || ''; e.nb.value = h.get('gnb') || ''; e.age.value = h.get('gage') || '';
   }
   function writeHash() {
     var h = __hp(win), e = bar.elements;
@@ -151,7 +144,7 @@
     pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
     var t = new Date(isPast ? past.asof + 'T12:00Z' : data.asof);
     asof.textContent = data.label + ' G League · next: ' + data.next + ' NBA · ' + (isPast ? 'season end' : 'updated ' + MON[t.getUTCMonth()] + ' ' + t.getUTCDate() + ', ' + t.getUTCFullYear());
-    ths.forEach(function (th) { th.removeAttribute('aria-sort'); if (th.dataset.sort === sortKey) th.setAttribute('aria-sort', dir > 0 ? 'ascending' : 'descending'); });
+    ths.forEach(function (th) { th.removeAttribute('aria-sort'); th.classList.toggle('is-key', th.dataset.sort === key); if (th.dataset.sort === sortKey || sortKey === 'rk' && th.dataset.sort === key) th.setAttribute('aria-sort', (dir > 0) === (th.dataset.sort === 'rk') ? 'ascending' : 'descending'); });
   }
   function teams() {
     var sel = bar.elements.team, want = sel.value, seen = {};
@@ -166,15 +159,13 @@
   }
   bar.addEventListener('input', function (e) { if (e.target !== bar.elements.season) update(); });
   bar.addEventListener('change', function (e) { if (e.target === bar.elements.season) pick(e.target.value); else update(); });
-  bar.addEventListener('reset', function () { view = 'p1'; sortKey = 'rk'; dir = 1; setTimeout(function () { bar.elements.season.value = String(cur.season); data = cur; teams(); chips(); update(); }); });
-  bar.querySelector('.nbaxpm__side').addEventListener('click', function (e) {
-    var c = e.target.closest('.cfb__chip'); if (!c) return;
-    view = c.dataset.view; sortKey = 'rk'; dir = 1; chips(); update();
-  });
+  bar.addEventListener('reset', function () { view = 'p1'; sortKey = 'rk'; dir = 1; setTimeout(function () { bar.elements.season.value = String(cur.season); data = cur; teams(); update(); }); });
   ths.forEach(function (th) {
     th.tabIndex = 0;
     function go() {
       var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk';
+      // a ranked column (NBA%, REG%, xVORX, xXPM): the board ranks by it, RK with it; again flips it
+      if (VIEWS.indexOf(k) >= 0) { if (view === k && sortKey === 'rk') dir = -dir; else { view = k; sortKey = 'rk'; dir = 1; } update(); return; }
       best = k === sortKey ? best : asc ? 1 : -1; dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
     }
     th.addEventListener('click', go);

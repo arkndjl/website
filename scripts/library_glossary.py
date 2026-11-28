@@ -113,6 +113,8 @@ _AG = ld('data/recruit_age_research.json')                  # recruit age for th
 _AGB, _AGF = _AG['cbb'], _AG['cfb']
 _CS = ld('data/class_score_research.json')                   # class score: top end vs depth against results (scripts/research/class_score_nov26)
 _CSF, _CSB = _CS['cfb'], _CS['cbb']
+_ox = lambda xs: (lambda L: ', '.join(L[:-1]) + ', and ' + L[-1] if len(L) > 2 else ' and '.join(L))(list(xs))
+_FC = ld('data/fv_classes.json')                           # draft class strength (scripts/fv_classes.py)
 _AS = ld('data/arkstars_research.json')                     # 5-star+ tests (scripts/research/arkstars_nov26)
 _AH = ld('data/arkstars_hist_research.json')                # past classes' ARK stars (scripts/arkstars_hist.py --test)
 _AHT = _AH['thin']['tests'][_AH['thin']['pick']]
@@ -133,6 +135,60 @@ _CW = json.load(_gz.open(ROOT + '/scripts/data/cbb_tabs_2026.json.gz'))   # 2025
 _PX = ld('data/nba_pxpm_research.json')                     # pXPM fit + held-out tests (scripts/nba_pxpm_research.py)
 _NBAEX = (f"Held out 2012-23 ({_NX['n']:,} player seasons, {100 * _NX['exitShare']:.0f}% out of the league), RMSE goes from {_NX['exit_vs_cp']['rmse'][1]:.2f} to "
           f"{_NX['exit_vs_cp']['rmse'][0]:.2f} (t = {_NX['exit_vs_cp']['t']:.1f}, {_NX['exit_vs_cp']['won']}/{_NX['exit_vs_cp']['of']} seasons).")
+
+
+_TYF = ld('data/team_years_fit.json'); _TYD = ld('data/team_years_dev.json')   # scripts/research/team_years_nov28
+_SOF = ld('data/start_odds_fit.json')   # scripts/research/start_odds_nov28
+
+
+def _f2(x): return f"{x:.3f}".lstrip('0') if x >= 0 else '-' + f"{-x:.3f}".lstrip('0')
+
+
+def _tbx_years():
+    """seasons 2 and 3: the roster chain test, from data/team_years_fit.json"""
+    if not _TYF: return ''
+    b, f = _TYF['cbb']['h'], _TYF['cfb']['h']
+    return ('The next three seasons come from the roster chain: each player is on the roster a season later at his chance to be back '
+            '(Ret%, Transfer% and the draft next season, then the stay rate at his class), the committed class joins as freshmen, and '
+            'the sum of their value above replacement is scaled with the team\'s strength now. Fit on NIL-era seasons, one season held out at a time, '
+            f'it beat strength now alone at every horizon. Basketball R2 went from {_f2(b["1"]["r2_0"])} to {_f2(b["1"]["r2_1"])} one season out (t = {b["1"]["t"]}), '
+            f'{_f2(b["2"]["r2_0"])} to {_f2(b["2"]["r2_1"])} two out and {_f2(b["3"]["r2_0"])} to {_f2(b["3"]["r2_1"])} three out. Football R2 went from {_f2(f["1"]["r2_0"])} to {_f2(f["1"]["r2_1"])}, '
+            f'{_f2(f["2"]["r2_0"])} to {_f2(f["2"]["r2_1"])} and {_f2(f["3"]["r2_0"])} to {_f2(f["3"]["r2_1"])} (t = {f["3"]["t"]} three out). Football value in the history is the 247 composite, '
+            'because there is no season FV before 2025.')
+
+
+def _tbx_dev():
+    """player development: data/team_years_dev.json"""
+    d = (_TYD or {}).get('cbb')
+    if not d: return ''
+    t = d['test']; b = d['b']
+    return (f'Basketball development is a curve on class, age, level and minutes: a freshman gains {b[1]:+.2f} pXPM on a senior, each year older than '
+            f'his class costs {b[4]:+.2f}, each point of pXPM now {b[5]:+.2f} and a full-time role {b[6]:+.2f}. Walking forward it beat the class means '
+            f'one season on (t = {t["1"]["t"]}) and two on (t = {t["2"]["t"]}), so the roster shows pXPM by season on it. Inside the team chain it did not help '
+            'next season, so the team projection keeps the class means. Football development waits for two season-end FV boards.')
+
+
+def _tbx_start():
+    """who wins the starting job: data/start_odds_fit.json"""
+    F = _SOF or {}; f, b = F.get('cfb'), F.get('cbb')
+    if not f or not b: return []
+    fs, bs, fc, bc = f['single'], b['single'], f['model']['coef'], b['model']['coef']
+    def ts(S, k): return f"t = {S[k]['t']}"
+    st = {x['add']: x for x in f['step']}; sb = {x['add']: x for x in b['step']}
+    rb = f.get('frRB') or {}
+    fr = f['room']['fr']['coef']; frs = ', '.join(f"{g} {fr['fr:' + g]:+.2f}" for g in ('RB', 'WR', 'QB', 'TE', 'DL', 'LB') if 'fr:' + g in fr)
+    t = ('The depth chart is ordered by the chance that a player starts for the team that season, which is his chance to be on the roster times '
+            'his chance to win the job if he is. Football starters are the top players at each spot on PFN\'s rankings by snaps, attempts or targets '
+            f"(starting seasons 2022 to 2025, {f['n']:,} players), and basketball starters are the top five in minutes ({b['n']:,} players). The base is the value "
+            'we had at the time, 247 composite and last season\'s PFN score in football and pXPM in basketball, and each input was added to it and tested a '
+            f"season at a time. In football, class ({ts(fs, 'class')}), being the starter last season ({ts(fs, 'inc')}) and transferring in ({ts(fs, 'tr')}) "
+            f"passed, and a transfer starts more often than a returner of the same value ({fc['tr']:+.2f} in log odds, against {fc['inc']:+.2f} for the incumbent). "
+            f"Last season's snap share and his rank in the room passed alone but added nothing once incumbency was in (t = {st.get('use', {}).get('t')} and "
+            f"{st.get('role', {}).get('t')}).", f"In basketball, last season's minute share ({ts(bs, 'use')}), incumbency and class passed, while transferring in "
+            f"({ts(bs, 'tr')}) did not, and age added nothing beyond class (t = {sb.get('age', {}).get('t')}). No input was different enough by position to "
+            f"pass. True freshmen are least behind at running back ({frs}), but the running back term on its own did not pass (t = {rb.get('t')}). "
+            'There is no point in time FV or NIL history to test, so the forward logs will test both after next season.')
+    return list(t)
 
 
 def _tbx_pot():
@@ -319,6 +375,15 @@ sections.append({'id': 'fv', 'title': 'FV and grades', 'entries': [
        'The CFB outcome is NFL AV a season since the draft over a class horizon index h (mean 1 on the 2020-23 drafts), so years an old class spent out of the league don\'t count against it.',
        'The other boards read their past lists, and only grade-complete rows are used.'],
       'all-time FV tab on CFB, CBB, hockey, soccer and tennis prospect pages', ['CFB', 'CBB', 'Hockey', 'Soccer', 'Tennis']),
+    E('Draft class strength', 'A draft class ranked on its draft-day grades, as the FV points over 40 that grades like them became.',
+      ["Each class is the all-time FV list at its draft, each player once at his draft-day grade. A grade counts for the mean of (Out - 40)+ among past players graded the same, so in the latest era a 70 is worth " + _ox(f"{_FC[k]['pts']['70']:.0f} ({L})" for k, L in (('cfb', 'CFB'), ('cbb', 'CBB'), ('hockey', 'hockey'))) + " and a 50 is worth " + _ox(f"{_FC[k]['pts']['50']:.0f}" for k in ('cfb', 'cbb', 'hockey')) + ".",
+       f"Top is the class's {_FC['top']} best grades, depth is grades {_FC['top'] + 1} to {_FC['depth']}, and overall is the two together. Fifty is about how many players on the lists go in the first two NBA or NHL rounds, and a fixed fifty keeps the size of each year's pool (thinner in the CFB box-score years) out of the ranks.",
+       "The points are fit by grading era, because a noisier grade of 45 is worth more than a sharper one: more of those players land well above 40. CFB splits the box-score lines (drafts 2015-19) from PFN's (2020 on), CBB splits the classes graded with their own class held out (2009-16) from the ones graded forward, and hockey is one era. A class with an outcome is fit without its own class.",
+       "Calibration is the log of career points over draft-day points, over every listed player of a class. On one pooled fit it falls " + _ox(f"{-100 * _FC[k]['calib']['pooled']['trend'][0]:.1f}% a year (t = {_FC[k]['calib']['pooled']['trend'][1]:.2f}) in {L}" for k, L in (('cfb', 'CFB'), ('cbb', 'CBB'))) + "; fit by era it falls " + _ox(f"{-100 * _FC[k]['calib']['era']['trend'][0]:.1f}% (t = {_FC[k]['calib']['era']['trend'][1]:.2f})" for k in ('cfb', 'cbb')) + f". Hockey has one era and falls {-100 * _FC['hockey']['calib']['era']['trend'][0]:.1f}% a year (t = {_FC['hockey']['calib']['era']['trend'][1]:.2f}); its newer classes have had fewer seasons to reach a peak.",
+       "The era check is the spread of overall ranks across the earliest, middle and latest third of the classes (Kruskal-Wallis H), against the 95% line of 10,000 era-blind shuffles: " + _ox(f"{L} H = {_FC[k]['gate']['adj']['h']:.2f} on a line of {_FC[k]['gate']['adj']['line']:.2f} (pooled fit {_FC[k]['gate']['raw']['h']:.2f})" for k, L in (('cfb', 'CFB'), ('cbb', 'CBB'), ('hockey', 'hockey'))) + ". " + ('All three pass' if all(_FC[k]['gate']['adj']['pass'] for k in ('cfb', 'cbb', 'hockey')) else 'Not all pass') + (', and so does what the classes became.' if all((_FC[k]['gate']['became'] or {}).get('pass') for k in ('cfb', 'cbb', 'hockey')) else '.'),
+       "Became is the same sum on the careers, the class's 10 and 50 best outcomes whoever was graded where, once the class has one. Draft-day overall against became, classes with an outcome: r = " + _ox(f"{_FC[k]['corr']['all']:.2f} ({L}, {len(_FC[k]['mature'])} classes)" for k, L in (('cfb', 'CFB'), ('cbb', 'CBB'), ('hockey', 'hockey'))) + ". Classes under eight seasons from their draft are marked provisional. On the complete classes alone r = " + _ox(f"{_FC[k]['corr']['done']['r']:.2f} ({L}, {_FC[k]['corr']['done']['n']})" for k, L in (('cfb', 'CFB'), ('cbb', 'CBB'), ('hockey', 'hockey'))) + ", and with the draft year held fixed r = " + _ox(f"{_FC[k]['corr']['done']['partialYear']:.2f}" for k in ('cfb', 'cbb', 'hockey')) + ". Year held fixed means the partial r of draft-day and became over every class with an outcome.",
+       "Strongest on draft day: " + _ox(f"{L} {_FC[k]['classes'][0]['y']}" for k, L in (('cfb', 'CFB'), ('cbb', 'CBB'), ('hockey', 'hockey'))) + ". Strongest careers among the complete classes: " + _ox(f"{L} {min((c for c in _FC[k]['classes'] if 'oallR' in c and not c.get('prov')), key=lambda c: c['oallR'])['y']}" for k, L in (('cfb', 'CFB'), ('cbb', 'CBB'), ('hockey', 'hockey'))) + ". CFB covers QB, RB, WR, TE, EDGE, DT, and LB."],
+      'all-time FV > draft classes on CFB, CBB and hockey prospect pages', ['CFB', 'CBB', 'Hockey']),
 ]})
 
 # ---------------------------------------------------------------- player value
@@ -726,7 +791,7 @@ sections.append({'id': 'players', 'title': 'Player odds and projections', 'entri
        f'Football strength is Elo from the plan\'s college WAR, fit on this season\'s Elo across FBS (R2 = {_TBX["cfb"].get("r2", 0):.2f}, n = {_TBX["cfb"].get("n", 0)}). Basketball strength is the ARK rating of the plan\'s rotation.',
        f'xW is wins over a conference schedule at every team\'s projected strength: {_TBX["cfb"].get("games", 12)} games in football, {_TBX["cbb"].get("games", 31)} in basketball. Wins over replacement are xW less a 10th-percentile team on the same schedule, and NIL $ a win is next season\'s spend over those wins.',
        f'DECT as an input failed everywhere it was tested. In Ret% the staying edge made held-out log loss worse in both sports (CFB t = {_DX["ret"]["cfb"]["terms"]["R1 ce"]["lodo"]["t"]}, CBB t = {_DX["ret"]["cbb"]["terms"]["R1 ce"]["lodo"]["t"]} against it). CBB Transfer%: DECT t = {_DX["cbb_move"]["move"]["terms"]["T4 dect"]["A"]["t"]} on 2025-26 (needs 2), school pay per market dollar t = {_DX["cbb_move"]["move"]["terms"]["T2 k"]["A"]["t"]}, market over school pay t = {_DX["cbb_move"]["move"]["terms"]["T1 zgap"]["A"]["t"]}. CBB landing, money per market dollar at the destination t = {_DX["cbb_move"]["land"]["L1 dest_k"]["A"]["t"]}. CFB Transfer% has one fall board to test on and is retested after the 2026-27 cycle. DECT shows on the builder for reading only.',
-       _tbx_pot()],
+       _tbx_pot(), _tbx_years(), _tbx_dev(), *_tbx_start()],
       'CFB team builder, CBB team builder', ['CFB', 'CBB']),
     E('FBS%', 'The chance an FCS player is on an FBS roster next season.',
       ['A logit on 2023-26 FCS-to-FBS moves: production, team strength, year in school and position. It is capped at 1 - Draft%.'],

@@ -46,6 +46,11 @@ jobs:
         run: |
           python3 scripts/glossary_gfx.py
           python3 scripts/library_build.py   # the term windows draw the cards' pictures
+      # replacement levels, every sport (scripts/repl_levels.py -> data/repl_levels.json; Noah, Nov 28 2026: refit on a
+      # schedule, by position): refits once a week, a run inside the week does nothing; the CBB VORX lines are read from it
+      - name: Replacement levels
+        continue-on-error: true
+        run: python3 scripts/repl_levels.py
       # forward logs (scripts/snapshots.py): depth charts, weekly board vintages and new agency ledger rows from the files
       # the boards just wrote, change-only, into scripts/data/snaps/; data/snapshots.json counts every log
       - name: Forward logs
@@ -53,7 +58,7 @@ jobs:
         run: python3 scripts/snapshots.py daily
       - name: Commit if anything changed
         run: |
-          git add data/agencies_board.json data/agency_pros.json static/data/agencies.json research/library.json data/library.json content/arkboard-process.md data/philosophy.json data/milestones.json data/glossary_gfx.json static/data/arklog.json data/arklog.json scripts/data/arklog_prs.json.gz scripts/data/snaps data/snapshots.json
+          git add data/agencies_board.json data/agency_pros.json static/data/agencies.json research/library.json data/library.json content/arkboard-process.md data/philosophy.json data/milestones.json data/glossary_gfx.json static/data/arklog.json data/arklog.json scripts/data/arklog_prs.json.gz scripts/data/snaps data/snapshots.json data/repl_levels.json
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git config user.name "arkboard-bot"; git config user.email "actions@users.noreply.github.com"
           python3 scripts/check_build.py || exit 1   # the build gate: strict JSON, file sizes

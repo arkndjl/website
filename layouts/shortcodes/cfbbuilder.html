@@ -6,7 +6,8 @@
        explains Transfer% and the hometown study (data/cfb_transfer_fit.json).
        {{< cfbbuilder title="..." tab="team builder" >}} */ -}}
 {{- $fit := site.Data.cfb_transfer_fit -}}
-<div class="win tb" data-tb data-arklist="{{ jsonify (index (site.Data.arklist | default dict) "college-football" | default slice) }}" data-tb-src="{{ "data/cfb-builder.json" | relURL }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}>
+{{ partial "tbyears.html" . }}
+<div class="win tb" data-tb data-arklist="{{ jsonify (index (site.Data.arklist | default dict) "college-football" | default slice) }}" data-tb-src="{{ "data/cfb-builder.json" | relURL }}" data-tb-ros="{{ "data/cfb-builder-ros.json" | relURL }}"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }}>
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-football"/></svg>{{ .Get "title" | default "team_builder.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
@@ -118,7 +119,7 @@
     var lo = 1300, hi = 2000;
     var bridge = rows.map(function (r) { var w = Math.max(2, Math.min(100, (r[1].e - lo) / (hi - lo) * 100));
       return '<span>' + r[0] + '</span><span class="tbx__bar" title="' + esc(r[0] + ': Elo ' + r[1].e + ', #' + r[1].rk + ' of ' + n + ', ' + num1(r[1].xw) + ' conference-schedule wins of ' + (D.nxFit || {}).games) + '"><i style="width:' + w.toFixed(0) + '%;--c:' + r[2] + '"></i></span><span class="tbx__n">' + r[1].e + '</span><span class="tbx__rk">#' + r[1].rk + '</span>'; }).join('');
-    var str = '<section class="tbx__box tbx__box--str"><h4>' + D.next + ' strength</h4><div class="tbx__big"><b>#' + N.plan.rk + '</b><span>of ' + n + ' FBS</span><b>' + num1(N.plan.xw) + '</b><span>xW</span></div><div class="tbx__bridge">' + bridge + '</div></section>';
+    var str = '<section class="tbx__box tbx__box--str"><h4>' + D.next + ' strength</h4><div class="tbx__big"><b>#' + N.plan.rk + '</b><span>of ' + n + ' FBS</span><b>' + num1(N.plan.xw) + '</b><span>xW</span></div><div class="tbx__bridge">' + bridge + '</div>' + (window.__tbYears ? window.__tbYears.strip(N, [D.next, D.next + 1, D.next + 2], 'e', function (v) { return v; }, n) : '') + '</section>';
     var WKc = WK, val = '<section class="tbx__box tbx__box--val"><h4>value</h4><div class="tbx__stats">' +
       '<div class="tbx__stat tbx__stat--teal"><b>' + num1(T.warSea) + '</b><span>college WAR ' + D.next + '</span></div>' +
       '<div class="tbx__stat"><b>' + num1(T.av26 * WKc) + '</b><span>college WAR now</span></div>' +
@@ -219,8 +220,15 @@
     var tg = function (yr, L, now) { return L && L.length ? tbl(yr + ' targets', [['Player'], ['Pos'], ['FV', 'projected FV (the recruit model)'], ['Y1 FV', 'FV if on the field, year 1'], ['ARK', 'ARK stars'], ['P', 'P(signs here): the ARK lean model where it has him, else On3 RPM, else his visits'], ['Lean', 'ARK lean model, this school'], ['RPM', 'On3 RPM, this school'], ['Experts', 'On3 expert picks on this school, of all picks'], ['Visit', 'official (OV) or unofficial (UV) visit here']].concat(now ? [['+Elo', 'P x On% x the room AV his Y1 FV adds, in Elo']] : []).concat([['xNIL']]),
       L.map(function (c) { return '<tr><td>' + esc(c.name) + (c.rk ? ' <span class="cfb__dim">No. ' + c.rk + '</span>' : '') + '</td><td>' + esc(c.pos || '') + '</td><td class="tbx__grp">' + fvc(c.fv) + '</td><td class="cfb__num">' + (c.y1 == null ? '—' : Math.round(c.y1)) + '</td><td>' + stars(c.ark) + '</td><td class="cfb__num tbx__grp tbx__p" title="' + esc(c.src || '') + '">' + pct(c.p) + '</td><td class="cfb__num">' + (c.lean != null ? c.lean + '%' : '—') + '</td><td class="cfb__num">' + (c.rpm != null ? c.rpm + '%' : '—') + '</td><td class="cfb__num">' + (c.ex ? c.ex[0] + '/' + c.ex[1] : '—') + '</td><td>' + (c.ov ? 'OV' : c.uv ? 'UV' : '—') + '</td>' + (now ? '<td class="cfb__num tbx__grp">' + (c.g ? '+' + c.g : '—') + '</td>' : '') + '<td class="cfb__num tbx__grp tbx__grp--nil">' + (c.x ? money(c.x) : '—') + '</td></tr>'; }), '') : ''; };
     var po = T.pot || {}, nPot = (po.next || []).length + (po.later || []).length;
-    var targets = tg(D.next, po.next, true) + tg(D.next + 1, po.later, false);
-    body.innerHTML = head + scoreboard(T, D) + chart + tabs('cfb', [['depth', null, depth], ['portal', nIn, plan + board], ['leaving', nOut, leaving + walk + priced], ['class', (T.cls || []).length, cls], ['targets', nPot || null, targets], ['keep', T.keep.length, keep], ['moves', (T.moves || []).length || null, moves]]);
+    var later = po.later || [], ly = later.map(function (c) { return c.yr; }).filter(function (y, i, a) { return a.indexOf(y) === i; }).sort();
+    var targets = tg(D.next, po.next, true) + ly.map(function (y) { return tg(y, later.filter(function (c) { return c.yr === y; }), false); }).join('');
+    var cls2 = (T.cls2 || []), c2y = cls2.map(function (c) { return c.yr; }).filter(function (y, i, a) { return a.indexOf(y) === i; });
+    cls += c2y.map(function (y) { var L = cls2.filter(function (c) { return c.yr === y; }); return tbl(y + ' class', [['Player'], ['Pos'], ['FV', 'projected FV (the recruit model)'], ['Y1 FV', 'FV if on the field, year 1'], ['ARK', 'ARK stars'], ['xNIL']],
+      L.map(function (c) { return '<tr><td>' + esc(c.name) + (c.rk ? ' <span class="cfb__dim">No. ' + c.rk + '</span>' : '') + '</td><td>' + esc(c.pos || '') + '</td><td class="tbx__grp">' + fvc(c.fv) + '</td><td class="cfb__num">' + (c.y1 == null ? '—' : Math.round(c.y1)) + '</td><td>' + stars(c.ark) + '</td><td class="cfb__num tbx__grp tbx__grp--nil">' + (c.x ? money(c.x) : '—') + '</td></tr>'; }), ''); }).join('');
+    var full = '<section class="tb__panel"><h4>full depth chart</h4><div data-tby-depth></div></section>', ros = '<section class="tb__panel"><h4>roster by season</h4><div data-tby-ros></div></section>';
+    body.__tbyKey = String(T.tid);
+    body.innerHTML = head + scoreboard(T, D) + chart + tabs('cfb', [['depth', null, full + depth], ['roster', null, ros], ['portal', nIn, plan + board], ['leaving', nOut, leaving + walk + priced], ['class', (T.cls || []).length + cls2.length || null, cls], ['targets', nPot || null, targets], ['keep', T.keep.length, keep], ['moves', (T.moves || []).length || null, moves]]);
+    if (window.__tbYears) window.__tbYears.fill(body, 'cfb', body.closest('[data-tb-ros]').getAttribute('data-tb-ros'), String(T.tid), D.next);
   }
 
   function setup(w, D) {

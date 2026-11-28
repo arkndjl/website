@@ -1,7 +1,7 @@
 {{- /* xAAV contract value for the NHL and NFL boards: every player of the last full season (static/data/xaav-<sport>.json,
        built by scripts/xaav.py), the AAV he would sign for as a free agent now against his current cap hit / APY.
        {{< xaav sport="nhl|nfl" title="..." tab="..." >}}
-       Views: xAAV (default), underpaid (xAAV over his deal), overpaid. Filters ride in the address with an x prefix. */ -}}
+       Every number is a column, ranked by xAAV; a header click sorts any column and RK follows (Gap: most underpaid first, again most overpaid; no stat toggles, Nov 28 2026). Filters ride in the address with an x prefix. */ -}}
 {{- $s := .Get "sport" -}}
 {{- $nhl := eq $s "nhl" -}}
 <div class="win cfb nbaxpm xaav"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-xaav="{{ $s }}" data-gfx-logo="/img/{{ $s }}/{}.png" data-src="{{ printf "data/xaav-%s.json" $s | relURL }}" data-gfx-cols="{{ if $nhl }}RK,Player,xAAV,Pos,Age,Gap,Cap hit,xTerm,Surplus,WAR,pWAR,3Y{{ else }}RK,Player,xAAV,Pos,Age,Gap,APY,WAR,WAA,Snaps{{ end }}">
@@ -18,16 +18,11 @@
     </select></label>
     <button type="reset" class="cfb__btn">reset</button>
     <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: players on screen">GFX</button>
-    <fieldset class="cfb__pos nbaxpm__side"><legend class="visually-hidden">rank by</legend>
-      <button type="button" class="cfb__chip is-on" data-view="" aria-pressed="true" title="xAAV, highest first">xAAV</button>
-      <button type="button" class="cfb__chip" data-view="u" aria-pressed="false" title="xAAV minus his current {{ if $nhl }}cap hit{{ else }}APY{{ end }}, most underpaid first">underpaid</button>
-      <button type="button" class="cfb__chip" data-view="o" aria-pressed="false" title="xAAV minus his current {{ if $nhl }}cap hit{{ else }}APY{{ end }}, most overpaid first">overpaid</button>
-    </fieldset>
   </form>
   <div class="wintable__scroll cfb__scroll">
     <table class="cfb__table nbaxpm__table">
       <thead><tr>
-        <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, in the order of the view">RK</th>
+        <th data-sort="rk" data-num aria-sort="ascending" title="rank within the filters, by xAAV or the sorted column">RK</th>
         <th data-sort="n">Player</th>
         <th data-sort="x" data-num class="c-x" title="xAAV, $M: the AAV he would sign for as a free agent now, from position, age and last full season's {{ if $nhl }}WAR, pWAR, 3Y, points and ice time{{ else }}WAR and snaps{{ end }}, priced at this season's cap">xAAV</th>
         <th data-sort="pos" class="cfb__g">Pos</th>
@@ -91,11 +86,11 @@
   function tl(t) { t = String(t || '').split('/').pop(); return t && t !== 'FA' ? '<img class="cfb__logo cfb__logo--in" src="/img/' + LG + '/' + esc(t.toLowerCase()) + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
   function sg(x, d) { if (x == null) return '<span class="cfb__dim">–</span>'; var s = x.toFixed(d == null ? 1 : d), r = +s; return '<span' + (r < 0 ? ' class="cfb__down"' : '') + '>' + (r > 0 ? '+' : '') + (r === 0 ? s.replace('-', '') : s) + '</span>'; }
   function f(x, d) { return x == null ? '<span class="cfb__dim">–</span>' : x.toFixed(d == null ? 1 : d); }
-  function chips() { [].forEach.call(bar.querySelectorAll('[data-view]'), function (c) { var on = c.dataset.view === view; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); }); }
   function readHash() {
     var h = __hp(win), e = bar.elements;
-    view = h.get('xview') || ''; if (['', 'u', 'o'].indexOf(view) < 0) view = '';
-    e.team.value = h.get('xteam') || ''; e.pos.value = h.get('xpos') || ''; e.q.value = h.get('xq') || ''; e.age.value = h.get('xage') || ''; chips();
+    var v = h.get('xview'); view = '';   // old underpaid / overpaid links: the Gap column sorted
+    if (v === 'u' || v === 'o') { sortKey = 'gap'; best = -1; dir = v === 'u' ? -1 : 1; }
+    e.team.value = h.get('xteam') || ''; e.pos.value = h.get('xpos') || ''; e.q.value = h.get('xq') || ''; e.age.value = h.get('xage') || '';
   }
   function writeHash() {
     var h = __hp(win), e = bar.elements;
@@ -129,10 +124,9 @@
     if (sortKey !== 'rk') __rr(list, 'rk', dir, best, function (p) { return p[sortKey]; });
     if (q) list = list.filter(function (p) { return (p.n + ' ' + p.tm + ' ' + p.pos).toLowerCase().indexOf(q) >= 0; });
     var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
-    // the number the view ranks by (xAAV, or Gap on underpaid / overpaid) right after the name, then Pos, Team, Age and the
-    // sample, then the other of the two, the deal and the value line (the board standard, Nov 23 2026); headers move with it
-    var order = [view ? 'gap' : 'x', 'pos', 'tm', 'age', NHL ? 'gp' : 'sn', view ? 'x' : 'gap'].concat(NHL ? ['cap', 'xt', 'sv', 'war', 'pwar', 'p3'] : ['apy', 'war', 'waa']), hr = ths[0].parentNode;
-    ['rk', 'n'].concat(order).forEach(function (c) { var th = ths.filter(function (t) { return t.dataset.sort === c; })[0]; if (th) hr.appendChild(th); });
+    // one fixed column order (no stat toggles, Nov 28 2026): xAAV right after the name, then Pos, Team, Age and the sample,
+    // Gap, the deal and the value line (the board standard, Nov 23 2026)
+    var order = ['x', 'pos', 'tm', 'age', NHL ? 'gp' : 'sn', 'gap'].concat(NHL ? ['cap', 'xt', 'sv', 'war', 'pwar', 'p3'] : ['apy', 'war', 'waa']);
     var gfxRow = function (p) {
       var d = deal(p), sub = esc(p.tm) + ' · ' + esc(p.pos) + (p.age == null ? '' : ' · ' + p.age) + (d == null ? '' : ' · $' + d.toFixed(1) + 'M');
       var C = {
@@ -171,11 +165,7 @@
   }
   function update() { page = 0; writeHash(); render(); }
   bar.addEventListener('input', update); bar.addEventListener('change', update);
-  bar.addEventListener('reset', function () { view = ''; sortKey = 'rk'; dir = 1; setTimeout(function () { chips(); update(); }); });
-  bar.querySelector('.nbaxpm__side').addEventListener('click', function (e) {
-    var c = e.target.closest('.cfb__chip'); if (!c) return;
-    view = c.dataset.view; sortKey = 'rk'; dir = 1; chips(); update();
-  });
+  bar.addEventListener('reset', function () { view = ''; sortKey = 'rk'; dir = 1; setTimeout(function () { update(); }); });
   ths.forEach(function (th) {
     th.tabIndex = 0;
     function go() {

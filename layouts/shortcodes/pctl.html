@@ -1,23 +1,24 @@
 {{- /* Percentile projections, one per section: {{< pctl sport="nba" icon="basketball" title="projections :: ..." tab="projections" >}}.
        Data: static/data/pctl-<sport>.json (scripts/player_pctl.py), fetched the first time the tab is on screen. One
-       chip per value or stat; the span switches between the full season (to date + rest of season) and the rest of
-       the season. NFL PPR/G has its own season quantiles (ssn: a ratio's percentiles aren't to date + rest of season). Every row has every column for the stat shown (players outside a stat's positions are left out).
-       Phones keep rank, player and the three percentiles. */ -}}
+       table, a column per value or stat (no stat toggles, Nov 28 2026): the full-season median (to date + rest of season)
+       with its 20th to 80th percentile range under it, to date and the rest-of-season percentiles in the cell's hover.
+       A stat shows only when every row in the filters has it (NFL: a position chip opens that position's stats). The
+       first column (VORX / WAR) ranks the board; a header click on another stat ranks by it. NFL PPR/G has its own
+       season quantiles (ssn: a ratio's percentiles aren't to date + rest of season). */ -}}
 {{- $sport := .Get "sport" -}}
-<div class="win cfb nbaxpm pctl"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-pctl {{ if in (slice "nhl" "nba" "nfl") $sport }}data-gfx-logo="/img/{{ $sport }}/{}.png" {{ end }}data-src="{{ printf "data/pctl-%s.json" $sport | relURL }}" {{ if eq $sport "nba" }}data-xsrc="{{ "data/nba-proj.json" | relURL }}" {{ end }}data-gfx-cols="RK,Player,P20,P50,P80">
+<div class="win cfb nbaxpm pctl"{{ with .Get "tab" }} data-tab="{{ . }}"{{ end }} data-pctl {{ if in (slice "nhl" "nba" "nfl") $sport }}data-gfx-logo="/img/{{ $sport }}/{}.png" {{ end }}data-src="{{ printf "data/pctl-%s.json" $sport | relURL }}" {{ if eq $sport "nba" }}data-xsrc="{{ "data/nba-proj.json" | relURL }}" {{ end }}data-gfx-cols="RK,Player">
   <div class="win__title">
     <span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-{{ .Get "icon" | default "trophy" }}"/></svg>{{ .Get "title" | default "projections.exe" }}<span class="win__cursor" aria-hidden="true">_</span></span>
     <span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>
   </div>
   <form class="cfb__bar nbaxpm__bar" data-pc-bar hidden onsubmit="return false" aria-label="filter the projections">
     <label class="cfb__field cfb__field--grow"><span>find</span><input type="search" name="q" placeholder="player or team" autocomplete="off"></label>
-    <label class="cfb__field"><span>span</span><select name="span"><option value="ssn">season</option><option value="ros">rest of season</option></select></label>
     <label class="cfb__field"><span>team</span><select name="team"><option value="">any</option></select></label>
     <label class="cfb__field"><span>players</span><select name="who"><option value="">all</option><option value="r">rookies</option><option value="v">veterans</option></select></label>
     <label class="cfb__field"><span>age</span><select name="age"><option value="">any</option><option value="0-24">≤24</option><option value="25-29">25-29</option><option value="30-99">30+</option></select></label>
     <button type="reset" class="cfb__btn">reset</button>
     <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: players on screen">GFX</button>
-    <fieldset class="cfb__pos nbaxpm__side" data-pc-chips><legend class="visually-hidden">stat and position</legend></fieldset>
+    <fieldset class="cfb__pos nbaxpm__side" data-pc-chips><legend class="visually-hidden">position</legend></fieldset>
   </form>
   <div class="wintable__scroll cfb__scroll">
     <table class="cfb__table nbaxpm__table pctl__table">
@@ -53,21 +54,21 @@
       return '<span class="pxframe pxframe--row"><img src="' + esc(u || '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>';
     }
     function tl(t) { t = String(t || '').split('/').pop(); return SP && t ? '<img class="cfb__logo cfb__logo--in" src="/img/' + SP + '/' + esc(t.toLowerCase()) + '.png" alt="" width="16" height="16" loading="lazy" onerror="this.remove()"> ' : ''; }
-    function T() { return D.targets.filter(function (t) { return t.k === stat; })[0] || D.targets[0]; }
-    function fmt(x) {
+    function T(k) { return D.targets.filter(function (t) { return t.k === k; })[0]; }
+    function has(r, k) { return r.ros[k] != null || !!(r.ssn && r.ssn[k]); }
+    function fmt(x, d) {
       if (x == null) return '<span class="cfb__dim">–</span>';
-      var d = T().d, s = d ? x.toFixed(d) : Math.round(x).toLocaleString();
+      var s = d ? x.toFixed(d) : Math.round(x).toLocaleString();
       return x < 0 ? '<span class="cfb__down">' + s + '</span>' : s;
     }
-    function rowsOf() { return D.players.filter(function (r) { return r.ros[stat] != null || (r.ssn && r.ssn[stat]); }); }
     function chips() {
-      var h = D.targets.map(function (t) { return '<button type="button" class="cfb__chip' + (t.k === stat ? ' is-on' : '') + '" data-stat="' + esc(t.k) + '" aria-pressed="' + (t.k === stat) + '">' + esc(t.l) + '</button>'; }).join('');
       var have = {}, ps = [];
-      rowsOf().forEach(function (r) { if (!have[r.pos]) { have[r.pos] = 1; ps.push(r.pos); } });
+      D.players.forEach(function (r) { if (!have[r.pos]) { have[r.pos] = 1; ps.push(r.pos); } });
       ps.sort();
-      if (pos && !have[pos]) pos = '';
-      if (ps.length > 1) h += '<span class="cfb__chipsep" aria-hidden="true"></span>' + ps.map(function (p) { return '<button type="button" class="cfb__chip' + (p === pos ? ' is-on' : '') + '" data-pos="' + esc(p) + '" aria-pressed="' + (p === pos) + '">' + esc(p) + '</button>'; }).join('');
-      chipsEl.innerHTML = '<legend class="visually-hidden">stat and position</legend>' + h;
+      if (pos && !have[pos] && !(pos === 'SK' && have.G)) pos = '';
+      if (SP === 'nhl' && have.G) ps.unshift('SK');   // skaters: every skater stat in one table
+      var h = ps.length > 1 ? ps.map(function (p) { return '<button type="button" class="cfb__chip' + (p === pos ? ' is-on' : '') + '" data-pos="' + esc(p) + '" aria-pressed="' + (p === pos) + '"' + (p === 'SK' ? ' title="skaters: C, L, R and D"' : '') + '>' + esc(p === 'SK' ? 'skaters' : p) + '</button>'; }).join('') : '';
+      chipsEl.innerHTML = '<legend class="visually-hidden">position</legend>' + h; chipsEl.hidden = !h;
     }
     function teams() {
       var sel = bar.elements.team, want = sel.value, seen = {};
@@ -75,54 +76,61 @@
       sel.innerHTML = '<option value="">any</option>' + Object.keys(seen).sort().map(function (t) { return '<option>' + esc(t) + '</option>'; }).join('');
       sel.value = seen[want] ? want : '';
     }
-    var C = [{ k: 'rk', l: 'RK', num: 1, cls: '', t: 'rank by P50' }, { k: 'n', l: 'Player', cls: '' }, { k: 'pos', l: 'Pos', cls: 'cfb__g nbaxpm__ph', t: 'position group the model projects' },
-             { k: 'age', l: 'Age', num: 1, cls: 'nbaxpm__ph', t: 'age this season' },
-             { k: 'g', l: 'G', num: 1, cls: 'nbaxpm__ph', t: 'games played' }, { k: 'td', l: 'To date', num: 1, cls: 'nbaxpm__ph', t: 'season to date' },
-             { k: 'p20', l: 'P20', num: 1, cls: '', t: '20th percentile: 1 in 5 outcomes fall below' },
-             { k: 'p50', l: 'P50', num: 1, cls: 'nbaxpm__v is-key', t: 'median: half of outcomes fall below' },
-             { k: 'p80', l: 'P80', num: 1, cls: '', t: '80th percentile: 1 in 5 outcomes land above' }];
-    var XC = [{ k: 'x1', l: '1Y XPM', num: 1, cls: 'nbaxpm__ph', x: 1, t: '1Y: projected XPM next season when he plays, minutes-weighted. Time off the board is not counted' },
+    var C = [{ k: 'rk', l: 'RK', num: 1, cls: '', t: 'rank within the filters by the ranked stat\'s season P50 (the first stat unless another is clicked)' }, { k: 'n', l: 'Player', cls: '' }],
+        CTX = [{ k: 'pos', l: 'Pos', cls: 'cfb__g', t: 'position group the model projects' },
+             { k: 'age', l: 'Age', num: 1, cls: '', t: 'age this season' },
+             { k: 'g', l: 'G', num: 1, cls: '', t: 'games played' }];
+    var XC = [{ k: 'x1', l: '1Y XPM', num: 1, cls: '', x: 1, t: '1Y: projected XPM next season when he plays, minutes-weighted. Time off the board is not counted' },
               { k: 'x3', l: '3Y XPM', num: 1, cls: '', x: 1, t: '3Y: projected XPM over the next three seasons when he plays, minutes-weighted. Time off the board is not counted' }];
     function sx(x) { return x == null ? '<span class="cfb__dim">–</span>' : x < 0 ? '<span class="cfb__down">' + x.toFixed(1) + '</span>' : '+' + x.toFixed(1); }
-    function val(r, k, span) {
+    // a stat's percentile i (0 P20, 1 P50, 2 P80) over the span: ssn = to date + rest of season (PPR/G: its own season quantiles)
+    function q(r, k, i, span) {
+      var t = T(k);
+      if (t.g) { var s = span === 'ssn' ? r.ssn && r.ssn[k] : r.ros[k]; return s ? s[i] : null; }
+      var v = r.ros[k]; if (!v) return null;
+      return span === 'ssn' ? +(v[i] + (r.td[k] || 0)).toFixed(3) : v[i];
+    }
+    function td(r, k) { return T(k).g ? (r.g ? +(r.td.ppr / r.g).toFixed(1) : null) : r.td[k]; }
+    function val(r, k) {
       if (k === 'g' || k === 'age' || k === 'x1' || k === 'x3') return r[k] == null ? null : r[k];
-      if (T().g) {                                                          // a game: to date over games, season quantiles of its own
-        if (k === 'td') return r.g ? +(r.td.ppr / r.g).toFixed(1) : null;
-        var s = span === 'ssn' ? r.ssn && r.ssn[stat] : r.ros[stat];
-        return s ? s[{ p20: 0, p50: 1, p80: 2 }[k]] : null;
-      }
-      if (k === 'td') return r.td[stat];
-      var q = r.ros[stat]; if (!q) return null;
-      var v = q[{ p20: 0, p50: 1, p80: 2 }[k]];
-      return span === 'ssn' ? +(v + (r.td[stat] || 0)).toFixed(3) : v;      // season = to date + rest of season
+      if (k === 'n' || k === 'pos') return r[k];
+      return T(k) ? q(r, k, 1, 'ssn') : null;
     }
     function render() {
       if (!D) return;
-      var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, span = e.span.value, who = e.who.value,
+      var e = bar.elements, qs = e.q.value.trim().toLowerCase(), team = e.team.value, who = e.who.value,
           ag = e.age.value ? e.age.value.split('-').map(Number) : null;
-      var num = function (r, k) { var v = val(r, k, span); return v == null ? -1e9 : v; };
-      var list = rowsOf().filter(function (r) {
-        return (!pos || r.pos === pos) && (!team || r.tm === team) && (!who || (who === 'r') === !!r.r) &&
+      var list = D.players.filter(function (r) {
+        return (!pos || (pos === 'SK' ? r.pos !== 'G' : r.pos === pos)) && (!team || r.tm === team) && (!who || (who === 'r') === !!r.r) &&
           (!ag || (r.age != null && r.age >= ag[0] && r.age < ag[1] + 1));
-      }).sort(function (a, b) { return num(b, 'p50') - num(a, 'p50') || num(b, 'p80') - num(a, 'p80'); });
+      });
+      // the lead value (VORX / WAR) always, then only the stats every row in the filters has (board rule: no column some players lack)
+      var S = D.targets.filter(function (t, i) { return !i || list.length && list.every(function (r) { return has(r, t.k); }); });
+      if (!S.some(function (t) { return t.k === stat; })) stat = S[0].k;
+      var num = function (r, k, i) { var v = q(r, k, i, 'ssn'); return v == null ? -1e9 : v; };
+      list.sort(function (a, b) { return num(b, stat, 1) - num(a, stat, 1) || num(b, stat, 2) - num(a, stat, 2); });
       list.forEach(function (r, i) { r.rk = i + 1; });
       var shown = list.length;
       if (sortKey !== 'rk') {
         list = list.slice().sort(function (a, b) {
-          var x = sortKey === 'n' || sortKey === 'pos' ? a[sortKey] : val(a, sortKey, span), y = sortKey === 'n' || sortKey === 'pos' ? b[sortKey] : val(b, sortKey, span);
+          var x = val(a, sortKey), y = val(b, sortKey);
           if (x == null && y == null) return a.rk - b.rk; if (x == null) return 1; if (y == null) return -1;
           return (typeof x === 'number' ? x - y : String(x).localeCompare(String(y))) * dir || a.rk - b.rk;
         });
       } else if (dir < 0) list = list.slice().reverse();
-      if (sortKey !== 'rk') __rr(list, 'rk', dir, best, function (p) { return sortKey === 'n' || sortKey === 'pos' ? p[sortKey] : val(p, sortKey, span); });
-      if (q) list = list.filter(function (r) { return (r.n + ' ' + r.tm + ' ' + r.pos).toLowerCase().indexOf(q) >= 0; });
+      if (sortKey !== 'rk') __rr(list, 'rk', dir, best, function (p) { return val(p, sortKey); });
+      if (qs) list = list.filter(function (r) { return (r.n + ' ' + r.tm + ' ' + r.pos).toLowerCase().indexOf(qs) >= 0; });
       var pages = Math.max(1, Math.ceil(list.length / PER)); page = Math.min(page, pages - 1);
-      var CC = SP === 'nba' && D.players.some(function (r) { return r.x3 != null; }) ? C.concat(XC) : C;
-      // the percentile columns name the stat and the span they are for
-      var pq = { p20: 1, p50: 1, p80: 1 }, pOf = T().l + (T().g ? ' a game' : '') + ', ' + (span === 'ssn' ? 'full season (to date + rest of season)' : 'rest of season');
+      // RK | Player | the first stat | Pos, Age, G | the other stats | 1Y, 3Y XPM (NBA)
+      var SC = S.map(function (t) { return { k: t.k, l: t.l + (t.g ? '' : ''), num: 1, st: t, cls: 'nbaxpm__v' + (t.k === stat ? ' is-key' : ''),
+        t: t.l + (t.g ? ' a game' : '') + ', full season (to date + rest of season): median, with the 20th to 80th percentile range under it; hover a cell for to date and the rest of season' +
+           (t.hits ? '. held out ' + D.test + ': ' + t.hits.map(function (x) { return (x * 100).toFixed(1) + '%'; }).join(' / ') + ' of outcomes fell below P20 / P50 / P80' : '') }; });
+      var CC = C.concat(SC.slice(0, 1), CTX, SC.slice(1), SP === 'nba' && D.players.some(function (r) { return r.x3 != null; }) ? XC : []);
+      var lead = sortKey === 'rk' ? stat : sortKey;
+      win.dataset.gfxCols = ['RK', 'Player'].concat(SC.filter(function (c) { return c.k === lead; }).map(function (c) { return c.l; }), SC.filter(function (c) { return c.k !== lead; }).slice(0, 5).map(function (c) { return c.l; })).join(',');
       head.innerHTML = CC.map(function (c) {
-        var tt = c.t ? (pq[c.k] ? c.t + ': ' + pOf : c.k === 'td' ? c.t + ': ' + T().l : c.t) : '';
-        return '<th data-sort="' + esc(c.k) + '"' + (c.num ? ' data-num' : '') + ' class="' + c.cls + '"' + (tt ? ' title="' + esc(tt) + '"' : '') + (c.k === sortKey ? ' aria-sort="' + (dir > 0 ? 'ascending' : 'descending') + '"' : '') + ' tabindex="0">' + esc(c.l) + '</th>';
+        var on = c.k === sortKey || sortKey === 'rk' && c.k === stat;
+        return '<th data-sort="' + esc(c.k) + '"' + (c.num ? ' data-num' : '') + ' class="' + c.cls + '"' + (c.t ? ' title="' + esc(c.t) + '"' : '') + (on ? ' aria-sort="' + ((dir > 0) === (c.k === 'rk') ? 'ascending' : 'descending') + '"' : '') + ' tabindex="0">' + esc(c.l) + '</th>';
       }).join('');
       var gfxRow = function (r) {
         return '<tr>' + CC.map(function (c) {
@@ -131,7 +139,9 @@
           if (c.k === 'n') return '<td>' + face(r) + '<b>' + esc(r.n) + '</b>' + (r.r ? ' <span class="cfb__dim" title="rookie">R</span>' : '') + ' <span class="cfb__dim nbaxpm__tm">' + tl(r.tm) + esc(r.tm) + '</span></td>';
           if (c.k === 'pos') return '<td class="' + c.cls + '">' + esc(r.pos) + '</td>';
           if (c.k === 'g' || c.k === 'age') return '<td class="cfb__num ' + c.cls + '">' + (r[c.k] == null ? '<span class="cfb__dim">–</span>' : r[c.k]) + '</td>';
-          return '<td class="cfb__num ' + c.cls + '">' + fmt(val(r, c.k, span)) + '</td>';
+          var t = c.st, d = t.d, lo = q(r, c.k, 0, 'ssn'), hi = q(r, c.k, 2, 'ssn'), rr = [0, 1, 2].map(function (i) { return q(r, c.k, i, 'ros'); }), now = td(r, c.k);
+          var tip = 'to date ' + (now == null ? '–' : d ? now.toFixed(d) : Math.round(now).toLocaleString()) + (rr[1] == null ? '' : ' · rest of season ' + rr.map(function (x) { return x == null ? '–' : d ? x.toFixed(d) : Math.round(x).toLocaleString(); }).join(' / ') + ' (P20 / P50 / P80)');
+          return '<td class="cfb__num ' + c.cls + '" title="' + esc(tip) + '">' + fmt(q(r, c.k, 1, 'ssn'), d) + (lo == null ? '' : '<span class="cfb__dim nbaxpm__od">' + fmt(lo, d).replace(/<[^>]*>/g, '') + '–' + fmt(hi, d).replace(/<[^>]*>/g, '') + '</span>') + '</td>';
         }).join('') + '</tr>';
       };
       body.innerHTML = list.slice(page * PER, page * PER + PER).map(gfxRow).join('');
@@ -139,18 +149,15 @@
       var gfxAll = null; body.parentNode.__gfxOff = page * PER;
       body.parentNode.__gfxAll = function () { if (!gfxAll) { var b = document.createElement('tbody'); b.innerHTML = list.map(gfxRow).join('').replace(/<img[^>]*>/g, ''); gfxAll = [].slice.call(b.rows); } return gfxAll; };
       none.hidden = list.length > 0;
-      count.textContent = (q ? list.length + ' of ' : '') + shown + ' players';
+      count.textContent = (qs ? list.length + ' of ' : '') + shown + ' players';
       pager.hidden = pages < 2; pageEl.textContent = page + 1; pagesEl.textContent = pages;
-      var t = T(), h = t.hits;
-      defEl.title = t.l + ', ' + (span === 'ssn' ? (t.g ? 'full season' : 'full season (to date + rest of season)') : 'rest of season') +
-        ': 20th, 50th and 80th percentile outcomes. ' + (/^ppr/.test(t.k) ? 'PPR: 1 a catch, 1 per 10 rushing or receiving yards, 1 per 25 passing yards, 4 a passing TD, 6 other TDs, -2 an INT or fumble lost, 2 a two-point conversion. ' : '') +
-        (t.g ? 'PPR/G: points a game played, from the same draws as PPR (games move with snaps); rest of season counts draws with a game or more left. ' : '') + D.def +
-        (h ? ' Held out ' + D.test + ': ' + h.map(function (x) { return (x * 100).toFixed(1) + '%'; }).join(' / ') + ' of outcomes fell below P20 / P50 / P80.' : '');
+      defEl.title = 'Each stat: full season (to date + rest of season), 20th, 50th and 80th percentile outcomes. ' + (S.some(function (t) { return /^ppr/.test(t.k); }) ? 'PPR: 1 a catch, 1 per 10 rushing or receiving yards, 1 per 25 passing yards, 4 a passing TD, 6 other TDs, -2 an INT or fumble lost, 2 a two-point conversion. ' : '') +
+        (S.some(function (t) { return t.g; }) ? 'PPR/G: points a game played, from the same draws as PPR (games move with snaps); rest of season counts draws with a game or more left. ' : '') + D.def;
       var a = D.asof ? new Date(D.asof) : null;
       asof.textContent = (D.games ? D.games + ' games' : D.week ? 'through week ' + D.week : '') + (a && !isNaN(a) ? ' · updated ' + MON[a.getUTCMonth()] + ' ' + a.getUTCDate() + ', ' + a.getUTCFullYear() : '');
     }
     function reset() {
-      stat = D.targets[0].k; pos = ''; sortKey = 'rk'; dir = 1; page = 0; bar.elements.span.value = 'ssn';
+      stat = D.targets[0].k; pos = ''; sortKey = 'rk'; dir = 1; page = 0;
       bar.elements.who.disabled = !D.players.some(function (r) { return r.r; });
       bar.elements.age.disabled = !D.players.some(function (r) { return r.age != null; });
       teams(); chips();
@@ -172,12 +179,13 @@
     bar.addEventListener('reset', function () { setTimeout(function () { if (D) { reset(); render(); } }); });
     chipsEl.addEventListener('click', function (e) {
       var c = e.target.closest('.cfb__chip'); if (!c) return;
-      if ('stat' in c.dataset) { stat = c.dataset.stat; sortKey = 'rk'; dir = 1; }
-      else pos = c.dataset.pos === pos ? '' : c.dataset.pos;
+      pos = c.dataset.pos === pos ? '' : c.dataset.pos;
       page = 0; chips(); render();
     });
     function sortBy(th) {
       var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk';
+      // a stat column: the board ranks by its season P50, RK with it; again flips it
+      if (T(k)) { if (stat === k && sortKey === 'rk') dir = -dir; else { stat = k; sortKey = 'rk'; dir = 1; } page = 0; render(); return; }
       best = k === sortKey ? best : asc ? 1 : -1; dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
     }
     head.addEventListener('click', function (e) { var th = e.target.closest('th'); if (th) sortBy(th); });

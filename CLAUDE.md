@@ -13,7 +13,9 @@
   mentions AI; one PROCESS #N article a month; every article gets an articleGFX card (each section's key words, a comma list).
 - Models ([docs/rules/models-tests.md](docs/rules/models-tests.md)): ship only what passes out-of-sample tests, point
   in time; 2026-27 is a lockbox; every failed or deferred test with a later look goes in data/retests.json; cross-sport rule; predictive metric in predictive contexts, descriptive in
-  descriptive; FV is absolute 20-80 true talent, mean headline, never class-relative or a shared cross-sport scale.
+  descriptive; FV is absolute 20-80 true talent, mean headline, never class-relative or a shared cross-sport scale. Replacement levels are refit on a schedule and by position (`scripts/repl_levels.py`, weekly; a split ships only after it passes).
+- Boards: no stat-toggle tables; every stat is a sortable column (header click ranks by it), phones scroll with the
+  name pinned, filters only for row subsets; new boards follow this (Noah, Nov 28).
 - Boards ([docs/rules/boards.md](docs/rules/boards.md)), metric definitions ([docs/rules/metrics.md](docs/rules/metrics.md)),
   sections ([docs/rules/sections.md](docs/rules/sections.md)), posting schedule and shipping
   ([docs/rules/workflow.md](docs/rules/workflow.md)): merge when done, then `python3 scripts/check_live.py`; retrigger
@@ -172,6 +174,18 @@
   `noTicker = true` drops it). `/news/` = `layouts/shortcodes/news.html`; the daily card = `buildNews` in
   `assets/js/gfx.js` (`/news/#gfx` opens the newest). Category icons: 11x11 bitmaps in `data/news_icons.json`.
 - Never surface hidden pages (Franchise Fantasy) or betting lines in the feed.
+
+## College team builders (CFB and CBB; Nov 27-28)
+
+- `scripts/team_builder_next.py` runs after the board builders (cfb-board.yml, cbb-board.yml) and adds next season's strength,
+  xW, wins over replacement, NIL $ a win, DECT chips, targets (uncommitted recruits with P(signs here): lean model top three in
+  `data/recruit_commit_top.json`, else On3 RPM, else visit rates), later classes' commits, and seasons 2-3.
+- Seasons ahead = the roster chain (`scripts/team_years.py`; fit and test `scripts/research/team_years_nov28/test.py` ->
+  `data/team_years_fit.json`, NIL-era origins, passed 1-3 seasons out both sports): P(back) next season, then stay rates by class,
+  scaled with strength now. Rerun the test after each season ends. Roster by season files: `static/data/<sport>-builder-ros.json`
+  (full depth and roster tabs, `layouts/partials/tbyears.html`).
+- CBB development curve (`dev.py` -> `data/team_years_dev.json`, class, age, level, minutes) shows pXPM by season; it is not in the
+  team chain (failed there next season) and CFB has none yet: both in data/retests.json.
 
 ## Recruit GFX card and MOVES strip
 

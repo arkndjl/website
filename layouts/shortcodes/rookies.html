@@ -10,7 +10,7 @@
        Pre / Δ: Δ = rank by the pre-draft order (pick, recruiting rank, expected slot) minus rank by the view's number,
        both among the rows shown that have one: + = playing above where he was picked. Rows carry a photo (ph) and team logo (lo) where the section has one. Columns: the ranked number leads,
        then Pos, Class, Age, Ht / Wt (hw, sorts by hi), the sample or usage (G, MP, Min, TOI, Snaps), the rest, then pre-draft.
-       Phones keep rank, player, the ranked number, the pre-draft grade and Δ. */ -}}
+       Every view is a column in one order (the file's key leads); a view's header ranks the board by it (no stat toggles, Nov 28 2026). Phones scroll with the player pinned. */ -}}
 {{- $sport := .Get "sport" -}}
 {{- /* key="war": the view the tab opens on and ranks by when the file's own key is another (the metric audit, Nov 24 2026:
        a season tab leads with the most descriptive number, a forward-looking tab with the most predictive). keyfrom names
@@ -29,7 +29,7 @@
     <label class="cfb__field"><span>team</span><select name="team"><option value="">any</option></select></label>
     <button type="reset" class="cfb__btn">reset</button>
     <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: players on screen">GFX</button>
-    <fieldset class="cfb__pos nbaxpm__side" data-rk-chips><legend class="visually-hidden">rank by and position</legend></fieldset>
+    <fieldset class="cfb__pos nbaxpm__side" data-rk-chips><legend class="visually-hidden">position</legend></fieldset>
   </form>
   <div class="wintable__scroll cfb__scroll">
     <table class="cfb__table nbaxpm__table rookies__table">
@@ -59,7 +59,7 @@
         count = $('[data-rk-count]'), none = $('[data-rk-none]'), loading = $('[data-rk-loading]'), asof = $('[data-rk-asof]'),
         pager = $('[data-rk-pager]'), pageEl = $('[data-rk-page]'), pagesEl = $('[data-rk-pages]'), defEl = $('[data-rk-def]');
     var PER = 50, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
-    var D = null, view = '', pos = '', grp = '', sortKey = 'rk', dir = 1, best = 1, page = 0, started = false;
+    var D = null, view = '', picked = false, pos = '', grp = '', sortKey = 'rk', dir = 1, best = 1, page = 0, started = false;
     function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
     var DASH = '<span class="cfb__dim">–</span>';
     // ph / lo: photo and team-logo URLs from scripts/rookies.py; no photo, or one that fails, shows the neutral frame
@@ -83,14 +83,14 @@
     // a season can name its own default view (key: a past draft opens on FV)
     function fixView() { if (!has(view)) { var k = season().key, v = D.views.filter(function (x) { return has(x[0]); })[0]; if (k && has(k)) view = k; else if (v) view = v[0]; } }
     function chips() {
-      var h = D.views.filter(function (v) { return has(v[0]); }).map(function (v) { return '<button type="button" class="cfb__chip' + (v[0] === view ? ' is-on' : '') + '" data-view="' + v[0] + '" aria-pressed="' + (v[0] === view) + '" title="' + esc(v[2]) + '">' + esc(v[1]) + '</button>'; }).join('');
+      var h = '';   // no view chips: every view is a column and its header ranks the board (no stat toggles, Nov 28 2026)
       var rows = season().rows, have = {}, ps = [];
       rows.forEach(function (r) { have[r.pos] = 1; });
       (D.pos || []).forEach(function (p) { if (have[p]) ps.push(p); });
-      if (ps.length) h += '<span class="cfb__chipsep" aria-hidden="true"></span>' + ps.map(function (p) { return '<button type="button" class="cfb__chip' + (p === pos ? ' is-on' : '') + '" data-pos="' + esc(p) + '" aria-pressed="' + (p === pos) + '">' + esc(p) + '</button>'; }).join('');
+      if (ps.length) h += (h ? '<span class="cfb__chipsep" aria-hidden="true"></span>' : '') + ps.map(function (p) { return '<button type="button" class="cfb__chip' + (p === pos ? ' is-on' : '') + '" data-pos="' + esc(p) + '" aria-pressed="' + (p === pos) + '">' + esc(p) + '</button>'; }).join('');
       var g = D.lgs || D.divs;
       if (g) h += '<span class="cfb__chipsep" aria-hidden="true"></span>' + g.map(function (p) { return '<button type="button" class="cfb__chip' + (p === grp ? ' is-on' : '') + '" data-grp="' + esc(p) + '" aria-pressed="' + (p === grp) + '">' + esc(p) + '</button>'; }).join('');
-      chipsEl.innerHTML = '<legend class="visually-hidden">rank by and position</legend>' + h;
+      chipsEl.innerHTML = '<legend class="visually-hidden">position</legend>' + h; chipsEl.hidden = !h;
     }
     function teams() {
       var sel = bar.elements.team, want = sel.value, seen = {};
@@ -102,20 +102,30 @@
     var DOW = 'Sunday Monday Tuesday Wednesday Thursday Friday Saturday'.split(' ');
     function wkIdx() { var S = season(); return S.wkFrom && S.wkV && window.__wk ? S.wkV.indexOf(view) : -1; }
     function cols() {
-      var key = view, hasPre = !!D.pre && has('pre'), hasPfv = !!D.pfv && has('pfv');
+      // one fixed column order on every board (no stat toggles, Nov 28 2026): the file's key leads; the ranked view is teal
+      var key = D.flat ? view : D.key, hasPre = !!D.pre && has('pre'), hasPfv = !!D.pfv && has('pfv');
       var c = [{ k: 'rk', l: 'RK', t: 'rank within the filters, by the view', num: 1, cls: '' }, { k: 'n', l: 'Player', t: '', cls: '' }];
       if (wkIdx() >= 0) c.push({ k: 'wk', l: '±', t: '± = rank change by the view since the last ' + DOW[new Date(season().wkFrom + 'T12:00Z').getUTCDay()] + ' post (' + window.__wk.day(season().wkFrom) + '), within the filters; hover for the rank and value then', num: 1, cls: '' });
       var mob = D.mob || [];   // next up: FV (or the rate stat) stays on phones; position, class and age ride on the team line
       var posC = { k: 'pos', l: 'Pos', t: 'position, rank at position within the filters', cls: 'cfb__g nbaxpm__ph' },
           ageC = season().rows.some(function (r) { return r.age != null; }) ? { k: 'age', l: 'Age', t: 'age', num: 1, cls: 'nbaxpm__ph' } : null;   // a view with no ages (CBB top performers) drops the column
-      var vc = function (x) { return { k: x.k, l: x.l, t: x.t, f: x.f, num: x.num, cls: 'nbaxpm__v' + (x.k === key ? ' is-key' : mob.indexOf(x.k) >= 0 ? '' : ' nbaxpm__ph') + (x.f === 's' ? ' rookies__line' : ''), val: 1 }; };
+      var vc = function (x) { return { k: x.k, l: x.l, t: x.t, f: x.f, num: x.num, cls: 'nbaxpm__v' + (x.k === view ? ' is-key' : mob.indexOf(x.k) >= 0 || D.flat ? '' : ' nbaxpm__ph') + (x.f === 's' ? ' rookies__line' : ''), val: 1 }; };
       // every board (Noah, Nov 23): the number it ranks by leads, then what it takes to read it: position, class, age,
       // size, the sample or usage (games, then minutes / snaps / TOI), then the rate stats, the rest, pre-draft last
       var ctx = /^(yr)$/, smp = function (x) { return /^(gp|mp|mpg|min|toi|sn|snp|snpg|u|maps)$/.test(x.k) || (x.k === 'g' && /^games/.test(x.t || '')); },
           rate = function (x) { return D.mob && /^(p|e|fv|x|xpm|splus|war|pg90)$/.test(x.k); },
           gms = function (x) { return x.k === 'gp' || x.k === 'g' ? 0 : x.k === 'u' ? 2 : 1; },
-          live = function (x) { return x.k !== key && has(x.k); };
+          live = function (x) { return x.k !== key && x.k !== (D.before && D.before[key]) && has(x.k); };
+      if (D.flat) {   // flat (Noah, Nov 28 2026): every view a column in the file's order, ranked by the key (teal), then the context
+        D.cols.filter(function (x) { return D.views.some(function (v) { return v[0] === x.k; }) && has(x.k); }).forEach(function (x) { c.push(vc(x)); });
+        c.push(posC); if (ageC) c.push(ageC);
+        D.cols.filter(function (x) { return !D.views.some(function (v) { return v[0] === x.k; }) && has(x.k); }).forEach(function (x) { c.push(vc(x)); });
+        return c;
+      }
       var kc = D.cols.filter(function (x) { return x.k === key; })[0];
+      // before: a column that sits ahead of the view's own (CBB: XPM before VORX, Noah Nov 28 2026)
+      var bk = D.before && D.before[key], bc = bk && has(bk) ? D.cols.filter(function (x) { return x.k === bk; })[0] : null;
+      if (bc) c.push(vc(bc));
       if (kc) c.push(vc(kc));
       c.push(posC);
       D.cols.filter(function (x) { return live(x) && ctx.test(x.k); }).forEach(function (x) { c.push(vc(x)); });
@@ -215,7 +225,7 @@
       asof.textContent = S.l + (S.games ? ' · ' + S.games + ' games' : '') + (t && !isNaN(t) ? ' · updated ' + MON[t.getUTCMonth()] + ' ' + t.getUTCDate() + ', ' + t.getUTCFullYear() : '');
     }
     function reset() {
-      view = D.key; pos = ''; grp = ''; sortKey = 'rk'; dir = 1; page = 0;
+      view = D.key; picked = false; pos = ''; grp = ''; sortKey = 'rk'; dir = 1; page = 0;
       bar.elements.season.value = String(D.seasons[0].s);
       fixView(); minDef();
       teams(); chips();
@@ -228,7 +238,7 @@
         $('[data-rk-min]').hidden = false; $('[data-rk-minl]').textContent = D.min.l;
         bar.elements.min.innerHTML = D.min.opts.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('');
       }
-      reset(); bar.hidden = false; loading.hidden = true; render();
+      reset(); qView(); bar.hidden = false; loading.hidden = true; render();
     }
     // data-key (the shortcode's key): open on and rank by that view, its chip first; data-key-col adds its column when the
     // file has none (the rows carry the field). A key the file can't show leaves the file's own.
@@ -248,17 +258,23 @@
     }
     // the minutes floor: a season can carry its own default (mdef: low early in a season, higher for a full one)
     function minDef() { if (D.min) { var m = season().mdef; bar.elements.min.value = String(m != null ? m : (D.min.def || 0)); } }
-    function update(ev) { page = 0; if (ev && ev.target === bar.elements.season) { if (season().key || D.seasons.some(function (x) { return x.key; })) view = season().key || D.key; fixView(); teams(); chips(); minDef(); } render(); }
+    // qkey: with the qualified floor (min 'q') and no view picked, the board ranks by qkey (CBB: XPM), else by its key (VORX)
+    function qView() { if (!D.qkey || picked) return; var q = bar.elements.min && bar.elements.min.value === 'q'; var v = q ? D.qkey : D.key; if (has(v) && v !== view) { view = v; sortKey = 'rk'; dir = 1; chips(); } }
+    function update(ev) { page = 0; if (ev && ev.target === bar.elements.season) { if (season().key || D.seasons.some(function (x) { return x.key; })) view = season().key || D.key; fixView(); teams(); chips(); minDef(); } qView(); render(); }
     bar.addEventListener('input', update); bar.addEventListener('change', update);
     bar.addEventListener('reset', function () { setTimeout(function () { if (D) { reset(); render(); } }); });
     chipsEl.addEventListener('click', function (e) {
       var c = e.target.closest('.cfb__chip'); if (!c) return;
-      if ('view' in c.dataset) { view = c.dataset.view; sortKey = 'rk'; dir = 1; }
+      if ('view' in c.dataset) { view = c.dataset.view; picked = true; sortKey = 'rk'; dir = 1; }
       else if ('pos' in c.dataset) pos = c.dataset.pos === pos ? '' : c.dataset.pos;
       else grp = c.dataset.grp === grp ? '' : c.dataset.grp;
       page = 0; chips(); render();
     });
     function sortBy(th) {
+      // every board: a view's header ranks the board by it (a second click flips the order)
+      if (D && D.views.some(function (v) { return v[0] === th.dataset.sort; })) {
+        var v = th.dataset.sort; if (v === view && sortKey === 'rk') dir = -dir; else { view = v; dir = 1; } picked = true; sortKey = 'rk'; best = 1; page = 0; render(); return;
+      }
       var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk' || k === 'age' || k === 'pre';
       best = k === sortKey ? best : asc ? 1 : -1; dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
     }

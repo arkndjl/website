@@ -412,6 +412,25 @@
       "Soccer",
       "Tennis"
      ]
+    },
+    {
+     "term": "Draft class strength",
+     "short": "A draft class ranked on its draft-day grades, as the FV points over 40 that grades like them became.",
+     "body": [
+      "Each class is the all-time FV list at its draft, each player once at his draft-day grade. A grade counts for the mean of (Out - 40)+ among past players graded the same, so in the latest era a 70 is worth 29 (CFB), 22 (CBB), and 28 (hockey) and a 50 is worth 14, 9, and 12.",
+      "Top is the class's 10 best grades, depth is grades 11 to 50, and overall is the two together. Fifty is about how many players on the lists go in the first two NBA or NHL rounds, and a fixed fifty keeps the size of each year's pool (thinner in the CFB box-score years) out of the ranks.",
+      "The points are fit by grading era, because a noisier grade of 45 is worth more than a sharper one: more of those players land well above 40. CFB splits the box-score lines (drafts 2015-19) from PFN's (2020 on), CBB splits the classes graded with their own class held out (2009-16) from the ones graded forward, and hockey is one era. A class with an outcome is fit without its own class.",
+      "Calibration is the log of career points over draft-day points, over every listed player of a class. On one pooled fit it falls 3.4% a year (t = -1.80) in CFB and 4.0% a year (t = -2.58) in CBB; fit by era it falls 1.3% (t = -0.58) and 1.9% (t = -1.07). Hockey has one era and falls 2.2% a year (t = -1.84); its newer classes have had fewer seasons to reach a peak.",
+      "The era check is the spread of overall ranks across the earliest, middle and latest third of the classes (Kruskal-Wallis H), against the 95% line of 10,000 era-blind shuffles: CFB H = 1.08 on a line of 5.65 (pooled fit 5.12), CBB H = 2.99 on a line of 5.72 (pooled fit 5.51), and hockey H = 3.50 on a line of 5.65 (pooled fit 3.50). All three pass, and so does what the classes became.",
+      "Became is the same sum on the careers, the class's 10 and 50 best outcomes whoever was graded where, once the class has one. Draft-day overall against became, classes with an outcome: r = 0.77 (CFB, 9 classes), -0.59 (CBB, 12 classes), and -0.07 (hockey, 12 classes). Classes under eight seasons from their draft are marked provisional. On the complete classes alone r = 0.80 (CFB, 4), -0.57 (CBB, 10), and -0.06 (hockey, 11), and with the draft year held fixed r = 0.71, -0.50, and 0.12. Year held fixed means the partial r of draft-day and became over every class with an outcome.",
+      "Strongest on draft day: CFB 2017, CBB 2015, and hockey 2016. Strongest careers among the complete classes: CFB 2017, CBB 2009, and hockey 2015. CFB covers QB, RB, WR, TE, EDGE, DT, and LB."
+     ],
+     "where": "all-time FV > draft classes on CFB, CBB and hockey prospect pages",
+     "sports": [
+      "CFB",
+      "CBB",
+      "Hockey"
+     ]
     }
    ]
   },
@@ -1244,7 +1263,11 @@
       "Football strength is Elo from the plan's college WAR, fit on this season's Elo across FBS (R2 = 0.63, n = 138). Basketball strength is the ARK rating of the plan's rotation.",
       "xW is wins over a conference schedule at every team's projected strength: 12 games in football, 31 in basketball. Wins over replacement are xW less a 10th-percentile team on the same schedule, and NIL $ a win is next season's spend over those wins.",
       "DECT as an input failed everywhere it was tested. In Ret% the staying edge made held-out log loss worse in both sports (CFB t = 2.96, CBB t = 0.72 against it). CBB Transfer%: DECT t = 1.47 on 2025-26 (needs 2), school pay per market dollar t = 1.61, market over school pay t = 0.17. CBB landing, money per market dollar at the destination t = 1.15. CFB Transfer% has one fall board to test on and is retested after the 2026-27 cycle. DECT shows on the builder for reading only.",
-      "Targets are uncommitted recruits a school is in on. His chance to sign there is the ARK lean model's for that school when the model has him (its top three schools), else On3's RPM share, else his visits: the rate at which committed recruits signed with a school they took an official visit to was .44 with 2, .32 with 3, .24 with 4 official visits and .18 with five or more. Those rates include visits after the commitment, so they run high. A school under 5% is left off. Next class targets add their chance times what they add to the plan (football: On% times the room AV of his Y1 FV, in Elo; basketball: the team rating of his projected XPM in the rotation), shown as plan + targets."
+      "Targets are uncommitted recruits a school is in on. His chance to sign there is the ARK lean model's for that school when the model has him (its top three schools), else On3's RPM share, else his visits: the rate at which committed recruits signed with a school they took an official visit to was .44 with 2, .32 with 3, .24 with 4 official visits and .18 with five or more. Those rates include visits after the commitment, so they run high. A school under 5% is left off. Next class targets add their chance times what they add to the plan (football: On% times the room AV of his Y1 FV, in Elo; basketball: the team rating of his projected XPM in the rotation), shown as plan + targets.",
+      "The next three seasons come from the roster chain: each player is on the roster a season later at his chance to be back (Ret%, Transfer% and the draft next season, then the stay rate at his class), the committed class joins as freshmen, and the sum of their value above replacement is scaled with the team's strength now. Fit on NIL-era seasons, one season held out at a time, it beat strength now alone at every horizon. Basketball R2 went from .659 to .683 one season out (t = 5.88), .579 to .613 two out and .532 to .587 three out. Football R2 went from .544 to .614, .389 to .535 and .336 to .492 (t = 3.7 three out). Football value in the history is the 247 composite, because there is no season FV before 2025.",
+      "Basketball development is a curve on class, age, level and minutes: a freshman gains +0.33 pXPM on a senior, each year older than his class costs -0.13, each point of pXPM now -0.05 and a full-time role +0.69. Walking forward it beat the class means one season on (t = 6.04) and two on (t = 4.75), so the roster shows pXPM by season on it. Inside the team chain it did not help next season, so the team projection keeps the class means. Football development waits for two season-end FV boards.",
+      "The depth chart is ordered by the chance that a player starts for the team that season, which is his chance to be on the roster times his chance to win the job if he is. Football starters are the top players at each spot on PFN's rankings by snaps, attempts or targets (starting seasons 2022 to 2025, 35,164 players), and basketball starters are the top five in minutes (20,081 players). The base is the value we had at the time, 247 composite and last season's PFN score in football and pXPM in basketball, and each input was added to it and tested a season at a time. In football, class (t = 18.22), being the starter last season (t = 5.23) and transferring in (t = 4.48) passed, and a transfer starts more often than a returner of the same value (+0.41 in log odds, against +1.01 for the incumbent). Last season's snap share and his rank in the room passed alone but added nothing once incumbency was in (t = -0.46 and -0.22).",
+      "In basketball, last season's minute share (t = 15.78), incumbency and class passed, while transferring in (t = -1.23) did not, and age added nothing beyond class (t = -0.96). No input was different enough by position to pass. True freshmen are least behind at running back (RB -1.21, WR -1.59, QB -1.65, TE -1.64, DL -1.94, LB -2.09), but the running back term on its own did not pass (t = 1.09). There is no point in time FV or NIL history to test, so the forward logs will test both after next season."
      ],
      "where": "CFB team builder, CBB team builder",
      "sports": [
@@ -3399,7 +3422,7 @@
      "45",
      "2+ seasons as a starter; most common: 2+ seasons as a starter (34%)",
      "5.89",
-     "13 of 5,561 (0.23%)",
+     "11 of 5,561 (0.20%)",
      "-0.6 to +0.0",
      "43",
      "median pick 23, 85% drafted",
@@ -3409,7 +3432,7 @@
      "40",
      "rotation, 3+ seasons; most common: rotation, 3+ seasons (35%)",
      "7.33",
-     "24 of 5,561 (0.43%)",
+     "27 of 5,561 (0.49%)",
      "-1.4 to -0.6",
      "64",
      "median pick 19, 83% drafted",
@@ -3419,7 +3442,7 @@
      "35",
      "bench, 100+ games; most common: bench, 100+ games (52%)",
      "12",
-     "46 of 5,561 (0.83%)",
+     "51 of 5,561 (0.92%)",
      "-2.1 to -1.4",
      "104",
      "median pick 29, 66% drafted",
@@ -3429,7 +3452,7 @@
      "30",
      "reached the NBA; most common: reached the NBA (83%)",
      "23",
-     "87 of 5,561 (1.6%)",
+     "93 of 5,561 (1.7%)",
      "-3.5 to -2.1",
      "191",
      "median pick 38, 57% drafted",

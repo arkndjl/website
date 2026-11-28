@@ -5,7 +5,8 @@
        alone where a player has no DPM row (marked). XPM, O-XPM and D-XPM show the team-adjusted rXPM (txpm / toxpm / tdxpm; VORX uses rXPM; the box blend xpm feeds pXPM and the models); pXPM is the
        predictive one, next season's XPM (sxpm: this season and the two before weighted 1 / .35 / .1 by minutes, 200 MP of
        role mean, plus the aging curve; scripts/nba_xpm.py pxpm()), O / D under it. VORX = .030 x (XPM + 1.4) x MP / 48: wins over replacement, both constants fit to NBA wins (scripts/nba_xpm.py).
-       Views: VORX (the default), XPM, pXPM, offense or defense ranks the board by that number. Filters: season, minutes (qualified = 1,000 MP
+       Views: VORX, XPM, pXPM, offense or defense ranks the board by that number; with none picked, a qualified board (the
+       qualified floor or 1,000+) ranks by XPM and an all-player one (any, 250+, 500+) by VORX, and XPM sits before VORX (Noah, Nov 28 2026). Filters: season, minutes (qualified = 1,000 MP
        per 82 team games), position, team, search. RK and the position rank count within the filters and the view;
        headers sort. Filters ride in the address (#season=2025&mp=500&pos=C&side=d; side=x for XPM, s for pXPM).
        3Y / 1Y (proj view, this season): p3 / p1 from scripts/nba_proj.py (data/nba_proj3y_fit.json): 3Y = the chance he plays x XPM given he plays + the rest at -2 (exit hurdle); 1Y = XPM given he plays.
@@ -33,15 +34,7 @@
     </select></label>
     <button type="reset" class="cfb__btn">reset</button>
     <button type="button" class="cfb__btn cfb__gfx" data-gfx data-gfx-top title="graphic: players on screen">GFX</button>
-    <fieldset class="cfb__pos nbaxpm__side"><legend class="visually-hidden">rank by</legend>
-      <button type="button" class="cfb__chip is-on" data-side="" aria-pressed="true" title="VORX: wins over replacement on XPM, .030 x (XPM + 1.4) x MP / 48">VORX</button>
-      <button type="button" class="cfb__chip" data-side="p" aria-pressed="false" hidden title="XPM (proj): XPM to date blended with his preseason prior by minutes (k = 509 minutes for veterans, 809 for newcomers), with an 80% range for his true level; this season only, display only">proj</button>
-      <button type="button" class="cfb__chip" data-side="3" aria-pressed="false" hidden title="3Y: projected XPM over the next three seasons x the chance he plays in them, the rest at replacement (-2). Next season below; this season only, display only">3Y</button>
-      <button type="button" class="cfb__chip" data-side="x" aria-pressed="false" title="XPM: Cross Plus-Minus, points per 100 possessions over an average player">XPM</button>
-      <button type="button" class="cfb__chip" data-side="s" aria-pressed="false" title="pXPM: predictive XPM, projected XPM next season from this season and the two before, aged">pXPM</button>
-      <button type="button" class="cfb__chip" data-side="o" aria-pressed="false" title="O-XPM: offense, .5 ODPM + .5 OBPM">offense</button>
-      <button type="button" class="cfb__chip" data-side="d" aria-pressed="false" title="D-XPM: defense, .5 DDPM + .5 DBPM">defense</button>
-      <span class="cfb__chipsep" aria-hidden="true"></span>
+    <fieldset class="cfb__pos nbaxpm__side"><legend class="visually-hidden">position</legend>
       {{- range $pos }}<button type="button" class="cfb__chip" data-pos="{{ . }}" aria-pressed="false">{{ . }}</button>{{ end -}}
     </fieldset>
   </form>
@@ -61,6 +54,8 @@
         <th data-sort="oxpm" data-num class="c-oxpm" title="O-XPM = .5 ODPM + .5 OBPM, team-adjusted to ORtg">O-XPM</th>
         <th data-sort="dxpm" data-num class="c-dxpm" title="D-XPM = .5 DDPM + .5 DBPM, team-adjusted to DRtg">D-XPM</th>
         <th data-sort="sxpm" data-num class="c-sxpm" title="pXPM: projected XPM next season = (200 x role mean + MP x XPM + .35 x MP and XPM last season + .1 x the season before) / (200 + the weighted MP) + the aging curve to next season's age; role mean -2 + ln(1 + MP82 / 100) (MP82: minutes on an 82-game pace). Fit on next-season XPM 2011-26, held out. Below: O / D">pXPM</th>
+        <th data-sort="soxpm" data-num class="c-sxpm" title="pO-XPM: projected offensive XPM next season (pXPM's offense side)">pO-XPM</th>
+        <th data-sort="sdxpm" data-num class="c-sxpm" title="pD-XPM: projected defensive XPM next season (pXPM's defense side)">pD-XPM</th>
         <th data-sort="pxpm" data-num class="c-pxpm" title="Proj: XPM to date blended with his preseason prior (his two seasons before, aged and shrunk) by minutes, k = 509 minutes for veterans and 809 for newcomers, fit on 2012-26 season-end XPM. Below: the 80% range for his true level. Display only">Proj</th>
         <th data-sort="p3" data-num class="c-p3" title="3Y: projected XPM over the next three seasons x the chance he plays in them, the rest at replacement (-2). Below: next season (1Y), given he plays. Display only">3Y</th>
         <th data-sort="dpm" data-num class="cfb__g nbaxpm__src c-dpm" title="databallr DPM (O / D below)">DPM</th>
@@ -94,7 +89,7 @@
   var bar = win.querySelector('[data-nx-bar]'), table = win.querySelector('table'), body = win.querySelector('tbody'), ths = [].slice.call(win.querySelectorAll('thead th')),
       count = win.querySelector('[data-nx-count]'), none = win.querySelector('[data-nx-none]'), loading = win.querySelector('[data-nx-loading]'),
       asof = win.querySelector('[data-nx-asof]'), pager = win.querySelector('[data-nx-pager]'), pageEl = win.querySelector('[data-nx-page]'), pagesEl = win.querySelector('[data-nx-pages]');
-  var PER = 50, KEY = { '': 'vorx', p: 'pxpm', 3: 'p3', x: 'xpm', s: 'sxpm', o: 'oxpm', d: 'dxpm' }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
+  var PER = 50, KEY = { v: 'vorx', p: 'pxpm', 3: 'p3', x: 'xpm', s: 'sxpm', o: 'oxpm', d: 'dxpm', xpm: 'xpm', oxpm: 'oxpm', dxpm: 'dxpm', vorx: 'vorx', sxpm: 'sxpm', soxpm: 'soxpm', sdxpm: 'sdxpm', pxpm: 'pxpm', p3: 'p3' }, MON = 'jan feb mar apr may jun jul aug sep oct nov dec'.split(' ');
   var cache = {}, data = null, pos = '', side = '', sortKey = 'rk', dir = 1, best = 1, page = 0;
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   // predictive badges (scripts/nba_badges.py, the CFB board's pixel medals): [name, tier, pct, stat], best first
@@ -107,14 +102,16 @@
   function face(p) { return '<span class="pxframe pxframe--row"><img src="' + esc(p.ph ? 'https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/' + p.ph + '.png&w=96&h=70&scale=crop' : '/img/face.svg') + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/img/face.svg\'"></span>'; }
   function sg(x, d) { if (x == null) return '<span class="cfb__dim">–</span>'; var s = x.toFixed(d == null ? 1 : d), r = +s; return '<span' + (r < 0 ? ' class="cfb__down"' : '') + '>' + (r > 0 ? '+' : '') + (r === 0 ? s.replace('-', '') : s) + '</span>'; }
   function od(o, d) { return o == null ? '' : '<span class="cfb__dim nbaxpm__od">' + (o > 0 ? '+' : '') + o.toFixed(1) + ' / ' + (d > 0 ? '+' : '') + d.toFixed(1) + '</span>'; }
+  // the minutes floor at or above the qualified line (qualified, 1,000+ ...): a rate board; below it (any, 250+, 500+): a value board
+  function qualView() { var v = bar.elements.mp.value; return v === '' || +v >= 1000; }
+  var VALS = { xpm: 1, oxpm: 1, dxpm: 1, vorx: 1, sxpm: 1, soxpm: 1, sdxpm: 1, pxpm: 1, p3: 1 };
   function chips() {
-    [].forEach.call(bar.querySelectorAll('[data-side]'), function (c) { var on = c.dataset.side === side; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); });
     [].forEach.call(bar.querySelectorAll('[data-pos]'), function (c) { var on = !!pos && c.dataset.pos === pos; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', on); });
   }
   function readHash() {
     var h = __hp(win), s = h.get('season');
     bar.elements.season.value = s && bar.querySelector('option[value="' + s.replace(/\D/g, '') + '"]') ? s : win.dataset.cur;
-    pos = h.get('pos') || ''; side = h.get('side') || ''; if (side === 'v' || !KEY[side]) side = '';   // side=v: old VORX links
+    pos = h.get('pos') || ''; side = KEY[h.get('side') || ''] || '';   // side = the column the board ranks by (old links: x, v, s, o, d, p, 3)
     bar.elements.team.value = h.get('team') || ''; bar.elements.q.value = h.get('q') || ''; bar.elements.age.value = h.get('age') || '';
     bar.elements.mp.value = h.get('mp') || ''; chips();
   }
@@ -127,7 +124,7 @@
   }
   function render() {
     if (!data) return;
-    var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, key = KEY[(side === 'p' || side === '3') && !data.proj ? 'x' : side],
+    var e = bar.elements, q = e.q.value.trim().toLowerCase(), team = e.team.value, key = (side === 'pxpm' || side === 'p3') && !data.proj ? 'xpm' : side || (qualView() ? 'xpm' : 'vorx'),
         qual = Math.round(1000 * data.games / 82), mp = e.mp.value === '' ? qual : +e.mp.value,
         ag = e.age.value.split('-'), amin = ag[0] ? +ag[0] : -Infinity, amax = ag.length > 1 && ag[1] ? +ag[1] : Infinity;
     var list = data.players.filter(function (p) {
@@ -139,7 +136,7 @@
     }).sort(function (a, b) { return b[key] - a[key] || b.mp - a.mp; });
     var pr = {};
     list.forEach(function (p, i) { p.rk = i + 1; p.pr = (pr[p.pos] = (pr[p.pos] || 0) + 1); });
-    var wkf = data.wkFrom, WL = { vorx: 'VORX', pxpm: 'XPM (proj)', p3: '3Y', xpm: 'XPM', sxpm: 'pXPM', oxpm: 'O-XPM', dxpm: 'D-XPM' };   // ± follows the view's key
+    var wkf = data.wkFrom, WL = { vorx: 'VORX', pxpm: 'XPM (proj)', p3: '3Y', xpm: 'XPM', sxpm: 'pXPM', soxpm: 'pO-XPM', sdxpm: 'pD-XPM', oxpm: 'O-XPM', dxpm: 'D-XPM' };   // ± follows the view's key
     __wk.rank(list, 'rk', key === 'vorx' ? null : key); if (!list.some(function (p) { return p.wb != null; })) wkf = null;   // a view with no base yet: no column
     __wk.show(win, wkf);
     var shown = list.length;
@@ -159,22 +156,29 @@
     table.dataset.key = key;
     // the board shows only columns every player has: before a season's first BPM/DPM posts (XPM is the prior) those columns go
     table.classList.toggle('no-dpm', !data.players.some(function (p) { return p.dpm != null; }));
-    table.classList.toggle('no-proj', !data.proj); bar.querySelector('[data-side="p"]').hidden = bar.querySelector('[data-side="3"]').hidden = !data.proj;
+    table.classList.toggle('no-proj', !data.proj); 
     table.classList.toggle('no-bpm', !data.players.some(function (p) { return p.bpm != null; }));
     // the number the view ranks by sits right after ±, then Pos, Team, Age, G, MP, then XPM's O / D split and the other
     // value numbers (the board standard, Nov 23 2026); headers move with it
-    var VAL = ['xpm', 'oxpm', 'dxpm', 'vorx', 'sxpm', 'pxpm', 'p3'], rest = VAL.filter(function (c) { return c !== key; }),
-        order = [key, 'pos', 'tm', 'age', 'g', 'mp'].concat(rest, ['dpm', 'bpm']), grp = { pos: 1, dpm: 1 }; grp[rest[0]] = 1;
+    // the VORX view keeps XPM ahead of VORX (Noah, Nov 28 2026: XPM before VORX on descriptive boards)
+    // one table, every number a column in a fixed order (Noah, Nov 28 2026: no view buttons; XPM before VORX); a header
+    // click ranks by that column, the key in teal; with none picked a qualified board ranks by XPM, an all-player one by VORX
+    var VAL = ['xpm', 'oxpm', 'dxpm', 'vorx', 'sxpm', 'soxpm', 'sdxpm', 'pxpm', 'p3'],
+        order = VAL.concat(['pos', 'tm', 'age', 'g', 'mp', 'dpm', 'bpm']), grp = { vorx: 1, sxpm: 1, pxpm: 1, pos: 1, dpm: 1 },
+        lead = key === 'vorx' ? ['xpm', 'vorx'] : key === 'xpm' ? ['xpm', 'vorx'] : [key, 'xpm'], rest = VAL.filter(function (c) { return lead.indexOf(c) < 0; });
     var hr = ths[0].parentNode;
     ['rk', 'n', 'wk'].concat(order).forEach(function (c) { var th = ths.filter(function (t) { return t.dataset.sort === c; })[0]; if (th) { th.classList.toggle('cfb__g', !!grp[c]); hr.appendChild(th); } });
     // the GFX follows the view (metric audit Nov 24 2026): its key after the player (pXPM view: pXPM leads), then Pos, MP
     // and the first three of the rest; the default view keeps VORX, XPM, O-XPM, D-XPM
-    var GL = { xpm: 'XPM', oxpm: 'O-XPM', dxpm: 'D-XPM', vorx: 'VORX', sxpm: 'pXPM', pxpm: 'Proj', p3: '3Y' };
-    win.dataset.gfxCols = ['RK', 'Player', GL[key]].concat(rest.slice(0, 3).map(function (c) { return GL[c]; }), ['Pos', 'MP']).join(',');
+    var GL = { xpm: 'XPM', oxpm: 'O-XPM', dxpm: 'D-XPM', vorx: 'VORX', sxpm: 'pXPM', soxpm: 'pO-XPM', sdxpm: 'pD-XPM', pxpm: 'Proj', p3: '3Y' };
+    win.dataset.gfxCols = ['RK', 'Player'].concat(lead.map(function (c) { return GL[c]; }), rest.slice(0, 4 - lead.length).map(function (c) { return GL[c]; }), ['Pos', 'MP']).join(',');
+    ths.forEach(function (th) { th.classList.toggle('is-key', th.dataset.sort === key); });
     function g(c) { return grp[c] ? ' cfb__g' : ''; }
     var CELL = {
       xpm: function (p) { return '<td class="cfb__num nbaxpm__v' + k('xpm') + g('xpm') + '">' + sg(p.xpm) + (p.dpm == null && p.bpm != null ? '<span class="cfb__dim" title="BPM only: no DPM row">*</span>' : '') + '</td>'; },
-      sxpm: function (p) { return '<td class="cfb__num c-sxpm nbaxpm__v' + k('sxpm') + g('sxpm') + '">' + sg(p.sxpm) + od(p.soxpm, p.sdxpm) + '</td>'; },
+      sxpm: function (p) { return '<td class="cfb__num c-sxpm nbaxpm__v' + k('sxpm') + g('sxpm') + '">' + sg(p.sxpm) + '</td>'; },
+      soxpm: function (p) { return '<td class="cfb__num c-sxpm nbaxpm__v' + k('soxpm') + '">' + sg(p.soxpm) + '</td>'; },
+      sdxpm: function (p) { return '<td class="cfb__num c-sxpm nbaxpm__v' + k('sdxpm') + '">' + sg(p.sdxpm) + '</td>'; },
       pxpm: function (p) { return '<td class="cfb__num c-pxpm nbaxpm__v' + k('pxpm') + g('pxpm') + '">' + (p.pxpm == null ? '' : sg(p.pxpm) + '<span class="cfb__dim nbaxpm__od" title="80% range">' + p.lo.toFixed(1) + '–' + p.hi.toFixed(1) + '</span>') + '</td>'; },
       p3: function (p) { return '<td class="cfb__num c-p3 nbaxpm__v' + k('p3') + g('p3') + '">' + (p.p3 == null ? '' : sg(p.p3) + '<span class="cfb__dim nbaxpm__od" title="next season (1Y)">1Y ' + (p.p1 > 0 ? '+' : '') + p.p1.toFixed(1) + '</span>') + '</td>'; },
       oxpm: function (p) { return '<td class="cfb__num c-oxpm nbaxpm__v' + k('oxpm') + g('oxpm') + '">' + sg(p.oxpm) + '</td>'; },
@@ -231,18 +235,21 @@
       data = d; teams(); loading.hidden = true; bar.hidden = false; render();
     }).catch(function () { loading.textContent = 'load failed.'; });
   }
-  function update(ev) { page = 0; writeHash(); if (ev && ev.target === bar.elements.season) load(); else render(); }
+  function update(ev) { page = 0; chips(); writeHash(); if (ev && ev.target === bar.elements.season) load(); else render(); }
   bar.addEventListener('input', update); bar.addEventListener('change', update);
   bar.addEventListener('reset', function () { pos = ''; side = ''; sortKey = 'rk'; dir = 1; setTimeout(function () { bar.elements.season.value = win.dataset.cur; chips(); page = 0; writeHash(); load(); }); });
   bar.querySelector('.nbaxpm__side').addEventListener('click', function (e) {
     var c = e.target.closest('.cfb__chip'); if (!c) return;
-    if ('side' in c.dataset) { side = c.dataset.side; sortKey = 'rk'; dir = 1; } else pos = c.dataset.pos === pos ? '' : c.dataset.pos;
+    if (c.dataset.pos) pos = c.dataset.pos === pos ? '' : c.dataset.pos;
     chips(); update();
   });
   ths.forEach(function (th) {
     th.tabIndex = 0;
     function go() {
-      var k = th.dataset.sort, asc = !th.hasAttribute('data-num') || k === 'rk' || k === 'age';
+      var k = th.dataset.sort;
+      // a number column: rank the board by it (a second click flips the order); the rest sort the rows in place
+      if (VALS[k]) { if (side === k || (!side && k === (qualView() ? 'xpm' : 'vorx'))) { dir = -dir; best = 1; } else { side = k; dir = 1; best = 1; } sortKey = 'rk'; page = 0; writeHash(); render(); return; }
+      var asc = !th.hasAttribute('data-num') || k === 'rk' || k === 'age';
       best = k === sortKey ? best : asc ? 1 : -1; dir = k === sortKey ? -dir : (asc ? 1 : -1); sortKey = k; render();
     }
     th.addEventListener('click', go);

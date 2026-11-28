@@ -3119,6 +3119,11 @@ table.trophycase__hist td.trophycase__post {
 .fvo i.fvo__s3 { background: #b3d8ee; }
 .fvo i.fvo__s4 { background: #7fffd4; }
 /* FV scorecard (layouts/shortcodes/fvcard.html): realized share vs predicted odds by FV band */
+/* draft classes (fvclasses.html): draft-day columns tinted lilac, the careers teal, each group boxed */
+.fvcl td.fvcl__d { background: rgba(200, 162, 255, 0.07); }
+.fvcl td.fvcl__o { background: rgba(127, 255, 212, 0.06); }
+.fvcl th.fvcl__d:nth-child(4), .fvcl td.fvcl__d:nth-child(4), .fvcl th.fvcl__o:nth-child(9), .fvcl td.fvcl__o:nth-child(9) { border-left: 2px solid var(--win-dark); }
+.wintable .fvcl td.cfb__name, .wintable .fvcl th { white-space: nowrap; }
 .fvsc { font-size: 0.9em; }
 .fvsc td { vertical-align: top; }
 .wintable .fvsc th, .wintable .fvsc td { padding-left: 4px; padding-right: 4px; }
@@ -4016,15 +4021,22 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 .nbaxpm__tm { display: none; }
 .nbaxpm__od { display: block; font-size: 0.8em; white-space: nowrap; }
 @media (max-width: 684px) {
-  .nbaxpm__table .nbaxpm__team, .nbaxpm__table .nbaxpm__src, .nbaxpm__table .nbaxpm__ph { display: none; }
+  .nbaxpm__table .nbaxpm__team { display: none; }   /* the team rides under the name; every number stays, the table scrolls (no stat toggles, Nov 28 2026) */
   .nbaxpm__tm { display: block; font-size: 0.85em; }
   .cfb__table td.cfb__name .nbaxpm__tm { white-space: normal; }   /* a long club + league line wraps inside the pinned cell (it ran under the next column) */
   /* badge medals ride on the team line, so a long name doesn't widen the table */
   .nbaxpm__table b + .cfb__medals { display: none; }
   .nbaxpm__table th, .nbaxpm__table td { padding-left: 4px; padding-right: 4px; }
-  /* XPM and the number the view ranks by; the other splits are a tap away */
-  .nbaxpm__table:not([data-key=pxpm]) .c-pxpm, .nbaxpm__table:not([data-key=p3]) .c-p3, .nbaxpm__table:not([data-key=oxpm]) .c-oxpm, .nbaxpm__table:not([data-key=dxpm]) .c-dxpm, .nbaxpm__table:not([data-key=sxpm]) .c-sxpm, .nbaxpm__table:not([data-key=vorx]) .c-vorx { display: none; }
+  /* one table, every number a column (Noah, Nov 28 2026): the player column stays pinned while the numbers scroll;
+     compact rows (no photo, a smaller two-line name cell) */
+  .nbaxpm__table td:nth-child(2), .nbaxpm__table thead th:nth-child(2) { position: sticky; left: 0; z-index: 2; background: var(--win-well); box-shadow: 2px 0 0 var(--win-dark); }
+  .nbaxpm__table thead th:nth-child(2) { z-index: 4; background: var(--background); }
+  .nbaxpm__table td:nth-child(2) { white-space: normal; min-width: 36vw; max-width: 40vw; font-size: 0.85em; line-height: 1.15; }
+  .nbaxpm__table td:nth-child(2) .pxframe--row, .nbaxpm__table td:nth-child(2) .cfb__medals { display: none; }
+  .nbaxpm__table td:nth-child(2) .nbaxpm__tm { white-space: nowrap; font-size: 0.85em; }
+  .nbaxpm__table td { padding-top: 3px; padding-bottom: 3px; }
 }
+.nbaxpm__table th.is-key { color: var(--accent); }
 
 /* NFL fantasy projections ({{< nflfantasy >}}): injury tags beside the name; on phones each player is a card:
    rank, player and points; position, team and opponent; the projected line and the chance he plays */
@@ -4049,6 +4061,8 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
   .nflff__table td.nflff__opp { grid-column: 4; text-align: right; }
   .nflff__table td.nflff__line { display: block; grid-column: 2 / span 2; grid-row: 3; font-size: .85em; overflow-wrap: anywhere; }
   .nflff__table td.nflff__av { display: block; grid-column: 4; grid-row: 3; text-align: right; font-size: .75em; color: color-mix(in srgb, var(--foreground) 55%, transparent); white-space: nowrap; }
+  .nflff__table td.nflff__ros { display: block; grid-column: 4; grid-row: 4; text-align: right; font-size: .85em; }
+  .nflff__table td.nflff__ros::after { content: " ROS"; font-size: .85em; color: color-mix(in srgb, var(--foreground) 55%, transparent); }
   .nflff__m { display: inline; }
 }
 
@@ -4157,19 +4171,12 @@ i.tb__seg--over { width: 2px !important; background: #fff; }
 }
 /* NBA XPM: a season whose BPM/DPM haven't posted yet (XPM is the prior) drops those columns */
 .nbaxpm__table.no-proj .c-pxpm, .nbaxpm__table.no-proj .c-p3, .nbaxpm__table.no-dpm .c-dpm, .nbaxpm__table.no-bpm .c-bpm { display: none; }
-/* contract value ({{< nbasurplus >}}): on phones only the surplus the view ranks by */
-@media (max-width: 684px) {
-  .nbasur__table:not([data-key=sur]) .c-sur, .nbasur__table:not([data-key=csur]) .c-csur { display: none; }
-}
-/* G League ({{< gleague >}}): team, parent club, age and draft slot under the name; on phones NBA% plus the odds the view ranks by */
+/* G League ({{< gleague >}}): team, parent club, age and draft slot under the name */
 .nbagl .nbaxpm__tm { display: block; font-size: 0.85em; }
 .nbagl__ct { display: inline-block; margin-left: 6px; padding: 0 4px; font-size: 0.72em; line-height: 1.3; vertical-align: 1px; letter-spacing: 0.05em; color: var(--win-dark); box-shadow: 2px 2px 0 var(--win-title); }
 .nbagl__ct::after { content: attr(data-g); }   /* text in CSS so the name, search and GFX text stay the name */
 .nbagl__ct--tw { background: #7fffd4; }
 .nbagl__ct--nba { background: #c8c7ff; }
-@media (max-width: 684px) {
-  .nbagl__table:not([data-key=p5]) .c-p5, .nbagl__table:not([data-key=xv]) .c-xv { display: none; }
-}
 
 /* backup watch: the playing-time columns fold away on phones */
 @media (max-width: 640px) { .bw .bw__x { display: none; } }
@@ -5779,3 +5786,36 @@ html.ytp-max { overflow: hidden; }
 .pb__man { font-size: 0.85em; overflow-wrap: anywhere; }
 @media (max-width: 640px) { .pb__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .pb__table .pb__dev { background: color-mix(in srgb, #7fffd4 7%, transparent); }
+/* team builder seasons ahead (layouts/partials/tbyears.html) */
+.tbx__yrs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px; border-top: 1px dashed #4a3a7a; padding-top: 6px; }
+.tbx__yr { display: flex; flex-direction: column; align-items: flex-start; background: #1d1440; border: 1px solid #3c2d6e; padding: 3px 6px; }
+.tbx__yr span { font-size: 11px; color: #c0b0ff; letter-spacing: .06em; }
+.tbx__yr b { font-size: 18px; color: #7fffd4; font-weight: normal; }
+.tbx__yr i { font-style: normal; font-size: 11px; color: #a99be0; }
+td.tbx__pc { background: rgba(127, 255, 212, calc(var(--a) * .32)); }
+.tbx__ybtn { display: flex; gap: 4px; margin-bottom: 6px; }
+.tbx__ybtn button { font: inherit; font-size: 12px; color: #c0b0ff; background: #1d1440; border: 1px solid #4a3a7a; padding: 2px 10px; cursor: pointer; }
+.tbx__ybtn button[aria-pressed="true"] { color: #12082b; background: #7fffd4; border-color: #7fffd4; }
+.tbx__room { display: flex; flex-direction: column; gap: 3px; }
+.tbx__bat { border: 1px solid #4a3a7a; background: #1d1540; padding: 4px 6px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px; }
+.tbx__bath { color: #6fe3d0; font-weight: normal; font-size: 12px; }
+.tbx__brow { display: grid; grid-template-columns: 64px 1fr; gap: 6px; align-items: start; }
+.tbx__bg { color: #c0b0ff; font-size: 12px; padding-top: 3px; }
+.tbx__bg small { display: block; color: #8a7cc4; font-size: 10px; }
+.tbx__bl { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.tbx__vs { color: #8a7cc4; font-size: 10px; font-style: normal; }
+@media (max-width: 760px) { .tbx__brow { grid-template-columns: 1fr; } }
+.tbx__rrow { display: grid; grid-template-columns: 42px 1fr; gap: 6px; align-items: start; border-bottom: 1px solid #2c2058; padding-bottom: 3px; }
+.tbx__rg { color: #c0b0ff; font-weight: normal; font-size: 12px; padding-top: 4px; }
+.tbx__rl { display: flex; flex-wrap: wrap; gap: 3px; }
+.tbx__rc { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; background: #241a4d; border: 1px solid #4a3a7a; padding: 1px 5px 1px 3px; white-space: nowrap; }
+.tbx__rc > i { font-style: normal; color: #8a7cc4; font-size: 10px; min-width: 10px; text-align: right; }
+.tbx__rc em { font-style: normal; font-size: 9px; color: #12082b; background: #c0b0ff; padding: 0 3px; }
+.tbx__rc small { color: #a99be0; font-size: 10px; }
+.tbx__rc--cls { border-color: #a24bff; } .tbx__rc--cls em { background: #a24bff; color: #fff; }
+.tbx__rc--new, .tbx__rc--keep { border-color: #7fffd4; } .tbx__rc--new em { background: #7fffd4; }
+.tbx__rc.is-maybe { opacity: .62; border-style: dashed; }
+@media (max-width: 760px) { .tbx__yr b { font-size: 15px; } .tbx__rrow { grid-template-columns: 34px 1fr; } .tbx__rc { font-size: 11px; } }
+.tbx__rg small { display: block; color: #8a7cc4; font-size: 10px; }
+.tbx__rc.is-deep { background: #1a1238; }
+.tbx__rc--tgt { border-style: dotted; border-color: #40e0d0; } .tbx__rc--tgt em { background: #40e0d0; color: #12082b; }

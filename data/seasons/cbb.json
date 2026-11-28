@@ -350,6 +350,15 @@
   },
   {
    "key": "season",
+   "file": "scripts/repl_levels.py",
+   "rx": "^CBB_SEASON = (\\d{4})",
+   "off": 0,
+   "auto": 1,
+   "mode": "int",
+   "why": "VORX position lines: the season in progress"
+  },
+  {
+   "key": "season",
    "file": "scripts/cbb_games_live.py",
    "rx": "^SEASON = (\\d{4})",
    "off": 0,
