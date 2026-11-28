@@ -100,7 +100,14 @@
     }
     // weekly move (scripts/board_moves.py VIEWS): rows carry w0, their values as of the season's wkFrom, one per view in wkV
     var DOW = 'Sunday Monday Tuesday Wednesday Thursday Friday Saturday'.split(' ');
-    function wkIdx() { var S = season(); return S.wkFrom && S.wkV && window.__wk ? S.wkV.indexOf(view) : -1; }
+    // a view the base snapshot has no values for (a column added since that post) gets no ± column, not "new" on every row
+    function wkIdx() {
+      var S = season(), i = S.wkFrom && S.wkV && window.__wk ? S.wkV.indexOf(view) : -1;
+      if (i < 0) return -1;
+      S.wkHas = S.wkHas || {};
+      if (S.wkHas[i] == null) S.wkHas[i] = S.rows.some(function (r) { return r.w0 && r.w0[i] != null; });
+      return S.wkHas[i] ? i : -1;
+    }
     function cols() {
       // one fixed column order on every board (no stat toggles, Nov 28 2026): the file's key leads; the ranked view is teal
       var key = D.flat ? view : D.key, hasPre = !!D.pre && has('pre'), hasPfv = !!D.pfv && has('pfv');
