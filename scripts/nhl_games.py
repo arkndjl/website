@@ -7,6 +7,7 @@
     python3 scripts/nhl_games.py --fit     # tune, walk-forward backtest 2016-2026 against the closing line, refit
     python3 scripts/nhl_games.py --lineups # freeze past seasons' dressed skaters into scripts/data/nhl_lineups.json.gz
     python3 scripts/nhl_games.py --goalies # tonight's starting goalies from Daily Faceoff into the board (no rebuild)
+    python3 scripts/nhl_games.py --test    # synthetic playoffs (series state, seeds, bracket marks) and the hist extension
 
 Data: the NHL's stats API (scores, last period, goalie and skater game logs), MoneyPuck (each team's expected goals a game, all
 situations and by strength, score- and venue-adjusted), ESPN (every listed book's moneyline and total, 2019-20 on),
@@ -208,6 +209,51 @@ def make_hist():
 
 def load_hist():
     return D.load(HIST)
+
+
+def ensure_hist(hist, S, pull=None, save=True):
+    """the frozen history through season S - 1. After the Aug 1 rollover (nhl_data.current_season) the season just
+    finished is in neither the frozen file nor the live pull; each missing completed season is pulled (season_rows,
+    final games only), added and saved, the same as --hist would. pull: season -> rows (the --test cases). A failed
+    pull is logged and the build goes on without that season"""
+    have = {r['S'] for r in hist}
+    last = max(have) if have else FIRST - 1
+    miss = [s for s in range(max(last + 1, FIRST), S) if s not in have]
+    if not miss:
+        return hist
+    print(f'nhl hist: ends {last}, current season {S}: adding {miss}', flush=True)
+    if pull is None:
+        mp = D.moneypuck_teams()
+        pull = lambda s: season_rows(s, mp)
+    add = []
+    for s in miss:
+        try:
+            rs = [r for r in pull(s) if r['final']]
+        except Exception as e:
+            print(f'nhl hist: {s} not pulled: {e!r}', file=sys.stderr, flush=True)
+            break
+        if not rs:
+            print(f'nhl hist: {s} has no final games', file=sys.stderr, flush=True)
+            break
+        print(f'nhl hist: {s}', len(rs), 'games', sum(1 for r in rs if 'c' in r), 'lined', flush=True)
+        add += rs
+    if not add:
+        return hist
+    hist = hist + add
+    if save:
+        D.save(HIST, hist)
+        print('nhl hist: wrote', HIST, len(hist), flush=True)
+        try:      # the same seasons' dressed lineups (the lineup-value input), as --lineups would
+            ln = D.load(LINEUPS)
+            for s in sorted({r['S'] for r in add}):
+                if str(s) not in ln:
+                    ln[str(s)] = lineups_from_logs(D.skater_logs(s))
+                    _LN.pop(s, None)
+                    print(f'nhl lineups: {s}', len(ln[str(s)]), 'games', flush=True)
+            D.save(LINEUPS, ln)
+        except Exception as e:
+            print('nhl lineups not extended:', repr(e), file=sys.stderr, flush=True)
+    return hist
 
 
 # ---------------------------------------------------------------- rating engines
@@ -1155,19 +1201,91 @@ def win_given_ot(ph, z, pot, ot, ow):
     return po if ot else min(0.995, max(0.005, (ph - pot * po) / max(1 - pot, 1e-6)))
 
 
-def simulate(m, fit, remaining, pts, sims=10000, share=1.0, seed=11, rw=None, tally=None):
+def conf_seeds(order, cf):
+    """a conference's eight seeds by the standings order: [A1, A2, A3, B1, B2, B3, WC1, WC2], A = the better division
+    winner's division (the tally's slots)"""
+    ds = CONF[cf]
+    tops = {d: sorted(DIV[d], key=lambda t: -order[t])[:3] for d in ds}
+    rest_ = sorted([t for d in ds for t in DIV[d] if t not in tops[d]], key=lambda t: -order[t])
+    da, db = sorted(ds, key=lambda d: -order[tops[d][0]])
+    return tops[da] + tops[db] + rest_[:2]
+
+
+def conf_sides(sd):
+    """the first round from the eight seeds, by bracket side: the better division winner meets the second wild card"""
+    return [[(sd[0], sd[7]), (sd[1], sd[2])], [(sd[3], sd[6]), (sd[4], sd[5])]]
+
+
+def series_state(games):
+    """the playoffs so far from the season's playoff rows (scheduled ones included): {frozenset((a, b)): {'hi': the
+    game-1 home side (home ice: games 1, 2, 5, 7), 'w': {team: wins}, 'rd': round from the game id (season, 03, 0,
+    round, series, game), 'won': the side with four wins or None}}. Two teams meet once a postseason"""
+    st = {}
+    for g in sorted((g for g in games if g.get('po')), key=lambda g: (g.get('t') or g.get('start') or g['day'], g['id'])):
+        s = st.setdefault(frozenset((g['h'], g['a'])), {'hi': g['h'], 'w': {g['h']: 0, g['a']: 0}, 'won': None,
+                                                         'rd': (int(g['id']) // 100) % 10 or None})
+        if g.get('final') and g.get('hs') is not None and g.get('as') is not None and g['hs'] != g['as']:
+            s['w'][g['h'] if g['hs'] > g['as'] else g['a']] += 1
+    for s in st.values():
+        s['won'] = next((t for t, v in s['w'].items() if v >= 4), None)
+    return st
+
+
+def actual_seeds(st, order):
+    """{conference: the eight seeds} from the real first-round pairs, for each conference whose four are set: a pair's
+    side is the division of its home-ice team; in a side the division winner's pair is the one with the better team by
+    the standings, the other is 2 v 3 (home ice = 2); the better division winner's opponent is the second wild card"""
+    out = {}
+    for cf, ds in CONF.items():
+        ps = [s for s in st.values() if s['rd'] == 1 and CONF_OF.get(s['hi']) == cf]
+        side = {d: [s for s in ps if DIV_OF[s['hi']] == d] for d in ds}
+        if len(ps) != 4 or any(len(v) != 2 for v in side.values()):
+            continue
+        lo = lambda s: next(t for t in s['w'] if t != s['hi'])
+        top = {d: sorted(v, key=lambda s: -order[s['hi']]) for d, v in side.items()}
+        da, db = sorted(ds, key=lambda d: -order[top[d][0]['hi']])
+        A, B = top[da], top[db]
+        out[cf] = [A[0]['hi'], A[1]['hi'], lo(A[1]), B[0]['hi'], B[1]['hi'], lo(B[1]), lo(B[0]), lo(A[0])]
+    return out
+
+
+def standings_tb(reg):
+    """the NHL's tiebreaks after points and regulation wins, from the season's final regular-season games: regulation
+    plus overtime wins, wins, goal differential, goals for; -> {team: rank / 32 in [0, 1)}, used once no games are left"""
+    k = {t: [0, 0, 0, 0] for t in TEAMS}
+    for g in reg:
+        if not g.get('final') or g.get('hs') is None or g['hs'] == g['as'] or g['h'] not in k or g['a'] not in k:
+            continue
+        w, l = (g['h'], g['a']) if g['hs'] > g['as'] else (g['a'], g['h'])
+        k[w][1] += 1
+        if (g.get('per') or 3) < 5:
+            k[w][0] += 1
+        for t, f, a in ((g['h'], g['hs'], g['as']), (g['a'], g['as'], g['hs'])):
+            k[t][2] += f - a; k[t][3] += f
+    rk = sorted(TEAMS, key=lambda t: k[t])
+    return {t: i / NT for i, t in enumerate(rk)}
+
+
+def simulate(m, fit, remaining, pts, sims=10000, share=1.0, seed=11, rw=None, tally=None, ps=None, tb=None,
+             base=None, knobs=None):
     """rest of the regular season, then the playoffs (division top three + two wild cards a conference; 2-2-1-1-1).
-    rw: regulation wins so far; points ties break on regulation wins (the NHL's first tiebreak), then at random.
+    rw: regulation wins so far; points ties break on regulation wins (the NHL's first tiebreak), then tb (standings_tb,
+    once the regular season is over), then at random.
+    ps: series_state() of the real playoffs: a decided series keeps its winner, one under way is played on from its
+    game count with its own home ice; once a conference's first round is set its seeds are the real ones.
     tally: a bracket.Tally over the conferences' eight slots (the better division winner, its division's 2 and 3, the
-    other winner, its 2 and 3, wild cards 1 and 2), filled in place"""
+    other winner, its 2 and 3, wild cards 1 and 2), filled in place. base / knobs: team logits and (shrink, sd) in
+    place of the model's (the --test cases)"""
     rw = rw or {}
+    ps = ps or {}
+    tb = tb or {}
     rng = random.Random(seed)
     c = fit['coef']
-    base = {t: team_logit(m, fit, t)[1] for t in TEAMS}
+    base = dict(base) if base is not None else {t: team_logit(m, fit, t)[1] for t in TEAMS}
     # how sure the sims are, tuned on the season outcomes themselves (scripts/nhl_sim_backtest.py, walk-forward
     # Brier of playoffs, division and Cup from checkpoints 2017-26): logits pulled toward the mean by shrink x share
     # of the season left, and a season-level rating error sd x sqrt(share left)
-    a, sd = sim_knobs(fit)
+    a, sd = knobs if knobs is not None else sim_knobs(fit)
     mz = sum(base.values()) / len(base)
     base = {t: mz + (1 - a * share) * (z - mz) for t, z in base.items()}
     sd = sd * math.sqrt(max(share, 0.04))
@@ -1176,6 +1294,8 @@ def simulate(m, fit, remaining, pts, sims=10000, share=1.0, seed=11, rw=None, ta
     cnt = {t: defaultdict(float) for t in TEAMS}
     pts_sum = defaultdict(float)
     lot = defaultdict(lambda: defaultdict(float))
+    order0 = {t: pts[t] + rw.get(t, 0) / 1000 + tb.get(t, 0.0) * 1e-4 for t in TEAMS}
+    real = actual_seeds(ps, order0) if ps else {}      # a set first round means the regular season is over
     for _ in range(sims):
         R = {t: base[t] + rng.gauss(0, sd) for t in TEAMS}
         P = dict(pts)
@@ -1195,40 +1315,36 @@ def simulate(m, fit, remaining, pts, sims=10000, share=1.0, seed=11, rw=None, ta
                 RW[w] += 1
         for t in TEAMS:
             pts_sum[t] += P[t]
-        order = {t: P[t] + RW[t] / 1000 + rng.random() * 1e-4 for t in TEAMS}
+        order = {t: P[t] + RW[t] / 1000 + tb.get(t, 0.0) * 1e-4 + rng.random() * 1e-7 for t in TEAMS}
         po = []
         bracket = {}
-        for cf, ds in CONF.items():
-            tops = {d: sorted(DIV[d], key=lambda t: -order[t])[:3] for d in ds}
-            rest_ = sorted([t for d in ds for t in DIV[d] if t not in tops[d]], key=lambda t: -order[t])
-            wc = rest_[:2]
-            dw = sorted([tops[d][0] for d in ds], key=lambda t: -order[t])
-            # the better division winner meets the second wild card
-            best_div = DIV_OF[dw[0]]
-            sides = []
-            for d in ds:
-                opp = wc[1] if DIV_OF[tops[d][0]] == best_div else wc[0]
-                sides.append([(tops[d][0], opp), (tops[d][1], tops[d][2])])
-            bracket[cf] = sides
+        for cf in CONF:
+            sl = real.get(cf) or conf_seeds(order, cf)
+            bracket[cf] = conf_sides(sl)
             if tally is not None:
-                da, db = DIV_OF[dw[0]], DIV_OF[dw[1]]
-                tally.seeds(cf, tops[da] + tops[db] + wc)
-                for t in tops[da] + tops[db] + wc:
+                tally.seeds(cf, sl)
+                for t in sl:
                     tally.reached(t, 'playoff')
-            po += [t for d in ds for t in tops[d]] + wc
-            for t in tops[ds[0]] + tops[ds[1]]:
-                cnt[t]['div'] += 0
-            for d in ds:
-                cnt[tops[d][0]]['divw'] += 1
+            po += sl
+            cnt[sl[0]]['divw'] += 1
+            cnt[sl[3]]['divw'] += 1
         for t in po:
             cnt[t]['playoff'] += 1
         pres = max(TEAMS, key=lambda t: order[t])
         cnt[pres]['pres'] += 1
 
         def series(a, b):
-            hi, lo = (a, b) if order[a] >= order[b] else (b, a)
-            w = {hi: 0, lo: 0}
-            for k in range(7):
+            s = ps.get(frozenset((a, b)))
+            if s and s['won']:
+                return s['won']
+            if s:                                        # under way: its own home ice and games so far
+                hi = s['hi']
+                lo = b if hi == a else a
+                w = {hi: s['w'][hi], lo: s['w'][lo]}
+            else:
+                hi, lo = (a, b) if order[a] >= order[b] else (b, a)
+                w = {hi: 0, lo: 0}
+            for k in range(w[hi] + w[lo], 7):
                 home = hi if k in (0, 1, 4, 6) else lo
                 away = lo if home == hi else hi
                 z = R[home] - R[away] + hc
@@ -1264,27 +1380,38 @@ def simulate(m, fit, remaining, pts, sims=10000, share=1.0, seed=11, rw=None, ta
     return out
 
 
-def nhl_bracket(BK, tal, sims):
+def nhl_bracket(BK, tal, sims, ps=None):
     """data/brackets/nhl.json: slot odds per conference (the better division winner v the second wild card, the other
-    winner v the first, 2 v 3 in each division; fixed bracket) and the projected bracket"""
+    winner v the first, 2 v 3 in each division; fixed bracket) and the projected bracket. ps (series_state): a series
+    with a game played carries each side's wins ('g'), a decided one 'done': 1 and its real winner"""
     import datetime
     proj, _, sd = tal.project()
     odds = {t: {k: sims[t].get(k, 0.0) for k in ('playoff', 'r2', 'cf', 'final', 'cup', 'divw')} for t in sims}
     secs, champ = [], {}
+    ps = ps or {}
+
+    def game(a, b, *x):                      # BK.game with the real series marked
+        gm = BK.game(a, b, *x)
+        s = ps.get(frozenset((a, b))) if a and b else None
+        if s and sum(s['w'].values()):
+            gm['a']['g'], gm['b']['g'] = s['w'][a], s['w'][b]
+            if s['won']:
+                gm['w'], gm['done'] = s['won'], 1
+        return gm
     # slots: A = the better division winner's division, B the other; shown in the bracket by the team's division (M1, A2)
     labels = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'WC1', 'WC2']
     for cf in CONF:
         sl = [r['t'] for r in proj[cf]]
         seed = {t: (DIV_OF[t][0] + labels[i][1] if i < 6 else labels[i]) for i, t in enumerate(sl)}
-        r1 = [BK.game(sl[0], sl[7], seed, odds, 'playoff', 'r2'), BK.game(sl[1], sl[2], seed, odds, 'playoff', 'r2'),
-              BK.game(sl[3], sl[6], seed, odds, 'playoff', 'r2'), BK.game(sl[4], sl[5], seed, odds, 'playoff', 'r2')]
-        r2 = [BK.game(r1[0]['w'], r1[1]['w'], seed, odds, 'r2', 'cf'), BK.game(r1[2]['w'], r1[3]['w'], seed, odds, 'r2', 'cf')]
-        cg = BK.game(r2[0]['w'], r2[1]['w'], seed, odds, 'cf', 'final')
+        r1 = [game(sl[0], sl[7], seed, odds, 'playoff', 'r2'), game(sl[1], sl[2], seed, odds, 'playoff', 'r2'),
+              game(sl[3], sl[6], seed, odds, 'playoff', 'r2'), game(sl[4], sl[5], seed, odds, 'playoff', 'r2')]
+        r2 = [game(r1[0]['w'], r1[1]['w'], seed, odds, 'r2', 'cf'), game(r1[2]['w'], r1[3]['w'], seed, odds, 'r2', 'cf')]
+        cg = game(r2[0]['w'], r2[1]['w'], seed, odds, 'cf', 'final')
         champ[cf] = cg['w']
         secs.append({'name': cf, 'rounds': [{'name': 'First round', 'games': r1}, {'name': 'Second round', 'games': r2},
                                            {'name': 'Conf final', 'games': [cg]}]})
     cfs = list(CONF)
-    fg = BK.game(champ[cfs[0]], champ[cfs[1]], {}, odds, 'final', 'cup')
+    fg = game(champ[cfs[0]], champ[cfs[1]], {}, odds, 'final', 'cup')
     secs.append({'name': 'Stanley Cup Final', 'rounds': [{'name': 'Final', 'games': [fg]}], 'champ': {'t': fg['w'], 'p': odds[fg['w']]['cup']}})
     for g in tal.groups:
         for i, r in enumerate(proj[g]):
@@ -1377,8 +1504,8 @@ def injuries():
 def build():
     fit = json.load(open(FIT))
     P = fit['params']
-    hist = load_hist()
     S = D.current_season()
+    hist = ensure_hist(load_hist(), S)       # the season just finished, after the Aug 1 rollover
     mp = D.moneypuck_teams()
     cur = season_rows(S, mp, fresh=True)
     try:   # this season's dressed lineups (the lineup-value input)
@@ -1471,9 +1598,14 @@ def build():
     share = len(left) / max(len(reg), 1)
     import bracket as BK                  # seed odds and the projected bracket (scripts/bracket.py)
     tal = BK.Tally({cf: 8 for cf in CONF}, ['playoff'])
-    sims = simulate(m, fit, left, pts, share=share, rw=dict(m.RW), tally=tal)
+    ps = series_state(cur)                # the real playoffs so far (decided series fixed, open ones played on)
+    sims = simulate(m, fit, left, pts, share=share, rw=dict(m.RW), tally=tal, ps=ps,
+                    tb=None if left else standings_tb(reg))
+    if ps:
+        print('nhl playoffs:', sum(1 for x in ps.values() if x['won']), 'series decided,',
+              sum(1 for x in ps.values() if not x['won'] and sum(x['w'].values())), 'under way', flush=True)
     try:
-        nhl_bracket(BK, tal, sims)
+        nhl_bracket(BK, tal, sims, ps)
     except Exception as e:            # the bracket keeps its last file rather than stop the build
         print('nhl bracket failed:', repr(e), flush=True)
     power = []
@@ -1632,8 +1764,135 @@ def refresh_goalies():
     print('nhl goalies:', len(changed), 'changed')
 
 
+# ---------------------------------------------------------------- tests
+def _test():
+    """synthetic seasons, no pulls: the playoff sims on the real series state (mid-series, after round 1, after the
+    Cup final), the seeds read back from the first-round pairs, the bracket's marks, the hist extension"""
+    import bracket as BK
+    S = 2027
+    rng = random.Random(3)
+    pts = {t: 70 + i for i, t in enumerate(sorted(TEAMS, key=lambda t: rng.random()))}     # every team its own total
+    order = {t: float(p) for t, p in pts.items()}
+    fit = {'coef': {'home': 0.0}, 'ot': [-1.6, 0.0, 0.0], 'otWin': None, 'seasonSd': 0.0}
+    base = {t: 0.0 for t in TEAMS}
+    seeds = {cf: conf_seeds(order, cf) for cf in CONF}
+    gid = iter(range(1, 10 ** 6))
+
+    def games(a, b, res, rd, n=7, played=None):
+        """series a (home ice) v b: res = winners of the games played in order, the rest scheduled"""
+        out = []
+        for k in range(n):
+            h, aw = (a, b) if k in (0, 1, 4, 6) else (b, a)
+            done = k < len(res)
+            out.append({'id': (S - 1) * 10 ** 6 + 30000 + rd * 100 + 10 + k + 1, 'S': S, 'po': 1, 'day': f'2027-05-{k + 1:02d}',
+                        't': f'2027-0{3 + rd}-{k + 1:02d}T19:00', 'h': h, 'a': aw, 'final': done,
+                        'hs': (1 if res[k] == h else 0) + 1 if done else None, 'as': (1 if res[k] == aw else 0) + 1 if done else None,
+                        'per': 3})
+        return out
+
+    def run(ps, sims=4000):
+        return simulate(None, fit, [], pts, sims=sims, share=0.0, base=base, knobs=(0.0, 0.0), ps=ps,
+                        tally=BK.Tally({cf: 8 for cf in CONF}, ['playoff']))
+
+    def r1(cf):
+        return [p for side in conf_sides(seeds[cf]) for p in side]
+
+    # the seeds come back from the real first-round pairs, even with every team's points read the same way
+    rows = [g for cf in CONF for a, b in r1(cf) for g in games(a, b, [], 1)]
+    st = series_state(rows)
+    assert actual_seeds(st, order) == seeds, (actual_seeds(st, order), seeds)
+    assert all(x['rd'] == 1 and not x['won'] and x['hi'] in seeds[CONF_OF[x['hi']]][:6] for x in st.values())
+
+    # mid-series: East A1 up 3-1 on WC2, A2 v A3 swept 4-0 by A3, the rest 0-0
+    e = seeds['East']
+    rows = [g for g in rows if frozenset((g['h'], g['a'])) not in (frozenset(e[0:8:7]), frozenset(e[1:3]))]
+    rows += games(e[0], e[7], [e[0], e[7], e[0], e[0]], 1) + games(e[1], e[2], [e[2]] * 4, 1)
+    st = series_state(rows)
+    x = st[frozenset((e[0], e[7]))]
+    assert x['w'] == {e[0]: 3, e[7]: 1} and x['won'] is None and x['hi'] == e[0]
+    assert st[frozenset((e[1], e[2]))]['won'] == e[2]
+    o = run(st)
+    assert o[e[1]].get('r2', 0) == 0 and o[e[2]]['r2'] == 1, (o[e[1]], o[e[2]])
+    assert abs(o[e[0]]['r2'] - 0.875) < 0.03, o[e[0]]          # even teams: the leader loses only by dropping three
+    assert abs(o[e[3]]['r2'] - 0.5) < 0.04
+    assert all(o[t]['playoff'] == 1 for cf in CONF for t in seeds[cf])
+    assert all(o[t].get('playoff', 0) == 0 and o[t].get('cup', 0) == 0 for t in TEAMS if t not in e + seeds['West'])
+    assert abs(sum(o[t].get('cup', 0) for t in TEAMS) - 1) < 1e-3
+
+    # a series played on from its count keeps its own home ice: home side certain to win at home, sure to lose away
+    hb = {t: 0.0 for t in TEAMS}
+    fit2 = dict(fit, coef={'home': 40.0})
+    x = {frozenset((e[0], e[7])): {'hi': e[0], 'w': {e[0]: 2, e[7]: 2}, 'won': None, 'rd': 1}}
+    o = simulate(None, fit2, [], pts, sims=200, share=0.0, base=hb, knobs=(0.0, 0.0), ps=x)
+    assert o[e[0]]['r2'] == 1.0, o[e[0]]                   # games 5 and 7 at A1, 6 at WC2: A1 wins 4-3
+    x = {frozenset((e[0], e[7])): {'hi': e[7], 'w': {e[0]: 2, e[7]: 2}, 'won': None, 'rd': 1}}
+    o = simulate(None, fit2, [], pts, sims=200, share=0.0, base=hb, knobs=(0.0, 0.0), ps=x)
+    assert o[e[7]]['r2'] == 1.0, o[e[7]]
+
+    # after round 1: every first-round series decided, the second round not started
+    rows, win1 = [], {}
+    for cf in CONF:
+        for i, (a, b) in enumerate(r1(cf)):
+            w = a if i % 2 == 0 else b
+            win1[frozenset((a, b))] = w
+            rows += games(a, b, [w] * 4, 1, n=4)
+    st = series_state(rows)
+    o = run(st)
+    for k, w in win1.items():
+        l = next(t for t in k if t != w)
+        assert o[w]['r2'] == 1 and o[l].get('r2', 0) == 0 and o[l].get('cup', 0) == 0, (w, l, o[w], o[l])
+    assert all(0 < o[w]['cf'] < 1 for w in win1.values())
+
+    # after the Cup final: every round decided, champion 1, everyone else 0
+    def sides_winners(cf):
+        sd = conf_sides(seeds[cf])
+        return [[win1[frozenset(p)] for p in side] for side in sd]
+    champ = {}
+    for cf in CONF:
+        r2w = []
+        for a, b in sides_winners(cf):
+            rows += games(a, b, [b] * 4, 2, n=4)
+            r2w.append(b)
+        rows += games(r2w[0], r2w[1], [r2w[0]] * 4, 3, n=4)
+        champ[cf] = r2w[0]
+    rows += games(champ['East'], champ['West'], [champ['West']] * 4, 4, n=4)
+    st = series_state(rows)
+    o = run(st, sims=500)
+    cup = champ['West']
+    assert o[cup]['cup'] == 1 and all(o[t].get('cup', 0) == 0 for t in TEAMS if t != cup)
+    assert o[champ['East']]['final'] == 1 and all(o[t].get('final', 0) == 0 for t in TEAMS if t not in champ.values())
+
+    # the bracket file marks the decided series with the winner and each side's wins
+    tal = BK.Tally({cf: 8 for cf in CONF}, ['playoff'])
+    o = simulate(None, fit, [], pts, sims=200, share=0.0, base=base, knobs=(0.0, 0.0), ps=st, tally=tal)
+    got = {}
+    save0 = BK.save
+    BK.save = lambda sport, pay: got.setdefault(sport, pay)
+    try:
+        nhl_bracket(BK, tal, o, st)
+    finally:
+        BK.save = save0
+    pay = got['nhl']
+    fg = pay['sections'][-1]['rounds'][0]['games'][0]
+    assert fg['done'] == 1 and fg['w'] == cup and {fg['a']['g'], fg['b']['g']} == {4, 0}, fg
+    assert pay['sections'][-1]['champ'] == {'t': cup, 'p': 1.0}
+    gs = [g for sec in pay['sections'] for r in sec['rounds'] for g in r['games']]
+    assert len(gs) == 15 and all(g.get('done') == 1 for g in gs)
+
+    # hist: a file that ends two seasons back gets the season just finished, finals only; a full file is left alone
+    h = [{'S': 2025, 'final': True}]
+    pulled = []
+    h2 = ensure_hist(h, 2027, pull=lambda s: pulled.append(s) or [{'S': s, 'final': True}, {'S': s, 'final': False}], save=False)
+    assert pulled == [2026] and [r['S'] for r in h2] == [2025, 2026], h2
+    assert ensure_hist(h2, 2027, pull=lambda s: 1 / 0, save=False) is h2
+    assert ensure_hist(h, 2027, pull=lambda s: 1 / 0, save=False) == h          # a failed pull: the build goes on
+    print('nhl_games playoffs + hist ok')
+
+
 if __name__ == '__main__':
-    if '--hist-goalies' in sys.argv:      # add the goalies' own xG faced to the frozen seasons (no other refetch)
+    if '--test' in sys.argv:
+        _test()
+    elif '--hist-goalies' in sys.argv:      # add the goalies' own xG faced to the frozen seasons (no other refetch)
         D.save(HIST, attach_gx(load_hist()))
     elif '--hist' in sys.argv:
         make_hist()

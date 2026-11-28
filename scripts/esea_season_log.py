@@ -145,6 +145,12 @@ def main():
         s['total'] = (D.get('record') or {}).get('total')
         s['current'] = True
         out[str(cur)] = s
+    # a past season the history file doesn't hold in full yet (it is pulled by hand, esea-history.yml) keeps the entry on
+    # file: the season fetch_esea.mjs just moved on from stays as it was when it ended
+    old = (load('data/esea_seasons.json') or {}).get('seasons') or {}
+    for k, s in old.items():
+        if cur and int(k) < cur and len((out.get(k) or {}).get('matches') or []) < len(s.get('matches') or []):
+            out[k] = {kk: v for kk, v in s.items() if kk != 'current'}
     for s in out.values():   # RWA first (it beat ARK Rating held out), ARK Rating when a season has no RWA line
         s['players'].sort(key=lambda p: (p.get('rwa') is None, -(p.get('rwa') if p.get('rwa') is not None else p.get('rating') or 0)))
     res = {'asof': D.get('asof'), 'current': cur, 'seasons': dict(sorted(out.items(), key=lambda kv: -int(kv[0])))}

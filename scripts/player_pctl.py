@@ -178,7 +178,26 @@ def nfl_team_games(y, thru=None):
 NFL_CP0 = 2016                     # first season with in-season checkpoints (the earlier ones are prior history only)
 
 
-def frames_nfl(years=range(2013, 2026)):
+def nfl_done():
+    """The last NFL season played through its Super Bowl (games.csv); without the file, the season before the game
+    board's (data/nfl_games.json)."""
+    try:
+        import nfl_war as W
+        ys = [int(g['season']) for g in W.rows(W.get('games.csv', W.GAMES))
+              if g['game_type'] == 'SB' and g['home_score'] not in ('', 'NA')]
+        if ys:
+            return max(ys)
+    except Exception as e:      # noqa: BLE001
+        print('nfl seasons: games.csv unavailable', repr(e))
+    try:
+        return int(json.load(open(os.path.join(ROOT, 'data', 'nfl_games.json')))['season']) - 1
+    except (OSError, ValueError, KeyError):
+        return 2025
+
+
+def frames_nfl(years=None):
+    """2013 through the last finished season (nfl_war_proj.attach needs last season's frame to project the next)"""
+    years = years or range(2013, nfl_done() + 1)
     out = {}
     for y in years:
         fn = os.path.join(CACHE, f'nfl_{y}.json')
@@ -222,7 +241,9 @@ def frames(sport):
     fn = os.path.join(CACHE, f'frames_{sport}.json.gz')
     if os.path.exists(fn) and '--refresh' not in sys.argv:
         with gzip.open(fn, 'rt') as f:
-            return {int(k): v for k, v in json.load(f).items()}
+            out = {int(k): v for k, v in json.load(f).items()}
+        if sport != 'nfl' or nfl_done() in out:      # a newly finished NFL season rebuilds (each season's pull is cached)
+            return out
     out = {'nba': frames_nba, 'nhl': frames_nhl, 'nfl': frames_nfl}[sport]()
     os.makedirs(CACHE, exist_ok=True)
     with gzip.open(fn, 'wt') as f:

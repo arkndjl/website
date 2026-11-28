@@ -1,0 +1,50 @@
+{{- /* ARKLOG > calendar: every sport's league dates and the site's season transitions, from data/seasons/<sport>.json
+       (scripts/season.py) and data/season_state.json (scripts/season_roll.py, season-roll workflow). Nothing typed here.
+       {{< arklogcal tab="calendar" >}} */ -}}
+{{- $st := site.Data.season_state -}}
+{{- $done := $st.done | default dict -}}
+{{- $now := now.Format "2006-01-02" -}}
+{{- $from := (now.AddDate 0 -1 0).Format "2006-01-02" -}}
+{{- $kl := dict "pre" "preseason" "reg" "regular season" "reg_end" "regular season" "post" "postseason" "champ" "final" "draft" "draft" "portal" "portal" "sign" "signing" "deadline" "deadline" "major" "major" "other" "league" "site" "site" -}}
+{{- $rows := slice -}}
+{{- range $s, $c := site.Data.seasons -}}
+  {{- range $c.events -}}
+    {{- $rows = $rows | append (dict "d" .d "to" (.to | default "") "k" .k "t" .t "est" (.est | default 0) "src" (.src | default "") "s" $c.name "sk" $s "site" false "done" false) -}}
+  {{- end -}}
+  {{- range $c.steps -}}
+    {{- $rows = $rows | append (dict "d" .on "to" "" "k" "site" "t" .t "est" 0 "src" "" "s" $c.name "sk" $s "site" true "done" (isset $done .id)) -}}
+  {{- end -}}
+{{- end -}}
+{{- $rows = sort $rows "d" -}}
+<div class="desk libgrid libgrid--one" data-tab="{{ .Get "tab" }}">
+<div class="win">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-site"/></svg>season state<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="libfv__wrap"><table class="libfv arklog__cal">
+    <thead><tr><th>sport</th><th>phase</th><th>season</th><th title="weekly board post, 10 AM New York">post</th><th title="the next change in the calendar">next</th></tr></thead>
+    <tbody>
+    {{- range $s, $c := site.Data.seasons }}{{ $x := index ($st.sports | default dict) $s }}
+    <tr><th>{{ $c.name }}</th><td>{{ with $x }}{{ .phase }}{{ end }}</td><td>{{ with $x }}{{ .season }}{{ end }}</td><td>{{ with $x }}{{ with .post }}{{ title . }}{{ end }}{{ end }}</td>
+      <td>{{ with $x }}{{ with index .next 0 }}{{ dateFormat "Jan 2 2006" (index . 0) }}: {{ if ne (index . 1) "phase" }}{{ index . 1 }} {{ end }}{{ index . 2 }}{{ end }}{{ end }}</td></tr>
+    {{- end }}
+    </tbody>
+  </table></div>
+  <div class="win__status"><span>{{ len site.Data.seasons }} sports</span>{{ with $st.asof }}<span>updated {{ dateFormat "Jan 2 2006" . }}</span>{{ end }}</div>
+</div>
+<div class="win">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-site"/></svg>season calendar<span class="win__cursor" aria-hidden="true">_</span></span><span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+  <div class="libfv__wrap"><table class="libfv arklog__cal">
+    <thead><tr><th>date</th><th>sport</th><th>event</th><th>type</th><th title="done: past or carried out; now: under way; est: the league has not published the date">state</th></tr></thead>
+    <tbody>
+    {{- range $rows }}{{ $end := cond (ne .to "") .to .d }}{{ if ge $end $from }}
+    {{- $state := cond (lt $end $now) "done" (cond (le .d $now) "now" "") -}}
+    {{- if and .site (not .done) (lt .d $now) }}{{ $state = "due" }}{{ end -}}
+    {{- if and .site .done }}{{ $state = "done" }}{{ end -}}
+    <tr class="arklog__cal--{{ .k }}{{ if .site }} arklog__cal--site{{ end }}"><th>{{ dateFormat "Jan 2 2006" .d }}{{ with .to }} to {{ dateFormat "Jan 2" . }}{{ end }}</th><td>{{ .s }}</td>
+      <td>{{ if .src }}<a href="{{ .src }}" rel="noopener" target="_blank">{{ .t }}</a>{{ else }}{{ .t }}{{ end }}</td><td>{{ index $kl .k }}</td>
+      <td>{{ $state }}{{ if and .est (ne $state "done") }}{{ if $state }} {{ end }}est{{ end }}</td></tr>
+    {{- end }}{{ end }}
+    </tbody>
+  </table></div>
+  <div class="win__status"><span>{{ len $rows }} dates</span></div>
+</div>
+</div>

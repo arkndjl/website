@@ -1,0 +1,159 @@
+{
+ "sport": "nhl",
+ "name": "NHL",
+ "page": "/arkboard/nhl/",
+ "events": [
+  {
+   "d": "2026-09-29",
+   "k": "reg",
+   "t": "regular season starts",
+   "src": "https://www.nhl.com/news/nhl-announces-2026-27-regular-season-schedule"
+  },
+  {
+   "d": "2027-04-10",
+   "k": "reg_end",
+   "t": "regular season ends",
+   "src": "https://www.nhl.com/news/nhl-announces-2026-27-regular-season-schedule"
+  },
+  {
+   "d": "2027-04-17",
+   "k": "post",
+   "t": "Stanley Cup playoffs start",
+   "est": 1
+  },
+  {
+   "d": "2027-06-23",
+   "k": "champ",
+   "t": "Stanley Cup Final ends (latest)",
+   "est": 1
+  },
+  {
+   "d": "2027-06-25",
+   "k": "draft",
+   "t": "NHL draft",
+   "to": "2027-06-26",
+   "src": "https://www.dailyfaceoff.com/news/2027-nhl-draft-set-june-25-26-landon-dupont-nazar-privalov-alexis-joseph"
+  },
+  {
+   "d": "2027-07-01",
+   "k": "other",
+   "t": "free agency",
+   "est": 1
+  },
+  {
+   "d": "2027-10-05",
+   "k": "reg",
+   "t": "2027-28 regular season starts",
+   "est": 1
+  }
+ ],
+ "keys": {
+  "phase": [
+   [
+    "2026-09-15",
+    "preseason"
+   ],
+   [
+    "2026-09-29",
+    "regular"
+   ],
+   [
+    "2027-04-11",
+    "postseason"
+   ],
+   [
+    "2027-06-24",
+    "offseason"
+   ],
+   [
+    "2027-09-15",
+    "preseason"
+   ],
+   [
+    "2027-10-05",
+    "regular"
+   ]
+  ],
+  "season": [
+   [
+    "2026-08-01",
+    2027
+   ],
+   [
+    "2027-08-01",
+    2028
+   ]
+  ],
+  "draft_class": [
+   [
+    "2026-07-01",
+    2027
+   ],
+   [
+    "2027-07-01",
+    2028
+   ]
+  ],
+  "post": [
+   [
+    "2026-01-01",
+    "sat"
+   ]
+  ]
+ },
+ "steps": [
+  {
+   "id": "nhl-bracket-real",
+   "on": "2027-04-11",
+   "do": "key",
+   "t": "NHL playoff bracket from the final standings"
+  },
+  {
+   "id": "nhl-archive-2027",
+   "on": "2027-06-24",
+   "do": "archive",
+   "t": "archive the 2026-27 season",
+   "season": 2027,
+   "files": [
+    "data/nhl_games.json",
+    "data/brackets/nhl.json",
+    "data/hockey.json"
+   ]
+  },
+  {
+   "id": "nhl-draft-2028",
+   "on": "2027-07-01",
+   "do": "bump",
+   "t": "hockey prospects: 2027 class drafted, 2028 class live",
+   "key": "draft_class",
+   "test": [
+    "python3 -m py_compile scripts/hockey_prospects.py"
+   ]
+  },
+  {
+   "id": "nhl-hist-2027",
+   "on": "2027-08-01",
+   "do": "run",
+   "t": "NHL game history takes in 2026-27",
+   "cmd": "python3 scripts/nhl_games.py --hist"
+  }
+ ],
+ "bumps": [
+  {
+   "key": "draft_class",
+   "file": "scripts/hockey_prospects.py",
+   "rx": "for y in range\\(FIRST, (\\d{4})\\)",
+   "off": 0,
+   "auto": 1,
+   "mode": "int"
+  },
+  {
+   "key": "draft_class",
+   "file": "scripts/hockey_prospects.py",
+   "rx": "for y0 in range\\(FIRST, (\\d{4})\\)",
+   "off": 0,
+   "auto": 1,
+   "mode": "int"
+  }
+ ]
+}

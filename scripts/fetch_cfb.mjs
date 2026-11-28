@@ -47,6 +47,7 @@ import { coachMarket } from './cfb_coach.mjs';
 import { fetchRotoballer, fetchNewsHeadlines, headlineStatus, statusOf, headlineClauses, seasonOut, fetchQbr, topPerformers, TOP_GROUPS } from './cfb_teams.mjs';
 import { fetchBoxes, fetchFullBoxes } from './cfb_box.mjs';
 import { timelines } from './cfb_avail.mjs';
+import { postWd, lastPost } from './season.mjs';
 import { weekStatuses, loadReports } from './cfb_avail_reports.mjs';
 import { avOf, nameKey } from './cfb_teams.mjs';
 import { seasonAv, SAV_W, SAV_REPL, cwar, nwar, CWAR_PER_AV, specialistWar } from './cfb_av.mjs';
@@ -122,7 +123,7 @@ ON3_TO_G.ATH = 'ATH';
 // 4. FV is scarcity: within each position, the k-th best composite is compared to how many
 //    players per NFL draft class reach each outcome tier, scaled by that position's share of
 //    the 22 NFL starting spots. "+" marks talent well ahead of production in a young player.
-const FV_WEIGHTS = { 2026: 5, 2025: 4, 2024: 3 };
+const FV_WEIGHTS = { [SEASON]: 5, [SEASON - 1]: 4, [SEASON - 2]: 3 };   // this season and the two before
 // regression, in weighted snaps (~600 current-season snaps). Stat+ backtest (scripts/cfb_statplus_backtest.mjs,
 // data/cfb_statplus_backtest.json: PFN 2019-22 final seasons against NFL AV): more regression predicts better at
 // every tested position, r .488 -> .497 (offense) and .386 -> .389 (defense) going from 1500 to 3000, and up to
@@ -2608,18 +2609,19 @@ await teamLogos(outFcs);
 const MODEL_VERSION = 'mean-2026-10';   // the headline FV at the mean outcome: no movers against the old grades
 const key = r => `${r.name}|${r.team}|${r.pos}`;
 const hist = fs.existsSync(HISTORY) ? JSON.parse(fs.readFileSync(HISTORY, 'utf8')) : { snapshots: [] };
-// the weekly CFB post is Wednesday morning (scripts/rank_moves.py POST, POST_HOUR 10 New York): moves count from the
-// board as last posted. Snapshots are dated on that post clock: the New York date, the next day once Wednesday's post
-// has gone out, so later Wednesday runs never overwrite the posted snapshot
-const POST_WD = 3, POST_HOUR = 10;
+// the weekly CFB post is Wednesday morning in the regular season and Monday from Dec 7 2026 through the bowls (Noah,
+// Nov 28 2026; data/seasons/cfb.json "post", scripts/season.mjs; POST_HOUR 10 New York): moves count from the board as
+// last posted. Snapshots are dated on that post clock: the New York date, the next day once the post day's post has
+// gone out, so later runs that day never overwrite the posted snapshot
+const POST_HOUR = 10;
 const BOARD_DAY = (() => {
   const p = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit',
     day: '2-digit', hour: '2-digit', hourCycle: 'h23' }).formatToParts(new Date()).map(x => [x.type, x.value]));
   const t = new Date(`${p.year}-${p.month}-${p.day}T12:00:00Z`);
-  return (t.getUTCDay() === POST_WD && +p.hour >= POST_HOUR ? new Date(+t + 86400e3) : t).toISOString().slice(0, 10);
+  const day = t.toISOString().slice(0, 10);
+  return (t.getUTCDay() === postWd('cfb', day, 3) && +p.hour >= POST_HOUR ? new Date(+t + 86400e3) : t).toISOString().slice(0, 10);
 })();
-const WEEK_AGO = (() => { const t = new Date(`${BOARD_DAY}T12:00:00Z`), back = ((t.getUTCDay() - POST_WD + 7) % 7) || 7;
-  return new Date(t - back * 86400e3).toISOString().slice(0, 10); })();
+const WEEK_AGO = lastPost('cfb', BOARD_DAY, 3);
 const base = hist.snapshots.filter(h => h.date <= WEEK_AGO && h.v === MODEL_VERSION).at(-1)
   ?? hist.snapshots.filter(h => h.date < BOARD_DAY && h.v === MODEL_VERSION)[0];   // a history under a week old: its oldest
 out.since = base?.date ?? null;

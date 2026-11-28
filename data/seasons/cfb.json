@@ -1,0 +1,325 @@
+{
+ "sport": "cfb",
+ "name": "CFB",
+ "page": "/arkboard/college-football/",
+ "events": [
+  {
+   "d": "2026-08-29",
+   "k": "reg",
+   "t": "regular season starts"
+  },
+  {
+   "d": "2026-11-28",
+   "k": "reg_end",
+   "t": "regular season ends"
+  },
+  {
+   "d": "2026-12-02",
+   "k": "sign",
+   "t": "early signing period",
+   "to": "2026-12-04",
+   "src": "https://sportsrecruits.com/resources/managing-recruiting/national-signing-day"
+  },
+  {
+   "d": "2026-12-04",
+   "k": "post",
+   "t": "conference championships",
+   "to": "2026-12-05"
+  },
+  {
+   "d": "2026-12-06",
+   "k": "post",
+   "t": "CFP selection"
+  },
+  {
+   "d": "2026-12-18",
+   "k": "post",
+   "t": "CFP first round",
+   "to": "2026-12-19",
+   "src": "https://collegefootballplayoff.com/news/2026/6/1/26-27-broadcast-sked"
+  },
+  {
+   "d": "2026-12-30",
+   "k": "post",
+   "t": "CFP quarterfinals",
+   "to": "2027-01-01",
+   "src": "https://collegefootballplayoff.com/news/2026/6/1/26-27-broadcast-sked"
+  },
+  {
+   "d": "2027-01-02",
+   "k": "portal",
+   "t": "transfer portal window",
+   "to": "2027-01-16",
+   "est": 1,
+   "src": "https://www.espn.com/college-football/story/_/id/46524004/ncaa-adopts-jan-2-16-transfer-portal-window-fbs-fcs-26"
+  },
+  {
+   "d": "2027-01-14",
+   "k": "post",
+   "t": "CFP semifinals",
+   "to": "2027-01-15",
+   "src": "https://collegefootballplayoff.com/news/2026/6/1/26-27-broadcast-sked"
+  },
+  {
+   "d": "2027-01-25",
+   "k": "champ",
+   "t": "CFP national championship",
+   "src": "https://collegefootballplayoff.com/news/2026/6/1/26-27-broadcast-sked"
+  },
+  {
+   "d": "2027-02-03",
+   "k": "sign",
+   "t": "national signing day",
+   "est": 1
+  },
+  {
+   "d": "2027-08-01",
+   "k": "pre",
+   "t": "preseason (fall camp)",
+   "est": 1
+  },
+  {
+   "d": "2027-08-26",
+   "k": "reg",
+   "t": "2027 regular season starts",
+   "est": 1,
+   "src": "https://www.foxsports.com/articles/cfb/ncaa-committee-recommends-earlier-start-to-football-season-for-all-teams-beginning-in-2027"
+  },
+  {
+   "d": "2028-01-24",
+   "k": "champ",
+   "t": "2027 CFP national championship",
+   "est": 1
+  }
+ ],
+ "keys": {
+  "phase": [
+   [
+    "2026-08-01",
+    "preseason"
+   ],
+   [
+    "2026-08-29",
+    "regular"
+   ],
+   [
+    "2026-12-04",
+    "postseason"
+   ],
+   [
+    "2027-01-26",
+    "offseason"
+   ],
+   [
+    "2027-08-01",
+    "preseason"
+   ],
+   [
+    "2027-08-26",
+    "regular"
+   ]
+  ],
+  "season": [
+   [
+    "2026-05-01",
+    2026
+   ],
+   [
+    "2027-05-02",
+    2027
+   ]
+  ],
+  "draft": [
+   [
+    "2026-04-26",
+    2027
+   ],
+   [
+    "2027-05-02",
+    2028
+   ]
+  ],
+  "class": [
+   [
+    "2026-01-01",
+    2027
+   ],
+   [
+    "2027-01-01",
+    2028
+   ],
+   [
+    "2028-01-01",
+    2029
+   ]
+  ],
+  "open_class": [
+   [
+    "2025-11-01",
+    2027
+   ],
+   [
+    "2026-11-01",
+    2028
+   ],
+   [
+    "2027-11-01",
+    2029
+   ]
+  ],
+  "post": [
+   [
+    "2026-08-01",
+    "wed"
+   ],
+   [
+    "2026-12-07",
+    "mon"
+   ],
+   [
+    "2027-08-26",
+    "wed"
+   ]
+  ]
+ },
+ "steps": [
+  {
+   "id": "cfb-post-mon",
+   "on": "2026-12-07",
+   "do": "key",
+   "t": "CFB weekly post moves to Monday"
+  },
+  {
+   "id": "cfb-bracket-real",
+   "on": "2026-12-06",
+   "do": "key",
+   "t": "CFP bracket view (real bracket)"
+  },
+  {
+   "id": "cfb-class-2028",
+   "on": "2027-01-01",
+   "do": "bump",
+   "t": "recruit classes 2028-2030 (2027 class signed)",
+   "key": "class"
+  },
+  {
+   "id": "cfb-archive-2026",
+   "on": "2027-01-26",
+   "do": "archive",
+   "t": "archive the 2026 season",
+   "season": 2026,
+   "files": [
+    "data/cfb.json",
+    "data/cfb_teams.json",
+    "data/cfb_rank.json",
+    "data/cfb_cfp.json",
+    "data/brackets/cfb.json",
+    "data/cfb_games.json",
+    "static/data/cfb-all.json",
+    "data/cfb_portal.json"
+   ]
+  },
+  {
+   "id": "cfb-kiper-2028",
+   "on": "2027-05-02",
+   "do": "alert",
+   "t": "new draft-year sources (Kiper board URL, draft ledger 2028 dates)",
+   "lead": 21,
+   "body": "fetch_cfb.mjs KIPER_URL names the 2027 big board; draft_ledger.py SCORE_AFTER / day1 hold 2027 dates. Point them at the 2028 class."
+  },
+  {
+   "id": "cfb-archive-draft-2027",
+   "on": "2027-05-02",
+   "do": "archive",
+   "t": "archive the 2027 draft board and mocks",
+   "season": 2027,
+   "files": [
+    "data/cfb_mock.json",
+    "data/cfb_mock_pred.json",
+    "data/cfb_mock_conv.json",
+    "data/cfb_top.json"
+   ]
+  },
+  {
+   "id": "cfb-season-2027",
+   "on": "2027-05-02",
+   "do": "bump",
+   "t": "CFB season 2027, draft board 2028",
+   "key": "season",
+   "lead": 21,
+   "test": [
+    "node --check scripts/fetch_cfb.mjs",
+    "node --check scripts/cfb_teams.mjs",
+    "node --check scripts/cfb_coach.mjs",
+    "python3 -m py_compile scripts/cfb_dob.py"
+   ]
+  },
+  {
+   "id": "cfb-nil-2027",
+   "on": "2027-09-15",
+   "do": "alert",
+   "t": "new CFB school NIL budgets (data/nil_budgets.json cfb)",
+   "lead": 0,
+   "body": "Replace data/nil_budgets.json cfb with the 2027 reported budgets (the board carries 2026 forward at growth 1.113 until then)."
+  }
+ ],
+ "bumps": [
+  {
+   "key": "class",
+   "file": "content/arkboard-college-football.md",
+   "rx": "\\{\\{< wintabs tab=\"classes\"[\\s\\S]*?\\{\\{< /wintabs >\\}\\}",
+   "off": 0,
+   "auto": 1,
+   "mode": "shift",
+   "why": "class tabs"
+  },
+  {
+   "key": "class",
+   "file": "scripts/arkstars_hist.py",
+   "rx": "^FIRST, LAST = 2008, (\\d{4})",
+   "off": 2,
+   "auto": 1,
+   "mode": "shift-line"
+  },
+  {
+   "key": "class",
+   "file": "scripts/cfb_recruit_fit.py",
+   "rx": "^HS_YEARS = range\\(2020, (\\d{4})\\)",
+   "off": 3,
+   "auto": 1,
+   "mode": "int"
+  },
+  {
+   "key": "season",
+   "file": "scripts/fetch_cfb.mjs",
+   "rx": "const SEASON = (\\d{4});",
+   "off": 0,
+   "auto": 1,
+   "mode": "int"
+  },
+  {
+   "key": "season",
+   "file": "scripts/cfb_teams.mjs",
+   "rx": "const SEASON = (\\d{4});",
+   "off": 0,
+   "auto": 1,
+   "mode": "int"
+  },
+  {
+   "key": "season",
+   "file": "scripts/cfb_coach.mjs",
+   "rx": "const SEASON = (\\d{4});",
+   "off": 0,
+   "auto": 1,
+   "mode": "int"
+  },
+  {
+   "key": "season",
+   "file": "scripts/cfb_dob.py",
+   "rx": "^SEASON = (\\d{4})",
+   "off": 0,
+   "auto": 1,
+   "mode": "int"
+  }
+ ]
+}

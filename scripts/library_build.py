@@ -164,6 +164,8 @@ GLOSS_TAB = {'fv': 'FV', 'value': 'player value', 'players': 'player odds', 'tea
 ARKLOG = {
     'log': '{{< arklog tab="log" >}}',
     'updates': '{{< arklogupdates tab="updates" >}}',
+    # every sport's league dates and the site's season transitions (data/seasons, scripts/season_roll.py; Nov 28 2026)
+    'calendar': '{{< arklogcal tab="calendar" >}}',
     'scoreboard': '{{< lazytab tab="scoreboard" >}}{{< arklogboard tab="scoreboard" >}}{{< /lazytab >}}',
     'traffic': '{{< desk tab="traffic" >}}\n{{< sitestats part="views" class="desk__wide" >}}\n{{< sitestats part="trend" >}}\n'
                '{{< sitestats part="traffic" >}}\n{{< /desk >}}',

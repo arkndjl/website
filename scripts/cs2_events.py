@@ -6,6 +6,7 @@ model (scripts/cs2_model.py), Swiss stages paired by Valve's Major rules, then s
     python3 scripts/cs2_events.py --pull   # S-tier event catalog from bo3.gg -> scripts/data/cs2_events.json.gz
     python3 scripts/cs2_events.py --fit    # backtest on past S-tier events -> data/cs2_events_fit.json
     python3 scripts/cs2_events.py          # live: the next Major -> data/cs2_events.json (run after cs2_model.py)
+    python3 scripts/cs2_events.py --test   # the Major list by date (MAJORS, next_major_missing_ids)
 
 Format (Valve's major-supplemental-rulebook, github.com/ValveSoftware/counter-strike_rules_and_regs; Liquipedia
 PGL/2026/Singapore): three 16-team Swiss stages (3 wins advance, 3 losses out; elimination and advancement matches
@@ -364,13 +365,48 @@ def poly_compare(fj):
     return out
 
 
-# ---------------------------------------------------------------------------------------------------- the Major
-MAJOR = {"name": "PGL Major Singapore 2026", "short": "Singapore Major", "invite": ("2026", "2026_11_02"),
-         # bo3.gg tournaments: Stage 1, Stage 2, Stage 3 + playoffs
-         "bo3": (6269, 6268, 4226), "dates": ("2026-11-24", "2026-11-28", "2026-12-02", "2026-12-10"), "end": "2026-12-13",
-         # invites per stage and region, in regional standing order (Liquipedia PGL/2026/Singapore)
-         "slots": {3: {"europe": (0, 6), "americas": (0, 2)}, 2: {"europe": (6, 12), "americas": (2, 3), "asia": (0, 1)},
-                   1: {"europe": (12, 18), "americas": (3, 9), "asia": (1, 5)}}}
+# ---------------------------------------------------------------------------------------------------- the Majors
+# In date order. invite: Valve's invitation standings file (year, date); bo3: bo3.gg tournament ids (Stage 1, Stage 2,
+# Stage 3 + playoffs); dates: the stages' first days (Stage 1-3, playoffs); slots: invites per stage and region, in
+# regional standing order (Liquipedia). A Major whose ids are not out yet has them as None: the odds, market log and
+# pick'em skip it (next_major_missing_ids flags it 21 days ahead).
+MAJORS = [
+    {"name": "PGL Major Singapore 2026", "short": "Singapore Major", "start": "2026-11-24", "end": "2026-12-13",
+     "invite": ("2026", "2026_11_02"), "bo3": (6269, 6268, 4226), "dates": ("2026-11-24", "2026-11-28", "2026-12-02", "2026-12-10"),
+     "slots": {3: {"europe": (0, 6), "americas": (0, 2)}, 2: {"europe": (6, 12), "americas": (2, 3), "asia": (0, 1)},
+               1: {"europe": (12, 18), "americas": (3, 9), "asia": (1, 5)}}},
+    {"name": "FiRe Buenos Aires Major 2027", "short": "Buenos Aires Major", "start": "2027-05-31", "end": "2027-06-20",
+     "invite": None, "bo3": None, "dates": None, "slots": None},
+    {"name": "Perfect World Shanghai Major 2027", "short": "Shanghai Major", "start": "2027-11-22", "end": "2027-12-12",
+     "invite": None, "bo3": None, "dates": None, "slots": None},
+]
+IDS = ("invite", "bo3", "dates", "slots")
+
+
+def _day(today=None):
+    if today is None:
+        return dt.date.today().isoformat()
+    return today.isoformat() if hasattr(today, "isoformat") else str(today)[:10]
+
+
+def ready(m):
+    """the Major has everything the odds need (invitation date, bo3.gg ids, stage dates, invite slots)"""
+    return bool(m) and all(m.get(k) for k in IDS)
+
+
+def current_major(today=None):
+    """the Major being played, else the next one (None after the last listed)"""
+    d = _day(today)
+    return next((m for m in MAJORS if m["end"] >= d), None)
+
+
+def next_major_missing_ids(today=None, days=21):
+    """the next (or current) Major starting within `days` that still lacks its ids, else None (the season runner alerts)"""
+    d = _day(today)
+    lim = (dt.date.fromisoformat(d) + dt.timedelta(days=days)).isoformat()
+    return next((m for m in MAJORS if m["end"] >= d and m["start"] <= lim and not ready(m)), None)
+
+
 POS = ("s2", "s3", "po", "sf", "f", "win")
 
 
@@ -452,7 +488,10 @@ def live(logit, names, rank, bo3, n=20000, sd=None):
     fj = json.loads(FIT.read_text()) if FIT.exists() else {}
     sd = fj.get("sd", 0.45) if sd is None else sd
     logit = memo(logit)
-    ev = MAJOR
+    ev = current_major()
+    if not ready(ev):
+        print("cs2 events: no Major with ids yet", (ev or {}).get("name"))
+        return None
     try:
         inv, glob = invitation(*ev["invite"])
     except OSError as e:
@@ -509,7 +548,7 @@ def live(logit, names, rank, bo3, n=20000, sd=None):
     for k, nm in ((k, nm) for st in by_stage for m in st for k, nm in ((tk(m[4], m[6]), m[6]), (tk(m[5], m[7]), m[7]))):
         names.setdefault(k, nm)
     P = chain(fields, logit, n, random.Random(11), sd, known, po_known)
-    nxt = next_stage(fields, known, po_known, names, by_stage, logit)
+    nxt = next_stage(fields, known, po_known, names, by_stage, logit, ev)
     start = {t: st for st, ts in fields.items() for t in ts}
     teams = []
     for t, pr in P.items():
@@ -529,9 +568,10 @@ def done(kr):
     return len(kr) == 5 and all(w for rr in kr for _, _, w in rr)
 
 
-def next_stage(fields, known, po_known, names, by_stage, logit):
+def next_stage(fields, known, po_known, names, by_stage, logit, ev=None):
     """The stage being played or next to be played: {event, stage, start, seeds, names, r1, known, allbo3,
     projected}. Earlier stages must be complete (their final seeds carry into this one)."""
+    ev = ev or current_major()
     rng = random.Random(0)
     carry = []
     for st in (1, 2, 3):
@@ -539,8 +579,8 @@ def next_stage(fields, known, po_known, names, by_stage, logit):
         kr = known.get(st, [])
         if not done(kr):
             sm = by_stage[st - 1] if len(by_stage) >= st else []
-            return {"event": MAJOR["name"], "stage": f"Stage {st}",
-                    "start": min(m[1] for m in sm) if sm else MAJOR["dates"][st - 1] + "T00:00:00Z",
+            return {"event": ev["name"], "stage": f"Stage {st}",
+                    "start": min(m[1] for m in sm) if sm else ev["dates"][st - 1] + "T00:00:00Z",
                     "seeds": seeds, "names": {t: names.get(t, t) for t in seeds},
                     "r1": [(a, b) for a, b, _ in kr[0]] if kr else [(seeds[i], seeds[i + 8]) for i in range(8)],
                     "known": kr, "allbo3": st == 3, "projected": not kr,
@@ -548,8 +588,8 @@ def next_stage(fields, known, po_known, names, by_stage, logit):
         _, _, order = swiss(seeds, lambda a, b, bo: 0.5, rng, kr, st == 3)
         carry = order[:8]
     sm = by_stage[3] if len(by_stage) >= 4 else []
-    return {"event": MAJOR["name"], "stage": "Playoffs",
-            "start": min(m[1] for m in sm) if sm else MAJOR["dates"][3] + "T00:00:00Z", "seeds": carry,
+    return {"event": ev["name"], "stage": "Playoffs",
+            "start": min(m[1] for m in sm) if sm else ev["dates"][3] + "T00:00:00Z", "seeds": carry,
             "names": {t: names.get(t, t) for t in carry}, "r1": [(carry[i], carry[7 - i]) for i in (0, 3, 1, 2)],
             "known": [[(a, b, po_known.get(frozenset((a, b)))) for a, b in
                        [(carry[i], carry[7 - i]) for i in (0, 3, 1, 2)]]], "allbo3": True, "projected": False}
@@ -575,8 +615,32 @@ def fair(q):
     return round(-100 * q / (1 - q)) if q >= 0.5 else round(100 * (1 - q) / q)
 
 
+def _test():
+    """python3 scripts/cs2_events.py --test: the Major list by date"""
+    global MAJORS
+    assert current_major("2026-11-28")["short"] == "Singapore Major" and ready(current_major("2026-12-13"))
+    assert current_major("2026-12-14")["short"] == "Buenos Aires Major" and not ready(current_major("2026-12-14"))
+    assert current_major(dt.date(2027, 7, 1))["short"] == "Shanghai Major" and current_major("2027-12-13") is None
+    assert next_major_missing_ids("2026-11-28") is None and next_major_missing_ids("2027-05-09") is None
+    assert next_major_missing_ids("2027-05-10")["short"] == "Buenos Aires Major"
+    assert next_major_missing_ids("2027-06-20")["short"] == "Buenos Aires Major" and next_major_missing_ids("2027-06-21") is None
+    assert next_major_missing_ids("2027-11-01")["short"] == "Shanghai Major" and next_major_missing_ids("2028-01-01") is None
+    assert all(a["end"] < b["start"] for a, b in zip(MAJORS, MAJORS[1:]))
+    keep = MAJORS
+    try:                                    # a Major with no ids: live() stops cleanly, before any pull
+        MAJORS = [dict(keep[1], start="2000-01-01", end="2100-01-01")]
+        assert live(lambda a, b, bo: 0.0, {}, {}, None) is None
+        MAJORS = []
+        assert live(lambda a, b, bo: 0.0, {}, {}, None) is None and next_major_missing_ids() is None
+    finally:
+        MAJORS = keep
+    print("cs2 events: majors ok")
+
+
 if __name__ == "__main__":
-    if "--pull" in sys.argv:
+    if "--test" in sys.argv:
+        _test()
+    elif "--pull" in sys.argv:
         pull()
     elif "--fit" in sys.argv:
         fit()
