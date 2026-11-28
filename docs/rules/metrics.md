@@ -56,8 +56,8 @@ Names are Noah's. Don't rename a metric without his call; renamed ones keep an a
 ## OVR
 
 - Noah, Nov 28: a 0-99 overall grade for pro players, the pro counterpart of FV, predictive first. It reads each sport's most
-  predictive rate and takes descriptive inputs only at the weight they earn held out. Scale: replacement 60, median starter 75,
-  the best in a typical season 97, cap 99. Inputs pass the OVR gate (next-season rate, next-season value, team results). See CLAUDE.md.
+  predictive rate and takes descriptive inputs only at the weight they earn held out. Scale: one straight line, median starter 75,
+  the best in a typical season 97, cap 99, replacement where the line puts it (about 70; Noah Nov 28). Inputs pass the OVR gate (next-season rate, next-season value, team results). See CLAUDE.md.
 - Team OVR: the roster's player rates weighted by minutes (NFL snaps, CS2 the five with the most maps), on the same points
   (replacement roster 60, median team 75, best team in a typical season 97). Minutes beat last season's minutes, depth slots and
   equal weights held out (NBA R2 .699, NHL .522). `scripts/research/ovr_nov28/team.py`.

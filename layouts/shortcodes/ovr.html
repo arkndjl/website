@@ -1,5 +1,5 @@
 {{- /* OVR board: {{< ovr sport="nba|nhl|nfl|soccer|atp|wta|cs2" tab="..." title="..." >}}. Rows from data/ovr/<sport>.json
-       (scripts/ovr.py): a 0-99 grade on each sport's most predictive rate, replacement 60, the median starter 75, the
+       (scripts/ovr.py): a 0-99 grade on each sport's most predictive rate, one straight line through the median starter 75 and the
        mean of each season's best 97. One table, every stat a sortable column; filters only pick rows. */ -}}
 {{- $sp := .Get "sport" -}}
 {{- with index (site.Data.ovr | default dict) $sp -}}
@@ -29,7 +29,7 @@
 <table class="cfb__table tstick2 ovr__table"{{ with $logo }} data-gfx-logo="{{ . }}"{{ end }}>
   <thead><tr>
     <th title="rank by OVR">RK</th><th>Player</th>
-    <th class="cfb__g ovr__k" data-term="OVR" title="0-99 on {{ $D.metric }}: replacement 60, median starter 75, the best in a typical season 97">OVR</th>
+    <th class="cfb__g ovr__k" data-term="OVR" title="0-99 on {{ $D.metric }}, one straight line: median starter 75, the best in a typical season 97{{ with $D.replOVR }}, replacement {{ . }}{{ end }}">OVR</th>
     {{- if $ten }}<th title="nationality">Nat</th>{{ end }}
     {{- if not $ten }}{{ if not $cs }}<th>Pos</th>{{ end }}<th>Team</th>{{ end }}
     {{- if $soc }}<th title="league">Lg</th>{{ end }}
@@ -68,5 +68,5 @@
   {{- end }}
   </tbody>
 </table>
-{{- partial "wintable-close.html" (dict "rows" (len $D.rows) "note" (printf "%s · updated %s" $D.label $date) "about" (printf "OVR 0-99 on %s. Replacement %.2f = 60, median starter %.2f = 75, the mean of each season's best %.2f = 97 (%s). Inputs and weights from held-out tests (research/ovr_research.json)." $D.metric (float $K.r) (float $K.s) (float $K.t) $K.unit)) -}}
+{{- partial "wintable-close.html" (dict "rows" (len $D.rows) "note" (printf "%s · updated %s" $D.label $date) "about" (printf "OVR 0-99 on %s, one straight line: median starter %.2f = 75, the mean of each season's best %.2f = 97 (%s); replacement %.2f lands at %v. Inputs and weights from held-out tests (research/ovr_research.json)." $D.metric (float $K.s) (float $K.t) $K.unit (float $K.r) $D.replOVR)) -}}
 {{- end -}}

@@ -37,16 +37,24 @@ LO, MID, HI, CAP, FLOOR = 60.0, 75.0, 97.0, 99, 20
 Z80 = 1.2816
 
 
-def grade(z, K):
-    """z -> OVR (float): replacement r 60, starter s 75, top t 97"""
+LINE = True   # players: one straight line through the median starter 75 and the season's best 97 (Nov 28 round 2, topend.py:
+              # a line beat the two slopes on next-season value, NBA r .69 -> .79, t 34.5; NHL t 10.9). Teams keep two slopes.
+
+
+def grade(z, K, line=None):
+    """z -> OVR (float). line: one slope through starter s = 75 and top t = 97 (replacement lands where the line puts it);
+    else two slopes, replacement r 60, starter s 75, top t 97"""
     if z is None: return None
     r, s, t = K['r'], K['s'], K['t']
-    g = LO + (MID - LO) * (z - r) / (s - r) if z <= s else MID + (HI - MID) * (z - s) / (t - s)
+    if LINE if line is None else line:
+        g = MID + (HI - MID) * (z - s) / (t - s)
+    else:
+        g = LO + (MID - LO) * (z - r) / (s - r) if z <= s else MID + (HI - MID) * (z - s) / (t - s)
     return max(FLOOR, min(CAP, g))
 
 
-def gi(z, K):
-    g = grade(z, K)
+def gi(z, K, line=None):
+    g = grade(z, K, line)
     return None if g is None else int(math.floor(g + 0.5))
 
 
@@ -354,7 +362,7 @@ def team_rows(sp, rows, K):
     v, T = team_value(sp, rows); out = []
     for t, x in v.items():
         pl = sorted(T[t], key=lambda r: -(r.get('ovr') or 0))
-        out.append({'tm': t, 'n': pl[0].get('tm') if sp == 'cs2' else t, 'ovr': gi(x, K), 'v': r2(x, 3), 'np': len(pl),
+        out.append({'tm': t, 'n': pl[0].get('tm') if sp == 'cs2' else t, 'ovr': gi(x, K, False), 'v': r2(x, 3), 'np': len(pl),
                     'logo': pl[0].get('logo'), 'tier': min((r.get('tier') or 9) for r in pl) if sp == 'cs2' else None,
                     'top': [[r['n'], r['ovr'], r.get('pos')] for r in pl[:3]]})
     out.sort(key=lambda r: -r['v'])
@@ -418,6 +426,7 @@ def build(sports):
         if sp in K.get('team', {}):
             meta['teams'] = team_rows(sp, rows, K['team'][sp]); meta['teamAnchors'] = K['team'][sp]
             summ.setdefault('teams', {})[sp] = meta['teams'][:10]
+        meta['replOVR'] = gi(K[sp]['r'], K[sp]) if K[sp].get('r') is not None else None
         meta.update(sport=sp, asof=dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), n=len(rows), anchors=K[sp])
         json.dump(dict(meta, rows=rows), open(os.path.join(OUTD, f'{sp}.json'), 'w'), separators=(',', ':'))
         # the card lookup (gfx.js pcOvr / team card): name, team, OVR; teams' OVR and rank
@@ -432,9 +441,10 @@ def build(sports):
 
 def _test():
     K = {'r': -1.0, 's': 1.0, 't': 9.0}
-    assert gi(-1.0, K) == 60 and gi(1.0, K) == 75 and gi(9.0, K) == 97
+    assert gi(-1.0, K, False) == 60 and gi(1.0, K, False) == 75 and gi(9.0, K, False) == 97
     assert gi(100, K) == CAP and gi(-100, K) == FLOOR
-    assert gi(0.0, K) == 68 and gi(5.0, K) == 86
+    assert gi(0.0, K, False) == 68 and gi(5.0, K, False) == 86
+    assert gi(1.0, K) == 75 and gi(9.0, K) == 97 and gi(-1.0, K) == 70 and gi(5.0, K) == 86
     par = {'beta': [0.0, 1.0, 0.5, 0.1, 0.0], 'ship': ['holisticN', 'age'], 'consts': {'medn': 100.0, 'age0': 27.0}}
     r = {'P': 2.0, 'D': 4.0, 'n': 100.0, 'car': 0, 'age': 28}
     assert abs(zof(par, r) - (2.0 + 0.5 * 2.0 + 0.1 * 1.0)) < 1e-9

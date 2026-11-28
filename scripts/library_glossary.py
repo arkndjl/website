@@ -44,13 +44,14 @@ _AGCR = ld('research/agency_composite.json')
 _AGCOMP = ('A check on the 2022-26 search, which is not used: built from the clients on file and the 2022-24 sends, it ranks the %d agencies by the first-round picks they sent in 2025-26 at Spearman %.2f (p %.3f, %d agencies with such a pick). Sends alone %.2f, Deal %.2f, Breakout %.2f, client count %.2f.'
         % (_AGCR['n'], _AGCR['score']['rho'], _AGCR['score']['p'], _AGCR['agencies with a 2025-26 pick'], _AGCR['sent']['rho'], _AGCR['deal']['rho'], _AGCR['breakout']['rho'], _AGCR['vol']['rho']))               # NIL agencies (scripts/agencies.py)
 _OVR = ld('research/ovr_research.json'); _OVF = ld('data/ovr_fit.json')     # OVR (scripts/ovr.py, scripts/research/ovr_nov28)
+def _ln(k): return int(75 + 22 * (k['r'] - k['s']) / (k['t'] - k['s']) + .5)    # replacement on the OVR line
 def _ovr():
     R, K = _OVR, _OVF['anchors']
     t = lambda sp, k, f='t': R[sp]['tests'][k][f]
     rk = lambda sp: min(R[sp]['rookie']['grid'], key=lambda g: g['mse'])
     c = R['soccer'].get('combo') or {}
     out = [
-        'Replacement level is 60, the median starter is 75 and the best player in a typical season is 97. Between those points the grade is linear in the rate. Above 97 the upper slope carries on to a cap of 99, and below replacement the lower slope carries on to a floor of 20. The points are set on past seasons (NBA %d-%d, NHL %d-%d, soccer %d-%d) so the scale holds still through a season.' % (tuple(K['nba']['from']) + tuple(K['nhl']['from']) + tuple(K['soccer']['from'])),
+        'The grade is one straight line in the rate through two points: the median starter is 75 and the best player in a typical season is 97. It carries on to a cap of 99 and a floor of 20. Replacement level lands where the line puts it: %d in the NBA, %d for NHL forwards, %d in the NFL and %d in soccer. The points are set on past seasons (NBA %d-%d, NHL %d-%d, soccer %d-%d) so the scale holds still through a season.' % ((_ln(K['nba']), _ln(K['nhl']), _ln(K['nfl']), _ln(K['soccer'])) + tuple(K['nba']['from']) + tuple(K['nhl']['from']) + tuple(K['soccer']['from'])),
         'The NBA reads pXPM, the NHL pWAR a 60 put on a full season at a starter\'s TOI for his position (F %d, D %d, G %d minutes), the NFL pXP/60, soccer p/90 put on a full season, tennis ARK as log-odds by tour, and CS2 the RWA rating. Putting the NHL and soccer on full seasons first keeps a defenseman and a forward on one scale of wins. Goalies have their own range (replacement 60, the median starting goalie 75, the best goalie in a typical season 97), because on the shared scale every starter sat at 86 to 89. The order is the same either way, and it is a weak one: held out, the goalie grade ranks next season\'s goalie WAR a 60 at a Spearman r of .17 (17 seasons, 1,500 minutes both years), against .48 for forwards and .43 for defensemen.' % (K['nhl']['toi']['F'], K['nhl']['toi']['D'], K['nhl']['toi']['G']),
         'Each idea was tested leaving one season out and scored three ways: next season\'s rate, next season\'s value (rate times playing time), and team results. It was kept only when it was better on one of the three with t of 2 or more and worse on none past 1. In the NBA nothing beat pXPM alone: this season\'s XPM t = %.2f, age t = %.2f, position t = %.2f, and a slope that grows with career minutes lost on team results (t = %.2f). NHL forwards and defensemen take that slope (forwards: value r t = %.2f, team R\u00b2 t = %.2f), goalies take age (t = %.2f), and this season\'s WAR added nothing to the fixed pWAR (forwards t = %.2f). Soccer takes this season\'s SV, age and position: next-season error t = %.2f, team R\u00b2 %.3f to %.3f (t = %.2f), %d of %d seasons.' % (
             t('nba', 'holistic'), t('nba', 'age'), t('nba', 'pos'), t('nba', 'shrink', 'tTeam'), t('nhlF', 'shrink', 'tR'), t('nhlF', 'shrink', 'tTeam'), t('nhlG', 'age'), t('nhlF', 'holistic'),
@@ -80,6 +81,11 @@ def _ovr():
         a, b = R2['nba']['tests'], R2['nhlF']['tests']
         out.append('A second round tried five more inputs against the live grade. Minutes a game (what his coaches think of him) passed in the NBA on team results (t = %.2f) and for NHL forwards on next season\'s rate (t = %.2f) and value (t = %.2f). Age times the rate passed in the NBA (t = %.2f), because a veteran\'s good rate carries forward less than a young player\'s. Last season\'s trend, a separate weight on defense and HPM beside pWAR did not pass, and nothing passed for defensemen, goalies or soccer.' % (
             a['role']['tTeam'], b['role']['t'], b['role']['tR'], a['ageP']['t']))
+    TE = R.get('topend') or {}
+    if TE.get('nba') and TE.get('nhl'):
+        a, b = TE['nba'], TE['nhl']
+        out.append('The grade was first two slopes, with replacement at 60, the median starter at 75 and the best at 97. Held out, one straight line followed next season\'s value more closely: NBA r %.3f against %.3f (t = %.2f) and NHL %.3f against %.3f (t = %.2f), with team R\u00b2 no worse (NBA t = %.2f, NHL t = %.2f). A plain percentile did no better than the two slopes (NBA value t = %.2f). Any straight line scores the same, so the points kept are the median starter at 75 and the best at 97.' % (
+            a['topline']['val'], a['piece']['val'], a['topline']['tVal'], b['topline']['val'], b['piece']['val'], b['topline']['tVal'], a['topline']['tTeam'], b['topline']['tTeam'], a['pct']['tVal']))
     PC = ld('research/nfl_poscredit.json')
     if PC:
         sl = PC['slopes']
