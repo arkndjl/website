@@ -23,9 +23,9 @@
 
   // ---- index ----
   var ITEMS = null, loading = null, nPlayers = 0;
-  function add(g, t, s, u, i, w) {
+  function add(g, t, s, u, i, w, x) {
     var k = fold(t);
-    ITEMS.push({ g: g, t: t, s: s || '', u: u, i: abs(i || ''), w: w || 0, k: k, ws: k.split(' '), ks: fold(s) });
+    ITEMS.push({ g: g, t: t, s: s || '', u: u, i: abs(i || ''), w: w || 0, k: k, ws: k.split(' '), ks: fold(s), x: x });
   }
   function load() {
     if (loading) return loading;
@@ -40,7 +40,8 @@
         P.rows.forEach(function (r) {
           var b = P.boards[r[0]], pg = b && pages[b[0]]; if (!pg) return;   // a page that no longer exists (or a draft) drops its rows
           var q = 'q=' + encodeURIComponent(r[6] || r[1]) + (r[5] ? '&p=' + encodeURIComponent(r[5]) : '');
-          add(b[2] === 't' ? 't' : 'p', r[1], (r[2] ? r[2] + ' · ' : '') + pg[1], pg[0] + '#' + slug(b[1]) + ':' + q, r[3] >= 0 ? P.imgs[r[3]] : pg[2], r[4]);
+          add(b[2] === 't' ? 't' : 'p', r[1], (r[2] ? r[2] + ' · ' : '') + pg[1], pg[0] + '#' + slug(b[1]) + ':' + q, r[3] >= 0 ? P.imgs[r[3]] : pg[2], r[4],
+            { b: b[0], sub: r[2] || '', pid: r[5] || '' });   // the board row itself, for "your favorites" (assets/js/favs.js)
           nPlayers++;
         });
       });
@@ -198,6 +199,9 @@
     load().then(draw, failed);
     if (!input.value) input.focus();
   }
+
+  // the same index and matching for "your favorites" (assets/js/favs.js): load() then find(q) -> [[score, item]]
+  window.arkSearch = { load: load, find: search, fold: fold };
 
   function init() {
     window.__arkSearch = true;
