@@ -4675,6 +4675,19 @@ a.tick__g:hover .tick__when, a.tick__g:hover .tick__note { color: #fff; }
 .libchart .lc-s1 { fill: var(--accent); }
 .libchart .lc-s2 { fill: #b46cff; }
 .libchart .lc-bar.lc-s0 { fill: color-mix(in srgb, var(--foreground) 80%, transparent); }
+.libstudy__ct { margin: 0 0 4px; font-size: .85em; color: var(--accent); }
+.libstudy__tree { width: 100%; table-layout: fixed; margin: 0 0 10px; border-collapse: collapse; font-size: .85em; font-variant-numeric: tabular-nums; }
+.libstudy__tree th { text-align: left; font-weight: 400; color: var(--accent); padding: 2px 6px; border-bottom: 2px solid var(--win-light); }
+.libstudy__tree td { white-space: normal !important; }
+.libstudy__tree td { padding: 2px 6px; color: color-mix(in srgb, var(--foreground) 85%, transparent); }
+.libstudy__tree td:nth-child(3), .libstudy__tree td:nth-child(5), .libstudy__tree th:nth-child(3), .libstudy__tree th:nth-child(5) { text-align: right; }
+.libstudy__tree tr.is-sum td { background: var(--win-well); color: #fff; }
+.libstudy__tree th:nth-child(1) { width: 18%; }
+.libstudy__tree th:nth-child(2) { width: 21%; }
+.libstudy__tree th:nth-child(3) { width: 15%; }
+.libstudy__tree th:nth-child(5) { width: 15%; }
+.libstudy__tree th { white-space: nowrap; overflow: hidden; }
+.libstudy__tree tr.is-split td { border-top: 6px solid transparent; }
 .libstudy__legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 6px 0 0; font-size: .85em; }
 .postchart { max-width: 640px; margin: 1.4em auto; }
 .lc-key::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 5px; vertical-align: -1px; }

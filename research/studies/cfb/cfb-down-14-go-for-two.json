@@ -1,0 +1,204 @@
+{
+  "id": "cfb-down-14-go-for-two",
+  "sport": "CFB",
+  "question": "Down 14, a team scores a touchdown. Should it go for two right away or kick?",
+  "answer": "Go for 2. Given two TDs and a stop it wins 56% of the time against 48% for kicking, worth +1.7 points of win chance overall.",
+  "date": "2026-11-28",
+  "findings": [
+    "The gain given two TDs is +8.0 points (+6.2 to +9.8), and going for 2 first wins as long as the 2-pt rate is above 36.8%.",
+    "After a Q4 PAT at down 8 the same team scored the next TD with nothing between in 20% (n=484); in the rest the choice decides almost nothing.",
+    "Inputs: 2-pt 44.3% (n=3,017), XP 97.5% (n=47,908), and teams that tied late won 52% in overtime (n=245).",
+    "Teams went for 2 at down 8 in the 4th in 1 of 94 in 2016-17 and 2 of 34 in 2026.",
+    "Raw results are noisy: teams that went for 2 won 9 of 52 and teams that kicked won 43 of 432, and the teams that chose each differ."
+  ],
+  "method": "A closed-form tree given two TDs and no opponent score: after 2 is good, kick to win; after 2 fails, 2 again to tie; after an XP, kick to tie; overtime at 50%. The CI comes from Beta draws of the 2-pt and XP rates. The game-level edge is the share of down-8 spots that reach a second TD first, times the gain.",
+  "data": "cfbfastR play-by-play, FBS against FBS, 2016 to 2026; 3,017 2-pt tries, 47,908 XPs, 484 Q4 PATs at down 8.",
+  "n": 484,
+  "robust": true,
+  "interest": 4,
+  "split_check": "The gain is +8.3 points with the 2016-20 rates (2-pt 44.3%) and +7.8 with the 2021-26 rates (2-pt 44.3%); with the measured overtime rate it is +6.7.",
+  "tree": {
+    "p": 0.4432,
+    "x": 0.9746,
+    "o": 0.5,
+    "go": 0.5609,
+    "kick": 0.4806,
+    "be": 0.368,
+    "rows": [
+      [
+        "go for 2",
+        "good",
+        0.4432,
+        "TD + kick wins",
+        0.9873
+      ],
+      [
+        "go for 2",
+        "no good",
+        0.5568,
+        "TD + 2 ties",
+        0.2216
+      ],
+      [
+        "kick",
+        "good",
+        0.9746,
+        "TD + kick ties",
+        0.4873
+      ],
+      [
+        "kick",
+        "no good",
+        0.0254,
+        "TD + 2 ties",
+        0.2216
+      ]
+    ]
+  },
+  "chart": {
+    "type": "line",
+    "title": "Win chance gain from going for 2 first, given two TDs",
+    "x_label": "2-pt rate %",
+    "y_label": "gain, WP",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": {
+      "y": 0,
+      "label": "even"
+    },
+    "mark": {
+      "x": 44.3,
+      "label": "CFB 44.3%"
+    },
+    "series": [
+      {
+        "name": "go for 2 first minus kick",
+        "points": [
+          {
+            "x": 30.0,
+            "y": -0.0776
+          },
+          {
+            "x": 32.0,
+            "y": -0.0543
+          },
+          {
+            "x": 34.0,
+            "y": -0.0314
+          },
+          {
+            "x": 36.0,
+            "y": -0.0089
+          },
+          {
+            "x": 38.0,
+            "y": 0.0132
+          },
+          {
+            "x": 40.0,
+            "y": 0.0349
+          },
+          {
+            "x": 42.0,
+            "y": 0.0562
+          },
+          {
+            "x": 44.0,
+            "y": 0.0771
+          },
+          {
+            "x": 46.0,
+            "y": 0.0976
+          },
+          {
+            "x": 48.0,
+            "y": 0.1177
+          },
+          {
+            "x": 50.0,
+            "y": 0.1374
+          },
+          {
+            "x": 52.0,
+            "y": 0.1567
+          },
+          {
+            "x": 54.0,
+            "y": 0.1756
+          },
+          {
+            "x": 56.0,
+            "y": 0.194
+          },
+          {
+            "x": 58.0,
+            "y": 0.2121
+          },
+          {
+            "x": 60.0,
+            "y": 0.2298
+          }
+        ]
+      }
+    ]
+  },
+  "chart2": {
+    "type": "bar",
+    "title": "Share going for 2 at down 8 in the 4th",
+    "x_label": "seasons",
+    "y_label": "go-for-2 %",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": null,
+    "mark": null,
+    "series": [
+      {
+        "name": "went for 2",
+        "points": [
+          {
+            "x": "2016-17",
+            "n": 94,
+            "y": 0.0106,
+            "lo": 0.0019,
+            "hi": 0.0578
+          },
+          {
+            "x": "2018-19",
+            "n": 95,
+            "y": 0.0632,
+            "lo": 0.0293,
+            "hi": 0.131
+          },
+          {
+            "x": "2020-21",
+            "n": 95,
+            "y": 0.1263,
+            "lo": 0.0738,
+            "hi": 0.2079
+          },
+          {
+            "x": "2022-23",
+            "n": 88,
+            "y": 0.1705,
+            "lo": 0.1061,
+            "hi": 0.2624
+          },
+          {
+            "x": "2024-25",
+            "n": 78,
+            "y": 0.2051,
+            "lo": 0.1304,
+            "hi": 0.3075
+          },
+          {
+            "x": "2026",
+            "n": 34,
+            "y": 0.0588,
+            "lo": 0.0163,
+            "hi": 0.1909
+          }
+        ]
+      }
+    ]
+  }
+}

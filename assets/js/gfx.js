@@ -3707,6 +3707,86 @@
     return F.canvas;
   }
 
+  // research card with a decision tree (research/studies/nfl/down14.py, scripts/library_build.py rq_tree): each choice,
+  // its two results with their chance, the state they leave and the win chance from there, the choice's total; under it
+  // the gain against the 2-pt rate (zero line = even, the league's rate marked)
+  function rqTree(g, d, sx, sy, sw, sh) {
+    var t = d.tree, pad = 36, x0 = sx + pad, w = sw - 2 * pad, y = sy + pad;
+    var pc = function (v, k) { return (v * 100).toFixed(k == null ? 0 : k) + '%'; };
+    g.textAlign = 'left'; g.font = '30px ' + FONT; g.fillStyle = C.lilac;
+    g.fillText('DOWN 8 AT THE PAT', x0, y + 14);
+    g.textAlign = 'right'; g.fillText('WIN % GIVEN TWO TDS', x0 + w, y + 14); g.textAlign = 'left';
+    y += 48;
+    var RW = 270, RH = 92, LH = 62, GAPB = 26, lx = x0 + RW + 64, TOTW = 150;
+    [[0, 'GO FOR 2', t.go, true], [2, 'KICK', t.kick, false]].forEach(function (b) {
+      var rows = [t.rows[b[0]], t.rows[b[0] + 1]], bh = 2 * LH, ry = y + bh / 2 - RH / 2;
+      // root box and its total
+      g.fillStyle = b[3] ? C.title : C.dark; g.fillRect(x0, ry, RW, RH); bevel(g, x0, ry, RW, RH, true, 3);
+      g.textAlign = 'center'; g.font = '44px ' + FONT; g.fillStyle = C.white; g.fillText(b[1], x0 + RW / 2, ry + RH / 2);
+      // connectors: out of the box, a trunk, one arm per result
+      var mx = x0 + RW + 28, c1 = y + LH / 2, c2 = y + LH + LH / 2;
+      g.fillStyle = C.lilac; g.fillRect(x0 + RW, ry + RH / 2 - 2, 28, 4); g.fillRect(mx - 2, c1 - 2, 4, c2 - c1 + 4);
+      g.textAlign = 'left';
+      rows.forEach(function (r, i) {
+        var cy = i ? c2 : c1, good = r[1] === 'good';
+        g.fillStyle = C.lilac; g.fillRect(mx, cy - 2, lx - mx - 8, 4);
+        g.font = '40px ' + FONT; g.fillStyle = good ? C.teal : C.down;
+        var lab = pc(r[2]) + ' ' + r[1].toUpperCase(); g.fillText(lab, lx, cy);
+        g.font = '32px ' + FONT; g.fillStyle = C.lilac;
+        g.fillText(fit(g, String(r[3]).replace(/^down \d+: /, ''), x0 + w - TOTW - 24 - 120 - (lx + 280)), lx + 280, cy);
+        g.textAlign = 'right'; g.font = '40px ' + FONT; g.fillStyle = C.white;
+        g.fillText(pc(r[4]), x0 + w - TOTW - 24, cy); g.textAlign = 'left';
+      });
+      // the choice's total, boxed at the right
+      var tx = x0 + w - TOTW;
+      g.fillStyle = C.dark; g.fillRect(tx, y + 6, TOTW, bh - 12);
+      g.textAlign = 'center'; g.font = '64px ' + FONT; g.fillStyle = b[3] ? C.teal : C.lilac;
+      g.fillText(pc(b[2]), tx + TOTW / 2, y + bh / 2); g.textAlign = 'left';
+      y += bh + GAPB;
+    });
+    // the gain line
+    var line = (d.line || []).filter(function (p) { return isFinite(+p[0]) && isFinite(+p[1]); });
+    if (line.length < 2) return;
+    y += 8;
+    g.fillStyle = C.dark; g.fillRect(x0, y, w, 4);
+    y += 28;
+    g.font = '30px ' + FONT; g.fillStyle = C.lilac; g.textAlign = 'left';
+    g.fillText('GAIN FROM GOING FOR 2 FIRST, BY 2-PT RATE', x0, y + 8);
+    g.textAlign = 'right'; g.fillStyle = C.teal; g.fillText('EVEN AT ' + pc(t.be, 1), x0 + w, y + 8); g.textAlign = 'left';
+    var top = y + 40, bot = sy + sh - pad - 44, cl = x0 + 96, cw = w - 96 - 8;
+    var xs = line.map(function (p) { return +p[0]; }), ys = line.map(function (p) { return +p[1]; });
+    var xa = Math.min.apply(null, xs), xb = Math.max.apply(null, xs);
+    var ya = Math.min(0, Math.min.apply(null, ys)), yb = Math.max.apply(null, ys);
+    var st = 0.05; ya = Math.floor(ya / st) * st; yb = Math.ceil(yb / st) * st;
+    var X = function (v) { return Math.round(cl + cw * (v - xa) / ((xb - xa) || 1)); };
+    var Y = function (v) { return Math.round(bot - (bot - top) * (v - ya) / ((yb - ya) || 1)); };
+    g.font = '28px ' + FONT;
+    for (var v = ya; v <= yb + 1e-9; v += st) {   // grid, y labels in points of win chance
+      var yy = Y(v); g.fillStyle = v === 0 || Math.abs(v) < 1e-9 ? C.lilac : C.dark; g.fillRect(cl, yy - (Math.abs(v) < 1e-9 ? 2 : 1), cw, Math.abs(v) < 1e-9 ? 4 : 2);
+      g.fillStyle = C.lilac; g.textAlign = 'right'; g.fillText((v > 1e-9 ? '+' : '') + Math.round(v * 100), cl - 14, yy); g.textAlign = 'left';
+    }
+    [30, 40, 50, 60].forEach(function (v) { if (v >= xa && v <= xb) { g.textAlign = 'center'; g.fillStyle = C.lilac; g.fillText(v + '%', X(v), bot + 30); g.textAlign = 'left'; } });
+    // breakeven and the league rate
+    var bx = X(t.be * 100);
+    g.fillStyle = C.teal; for (var yy2 = top; yy2 < bot; yy2 += 12) g.fillRect(bx - 1, yy2, 3, 6);
+    if (d.mark != null) {
+      var mxx = X(+d.mark); g.fillStyle = C.white; for (var yy3 = top; yy3 < bot; yy3 += 12) g.fillRect(mxx - 1, yy3, 3, 6);
+      g.font = '28px ' + FONT; g.fillStyle = C.white; g.textAlign = mxx > cl + cw * 0.75 ? 'right' : 'left';
+      g.fillText(String(d.mlab || '').toUpperCase(), mxx + (g.textAlign === 'right' ? -10 : 10), top + 8); g.textAlign = 'left';
+    }
+    // stair-step line, 6 px thick
+    g.fillStyle = C.teal;
+    for (var i = 0; i < line.length - 1; i++) {
+      var xA = X(xs[i]), xB = X(xs[i + 1]), yA = Y(ys[i]), yB = Y(ys[i + 1]), xm = Math.round((xA + xB) / 2);
+      g.fillRect(xA, yA - 3, xm - xA + 3, 6); g.fillRect(xm, Math.min(yA, yB) - 3, 6, Math.abs(yB - yA) + 6); g.fillRect(xm, yB - 3, xB - xm + 3, 6);
+    }
+    if (d.mark != null) {   // the league's point
+      var px = +d.mark, k = 0; while (k < xs.length - 1 && xs[k + 1] < px) k++;
+      var f = (px - xs[k]) / ((xs[k + 1] - xs[k]) || 1), py = ys[k] + f * (ys[k + 1] - ys[k]);
+      g.fillStyle = C.white; g.fillRect(X(px) - 9, Y(py) - 9, 18, 18); g.fillStyle = C.title; g.fillRect(X(px) - 5, Y(py) - 5, 10, 10);
+    }
+  }
+
   async function buildRQ(win, btn) {
     var d; try { d = JSON.parse(btn.getAttribute('data-gfx-rq') || '{}'); } catch (e) { return null; }
     if (!d.q || !d.a) return null;
@@ -3725,7 +3805,7 @@
     ql.forEach(function (t, i) { g.fillText(t, x + pad + qs * 1.1, y + pad + qs * 0.65 + i * qs * 1.3); });
     var top = y + qh + 24, bh = y + h - top;
     // right panel: the key number, the bars, or both
-    var side = d.n || bars.length, sw = side ? Math.round(w * (bars.length ? 0.46 : 0.36)) : 0, lw = w - sw - (side ? 24 : 0);
+    var side = d.n || bars.length || d.tree, sw = side ? Math.round(w * (d.tree ? 0.6 : bars.length ? 0.46 : 0.36)) : 0, lw = w - sw - (side ? 24 : 0);
     // answer: the largest of 96/80/64/48 px that fits the left panel (note line kept free at the bottom)
     var noteH = d.note ? 64 : 0, as = 96, al;
     for (; as >= 48; as -= 16) { g.font = as + 'px ' + FONT; al = wrap(g, d.a, lw - 2 * pad); if (al.length * as * 1.3 <= bh - 2 * pad - noteH) break; }
@@ -3738,6 +3818,7 @@
     if (!side) return F.canvas;
     var sx = x + lw + 24, sy = top;
     well(g, sx, sy, sw, bh);
+    if (d.tree) { rqTree(g, d, sx, sy, sw, bh); return F.canvas; }
     var cy = sy + pad;
     if (d.n) {
       var ns = bars.length ? 128 : 192; g.font = ns + 'px ' + FONT;

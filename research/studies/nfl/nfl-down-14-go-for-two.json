@@ -1,23 +1,150 @@
 {
   "id": "nfl-down-14-go-for-two",
   "sport": "NFL",
-  "question": "Down 14 in the 4th, should a team go for two after the first touchdown?",
-  "answer": "Yes. Given two TDs and a stop, going for 2 first wins 59% of the time, against 47% for kicking. Teams went for 2 54% of the time in 2025-26.",
+  "question": "Down 14, a team scores a touchdown. Should it go for two right away or kick?",
+  "answer": "Go for 2. Given two TDs and a stop it wins 59% of the time against 46% for kicking, worth +3.2 points of win chance overall.",
+  "date": "2026-11-28",
   "findings": [
-    "The gain in win chance given two TDs is +12.1 points (+9.7 to +14.4).",
-    "Down 8 at a Q4 PAT, teams went for 2 in 2 of 72 in 2015-18 and in 13 of 24 in 2025-26.",
-    "Inputs: 2-pt 48.1% (n=1,458), XP 94.4% (n=14,618), overtime 50/50.",
-    "The early 2-pt result also tells the team whether it needs a TD or a TD and 2 on the next drive."
+    "The gain given two TDs is +13.3 points (+10.8 to +15.7), and going for 2 first wins as long as the 2-pt rate is above 35.2%.",
+    "After a Q4 PAT at down 8 the same team scored the next TD with nothing between in 24% (n=199); in the rest the choice decides almost nothing.",
+    "Inputs: 2-pt 48.1% (n=1,476), XP 94.4% (n=14,843), and teams that tied late won 47% in overtime (n=161).",
+    "Teams went for 2 at down 8 in the 4th in 0 of 35 in 2015-16 and 16 of 30 in 2025-26.",
+    "Raw results are noisy: teams that went for 2 won 5 of 48 and teams that kicked won 19 of 151, and the teams that chose each differ."
   ],
-  "method": "A closed-form win chance given two TDs and no opponent score, with pooled 2-pt and XP rates. The CI comes from Beta draws of both rates. The go-for-2 share counts Q4 tries at down 8, with Wilson CIs.",
-  "data": "nflverse play-by-play, 2015 to 2026 wk 8; 193 Q4 PATs at down 8; 1,458 2-pt tries.",
-  "n": 193,
+  "method": "A closed-form tree given two TDs and no opponent score: after 2 is good, kick to win; after 2 fails, 2 again to tie; after an XP, kick to tie; overtime at 50%. The CI comes from Beta draws of the 2-pt and XP rates. The game-level edge is the share of down-8 spots that reach a second TD first, times the gain.",
+  "data": "nflverse play-by-play, 2015 to 2026; 1,476 2-pt tries, 14,843 XPs, 199 Q4 PATs at down 8.",
+  "n": 199,
   "robust": true,
   "interest": 4,
-  "split_check": "The gain holds with the 2015-20 rates (+11.7 points) and the 2021-26 rates (+12.3 points).",
+  "split_check": "The gain is +13.1 points with the 2015-20 rates (2-pt 47.6%) and +13.5 with the 2021-26 rates (2-pt 48.6%); with the measured overtime rate it is +15.1.",
+  "tree": {
+    "p": 0.481,
+    "x": 0.9444,
+    "o": 0.5,
+    "go": 0.5925,
+    "kick": 0.4593,
+    "be": 0.3515,
+    "rows": [
+      [
+        "go for 2",
+        "good",
+        0.481,
+        "TD + kick wins",
+        0.9722
+      ],
+      [
+        "go for 2",
+        "no good",
+        0.519,
+        "TD + 2 ties",
+        0.2405
+      ],
+      [
+        "kick",
+        "good",
+        0.9444,
+        "TD + kick ties",
+        0.4722
+      ],
+      [
+        "kick",
+        "no good",
+        0.0556,
+        "TD + 2 ties",
+        0.2405
+      ]
+    ]
+  },
   "chart": {
+    "type": "line",
+    "title": "Win chance gain from going for 2 first, given two TDs",
+    "x_label": "2-pt rate %",
+    "y_label": "gain, WP",
+    "y_fmt": "pct",
+    "x_reverse": false,
+    "ref": {
+      "y": 0,
+      "label": "even"
+    },
+    "mark": {
+      "x": 48.1,
+      "label": "NFL 48.1%"
+    },
+    "series": [
+      {
+        "name": "go for 2 first minus kick",
+        "points": [
+          {
+            "x": 30.0,
+            "y": -0.0576
+          },
+          {
+            "x": 32.0,
+            "y": -0.0349
+          },
+          {
+            "x": 34.0,
+            "y": -0.0127
+          },
+          {
+            "x": 36.0,
+            "y": 0.0092
+          },
+          {
+            "x": 38.0,
+            "y": 0.0307
+          },
+          {
+            "x": 40.0,
+            "y": 0.0518
+          },
+          {
+            "x": 42.0,
+            "y": 0.0725
+          },
+          {
+            "x": 44.0,
+            "y": 0.0928
+          },
+          {
+            "x": 46.0,
+            "y": 0.1127
+          },
+          {
+            "x": 48.0,
+            "y": 0.1322
+          },
+          {
+            "x": 50.0,
+            "y": 0.1512
+          },
+          {
+            "x": 52.0,
+            "y": 0.1699
+          },
+          {
+            "x": 54.0,
+            "y": 0.1882
+          },
+          {
+            "x": 56.0,
+            "y": 0.2061
+          },
+          {
+            "x": 58.0,
+            "y": 0.2236
+          },
+          {
+            "x": 60.0,
+            "y": 0.2407
+          }
+        ]
+      }
+    ]
+  },
+  "chart2": {
     "type": "bar",
-    "title": "Share going for 2 when down 8 at a 4th-quarter PAT",
+    "title": "Share going for 2 at down 8 in the 4th",
     "x_label": "seasons",
     "y_label": "go-for-2 %",
     "y_fmt": "pct",
@@ -30,49 +157,48 @@
         "points": [
           {
             "x": "2015-16",
+            "n": 35,
             "y": 0.0,
             "lo": 0.0,
-            "hi": 0.0989,
-            "n": 35
+            "hi": 0.0989
           },
           {
             "x": "2017-18",
+            "n": 37,
             "y": 0.0541,
             "lo": 0.015,
-            "hi": 0.177,
-            "n": 37
+            "hi": 0.177
           },
           {
             "x": "2019-20",
+            "n": 36,
             "y": 0.2778,
             "lo": 0.1585,
-            "hi": 0.4399,
-            "n": 36
+            "hi": 0.4399
           },
           {
             "x": "2021-22",
+            "n": 25,
             "y": 0.28,
             "lo": 0.1428,
-            "hi": 0.4758,
-            "n": 25
+            "hi": 0.4758
           },
           {
             "x": "2023-24",
+            "n": 36,
             "y": 0.3611,
             "lo": 0.2248,
-            "hi": 0.5243,
-            "n": 36
+            "hi": 0.5243
           },
           {
             "x": "2025-26",
-            "y": 0.5417,
-            "lo": 0.3507,
-            "hi": 0.7211,
-            "n": 24
+            "n": 30,
+            "y": 0.5333,
+            "lo": 0.3614,
+            "hi": 0.6977
           }
         ]
       }
     ]
-  },
-  "publish": true
+  }
 }
