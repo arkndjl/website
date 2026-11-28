@@ -95,9 +95,29 @@ def stack(teams, id_name):
             'avg': [m[t]['avg'] if t in m else nan for t in teams], 'share': [m[t]['share'] if t in m else 0.0 for t in teams]}
 
 
+def fetch(tries=3, wait=60):
+    """the parsed live page; the page has come back without its table now and then (0 teams on Nov 26 and 27, the same
+    page parsing in full from elsewhere), so a short read is tried again, and the last one is described in the log"""
+    import time
+    for i in range(tries):
+        try:
+            with urllib.request.urlopen(urllib.request.Request(URL, headers={'User-Agent': UA}), timeout=60) as r:
+                code, body = r.status, r.read().decode('utf-8', 'replace')
+        except Exception as e:   # noqa: BLE001 (network or HTTP error: try again)
+            code, body = repr(e), ''
+        rows = parse(body)
+        if len(rows) >= 40:
+            return rows
+        title = re.search(r'<title>(.*?)</title>', body, re.S | re.I)
+        print(f'bracket matrix: try {i + 1}: {code}, {len(body):,} chars, {body.count("<tr")} rows, title '
+              f'{(title.group(1).strip()[:80] if title else None)!r}, {len(rows)} teams parsed')
+        if i + 1 < tries:
+            time.sleep(wait)
+    return rows
+
+
 def log():
-    req = urllib.request.Request(URL, headers={'User-Agent': UA})
-    rows = parse(urllib.request.urlopen(req, timeout=60).read().decode('utf-8', 'replace'))
+    rows = fetch()
     if len(rows) < 40:
         sys.exit(f'bracket matrix: {len(rows)} teams parsed, nothing logged')
     teams = [[x['team'], x['seed'], x['avg'], x['n']] for x in rows]

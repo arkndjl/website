@@ -130,7 +130,17 @@ def shrink_k(groups, floor=1.0, cap=40.0):
 
 # ---- the join -------------------------------------------------------------------------------------------------------
 
+def one_kicker(rows):
+    """the CFB board lists a kicker who also punts twice (K and P rows, by design): one row for the join, the higher FV"""
+    best = {}
+    for r in rows:
+        k = (r['name'], r['team']) if r.get('pos') in ('K', 'P') else id(r)
+        if k not in best or (r.get('fv') or 0) > (best[k].get('fv') or 0): best[k] = r
+    return list(best.values())
+
+
 def join(ledger, sport, college, recruits):
+    college = one_kicker(college)
     mc = names.Matcher(college, sport='football' if sport == 'cfb' else 'basketball')
     mr = names.Matcher(recruits, sport='football' if sport == 'cfb' else 'basketball')
     out, miss = [], []
@@ -143,6 +153,9 @@ def join(ledger, sport, college, recruits):
             row, how = mc.find(e['player'], team=e.get('school'), pos=e.get('pos'))
         if row is None and not e.get('cls'):
             row, how = mr.find(e['player'], team=e.get('school'), pos=e.get('pos'))
+        # a ledger row with no school joins on his exact name only: a nickname match there is a guess
+        # (Christian Davis, no school, is not the uncommitted recruit Chris Davis Jr.)
+        if row is not None and not e.get('school') and how and how.startswith('variant'): row = None
         if row is None: miss.append(e); continue
         out.append(dict(row, agency=canon(e['agency']), agent=e.get('agent'), conf=e.get('confidence') or 'medium',
                         src=e.get('source'), date=e.get('source_date'), how=how, scope=e.get('scope')))
@@ -420,6 +433,12 @@ def _test():
     assert [(g['player'], g['agency'], g['round']) for g in got] == [('Jeremiyah Love', 'CAA Sports', 1)], got   # same name, other school: not him
     late = [dict(player='Jeremiyah Love', school='Notre Dame', sport='cfb', agency='CAA', confidence='high', source_date='2026-01-10')]
     assert match_drafts(late, 'cfb', picks, 2026) == []          # signed after Dec 1: the pro agent, not counted
+    col = [dict(name='Nolan Hauser', team='Clemson', pos='K', cls='Jr', fv=47, kind='college'),
+           dict(name='Nolan Hauser', team='Clemson', pos='P', cls='Jr', fv=34, kind='college')]
+    rec = [dict(name='Chris Davis Jr.', team=None, pos='RB', cls=2028, fv=22, kind='recruit')]
+    got, miss = join([dict(player='Nolan Hauser', school='Clemson', sport='cfb', agency='1 of 1 Agency'),
+                      dict(player='Christian Davis', school=None, sport='cfb', agency='Jordan Sports Group')], 'cfb', col, rec)
+    assert [(g['name'], g['pos']) for g in got] == [('Nolan Hauser', 'K')] and [m['player'] for m in miss] == ['Christian Davis'], (got, miss)
     rows, _ = board([], [dict(agency='CAA', round=1)])
     assert rows[0]['agency'] == 'CAA Sports' and rows[0]['pro'] == 1 and rows[0]['pro1'] == 1 and rows[0]['proPct'] is None   # no college clients on file
     print('ok')

@@ -2667,7 +2667,16 @@ const carriedRows = now => {
   const espnId = r => (/\/id\/(\d+)/.exec(r.espnl || '') || [])[1] || null;
   const ids = new Set(now.map(espnId).filter(Boolean)), m = new Matcher(now, { name: 'name', team: 'team', pos: 'pos', id: espnId });
   const ark = new Set(ARKLIST['college-football'] || []);
-  return PREV_ALL.rows.map(a => Object.fromEntries(PREV_ALL.cols.map((c, j) => [c, a[j]])))
+  // a row kept under a source's old school name (Sam Houston State) is read under the name the alias gives it, so the
+  // roster listed again under that name isn't carried a second time
+  const aliasTeam = r => { const t = r.team && (TEAM_ALIAS[r.team.toLowerCase().replace(/\s+/g, '')] || TEAM_ALIAS[norm(r.team)]);
+    return t && t !== r.team ? { ...r, team: t, logo: r.logo || now.find(x => x.team === t && x.logo)?.logo || null } : r; };
+  // and a row kept from before the lost-letter repair ("Dakota Qui��onez") is read back from his school's ESPN roster
+  const tix = teamIndex({ ...(espnFcs?.teams || {}), ...(espn?.teams || {}) });
+  const roster = t => [...now.filter(x => x.team === t).map(x => x.name),
+    ...(espn?.rosters?.[tix.resolve(t)] || espnFcs?.rosters?.[tix.resolve(t)] || []).map(a => a.name)];
+  const fixName = r => /�/.test(r.name || '') ? { ...r, name: repairName(r.name, roster(r.team)) } : r;
+  return PREV_ALL.rows.map(a => fixName(aliasTeam(Object.fromEntries(PREV_ALL.cols.map((c, j) => [c, a[j]])))))
     .filter(r => r.src !== 'espn' && !(espnId(r) && ids.has(espnId(r))) && !m.find(r.name, { team: r.team, pos: r.pos, id: espnId(r), crossTeam: 'none' })[0])
     .map(r => ({ ...r, ...(r.age > 35 ? { age: null, ageEst: r.elig ? r1(18.4 + r.elig) : null } : {}),   // an impossible age kept from an older build
       carried: r.carried || PREV_ALL.asof, delta: null, ovr: null, star: ark.has(r.name) || ark.has(`${r.name}|${r.team}`) || null }));

@@ -387,6 +387,8 @@ def repair_links(prior, ci):
       Alabama A&M carried Notre Dame's): dropped, except on the row whose Barttorvik career carries a recruit rating (the highest), else the one
       row whose first season fits the class"""
     K = {k: i for i, k in enumerate(prior['keep'])}
+    SVC = ('on3', 'on3rk', 'r247', 'rk247')
+    had = {j for j, m in enumerate(prior['careers']) if m.get('rec')}
     by = defaultdict(list)
     for j, m in enumerate(prior['careers']):
         if m.get('pid'):
@@ -432,6 +434,13 @@ def repair_links(prior, ci):
         drop |= {j for j in js if not (len(ok) == 1 and j == ok[0])}
     for j in drop:
         prior['careers'][j]['rec'] = None; fixed += 1
+    # the row's own recruit column (the scouting card's recruit line) follows the career: a grade dropped there was
+    # still shown on the namesake's card (Colgate's Ethan Brown, a junior, read as Illinois' 2026 No. 197)
+    if 'rec' in ci:
+        for j, (row, m) in enumerate(zip(prior['rows'], prior['careers'])):
+            r = row[ci['rec']]
+            if j in had and not m.get('rec') and isinstance(r, dict) and any(r.get(k) for k in SVC):
+                row[ci['rec']] = {k: v for k, v in r.items() if k == 'bt'} or None; fixed += 1
     print(f'preseason links repaired: {fixed}', flush=True)
 
 

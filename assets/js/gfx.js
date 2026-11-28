@@ -4464,8 +4464,8 @@
   function rqFromHash() {
     var h = location.hash.slice(1); try { h = decodeURIComponent(h); } catch (e) {} if (!/^(rq|g|sheet)-/.test(h)) return;
     var el = document.getElementById(h);
-    if (!el && /^(g|sheet)-/.test(h)) {   // a glossary term or sport sheet in a closed lazy tab: open that tab (below), scroll once it has loaded
-      var ix = document.getElementById('libgidx'), tab; try { tab = /^sheet-/.test(h) ? 'sports' : JSON.parse(ix.textContent)[h]; } catch (e) { tab = null; }
+    if (!el) {   // a glossary term, study or sport sheet in a closed lazy tab: open that tab (below), scroll once it has loaded
+      var ix = document.getElementById('libgidx'), tab; try { tab = /^sheet-/.test(h) ? 'sports' : /^rq-/.test(h) ? 'all studies' : JSON.parse(ix.textContent)[h]; } catch (e) { tab = null; }
       el = tab && [].filter.call(document.querySelectorAll('[data-tab]'), function (x) { return x.getAttribute('data-tab') === tab; })[0];
       if (!el) return;
       document.addEventListener('ark:lazy', function once() { var t = document.getElementById(h); if (t) { document.removeEventListener('ark:lazy', once); setTimeout(function () { t.scrollIntoView({ block: 'start' }); }, 30); } });

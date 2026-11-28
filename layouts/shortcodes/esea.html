@@ -883,8 +883,8 @@
     {{- $sides := dict }}{{ $sf := "research/studies/cs2/cs2-side-first.json" }}{{ if fileExists $sf }}{{ range (index ((os.ReadFile $sf | transform.Unmarshal).chart.series) 0).points }}{{ $sides = merge $sides (dict .x (dict "t" .y "lo" .lo "hi" .hi "n" .n)) }}{{ end }}{{ end }}
     {{- /* playoff series: this slot, where a win and a loss send 1NT (upper / lower), 1NT's chance at each reward */}}
     {{- $stk := "" }}{{ with $d.bracket }}{{ $b := . }}{{ with .next }}{{ if and .from $pv.series }}
+      {{- $lose := "" }}{{ with .drop }}{{ $do := .opp | default dict }}{{ $lose = dict "n" .n "opp" (index $do "name") "tbd" ((index $do "tbd") | default false) }}{{ end }}
       {{- $rw := slice }}{{ range $b.rewards }}{{ $rw = $rw | append (dict "s" .s "top" .top "p" (index $b.odds (printf "top%v" .top))) }}{{ end }}
-      {{- $lose := "" }}{{ with .drop }}{{ $lose = dict "n" .n "opp" .opp.name "tbd" (.opp.tbd | default false) }}{{ end }}
       {{- $stk = dict "slot" .from "win" (dict "n" .n "opp" .opp.name "tbd" .opp.tbd) "lose" $lose "rewards" $rw }}
     {{- end }}{{ end }}{{ end }}
     {{- $gd := dict "opp" $o.name "when" (printf "%s ET" ((time.In "America/New_York" (time (int (div $pv.at 1000)))).Format "Mon Jan 2 · 3:04 PM")) "event" (printf "ESEA S%v · Main · Bo%v" $season ($pv.bestOf | default 1)) "bo" (printf "Bo%v" ($pv.bestOf | default 1))

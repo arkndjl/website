@@ -425,4 +425,9 @@ if __name__ == '__main__':
     except Exception as e:   # no On3 pack or no ESPN team list: visits read nothing, the lean model and RPM still do
         print('visit rates', repr(e)); RATES = ({(o, k): None for o in (0, 1) for k in range(1, 6)}, {})
     print('visit rates', RATES[1])
-    print('cfb', cfb()); print('cbb', cbb())
+    bad = []
+    for sp, fn in (('cfb', cfb), ('cbb', cbb)):   # one sport failing still writes the other
+        try: print(sp, fn())
+        except Exception:
+            import traceback; traceback.print_exc(); bad.append(sp)
+    if bad: sys.exit(f'team builder next: {", ".join(bad)} not updated')

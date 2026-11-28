@@ -24,10 +24,11 @@ def slug_map(sp):
     """On3 school slug -> ESPN team id (ESPN's own team slug is the same 'georgia-bulldogs' form)"""
     f = os.path.join(CACHE, f'espn_teams_{TEAMS[sp]}.json')
     if not os.path.exists(f):
-        import requests
+        import urllib.request   # standard library: the board workflows that read this don't install requests
         lg = 'football/college-football' if sp == 'cfb' else 'basketball/mens-college-basketball'
         os.makedirs(CACHE, exist_ok=True)
-        open(f, 'w').write(requests.get(f'https://site.api.espn.com/apis/site/v2/sports/{lg}/teams?limit=1500', timeout=60).text)
+        req = urllib.request.Request(f'https://site.api.espn.com/apis/site/v2/sports/{lg}/teams?limit=1500', headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=60) as r: open(f, 'w').write(r.read().decode('utf-8'))
     d = json.load(open(f))
     out = {t['team']['slug']: str(t['team']['id']) for t in d['sports'][0]['leagues'][0]['teams']}
     norm = lambda s: '-'.join(w for w in s.split('-') if w not in DROP)
