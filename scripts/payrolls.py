@@ -655,9 +655,21 @@ def soccer():
         sv = json.load(open(os.path.join(ROOT, 'static', 'data', 'soccer-war', '2026.json')))['players']
     except OSError:
         sv = []
-    SV = defaultdict(list)
+    one = {}                  # a season split between two clubs is two rows with one id: his SVAR is their sum
     for p in sv:
-        SV[(p['lg'], NM.key(p['n']))].append(p)
+        q = one.setdefault(p['p'], {'n': p['n'], 'lg': p['lg'], 'age': p.get('age'), 'svar': 0.0, 'min': 0})
+        q['svar'] += p.get('svar') or 0
+        if (p.get('min') or 0) >= q['min']:
+            q['lg'], q['min'] = p['lg'], p.get('min') or 0
+    SV = NM.Matcher(one.values(), name='n', team='lg', pos=None, sport='soccer', team_eq=lambda a, b: a == b)
+
+    def svar(r, lg):
+        """his 2025-26 SVAR: the same name (or a spelling the matcher reads as his) in his league, else the same name in
+        another big-five league (he moved) at his age"""
+        q, how = SV.find(r['n'], lg)
+        if q and how == 'name' and q.get('age') and r.get('age') and abs(q["age"] - r["age"]) > 2:
+            return None
+        return q['svar'] if q else None
     end = '2027-06-30'
     teams, players = [], []
     for lg, clubs in W.items():
@@ -672,8 +684,7 @@ def soccer():
             exp = [r for r in rows if r.get('until') and r['until'] <= end]
             val = 0.0
             for r in sorted(rows, key=lambda r: -r['wage_year_gbp']):
-                c = SV.get((lg, NM.key(r['n'])), [])
-                v = c[0].get('svar') if len(c) == 1 else None
+                v = svar(r, lg)
                 val += v or 0
                 if len([q for q in players if q['tm'] == code]) >= SOC_TOP:
                     continue
