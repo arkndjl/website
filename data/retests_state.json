@@ -1,9 +1,9 @@
 {
 "asof":"2026-11-28",
-"n":77,
+"n":84,
 "count":{
 "watching":1,
-"waiting":76
+"waiting":83
 },
 "next":[
 "understat_return",
@@ -178,6 +178,21 @@
 "state":"waiting"
 },
 {
+"key":"cs2_repl_role",
+"t":"CS2 replacement level by role (AWP / rifle)",
+"sp":[
+"CS2"
+],
+"ar":"value",
+"kind":"retest",
+"how":"hand",
+"trigger":"cross-sport port of the CBB position lines (Nov 28 2026); needs role labels for the VRS 51-100 starters",
+"gate":"scripts/cs2_value.py fee test: replacement by role against one line, leave one fee out, t >= 2",
+"due":"2027-01-15",
+"est":1,
+"state":"waiting"
+},
+{
 "key":"cfb_recruit_tail",
 "t":"Tail-only fix for recruit visits and picks",
 "sp":[
@@ -307,6 +322,40 @@
 "state":"waiting"
 },
 {
+"key":"start_odds_fv_nil",
+"t":"FV and x/yNIL as inputs to P(wins the starting job) on the college depth charts",
+"sp":[
+"CFB",
+"CBB"
+],
+"ar":"teams",
+"kind":"deferred",
+"how":"hand",
+"was":"untestable: no point in time FV or NIL before the Nov 28 2026 forward logs; the base uses 247 composite + PFN score (CFB) and pXPM (CBB)",
+"trigger":"2027 starters on file (PFN 2027 season) with the Nov 2026 to Aug 2027 board vintages and On3 NIL snaps (scripts/data/snaps)",
+"gate":"scripts/research/start_odds_nov28/prereg.md: held-out log loss against the shipped model, t >= 2 clustered by team (one season: two-fold team split)",
+"due":"2027-02-24",
+"est":0,
+"state":"waiting"
+},
+{
+"key":"start_odds_by_pos",
+"t":"Starting-job drivers by position (true freshmen at RB, transfer-in and incumbency by spot) and CBB transfer-in",
+"sp":[
+"CFB",
+"CBB"
+],
+"ar":"teams",
+"kind":"retest",
+"how":"hand",
+"was":"no spot split passed: CFB true freshman x spot t .54, RB-only freshman term t 1.09 (3/4 seasons, least behind at RB -1.21 vs -1.59 to -2.09); CBB transfer-in t -1.77, age after class t -.96",
+"trigger":"the 2026 season is out of the lockbox (one more origin, and a second OL and DB origin)",
+"gate":"prereg.md spot test: driver x spot against the pooled driver, t >= 2, every season but one",
+"due":"2027-02-24",
+"est":0,
+"state":"waiting"
+},
+{
 "key":"nfl_fpi_stack",
 "t":"ESPN FPI stacked on the NFL game model",
 "sp":[
@@ -385,6 +434,22 @@
 "state":"waiting"
 },
 {
+"key":"cbb_vorx_level",
+"t":"CBB VORX replacement level refit each season",
+"sp":[
+"CBB"
+],
+"ar":"value",
+"kind":"retest",
+"how":"hand",
+"was":"t -2.82 same season (next season t 3.49)",
+"trigger":"one more college season (2026-27) in the team tests",
+"gate":"scripts/research/repl_nov28/cbb.py bench:expanding:pos against prod (level -1.4 + position offsets): same-season W% t >= 2 pooled and next season t > -2",
+"due":"2027-04-19",
+"est":0,
+"state":"waiting"
+},
+{
 "key":"cbb_lowdiv_movers",
 "t":"D-II and D-III movers into D-I",
 "sp":[
@@ -459,6 +524,21 @@
 "gate":"tune and held both",
 "due":"2027-04-19",
 "est":1,
+"state":"waiting"
+},
+{
+"key":"cbb_next_pos",
+"t":"CBB Next (next-season VORX) refit on the position lines",
+"sp":[
+"CBB"
+],
+"ar":"players",
+"kind":"retest",
+"how":"hand",
+"trigger":"Next's target is still VORX on the flat -1.4 line (data/cbb_next_fit.json); refit it on the position lines with the 2026-27 season in",
+"gate":"scripts/cbb_next_research.py with the target on scripts/repl_levels.py cbb_line: walk-forward RMSE no worse (t > -2) than the flat-line fit on the same target",
+"due":"2027-05-05",
+"est":0,
 "state":"waiting"
 },
 {
@@ -759,6 +839,38 @@
 "how":"hand",
 "trigger":"the 2026-27 NBA season is over",
 "gate":"every shipped model scored once, hash recorded first; batch b at .05 / (1 + earlier batches)",
+"due":"2027-07-04",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"nba_vorx_level",
+"t":"NBA VORX replacement level refit each season",
+"sp":[
+"NBA"
+],
+"ar":"value",
+"kind":"retest",
+"how":"hand",
+"was":"t -4.91 pooled, .81 with fixed effects",
+"trigger":"one more NBA season (2026-27)",
+"gate":"scripts/research/repl_nov28/nba.py flatx (expanding freely available pool) against -1.4: same-season team W% t >= 2 pooled and with fixed effects",
+"due":"2027-07-04",
+"est":1,
+"state":"waiting"
+},
+{
+"key":"nba_vorx_pos",
+"t":"NBA VORX replacement lines by position",
+"sp":[
+"NBA"
+],
+"ar":"value",
+"kind":"retest",
+"how":"hand",
+"was":"t .59",
+"trigger":"one more NBA season (2026-27) in the team tests",
+"gate":"scripts/research/repl_nov28/nba.py qposoff3 against the flat -1.4: same-season team W% t >= 2 with season fixed effects and next-season W% t > -2, ahead in most seasons",
 "due":"2027-07-04",
 "est":1,
 "state":"waiting"
