@@ -111,7 +111,7 @@
     bar.elements.season.value = s && bar.querySelector('option[value="' + s.replace(/\D/g, '') + '"]') ? s : win.dataset.cur;
     pos = h.get('pos') || ''; side = h.get('side') || ''; if (side === 'v' || !KEY[side]) side = '';   // side=v: old VORX links
     bar.elements.team.value = h.get('team') || ''; bar.elements.q.value = h.get('q') || ''; bar.elements.age.value = h.get('age') || '';
-    bar.elements.mp.value = h.get('mp') || ''; chips();
+    bar.elements.mp.value = h.get('mp') || (h.get('q') ? '0' : ''); chips();   // a link to a named player (the search) shows him at any minutes
   }
   function writeHash() {
     var h = new URLSearchParams(), e = bar.elements;
