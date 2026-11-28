@@ -1,5 +1,5 @@
 +++
-title = "Process #1: Introducing ARKLOG / November updates"
+title = "PROCESS #1: Introducing ARKLOG / November updates"
 date = "2026-11-28T09:00:00-05:00"
 author = "arkndjl"
 authorTwitter = "ARKNDJL" #do not include @
