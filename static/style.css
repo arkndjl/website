@@ -5785,6 +5785,12 @@ html.ytp-max { overflow: hidden; }
 .pb__pos > b { font-weight: normal; color: #c0b0ff; font-size: 0.8em; letter-spacing: 0.08em; }
 .pb__man { font-size: 0.85em; overflow-wrap: anywhere; }
 @media (max-width: 640px) { .pb__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* phones: the player stays pinned while the money columns scroll (board rule, Nov 28 2026) */
+@media (max-width: 640px) {
+  .pb__table.pay__table td:first-child, .pb__table.pay__table thead th:first-child { position: sticky; left: 0; z-index: 2; background: var(--win-well); box-shadow: 2px 0 0 var(--win-dark); }
+  .pb__table.pay__table thead th:first-child { z-index: 4; background: var(--background); }
+  .pb__table.pay__table td:first-child { white-space: normal; min-width: 34vw; max-width: 40vw; }
+}
 .pb__table .pb__dev { background: color-mix(in srgb, #7fffd4 7%, transparent); }
 /* team builder seasons ahead (layouts/partials/tbyears.html) */
 .tbx__yrs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px; border-top: 1px dashed #4a3a7a; padding-top: 6px; }
