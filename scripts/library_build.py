@@ -196,7 +196,7 @@ def regroup(sections):
 
 def write_page(studies, sections, fv_tables):
     """content/arkboard-process.md (the Process page, was Reference, before that Library): hero, glossary search, then the
-    side strip: Overview (overview, sports), Metrics, Models, Research, Data. The log is ARKLOG (/arklog/)."""
+    side strip: Overview (overview, sports), Philosophy, Metrics, Models, Research, Data. The log is ARKLOG (/arklog/)."""
     page = ROOT / 'content/arkboard-process.md'
     head = page.read_text().split('{{< glossfind', 1)[0].split('{{< wintabs', 1)[0]
     groups = [g for g in GROUP_ORDER if any(s['group'] == g for s in studies)]
@@ -207,7 +207,9 @@ def write_page(studies, sections, fv_tables):
     side = [(lab, [sid for sid in ids if sid in have]) for lab, ids in SIDE]
     placed = {sid for _, ids in side for sid in ids}
     side[0][1].extend(x['id'] for x in sections if x['id'] not in placed)   # a section added later lands under Metrics
-    strip = (['Overview:overview,sports'] + [f'{lab}:' + ','.join(tab[i] for i in ids) for lab, ids in side[:2]]
+    phil = [t['tab'] for t in json.loads((ROOT / 'data/philosophy.json').read_text())['tabs']] \
+        if (ROOT / 'data/philosophy.json').exists() else []        # scripts/philosophy_build.py
+    strip = (['Overview:overview,sports'] + (['Philosophy:' + ','.join(phil)] if phil else []) + [f'{lab}:' + ','.join(tab[i] for i in ids) for lab, ids in side[:2]]
              + ['Research:' + ','.join(rtabs)] + [f'{lab}:' + ','.join(tab[i] for i in ids) for lab, ids in side[2:]])
     gidx = '|'.join(f'{x["id"]}={tab[x["id"]]}' for x in sections)
     lines = ['{{< glossfind tabs="' + gidx + '" >}}', '',   # glossary search (layouts/shortcodes/glossfind.html)
@@ -215,6 +217,7 @@ def write_page(studies, sections, fv_tables):
              '{{< procover tab="overview" >}}']
     lazy = lambda t, sc: f'{{{{< lazytab tab="{t}" >}}}}{sc}{{{{< /lazytab >}}}}'   # later tabs load on first open
     lines += [lazy('sports', '{{< procsports tab="sports" >}}')]
+    lines += [lazy(t, f'{{{{< procphil tab="{t}" >}}}}') for t in phil]
 
     def gloss(sid):
         t = tab[sid]

@@ -1,0 +1,42 @@
+{{- /* Process > Philosophy: one tab of data/philosophy.json (scripts/philosophy_build.py from research/philosophy.json).
+       Text in one window, each figure in its own window. Nothing is typed here.
+       {{< procphil tab="count and rate" >}} */ -}}
+{{- $tab := .Get "tab" -}}
+{{- $btns := `<span class="win__title-btns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span>` | safeHTML -}}
+{{- range where site.Data.philosophy.tabs "tab" $tab }}
+<div class="desk libgrid proc phil" data-tab="{{ $tab }}">
+<div class="win proc__wide phil__text">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>{{ .title }}<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="libstudy__body phil__body">
+  {{- $links := slice }}{{ $srcs := slice }}
+  {{- range .blocks }}
+    {{- with .q }}<p class="phil__q">{{ . }}</p>{{ end }}
+    {{- with .h }}<h3 class="phil__h">{{ . }}</h3>{{ end }}
+    {{- with .p }}<p class="phil__p">{{ . }}</p>{{ end }}
+    {{- if .link }}{{ $links = $links | append . }}{{ end }}
+    {{- if .src }}{{ $srcs = $srcs | append . }}{{ end }}
+  {{- end }}
+  {{- with $srcs }}<ul class="phil__src">{{ range . }}<li>{{ .src }}{{ with .href }} <a href="{{ . }}" rel="noopener" target="_blank">link</a>{{ end }}</li>{{ end }}</ul>{{ end }}
+  </div>
+  {{- with $links }}<p class="rq__bar libstudy__bar">{{ range . }}<a class="cfb__btn rq__link" href="{{ if .ext }}{{ .link }}{{ else }}#{{ .link }}{{ end }}">{{ .label }}</a>{{ end }}</p>{{ end }}
+</div>
+{{- range $b := .blocks }}{{ if .fig }}
+<div class="win phil__fig{{ if or (eq .fig "spec") .img }} proc__wide{{ end }}">
+  <div class="win__title"><span class="win__title-text"><svg class="win__icon" aria-hidden="true"><use href="#icon-process"/></svg>{{ .fig }}.gfx<span class="win__cursor" aria-hidden="true">_</span></span>{{ $btns }}</div>
+  <div class="libstudy__body">
+    {{- with .img }}<a href="{{ . | relURL }}" target="_blank"><img class="phil__img" src="{{ . | relURL }}" alt="{{ $b.alt }}" width="1600" height="900" loading="lazy"></a>{{ end }}
+    {{- with .svg }}<div class="libstudy__chart">{{ . | safeHTML }}
+</div>{{ end }}
+    {{- $k := .keys }}{{ with .legend }}<p class="libstudy__legend">{{ range $i, $l := . }}<span class="lc-key lc-k{{ index $k $i }}">{{ $l }}</span>{{ end }}</p>{{ end }}
+    {{- with .table }}{{ $g := .group }}
+    <div class="libfv__wrap"><table class="libfv phil__tbl">
+      <thead><tr>{{ range $i, $h := .head }}<th{{ range $g }}{{ if and (ge $i (index . 0)) (le $i (index . 1)) }} class="phil__g{{ if eq $i (index . 0) }} phil__g0{{ end }}"{{ end }}{{ end }}>{{ $h }}</th>{{ end }}</tr></thead>
+      <tbody>{{ range .rows }}<tr>{{ range $i, $c := . }}<td{{ range $g }}{{ if and (ge $i (index . 0)) (le $i (index . 1)) }} class="phil__g{{ if eq $i (index . 0) }} phil__g0{{ end }}"{{ end }}{{ end }}>{{ $c }}</td>{{ end }}</tr>{{ end }}</tbody>
+    </table></div>{{ end }}
+    {{- with .cap }}<p class="phil__cap">{{ . }}</p>{{ end }}
+  </div>
+  {{- with .note }}<div class="win__status"><span>{{ . }}</span><span></span></div>{{ end }}
+</div>
+{{- end }}{{ end }}
+</div>
+{{- end -}}
