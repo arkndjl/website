@@ -224,10 +224,11 @@ CBB_G = {'PG': 'G', 'SG': 'G', 'G': 'G', 'G/F': 'G', 'SF': 'F', 'PF': 'F', 'F': 
 
 
 def rec_pos(sp, year, name, fallback):
-    """the projected college position (data/recruit_pos.json, PR #1364), first spot of a hybrid label"""
+    """the projected college position (data/recruit_pos.json, PR #1364), first spot of a hybrid label; a CFB listed
+    position's style suffix dropped (On3's QB-PP, TE-H), so the row lands in its room"""
     v = RPOS.get(sp, {}).get(f'{year}|{name}')
     lab = (v[0] if v else fallback) or ''
-    return lab.split('/')[0] if sp == 'cfb' else lab
+    return lab.split('/')[0].split('-')[0] if sp == 'cfb' else lab
 
 
 RPOS = J('data', 'recruit_pos.json')
