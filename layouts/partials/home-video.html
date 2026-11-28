@@ -5,17 +5,26 @@
        through the YouTube iframe postMessage API (enablejsapi=1), no API script; a finished video plays the next. */ -}}
 {{- $chs := slice (dict "k" "laursen" "n" "LAURSEN_111" "b" "LAURSEN_111" "s" "L111" "h" "LAURSEN_111" "yt" site.Data.laursen_socials.yt) (dict "k" "arkndjl" "n" "ARKNDJL" "b" "ARKNDJL" "s" "ARK" "h" "ARKNDJL" "yt" site.Data.arkndjl_socials.yt) (dict "k" "ytst" "n" "Your Team Should Tank" "b" "YTST" "s" "YTST" "h" "YourTeamShouldTankPodcast" "yt" site.Data.ytst_socials.yt) -}}
 {{- $v := slice -}}
-{{- range $chs }}{{ $c := . }}
+{{- /* YTST episodes are numbered by upload order (oldest = #1), or by the "#N" in the title when it has one */ -}}
+{{- range $chs }}{{ $c := . }}{{ $rows := slice }}
   {{- range $id, $x := .yt }}
     {{- if and (not $x.short) (not (findRE `(?i)#shorts?\b` $x.title)) $x.pub }}
-      {{- $v = $v | append (dict "id" $id "t" $x.title "pub" $x.pub "k" $c.k "n" $c.n "s" $c.s) }}
+      {{- $rows = $rows | append (dict "id" $id "t" $x.title "pub" $x.pub "k" $c.k "n" $c.n "s" $c.s) }}
     {{- end }}
   {{- end }}
+  {{- if eq $c.k "ytst" }}
+    {{- range $i, $r := sort $rows "pub" "asc" }}{{ $ep := add $i 1 }}
+      {{- with findRESubmatch `#\s*(\d+)` $r.t 1 }}{{ $ep = int (index (index . 0) 1) }}{{ end }}
+      {{- $v = $v | append (merge $r (dict "n" (printf "%s #%d" $c.n $ep) "s" (printf "%s #%d" $c.s $ep))) }}
+    {{- end }}
+  {{- else }}{{ $v = $v | append $rows }}{{ end }}
 {{- end -}}
 {{- $v = sort $v "pub" "desc" -}}
 {{- /* the newest ARKNDJL video is always #1, even when a LAURSEN_111 video is newer */ -}}
 {{- with where $v "k" "arkndjl" }}{{ $top := index . 0 }}{{ $v = (slice $top) | append (where $v "id" "ne" $top.id) }}{{ end -}}
-{{- $v = first 16 $v -}}
+{{- /* the 16 newest, plus each channel's 4 newest when they fell outside, so every channel button has its own list */ -}}
+{{- $all := $v }}{{ $v = first 16 $v -}}
+{{- range $chs }}{{ range first 4 (where $all "k" .k) }}{{ if not (where $v "id" .id) }}{{ $v = $v | append . }}{{ end }}{{ end }}{{ end -}}
 {{- with $v }}
 {{- $f := index . 0 }}
 <div class="win hvid" id="video">
@@ -55,7 +64,7 @@
       {{- with site.Data.arkmixes_upcoming }}
       <ol class="hvid__list hvid__up" hidden>
         {{- range $i, $x := . }}
-        <li><span class="hvid__no">{{ printf "%02d" (add $i 1) }}</span><span class="hvid__t">{{ with .t }}{{ . }}{{ else }}{{ .n }} ARKMIX{{ end }}{{ with .d }} <i class="hvid__date">{{ . }}</i>{{ end }}</span>{{ if .tb }}<b class="hvid__ch hvid__ch--arkndjl">THROWBACK</b>{{ else if .k }}<b class="hvid__ch hvid__ch--{{ .k }}">{{ .s }}</b>{{ end }}</li>
+        <li><span class="hvid__no">{{ printf "%02d" (add $i 1) }}</span><span class="hvid__t">{{ with .t }}{{ . }}{{ else }}{{ .n }} ARKMIX{{ end }}{{ with .d }} <i class="hvid__date">{{ . }}</i>{{ end }}</span>{{ if .tb }}<b class="hvid__ch hvid__ch--arkndjl">THROWBACK</b>{{ else if .k }}<b class="hvid__ch hvid__ch--{{ .k }}">{{ .s }}{{ with .ep }} #{{ . }}{{ end }}</b>{{ end }}</li>
         {{- end }}
       </ol>
       {{- end }}
