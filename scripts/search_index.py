@@ -109,7 +109,10 @@ def cfb(ix):
             if t['team'] not in teams: teams[t['team']] = (t['team'], t.get('conf') or '', t.get('logo'))
             elif t.get('abbr'): teams[t['team']] = (t['team'], sub(t['abbr'], t.get('conf')), teams[t['team']][2] or t.get('logo'))
     print('cfb teams', ix.add('arkboard-college-football', 'ARK Ranking',
-                              [(n, s, lo, order.get(n), None) for n, s, lo in teams.values()], 't'))
+                              [(n, s, lo, order.get(n), None) for n, s, lo in teams.values() if n in order], 't'))
+    # FCS and other teams the ARK Ranking does not list open the board filtered to their players
+    print('cfb other teams', ix.add('arkboard-college-football', 'all',
+                                    [(n, s, lo, None, None) for n, s, lo in teams.values() if n not in order], 't'))
 
 
 def cbb(ix):
