@@ -40,11 +40,24 @@ function looksLikeBot(ua) {
 // Any of these names works. /api/feeds says which name it found (never the value) and how the last dispatch went.
 const DISPATCH = ["odds-snap.yml", "esea.yml", "picks-refresh.yml"];
 const TOKEN_NAMES = ["GITHUB_TOKEN", "GH_TOKEN", "GITHUB_PAT", "GH_PAT", "GITHUB_API_TOKEN", "GITHUB_ACCESS_TOKEN", "GH_DISPATCH_TOKEN"];
-const FEEDS_KEY = "https://arkndjl.net/__feeds_last";
 
 function ghToken(env) {
-  for (const k of TOKEN_NAMES) if (env[k]) return [k, env[k]];
+  for (const k of TOKEN_NAMES) if (typeof env[k] === "string" && env[k].trim()) return [k, env[k].trim()];
+  // a name typed with other case, spaces or wording (github token, GitHubToken, GH-PAT)
+  for (const k of Object.keys(env)) {
+    const n = k.toUpperCase().replace(/[^A-Z]/g, "");
+    if (typeof env[k] === "string" && env[k].trim() && /(GITHUB|^GH)/.test(n) && /(TOKEN|PAT|KEY)/.test(n)) return [k, env[k].trim()];
+  }
   return [null, null];
+}
+
+// names (never values) of the text bindings this Worker sees, so a secret saved somewhere else shows by its absence
+function textBindings(env) {
+  return Object.keys(env).filter((k) => typeof env[k] === "string").sort();
+}
+
+function feedLog(env) {
+  return env.SUPPORTERS.get(env.SUPPORTERS.idFromName("feed-dispatch"));
 }
 
 async function dispatchFeeds(env) {
@@ -68,17 +81,13 @@ async function dispatchFeeds(env) {
       console.log(`feed dispatch ${wf}: ${r.status}`);
     }
   }
-  try {
-    await caches.default.put(FEEDS_KEY, new Response(JSON.stringify(last), {
-      headers: { "content-type": "application/json", "cache-control": "max-age=86400" },
-    }));
-  } catch (e) { console.log("feed dispatch: could not keep the last result", e); }
+  try { await feedLog(env).note(last); } catch (e) { console.log("feed dispatch: could not keep the last result", e); }
 }
 
 async function feeds(env) {
   let last = null;
-  try { const r = await caches.default.match(FEEDS_KEY); if (r) last = await r.json(); } catch { last = null; }
-  return json({ token: ghToken(env)[0], names: TOKEN_NAMES, last }, 200, { "cache-control": "no-store" });
+  try { last = (await feedLog(env).note()) || null; } catch { last = null; }
+  return json({ token: ghToken(env)[0], names: TOKEN_NAMES, bindings: textBindings(env), last }, 200, { "cache-control": "no-store" });
 }
 
 // /api/photo/<path>: an On3 recruit photo (on3static.com/<path>) served from this site, so the GFX cards can draw it on a
@@ -300,6 +309,11 @@ export class Supporters extends DurableObject {
   }
   add(r) {
     this.sql.exec(`INSERT OR IGNORE INTO tips (id, name, amount, currency, pub, t, type) VALUES (?, ?, ?, ?, ?, ?, ?)`, r.id, r.name, r.amount, r.currency, r.pub, r.t, r.type);
+  }
+  // the feed cron's last dispatch (its own instance, "feed-dispatch"; no tips there)
+  async note(v) {
+    if (v !== undefined) await this.ctx.storage.put("last", v);
+    return await this.ctx.storage.get("last");
   }
   rows() {
     return this.sql.exec(`SELECT id, name, amount, currency, pub, t, type FROM tips`).toArray();
