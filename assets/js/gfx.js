@@ -4845,29 +4845,30 @@
     var D = agData(btn.getAttribute('data-gfx-sport')); if (!D) return null;
     var a = D.agencies[+btn.getAttribute('data-gfx-i')]; if (!a) return null;
     var lab = D.sport === 'cbb' ? 'CBB' : 'CFB';
-    var F = await frame(2400, 1350, 'ARKBOARD ' + lab + ' :: AGENCIES :: ' + a.agency, D.date, SITE + '#agencies');
+    var F = await frame(2400, 1350, a.agency + ' :: ' + lab + ' NIL agency', D.date, SITE + '#agencies');
+    F.canvas._name = a.agency.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     var g = F.g, x = F.x, y = F.y, w = F.w, h = F.h, gap = 24, lw = Math.round(w * 0.42), rx = x + lw + gap, rw = w - lw - gap;
     // left: the name and the numbers
-    var ns = 96; g.font = ns + 'px ' + FONT; while (ns > 48 && g.measureText(a.agency).width > lw - 20) { ns -= 4; g.font = ns + 'px ' + FONT; }
-    g.fillStyle = C.teal; g.fillText(fit(g, a.agency, lw - 20), x + 10, y + ns * 0.6);
+    // the name is the title bar's; here the rank line
     var pl = (D.fit && D.fit.plus) || {}, lead = D.fit && D.fit.lead, ldN = lead === 'agencyP' ? 'Agency+' : lead === 'dealP' ? 'Deal+' : lead === 'breakoutP' ? 'Breakout+' : '';
     var rk = lead ? D.agencies.filter(function (r) { return r[lead] != null && r.agency !== 'Family' && r.agency !== 'None'; }).indexOf(a) : -1;
-    g.font = '36px ' + FONT; g.fillStyle = C.lilac;
-    g.fillText(fit(g, [rk >= 0 ? '#' + (rk + 1) + ' ' + ldN : '', a.n + ' clients', a.nRec ? a.nRec + (a.nRec === 1 ? ' recruit' : ' recruits') : ''].filter(Boolean).join(' · '), lw - 20), x + 10, y + ns * 1.2 + 20);
-    var ty = y + ns * 1.2 + 60, th = Math.round((y + h - ty - 2 * gap) / 3), tw = Math.round((lw - 2 * gap) / 3);
+    g.font = '48px ' + FONT; g.fillStyle = C.teal;
+    g.fillText(fit(g, [rk >= 0 ? '#' + (rk + 1) + ' ' + ldN : '', a.n + ' clients', a.nRec ? a.nRec + (a.nRec === 1 ? ' recruit' : ' recruits') : ''].filter(Boolean).join(' · '), lw - 20), x + 10, y + 30);
+    var ty = y + 84, th = Math.round((y + h - ty - 2 * gap) / 3), tw = Math.round((lw - 2 * gap) / 3);
     var pc = function (v) { return v == null ? C.white : v >= 100 ? C.teal : C.down; }, ps = function (v) { return v == null ? '—' : String(v); };
     var T = [];
     if (pl.agencyP) T.push(['AGENCY+', ps(a.agencyP), pc(a.agencyP)]);
     if (pl.dealP) T.push(['DEAL+', ps(a.dealP), pc(a.dealP)]);
     if (pl.breakoutP) T.push(['BREAKOUT+', ps(a.breakoutP), pc(a.breakoutP)]);
-    T.push(['CLIENTS', String(a.n)], ['FV SUM', a.fv == null ? '—' : String(Math.round(a.fv))], ['TOP FV', a.fvTop == null ? '—' : String(Math.round(a.fvTop))],
-      ['ARK', a.ark == null ? '—' : a.ark.toFixed(1)], ['5-STAR+', String(a.ark5 || 0)], ['DRAFTED', String(a.pro || 0)]);
+    // sends: clients drafted with the agency signed before the draft process (from the 2027 drafts on), then the first-rounders
+    T.push(['DRAFTED', String(a.pro || 0)], ['1ST RD', String(a.pro1 || 0)], ['CLIENTS', String(a.n)], ['FV SUM', a.fv == null ? '—' : String(Math.round(a.fv))],
+      ['ARK', a.ark == null ? '—' : a.ark.toFixed(1)], ['5-STAR+', String(a.ark5 || 0)], ['TOP FV', a.fvTop == null ? '—' : String(Math.round(a.fvTop))]);
     T = T.slice(0, 9);
     T.forEach(function (t, i) { agTile(g, x + (i % 3) * (tw + gap), ty + Math.floor(i / 3) * (th + gap), tw, th, t[0], t[1], t[2]); });
     // right: the clients by FV
     var L = (D.clients || []).filter(function (c) { return c.agency === a.agency; }).sort(function (p, q) { return (q.fv || 0) - (p.fv || 0); });
     well(g, rx, y, rw, h);
-    var n = Math.min(L.length, 14), hh = 56, rh = n ? Math.min(78, Math.floor((h - hh - 24) / n)) : 78, fsz = Math.round(rh * 0.5);
+    var n = Math.min(L.length, L.length > 14 ? 13 : 14), hh = 56, rh = n ? Math.min(78, Math.floor((h - hh - 24) / n)) : 78, fsz = Math.round(rh * 0.5);
     var cols = [['PLAYER', rx + 30 + rh], ['POS', rx + rw * 0.50], ['TEAM', rx + rw * 0.64], ['FV', rx + rw - 90]];
     g.font = '28px ' + FONT; g.fillStyle = C.lilac;
     cols.forEach(function (c) { g.fillText(c[0], c[1], y + 36); });
@@ -5079,7 +5080,7 @@
         if (/^esea-/.test(mode || '')) { preview(canvas, pre + (btn.getAttribute('data-gfx-title') || mode).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
         if (mode === 'term') { preview(canvas, 'arkboard-process-' + (btn.hasAttribute('data-gfx-wide') ? 'wide-' : '') + ((JSON.parse(btn.getAttribute('data-gfx-term') || '{}').t) || 'term').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60)); return; }
         if (mode === 'rq') { preview(canvas, 'arkboard-research-' + ((JSON.parse(btn.getAttribute('data-gfx-rq') || '{}').id) || 'card').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 60)); return; }
-        var name = mode === 'class' ? 'arkboard-class-' + (canvas._name || 'school') : mode === 'depth' ? 'arkboard-depth-' + (((win.__dcTeam || {}).n) || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'perf' ? 'arkboard-arklist-' + ((win.__arkPerf || {}).sport || 'all').replace(/^college-/, '') + '-' + ((win.__arkPerf || {}).day || 'latest') : mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' || mode === 'bracket' || mode === 'pickem' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        var name = mode === 'class' ? 'arkboard-class-' + (canvas._name || 'school') : mode === 'agency' ? 'arkboard-agency-' + (canvas._name || 'agency') : mode === 'depth' ? 'arkboard-depth-' + (((win.__dcTeam || {}).n) || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'perf' ? 'arkboard-arklist-' + ((win.__arkPerf || {}).sport || 'all').replace(/^college-/, '') + '-' + ((win.__arkPerf || {}).day || 'latest') : mode === 'rank' ? (JSON.parse(win.getAttribute('data-gfx-rank') || '{}').name || 'arkboard-ark-top-25') : mode === 'cbbplan' ? 'arkboard-cbb-plan-' + (((window.__arkCbbBuilder || {}).current || {}).t || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'builder' ? 'arkboard-plan-' + ((window.__arkBuilder || {}).current || {}).team.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'coach' ? 'arkboard-coach-' + ((window.__arkCoaches || [])[+btn.getAttribute('data-gfx-i')] || {}).name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'pcard' ? 'arkboard-' + ((btn.closest('tr[class*="__detail"]').querySelector('.cfb__dhead b, b') || {}).textContent || 'player').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'team' ? 'arkboard-team-' + (btn.getAttribute('data-gfx-name') || 'team').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : mode === 'card' || mode === 'game' || mode === 'method' || mode === 'bracket' || mode === 'pickem' ? 'arkboard-' + (btn.getAttribute('data-gfx-name') || 'player').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') : pre + (btn.hasAttribute('data-gfx-top') ? (rowsWanted(win, btn) === ROWS_MAX && (btn.parentNode.querySelector('.gfx-rows select') || {}).value === 'all' ? 'all-' : 'top-' + rowsWanted(win, btn) + '-') : '') + txt(win.querySelector('.win__title-text')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
         preview(canvas, name);
       }
     } catch (err) {
