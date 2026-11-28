@@ -119,23 +119,24 @@
 
 {{- else -}}
 {{- $fa := eq $view "fa" -}}
+{{- $FX := index (site.Data.pro_fa | default dict) $lg | default dict -}}
 {{- $list := $D.players -}}
 {{- if $fa }}{{ $list = where (where $D.players "fa" true) "dead" "!=" 1 }}{{ $list = where $list "nr" "!=" 1 }}{{ end -}}
 {{- $key := "h0" -}}
 {{- $rows := slice }}{{ range $list }}{{ $h0 := 0.0 }}{{ with index .h 0 }}{{ $h0 = . }}{{ end }}{{ $x := -1.0 }}{{ with .x }}{{ $x = . }}{{ end }}{{ $rows = $rows | append (dict "p" . "h0" $h0 "x" $x) }}{{ end -}}
 {{- $rows = sort $rows (cond (and $fa (not $mls)) "x" "h0") "desc" -}}
 {{- $gc := "RK,Player,Cap hit,Pos,Team,Age,AAV,Yrs,Thru" -}}
-{{- if $fa }}{{ $gc = "RK,Player,xAAV,Pos,Team,Age,Status,Cap hit" }}{{ end }}{{ if $mls }}{{ $gc = "RK,Player,Gtd comp,Pos,Team,Base,g+" }}{{ end -}}
+{{- if $fa }}{{ $gc = "RK,Player,xAAV,xYrs,Pos,Team,Age,Status" }}{{ end }}{{ if $mls }}{{ $gc = "RK,Player,Gtd comp,Pos,Team,Base,g+" }}{{ end -}}
 {{- partial "wintable-open.html" (dict "title" ($.Get "title" | default (cond $fa "free agents" "contracts")) "icon" $icon "filter" (cond $mls "Team,Pos" "Team,Pos,Status") "rerank" true "tab" ($.Get "tab") "gfxCols" $gc "gfxDate" $date "gfxMax" "25" "class" "pay") -}}
 <table class="cfb__table pay__table pay__table--pl">
   <thead><tr>
     <th>RK</th><th>Player</th>
-    {{- if and $fa (not $mls) }}<th class="pay__k" data-term="XAAV" title="xAAV, $M: the AAV he would sign for as a free agent now, from position, age and last full season's play (the contract value model)">xAAV</th>{{ end }}
+    {{- if and $fa (not $mls) }}<th class="pay__k" data-term="XAAV" title="xAAV, $M: the AAV he would sign for as a free agent now, from position, age and last full season's play (the contract value model)">xAAV</th><th title="xYrs: the years his next deal is expected to run, from age, position and xAAV (held out: research/pro_term.json; NHL xTerm)">xYrs</th>{{ end }}
     <th class="{{ if not $fa }}pay__k{{ end }}" title="{{ if $mls }}guaranteed compensation, $M (MLSPA){{ else }}cap hit, {{ index $y 0 }}, $M{{ end }}">{{ if $mls }}Gtd comp{{ else }}Cap hit{{ end }}</th>
     <th>Pos</th><th>Team</th>{{ if not $mls }}<th>Age</th>{{ end }}
     {{- if not $mls }}<th title="free-agent status when the deal ends: UFA, RFA, ERFA; PO / TO / ETO = a player, team or early-termination option; FA = status not in the source">Status</th>{{ end }}
     {{- if and (not $fa) (not $mls) }}{{ range $j, $s := after 1 $y }}<th class="{{ if eq $j 0 }}cfb__g{{ end }}" title="cap hit, {{ $s }}, $M">{{ $s }}</th>{{ end }}{{ end }}
-    {{- if not $mls }}
+    {{- if and (not $mls) (not $fa) }}
     <th class="cfb__g" data-term="AAV" title="{{ if $nba }}mean salary of the years left, $M (Basketball-Reference shows the years left){{ else }}average annual value of the contract, $M{{ end }}">AAV</th>
     <th data-term="YRS" title="{{ if $nba }}years left, this season in{{ else }}contract length, years{{ end }}">Yrs</th>
     <th title="{{ if $nba }}salary left, $M{{ else }}total value of the contract, $M{{ end }}">Total</th>
@@ -150,19 +151,19 @@
   </tr></thead>
   <tbody>
   {{- range $i, $o := $rows }}{{ $p := $o.p }}
-  {{- $st := $p.st | default "" }}{{ if and $p.fa (not $st) }}{{ $st = "FA" }}{{ end }}{{ if and (not $p.fa) $p.opt }}{{ $st = index (split $p.opt " ") 0 }}{{ end -}}
+  {{- $fx := index $FX (string $p.id) | default dict }}{{ $st := $p.st | default "" }}{{ if and $p.fa (not $st) }}{{ $st = "FA" }}{{ end }}{{ if and $p.fa (eq $st "FA") $fx.s }}{{ $st = $fx.s }}{{ end }}{{ if and (not $p.fa) $p.opt }}{{ $st = index (split $p.opt " ") 0 }}{{ end -}}
   {{- $stt := "" }}{{ if $p.fa }}{{ $stt = printf "%s after %s" (cond (eq $st "FA") "free agent" $st) (index $y 0) }}{{ with $p.stx }}{{ $stt = printf "%s after %s" . (index $y 0) }}{{ end }}{{ end }}{{ with $p.opt }}{{ $stt = printf "%s%s%s option" $stt (cond (eq $stt "") "" "; ") (replace (replace (replace . "PO " "player ") "TO " "team ") "ETO " "early termination ") }}{{ end -}}
   <tr{{ if $p.dead }} class="pay__dead"{{ end }}>
     <td class="cfb__rk">{{ add $i 1 }}</td>
     <td><b>{{ $p.n }}</b>{{ if $p.fa }} <span class="pay__tag" title="{{ $stt }}">{{ $st }}</span>{{ end }}{{ with $p.ct }}{{ if not (in (slice "Extension" "UFA" "Drafted" "SFA" "Waiver Claim" "Practice Squad" "RFA" "ERFA" "Franchise Tag" "Trade" "Other" "Rookie" "Undrafted") .) }} <span class="cfb__dim">{{ . }}</span>{{ end }}{{ end }}{{ if $p.ltir }} <span class="cfb__dim" title="long-term injured reserve">LTIR</span>{{ end }}{{ if $p.nr }} <span class="cfb__dim" title="in the minors: not on the NHL cap unless buried over the limit">minors</span>{{ end }}</td>
-    {{- if and $fa (not $mls) }}<td class="cfb__num is-key pay__k" data-v="{{ $p.x }}">{{ with $p.x }}{{ printf "%.1f" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
+    {{- if and $fa (not $mls) }}<td class="cfb__num is-key pay__k" data-v="{{ $p.x }}">{{ with $p.x }}{{ printf "%.1f" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td><td class="cfb__num" data-v="{{ $fx.y }}">{{ with $fx.y }}{{ printf "%.1f" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>{{ end }}
     <td class="cfb__num{{ if not $fa }} is-key pay__k{{ end }}" data-v="{{ $o.h0 }}">{{ with index $p.h 0 }}{{ printf "%.2f" . }}{{ else }}<span class="cfb__dim">—</span>{{ end }}</td>
     <td>{{ $p.pos }}</td>
     <td class="cfb__team">{{ if $logo }}<img class="cfb__logo" src="/img/{{ $lg }}/{{ lower $p.tm }}.png" alt="" width="20" height="20" loading="lazy" onerror="this.remove()">{{ end }}<span>{{ $p.tm }}</span></td>
     {{- if not $mls }}<td class="cfb__num">{{ $p.age }}</td>{{ end }}
     {{- if not $mls }}<td{{ with $stt }} title="{{ . }}"{{ end }}>{{ $st }}</td>{{ end }}
     {{- if and (not $fa) (not $mls) }}{{ range $j, $v := after 1 $p.h }}{{ $o2 := "" }}{{ with $p.o }}{{ with index . (add $j 1) }}{{ $o2 = . }}{{ end }}{{ end }}<td class="cfb__num{{ if eq $j 0 }} cfb__g{{ end }}"{{ with $v }} data-v="{{ . }}"{{ end }}{{ with $o2 }} title="{{ . }}"{{ end }}>{{ with $v }}{{ printf "%.1f" . }}{{ with $o2 }}<span class="pay__opt">{{ . }}</span>{{ end }}{{ end }}</td>{{ end }}{{ end }}
-    {{- if not $mls }}
+    {{- if and (not $mls) (not $fa) }}
     <td class="cfb__num cfb__g" data-v="{{ $p.aav }}">{{ with $p.aav }}{{ printf "%.2f" . }}{{ end }}</td>
     <td class="cfb__num">{{ with $p.len }}{{ . }}{{ else }}{{ $p.left }}{{ end }}</td>
     <td class="cfb__num" data-v="{{ $p.tot }}">{{ with $p.tot }}{{ printf "%.1f" . }}{{ end }}</td>

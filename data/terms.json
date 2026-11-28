@@ -3524,13 +3524,66 @@
   },
   "Verdict": {
    "n": "Team builder verdict",
-   "d": "Extend, let walk, keep or trade, from the sign of his surplus over the next three seasons.",
+   "d": "Extend, let walk, keep or trade: whether his next three seasons beat the replacement his money buys at his position.",
    "g": "Pro team builder"
   },
   "Pick value": {
    "n": "Pick value",
    "d": "What a pick at that slot has returned over the cheap years at the price of a win, less its rookie pay.",
    "g": "Pro team builder"
+  },
+  "vs Repl": {
+   "n": "Versus replacement",
+   "d": "His projected value over the next three seasons less what the same money bought at his position, in dollars.",
+   "g": "Pro team builder",
+   "only": [
+    "nba",
+    "nfl",
+    "nhl"
+   ]
+  },
+  "Core": {
+   "n": "Core player",
+   "d": "Top two on his team and top 15% in the league in projected value, 31 or under; never traded or let go.",
+   "g": "Pro team builder",
+   "only": [
+    "nba",
+    "nfl",
+    "nhl"
+   ],
+   "part": false
+  },
+  "xYrs": {
+   "n": "Expected years",
+   "d": "How many years his next deal should run, from age, price and position.",
+   "g": "Pro team builder",
+   "only": [
+    "nba",
+    "nfl",
+    "nhl"
+   ]
+  },
+  "Mode": {
+   "n": "Team mode",
+   "d": "Now, window or rebuild, from the seasons his team's value under contract ranks in the league's top ten.",
+   "g": "Pro team builder",
+   "only": [
+    "nba",
+    "nfl",
+    "nhl"
+   ],
+   "part": false
+  },
+  "Fits": {
+   "n": "Trade fits",
+   "d": "The three teams with the biggest need at his position that can take his cap hit.",
+   "g": "Pro team builder",
+   "only": [
+    "nba",
+    "nfl",
+    "nhl"
+   ],
+   "part": false
   },
   "OVR": {
    "n": "Overall",
